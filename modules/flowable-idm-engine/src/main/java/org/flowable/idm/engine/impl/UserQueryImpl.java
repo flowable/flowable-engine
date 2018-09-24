@@ -15,10 +15,10 @@ package org.flowable.idm.engine.impl;
 
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.AbstractQuery;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.AbstractQuery;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
 import org.flowable.idm.api.UserQueryProperty;
@@ -41,6 +41,9 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
     protected String lastNameLikeIgnoreCase;
     protected String fullNameLike;
     protected String fullNameLikeIgnoreCase;
+    protected String displayName;
+    protected String displayNameLike;
+    protected String displayNameLikeIgnoreCase;
     protected String email;
     protected String emailLike;
     protected String groupId;
@@ -154,6 +157,33 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
             throw new FlowableIllegalArgumentException("Provided full name is null");
         }
         this.fullNameLikeIgnoreCase = fullNameLikeIgnoreCase.toLowerCase();
+        return this;
+    }
+    
+    @Override
+    public UserQuery userDisplayName(String displayName) {
+        if (displayName == null) {
+            throw new FlowableIllegalArgumentException("Provided display name is null");
+        }
+        this.displayName = displayName;
+        return this;
+    }
+
+    @Override
+    public UserQuery userDisplayNameLike(String displayNameLike) {
+        if (displayNameLike == null) {
+            throw new FlowableIllegalArgumentException("Provided display name is null");
+        }
+        this.displayNameLike = displayNameLike;
+        return this;
+    }
+
+    @Override
+    public UserQuery userDisplayNameLikeIgnoreCase(String displayNameLikeIgnoreCase) {
+        if (displayNameLikeIgnoreCase == null) {
+            throw new FlowableIllegalArgumentException("Provided display name is null");
+        }
+        this.displayNameLikeIgnoreCase = displayNameLikeIgnoreCase.toLowerCase();
         return this;
     }
 

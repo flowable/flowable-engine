@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -27,14 +26,14 @@ import java.util.Map;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.impl.identity.Authentication;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcher;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.impl.ExecutionQueryImpl;
@@ -54,7 +53,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.identitylink.service.IdentityLinkService;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.IdentityLinksByProcessInstanceMatcher;
 import org.flowable.job.service.JobService;
@@ -626,12 +625,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         if (childExecutions != null && childExecutions.size() > 0) {
 
             // Have a fixed ordering of child executions (important for the order in which events are sent)
-            Collections.sort(childExecutions, new Comparator<ExecutionEntity>() {
-                @Override
-                public int compare(ExecutionEntity e1, ExecutionEntity e2) {
-                    return e1.getStartTime().compareTo(e2.getStartTime());
-                }
-            });
+            Collections.sort(childExecutions, ExecutionEntity.EXECUTION_ENTITY_START_TIME_ASC_COMPARATOR);
 
             for (ExecutionEntity childExecution : childExecutions) {
                 if (!executionIdsToExclude.contains(childExecution.getId())) {

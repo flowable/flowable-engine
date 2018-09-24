@@ -47,13 +47,19 @@
           case "specfile/dmn/flowable.json":
               api = "dmn";
               break;
+          case "specfile/cmmn/flowable.json":
+              api = "cmmn";
+              break;
           case "specfile/form/flowable.json":
               api = "form";
               break;
           case "specfile/content/flowable.json":
               api = "content";
               break;
-        }
+          case "specfile/app/flowable.json":
+              api = "app";
+              break;
+      }
 
         if (!api) {
             window.location.search = window.location.search.replace(url, "specfile/process/flowable.json");
@@ -111,11 +117,17 @@
               case "dmn":
                   specFile = "specfile/dmn/flowable.json";
                   break;
+              case "cmmn":
+                  specFile = "specfile/cmmn/flowable.json";
+                  break;
               case "form":
                   specFile = "specfile/form/flowable.json";
                   break;
               case "content":
                   specFile = "specfile/content/flowable.json";
+                  break;
+              case "app":
+                  specFile = "specfile/app/flowable.json";
                   break;
           }
 
@@ -141,8 +153,10 @@
           <option value="process">Process</option>
           <option value="idm">IDM</option>
           <option value="dmn">DMN</option>
+          <option value="cmmn">CMMN</option>
           <option value="form">Form</option>
           <option value="content">Content</option>
+          <option value="app">App</option>
         </select>
       </div>
   </div>

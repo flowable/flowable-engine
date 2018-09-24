@@ -27,23 +27,24 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityMana
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.TableDataManager;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentService;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
 import org.flowable.dmn.api.DmnRuleService;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.db.DbSqlSession;
-import org.flowable.engine.common.impl.el.ExpressionManager;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
@@ -51,9 +52,10 @@ import org.flowable.form.api.FormService;
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
+import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
-import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.task.service.HistoricTaskService;
+import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.variable.service.HistoricVariableService;
@@ -184,6 +186,14 @@ public class CommandContextUtil {
         return getCmmnEngineConfiguration(commandContext).getHistoricMilestoneInstanceEntityManager();
     }
 
+    public static HistoricPlanItemInstanceEntityManager getHistoricPlanItemInstanceEntityManager() {
+        return getHistoricPlanItemInstanceEntityManager(getCommandContext());
+    }
+
+    public static HistoricPlanItemInstanceEntityManager getHistoricPlanItemInstanceEntityManager(CommandContext commandContext) {
+        return getCmmnEngineConfiguration(commandContext).getHistoricPlanItemInstanceEntityManager();
+    }
+
     public static TableDataManager getTableDataManager() {
         return getTableDataManager(getCommandContext());
     }
@@ -280,17 +290,17 @@ public class CommandContextUtil {
     
     // IDM ENGINE
 
-    public static IdmEngineConfiguration getIdmEngineConfiguration() {
+    public static IdmEngineConfigurationApi getIdmEngineConfiguration() {
         return getIdmEngineConfiguration(getCommandContext());
     }
 
-    public static IdmEngineConfiguration getIdmEngineConfiguration(CommandContext commandContext) {
-        return (IdmEngineConfiguration) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
+    public static IdmEngineConfigurationApi getIdmEngineConfiguration(CommandContext commandContext) {
+        return (IdmEngineConfigurationApi) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
     }
 
     public static IdmIdentityService getIdmIdentityService() {
         IdmIdentityService identityService = null;
-        IdmEngineConfiguration idmEngineConfiguration = getIdmEngineConfiguration();
+        IdmEngineConfigurationApi idmEngineConfiguration = getIdmEngineConfiguration();
         if (idmEngineConfiguration != null) {
             identityService = idmEngineConfiguration.getIdmIdentityService();
         }
@@ -427,6 +437,14 @@ public class CommandContextUtil {
             throw new FlowableException("Dmn engine is not configured");
         }
         return dmnEngineConfiguration.getDmnRuleService();
+    }
+
+    public static InternalTaskAssignmentManager getInternalTaskAssignmentManager(CommandContext commandContext) {
+        return getCmmnEngineConfiguration(commandContext).getTaskServiceConfiguration().getInternalTaskAssignmentManager();
+    }
+
+    public static InternalTaskAssignmentManager getInternalTaskAssignmentManager() {
+        return getInternalTaskAssignmentManager(getCommandContext());
     }
 
 }

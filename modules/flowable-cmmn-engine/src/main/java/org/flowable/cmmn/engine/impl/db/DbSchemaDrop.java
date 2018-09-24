@@ -20,15 +20,15 @@ import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author Tijs Rademakwrs
+ * @author Tijs Rademakers
  */
 public class DbSchemaDrop {
     
@@ -42,7 +42,7 @@ public class DbSchemaDrop {
             commandExecutor.execute(config, new Command<Object>() {
                 @Override
                 public Object execute(CommandContext commandContext) {
-                    CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDbSchemaManager().dbSchemaDrop();
+                    CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDbSchemaManager().schemaDrop();
                     return null;
                 }
             });

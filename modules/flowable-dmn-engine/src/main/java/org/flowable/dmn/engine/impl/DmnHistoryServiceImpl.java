@@ -12,14 +12,16 @@
  */
 package org.flowable.dmn.engine.impl;
 
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.dmn.api.DmnHistoricDecisionExecutionQuery;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.NativeHistoricDecisionExecutionQuery;
+import org.flowable.dmn.engine.DmnEngineConfiguration;
 
 /**
  * @author Tijs Rademakers
  */
-public class DmnHistoryServiceImpl extends ServiceImpl implements DmnHistoryService {
+public class DmnHistoryServiceImpl extends CommonEngineServiceImpl<DmnEngineConfiguration> implements DmnHistoryService {
 
     @Override
     public DmnHistoricDecisionExecutionQuery createHistoricDecisionExecutionQuery() {

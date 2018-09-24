@@ -25,7 +25,7 @@ import java.util.List;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -116,7 +116,7 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
     @Test
     public void testQueryByEmptyDeploymentIds() {
         try {
-            cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<String>()).list();
+            cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>()).list();
             fail();
         } catch (FlowableIllegalArgumentException e) {
         }
@@ -166,7 +166,7 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
     @Test
     public void testQueryByEmptyCaseDefinitionIds() {
         try {
-            cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionIds(new HashSet<String>()).list();
+            cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionIds(new HashSet<>()).list();
             fail();
         } catch (FlowableIllegalArgumentException e) {
         }

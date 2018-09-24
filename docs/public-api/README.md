@@ -1,6 +1,6 @@
 # Flowable Rest API Documentation
 
-This project contains all informations & tooling about Flowable Public Rest API.
+This project contains information and tooling about Flowable Public Rest API.
 
 ## Introduction
 

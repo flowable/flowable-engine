@@ -12,8 +12,8 @@
  */
 package org.flowable.engine.impl.scripting;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.scripting.ScriptingEngines;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.Condition;
 import org.flowable.engine.impl.util.CommandContextUtil;

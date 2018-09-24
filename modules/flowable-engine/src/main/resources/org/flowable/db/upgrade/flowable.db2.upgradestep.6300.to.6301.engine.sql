@@ -12,4 +12,4 @@ alter table ACT_RE_PROCDEF
     add constraint ACT_UNIQ_PROCDEF
     unique (KEY_,VERSION_, DERIVED_VERSION_, TENANT_ID_);
 
-update ACT_GE_PROPERTY set VALUE_ = '6.3.0.' where NAME_ = 'schema.version';
+update ACT_GE_PROPERTY set VALUE_ = '6.3.0.1' where NAME_ = 'schema.version';

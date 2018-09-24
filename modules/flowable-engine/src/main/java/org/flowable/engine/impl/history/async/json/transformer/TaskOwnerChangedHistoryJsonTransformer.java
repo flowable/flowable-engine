@@ -12,11 +12,14 @@
  */
 package org.flowable.engine.impl.history.async.json.transformer;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDateFromJson;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
+
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 

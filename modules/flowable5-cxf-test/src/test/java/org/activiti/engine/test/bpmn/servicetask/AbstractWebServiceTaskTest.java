@@ -12,13 +12,13 @@
  */
 package org.activiti.engine.test.bpmn.servicetask;
 
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.webservice.WebServiceMock;
 import org.activiti.engine.impl.webservice.WebServiceMockImpl;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
-import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 
 /**
  * @author Esteban Robles Luna

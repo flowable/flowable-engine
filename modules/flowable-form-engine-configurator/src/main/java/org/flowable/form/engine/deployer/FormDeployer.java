@@ -14,9 +14,9 @@ package org.flowable.form.engine.deployer;
 
 import java.util.Map;
 
-import org.flowable.engine.common.api.repository.EngineDeployment;
-import org.flowable.engine.common.api.repository.EngineResource;
-import org.flowable.engine.common.impl.EngineDeployer;
+import org.flowable.common.engine.api.repository.EngineDeployment;
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.form.api.FormDeploymentBuilder;
 import org.flowable.form.api.FormRepositoryService;
@@ -45,7 +45,7 @@ public class FormDeployer implements EngineDeployer {
                 LOGGER.info("FormDeployer: processing resource {}", resourceName);
                 if (formDeploymentBuilder == null) {
                     FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService();
-                    formDeploymentBuilder = formRepositoryService.createDeployment();
+                    formDeploymentBuilder = formRepositoryService.createDeployment().name(deployment.getName());
                 }
 
                 formDeploymentBuilder.addFormBytes(resourceName, resources.get(resourceName).getBytes());

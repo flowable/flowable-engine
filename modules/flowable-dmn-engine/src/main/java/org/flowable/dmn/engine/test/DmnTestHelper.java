@@ -19,18 +19,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.db.SchemaManager;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.deployer.DmnResourceUtil;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.db.DbSchemaManager;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,6 +75,22 @@ public abstract class DmnTestHelper {
             deploymentId = deployResourceFromAnnotation(dmnEngine, testClass, methodName, method, deploymentAnnotation2.resources());
         }
 
+        return deploymentId;
+    }
+
+    public static String annotationDeploymentSetUp(DmnEngine dmnEngine, Class<?> testClass, Method method, DmnDeployment dmnDeploymentAnnotation) {
+        String deploymentId = null;
+        if (dmnDeploymentAnnotation != null) {
+            deploymentId = deployResourceFromAnnotation(dmnEngine, testClass, method.getName(), method, dmnDeploymentAnnotation.resources());
+        }
+        return deploymentId;
+    }
+
+    public static String annotationDeploymentSetUp(DmnEngine dmnEngine, Class<?> testClass, Method method, DmnDeploymentAnnotation dmnDeploymentAnnotation) {
+        String deploymentId = null;
+        if (dmnDeploymentAnnotation != null) {
+            deploymentId = deployResourceFromAnnotation(dmnEngine, testClass, method.getName(), method, dmnDeploymentAnnotation.resources());
+        }
         return deploymentId;
     }
 
@@ -179,9 +195,9 @@ public abstract class DmnTestHelper {
             commandExecutor.execute(config, new Command<Object>() {
                 @Override
                 public Object execute(CommandContext commandContext) {
-                    DbSchemaManager dbSchemaManager = CommandContextUtil.getDmnEngineConfiguration().getDbSchemaManager();
-                    dbSchemaManager.dbSchemaDrop();
-                    dbSchemaManager.dbSchemaCreate();
+                    SchemaManager dbSchemaManager = CommandContextUtil.getDmnEngineConfiguration().getDbSchemaManager();
+                    dbSchemaManager.schemaDrop();
+                    dbSchemaManager.schemaCreate();
                     return null;
                 }
             });

@@ -20,6 +20,7 @@ import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.junit.jupiter.api.Test;
 
 /**
  * 
@@ -74,6 +75,7 @@ public class ServiceTaskVariablesTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testSerializedVariablesBothAsync() {
 
@@ -94,6 +96,7 @@ public class ServiceTaskVariablesTest extends PluggableFlowableTestCase {
         assertTrue(isOkInDelegate3);
     }
 
+    @Test
     @Deployment
     public void testSerializedVariablesThirdAsync() {
 

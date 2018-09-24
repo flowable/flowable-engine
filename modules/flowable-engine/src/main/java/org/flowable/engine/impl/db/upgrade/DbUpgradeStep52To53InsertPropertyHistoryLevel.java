@@ -13,7 +13,7 @@
 
 package org.flowable.engine.impl.db.upgrade;
 
-import org.flowable.engine.common.impl.db.DbUpgradeStep;
+import org.flowable.common.engine.impl.db.DbUpgradeStep;
 
 /**
  * @author Tom Baeyens

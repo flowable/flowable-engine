@@ -12,10 +12,10 @@
  */
 package org.flowable.engine.impl.cfg.multitenant;
 
+import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.impl.cfg.multitenant.TenantInfoHolder;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.db.ProcessDbSchemaManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -40,7 +40,7 @@ public class ExecuteSchemaOperationCommand implements Command<Void> {
         ProcessDbSchemaManager processDbSchemaManager = (ProcessDbSchemaManager) CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager();
         if (ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE.equals(schemaOperation)) {
             try {
-                processDbSchemaManager.dbSchemaDrop();
+                processDbSchemaManager.schemaDrop();
             } catch (RuntimeException e) {
                 // ignore
             }
@@ -48,13 +48,13 @@ public class ExecuteSchemaOperationCommand implements Command<Void> {
         if (org.flowable.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(schemaOperation)
                 || ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE.equals(schemaOperation)
                 || ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_CREATE.equals(schemaOperation)) {
-            processDbSchemaManager.dbSchemaCreate();
+            processDbSchemaManager.schemaCreate();
 
         } else if (org.flowable.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE.equals(schemaOperation)) {
-            processDbSchemaManager.dbSchemaCheckVersion();
+            processDbSchemaManager.schemaCheckVersion();
 
         } else if (ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE.equals(schemaOperation)) {
-            processDbSchemaManager.dbSchemaUpdate();
+            processDbSchemaManager.schemaUpdate();
         }
 
         return null;

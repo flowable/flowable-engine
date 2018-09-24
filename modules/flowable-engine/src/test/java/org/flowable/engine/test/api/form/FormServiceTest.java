@@ -21,10 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.form.FormProperty;
 import org.flowable.engine.form.StartFormData;
 import org.flowable.engine.form.TaskFormData;
@@ -32,6 +32,8 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.engine.test.DeploymentId;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -41,6 +43,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class FormServiceTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/taskforms/VacationRequest_deprecated_forms.bpmn20.xml", "org/flowable/examples/taskforms/approve.form",
             "org/flowable/examples/taskforms/request.form", "org/flowable/examples/taskforms/adjustRequest.form" })
     public void testGetStartFormByProcessDefinitionId() {
@@ -52,6 +55,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         assertNotNull(startForm);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testGetStartFormByProcessDefinitionIdWithoutStartform() {
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
@@ -62,6 +66,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         assertNull(startForm);
     }
 
+    @Test
     public void testGetStartFormByKeyNullKey() {
         try {
             formService.getRenderedStartForm(null);
@@ -71,6 +76,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testGetStartFormByIdNullId() {
         try {
             formService.getRenderedStartForm(null);
@@ -80,6 +86,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testGetStartFormByIdUnexistingProcessDefinitionId() {
         try {
             formService.getRenderedStartForm("unexistingId");
@@ -90,6 +97,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testGetTaskFormNullTaskId() {
         try {
             formService.getRenderedTaskForm(null);
@@ -99,6 +107,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testGetTaskFormUnexistingTaskId() {
         try {
             formService.getRenderedTaskForm("unexistingtask");
@@ -109,8 +118,9 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/form/FormsProcess.bpmn20.xml", "org/flowable/engine/test/api/form/start.form", "org/flowable/engine/test/api/form/task.form" })
-    public void testTaskFormPropertyDefaultsAndFormRendering() {
+    public void testTaskFormPropertyDefaultsAndFormRendering(@DeploymentId String deploymentIdFromDeploymentAnnotation) {
         String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
         StartFormData startForm = formService.getStartFormData(procDefId);
         assertNotNull(startForm);
@@ -156,6 +166,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         assertEquals(expectedVariables, variables);
     }
 
+    @Test
     @Deployment
     public void testFormPropertyHandling() {
         Map<String, String> properties = new HashMap<>();
@@ -215,7 +226,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         assertEquals(6, formProperties.size());
 
         try {
-            formService.submitTaskFormData(taskId, new HashMap<String, String>());
+            formService.submitTaskFormData(taskId, new HashMap<>());
             fail("expected exception about required form property 'street'");
         } catch (FlowableException e) {
             // OK
@@ -247,6 +258,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         assertEquals(expectedVariables, variables);
     }
 
+    @Test
     @Deployment
     public void testFormPropertyExpression() {
         Map<String, Object> varMap = new HashMap<>();
@@ -276,6 +288,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
     }
 
     @SuppressWarnings("unchecked")
+    @Test
     @Deployment
     public void testFormPropertyDetails() {
         String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
@@ -322,6 +335,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         assertEquals(expectedValues, values);
     }
 
+    @Test
     @Deployment
     public void testInvalidFormKeyReference() {
         try {
@@ -332,6 +346,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testSubmitStartFormDataWithBusinessKey() {
         Map<String, String> properties = new HashMap<>();
@@ -345,6 +360,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("123").singleResult().getId());
     }
 
+    @Test
     public void testGetStartFormKeyEmptyArgument() {
         try {
             formService.getStartFormKey(null);
@@ -361,6 +377,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/form/FormsProcess.bpmn20.xml")
     public void testGetStartFormKey() {
         String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
@@ -369,6 +386,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         assertEquals(expectedFormKey, actualFormKey);
     }
 
+    @Test
     public void testGetTaskFormKeyEmptyArguments() {
         try {
             formService.getTaskFormKey(null, "23");
@@ -399,6 +417,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/form/FormsProcess.bpmn20.xml")
     public void testGetTaskFormKey() {
         String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
@@ -410,6 +429,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         assertEquals(expectedFormKey, actualFormKey);
     }
 
+    @Test
     @Deployment
     public void testGetTaskFormKeyWithExpression() {
         runtimeService.startProcessInstanceByKey("FormsProcess", CollectionUtil.singletonMap("dynamicKey", "test"));
@@ -418,6 +438,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         assertEquals("test", formService.getTaskFormData(task.getId()).getFormKey());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testSubmitTaskFormData() {
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
@@ -440,6 +461,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testSaveFormData() {
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();

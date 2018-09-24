@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
@@ -27,12 +27,14 @@ import org.flowable.job.service.impl.asyncexecutor.ResetExpiredJobsCmd;
 import org.flowable.job.service.impl.cmd.AcquireJobsCmd;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testResetExpiredJobs() {
 
@@ -98,6 +100,7 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
         }
     }
     
+    @Test
     @Deployment
     public void testResetExpiredJobTimeout() {
         Date startOfTestTime = new Date();

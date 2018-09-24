@@ -16,8 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -26,6 +26,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.job.api.Job;
+import org.junit.jupiter.api.Test;
 
 /**
  * These are the first tests ever written for Flowable 6. Keeping them here for nostalgic reasons.
@@ -34,6 +35,7 @@ import org.flowable.job.api.Job;
  */
 public class Flowable6Test extends PluggableFlowableTestCase {
 
+    @Test
     public void testSimplestProcessPossible() {
         repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/v6/Flowable6Test.simplestProcessPossible.bpmn20.xml").deploy();
 
@@ -47,6 +49,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @org.flowable.engine.test.Deployment
     public void testOneTaskProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -60,6 +63,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
     }
 
+    @Test
     @org.flowable.engine.test.Deployment(resources = "org/flowable/engine/test/api/v6/Flowable6Test.testOneTaskProcess.bpmn20.xml")
     public void testOneTaskProcessCleanupInMiddleOfProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -71,6 +75,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertEquals("kermit", task.getAssignee());
     }
 
+    @Test
     @org.flowable.engine.test.Deployment
     public void testSimpleParallelGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelGateway");
@@ -89,6 +94,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     }
 
+    @Test
     @org.flowable.engine.test.Deployment
     public void testSimpleNestedParallelGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelGateway");
@@ -112,6 +118,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
     /*
      * This fails on Activiti 5
      */
+    @Test
     @org.flowable.engine.test.Deployment
     public void testLongServiceTaskLoop() {
         int maxCount = 3210; // You can make this as big as you want (as long as it still fits within transaction timeouts).
@@ -132,6 +139,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @org.flowable.engine.test.Deployment
     public void testScriptTask() {
         Map<String, Object> variableMap = new HashMap<>();
@@ -152,6 +160,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult());
     }
 
+    @Test
     @org.flowable.engine.test.Deployment
     public void testSimpleTimerBoundaryEvent() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleBoundaryTimer");
@@ -169,6 +178,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createExecutionQuery().count());
     }
 
+    @Test
     @org.flowable.engine.test.Deployment
     public void testSimpleTimerBoundaryEventTimerDoesNotFire() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleBoundaryTimer");
@@ -185,6 +195,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createExecutionQuery().count());
     }
 
+    @Test
     @org.flowable.engine.test.Deployment
     public void testSimpleNonInterruptingTimerBoundaryEvent() {
 
@@ -225,6 +236,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createExecutionQuery().count());
     }
 
+    @Test
     @org.flowable.engine.test.Deployment
     public void testConditionsWithoutExclusiveGateway() {
 
@@ -274,6 +286,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @org.flowable.engine.test.Deployment
     public void testNonInterruptingMoreComplex() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nonInterruptingTimer");
@@ -325,6 +338,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createExecutionQuery().count());
     }
 
+    @Test
     @org.flowable.engine.test.Deployment
     public void testNonInterruptingMoreComplex2() {
 
@@ -415,6 +429,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
     /**
      * Based on the process and use cases described in http://www.bp-3.com/blogs/2013/09/joins-and-ibm-bpm-diving-deeper/
      */
+    @Test
     @org.flowable.engine.test.Deployment
     public void testInclusiveTrickyMerge() {
 
@@ -482,6 +497,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
     /**
      * Simple test that checks if all databases have correctly added the process definition tag.
      */
+    @Test
     @org.flowable.engine.test.Deployment(resources = "org/flowable/engine/test/api/v6/Flowable6Test.testOneTaskProcess.bpmn20.xml")
     public void testProcessDefinitionTagCreated() {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();

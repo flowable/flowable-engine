@@ -15,12 +15,12 @@ package org.flowable.dmn.engine.impl.deployer;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.dmn.engine.impl.parser.DmnParse;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnDefinition;
-import org.flowable.engine.common.api.repository.EngineResource;
 
 /**
  * An intermediate representation of a DeploymentEntity which keeps track of all of the entity's DecisionTableEntities and resources and processes associated with each

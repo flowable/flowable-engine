@@ -20,18 +20,19 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
 import org.flowable.common.rest.util.RestUrlBuilder;
 import org.flowable.common.rest.variable.BooleanRestVariableConverter;
 import org.flowable.common.rest.variable.DateRestVariableConverter;
 import org.flowable.common.rest.variable.DoubleRestVariableConverter;
 import org.flowable.common.rest.variable.IntegerRestVariableConverter;
+import org.flowable.common.rest.variable.JsonObjectRestVariableConverter;
 import org.flowable.common.rest.variable.LongRestVariableConverter;
 import org.flowable.common.rest.variable.RestVariableConverter;
 import org.flowable.common.rest.variable.ShortRestVariableConverter;
 import org.flowable.common.rest.variable.StringRestVariableConverter;
 import org.flowable.dmn.api.DmnDecisionTable;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.form.FormData;
 import org.flowable.engine.form.FormProperty;
 import org.flowable.engine.form.StartFormData;
@@ -93,6 +94,8 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * Default implementation of a {@link RestResponseFactory}.
  * 
@@ -116,9 +119,11 @@ public class RestResponseFactory {
     public static final String BYTE_ARRAY_VARIABLE_TYPE = "binary";
     public static final String SERIALIZABLE_VARIABLE_TYPE = "serializable";
 
+    protected ObjectMapper objectMapper;
     protected List<RestVariableConverter> variableConverters = new ArrayList<>();
 
-    public RestResponseFactory() {
+    public RestResponseFactory(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
         initializeVariableConverters();
     }
 
@@ -548,13 +553,18 @@ public class RestResponseFactory {
     public ProcessInstanceResponse createProcessInstanceResponse(ProcessInstance processInstance, RestUrlBuilder urlBuilder) {
         ProcessInstanceResponse result = new ProcessInstanceResponse();
         result.setActivityId(processInstance.getActivityId());
+        result.setStartedBy(processInstance.getStartUserId());
+        result.setStarted(processInstance.getStartTime());
         result.setBusinessKey(processInstance.getBusinessKey());
         result.setId(processInstance.getId());
+        result.setName(processInstance.getName());
         result.setProcessDefinitionId(processInstance.getProcessDefinitionId());
         result.setProcessDefinitionUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION, processInstance.getProcessDefinitionId()));
         result.setEnded(processInstance.isEnded());
         result.setSuspended(processInstance.isSuspended());
         result.setUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId()));
+        result.setCallbackId(processInstance.getCallbackId());
+        result.setCallbackType(processInstance.getCallbackType());
         result.setTenantId(processInstance.getTenantId());
 
         // Added by Ryan Johnston
@@ -583,13 +593,18 @@ public class RestResponseFactory {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         ProcessInstanceResponse result = new ProcessInstanceResponse();
         result.setActivityId(processInstance.getActivityId());
+        result.setStartedBy(processInstance.getStartUserId());
+        result.setStarted(processInstance.getStartTime());
         result.setBusinessKey(processInstance.getBusinessKey());
         result.setId(processInstance.getId());
+        result.setName(processInstance.getName());
         result.setProcessDefinitionId(processInstance.getProcessDefinitionId());
         result.setProcessDefinitionUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION, processInstance.getProcessDefinitionId()));
         result.setEnded(processInstance.isEnded());
         result.setSuspended(processInstance.isSuspended());
         result.setUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId()));
+        result.setCallbackId(processInstance.getCallbackId());
+        result.setCallbackType(processInstance.getCallbackType());
         result.setTenantId(processInstance.getTenantId());
 
         // Added by Ryan Johnston
@@ -726,7 +741,6 @@ public class RestResponseFactory {
         return createHistoricProcessInstanceResponse(processInstance, createUrlBuilder());
     }
 
-    @SuppressWarnings("deprecation")
     public HistoricProcessInstanceResponse createHistoricProcessInstanceResponse(HistoricProcessInstance processInstance, RestUrlBuilder urlBuilder) {
         HistoricProcessInstanceResponse result = new HistoricProcessInstanceResponse();
         result.setBusinessKey(processInstance.getBusinessKey());
@@ -735,6 +749,7 @@ public class RestResponseFactory {
         result.setEndActivityId(processInstance.getEndActivityId());
         result.setEndTime(processInstance.getEndTime());
         result.setId(processInstance.getId());
+        result.setName(processInstance.getName());
         result.setProcessDefinitionId(processInstance.getProcessDefinitionId());
         result.setProcessDefinitionUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION, processInstance.getProcessDefinitionId()));
         result.setStartActivityId(processInstance.getStartActivityId());
@@ -748,6 +763,8 @@ public class RestResponseFactory {
                 result.addVariable(createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, processInstance.getId(), VARIABLE_HISTORY_PROCESS, false, urlBuilder));
             }
         }
+        result.setCallbackId(processInstance.getCallbackId());
+        result.setCallbackType(processInstance.getCallbackType());
         result.setTenantId(processInstance.getTenantId());
         return result;
     }
@@ -782,6 +799,9 @@ public class RestResponseFactory {
         result.setParentTaskId(taskInstance.getParentTaskId());
         result.setPriority(taskInstance.getPriority());
         result.setProcessDefinitionId(taskInstance.getProcessDefinitionId());
+        result.setScopeDefinitionId(taskInstance.getScopeDefinitionId());
+        result.setScopeId(taskInstance.getScopeId());
+        result.setScopeType(taskInstance.getScopeType());
         result.setTenantId(taskInstance.getTenantId());
         result.setCategory(taskInstance.getCategory());
         if (taskInstance.getProcessDefinitionId() != null) {
@@ -1045,6 +1065,10 @@ public class RestResponseFactory {
         return response;
     }
 
+    public List<UserResponse> createUserResponseList(List<User> users) {
+        return createUserResponseList(users, false);
+    }
+
     public List<UserResponse> createUserResponseList(List<User> users, boolean incudePassword) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         List<UserResponse> responseList = new ArrayList<>();
@@ -1062,6 +1086,7 @@ public class RestResponseFactory {
         UserResponse response = new UserResponse();
         response.setFirstName(user.getFirstName());
         response.setLastName(user.getLastName());
+        response.setDisplayName(user.getDisplayName());
         response.setId(user.getId());
         response.setEmail(user.getEmail());
         response.setUrl(urlBuilder.buildUrl(RestUrls.URL_USER, user.getId()));
@@ -1233,6 +1258,7 @@ public class RestResponseFactory {
         variableConverters.add(new DoubleRestVariableConverter());
         variableConverters.add(new BooleanRestVariableConverter());
         variableConverters.add(new DateRestVariableConverter());
+        variableConverters.add(new JsonObjectRestVariableConverter(objectMapper));
     }
 
     protected String formatUrl(String serverRootUrl, String[] fragments, Object... arguments) {

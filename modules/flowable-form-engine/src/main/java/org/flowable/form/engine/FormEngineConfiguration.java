@@ -15,26 +15,21 @@ package org.flowable.form.engine;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
+import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
+import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
+import org.flowable.common.engine.impl.el.DefaultExpressionManager;
+import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
+import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.editor.form.converter.FormJsonConverter;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.AbstractEngineConfiguration;
-import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
-import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
-import org.flowable.engine.common.impl.el.DefaultExpressionManager;
-import org.flowable.engine.common.impl.el.ExpressionManager;
-import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.engine.common.impl.interceptor.SessionFactory;
-import org.flowable.engine.common.impl.persistence.GenericManagerFactory;
-import org.flowable.engine.common.impl.persistence.cache.EntityCache;
-import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
-import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
-import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
@@ -43,9 +38,9 @@ import org.flowable.form.engine.impl.FormEngineImpl;
 import org.flowable.form.engine.impl.FormManagementServiceImpl;
 import org.flowable.form.engine.impl.FormRepositoryServiceImpl;
 import org.flowable.form.engine.impl.FormServiceImpl;
-import org.flowable.form.engine.impl.ServiceImpl;
 import org.flowable.form.engine.impl.cfg.StandaloneFormEngineConfiguration;
 import org.flowable.form.engine.impl.cfg.StandaloneInMemFormEngineConfiguration;
+import org.flowable.form.engine.impl.cmd.SchemaOperationsFormEngineBuild;
 import org.flowable.form.engine.impl.db.EntityDependencyOrder;
 import org.flowable.form.engine.impl.db.FormDbSchemaManager;
 import org.flowable.form.engine.impl.deployer.CachingAndArtifactsManager;
@@ -84,9 +79,11 @@ import liquibase.database.Database;
 import liquibase.database.DatabaseConnection;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
+import liquibase.exception.DatabaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
-public class FormEngineConfiguration extends AbstractEngineConfiguration implements FormEngineConfigurationApi {
+public class FormEngineConfiguration extends AbstractEngineConfiguration
+        implements FormEngineConfigurationApi, HasExpressionManagerEngineConfiguration {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(FormEngineConfiguration.class);
 
@@ -99,9 +96,9 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
     // SERVICES
     // /////////////////////////////////////////////////////////////////
 
-    protected FormManagementService formManagementService = new FormManagementServiceImpl();
-    protected FormRepositoryService formRepositoryService = new FormRepositoryServiceImpl();
-    protected FormService formService = new FormServiceImpl();
+    protected FormManagementService formManagementService = new FormManagementServiceImpl(this);
+    protected FormRepositoryService formRepositoryService = new FormRepositoryServiceImpl(this);
+    protected FormService formService = new FormServiceImpl(this);
 
     // DATA MANAGERS ///////////////////////////////////////////////////
 
@@ -179,6 +176,9 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
     // /////////////////////////////////////////////////////////////////////
 
     protected void init() {
+        initEngineConfigurations();
+        initConfigurators();
+        configuratorsBeforeInit();
         initExpressionManager();
         initCommandContextFactory();
         initTransactionContextFactory();
@@ -187,8 +187,11 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
 
         if (usingRelationalDatabase) {
             initDataSource();
-            initDbSchemaManager();
-            initDbSchema();
+        }
+        
+        if (usingRelationalDatabase || usingSchemaMgmt) {
+            initSchemaManager();
+            initSchemaManagementCommand();
         }
 
         initBeans();
@@ -200,6 +203,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
 
         initSessionFactories();
         initServices();
+        configuratorsAfterInit();
         initDataManagers();
         initEntityManagers();
         initDeployers();
@@ -213,12 +217,6 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
         initService(formManagementService);
         initService(formRepositoryService);
         initService(formService);
-    }
-
-    protected void initService(Object service) {
-        if (service instanceof ServiceImpl) {
-            ((ServiceImpl) service).setCommandExecutor(commandExecutor);
-        }
     }
 
     public void initExpressionManager() {
@@ -265,68 +263,35 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
 
     // data model ///////////////////////////////////////////////////////////////
 
-    public void initDbSchemaManager() {
-        if (this.dbSchemaManager == null) {
-            this.dbSchemaManager = new FormDbSchemaManager();
+    @Override
+    public void initSchemaManager() {
+        if (this.schemaManager == null) {
+            this.schemaManager = new FormDbSchemaManager();
+        }
+    }
+    
+    public void initSchemaManagementCommand() {
+        if (schemaManagementCmd == null) {
+            if (usingRelationalDatabase && databaseSchemaUpdate != null) {
+                this.schemaManagementCmd = new SchemaOperationsFormEngineBuild();
+            }
         }
     }
 
-    public void initDbSchema() {
-        try {
-            DatabaseConnection connection = new JdbcConnection(dataSource.getConnection());
-            Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
-            database.setDatabaseChangeLogTableName(LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogTableName());
-            database.setDatabaseChangeLogLockTableName(LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogLockTableName());
-
-            if (StringUtils.isNotEmpty(databaseSchema)) {
-                database.setDefaultSchemaName(databaseSchema);
-                database.setLiquibaseSchemaName(databaseSchema);
+    private void closeDatabase(Liquibase liquibase) {
+        if (liquibase != null) {
+            Database database = liquibase.getDatabase();
+            if (database != null) {
+                try {
+                    database.close();
+                } catch (DatabaseException e) {
+                    LOGGER.warn("Error closing database", e);
+                }
             }
-
-            if (StringUtils.isNotEmpty(databaseCatalog)) {
-                database.setDefaultCatalogName(databaseCatalog);
-                database.setLiquibaseCatalogName(databaseCatalog);
-            }
-
-            Liquibase liquibase = new Liquibase("org/flowable/form/db/liquibase/flowable-form-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
-
-            if (DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
-                LOGGER.debug("Dropping and creating schema FORM");
-                liquibase.dropAll();
-                liquibase.update("form");
-            } else if (DB_SCHEMA_UPDATE_TRUE.equals(databaseSchemaUpdate)) {
-                LOGGER.debug("Updating schema FORM");
-                liquibase.update("form");
-            } else if (DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
-                LOGGER.debug("Validating schema FORM");
-                liquibase.validate();
-            }
-        } catch (Exception e) {
-            throw new FlowableException("Error initialising form data schema", e);
         }
     }
 
     // session factories ////////////////////////////////////////////////////////
-
-    public void initSessionFactories() {
-        if (sessionFactories == null) {
-            sessionFactories = new HashMap<>();
-
-            if (usingRelationalDatabase) {
-                initDbSqlSessionFactory();
-            }
-
-            addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
-
-            commandContextFactory.setSessionFactories(sessionFactories);
-        }
-
-        if (customSessionFactories != null) {
-            for (SessionFactory sessionFactory : customSessionFactories) {
-                addSessionFactory(sessionFactory);
-            }
-        }
-    }
 
     @Override
     public void initDbSqlSessionFactory() {
@@ -350,7 +315,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
 
     @Override
     public DbSqlSessionFactory createDbSqlSessionFactory() {
-        return new DbSqlSessionFactory();
+        return new DbSqlSessionFactory(usePrefixId);
     }
 
     // command executors
@@ -437,6 +402,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
         formDeployer.setParsedDeploymentBuilderFactory(parsedDeploymentBuilderFactory);
         formDeployer.setFormDeploymentHelper(formDeploymentHelper);
         formDeployer.setCachingAndArtifactsManager(cachingAndArtifactsManager);
+        formDeployer.setUsePrefixId(usePrefixId);
 
         defaultDeployers.add(formDeployer);
         return defaultDeployers;
@@ -635,10 +601,12 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    @Override
     public ExpressionManager getExpressionManager() {
         return expressionManager;
     }
 
+    @Override
     public FormEngineConfiguration setExpressionManager(ExpressionManager expressionManager) {
         this.expressionManager = expressionManager;
         return this;

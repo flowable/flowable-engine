@@ -29,6 +29,10 @@ import org.flowable.idm.rest.service.api.user.UserResponse;
  */
 public class IdmRestResponseFactory {
     
+    public List<UserResponse> createUserResponseList(List<User> users) {
+        return createUserResponseList(users, false);
+    }
+
     public List<UserResponse> createUserResponseList(List<User> users, boolean incudePassword) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         List<UserResponse> responseList = new ArrayList<>(users.size());
@@ -46,6 +50,7 @@ public class IdmRestResponseFactory {
         UserResponse response = new UserResponse();
         response.setFirstName(user.getFirstName());
         response.setLastName(user.getLastName());
+        response.setDisplayName(user.getDisplayName());
         response.setId(user.getId());
         response.setEmail(user.getEmail());
 

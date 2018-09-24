@@ -18,10 +18,10 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.engine.app.AppModel;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.repository.DeploymentQuery;
 import org.flowable.engine.repository.DiagramLayout;
@@ -130,12 +130,22 @@ public interface RepositoryService {
      *            The new tenant identifier.
      */
     void changeDeploymentTenantId(String deploymentId, String newTenantId);
+    
+    /**
+     * Changes the parent deployment id of a deployment. This is used to move deployments to a different app deployment parent.
+     * 
+     * @param deploymentId
+     *              The id of the deployment of which the parent deployment identifier will be changed.
+     * @param newParentDeploymentId
+     *              The new parent deployment identifier.
+     */
+    void changeDeploymentParentDeploymentId(String deploymentId, String newParentDeploymentId);
 
     /** Query process definitions. */
     ProcessDefinitionQuery createProcessDefinitionQuery();
 
     /**
-     * Returns a new {@link org.flowable.engine.common.api.query.NativeQuery} for process definitions.
+     * Returns a new {@link org.flowable.common.engine.api.query.NativeQuery} for process definitions.
      */
     NativeProcessDefinitionQuery createNativeProcessDefinitionQuery();
 
@@ -143,7 +153,7 @@ public interface RepositoryService {
     DeploymentQuery createDeploymentQuery();
 
     /**
-     * Returns a new {@link org.flowable.engine.common.api.query.NativeQuery} for deployment.
+     * Returns a new {@link org.flowable.common.engine.api.query.NativeQuery} for deployment.
      */
     NativeDeploymentQuery createNativeDeploymentQuery();
 
@@ -360,7 +370,7 @@ public interface RepositoryService {
 
     /**
      * @param modelId
-     *            id of model to delete, cannot be null. When an id is passed for an unexisting model, this operation is ignored.
+     *            id of model to delete, cannot be null. When an id is passed for a non-existent model, this operation is ignored.
      */
     public void deleteModel(String modelId);
 
@@ -368,7 +378,7 @@ public interface RepositoryService {
      * Saves the model editor source for a model
      * 
      * @param modelId
-     *            id of model to delete, cannot be null. When an id is passed for an unexisting model, this operation is ignored.
+     *            id of model to delete, cannot be null. When an id is passed for a non-existent model, this operation is ignored.
      */
     public void addModelEditorSource(String modelId, byte[] bytes);
 
@@ -384,7 +394,7 @@ public interface RepositoryService {
     public ModelQuery createModelQuery();
 
     /**
-     * Returns a new {@link org.flowable.engine.common.api.query.NativeQuery} for process definitions.
+     * Returns a new {@link org.flowable.common.engine.api.query.NativeQuery} for process definitions.
      */
     NativeModelQuery createNativeModelQuery();
 
@@ -459,7 +469,7 @@ public interface RepositoryService {
      *             when the process definition or group doesn't exist.
      */
     void deleteCandidateStarterGroup(String processDefinitionId, String groupId);
-
+    
     /**
      * Retrieves the {@link IdentityLink}s associated with the given process definition. Such an {@link IdentityLink} informs how a certain identity (eg. group or user) is authorized for a certain
      * process definition

@@ -21,7 +21,7 @@ Since the DB contains historic entities for past as well as ongoing instances, y
 
 === IDM engine configuration
 
-By default the Flowable engine is started with the +org.flowable.engine.impl.cfg.IdmEngineConfigurator+. This configurator uses the same datasource configuration as the Flowable process engine configuration. No additional configuration is needed to use the identity component as it was configured in Flowable v5.
+By default the Flowable engine is started with the +org.flowable.idm.engine.configurator.IdmEngineConfigurator+. This configurator uses the same datasource configuration as the Flowable process engine configuration. No additional configuration is needed to use the identity component as it was configured in Flowable v5.
 
 When no identity logic is needed in the Flowable engine the IDM engine can be disabled in the process engine configuration.
 

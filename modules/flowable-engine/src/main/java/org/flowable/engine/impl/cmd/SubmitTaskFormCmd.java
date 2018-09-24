@@ -15,7 +15,7 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Map;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.form.FormHandlerHelper;
 import org.flowable.engine.impl.form.TaskFormHandler;

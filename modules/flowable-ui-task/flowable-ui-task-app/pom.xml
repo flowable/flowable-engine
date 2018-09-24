@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.flowable</groupId>
         <artifactId>flowable-ui-task</artifactId>
-        <version>6.3.1-SNAPSHOT</version>
+        <version>6.4.0-SNAPSHOT</version>
     </parent>
     <artifactId>flowable-ui-task-app</artifactId>
     <packaging>war</packaging>
@@ -44,7 +44,6 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-spring-boot-autoconfigure</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -63,7 +62,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-properties-migrator</artifactId>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
@@ -190,14 +188,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-        </dependency>
 
         <!-- COMMON dependencies -->
 		<dependency>
@@ -287,6 +277,12 @@
         <dependency>
             <groupId>com.sun.mail</groupId>
             <artifactId>javax.mail</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
@@ -428,8 +424,9 @@
                 </plugins>
             </build>
         </profile>
+        <!-- docker image build and push -->
         <profile>
-            <id>buildDockerImage</id>
+            <id>docker</id>
             <dependencies>
                 <dependency>
                     <groupId>org.postgresql</groupId>
@@ -440,80 +437,80 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>com.spotify</groupId>
-                        <artifactId>docker-maven-plugin</artifactId>
-                        <version>0.4.13</version>
+                        <artifactId>maven-deploy-plugin</artifactId>
                         <configuration>
-                            <imageName>flowable/${project.build.finalName}</imageName>
-                            <baseImage>flowable/java8_server</baseImage>
-                            <entryPoint>["java", "-jar", "/${project.build.finalName}.war"]</entryPoint>
-                            <forceTags>true</forceTags>
-                            <imageTags>
-                                <imageTag>${project.version}</imageTag>
-                                <imageTag>latest</imageTag>
-                            </imageTags>
-                            <resources>
-                                <resource>
-                                    <targetPath>/</targetPath>
-                                    <directory>${project.build.directory}</directory>
-                                    <include>${project.build.finalName}.war</include>
-                                </resource>
-                                <resource>
-                                  <targetPath>/</targetPath>
-                                  <directory>${project.basedir}/src/main/docker</directory>
-                                  <include>wait-for-something.sh</include>
-                                </resource>
-                            </resources>
+                            <skip>true</skip>
                         </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>build-image</id>
+                                <id>docker-resources</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>target/</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>src/main/docker/</directory>
+                                            <filtering>false</filtering>
+                                            <excludes>
+                                                <exclude>**/*.yml</exclude>
+                                            </excludes>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.spotify</groupId>
+                        <artifactId>dockerfile-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>build</id>
                                 <phase>package</phase>
                                 <goals>
                                     <goal>build</goal>
                                 </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>pushDockerImage</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.spotify</groupId>
-                        <artifactId>docker-maven-plugin</artifactId>
-                        <version>0.4.13</version>
-                        <executions>
-                            <execution>
-                                <id>tag-image-version</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>tag</goal>
-                                </goals>
                                 <configuration>
-                                    <image>flowable/${project.build.finalName}</image>
-                                    <newName>docker.io/flowable/${project.build.finalName}:${project.version}</newName>
-                                    <serverId>docker-hub</serverId>
-                                    <pushImage>true</pushImage>
+                                    <tag>latest</tag>
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>tag-image-latest</id>
-                                <phase>package</phase>
+                                <id>push-latest</id>
+                                <phase>deploy</phase>
                                 <goals>
-                                    <goal>tag</goal>
+                                    <goal>push</goal>
                                 </goals>
                                 <configuration>
-                                    <image>flowable/${project.build.finalName}</image>
-                                    <newName>docker.io/flowable/${project.build.finalName}:latest</newName>
-                                    <serverId>docker-hub</serverId>
-                                    <pushImage>true</pushImage>
+                                    <tag>latest</tag>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>push-version</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>tag</goal>
+                                    <goal>push</goal>
+                                </goals>
+                                <configuration>
+                                    <tag>${project.version}</tag>
                                 </configuration>
                             </execution>
                         </executions>
+                        <configuration>
+                            <repository>flowable/flowable-task</repository>
+                            <buildArgs>
+                                <WAR_FILE>${project.build.finalName}.war</WAR_FILE>
+                            </buildArgs>
+                            <contextDirectory>${project.build.directory}</contextDirectory>
+                            <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>

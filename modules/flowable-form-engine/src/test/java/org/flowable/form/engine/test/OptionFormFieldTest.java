@@ -21,14 +21,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormInstance;
 import org.flowable.form.api.FormInstanceInfo;
 import org.flowable.form.model.Option;
 import org.flowable.form.model.OptionFormField;
 import org.flowable.form.model.SimpleFormModel;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class OptionFormFieldTest extends AbstractFlowableFormTest {
 
@@ -47,7 +47,7 @@ public class OptionFormFieldTest extends AbstractFlowableFormTest {
         assertNull(optionFormField.getOptions());
         
         String expectedJson = "[{\"id\":\"opt0\",\"name\":\"Opt0\"},{\"id\":\"opt1\",\"name\":\"Opt1\"},{\"id\":\"opt2\",\"name\":\"Opt2\"}]";
-        List<Option> expectedOptions = new ArrayList<Option>();
+        List<Option> expectedOptions = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             Option option = new Option("Opt" + i);
             option.setId("opt" + i);

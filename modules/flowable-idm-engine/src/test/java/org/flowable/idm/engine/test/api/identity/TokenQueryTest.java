@@ -13,27 +13,33 @@
 
 package org.flowable.idm.engine.test.api.identity;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.idm.api.Token;
 import org.flowable.idm.api.TokenQuery;
 import org.flowable.idm.engine.impl.persistence.entity.TokenEntity;
 import org.flowable.idm.engine.test.PluggableFlowableIdmTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
  */
 public class TokenQueryTest extends PluggableFlowableIdmTestCase {
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
-
         Calendar tokenCal = new GregorianCalendar();
         tokenCal.set(2015, 1, 1, 0, 0, 0);
         createToken("1111", "aaaa", tokenCal.getTime(), "127.0.0.1", "chrome", "user1", null);
@@ -59,25 +65,26 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         return token;
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         idmIdentityService.deleteToken("1111");
         idmIdentityService.deleteToken("2222");
         idmIdentityService.deleteToken("3333");
-
-        super.tearDown();
     }
 
+    @Test
     public void testQueryByNoCriteria() {
         TokenQuery query = idmIdentityService.createTokenQuery();
         verifyQueryResults(query, 3);
     }
 
+    @Test
     public void testQueryById() {
         TokenQuery query = idmIdentityService.createTokenQuery().tokenId("1111");
         verifyQueryResults(query, 1);
     }
 
+    @Test
     public void testQueryByInvalidId() {
         TokenQuery query = idmIdentityService.createTokenQuery().tokenId("invalid");
         verifyQueryResults(query, 0);
@@ -89,6 +96,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testQueryByTokenValue() {
         TokenQuery query = idmIdentityService.createTokenQuery().tokenValue("aaaa");
         verifyQueryResults(query, 1);
@@ -97,6 +105,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         assertEquals("aaaa", result.getTokenValue());
     }
 
+    @Test
     public void testQueryByInvalidTokenValue() {
         TokenQuery query = idmIdentityService.createTokenQuery().tokenValue("invalid");
         verifyQueryResults(query, 0);
@@ -108,6 +117,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testQueryByTokenDateBefore() {
         Calendar queryCal = new GregorianCalendar(2015, 6, 1, 0, 0, 0);
         TokenQuery query = idmIdentityService.createTokenQuery().tokenDateBefore(queryCal.getTime());
@@ -120,6 +130,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         assertEquals(1, tokenCal.get(Calendar.MONTH));
     }
 
+    @Test
     public void testQueryByTokenDateAfter() {
         Calendar queryCal = new GregorianCalendar(2016, 6, 1, 0, 0, 0);
         TokenQuery query = idmIdentityService.createTokenQuery().tokenDateAfter(queryCal.getTime());
@@ -132,6 +143,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         assertEquals(1, tokenCal.get(Calendar.MONTH));
     }
 
+    @Test
     public void testQueryByIpAddress() {
         TokenQuery query = idmIdentityService.createTokenQuery().ipAddress("127.0.0.1");
         verifyQueryResults(query, 1);
@@ -140,6 +152,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         assertEquals("127.0.0.1", result.getIpAddress());
     }
 
+    @Test
     public void testQueryByInvalidIpAddress() {
         TokenQuery query = idmIdentityService.createTokenQuery().ipAddress("invalid");
         verifyQueryResults(query, 0);
@@ -151,6 +164,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testQueryByIpAddressLike() {
         TokenQuery query = idmIdentityService.createTokenQuery().ipAddressLike("%0.0.1%");
         verifyQueryResults(query, 2);
@@ -159,6 +173,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         verifyQueryResults(query, 1);
     }
 
+    @Test
     public void testQueryByInvalidIpAddressLike() {
         TokenQuery query = idmIdentityService.createTokenQuery().ipAddressLike("%invalid%");
         verifyQueryResults(query, 0);
@@ -170,6 +185,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testQueryByUserAgent() {
         TokenQuery query = idmIdentityService.createTokenQuery().userAgent("chrome");
         verifyQueryResults(query, 1);
@@ -178,6 +194,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         assertEquals("chrome", result.getUserAgent());
     }
 
+    @Test
     public void testQueryByInvalidUserAgent() {
         TokenQuery query = idmIdentityService.createTokenQuery().userAgent("invalid");
         verifyQueryResults(query, 0);
@@ -189,6 +206,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testQueryByUserAgentLike() {
         TokenQuery query = idmIdentityService.createTokenQuery().userAgentLike("%fire%");
         verifyQueryResults(query, 2);
@@ -197,6 +215,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         verifyQueryResults(query, 1);
     }
 
+    @Test
     public void testQueryByInvalidUserAgentLike() {
         TokenQuery query = idmIdentityService.createTokenQuery().userAgentLike("%invalid%");
         verifyQueryResults(query, 0);
@@ -208,6 +227,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testQueryByUserId() {
         TokenQuery query = idmIdentityService.createTokenQuery().userId("user1");
         verifyQueryResults(query, 1);
@@ -216,6 +236,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         assertEquals("user1", result.getUserId());
     }
 
+    @Test
     public void testQueryByInvalidUserId() {
         TokenQuery query = idmIdentityService.createTokenQuery().userId("invalid");
         verifyQueryResults(query, 0);
@@ -227,6 +248,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testQueryByUserIdLike() {
         TokenQuery query = idmIdentityService.createTokenQuery().userIdLike("%user%");
         verifyQueryResults(query, 2);
@@ -235,6 +257,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         verifyQueryResults(query, 1);
     }
 
+    @Test
     public void testQueryByInvalidUserIdLike() {
         TokenQuery query = idmIdentityService.createTokenQuery().userIdLike("%invalid%");
         verifyQueryResults(query, 0);
@@ -246,6 +269,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testQueryByTokenData() {
         TokenQuery query = idmIdentityService.createTokenQuery().tokenData("test");
         verifyQueryResults(query, 1);
@@ -254,6 +278,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         assertEquals("test", result.getTokenData());
     }
 
+    @Test
     public void testQueryByInvalidTokenData() {
         TokenQuery query = idmIdentityService.createTokenQuery().tokenData("invalid");
         verifyQueryResults(query, 0);
@@ -265,11 +290,13 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testQueryByTokenDataLike() {
         TokenQuery query = idmIdentityService.createTokenQuery().tokenDataLike("%test%");
         verifyQueryResults(query, 1);
     }
 
+    @Test
     public void testQueryByInvalidTokenDataLike() {
         TokenQuery query = idmIdentityService.createTokenQuery().tokenDataLike("%invalid%");
         verifyQueryResults(query, 0);
@@ -281,6 +308,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testQuerySorting() {
         // asc
         assertEquals(3, idmIdentityService.createTokenQuery().orderByTokenId().asc().count());
@@ -298,6 +326,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         assertEquals("firefox2", tokens.get(1).getUserAgent());
     }
 
+    @Test
     public void testQueryInvalidSortingUsage() {
         try {
             idmIdentityService.createTokenQuery().orderByTokenId().list();
@@ -333,6 +362,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testNativeQuery() {
         assertEquals("ACT_ID_TOKEN", idmManagementService.getTableName(Token.class));
         assertEquals("ACT_ID_TOKEN", idmManagementService.getTableName(TokenEntity.class));

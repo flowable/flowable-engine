@@ -48,6 +48,11 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.server.Server;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.db.SchemaManager;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.rest.util.RestUrlBuilder;
 import org.flowable.engine.DynamicBpmnService;
 import org.flowable.engine.FormService;
@@ -58,11 +63,6 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.db.DbSchemaManager;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.TestHelper;
@@ -90,8 +90,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
-
-import junit.framework.AssertionFailedError;
 
 public class BaseSpringRestTestCase {
 
@@ -226,7 +224,7 @@ public class BaseSpringRestTestCase {
         try {
             TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), testName.getMethodName());
 
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             LOGGER.error(System.lineSeparator());
             LOGGER.error("ASSERTION FAILED: {}", e, e);
             exception = e;
@@ -258,8 +256,20 @@ public class BaseSpringRestTestCase {
         Group group = identityService.newGroup("admin");
         group.setName("Administrators");
         identityService.saveGroup(group);
-
+        
         identityService.createMembership(user.getId(), group.getId());
+        
+        user = identityService.newUser("aSalesUser");
+        user.setFirstName("Sales");
+        user.setLastName("User");
+        user.setPassword("sales");
+        identityService.saveUser(user);
+        
+        Group salesGroup = identityService.newGroup("sales");
+        salesGroup.setName("Administrators");
+        identityService.saveGroup(salesGroup);
+        
+        identityService.createMembership(user.getId(), salesGroup.getId());
     }
 
     /**
@@ -322,6 +332,10 @@ public class BaseSpringRestTestCase {
         identityService.deleteUser("kermit");
         identityService.deleteGroup("admin");
         identityService.deleteMembership("kermit", "admin");
+        
+        identityService.deleteUser("aSalesUser");
+        identityService.deleteGroup("sales");
+        identityService.deleteMembership("aSalesUser", "sales");
     }
 
     /**
@@ -352,9 +366,9 @@ public class BaseSpringRestTestCase {
             commandExecutor.execute(new Command<Object>() {
                 @Override
                 public Object execute(CommandContext commandContext) {
-                    DbSchemaManager dbSchemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager();
-                    dbSchemaManager.dbSchemaDrop();
-                    dbSchemaManager.dbSchemaCreate();
+                    SchemaManager dbSchemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager();
+                    dbSchemaManager.schemaDrop();
+                    dbSchemaManager.schemaCreate();
                     return null;
                 }
             });
@@ -397,7 +411,7 @@ public class BaseSpringRestTestCase {
         ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 
         if (processInstance != null) {
-            throw new AssertionFailedError("Expected finished process instance '" + processInstanceId + "' but it was still in the db");
+            throw new AssertionError("Expected finished process instance '" + processInstanceId + "' but it was still in the db");
         }
     }
 

@@ -16,9 +16,9 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.flowable.engine.common.impl.Page;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.Page;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.impl.asyncexecutor.AcquiredTimerJobEntities;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
@@ -40,7 +40,7 @@ public class AcquireTimerJobsCmd implements Command<AcquiredTimerJobEntities> {
         AcquiredTimerJobEntities acquiredJobs = new AcquiredTimerJobEntities();
         List<TimerJobEntity> timerJobs = CommandContextUtil.getTimerJobEntityManager(commandContext)
                 .findTimerJobsToExecute(new Page(0, asyncExecutor.getMaxAsyncJobsDuePerAcquisition()));
-
+        
         for (TimerJobEntity job : timerJobs) {
             lockJob(commandContext, job, asyncExecutor.getAsyncJobLockTimeInMillis());
             acquiredJobs.addJob(job);

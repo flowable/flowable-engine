@@ -17,9 +17,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.activiti.engine.impl.test.PvmTestCase;
-import org.flowable.engine.common.impl.calendar.CycleBusinessCalendar;
-import org.flowable.engine.common.impl.runtime.Clock;
-import org.flowable.engine.common.impl.util.DefaultClockImpl;
+import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
+import org.flowable.common.engine.impl.runtime.Clock;
+import org.flowable.common.engine.impl.util.DefaultClockImpl;
 
 public class CycleBusinessCalendarTest extends PvmTestCase {
 

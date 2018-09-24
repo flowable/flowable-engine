@@ -20,15 +20,15 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.calendar.BusinessCalendar;
+import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
+import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.impl.calendar.BusinessCalendar;
-import org.flowable.engine.common.impl.calendar.DueDateBusinessCalendar;
-import org.flowable.engine.common.impl.el.ExpressionManager;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
@@ -287,14 +287,13 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                         List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(task.getId(), (Collection) value);
                         IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
                         
-                    } else if (value != null) {
+                    } else {
                         String strValue = value.toString();
                         if (StringUtils.isNotEmpty(strValue)) {
                             List<String> candidates = extractCandidates(strValue);
                             List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(task.getId(), candidates);
                             IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
                         }
-                        
                     }
                 }
             }
@@ -308,7 +307,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                     if (value instanceof Collection) {
                         List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(task.getId(), (Collection) value);
                         IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
-                        
+
                     } else {
                         String strValue = value.toString();
                         if (StringUtils.isNotEmpty(strValue)) {

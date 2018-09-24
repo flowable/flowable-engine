@@ -12,10 +12,14 @@
  */
 package org.flowable.variable.service.impl.util;
 
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.db.DbSqlSession;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityManager;
 import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayEntityManager;
@@ -71,4 +75,12 @@ public class CommandContextUtil {
         return Context.getCommandContext();
     }
 
+    public static ExpressionManager getExpressionManager() {
+        AbstractEngineConfiguration currentEngineConfiguration = getCommandContext().getCurrentEngineConfiguration();
+        if (currentEngineConfiguration instanceof HasExpressionManagerEngineConfiguration) {
+            return ((HasExpressionManagerEngineConfiguration) currentEngineConfiguration).getExpressionManager();
+        } else {
+            throw new FlowableException("Unable to obtain expression manager from the current engine configuration" + currentEngineConfiguration);
+        }
+    }
 }

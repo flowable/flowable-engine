@@ -38,9 +38,9 @@ import org.flowable.cmmn.model.FlowableHttpRequestHandler;
 import org.flowable.cmmn.model.FlowableHttpResponseHandler;
 import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.ImplementationType;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.http.ExpressionUtils;
 import org.flowable.http.HttpActivityExecutor;
 import org.flowable.http.HttpRequest;
@@ -69,6 +69,8 @@ public class CmmnHttpActivityBehaviorImpl extends CoreCmmnActivityBehavior {
     protected String requestHeaders;
     // HttpRequest body expression (Optional)
     protected String requestBody;
+    // HttpRequest body encoding expression, for example UTF-8 (Optional)
+    protected String requestBodyEncoding;
     // Timeout in seconds for the body (Optional)
     protected String requestTimeout;
     // HttpRequest retry disable HTTP redirects (Optional)
@@ -138,6 +140,7 @@ public class CmmnHttpActivityBehaviorImpl extends CoreCmmnActivityBehavior {
             request.setUrl(ExpressionUtils.getStringFromField(createExpression(requestUrl), planItemInstanceEntity));
             request.setHeaders(ExpressionUtils.getStringFromField(createExpression(requestHeaders), planItemInstanceEntity));
             request.setBody(ExpressionUtils.getStringFromField(createExpression(requestBody), planItemInstanceEntity));
+            request.setBodyEncoding(ExpressionUtils.getStringFromField(createExpression(requestBodyEncoding), planItemInstanceEntity));
             request.setTimeout(ExpressionUtils.getIntFromField(createExpression(requestTimeout), planItemInstanceEntity));
             request.setNoRedirects(ExpressionUtils.getBooleanFromField(createExpression(disallowRedirects), planItemInstanceEntity));
             request.setIgnoreErrors(ExpressionUtils.getBooleanFromField(createExpression(ignoreException), planItemInstanceEntity));
@@ -167,6 +170,7 @@ public class CmmnHttpActivityBehaviorImpl extends CoreCmmnActivityBehavior {
                 planItemInstanceEntity.setVariable(request.getPrefix() + "RequestUrl", request.getUrl());
                 planItemInstanceEntity.setVariable(request.getPrefix() + "RequestHeaders", request.getHeaders());
                 planItemInstanceEntity.setVariable(request.getPrefix() + "RequestBody", request.getBody());
+                planItemInstanceEntity.setVariable(request.getPrefix() + "RequestBodyEncoding", request.getBodyEncoding());
                 planItemInstanceEntity.setVariable(request.getPrefix() + "RequestTimeout", request.getTimeout());
                 planItemInstanceEntity.setVariable(request.getPrefix() + "DisallowRedirects", request.isNoRedirects());
                 planItemInstanceEntity.setVariable(request.getPrefix() + "FailStatusCodes", failCodes);

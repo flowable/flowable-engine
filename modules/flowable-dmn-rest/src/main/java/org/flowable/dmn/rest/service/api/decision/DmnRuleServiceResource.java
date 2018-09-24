@@ -12,30 +12,33 @@
  */
 package org.flowable.dmn.rest.service.api.decision;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.variable.EngineRestVariable;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.api.ExecuteDecisionBuilder;
+import org.flowable.dmn.rest.service.api.DmnRestApiInterceptor;
 import org.flowable.dmn.rest.service.api.DmnRestResponseFactory;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Yvo Swillens
@@ -50,6 +53,8 @@ public class DmnRuleServiceResource {
     @Autowired
     protected DmnRuleService dmnRuleService;
 
+    @Autowired(required=false)
+    protected DmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Execute a Decision", tags = {"DMN Rule Service"})
     @ApiResponses(value = {
@@ -59,6 +64,10 @@ public class DmnRuleServiceResource {
     public DmnRuleServiceResponse executeDecision(@ApiParam("request") @RequestBody DmnRuleServiceRequest request, HttpServletRequest httpRequest, HttpServletResponse response) {
         if (request.getDecisionKey() == null) {
             throw new FlowableIllegalArgumentException("Decision key is required.");
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.executeDecisionTable(request);
         }
 
         Map<String, Object> inputVariables = composeInputVariables(request.getInputVariables());

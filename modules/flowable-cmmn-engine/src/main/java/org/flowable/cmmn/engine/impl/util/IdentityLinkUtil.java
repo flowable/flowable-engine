@@ -15,8 +15,7 @@ package org.flowable.cmmn.engine.impl.util;
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.flowable.engine.common.api.scope.ScopeTypes;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -46,40 +45,28 @@ public class IdentityLinkUtil {
                         caseInstance.getId(), ScopeTypes.CMMN, userId, groupId, type);
         
         for (IdentityLinkEntity identityLinkEntity : removedIdentityLinkEntities) {
-            CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkDeleted(identityLinkEntity.getId());
+            CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkDeleted(identityLinkEntity);
         }
     }
-    
+
     public static void handleTaskIdentityLinkAdditions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinkEntities) {
         for (IdentityLinkEntity identityLinkEntity : identityLinkEntities) {
             handleTaskIdentityLinkAddition(taskEntity, identityLinkEntity);
         }
     }
-    
+
     public static void handleTaskIdentityLinkAddition(TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity) {
         CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkCreated(identityLinkEntity);
-        
+
         CountingTaskEntity countingTaskEntity = (CountingTaskEntity) taskEntity;
         if (countingTaskEntity.isCountEnabled()) {
             countingTaskEntity.setIdentityLinkCount(countingTaskEntity.getIdentityLinkCount() + 1);
         }
 
         taskEntity.getIdentityLinks().add(identityLinkEntity);
-        if (identityLinkEntity.getUserId() != null && taskEntity.getScopeId() != null && ScopeTypes.CMMN.equals(taskEntity.getScopeType())) {
-            CaseInstance caseInstance = CommandContextUtil.getCaseInstanceEntityManager().findById(taskEntity.getScopeId());
-            if (caseInstance != null) {
-                List<IdentityLinkEntity> identityLinks = CommandContextUtil.getIdentityLinkService().findIdentityLinksByScopeIdAndType(taskEntity.getScopeId(), ScopeTypes.CMMN);
-                for (IdentityLinkEntity identityLink : identityLinks) {
-                    if (identityLink.isUser() && identityLink.getUserId().equals(identityLinkEntity.getUserId())) {
-                        return;
-                    }
-                }
-                
-                createCaseInstanceIdentityLink(caseInstance, identityLinkEntity.getUserId(), null, IdentityLinkType.PARTICIPANT);
-            }
-        }
+        CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLinkToParent(taskEntity, identityLinkEntity.getUserId());
     }
-    
+
     public static void handleTaskIdentityLinkDeletions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinks, boolean cascaseHistory) {
         for (IdentityLinkEntity identityLinkEntity : identityLinks) {
             CountingTaskEntity countingTaskEntity = (CountingTaskEntity) taskEntity;
@@ -87,10 +74,10 @@ public class IdentityLinkUtil {
                 countingTaskEntity.setIdentityLinkCount(countingTaskEntity.getIdentityLinkCount() - 1);
             }
             if (cascaseHistory) {
-                CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkDeleted(identityLinkEntity.getId());
+                CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkDeleted(identityLinkEntity);
             }
         }
-        
+
         taskEntity.getIdentityLinks().removeAll(identityLinks);
     }
 }

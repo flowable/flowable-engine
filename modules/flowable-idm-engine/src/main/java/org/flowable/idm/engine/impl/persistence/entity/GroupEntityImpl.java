@@ -16,12 +16,10 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
-
 /**
  * @author Tom Baeyens
  */
-public class GroupEntityImpl extends AbstractEntity implements GroupEntity, Serializable {
+public class GroupEntityImpl extends AbstractIdmEngineEntity implements GroupEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

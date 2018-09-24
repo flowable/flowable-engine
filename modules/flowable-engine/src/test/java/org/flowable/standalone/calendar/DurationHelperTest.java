@@ -23,10 +23,10 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import org.apache.commons.lang3.time.DateUtils;
-import org.flowable.engine.common.impl.calendar.DurationHelper;
-import org.flowable.engine.common.impl.runtime.Clock;
-import org.flowable.engine.common.impl.util.DefaultClockImpl;
-import org.junit.Test;
+import org.flowable.common.engine.impl.calendar.DurationHelper;
+import org.flowable.common.engine.impl.runtime.Clock;
+import org.flowable.common.engine.impl.util.DefaultClockImpl;
+import org.junit.jupiter.api.Test;
 
 public class DurationHelperTest {
 

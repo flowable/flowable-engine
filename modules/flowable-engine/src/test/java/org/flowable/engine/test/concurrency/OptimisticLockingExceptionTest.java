@@ -17,22 +17,24 @@ import java.util.Map;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
+import org.flowable.common.engine.api.FlowableOptimisticLockingException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContextCloseListener;
 import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.common.api.FlowableOptimisticLockingException;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandContextCloseListener;
 import org.flowable.engine.impl.cmd.TriggerCmd;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class OptimisticLockingExceptionTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/concurrency/CompetingJoinTest.testCompetingJoins.bpmn20.xml" })
     public void testOptimisticLockExceptionForConcurrentJoin() throws Exception {
 
@@ -63,7 +65,7 @@ public class OptimisticLockingExceptionTest extends PluggableFlowableTestCase {
                 Thread.sleep(250L);
                 totalWaitTime += 250L;
 
-                if (totalWaitTime >= 5000L) {
+                if (totalWaitTime >= 7000L) {
                     break;
                 }
             }

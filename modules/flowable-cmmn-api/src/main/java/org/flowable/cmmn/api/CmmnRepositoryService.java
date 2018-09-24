@@ -20,8 +20,8 @@ import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.api.repository.CmmnDeploymentQuery;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.dmn.api.DmnDecisionTable;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormDefinition;
 
 public interface CmmnRepositoryService {
@@ -96,6 +96,16 @@ public interface CmmnRepositoryService {
      *             if no case definition with the provided id can be found.
      */
     void setCaseDefinitionCategory(String caseDefinitionId, String category);
+    
+    /**
+     * Changes the parent deployment id of a deployment. This is used to move deployments to a different app deployment parent.
+     * 
+     * @param deploymentId
+     *              The id of the deployment of which the parent deployment identifier will be changed.
+     * @param newParentDeploymentId
+     *              The new parent deployment identifier.
+     */
+    void changeDeploymentParentDeploymentId(String deploymentId, String newParentDeploymentId);
     
     /**
      * Retrieves the {@link DmnDecisionTable}s associated with the given case definition.

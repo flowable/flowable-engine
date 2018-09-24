@@ -13,6 +13,7 @@
 
 package org.flowable.idm.spring;
 
+import org.flowable.common.engine.impl.cfg.SpringBeanFactoryProxyMap;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.springframework.beans.BeansException;
@@ -49,6 +50,10 @@ public class IdmEngineFactoryBean implements FactoryBean<IdmEngine>, DisposableB
     @Override
     public IdmEngine getObject() throws Exception {
         configureExternallyManagedTransactions();
+        
+        if (idmEngineConfiguration.getBeans() == null) {
+            idmEngineConfiguration.setBeans(new SpringBeanFactoryProxyMap(applicationContext));
+        }
 
         this.idmEngine = idmEngineConfiguration.buildIdmEngine();
         return this.idmEngine;

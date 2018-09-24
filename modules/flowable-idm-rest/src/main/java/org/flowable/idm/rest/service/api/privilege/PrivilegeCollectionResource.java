@@ -12,16 +12,21 @@
  */
 package org.flowable.idm.rest.service.api.privilege;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.PrivilegeQuery;
 import org.flowable.idm.api.User;
+import org.flowable.idm.rest.service.api.IdmRestApiInterceptor;
 import org.flowable.idm.rest.service.api.IdmRestResponseFactory;
 import org.flowable.idm.rest.service.api.group.GroupResponse;
 import org.flowable.idm.rest.service.api.user.UserResponse;
@@ -54,6 +59,9 @@ public class PrivilegeCollectionResource {
     
     @Autowired
     protected IdmRestResponseFactory idmRestResponseFactory;
+    
+    @Autowired(required=false)
+    protected IdmRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "List privileges", nickname="listPrivileges", tags = { "Privileges" }, produces = "application/json")
     @ApiImplicitParams({
@@ -82,7 +90,11 @@ public class PrivilegeCollectionResource {
             query.groupId(allRequestParams.get("groupId"));
         }
         
-        return new PrivilegePaginateList(idmRestResponseFactory).paginateList(allRequestParams, query, "id", null);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessPrivilegeInfoWithQuery(query);
+        }
+        
+        return paginateList(allRequestParams, query, "id", null, idmRestResponseFactory::createPrivilegeResponseList);
     }
 
     @ApiOperation(value = "List all users for a given privilege", nickname = "listPrivilegeUsers", tags = { "Privileges" }, produces = "application/json")
@@ -91,6 +103,12 @@ public class PrivilegeCollectionResource {
     })
     @RequestMapping(value = "/privileges/{privilegeId}/users", method = RequestMethod.GET)
     public List<UserResponse> getUsers(@PathVariable String privilegeId) {
+        Privilege privilege = getPrivilegeById(privilegeId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessPrivilegeInfoById(privilege);
+        }
+        
         List<User> users = identityService.getUsersWithPrivilege(privilegeId);
         return idmRestResponseFactory.createUserResponseList(users, false);
     }
@@ -101,6 +119,12 @@ public class PrivilegeCollectionResource {
     })
     @RequestMapping(value = "/privileges/{privilegeId}/users/{userId}", method = RequestMethod.DELETE)
     public void deleteUserPrivilege(@PathVariable String privilegeId, @PathVariable String userId) {
+        Privilege privilege = getPrivilegeById(privilegeId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteUserPrivilege(privilege, userId);
+        }
+        
         identityService.deleteUserPrivilegeMapping(privilegeId, userId);
     }
     
@@ -109,8 +133,13 @@ public class PrivilegeCollectionResource {
             @ApiResponse(code = 200, message = "Indicates the user privilege has been added")
     })
     @RequestMapping(value = "privileges/{privilegeId}/users", method = RequestMethod.POST)
-    public void addUserPrivilege(@PathVariable String privilegeId,
-                                 @RequestBody AddUserPrivilegeRequest request) {
+    public void addUserPrivilege(@PathVariable String privilegeId, @RequestBody AddUserPrivilegeRequest request) {
+        Privilege privilege = getPrivilegeById(privilegeId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.addUserPrivilege(privilege, request.getUserId());
+        }
+        
         identityService.addUserPrivilegeMapping(privilegeId, request.getUserId());
     }
     
@@ -120,6 +149,12 @@ public class PrivilegeCollectionResource {
     })
     @RequestMapping(value = "/privileges/{privilegeId}/groups", method = RequestMethod.GET)
     public List<GroupResponse> getGroups(@PathVariable String privilegeId) {
+        Privilege privilege = getPrivilegeById(privilegeId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessPrivilegeInfoById(privilege);
+        }
+        
         List<Group> groups = identityService.getGroupsWithPrivilege(privilegeId);
         return idmRestResponseFactory.createGroupResponseList(groups);
     }
@@ -130,6 +165,12 @@ public class PrivilegeCollectionResource {
     })
     @RequestMapping(value = "/privileges/{privilegeId}/group/{groupId}", method = RequestMethod.DELETE)
     public void deleteGroupPrivilege(@PathVariable String privilegeId, @PathVariable String groupId) {
+        Privilege privilege = getPrivilegeById(privilegeId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteGroupPrivilege(privilege, groupId);
+        }
+        
         identityService.deleteUserPrivilegeMapping(privilegeId, groupId);
     }
     
@@ -138,9 +179,23 @@ public class PrivilegeCollectionResource {
             @ApiResponse(code = 200, message = "Indicates the group privilege has been added")
     })
     @RequestMapping(value = "privileges/{privilegeId}/groups", method = RequestMethod.POST)
-    public void addGroupPrivilege(@PathVariable String privilegeId,
-                                 @RequestBody AddGroupPrivilegeRequest request) {
+    public void addGroupPrivilege(@PathVariable String privilegeId, @RequestBody AddGroupPrivilegeRequest request) {
+        Privilege privilege = getPrivilegeById(privilegeId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.addGroupPrivilege(privilege, request.getGroupId());
+        }
+        
         identityService.addGroupPrivilegeMapping(privilegeId, request.getGroupId());
     }
 
+    protected Privilege getPrivilegeById(String privilegeId) {
+        Privilege privilege = identityService.createPrivilegeQuery().privilegeId(privilegeId).singleResult();
+        
+        if (privilege == null) {
+            throw new FlowableObjectNotFoundException("Could not find privilege with id " + privilegeId, Privilege.class);
+        }
+        
+        return privilege;
+    }
 }

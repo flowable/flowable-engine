@@ -17,11 +17,11 @@ import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.impl.TimeBasedGenerator;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.content.api.ContentMetaDataKeys;
 import org.flowable.content.api.ContentObject;
 import org.flowable.content.api.ContentStorage;
 import org.flowable.content.api.ContentStorageException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,8 +94,8 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
     public ContentObject createContentObject(InputStream contentStream, Map<String, Object> metaData) {
         String uuid = UUID_GENERATOR.generate().toString();
         File file = getContentFile(metaData, uuid);
-        try {
-            long length = IOUtils.copy(contentStream, new FileOutputStream(file, false));
+        try (FileOutputStream fos = new FileOutputStream(file, false)) {
+            long length = IOUtils.copy(contentStream, fos);
             String contentId = generateContentId(uuid, metaData);
             return new FileSystemContentObject(file, contentId, length);
         } catch (IOException e) {
@@ -105,25 +105,29 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
 
     protected String generateContentId(String uuid, Map<String, Object> metaData) {
         String contentId = "";
-        switch (determineType(metaData)) {
-        case TYPE_PROCESS_INSTANCE:
-            String processInstanceId = (String) metaData.get(ContentMetaDataKeys.PROCESS_INSTANCE_ID);
-            contentId = PROCESS_INSTANCE_PREFIX + "." + processInstanceId;
-            break;
+        String type = determineType(metaData);
+        switch (type) {
+            case TYPE_PROCESS_INSTANCE:
+                String processInstanceId = (String) metaData.get(ContentMetaDataKeys.PROCESS_INSTANCE_ID);
+                contentId = PROCESS_INSTANCE_PREFIX + "." + processInstanceId;
+                break;
 
-        case TYPE_TASK:
-            String taskId = (String) metaData.get(ContentMetaDataKeys.TASK_ID);
-            contentId = TASK_PREFIX + "." + taskId;
-            break;
+            case TYPE_TASK:
+                String taskId = (String) metaData.get(ContentMetaDataKeys.TASK_ID);
+                contentId = TASK_PREFIX + "." + taskId;
+                break;
 
-        case TYPE_CASE_INSTANCE:
-            String caseId = (String) metaData.get(ContentMetaDataKeys.SCOPE_ID);
-            contentId = CASE_PREFIX + "." + caseId;
-            break;
+            case TYPE_CASE_INSTANCE:
+                String caseId = (String) metaData.get(ContentMetaDataKeys.SCOPE_ID);
+                contentId = CASE_PREFIX + "." + caseId;
+                break;
 
-        default:
-            contentId = UNCATEGORIZED_PREFIX;
-            break;
+            case TYPE_UNCATEGORIZED:
+                contentId = type;
+                break;
+
+            default:
+                contentId = type + "." + metaData.get(ContentMetaDataKeys.SCOPE_ID);
         }
         contentId += "." + uuid;
         return contentId;
@@ -149,9 +153,9 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
             tempFileCreated = true;
 
             // Write the actual content to the file
-            FileOutputStream tempOutputStream = new FileOutputStream(tempContentFile);
-            length = IOUtils.copy(contentStream, tempOutputStream);
-            IOUtils.closeQuietly(tempOutputStream);
+            try (FileOutputStream tempOutputStream = new FileOutputStream(tempContentFile)) {
+                length = IOUtils.copy(contentStream, tempOutputStream);
+            }
 
             // Rename the content file first
             if (contentFile.renameTo(oldContentFile)) {
@@ -190,26 +194,31 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
 
     protected File getContentFile(String id) {
         String[] ids = id.split("\\.");
-        String type = ids[0];
-        if (PROCESS_INSTANCE_PREFIX.equals(type) || TASK_PREFIX.equals(type) || CASE_PREFIX.equals(type)) {
+        String typePrefix = ids[0];
+        File contentFile;
+
+        if (!UNCATEGORIZED_PREFIX.equals(typePrefix)) {
             File subFolder=null;
-            if (PROCESS_INSTANCE_PREFIX.equals(type)) {
+            if (PROCESS_INSTANCE_PREFIX.equals(typePrefix)) {
                 subFolder = processInstanceFolder;
-            } else if(TASK_PREFIX.equals(type)) {
+            } else if(TASK_PREFIX.equals(typePrefix)) {
                 subFolder = taskFolder;
-            } else if (CASE_PREFIX.equals(type)) {
+            } else if (CASE_PREFIX.equals(typePrefix)) {
                 subFolder = caseFolder;
+            } else {
+                subFolder = new File(this.contentFolderRoot, typePrefix);
             }
             File idFolder = new File(subFolder, ids[1]);
-            File contentFile = new File(idFolder, ids[2]);
-            return contentFile;
+            contentFile = new File(idFolder, ids[2]);
 
-        } else if (UNCATEGORIZED_PREFIX.equals(type)) {
-            File contentFile = new File(uncategorizedFolder, ids[1]);
-            return contentFile;
+        } else {
+            contentFile = new File(uncategorizedFolder, ids[1]);
         }
 
-        throw new FlowableObjectNotFoundException("No content found for id " + id);
+        if (!contentFile.exists()) {
+            throw new FlowableObjectNotFoundException("No content found for id " + id);
+        }
+        return contentFile;
     }
 
     @Override
@@ -225,7 +234,7 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
             File parentFile = contentFile.getParentFile();
             contentFile.delete();
 
-            if (parentFile.listFiles().length == 0) {
+            if (parentFile.listFiles().length == 0 && !id.startsWith(UNCATEGORIZED_PREFIX)) {
                 parentFile.delete();
             }
         } catch (Exception e) {
@@ -262,7 +271,8 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
     }
 
     protected File createOrGetFolderBasedOnMetaData(Map<String, Object> metaData) {
-        switch (determineType(metaData)) {
+        String type = determineType(metaData);
+        switch (type) {
         case TYPE_PROCESS_INSTANCE:
             String processInstanceId = (String) metaData.get(ContentMetaDataKeys.PROCESS_INSTANCE_ID);
             return internalCreateOrGetFolder(processInstanceFolder, processInstanceId);
@@ -275,8 +285,11 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
             String caseId = (String) metaData.get(ContentMetaDataKeys.SCOPE_ID);
             return internalCreateOrGetFolder(caseFolder, caseId);
 
-        default:
+        case TYPE_UNCATEGORIZED:
             return uncategorizedFolder;
+
+        default:
+            return internalCreateOrGetFolder(validateOrCreateFolder(type), (String) metaData.get(ContentMetaDataKeys.SCOPE_ID));
         }
     }
 

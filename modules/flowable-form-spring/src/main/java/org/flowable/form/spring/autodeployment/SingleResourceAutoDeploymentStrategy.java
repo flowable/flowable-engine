@@ -15,7 +15,7 @@ package org.flowable.form.spring.autodeployment;
 
 import java.io.IOException;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.form.api.FormDeploymentBuilder;
 import org.flowable.form.api.FormRepositoryService;
 import org.springframework.core.io.Resource;

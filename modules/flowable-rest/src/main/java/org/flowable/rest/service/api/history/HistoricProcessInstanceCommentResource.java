@@ -13,15 +13,12 @@
 
 package org.flowable.rest.service.api.history;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.task.Comment;
 import org.flowable.rest.service.api.RestResponseFactory;
@@ -33,15 +30,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Frederik Heremans
  */
 @RestController
 @Api(tags = { "History Process" }, description = "Manage History Process Instances", authorizations = { @Authorization(value = "basicAuth") })
-public class HistoricProcessInstanceCommentResource {
+public class HistoricProcessInstanceCommentResource extends HistoricProcessInstanceBaseResource {
 
     @Autowired
     protected RestResponseFactory restResponseFactory;
@@ -51,7 +52,7 @@ public class HistoricProcessInstanceCommentResource {
 
     @Autowired
     protected TaskService taskService;
-
+    
     @ApiOperation(value = "Get a comment on a historic process instance", tags = { "History Process" }, notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the historic process instance and comment were found and the comment is returned."),
@@ -86,13 +87,5 @@ public class HistoricProcessInstanceCommentResource {
 
         taskService.deleteComment(commentId);
         response.setStatus(HttpStatus.NO_CONTENT.value());
-    }
-
-    protected HistoricProcessInstance getHistoricProcessInstanceFromRequest(String processInstanceId) {
-        HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-        if (processInstance == null) {
-            throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.", HistoricProcessInstance.class);
-        }
-        return processInstance;
     }
 }

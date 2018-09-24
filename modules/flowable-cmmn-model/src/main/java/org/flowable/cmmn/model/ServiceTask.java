@@ -59,6 +59,7 @@ public class ServiceTask extends TaskWithFieldExtensions {
         this.type = type;
     }
 
+    @Override
     public ServiceTask clone() {
         ServiceTask clone = new ServiceTask();
         clone.setValues(this);

@@ -17,7 +17,7 @@ The Flowable starters are also puling spring boot starter transitively, which me
 
 ==== Getting started
 
-Spring Boot is all about convention over configuration. To get started, simply add the _flowable-spring-boot-starter_ or _flowable-spring-boot-starter-rest_ dependency to your project.
+Spring Boot is all about convention over configuration. To get started, simply add the _flowable-spring-boot-starter_ or _flowable-spring-boot-starter-rest_ dependency to your Spring Boot project.
 In case you don't need all the engines see the other <<springBootFlowableStarter, Flowable starters>>.
 For example for Maven:
 
@@ -92,19 +92,19 @@ o.s.b.w.servlet.FilterRegistrationBean   : Mapping filter: 'requestContextFilter
 uration$$EnhancerBySpringCGLIB$$3d0c70ac : No deployment resources were found for autodeployment
 uration$$EnhancerBySpringCGLIB$$8131eb1a : No deployment resources were found for autodeployment
 o.f.e.i.c.ProcessEngineConfigurationImpl : Found 5 Engine Configurators in total:
-o.f.e.i.c.ProcessEngineConfigurationImpl : class org.flowable.spring.configurator.SpringIdmEngineConfigurator (priority:100000)
+o.f.e.i.c.ProcessEngineConfigurationImpl : class org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator (priority:100000)
 o.f.e.i.c.ProcessEngineConfigurationImpl : class org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator (priority:200000)
 o.f.e.i.c.ProcessEngineConfigurationImpl : class org.flowable.form.spring.configurator.SpringFormEngineConfigurator (priority:300000)
 o.f.e.i.c.ProcessEngineConfigurationImpl : class org.flowable.content.spring.configurator.SpringContentEngineConfigurator (priority:400000)
 o.f.e.i.c.ProcessEngineConfigurationImpl : class org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator (priority:500000)
-o.f.e.i.c.ProcessEngineConfigurationImpl : Executing beforeInit() of class org.flowable.spring.configurator.SpringIdmEngineConfigurator (priority:100000)
+o.f.e.i.c.ProcessEngineConfigurationImpl : Executing beforeInit() of class org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator (priority:100000)
 o.f.e.i.c.ProcessEngineConfigurationImpl : Executing beforeInit() of class org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator (priority:200000)
 o.f.e.i.c.ProcessEngineConfigurationImpl : Executing beforeInit() of class org.flowable.form.spring.configurator.SpringFormEngineConfigurator (priority:300000)
 o.f.e.i.c.ProcessEngineConfigurationImpl : Executing beforeInit() of class org.flowable.content.spring.configurator.SpringContentEngineConfigurator (priority:400000)
 o.f.e.i.c.ProcessEngineConfigurationImpl : Executing beforeInit() of class org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator (priority:500000)
 com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
 com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-o.f.e.i.c.ProcessEngineConfigurationImpl : Executing configure() of class org.flowable.spring.configurator.SpringIdmEngineConfigurator (priority:100000)
+o.f.e.i.c.ProcessEngineConfigurationImpl : Executing configure() of class org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator (priority:100000)
 .d.AbstractSqlScriptBasedDbSchemaManager : performing create on identity with resource org/flowable/idm/db/create/flowable.h2.create.identity.sql
 o.f.idm.engine.impl.IdmEngineImpl        : IdmEngine default created
 o.f.e.i.c.ProcessEngineConfigurationImpl : Executing configure() of class org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator (priority:200000)
@@ -116,9 +116,9 @@ o.f.c.engine.ContentEngineConfiguration  : Content file system root : ...
 o.f.c.engine.impl.ContentEngineImpl      : ContentEngine default created
 o.f.e.i.c.ProcessEngineConfigurationImpl : Executing configure() of class org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator (priority:500000)
 o.f.cmmn.engine.CmmnEngineConfiguration  : Found 1 Engine Configurators in total:
-o.f.cmmn.engine.CmmnEngineConfiguration  : class org.flowable.cmmn.engine.impl.cfg.IdmEngineConfigurator (priority:100000)
-o.f.cmmn.engine.CmmnEngineConfiguration  : Executing beforeInit() of class org.flowable.cmmn.engine.impl.cfg.IdmEngineConfigurator (priority:100000)
-o.f.cmmn.engine.CmmnEngineConfiguration  : Executing configure() of class org.flowable.cmmn.engine.impl.cfg.IdmEngineConfigurator (priority:100000)
+o.f.cmmn.engine.CmmnEngineConfiguration  : class org.flowable.idm.engine.configurator.IdmEngineConfigurator (priority:100000)
+o.f.cmmn.engine.CmmnEngineConfiguration  : Executing beforeInit() of class org.flowable.idm.engine.configurator.IdmEngineConfigurator (priority:100000)
+o.f.cmmn.engine.CmmnEngineConfiguration  : Executing configure() of class org.flowable.idm.engine.configurator.IdmEngineConfigurator (priority:100000)
 o.f.idm.engine.impl.IdmEngineImpl        : IdmEngine default created
 o.f.cmmn.engine.impl.CmmnEngineImpl      : CmmnEngine default created
 o.f.engine.impl.ProcessEngineImpl        : ProcessEngine default created
@@ -622,7 +622,7 @@ Flowable also provides a Spring Boot `InfoContributor` which looks like:
 ----
 {
   "flowable": {
-    "version": "6.3.1.0"
+    "version": "6.4.0-SNAPSHOT"
   }
 }
 ----
@@ -763,6 +763,7 @@ flowable.idm.ldap.user-base-dn= # The base 'distinguished name' (DN) from which 
 
 # Flowable Mail {sc-flowable-boot}/FlowableMailProperties.java[FlowableMailProperties]
 flowable.mail.server.default-from=flowable@localhost # The default from address that needs to be used when sending emails.
+flowable.mail.server.force-to= # The force to address(es) that would be used when sending out emails. IMPORTANT: If this is set then all emails will be send to defined address(es) instead of the address configured in the MailActivity.
 flowable.mail.server.host=localhost # The host of the mail server.
 flowable.mail.server.password= # The password for the mail server authentication.
 flowable.mail.server.port=1025 # The port of the mail server.
@@ -947,7 +948,7 @@ You can provide a custom implementation of a Flowable Service by using this. See
 
 ===== Combining starters
 
-In case you need only a combination of the engines then you can add only the required depdenencies.
+In case you need only a combination of the engines then you can add only the required dependencies.
 For example to use the Process, CMMN, Form and IDM engine and use LDAP you need to add the following dependencies:
 
 [source,xml,linenums]

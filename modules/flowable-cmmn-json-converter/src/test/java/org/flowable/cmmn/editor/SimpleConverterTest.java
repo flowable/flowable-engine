@@ -28,7 +28,6 @@ import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
 import org.flowable.cmmn.model.Stage;
-import org.junit.Test;
 
 public class SimpleConverterTest extends AbstractConverterTest {
 

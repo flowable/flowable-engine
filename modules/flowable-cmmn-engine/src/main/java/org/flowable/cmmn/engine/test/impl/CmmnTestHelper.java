@@ -22,8 +22,8 @@ import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +41,6 @@ public abstract class CmmnTestHelper {
     // Test annotation support /////////////////////////////////////////////
 
     public static String annotationDeploymentSetUp(CmmnEngine cmmnEngine, Class<?> testClass, String methodName) {
-        String deploymentId = null;
         Method method = null;
         try {
             method = testClass.getMethod(methodName, (Class<?>[]) null);
@@ -49,7 +48,17 @@ public abstract class CmmnTestHelper {
             LOGGER.warn("Could not get method by reflection. This could happen if you are using @Parameters in combination with annotations.", e);
             return null;
         }
+        return annotationDeploymentSetUp(cmmnEngine, testClass, method);
+    }
+
+    public static String annotationDeploymentSetUp(CmmnEngine cmmnEngine, Class<?> testClass, Method method) {
         CmmnDeployment deploymentAnnotation = method.getAnnotation(CmmnDeployment.class);
+        return annotationDeploymentSetUp(cmmnEngine, testClass, method, deploymentAnnotation);
+    }
+
+    public static String annotationDeploymentSetUp(CmmnEngine cmmnEngine, Class<?> testClass, Method method, CmmnDeployment deploymentAnnotation) {
+        String deploymentId = null;
+        String methodName = method.getName();
         if (deploymentAnnotation != null) {
             LOGGER.debug("annotation @CmmnDeployment creates deployment for {}.{}", testClass.getSimpleName(), methodName);
             String[] resources = deploymentAnnotation.resources();
@@ -66,7 +75,7 @@ public abstract class CmmnTestHelper {
             }
 
             if (deploymentAnnotation.tenantId() != null
-                    && deploymentAnnotation.tenantId().length() > 0) {
+                && deploymentAnnotation.tenantId().length() > 0) {
                 deploymentBuilder.tenantId(deploymentAnnotation.tenantId());
             }
 

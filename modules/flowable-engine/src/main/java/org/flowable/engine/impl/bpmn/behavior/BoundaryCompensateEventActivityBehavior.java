@@ -21,7 +21,7 @@ import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SubProcess;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -54,9 +54,11 @@ public class BoundaryCompensateEventActivityBehavior extends BoundaryEventActivi
             throw new FlowableException("Process model (id = " + execution.getId() + ") could not be found");
         }
 
+        Activity sourceActivity = null;
         Activity compensationActivity = null;
         List<Association> associations = process.findAssociationsWithSourceRefRecursive(boundaryEvent.getId());
         for (Association association : associations) {
+            sourceActivity = boundaryEvent.getAttachedToRef();
             FlowElement targetElement = process.getFlowElement(association.getTargetRef(), true);
             if (targetElement instanceof Activity) {
                 Activity activity = (Activity) targetElement;
@@ -65,6 +67,10 @@ public class BoundaryCompensateEventActivityBehavior extends BoundaryEventActivi
                     break;
                 }
             }
+        }
+        
+        if (sourceActivity == null) {
+            throw new FlowableException("Parent activity for boundary compensation event could not be found");
         }
 
         if (compensationActivity == null) {
@@ -90,7 +96,7 @@ public class BoundaryCompensateEventActivityBehavior extends BoundaryEventActivi
         }
 
         CommandContextUtil.getEventSubscriptionEntityManager().insertCompensationEvent(
-                scopeExecution, compensationActivity.getId());
+                scopeExecution, sourceActivity.getId());
     }
 
     @Override

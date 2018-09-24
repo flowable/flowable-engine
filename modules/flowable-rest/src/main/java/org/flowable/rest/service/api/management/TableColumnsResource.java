@@ -13,9 +13,10 @@
 
 package org.flowable.rest.service.api.management;
 
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.engine.ManagementService;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.management.TableMetaData;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,6 +38,9 @@ public class TableColumnsResource {
 
     @Autowired
     protected ManagementService managementService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get column info for a single table", tags = { "Database tables" })
     @ApiResponses(value = {
@@ -45,6 +49,10 @@ public class TableColumnsResource {
     })
     @GetMapping(value = "/management/tables/{tableName}/columns", produces = "application/json")
     public TableMetaData getTableMetaData(@ApiParam(name = "tableName") @PathVariable String tableName) {
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessTableInfo();
+        }
+        
         TableMetaData response = managementService.getTableMetaData(tableName);
 
         if (response == null) {

@@ -16,8 +16,9 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItemTransition;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
@@ -40,14 +41,8 @@ public class StartPlanItemInstanceOperation extends AbstractChangePlanItemInstan
     
     @Override
     protected void internalExecute() {
-
+        CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceStarted(planItemInstanceEntity);
         executeActivityBehavior();
-
-        // For the first instance of a repeatable plan item, the counter variable needs to be set.
-        if (isPlanItemRepeatableOnComplete(planItemInstanceEntity.getPlanItem())
-                && getRepetitionCounter(planItemInstanceEntity) == 0) {
-            setRepetitionCounter(planItemInstanceEntity, 1);
-        }
     }
     
     protected void executeActivityBehavior() {

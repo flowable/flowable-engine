@@ -1,7 +1,7 @@
 package org.flowable.spring.impl.test;
 
+import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.engine.RepositoryService;
-import org.flowable.engine.common.api.FlowableOptimisticLockingException;
 import org.flowable.engine.repository.Deployment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

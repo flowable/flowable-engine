@@ -12,10 +12,10 @@
  */
 package org.flowable.engine.impl.el;
 
-import org.flowable.engine.common.api.variable.VariableContainer;
-import org.flowable.engine.common.impl.el.VariableContainerELResolver;
-import org.flowable.engine.common.impl.identity.Authentication;
-import org.flowable.engine.common.impl.javax.el.ELContext;
+import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.common.engine.impl.el.VariableContainerELResolver;
+import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.common.engine.impl.javax.el.ELContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;

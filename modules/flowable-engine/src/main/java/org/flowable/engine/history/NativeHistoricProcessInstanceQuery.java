@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.history;
 
-import org.flowable.engine.common.api.query.NativeQuery;
+import org.flowable.common.engine.api.query.NativeQuery;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 
 /**

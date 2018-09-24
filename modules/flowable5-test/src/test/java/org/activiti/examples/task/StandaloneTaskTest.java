@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.api.FlowableOptimisticLockingException;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.api.FlowableOptimisticLockingException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 
@@ -61,6 +61,7 @@ public class StandaloneTaskTest extends PluggableFlowableTestCase {
         assertEquals(1, tasks.size());
         assertEquals("testTask", tasks.get(0).getName());
 
+        task = tasks.get(0);
         task.setName("Update name");
         taskService.saveTask(task);
         tasks = taskService.createTaskQuery().taskCandidateUser("kermit").list();

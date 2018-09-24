@@ -61,7 +61,7 @@ import org.osgi.framework.Constants;
 @ExamReactorStrategy(PerMethod.class)
 public class BlueprintBasicTest {
     
-    private static final String FLOWABLE_VERSION = "6.3.1-SNAPSHOT";
+    private static final String FLOWABLE_VERSION = "6.4.0-SNAPSHOT";
 
     @Inject
     protected BundleContext ctx;
@@ -93,6 +93,7 @@ public class BlueprintBasicTest {
                 mavenBundle().groupId("org.flowable").artifactId("flowable-dmn-api").version(FLOWABLE_VERSION),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-idm-api").version(FLOWABLE_VERSION),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-idm-engine").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-idm-engine-configurator").version(FLOWABLE_VERSION),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-content-api").version(FLOWABLE_VERSION),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-variable-service-api").version(FLOWABLE_VERSION),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-variable-service").version(FLOWABLE_VERSION),
@@ -105,12 +106,12 @@ public class BlueprintBasicTest {
                 mavenBundle().groupId("org.flowable").artifactId("flowable-cmmn-model").version(FLOWABLE_VERSION),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-cmmn-api").version(FLOWABLE_VERSION),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-engine").version(FLOWABLE_VERSION),
-                mavenBundle().groupId("org.apache.commons").artifactId("commons-lang3").version("3.7"),
-                mavenBundle().groupId("com.fasterxml.uuid").artifactId("java-uuid-generator").version("3.1.3"),
+                mavenBundle().groupId("org.apache.commons").artifactId("commons-lang3").version("3.8.1"),
+                mavenBundle().groupId("com.fasterxml.uuid").artifactId("java-uuid-generator").version("3.1.5"),
                 mavenBundle().groupId("com.fasterxml.jackson.core").artifactId("jackson-core").version("2.9.3"),
                 mavenBundle().groupId("com.fasterxml.jackson.core").artifactId("jackson-databind").version("2.9.3"),
                 mavenBundle().groupId("com.fasterxml.jackson.core").artifactId("jackson-annotations").version("2.9.3"),
-                mavenBundle().groupId("joda-time").artifactId("joda-time").version("2.9.9"),
+                mavenBundle().groupId("joda-time").artifactId("joda-time").version("2.10"),
                 mavenBundle().groupId("com.h2database").artifactId("h2").version("1.4.196"),
                 mavenBundle().groupId("org.mybatis").artifactId("mybatis").version("3.4.5"),
                 mavenBundle().groupId("org.slf4j").artifactId("slf4j-log4j12").version("1.7.25").noStart(),

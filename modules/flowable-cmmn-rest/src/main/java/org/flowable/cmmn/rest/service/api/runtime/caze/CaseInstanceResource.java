@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.rest.service.api.RestActionRequest;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -64,6 +64,10 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
                     @RequestBody RestActionRequest actionRequest, HttpServletRequest request, HttpServletResponse response) {
 
         CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.doCaseInstanceAction(caseInstance, actionRequest);
+        }
 
         if (RestActionRequest.EVALUATE_CRITERIA.equals(actionRequest.getAction())) {
             runtimeService.evaluateCriteria(caseInstance.getId());
@@ -89,9 +93,12 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
             @ApiResponse(code = 404, message = "Indicates the requested case instance was not found.")
     })
     @DeleteMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}")
-    public void deleteProcessInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, @RequestParam(value = "deleteReason", required = false) String deleteReason, HttpServletResponse response) {
-
+    public void deleteCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, @RequestParam(value = "deleteReason", required = false) String deleteReason, HttpServletResponse response) {
         CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteCaseInstance(caseInstance);
+        }
 
         runtimeService.terminateCaseInstance(caseInstance.getId());
         response.setStatus(HttpStatus.NO_CONTENT.value());

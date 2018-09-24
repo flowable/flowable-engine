@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstanceQuery;
+import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricVariableInstanceQuery;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
@@ -33,6 +34,8 @@ public interface CmmnHistoryService {
     HistoricVariableInstanceQuery createHistoricVariableInstanceQuery();
     
     HistoricTaskInstanceQuery createHistoricTaskInstanceQuery();
+
+    HistoricPlanItemInstanceQuery createHistoricPlanItemInstanceQuery();
 
     void deleteHistoricCaseInstance(String caseInstanceId);
     
@@ -52,5 +55,5 @@ public interface CmmnHistoryService {
      * Retrieves the {@link HistoricIdentityLink}s associated with the given case instance. Such an {@link IdentityLink} informs how a certain identity (eg. group or user) is associated with a
      * certain case instance, even if the instance is completed as opposed to {@link IdentityLink}s which only exist for active instances.
      */
-    List<HistoricIdentityLink> getHistoricIdentityLinksForCaseInstance(String processInstanceId);
+    List<HistoricIdentityLink> getHistoricIdentityLinksForCaseInstance(String caseInstanceId);
 }

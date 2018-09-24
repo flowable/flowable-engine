@@ -28,8 +28,8 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataMan
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.matcher.CaseInstanceByCaseDefinitionIdMatcher;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
-import org.flowable.engine.common.api.FlowableOptimisticLockingException;
-import org.flowable.engine.common.impl.persistence.cache.EntityCache;
+import org.flowable.common.engine.api.FlowableOptimisticLockingException;
+import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
@@ -51,9 +51,9 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
     @Override
     public CaseInstanceEntity create() {
         CaseInstanceEntityImpl caseInstanceEntityImpl = new CaseInstanceEntityImpl();
-        caseInstanceEntityImpl.setChildPlanItemInstances(new ArrayList<PlanItemInstanceEntity>(1));
-        caseInstanceEntityImpl.setSatisfiedSentryPartInstances(new ArrayList<SentryPartInstanceEntity>(1));
-        caseInstanceEntityImpl.internalSetVariableInstances(new HashMap<String, VariableInstanceEntity>(1));
+        caseInstanceEntityImpl.setChildPlanItemInstances(new ArrayList<>(1));
+        caseInstanceEntityImpl.setSatisfiedSentryPartInstances(new ArrayList<>(1));
+        caseInstanceEntityImpl.internalSetVariableInstances(new HashMap<>(1));
         return caseInstanceEntityImpl;
     }
 
@@ -62,6 +62,7 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
         return findCaseInstanceEntityEagerFetchPlanItemInstances(caseInstanceId, null);
     }
 
+    @Override
     public CaseInstanceEntity findCaseInstanceEntityEagerFetchPlanItemInstances(String caseInstanceId, String planItemInstanceId) {
 
         // Could have been fetched before
@@ -104,7 +105,7 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
 
                 // Always add empty list, so no check is needed later and plan items
                 // without children have a non-null value, not triggering the fetch
-                planItemInstanceEntity.setChildPlanItemInstances(new ArrayList<PlanItemInstanceEntity>());
+                planItemInstanceEntity.setChildPlanItemInstances(new ArrayList<>());
             }
 
             // Add to correct parent

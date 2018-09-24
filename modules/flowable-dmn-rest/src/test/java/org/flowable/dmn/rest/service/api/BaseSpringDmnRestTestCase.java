@@ -49,7 +49,6 @@ import org.flowable.dmn.engine.DmnEngines;
 import org.flowable.dmn.engine.impl.test.AbstractDmnTestCase;
 import org.flowable.dmn.engine.test.DmnTestHelper;
 import org.flowable.dmn.rest.conf.ApplicationConfiguration;
-import org.flowable.dmn.rest.service.api.DmnRestUrlBuilder;
 import org.flowable.dmn.rest.util.TestServerUtil;
 import org.flowable.dmn.rest.util.TestServerUtil.TestServer;
 import org.junit.Assert;
@@ -61,8 +60,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import junit.framework.AssertionFailedError;
 
 public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
 
@@ -140,7 +137,7 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
             deploymentId = DmnTestHelper.annotationDeploymentSetUp(dmnEngine, getClass(), getName());
 
             super.runBare();
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             LOGGER.error(EMPTY_LINE);
             LOGGER.error("ASSERTION FAILED: {}", e, e);
             exception = e;

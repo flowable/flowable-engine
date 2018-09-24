@@ -14,16 +14,18 @@ package org.flowable.standalone.event;
 
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.api.event.StaticTestFlowableEventListener;
 import org.flowable.engine.test.api.event.TestFlowableEventListener;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test for event-listeners that are registered on a process-definition scope, rather than on the global engine-wide scope, declared in the BPMN XML.
@@ -41,6 +43,7 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
     /**
      * Test to verify listeners defined in the BPMN xml are added to the process definition and are active.
      */
+    @Test
     @Deployment
     public void testProcessDefinitionListenerDefinition() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testEventListeners");
@@ -82,6 +85,7 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
     /**
      * Test to verify listeners defined in the BPMN xml with invalid class/delegateExpression values cause an exception when process is started.
      */
+    @Test
     public void testProcessDefinitionListenerDefinitionError() throws Exception {
 
         // Deploy process with expression which references an unexisting bean
@@ -99,6 +103,7 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
     /**
      * Test to verify if event listeners defined in the BPMN XML which have illegal event-types cause an exception on deploy.
      */
+    @Test
     public void testProcessDefinitionListenerDefinitionIllegalType() throws Exception {
         // In case deployment doesn't fail, we delete the deployment in the
         // finally block to
@@ -123,6 +128,7 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
     /**
      * Test to verify listeners defined in the BPMN xml are added to the process definition and are active, for all entity types
      */
+    @Test
     @Deployment
     public void testProcessDefinitionListenerDefinitionEntities() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testEventListeners");
@@ -142,9 +148,8 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
 
     }
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         testListenerBean = (TestFlowableEventListener) processEngineConfiguration.getBeans().get("testEventListener");
     }
 }

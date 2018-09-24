@@ -13,9 +13,9 @@
 
 package org.flowable.content.engine.impl.persistence;
 
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.content.engine.ContentEngineConfiguration;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Tijs Rademakers

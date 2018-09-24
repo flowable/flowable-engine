@@ -12,21 +12,27 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
-import org.flowable.cmmn.api.PlanItemInstanceCallbackType;
+import liquibase.util.StringUtils;
+import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.Process;
 import org.flowable.cmmn.model.ProcessTask;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
-import liquibase.util.StringUtils;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -35,11 +41,17 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
 
     protected Process process;
     protected Expression processRefExpression;
+    protected String processRef;
+    List<IOParameter> inParameters;
+    List<IOParameter> outParameters;
 
     public ProcessTaskActivityBehavior(Process process, Expression processRefExpression, ProcessTask processTask) {
         super(processTask.isBlocking(), processTask.getBlockingExpression());
         this.process = process;
         this.processRefExpression = processRefExpression;
+        this.processRef = processTask.getProcessRef();
+        this.inParameters = processTask.getInParameters();
+        this.outParameters = processTask.getOutParameters();
     }
 
     @Override
@@ -54,6 +66,8 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
             externalRef = process.getExternalRef();
         } else if (processRefExpression != null) {
             externalRef = processRefExpression.getValue(planItemInstanceEntity).toString();
+        } else if (processRef != null){
+            externalRef = processRef;
         }
         if (StringUtils.isEmpty(externalRef)) {
             throw new FlowableException("Could not start process instance: no externalRef defined");
@@ -61,13 +75,31 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
 
         String processInstanceId = null;
         boolean blocking = evaluateIsBlocking(planItemInstanceEntity);
-        if (blocking) {
-            processInstanceId = processInstanceService.startProcessInstanceByKey(externalRef, planItemInstanceEntity.getId());
-        } else {
-            processInstanceId = processInstanceService.startProcessInstanceByKey(externalRef);
+        Map<String, Object> inParametersMap = new HashMap<>();
+        for (IOParameter ioParameter : inParameters) {
+            if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
+                inParametersMap.put(ioParameter.getTarget(), planItemInstanceEntity.getVariable(ioParameter.getSourceExpression()));
+            } else if (StringUtils.isNotEmpty(ioParameter.getSource())) {
+                inParametersMap.put(ioParameter.getTarget(), planItemInstanceEntity.getVariable(ioParameter.getSource()));
+            }
         }
 
-        planItemInstanceEntity.setReferenceType(PlanItemInstanceCallbackType.CHILD_PROCESS);
+        for (IOParameter ioParameter : outParameters) {
+            Object value = null;
+            if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
+                value = planItemInstanceEntity.getVariable(ioParameter.getSourceExpression());
+            } else if (StringUtils.isNotEmpty(ioParameter.getSource())) {
+                value = planItemInstanceEntity.getVariable(ioParameter.getSource());
+            }
+            inParametersMap.put(ioParameter.getTarget(), value);
+        }
+        if (blocking) {
+            processInstanceId = processInstanceService.startProcessInstanceByKey(externalRef, planItemInstanceEntity.getId(), planItemInstanceEntity.getTenantId(), inParametersMap);
+        } else {
+            processInstanceId = processInstanceService.startProcessInstanceByKey(externalRef, planItemInstanceEntity.getTenantId(), inParametersMap);
+        }
+
+        planItemInstanceEntity.setReferenceType(CallbackTypes.PLAN_ITEM_CHILD_PROCESS);
         planItemInstanceEntity.setReferenceId(processInstanceId);
 
         if (!blocking) {
@@ -83,10 +115,11 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
         if (planItemInstance.getReferenceId() == null) {
             throw new FlowableException("Cannot trigger process task plan item instance : no reference id set");
         }
-        if (!PlanItemInstanceCallbackType.CHILD_PROCESS.equals(planItemInstance.getReferenceType())) {
+        if (!CallbackTypes.PLAN_ITEM_CHILD_PROCESS.equals(planItemInstance.getReferenceType())) {
             throw new FlowableException("Cannot trigger process task plan item instance : reference type '"
                     + planItemInstance.getReferenceType() + "' not supported");
         }
+
 
         // Triggering the plan item (as opposed to a regular complete) terminates the process instance
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstance);
@@ -98,6 +131,19 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
         // The process task plan item will be deleted by the regular TerminatePlanItemOperation
         if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
             deleteProcessInstance(commandContext, planItemInstance);
+        } else if (PlanItemTransition.COMPLETE.equals(transition)) {
+            ProcessInstanceService processInstanceService = CommandContextUtil.getCmmnEngineConfiguration().getProcessInstanceService();
+
+            CaseInstance caseInstance = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(planItemInstance.getCaseInstanceId());
+            for (IOParameter ioParameter : outParameters) {
+                Object value = null;
+                if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
+                    value = processInstanceService.getVariables(planItemInstance.getReferenceId()).get(ioParameter.getSourceExpression());
+                } else if (StringUtils.isNotEmpty(ioParameter.getSource())) {
+                    value = processInstanceService.getVariables(planItemInstance.getReferenceId()).get(ioParameter.getSource());
+                }
+                ((CaseInstanceEntity) caseInstance).setVariable(ioParameter.getTarget(), value);
+            }
         }
     }
 

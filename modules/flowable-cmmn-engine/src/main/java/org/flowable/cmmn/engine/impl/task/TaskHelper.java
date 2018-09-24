@@ -16,14 +16,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.impl.util.IdentityLinkUtil;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.scope.ScopeTypes;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.HistoricTaskService;
@@ -38,19 +35,19 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  * @author Joram Barrez
  */
 public class TaskHelper {
-    
+
     public static void insertTask(TaskEntity taskEntity, boolean fireCreateEvent) {
         if (taskEntity.getOwner() != null) {
-            addOwnerIdentityLink(taskEntity, taskEntity.getOwner());
+            addOwnerIdentityLink(taskEntity);
         }
         if (taskEntity.getAssignee() != null) {
             addAssigneeIdentityLinks(taskEntity);
         }
-        
+
         CommandContextUtil.getTaskService().insertTask(taskEntity, fireCreateEvent);
         CommandContextUtil.getCmmnHistoryManager().recordTaskCreated(taskEntity);
     }
-    
+
     public static void deleteTask(String taskId, String deleteReason, boolean cascade) {
         TaskEntity task = CommandContextUtil.getTaskService().getTask(taskId);
         if (task != null) {
@@ -128,33 +125,23 @@ public class TaskHelper {
     public static void changeTaskOwner(TaskEntity taskEntity, String owner) {
         if ((taskEntity.getOwner() != null && !taskEntity.getOwner().equals(owner))
                 || (taskEntity.getOwner() == null && owner != null)) {
-            
+
             CommandContextUtil.getTaskService().changeTaskOwner(taskEntity, owner);
-            
+
             if (taskEntity.getId() != null) {
-                addOwnerIdentityLink(taskEntity, taskEntity.getOwner());
+                addOwnerIdentityLink(taskEntity);
             }
         }
     }
     
     protected static void addAssigneeIdentityLinks(TaskEntity taskEntity) {
-        if (taskEntity.getAssignee() != null && taskEntity.getScopeId() != null && ScopeTypes.CMMN.equals(taskEntity.getScopeType())) {
-            CaseInstance caseInstance = CommandContextUtil.getCaseInstanceEntityManager().findById(taskEntity.getScopeId());
-            IdentityLinkUtil.createCaseInstanceIdentityLink(caseInstance, taskEntity.getAssignee(), null, IdentityLinkType.PARTICIPANT);
-        }
+        CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLinkToParent(taskEntity, taskEntity.getAssignee());
     }
-    
-    protected static void addOwnerIdentityLink(TaskEntity taskEntity, String owner) {
-        if (owner == null && taskEntity.getOwner() == null) {
-            return;
-        }
 
-        if (owner != null && taskEntity.getScopeId() != null && ScopeTypes.CMMN.equals(taskEntity.getScopeType())) {
-            CaseInstance caseInstance = CommandContextUtil.getCaseInstanceEntityManager().findById(taskEntity.getScopeId());
-            IdentityLinkUtil.createCaseInstanceIdentityLink(caseInstance, owner, null, IdentityLinkType.PARTICIPANT);
-        }
+    protected static void addOwnerIdentityLink(TaskEntity taskEntity) {
+        CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLinkToParent(taskEntity, taskEntity.getOwner());
     }
-    
+
     public static void deleteHistoricTask(String taskId) {
         if (CommandContextUtil.getCmmnEngineConfiguration().getHistoryLevel() != HistoryLevel.NONE) {
             HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();

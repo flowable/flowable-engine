@@ -18,14 +18,15 @@ import java.util.GregorianCalendar;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.impl.calendar.BusinessCalendar;
-import org.flowable.engine.common.impl.cfg.TransactionState;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.calendar.BusinessCalendar;
+import org.flowable.common.engine.impl.cfg.TransactionContext;
+import org.flowable.common.engine.impl.cfg.TransactionState;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobInfo;
@@ -39,12 +40,15 @@ import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.HistoryJobProcessorContextImpl;
 import org.flowable.job.service.impl.JobProcessorContextImpl;
+import org.flowable.job.service.impl.history.async.AsyncHistorySession;
+import org.flowable.job.service.impl.history.async.TriggerAsyncHistoryExecutorTransactionListener;
 import org.flowable.job.service.impl.persistence.entity.AbstractJobEntity;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobByteArrayRef;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
@@ -267,8 +271,12 @@ public class DefaultJobManager implements JobManager {
             // as the chance of failure will be high.
 
         } else {
-            // It could be a v5 job, so simply unlock it.
-            jobServiceConfiguration.getJobEntityManager().resetExpiredJob(job.getId());
+            if (job != null) {
+                // It could be a v5 job, so simply unlock it.
+                jobServiceConfiguration.getJobEntityManager().resetExpiredJob(job.getId());
+            } else {
+                throw new FlowableException("Programmatic error: null job passed");
+            }
         }
 
     }
@@ -374,14 +382,30 @@ public class DefaultJobManager implements JobManager {
         VariableScope variableScope = jobServiceConfiguration.getInternalJobManager().resolveVariableScope(jobEntity);
 
         Map<String, JobHandler> jobHandlers = jobServiceConfiguration.getJobHandlers();
-        JobHandler jobHandler = jobHandlers.get(jobEntity.getJobHandlerType());
-        jobHandler.execute(jobEntity, jobEntity.getJobHandlerConfiguration(), variableScope, getCommandContext());
+        if (jobEntity.getJobHandlerType() != null) {
+            JobHandler jobHandler = jobHandlers.get(jobEntity.getJobHandlerType());
+            if (jobHandler != null) {
+                jobHandler.execute(jobEntity, jobEntity.getJobHandlerConfiguration(), variableScope, getCommandContext());
+            } else {
+                throw new FlowableException("No job handler registered for type " + jobEntity.getJobHandlerType());
+            }
+        } else {
+            throw new FlowableException("Job has no job handler type");
+        }
     }
 
     protected void executeHistoryJobHandler(HistoryJobEntity historyJobEntity) {
         Map<String, HistoryJobHandler> jobHandlers = jobServiceConfiguration.getHistoryJobHandlers();
-        HistoryJobHandler jobHandler = jobHandlers.get(historyJobEntity.getJobHandlerType());
-        jobHandler.execute(historyJobEntity, historyJobEntity.getJobHandlerConfiguration(), getCommandContext());
+        if (historyJobEntity.getJobHandlerType() != null) {
+            HistoryJobHandler jobHandler = jobHandlers.get(historyJobEntity.getJobHandlerType());
+            if (jobHandler != null) {
+                jobHandler.execute(historyJobEntity, historyJobEntity.getJobHandlerConfiguration(), getCommandContext());
+            } else {
+                throw new FlowableException("No history job handler registered for type " + historyJobEntity.getJobHandlerType());
+            }
+        } else {
+            throw new FlowableException("Async history job has no job handler type");
+        }
     }
 
     protected boolean isValidTime(JobEntity timerEntity, Date newTimerDate, VariableScope variableScope) {
@@ -391,19 +415,24 @@ public class DefaultJobManager implements JobManager {
     }
 
     protected void hintAsyncExecutor(JobEntity job) {
-        
         // Verify that correct properties have been set when the async executor will be hinted
         if (job.getLockOwner() == null || job.getLockExpirationTime() == null) {
             createAsyncJob(job, job.isExclusive());
         }
-        
+        createHintListeners(getAsyncExecutor(), job);
+    }
+
+    protected void createHintListeners(AsyncExecutor asyncExecutor, JobInfoEntity job) {
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
         if (Context.getTransactionContext() != null) {
-            JobAddedTransactionListener jobAddedTransactionListener = new JobAddedTransactionListener(job, getAsyncExecutor(),
-                            CommandContextUtil.getJobServiceConfiguration().getCommandExecutor());
+            JobAddedTransactionListener jobAddedTransactionListener = new JobAddedTransactionListener(job, asyncExecutor,
+                            CommandContextUtil.getJobServiceConfiguration(commandContext).getCommandExecutor());
             Context.getTransactionContext().addTransactionListener(TransactionState.COMMITTED, jobAddedTransactionListener);
+            
         } else {
-            AsyncJobAddedNotification jobAddedNotification = new AsyncJobAddedNotification(job, getAsyncExecutor());
-            getCommandContext().addCloseListener(jobAddedNotification);
+            AsyncJobAddedNotification jobAddedNotification = new AsyncJobAddedNotification(job, asyncExecutor);
+            commandContext.addCloseListener(jobAddedNotification);
+            
         }
     }
 
@@ -439,21 +468,49 @@ public class DefaultJobManager implements JobManager {
     public HistoryJobEntity scheduleHistoryJob(HistoryJobEntity historyJobEntity) {
         callHistoryJobProcessors(HistoryJobProcessorContext.Phase.BEFORE_CREATE, historyJobEntity);
         jobServiceConfiguration.getHistoryJobEntityManager().insert(historyJobEntity);
+        triggerAsyncHistoryExecutorIfNeeded(historyJobEntity);
         return historyJobEntity;
     }
+    
+    protected void triggerAsyncHistoryExecutorIfNeeded(HistoryJobEntity historyJobEntity) {
+        if (isAsyncHistoryExecutorActive()) {
+            hintAsyncHistoryExecutor(historyJobEntity);
+        }
+    }
 
+    protected void hintAsyncHistoryExecutor(HistoryJobEntity historyJobEntity) {
+        if (historyJobEntity.getLockOwner() == null || historyJobEntity.getLockExpirationTime() == null) {
+            setLockTimeAndOwner(getAsyncHistoryExecutor(), historyJobEntity);
+        }
+        createAsyncHistoryHintListeners(historyJobEntity);
+    }
+
+    protected void createAsyncHistoryHintListeners(HistoryJobEntity historyJobEntity) {
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
+        AsyncHistorySession asyncHistorySession = commandContext.getSession(AsyncHistorySession.class);
+        if (asyncHistorySession != null) {
+            TransactionContext transactionContext = asyncHistorySession.getTransactionContext();
+            if (transactionContext != null) {
+                transactionContext.addTransactionListener(TransactionState.COMMITTED, new TriggerAsyncHistoryExecutorTransactionListener(commandContext, historyJobEntity)); 
+            }
+        }
+    }
+    
     protected void internalCreateAsyncJob(JobEntity jobEntity, boolean exclusive) {
         fillDefaultAsyncJobInfo(jobEntity, exclusive);
     }
 
     protected void internalCreateLockedAsyncJob(JobEntity jobEntity, boolean exclusive) {
         fillDefaultAsyncJobInfo(jobEntity, exclusive);
+        setLockTimeAndOwner(getAsyncExecutor(), jobEntity);
+    }
 
+    protected void setLockTimeAndOwner(AsyncExecutor asyncExecutor , JobInfoEntity jobInfoEntity) {
         GregorianCalendar gregorianCalendar = new GregorianCalendar();
         gregorianCalendar.setTime(jobServiceConfiguration.getClock().getCurrentTime());
-        gregorianCalendar.add(Calendar.MILLISECOND, getAsyncExecutor().getAsyncJobLockTimeInMillis());
-        jobEntity.setLockExpirationTime(gregorianCalendar.getTime());
-        jobEntity.setLockOwner(getAsyncExecutor().getLockOwner());
+        gregorianCalendar.add(Calendar.MILLISECOND, asyncExecutor.getAsyncJobLockTimeInMillis());
+        jobInfoEntity.setLockExpirationTime(gregorianCalendar.getTime());
+        jobInfoEntity.setLockOwner(asyncExecutor.getLockOwner());
     }
 
     protected void fillDefaultAsyncJobInfo(JobEntity jobEntity, boolean exclusive) {
@@ -463,7 +520,7 @@ public class DefaultJobManager implements JobManager {
         jobEntity.setExclusive(exclusive);
     }
 
-    protected JobEntity createExecutableJobFromOtherJob(AbstractRuntimeJobEntity job) {
+    public JobEntity createExecutableJobFromOtherJob(AbstractRuntimeJobEntity job) {
         JobEntity executableJob = jobServiceConfiguration.getJobEntityManager().create();
         copyJobInfo(executableJob, job);
 
@@ -478,25 +535,25 @@ public class DefaultJobManager implements JobManager {
         return executableJob;
     }
 
-    protected TimerJobEntity createTimerJobFromOtherJob(AbstractRuntimeJobEntity otherJob) {
+    public TimerJobEntity createTimerJobFromOtherJob(AbstractRuntimeJobEntity otherJob) {
         TimerJobEntity timerJob = jobServiceConfiguration.getTimerJobEntityManager().create();
         copyJobInfo(timerJob, otherJob);
         return timerJob;
     }
 
-    protected SuspendedJobEntity createSuspendedJobFromOtherJob(AbstractRuntimeJobEntity otherJob) {
+    public SuspendedJobEntity createSuspendedJobFromOtherJob(AbstractRuntimeJobEntity otherJob) {
         SuspendedJobEntity suspendedJob = jobServiceConfiguration.getSuspendedJobEntityManager().create();
         copyJobInfo(suspendedJob, otherJob);
         return suspendedJob;
     }
 
-    protected DeadLetterJobEntity createDeadLetterJobFromOtherJob(AbstractRuntimeJobEntity otherJob) {
+    public DeadLetterJobEntity createDeadLetterJobFromOtherJob(AbstractRuntimeJobEntity otherJob) {
         DeadLetterJobEntity deadLetterJob = jobServiceConfiguration.getDeadLetterJobEntityManager().create();
         copyJobInfo(deadLetterJob, otherJob);
         return deadLetterJob;
     }
 
-    protected AbstractRuntimeJobEntity copyJobInfo(AbstractRuntimeJobEntity copyToJob, AbstractRuntimeJobEntity copyFromJob) {
+    public AbstractRuntimeJobEntity copyJobInfo(AbstractRuntimeJobEntity copyToJob, AbstractRuntimeJobEntity copyFromJob) {
         copyToJob.setDuedate(copyFromJob.getDuedate());
         copyToJob.setEndDate(copyFromJob.getEndDate());
         copyToJob.setExclusive(copyFromJob.isExclusive());
@@ -544,6 +601,7 @@ public class DefaultJobManager implements JobManager {
         copyToJob.setCustomValues(copyFromJob.getCustomValues());
         copyToJob.setRetries(copyFromJob.getRetries());
         copyToJob.setRevision(copyFromJob.getRevision());
+        copyToJob.setScopeType(copyFromJob.getScopeType());
         copyToJob.setTenantId(copyFromJob.getTenantId());
 
         return copyToJob;
@@ -559,8 +617,15 @@ public class DefaultJobManager implements JobManager {
     }
 
     protected boolean isAsyncExecutorActive() {
-        return jobServiceConfiguration.getAsyncExecutor() != null
-                && jobServiceConfiguration.getAsyncExecutor().isActive();
+        return isExecutorActive(jobServiceConfiguration.getAsyncExecutor());
+    }
+    
+    protected boolean isAsyncHistoryExecutorActive() {
+        return isExecutorActive(jobServiceConfiguration.getAsyncHistoryExecutor());
+    }
+    
+    protected boolean isExecutorActive(AsyncExecutor asyncExecutor) {
+        return asyncExecutor != null && asyncExecutor.isActive();
     }
 
     protected CommandContext getCommandContext() {
@@ -569,6 +634,10 @@ public class DefaultJobManager implements JobManager {
 
     protected AsyncExecutor getAsyncExecutor() {
         return jobServiceConfiguration.getAsyncExecutor();
+    }
+    
+    protected AsyncExecutor getAsyncHistoryExecutor() {
+        return jobServiceConfiguration.getAsyncHistoryExecutor();
     }
 
     protected void callJobProcessors(JobProcessorContext.Phase processorType, AbstractJobEntity abstractJobEntity) {

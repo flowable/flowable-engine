@@ -27,7 +27,7 @@ import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.DelegationState;
@@ -239,6 +239,10 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
 
             // Candidate group filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateGroup=sales";
+            assertResultsPresentInDataResponse(url, processTask.getId());
+            
+            // Candidate user with group filtering
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateUser=aSalesUser";
             assertResultsPresentInDataResponse(url, processTask.getId());
 
             // Involved user filtering

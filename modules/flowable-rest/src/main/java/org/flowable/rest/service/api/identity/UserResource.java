@@ -34,6 +34,7 @@ import io.swagger.annotations.Authorization;
 
 /**
  * @author Frederik Heremans
+ * @author Filip Hrisafov
  */
 @RestController
 @Api(tags = { "Users" }, description = "Manage Users", authorizations = { @Authorization(value = "basicAuth") })
@@ -67,6 +68,9 @@ public class UserResource extends BaseUserResource {
         if (userRequest.isFirstNameChanged()) {
             user.setFirstName(userRequest.getFirstName());
         }
+        if (userRequest.isDisplayNameChanged()) {
+            user.setDisplayName(userRequest.getDisplayName());
+        }
         if (userRequest.isLastNameChanged()) {
             user.setLastName(userRequest.getLastName());
         }
@@ -88,6 +92,11 @@ public class UserResource extends BaseUserResource {
     @DeleteMapping("/identity/users/{userId}")
     public void deleteUser(@ApiParam(name = "userId") @PathVariable String userId, HttpServletResponse response) {
         User user = getUserFromRequest(userId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteUser(user);
+        }
+        
         identityService.deleteUser(user.getId());
         response.setStatus(HttpStatus.NO_CONTENT.value());
     }

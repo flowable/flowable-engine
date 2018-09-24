@@ -12,10 +12,11 @@
  */
 package org.flowable.form.rest.service.api.repository;
 
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
+import org.flowable.form.rest.FormRestApiInterceptor;
 import org.flowable.form.rest.FormRestResponseFactory;
 import org.flowable.form.rest.service.api.form.FormModelResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,9 @@ public class FormModelResource {
 
     @Autowired
     protected FormRepositoryService formRepositoryService;
+    
+    @Autowired(required=false)
+    protected FormRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get a form definition Form model", tags = { "Form Definitions" }, nickname = "getFormDefinitionFormModel")
     @ApiResponses(value = {
@@ -57,6 +61,10 @@ public class FormModelResource {
 
         if (formInfo == null) {
             throw new FlowableObjectNotFoundException("Could not find a form model with id '" + formDefinitionId);
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessFormInfoById(formInfo, null);
         }
 
         return formRestResponseFactory.createFormModelResponse(formInfo);

@@ -9,7 +9,7 @@ import java.util.Collections;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;

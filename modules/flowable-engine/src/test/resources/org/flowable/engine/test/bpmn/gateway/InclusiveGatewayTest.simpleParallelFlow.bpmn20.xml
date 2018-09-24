@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             targetNamespace="http://www.activiti.org/test">
+    <process id="simpleParallelFlow" name="simpleParallelFloW" isExecutable="true">
+        <startEvent id="startEvent" name="Start"/>
+        <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="inclusiveFork"/>
+
+        <inclusiveGateway id="inclusiveFork"/>
+
+        <sequenceFlow id="gatewayCondition1" sourceRef="inclusiveFork" targetRef="taskInclusive1">
+            <conditionExpression>${true}</conditionExpression>
+        </sequenceFlow>
+
+        <sequenceFlow id="gatewayCondition2" sourceRef="inclusiveFork" targetRef="taskInclusive2">
+            <conditionExpression>${true}</conditionExpression>
+        </sequenceFlow>
+
+        <sequenceFlow id="gatewayCondition3" sourceRef="inclusiveFork" targetRef="taskInclusive3">
+            <conditionExpression>${true}</conditionExpression>
+        </sequenceFlow>
+
+        <userTask id="taskInclusive1"/>
+        <userTask id="taskInclusive2"/>
+        <userTask id="taskInclusive3"/>
+
+        <sequenceFlow id="gatewayFlow1" sourceRef="taskInclusive1" targetRef="endEvent"/>
+        <sequenceFlow id="gatewayFlow2" sourceRef="taskInclusive2" targetRef="endEvent"/>
+        <sequenceFlow id="gatewayFlow3" sourceRef="taskInclusive3" targetRef="endEvent"/>
+
+        <!--<inclusiveGateway id="inclusiveJoin"/>-->
+        <!--<sequenceFlow id="gatewayFlow4" sourceRef="inclusiveJoin" targetRef="endEvent"/>-->
+        <endEvent id="endEvent"/>
+    </process>
+</definitions>

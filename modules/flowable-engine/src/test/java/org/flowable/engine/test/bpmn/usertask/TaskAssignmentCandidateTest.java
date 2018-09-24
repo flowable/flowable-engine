@@ -16,6 +16,9 @@ import java.util.List;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case for task candidate use case.
@@ -24,18 +27,19 @@ import org.flowable.engine.test.Deployment;
  */
 public class TaskAssignmentCandidateTest extends PluggableFlowableTestCase {
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
         identityService.saveGroup(identityService.newGroup("accounting"));
         identityService.saveGroup(identityService.newGroup("management"));
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
         identityService.deleteGroup("accounting");
         identityService.deleteGroup("management");
     }
 
+    @Test
     @Deployment
     public void testCandidateGroups() {
         runtimeService.startProcessInstanceByKey("taskCandidateExample");

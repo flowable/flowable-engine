@@ -12,14 +12,15 @@
  */
 package org.flowable.test.cmmn.converter;
 
-import org.flowable.cmmn.model.*;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.HumanTask;
+import org.flowable.cmmn.model.UserEventListener;
+import org.junit.Test;
 
 /**
  * @author Dennis Federico
@@ -54,6 +55,5 @@ public class UserEventListenerCmmnXmlConverterTest extends AbstractConverterTest
         assertEquals("myUserEventListener", userEventListener.getName());
         assertEquals("userActionListener",userEventListener.getId());
         assertEquals("UserEventListener documentation",userEventListener.getDocumentation());
-        assertArrayEquals(new String[]{"aRole"}, userEventListener.getAuthorizedRoleRefs());
     }
 }

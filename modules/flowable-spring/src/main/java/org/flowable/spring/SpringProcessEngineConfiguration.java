@@ -19,22 +19,21 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.spring.SpringEngineConfiguration;
+import org.flowable.common.spring.SpringTransactionContextFactory;
+import org.flowable.common.spring.SpringTransactionInterceptor;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.ProcessEngines;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
-import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
-import org.flowable.idm.spring.SpringTransactionContextFactory;
-import org.flowable.idm.spring.SpringTransactionInterceptor;
-import org.flowable.spring.common.SpringEngineConfiguration;
 import org.flowable.spring.configurator.AutoDeploymentStrategy;
 import org.flowable.spring.configurator.DefaultAutoDeploymentStrategy;
 import org.flowable.spring.configurator.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.spring.configurator.SingleResourceAutoDeploymentStrategy;
-import org.flowable.spring.configurator.SpringIdmEngineConfigurator;
 import org.flowable.variable.service.impl.types.EntityManagerSession;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -66,7 +65,6 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
         deploymentStrategies.add(new DefaultAutoDeploymentStrategy());
         deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy());
         deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy());
-        setIdmEngineConfigurator(new SpringIdmEngineConfigurator());
     }
 
     @Override
@@ -130,30 +128,37 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
         }
     }
 
+    @Override
     public PlatformTransactionManager getTransactionManager() {
         return transactionManager;
     }
 
+    @Override
     public void setTransactionManager(PlatformTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
     }
 
+    @Override
     public String getDeploymentName() {
         return deploymentName;
     }
 
+    @Override
     public void setDeploymentName(String deploymentName) {
         this.deploymentName = deploymentName;
     }
 
+    @Override
     public Resource[] getDeploymentResources() {
         return deploymentResources;
     }
 
+    @Override
     public void setDeploymentResources(Resource[] deploymentResources) {
         this.deploymentResources = deploymentResources;
     }
 
+    @Override
     public ApplicationContext getApplicationContext() {
         return applicationContext;
     }
@@ -163,10 +168,12 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
         this.applicationContext = applicationContext;
     }
 
+    @Override
     public String getDeploymentMode() {
         return deploymentMode;
     }
 
+    @Override
     public void setDeploymentMode(String deploymentMode) {
         this.deploymentMode = deploymentMode;
     }

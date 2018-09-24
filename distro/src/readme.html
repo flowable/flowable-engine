@@ -26,6 +26,102 @@
 
 <h1>Flowable Release Notes</h1>
 
+<h3>Release Notes - Flowable - 6.3.2</h3>
+
+<h4>Highlights</h4>
+
+<ul>
+    <li>Depend on Spring 5.x for the Spring Engine support.</li>
+    <li>Upgrade Java Persistence API to 2.1</li>
+    <li>Upgrade JMS API to 2.0.1</li>
+    <li>Support for using java.time.Duration variables and expressions for Timer durations</li>
+</ul>
+
+<h4>Upgrade notes</h4>
+
+<h5>Idm Engine SpringEncoder</h5>
+<p>
+    The deprecated constructor from SpringEncoder that accepted org.springframework.security.authentication.encoding.PasswordEncoder has been removed
+</p>
+
+<h5>Custom IdGenerator using a Bean in Spring Boot</h5>
+<p>
+    It is now possible to define the custom IdGenerator for the Flowable Process engine, by creating a bean of type IdGenerator.
+    If no bean is provided the StrongUuidGenerator will be used.
+    If there is a bean qualified with @Process then this one would be used, otherwise a unique global one would be used.
+    If there are more global beans then the default StrongUuidGenerator will be used.
+</p>
+
+<h3>Release Notes - Flowable - 6.3.1</h3>
+
+<h4>Highlights</h4>
+
+<ul>
+    <li>Introduction of an app engine, so apps are now a first class citizen and the process engine is not misused any more to handle app deployments. 
+    When starting the Flowable Task application all app deployments are automatically migrated to the new app engine.</li>
+    <li>Added async history support to the CMMN engine.</li>
+    <li>Added more history information to the CMMN engine with historic plan items.</li>
+    <li>Improved the Spring Boot support and upgraded to Spring Boot 2.0.2.</li>
+    <li>Enhanced debugger in the Flowable Task application to evaluate expressions and scripts.</li>
+    <li>Made the job service more generic with the scope type property to improve the possibility to run different job handlers for different job types.</li>
+    <li>Various small bugfixes all around.</li>
+</ul>
+
+<h4>Community contributors</h4>
+
+<ul>
+    <li>Pascal Schumacher (PascalSchumacher)</li>
+    <li>Amina Zoheir (AminaZoheir)</li>
+    <li>Toni (ttonl)</li>
+    <li>David Malkovsky (dbmalkovsky)</li>
+    <li>Michael Lippens (mlippens)</li>
+</ul>
+
+<h4>Upgrade notes</h4>
+	
+<h5>Package renaming</h5>
+	
+<p>To make the Flowable modules compatible with OSGi and Java 9 modules some package renaming was needed to prevent clashes.
+The renaming has been done according to this pattern org.flowable.engine.common -> org.flowable.common.engine</p>
+
+<h5>StrongUuidGenerator usage with Spring Boot</h5>
+
+<p>The Spring Boot process auto configuration now uses the StrongUuidGenerator. In case you were overwriting the default one you can remove that.
+In case you want to keep using the DbIdGenerator, then just add the following bean to your configuration:
+<pre><code>
+    @Bean
+    public EngineConfigurationConfigurer&lt;SpringProcessEngineConfiguration&gt; processEngineDbIdGeneratorConfigurer() {
+        return engineConfiguration -> engineConfiguration.setIdGenerator(new DbIdGenerator());
+    }
+</code></pre>
+The default values of the DbIdGenerator would be filled in during the creation of the Process Engine.
+
+<h5>IdmEngineConfigurator</h5>
+
+<p>
+    The default <code>IdmEngineConfigurator</code> and <code>SpringIdmEngineConfigurator</code> have been moved from <code>org.flowable.app.engine.impl.cfg</code>
+    and <code>org.flowable.spring.configurator</code> to <code>org.flowable.idm.engine.configurator</code> and <code>org.flowable.idm.spring.configurator</code>
+    respectively. In case you have used them please replace your imports.
+</p>
+
+<h5>Async history classes package change</h5>
+<p>
+    The async history classes have been moved from the process engine module to the job service, to make them available for other components. Generally, the packages now have <code>job.service</code> added to make this clear.
+    <ul>
+      <li>
+          Classes with regards to async history collection and execution (<code>AbstractAsyncHistoryJobHandler, AsyncHistoryJobHandler, AsyncHistoryListener, AsyncHistorySessionFactory, 
+          AsyncHistorySession, DefaultAsyncHistoryJobProducer, HistoryJsonTransformer</code>) in the <code>org.flowable.engine.impl.history.async</code> have been moved to the <code>org.flowable.job.service.impl.history.async</code> package.</li>
+      <li>
+          Classes related to executing async jobs using a message queue (most notably <code>AsyncHistoryJobMessageHandler and AsyncHistoryJobMessageReceiver</code>) have been moved from the 
+          <code>org.flowable.engine.impl.asyncexecutor.message</code> to the <code>org.flowable.job.service.impl.asyncexecutor.message</code> package.     
+      </li>
+      <li>
+          Similarly, for executing async history jobs using a message queue: the classes in the package <code>org.flowable.engine.impl.history.async.message</code> are now found in the <code>org.flowable.job.service.impl.history.async.message</code> package.
+      </li>
+    </ul>  
+    Updating the imports is sufficient when upgrading.
+</p>
+
 <h3>Release Notes - Flowable - 6.3.0</h3>
 
 <p>Flowable 6.3.0 has turned out to be a big release with many new features (and even more fixes). Many thanks to all the community contributers that participated in the release

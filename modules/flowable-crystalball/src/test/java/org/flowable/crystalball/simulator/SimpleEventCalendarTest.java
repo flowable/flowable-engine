@@ -8,8 +8,8 @@ import static org.junit.Assert.fail;
 import java.util.Comparator;
 import java.util.Date;
 
-import org.flowable.engine.common.impl.runtime.Clock;
-import org.flowable.engine.common.impl.util.DefaultClockImpl;
+import org.flowable.common.engine.impl.runtime.Clock;
+import org.flowable.common.engine.impl.util.DefaultClockImpl;
 import org.junit.Before;
 import org.junit.Test;
 

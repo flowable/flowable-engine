@@ -18,13 +18,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.content.engine.ContentEngineConfiguration;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
 
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class ContentItemEntityImpl extends AbstractEntityNoRevision implements ContentItemEntity, Serializable {
+public class ContentItemEntityImpl extends AbstractContentEngineNoRevisionEntity implements ContentItemEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -44,6 +43,7 @@ public class ContentItemEntityImpl extends AbstractEntityNoRevision implements C
     protected Date lastModified;
     protected String lastModifiedBy;
     protected String tenantId = ContentEngineConfiguration.NO_TENANT_ID;
+    protected boolean provisional;
 
     @Override
     public Object getPersistentState() {
@@ -228,6 +228,16 @@ public class ContentItemEntityImpl extends AbstractEntityNoRevision implements C
     @Override
     public void setScopeType(String scopeType) {
         this.scopeType = scopeType;
+    }
+
+    @Override
+    public boolean isProvisional() {
+        return provisional;
+    }
+
+    @Override
+    public void setProvisional(boolean provisional) {
+        this.provisional = provisional;
     }
 
     @Override

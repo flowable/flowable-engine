@@ -12,10 +12,10 @@
  */
 package org.flowable.examples.runtime;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.FlowableEngineAgendaFactory;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.agenda.DefaultFlowableEngineAgenda;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
@@ -83,6 +83,11 @@ public class WatchDogAgendaFactory implements FlowableEngineAgendaFactory {
         @Override
         public void planEndExecutionOperation(ExecutionEntity execution) {
             agenda.planEndExecutionOperation(execution);
+        }
+        
+        @Override
+        public void planEndExecutionOperationSynchronous(ExecutionEntity execution) {
+            agenda.planEndExecutionOperationSynchronous(execution);
         }
 
         @Override

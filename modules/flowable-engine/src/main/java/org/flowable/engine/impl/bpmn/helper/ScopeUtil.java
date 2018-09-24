@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;

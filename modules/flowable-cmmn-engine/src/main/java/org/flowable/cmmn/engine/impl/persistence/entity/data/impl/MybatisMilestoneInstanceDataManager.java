@@ -21,7 +21,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityI
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.MilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.MilestoneInstanceQueryImpl;
-import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcherAdapter;
+import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcherAdapter;
 
 /**
  * @author Joram Barrez

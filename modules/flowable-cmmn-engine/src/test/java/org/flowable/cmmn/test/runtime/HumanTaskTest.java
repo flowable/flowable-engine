@@ -24,10 +24,10 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.flowable.engine.common.impl.identity.Authentication;
+import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -196,6 +196,36 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
                 assertEquals("cmmn-state-transition-exit", historicTaskInstance.getDeleteReason());
             }
         }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/HumanTaskTest.testHumanTask.cmmn")
+    public void addCompleteAuthenticatedUserAsParticipantToParentCase() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("myCase")
+            .start();
+        assertNotNull(caseInstance);
+
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertEquals("Task 1", task.getName());
+        assertNull(task.getAssignee());
+
+
+
+        assertEquals(0, cmmnRuntimeService.getIdentityLinksForCaseInstance(caseInstance.getId()).size());
+
+        String prevUserId = Authentication.getAuthenticatedUserId();
+        Authentication.setAuthenticatedUserId("JohnDoe");
+        try {
+            cmmnTaskService.complete(task.getId());
+        } finally {
+            Authentication.setAuthenticatedUserId(prevUserId);
+        }
+
+        assertEquals(1, cmmnRuntimeService.getIdentityLinksForCaseInstance(caseInstance.getId()).size());
+        assertEquals("JohnDoe", cmmnRuntimeService.getIdentityLinksForCaseInstance(caseInstance.getId()).get(0).getUserId());
+        assertEquals(IdentityLinkType.PARTICIPANT, cmmnRuntimeService.getIdentityLinksForCaseInstance(caseInstance.getId()).get(0).getType());
     }
 
 }

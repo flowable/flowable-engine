@@ -19,10 +19,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventType;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventType;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -31,6 +31,9 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.api.event.FlowableVariableEvent;
 import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case for all {@link FlowableEvent}s related to variables.
@@ -44,6 +47,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
     /**
      * Test create, update and delete variables on a process-instance, using the API.
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testProcessInstanceVariableEvents() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -112,6 +116,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertTrue(listener.getEventsReceived().isEmpty());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testStartEndProcessInstanceVariableEvents() throws Exception {
         Map<String, Object> variables = new HashMap<>();
@@ -131,6 +136,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
     /**
      * Test create event of variables when process is started with variables passed in.
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testProcessInstanceVariableEventsOnStart() throws Exception {
 
@@ -156,6 +162,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
     /**
      * Test create, update and delete variables locally on a child-execution of the process instance.
      */
+    @Test
     @Deployment
     public void testProcessInstanceVariableEventsOnChildExecution() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("variableProcess");
@@ -175,6 +182,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertEquals(processInstance.getId(), event.getProcessInstanceId());
     }
 
+    @Test
     @Deployment
     public void testProcessInstanceVariableEventsOnCallActivity() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callVariableProcess",
@@ -239,8 +247,9 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
     /**
      * Test variable events when done within a process (eg. execution-listener)
      */
+    @Test
     @Deployment
-    public void FlowableEventType() throws Exception {
+    public void testProcessInstanceVariableEventsWithinProcess() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("variableProcess");
         assertNotNull(processInstance);
 
@@ -274,12 +283,14 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertEquals(processInstance.getId(), event.getProcessInstanceId());
         assertNull(event.getTaskId());
         assertEquals("variable", event.getVariableName());
-        assertEquals(456, event.getVariableValue());
+        // deleted values are always null
+        assertNull(event.getVariableValue());
     }
 
     /**
      * Test create, update and delete of task-local variables.
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testTaskVariableEvents() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -325,6 +336,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
     /**
      * Test variable events when done within a process (eg. execution-listener)
      */
+    @Test
     @Deployment
     public void testTaskVariableEventsWithinProcess() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("variableProcess");
@@ -368,6 +380,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
     /**
      * Test to check create, update an delete behavior for variables on a task not related to a process.
      */
+    @Test
     public void testTaskVariableStandalone() throws Exception {
         org.flowable.task.api.Task newTask = taskService.newTask();
         try {
@@ -376,7 +389,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
             taskService.setVariable(newTask.getId(), "testVariable", 123);
             taskService.setVariable(newTask.getId(), "testVariable", 456);
             
-            waitForJobExecutorToProcessAllHistoryJobs(5000, 200);
+            waitForJobExecutorToProcessAllHistoryJobs(7000, 200);
             
             taskService.removeVariable(newTask.getId(), "testVariable");
 
@@ -421,6 +434,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/processVariableEvent.bpmn20.xml" })
     public void testProcessInstanceVariableEventsForModeledDataObjectOnStart() throws Exception {
 
@@ -456,6 +470,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
     /**
      * Test variables event for modeled data objects on callActivity.
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/callActivity.bpmn20.xml", "org/flowable/engine/test/api/runtime/calledActivity.bpmn20.xml" })
     public void testProcessInstanceVariableEventsForModeledDataObjectOnCallActivityStart() throws Exception {
 
@@ -499,18 +514,14 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertEquals("var1 value", event.getVariableValue());
     }
 
-    @Override
-    protected void initializeServices() {
-        super.initializeServices();
-
+    @BeforeEach
+    public void setUp() {
         listener = new TestVariableEventListener();
         processEngineConfiguration.getEventDispatcher().addEventListener(listener);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-
+    @AfterEach
+    public void tearDown() throws Exception {
         if (listener != null) {
             listener.clearEventsReceived();
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);

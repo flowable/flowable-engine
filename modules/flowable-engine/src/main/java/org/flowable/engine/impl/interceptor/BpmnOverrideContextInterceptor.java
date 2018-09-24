@@ -12,9 +12,9 @@
  */
 package org.flowable.engine.impl.interceptor;
 
-import org.flowable.engine.common.impl.interceptor.AbstractCommandInterceptor;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.interceptor.AbstractCommandInterceptor;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 
 public class BpmnOverrideContextInterceptor extends AbstractCommandInterceptor {

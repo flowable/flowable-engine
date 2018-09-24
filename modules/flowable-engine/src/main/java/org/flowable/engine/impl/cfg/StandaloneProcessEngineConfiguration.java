@@ -13,7 +13,7 @@
 
 package org.flowable.engine.impl.cfg;
 
-import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
+import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 
 /**
  * @author Tom Baeyens

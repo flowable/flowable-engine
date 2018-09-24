@@ -40,6 +40,29 @@ public interface CaseInstanceBuilder {
     
     CaseInstanceBuilder outcome(String outcome);
 
+    /**
+     * Set callback type of the newly created case instance.
+     * @param callbackType type of the callback
+     * @return case instance builder which creates case instance with defined callback type
+     */
+    CaseInstanceBuilder callbackType(String callbackType);
+
+    /**
+     * Set callback id of the newly created case instance.
+     *
+     * @param callbackId id of the callback
+     * @return case instance builder which creates case instance with defined callback id
+     */
+    CaseInstanceBuilder callbackId(String callbackId);
+
+    /**
+     * Set parent case instanceId of the newly create case instance
+     *
+     * @param parentCaseInstanceId parent case instance identifier
+     * @return modified case instance builder which creates case instance with the reference to parent
+     */
+    CaseInstanceBuilder parentId(String parentCaseInstanceId);
+
     CaseInstance start();
     
     CaseInstance startWithForm();
@@ -59,4 +82,11 @@ public interface CaseInstanceBuilder {
     String getTenantId();
 
     String getOutcome();
+
+    String getCallbackType();
+
+    String getCallbackId();
+
+    String getParentId();
+
 }

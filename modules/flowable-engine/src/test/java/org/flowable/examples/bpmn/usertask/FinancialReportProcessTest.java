@@ -17,10 +17,13 @@ import java.util.List;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class FinancialReportProcessTest extends PluggableFlowableTestCase {
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
         identityService.saveUser(identityService.newUser("fozzie"));
         identityService.saveUser(identityService.newUser("kermit"));
@@ -32,7 +35,7 @@ public class FinancialReportProcessTest extends PluggableFlowableTestCase {
         identityService.createMembership("kermit", "management");
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
         identityService.deleteUser("fozzie");
         identityService.deleteUser("kermit");
@@ -40,6 +43,7 @@ public class FinancialReportProcessTest extends PluggableFlowableTestCase {
         identityService.deleteGroup("management");
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/usertask/FinancialReportProcess.bpmn20.xml" })
     public void testProcess() {
 

@@ -26,8 +26,8 @@ import org.activiti.engine.impl.bpmn.parser.factory.ActivityBehaviorFactory;
 import org.activiti.engine.impl.bpmn.parser.factory.ListenerFactory;
 import org.activiti.engine.impl.el.ExpressionManager;
 import org.activiti.engine.parse.BpmnParseHandler;
-import org.flowable.engine.common.impl.EngineDeployer;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.EngineDeployer;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.flowable.engine.impl.rules.RulesDeployer;
@@ -68,6 +68,7 @@ public class DefaultProcessEngineFactory {
         flowable5Configuration.setEventDispatcher(flowable6Configuration.getEventDispatcher());
         copyPostDeployers(flowable6Configuration, flowable5Configuration);
         flowable5Configuration.setBusinessCalendarManager(flowable6Configuration.getBusinessCalendarManager());
+        copyCustomVariableTypes(flowable6Configuration, flowable5Configuration);
     }
 
     protected void copyJdbcConfig(ProcessEngineConfigurationImpl flowable6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl flowable5Configuration) {
@@ -222,6 +223,11 @@ public class DefaultProcessEngineFactory {
                 }
             }
         }
+    }
+
+    protected void copyCustomVariableTypes(ProcessEngineConfigurationImpl flowable6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl flowable5Configuration) {
+        flowable5Configuration.setCustomPreVariableTypes(flowable6Configuration.getCustomPreVariableTypes());
+        flowable5Configuration.setCustomPostVariableTypes(flowable6Configuration.getCustomPostVariableTypes());
     }
 
     protected void convertParseHandlers(ProcessEngineConfigurationImpl flowable6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl flowable5Configuration) {

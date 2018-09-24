@@ -12,14 +12,17 @@
  */
 package org.flowable.form.rest.service.api.form;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
-import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.form.api.FormInstanceQuery;
 import org.flowable.form.api.FormService;
 import org.flowable.form.engine.impl.FormInstanceQueryProperty;
+import org.flowable.form.rest.FormRestApiInterceptor;
 import org.flowable.form.rest.FormRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -40,6 +43,9 @@ public class BaseFormInstanceResource {
 
     @Autowired
     protected FormRestResponseFactory restResponseFactory;
+    
+    @Autowired(required=false)
+    protected FormRestApiInterceptor restApiInterceptor;
 
     protected DataResponse<FormInstanceResponse> getQueryResponse(FormInstanceQueryRequest queryRequest, Map<String, String> requestParams) {
 
@@ -93,8 +99,12 @@ public class BaseFormInstanceResource {
         if (Boolean.TRUE.equals(queryRequest.isWithoutTenantId())) {
             query.deploymentWithoutTenantId();
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessFormInstanceInfoWithQuery(query);
+        }
 
-        return new FormInstancePaginateList(restResponseFactory).paginateList(requestParams, queryRequest, query, "submittedDate", allowedSortProperties);
+        return paginateList(requestParams, queryRequest, query, "submittedDate", allowedSortProperties, restResponseFactory::createFormInstanceResponse);
     }
 
 }

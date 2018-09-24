@@ -15,7 +15,7 @@ package org.flowable.job.service.impl;
 import java.util.Collection;
 import java.util.List;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
@@ -28,10 +28,6 @@ import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
  * @author Tijs Rademakers
  */
 public class TimerJobServiceImpl extends ServiceImpl implements TimerJobService {
-
-    public TimerJobServiceImpl() {
-
-    }
 
     public TimerJobServiceImpl(JobServiceConfiguration jobServiceConfiguration) {
         super(jobServiceConfiguration);

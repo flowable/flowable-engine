@@ -18,6 +18,8 @@ import java.util.Map;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.RuleEngineExecutor;
@@ -40,8 +42,6 @@ import org.flowable.dmn.model.HitPolicy;
 import org.flowable.dmn.model.LiteralExpression;
 import org.flowable.dmn.model.RuleInputClauseContainer;
 import org.flowable.dmn.model.RuleOutputClauseContainer;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -222,7 +222,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
                 // add audit entry
                 executionContext.getAuditContainer().addInputEntry(rule.getRuleNumber(), inputEntryId, conditionResult);
 
-                LOGGER.debug("input entry {} ( {} {} ): {} ", inputEntryId,
+                LOGGER.debug("input entry {} ( {} {} ): {}", inputEntryId,
                         conditionContainer.getInputClause().getInputExpression().getText(),
                         inputEntryText, conditionResult);
 
@@ -296,7 +296,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
                 executionContext.getAuditContainer().addDecisionResultType(outputVariableId, outputVariableType);
 
                 if (executionVariable != null) {
-                    LOGGER.debug("Created conclusion result: {} of type: {} with value {} ", outputVariableId, resultValue.getClass(), resultValue.toString());
+                    LOGGER.debug("Created conclusion result: {} of type: {} with value {}", outputVariableId, resultValue.getClass(), resultValue.toString());
                 } else {
                     LOGGER.warn("Could not create conclusion result");
                 }
@@ -361,5 +361,35 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
                 throw new FlowableException(String.format("HitPolicy: %s has aggregation: %s needs output type number", decisionTable.getHitPolicy(), decisionTable.getAggregation()));
             }
         }
+    }
+
+    @Override
+    public Map<String, AbstractHitPolicy> getHitPolicyBehaviors() {
+        return hitPolicyBehaviors;
+    }
+
+    @Override
+    public void setHitPolicyBehaviors(Map<String, AbstractHitPolicy> hitPolicyBehaviors) {
+        this.hitPolicyBehaviors = hitPolicyBehaviors;
+    }
+
+    @Override
+    public ExpressionManager getExpressionManager() {
+        return expressionManager;
+    }
+
+    @Override
+    public void setExpressionManager(ExpressionManager expressionManager) {
+        this.expressionManager = expressionManager;
+    }
+
+    @Override
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
+    }
+
+    @Override
+    public void setObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
     }
 }

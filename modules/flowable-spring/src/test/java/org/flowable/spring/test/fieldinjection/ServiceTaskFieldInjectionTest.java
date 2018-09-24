@@ -14,10 +14,11 @@ package org.flowable.spring.test.fieldinjection;
 
 import java.util.Map;
 
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -26,6 +27,7 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration("classpath:org/flowable/spring/test/fieldinjection/fieldInjectionSpringTest-context.xml")
 public class ServiceTaskFieldInjectionTest extends SpringFlowableTestCase {
 
+    @Test
     @Deployment
     public void testDelegateExpressionWithSingletonBean() {
         runtimeService.startProcessInstanceByKey("delegateExpressionSingleton", CollectionUtil.singletonMap("input", 100));
@@ -42,6 +44,7 @@ public class ServiceTaskFieldInjectionTest extends SpringFlowableTestCase {
         assertEquals(1, SingletonDelegateExpressionBean.INSTANCE_COUNT.get());
     }
 
+    @Test
     @Deployment
     public void testDelegateExpressionWithPrototypeBean() {
         runtimeService.startProcessInstanceByKey("delegateExpressionPrototype", CollectionUtil.singletonMap("input", 100));

@@ -19,15 +19,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.flowable.engine.common.impl.util.IoUtil;
+import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
  */
 public class DeploymentPersistenceTest extends PluggableFlowableTestCase {
 
+    @Test
     public void testDeploymentPersistence() {
         Deployment deployment = repositoryService.createDeployment().name("strings").addString("org/flowable/test/HelloWorld.string", "hello world").addString("org/flowable/test/TheAnswer.string", "42")
                 .deploy();

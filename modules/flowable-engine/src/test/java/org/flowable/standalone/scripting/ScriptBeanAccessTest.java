@@ -16,6 +16,7 @@ package org.flowable.standalone.scripting;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
@@ -26,6 +27,7 @@ public class ScriptBeanAccessTest extends ResourceFlowableTestCase {
         super("org/flowable/standalone/scripting/flowable.cfg.xml");
     }
 
+    @Test
     @Deployment
     public void testConfigurationBeanAccess() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("ScriptBeanAccess");

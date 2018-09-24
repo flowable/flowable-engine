@@ -29,57 +29,57 @@
   ],
   "rules": [
     {
-      "1_operator": "NOT IN",
+      "1_operator": "NONE OF",
       "1_expression": "\"testValue\"",
       "2": "result 1"
     },
     {
-      "1_operator": "IN",
+      "1_operator": "ALL OF",
       "1_expression": "\"testValue\"",
       "2": "result 1"
     },
     {
-      "1_operator": "IN",
+      "1_operator": "ALL OF",
       "1_expression": "testVar1, testVar2",
       "2": "result 1"
     },
     {
-      "1_operator": "IN",
+      "1_operator": "ALL OF",
       "1_expression": "\"testValue1\", \"testValue2\"",
       "2": "result 1"
     },
     {
-      "1_operator": "IN",
+      "1_operator": "ALL OF",
       "1_expression": "10, 20",
       "2": "result 1"
     },
     {
-      "1_operator": "IN",
+      "1_operator": "ALL OF",
       "1_expression": "10",
       "2": "result 1"
     },
     {
-      "1_operator": "IN",
+      "1_operator": "ALL OF",
       "1_expression": "-",
       "2": "result 2"
     },
     {
-      "1_operator": "NOT IN",
+      "1_operator": "NONE OF",
       "1_expression": "\"testValue\"",
       "2": "result 2"
     },
     {
-      "1_operator": "NOT IN",
+      "1_operator": "NONE OF",
       "1_expression": "-",
       "2": "result 2"
     },
     {
-      "1_operator": "ANY",
+      "1_operator": "ANY OF",
       "1_expression": "\"testValue\"",
       "2": "result 2"
     },
     {
-      "1_operator": "ANY",
+      "1_operator": "ANY OF",
       "1_expression": "-",
       "2": "result 2"
     },
@@ -99,7 +99,7 @@
       "2": "result 4"
     },
     {
-      "1_operator": "IN",
+      "1_operator": "ALL OF",
       "1_expression": "\"test,Value1\", \"test,Value2\"",
       "2": "result 4"
     }

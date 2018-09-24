@@ -14,9 +14,9 @@ package org.flowable.content.api;
 
 import java.util.Map;
 
-import org.flowable.engine.common.api.management.TableMetaData;
-import org.flowable.engine.common.api.management.TablePage;
-import org.flowable.engine.common.api.management.TablePageQuery;
+import org.flowable.common.engine.api.management.TableMetaData;
+import org.flowable.common.engine.api.management.TablePage;
+import org.flowable.common.engine.api.management.TablePageQuery;
 
 /**
  * Service for admin and maintenance operations on the content engine.

@@ -15,12 +15,16 @@ package org.flowable.engine.impl.event;
 
 import java.util.List;
 
+import org.flowable.bpmn.model.Activity;
+import org.flowable.bpmn.model.Association;
+import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SubProcess;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.bpmn.helper.ScopeUtil;
 import org.flowable.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
@@ -73,6 +77,31 @@ public class CompensationEventHandler implements EventHandler {
                             FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPENSATE, flowElement.getId(), flowElement.getName(),
                                     compensatingExecution.getId(), compensatingExecution.getProcessInstanceId(), compensatingExecution.getProcessDefinitionId(), flowElement));
                 }
+                
+                Activity compensationActivity = null;
+                Activity activity = (Activity) flowElement;
+                if (!activity.isForCompensation() && activity.getBoundaryEvents().size() > 0) {
+                    for (BoundaryEvent boundaryEvent : activity.getBoundaryEvents()) {
+                        if (boundaryEvent.getEventDefinitions().size() > 0 && boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition) {
+                            List<Association> associations = process.findAssociationsWithSourceRefRecursive(boundaryEvent.getId());
+                            for (Association association : associations) {
+                                FlowElement targetElement = process.getFlowElement(association.getTargetRef(), true);
+                                if (targetElement instanceof Activity) {
+                                    Activity targetActivity = (Activity) targetElement;
+                                    if (targetActivity.isForCompensation()) {
+                                        compensationActivity = targetActivity;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                if (compensationActivity != null) {
+                    flowElement = compensationActivity;
+                }
+                
                 compensatingExecution.setCurrentFlowElement(flowElement);
                 CommandContextUtil.getAgenda().planContinueProcessInCompensation(compensatingExecution);
 

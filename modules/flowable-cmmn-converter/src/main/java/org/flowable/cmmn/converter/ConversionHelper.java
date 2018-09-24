@@ -35,7 +35,7 @@ import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryIfPart;
 import org.flowable.cmmn.model.SentryOnPart;
 import org.flowable.cmmn.model.Stage;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * @author Joram Barrez
@@ -69,7 +69,7 @@ public class ConversionHelper {
 
     public void addCaseElement(CaseElement caseElement) {
         if (!caseElements.containsKey(currentCase)) {
-            caseElements.put(currentCase, new ArrayList<CaseElement>());
+            caseElements.put(currentCase, new ArrayList<>());
         }
         caseElements.get(currentCase).add(caseElement);
     }

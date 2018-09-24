@@ -19,12 +19,14 @@ import org.flowable.engine.app.AppModel;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
  */
 public class AppResourceDeploymentTest extends PluggableFlowableTestCase {
 
+    @Test
     public void testSingleAppResource() {
         InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("org/flowable/engine/test/api/app/test.app");
         Deployment deployment = repositoryService.createDeployment().addInputStream("test.app", inputStream).deploy();
@@ -50,6 +52,7 @@ public class AppResourceDeploymentTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testAppResourceWithProcessDefinition() {
         InputStream appInputStream = this.getClass().getClassLoader().getResourceAsStream("org/flowable/engine/test/api/app/test.app");
         InputStream bpmnInputStream = this.getClass().getClassLoader().getResourceAsStream("org/flowable/engine/test/repository/one.bpmn20.xml");

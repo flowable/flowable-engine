@@ -26,9 +26,9 @@ import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.UserTask;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.dynamic.BaseDynamicSubProcessInjectUtil;
 import org.flowable.engine.impl.dynamic.DynamicUserTaskBuilder;
@@ -63,7 +63,7 @@ public class InjectParallelUserTaskCmd extends AbstractDynamicInjectionCmd imple
         
         TaskEntity taskEntity = CommandContextUtil.getTaskService().getTask(taskId);
         FlowElement flowElement = process.getFlowElement(taskEntity.getTaskDefinitionKey(), true);
-        if (flowElement == null || !(flowElement instanceof UserTask)) {
+        if (!(flowElement instanceof UserTask)) {
             throw new FlowableException("No UserTask instance found for task definition key " + taskEntity.getTaskDefinitionKey());
         }
         
@@ -84,8 +84,8 @@ public class InjectParallelUserTaskCmd extends AbstractDynamicInjectionCmd imple
         }
         subProcess.setOutgoingFlows(userTask.getOutgoingFlows());
         
-        userTask.setIncomingFlows(new ArrayList<SequenceFlow>());
-        userTask.setOutgoingFlows(new ArrayList<SequenceFlow>());
+        userTask.setIncomingFlows(new ArrayList<>());
+        userTask.setOutgoingFlows(new ArrayList<>());
         
         GraphicInfo elementGraphicInfo = bpmnModel.getGraphicInfo(flowElement.getId());
         if (elementGraphicInfo != null) {

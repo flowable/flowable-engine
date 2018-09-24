@@ -16,14 +16,13 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 
 /**
  * @author Tom Baeyens
  * @author Marcus Klimstra (CGI)
  * @author Joram Barrez
  */
-public class VariableByteArrayEntityImpl extends AbstractEntity implements VariableByteArrayEntity, Serializable {
+public class VariableByteArrayEntityImpl extends AbstractVariableServiceEntity implements VariableByteArrayEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

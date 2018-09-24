@@ -15,9 +15,10 @@ package org.flowable.standalone.cfg;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.cmd.CustomSqlExecution;
+import org.flowable.common.engine.impl.cmd.CustomSqlExecution;
 import org.flowable.engine.impl.cmd.AbstractCustomSqlExecution;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author jbarrez
@@ -28,6 +29,7 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
         super("org/flowable/standalone/cfg/custom-mybatis-mappers-flowable.cfg.xml");
     }
 
+    @Test
     public void testSelectTaskColumns() {
 
         // Create test data
@@ -64,6 +66,7 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
 
     }
 
+    @Test
     public void testFetchTaskWithSpecificVariable() {
 
         // Create test data

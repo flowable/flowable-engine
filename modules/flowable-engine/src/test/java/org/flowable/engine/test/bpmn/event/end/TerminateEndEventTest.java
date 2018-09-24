@@ -26,9 +26,9 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.ExtensionAttribute;
 import org.flowable.bpmn.model.ExtensionElement;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
@@ -43,6 +43,8 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Nico Rehwaldt
@@ -52,9 +54,8 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
 
     public static int serviceTaskInvokedCount;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         serviceTaskInvokedCount = 0;
         serviceTaskInvokedCount2 = 0;
     }
@@ -80,6 +81,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testProcessTerminate() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
@@ -100,6 +102,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricActivitiesDeleteReason(pi, null, "preTerminateTask");
     }
     
+    @Test
     @Deployment
     public void testTerminateExecutionListener() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
@@ -113,6 +116,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertEquals(1, TerminateExecutionListener.endCalled);
     }
 
+    @Test
     @Deployment
     public void testProcessTerminateAll() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
@@ -130,6 +134,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricActivitiesDeleteReason(pi, null, "preTerminateTask");
     }
 
+    @Test
     @Deployment
     public void testTerminateWithSubProcess() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
@@ -151,6 +156,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricActivitiesDeleteReason(pi, null, "preTerminateEnd");
     }
 
+    @Test
     @Deployment
     public void testTerminateWithSubProcess2() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
@@ -172,6 +178,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricActivitiesDeleteReason(pi, DeleteReason.TERMINATE_END_EVENT, "SubProcess_1");
     }
 
+    @Test
     @Deployment
     public void testTerminateWithSubProcessTerminateAll() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
@@ -190,6 +197,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricActivitiesDeleteReason(pi, null, "preNormalEnd");
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateWithCallActivity.bpmn",
             "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.subProcessNoTerminate.bpmn"
@@ -213,6 +221,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricActivitiesDeleteReason(subProcessInstance, DeleteReason.TERMINATE_END_EVENT, "task");
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateWithCallActivityTerminateAll.bpmn20.xml",
             "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.subProcessNoTerminate.bpmn" })
@@ -236,6 +245,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricActivitiesDeleteReason(subProcessInstance, DeleteReason.TERMINATE_END_EVENT, "task");
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInExclusiveGatewayWithCallActivity.bpmn",
             "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.subProcessNoTerminate.bpmn"
@@ -255,6 +265,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(pi);
     }
 
+    @Test
     @Deployment
     public void testTerminateInExclusiveGatewayWithMultiInstanceSubProcess() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample-terminateAfterExclusiveGateway");
@@ -274,6 +285,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricActivitiesDeleteReason(pi, DeleteReason.TERMINATE_END_EVENT, "task");
     }
 
+    @Test
     @Deployment
     public void testTerminateInExclusiveGatewayWithMultiInstanceSubProcessTerminateAll() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample-terminateAfterExclusiveGateway");
@@ -297,6 +309,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(pi);
     }
     
+    @Test
     @Deployment
     public void testTerminateParallelGateway() throws Exception {
         final List<FlowableEvent> events = new ArrayList<>();
@@ -327,6 +340,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertNull(historicTask);
     }
 
+    @Test
     @Deployment
     public void testTerminateInSubProcess() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
@@ -342,6 +356,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(pi);
     }
 
+    @Test
     @Deployment
     public void testTerminateInSubProcessTerminateAll() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
@@ -349,6 +364,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(pi);
     }
 
+    @Test
     @Deployment
     public void testTerminateInSubProcessWithBoundary() throws Exception {
         Date startTime = new Date();
@@ -361,7 +377,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
 
         // Set clock time to '1 hour and 5 seconds' ahead to fire timer
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
-        waitForJobExecutorToProcessAllJobs(5000L, 25L);
+        waitForJobExecutorToProcessAllJobs(7000L, 25L);
 
         // timer has fired
         assertEquals(0L, managementService.createJobQuery().count());
@@ -399,6 +415,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(pi);
     }
 
+    @Test
     @Deployment
     public void testTerminateInSubProcessWithBoundaryTerminateAll() throws Exception {
         // Test terminating subprocess
@@ -415,6 +432,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(pi);
     }
 
+    @Test
     @Deployment
     public void testTerminateInSubProcessConcurrent() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
@@ -429,6 +447,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(pi);
     }
 
+    @Test
     @Deployment
     public void testTerminateInSubProcessConcurrentTerminateAll() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
@@ -436,6 +455,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(pi);
     }
 
+    @Test
     @Deployment
     public void testTerminateInSubProcessConcurrentTerminateAll2() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
@@ -450,6 +470,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(pi);
     }
 
+    @Test
     @Deployment
     public void testTerminateInSubProcessConcurrentMultiInstance() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
@@ -475,6 +496,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(pi);
     }
 
+    @Test
     @Deployment
     public void testTerminateInSubProcessConcurrentMultiInstance2() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
@@ -493,6 +515,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(pi);
     }
 
+    @Test
     @Deployment
     public void testTerminateInSubProcessConcurrentMultiInstanceTerminateAll() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
@@ -500,6 +523,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(pi);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInCallActivityConcurrentCallActivity.bpmn",
             "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateAfterUserTask.bpmn",
             "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
@@ -516,6 +540,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).count());
     }
 
+    @Test
     @Deployment
     public void testTerminateInSubProcessMultiInstance() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
@@ -530,6 +555,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(pi);
     }
 
+    @Test
     @Deployment
     public void testTerminateInSubProcessSequentialConcurrentMultiInstance() throws Exception {
 
@@ -550,6 +576,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(pi);
     }
 
+    @Test
     @Deployment
     public void testTerminateInSubProcessSequentialConcurrentMultiInstanceTerminateAll() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
@@ -557,6 +584,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(pi);
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInCallActivity.bpmn",
             "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.subProcessTerminate.bpmn"
@@ -575,6 +603,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(pi);
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInCallActivityMulitInstance.bpmn",
             "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.subProcessTerminate.bpmn"
@@ -593,6 +622,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(pi);
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInCallActivityMulitInstance.bpmn",
             "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.subProcessTerminateTerminateAll.bpmn20.xml" })
@@ -602,6 +632,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(pi);
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInCallActivityConcurrent.bpmn",
             "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.subProcessConcurrentTerminate.bpmn"
@@ -620,6 +651,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(pi);
     }
 
+    @Test
     @Deployment
     public void testMiCallActivityParallel() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testMiCallActivity");
@@ -646,12 +678,13 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
 
         taskService.complete(task.getId());
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         
         assertProcessEnded(processInstance.getId());
         assertHistoricProcessInstanceDetails(processInstance);
     }
 
+    @Test
     @Deployment
     public void testMiCallActivitySequential() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testMiCallActivity");
@@ -688,6 +721,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInCallActivityConcurrent.bpmn",
             "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.subProcessConcurrentTerminateTerminateAll.bpmn20.xml"
@@ -698,6 +732,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(pi);
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInCallActivityConcurrentMulitInstance.bpmn",
             "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.subProcessConcurrentTerminate.bpmn"
@@ -716,6 +751,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(pi);
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInCallActivityConcurrentMulitInstance.bpmn",
             "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.subProcessConcurrentTerminateTerminateAll.bpmn20.xml" })
@@ -725,6 +761,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(pi);
     }
 
+    @Test
     @Deployment
     public void testTerminateNestedSubprocesses() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TestTerminateNestedSubprocesses");
@@ -760,6 +797,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertNotNull(task);
     }
 
+    @Test
     @Deployment
     public void testTerminateNestedSubprocessesTerminateAll1() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TestTerminateNestedSubprocesses");
@@ -771,6 +809,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(processInstance);
     }
 
+    @Test
     @Deployment
     public void testTerminateNestedSubprocessesTerminateAll2() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TestTerminateNestedSubprocesses");
@@ -784,6 +823,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment
     public void testTerminateNestedMiSubprocesses() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TestTerminateNestedMiSubprocesses");
@@ -814,6 +854,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertNotNull(task);
     }
 
+    @Test
     @Deployment
     public void testTerminateNestedMiSubprocessesSequential() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TestTerminateNestedMiSubprocesses");
@@ -845,6 +886,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertNotNull(taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("H").singleResult());
     }
 
+    @Test
     @Deployment
     public void testTerminateNestedMiSubprocessesTerminateAll1() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TestTerminateNestedMiSubprocesses");
@@ -854,6 +896,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(processInstance);
     }
 
+    @Test
     @Deployment
     public void testTerminateNestedMiSubprocessesTerminateAll2() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TestTerminateNestedMiSubprocesses");
@@ -864,6 +907,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(processInstance);
     }
 
+    @Test
     @Deployment
     public void testTerminateNestedMiSubprocessesTerminateAll3() { // Same as 1, but sequential Multi-Instance
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TestTerminateNestedMiSubprocesses");
@@ -873,6 +917,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(processInstance);
     }
 
+    @Test
     @Deployment
     public void testTerminateNestedMiSubprocessesTerminateAll4() { // Same as 2, but sequential Multi-Instance
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TestTerminateNestedMiSubprocesses");
@@ -883,6 +928,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(processInstance);
     }
 
+    @Test
     @Deployment
     public void testNestedCallActivities() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TestNestedCallActivities");
@@ -913,6 +959,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testNestedCallActivitiesTerminateAll() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TestNestedCallActivities");
@@ -955,6 +1002,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         return tasks;
     }
 
+    @Test
     public void testParseTerminateEndEventDefinitionWithExtensions() {
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.parseExtensionElements.bpmn20.xml").deploy();
         ProcessDefinition processDefinitionQuery = repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult();
@@ -978,6 +1026,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
     }
 
     // Unit test for ACT-4101 : NPE when there are multiple routes to terminateEndEvent, and both are reached
+    @Test
     @Deployment
     public void testThreeExecutionsArrivingInTerminateEndEvent() {
         Map<String, Object> variableMap = new HashMap<>();

@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.entry;
 
 import java.util.Map;
 
-import org.flowable.engine.common.impl.FlowableVersions;
+import org.flowable.common.engine.impl.FlowableVersions;
 import org.flowable.spring.boot.actuate.endpoint.ProcessEngineEndpoint;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +29,6 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 

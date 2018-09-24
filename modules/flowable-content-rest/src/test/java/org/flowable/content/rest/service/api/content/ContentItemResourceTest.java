@@ -146,6 +146,9 @@ public class ContentItemResourceTest extends BaseSpringContentRestTestCase {
     }
 
     protected void executePostAndAssert(String contentItemId) throws IOException {
+        ContentItem origContentItem = contentService.createContentItemQuery().id(contentItemId).singleResult();
+        assertNotNull(origContentItem);
+
         InputStream binaryContent = null;
         try {
             binaryContent = new ByteArrayInputStream("This is binary content".getBytes());
@@ -164,6 +167,9 @@ public class ContentItemResourceTest extends BaseSpringContentRestTestCase {
             assertEquals("application/pdf", response.getEntity().getContentType().getValue());
             assertEquals("This is binary content", IOUtils.toString(response.getEntity().getContent()));
             closeResponse(response);
+
+            ContentItem changedContentItem = contentService.createContentItemQuery().id(contentItemId).singleResult();
+            assertTrue(origContentItem.getLastModified().getTime() < changedContentItem.getLastModified().getTime());
 
         } finally {
             contentService.deleteContentItem(contentItemId);

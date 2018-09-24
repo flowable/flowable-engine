@@ -14,12 +14,14 @@ package org.flowable.dmn.rest.service.api.history;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
+import org.flowable.dmn.api.DmnHistoricDecisionExecutionQuery;
 import org.flowable.dmn.api.DmnHistoryService;
+import org.flowable.dmn.rest.service.api.DmnRestApiInterceptor;
 import org.flowable.dmn.rest.service.api.DmnRestResponseFactory;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,12 +39,21 @@ public class BaseHistoricDecisionExecutionResource {
 
     @Autowired
     protected DmnHistoryService dmnHistoryService;
+    
+    @Autowired(required=false)
+    protected DmnRestApiInterceptor restApiInterceptor;
 
     /**
-     * Returns the {@link DmnHistoricDecisionExecution} that is requested. Throws the right exceptions when bad request was made or decision table is not found.
+     * Returns the {@link DmnHistoricDecisionExecution} that is requested. Throws the right exceptions when bad request was made or decision table was not found.
      */
     protected DmnHistoricDecisionExecution getHistoricDecisionExecutionFromRequest(String decisionExecutionId) {
-        DmnHistoricDecisionExecution decisionExecution = dmnHistoryService.createHistoricDecisionExecutionQuery().id(decisionExecutionId).singleResult();
+        DmnHistoricDecisionExecutionQuery historicDecisionExecutionQuery = dmnHistoryService.createHistoricDecisionExecutionQuery().id(decisionExecutionId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDecisionHistoryInfoWithQuery(historicDecisionExecutionQuery);
+        }
+        
+        DmnHistoricDecisionExecution decisionExecution = historicDecisionExecutionQuery.singleResult();
 
         if (decisionExecution == null) {
             throw new FlowableObjectNotFoundException("Could not find a decision execution with id '" + decisionExecution);

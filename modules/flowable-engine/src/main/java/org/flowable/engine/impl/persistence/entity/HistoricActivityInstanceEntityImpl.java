@@ -51,6 +51,8 @@ public class HistoricActivityInstanceEntityImpl extends HistoricScopeInstanceEnt
         persistentState.put("taskId", taskId);
         persistentState.put("assignee", assignee);
         persistentState.put("calledProcessInstanceId", calledProcessInstanceId);
+        persistentState.put("activityId", activityId);
+        persistentState.put("activityName", activityName);
         return persistentState;
     }
 

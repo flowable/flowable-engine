@@ -21,7 +21,7 @@ import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.CmmnEngines;
 import org.flowable.cmmn.engine.impl.cmd.SchemaOperationsCmmnEngineBuild;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +42,7 @@ public class CmmnEngineImpl implements CmmnEngine {
     protected CmmnHistoryService cmmnHistoryService;
     
     protected AsyncExecutor asyncExecutor;
+    protected AsyncExecutor asyncHistoryExecutor;
     
     public CmmnEngineImpl(CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.cmmnEngineConfiguration = cmmnEngineConfiguration;
@@ -53,10 +54,11 @@ public class CmmnEngineImpl implements CmmnEngine {
         this.cmmnHistoryService = cmmnEngineConfiguration.getCmmnHistoryService();
         
         this.asyncExecutor = cmmnEngineConfiguration.getAsyncExecutor();
+        this.asyncHistoryExecutor = cmmnEngineConfiguration.getAsyncHistoryExecutor();
         
-        if (cmmnEngineConfiguration.isUsingRelationalDatabase() && cmmnEngineConfiguration.getDatabaseSchemaUpdate() != null) {
+        if (cmmnEngineConfiguration.getSchemaManagementCmd() != null) {
             CommandExecutor commandExecutor = cmmnEngineConfiguration.getCommandExecutor();
-            commandExecutor.execute(cmmnEngineConfiguration.getSchemaCommandConfig(), new SchemaOperationsCmmnEngineBuild());
+            commandExecutor.execute(cmmnEngineConfiguration.getSchemaCommandConfig(), cmmnEngineConfiguration.getSchemaManagementCmd());
         }
 
         LOGGER.info("CmmnEngine {} created", name);
@@ -80,8 +82,12 @@ public class CmmnEngineImpl implements CmmnEngine {
         if (asyncExecutor != null && asyncExecutor.isActive()) {
             asyncExecutor.shutdown();
         }
+        if (asyncHistoryExecutor != null && asyncHistoryExecutor.isActive()) {
+            asyncHistoryExecutor.shutdown();
+        }
     }
     
+    @Override
     public CmmnEngineConfiguration getCmmnEngineConfiguration() {
         return cmmnEngineConfiguration;
     }

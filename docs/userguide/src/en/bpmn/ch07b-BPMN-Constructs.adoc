@@ -116,6 +116,7 @@ The recurring time duration is better suited for handling relative timers, which
 
 You can use expressions for timer event definitions, and by doing so, you can influence the timer definition
 based on process variables. The process variables must contain the ISO 8601 (or cron for cycle type) string for appropriate timer type.
+Additionally, for durations variables of type or expressions that return `java.time.Duration` can be used.
 
 [source,xml,linenums]
 ----
@@ -3450,6 +3451,7 @@ The Flowable engine sends e-mails trough an external mail server with SMTP capab
 |Property|Required?|Description
 |mailServerHost|no|The hostname of your mail server (for example, mail.mycorp.com). Default is +localhost+
 |mailServerPort|yes, if not on the default port|The port for SMTP traffic on the mail server. The default is _25_
+|mailServerForceTo|no|If set it will be used as a replacement of the configured to, cc and / or bcc in the Mail Task when sending out emails.
 |mailServerDefaultFrom|no|The default e-mail address of the sender of e-mails, when none is provided by the user. By default this is _flowable@flowable.org_
 |mailServerUsername|if applicable for your server|Some mail servers require credentials for sending e-mail. By default not set.
 |mailServerPassword|if applicable for your server|Some mail servers require credentials for sending e-mail. By default not set.
@@ -5105,8 +5107,6 @@ Defining the 'inheritBusinessKey' attribute with a value of +true+ will set the 
 ----
 
 
-[[bpmnCallActivityExample]]
-
 ===== Reference the process from the same deployment
 
 The default behavior is that the latest deployed process definition is taken to start the referenced process. There are use cases where
@@ -5124,6 +5124,23 @@ like in the following example:
 ----
 
 By default the `sameDeployment` attribute is set to false.
+
+===== Reference the process definition by id
+
+The default behavior is that the latest deployed process definition is taken to start the referenced process by key. There are use cases where
+you would like to reference exact process definition by its id.
+
+To use the referenced process definition by its id use `flowable:calledElementType` with the value `id`. Allowed values are `key` and `id`.
+
+----
+<callActivity id="callSubProcess" calledElement="UNIQUE-PROCESS_DEFINITION-ID" flowable:calledElementType="id">
+...
+</callActivity>
+----
+
+By default the `flowable:calledElementType` attribute is set to `key`.
+
+[[bpmnCallActivityExample]]
 
 ===== Example
 
@@ -5155,6 +5172,23 @@ The sub-process looks as follows:
 image::images/bpmn.call.activity.sub.process.png[align="center"]
 
 There is nothing special about the process definition of the sub-process. It could as well be used without being called from another process.
+
+===== Async completion
+
+In some particular use cases, it's needed to make the completion of the call activity asynchronous (and exclusive).
+
+Take the following process definition. Let's assume the called process definition consists of _only service tasks which are marked as asynchronous and exclusive_.
+All the steps of these sub process instances will be executed asynchronously. When the last asynchronous service task is executed, the end event will be visited.
+At that point, the control will be passed back to the parent process instance. 
+
+image::images/bpmn.call.activity.async.complete.png[align="center"]
+
+The problem is that asynchronous locking happens on the process instance level. In this cases, the child process instances will be locked when the last service task and event event are visited.
+This means that when the control is passed back to the parent process instance, and thus when the call activity _completes_, the parent process instance is not locked. When multi-instance is used, this means that x number of instances try to complete the call activity. Even when using exclusive on all steps, this still would mean every child process instance concurrently will try to update the parent process instance, potentially leadinging to _FlowableOptimisticLockingExceptions_ as the 'wrong' process instance is used for the exclusive lock.
+
+The solution to this problem is to mark the _async complete_ flag for the call activity. When _true_, a new asynchronous job will be created, using the parent process instance.
+When the exclusive lock is created, it will be held for parent process instance and the multi instance completion of the call activity will be handled exclusively for each child execution separately. 
+
 
 
 [[bpmnConcurrencyAndTransactions]]

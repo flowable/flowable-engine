@@ -13,7 +13,8 @@
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.db.HasRevision;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 import java.util.Date;
@@ -22,7 +23,7 @@ import java.util.List;
 /**
  * @author Joram Barrez
  */
-public interface HistoricCaseInstanceEntity extends Entity, HistoricCaseInstance {
+public interface HistoricCaseInstanceEntity extends Entity, HasRevision, HistoricCaseInstance {
 
     void setBusinessKey(String businessKey);
     void setName(String name);

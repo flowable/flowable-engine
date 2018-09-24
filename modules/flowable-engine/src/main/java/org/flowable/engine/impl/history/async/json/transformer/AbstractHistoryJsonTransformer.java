@@ -12,70 +12,22 @@
  */
 package org.flowable.engine.impl.history.async.json.transformer;
 
-import java.util.Date;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
+
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.history.async.AsyncHistoryDateUtil;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.job.service.impl.history.async.transformer.HistoryJsonTransformer;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public abstract class AbstractHistoryJsonTransformer implements HistoryJsonTransformer {
-
-    protected String getStringFromJson(ObjectNode objectNode, String fieldName) {
-        if (objectNode.has(fieldName)) {
-            return objectNode.get(fieldName).asText();
-        }
-        return null;
-    }
-
-    protected Date getDateFromJson(ObjectNode objectNode, String fieldName) {
-        String s = getStringFromJson(objectNode, fieldName);
-        return AsyncHistoryDateUtil.parseDate(s);
-    }
-
-    protected Integer getIntegerFromJson(ObjectNode objectNode, String fieldName) {
-        String s = getStringFromJson(objectNode, fieldName);
-        if (StringUtils.isNotEmpty(s)) {
-            return Integer.valueOf(s);
-        }
-        return null;
-    }
-    
-    protected Double getDoubleFromJson(ObjectNode objectNode, String fieldName) {
-        String s = getStringFromJson(objectNode, fieldName);
-        if (StringUtils.isNotEmpty(s)) {
-            return Double.valueOf(s);
-        }
-        return null;
-    }
-    
-    protected Long getLongFromJson(ObjectNode objectNode, String fieldName) {
-        String s = getStringFromJson(objectNode, fieldName);
-        if (StringUtils.isNotEmpty(s)) {
-            return Long.valueOf(s);
-        }
-        return null;
-    }
-    
-    protected Boolean getBooleanFromJson(ObjectNode objectNode, String fieldName, Boolean defaultValue) {
-        Boolean value = getBooleanFromJson(objectNode, fieldName);
-        return value != null ? value : defaultValue;
-    }
-    
-    protected Boolean getBooleanFromJson(ObjectNode objectNode, String fieldName) {
-        String s = getStringFromJson(objectNode, fieldName);
-        if ((StringUtils.isNotEmpty(s))) {
-            return Boolean.valueOf(s);
-        }
-        return null;
-    }
 
     protected void dispatchEvent(CommandContext commandContext, FlowableEvent event) {
         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher();

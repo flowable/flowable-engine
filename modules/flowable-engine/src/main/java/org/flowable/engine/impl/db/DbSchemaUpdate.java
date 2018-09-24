@@ -13,11 +13,11 @@
 
 package org.flowable.engine.impl.db;
 
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.ProcessEngines;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
@@ -33,7 +33,7 @@ public class DbSchemaUpdate {
         commandExecutor.execute(config, new Command<Object>() {
             @Override
             public Object execute(CommandContext commandContext) {
-                CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager().dbSchemaUpdate();
+                CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager().schemaUpdate();
                 return null;
             }
         });

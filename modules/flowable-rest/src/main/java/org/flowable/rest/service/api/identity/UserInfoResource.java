@@ -16,9 +16,9 @@ package org.flowable.rest.service.api.identity;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.IdentityService;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.idm.api.User;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +53,7 @@ public class UserInfoResource extends BaseUserResource {
     @ApiOperation(value = "Get a user’s info", tags = { "Users" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the user was found and the user has info for the given key."),
-            @ApiResponse(code = 404, message = "Indicates the requested user was not found or the user doesn’t have info for the given key. Status description contains additional information about the error.")
+            @ApiResponse(code = 404, message = "Indicates the requested user was not found or the user does ot have info for the given key. Status description contains additional information about the error.")
     })
     @GetMapping(value = "/identity/users/{userId}/info/{key}", produces = "application/json")
     public UserInfoResponse getUserInfo(@ApiParam(name = "userId") @PathVariable("userId") String userId, @ApiParam(name = "key") @PathVariable("key") String key, HttpServletRequest request) {
@@ -71,7 +71,7 @@ public class UserInfoResource extends BaseUserResource {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the user was found and the info has been updated."),
             @ApiResponse(code = 400, message = "Indicates the value was missing from the request body."),
-            @ApiResponse(code = 404, message = "Indicates the requested user was not found or the user doesn’t have info for the given key. Status description contains additional information about the error.")
+            @ApiResponse(code = 404, message = "Indicates the requested user was not found or the user does not have info for the given key. Status description contains additional information about the error.")
     })
     @PutMapping(value = "/identity/users/{userId}/info/{key}", produces = "application/json")
     public UserInfoResponse setUserInfo(@ApiParam(name = "userId") @PathVariable("userId") String userId, @ApiParam(name = "key") @PathVariable("key") String key, @RequestBody UserInfoRequest userRequest, HttpServletRequest request) {
@@ -95,11 +95,16 @@ public class UserInfoResource extends BaseUserResource {
     @ApiOperation(value = "Delete a user’s info", tags = { "Users" })
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the user was found and the info for the given key has been deleted. Response body is left empty intentionally."),
-            @ApiResponse(code = 404, message = "Indicates the requested user was not found or the user doesn’t have info for the given key. Status description contains additional information about the error.")
+            @ApiResponse(code = 404, message = "Indicates the requested user was not found or the user does not have info for the given key. Status description contains additional information about the error.")
     })
     @DeleteMapping("/identity/users/{userId}/info/{key}")
     public void deleteUserInfo(@ApiParam(name = "userId") @PathVariable("userId") String userId, @ApiParam(name = "key") @PathVariable("key") String key, HttpServletResponse response) {
         User user = getUserFromRequest(userId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteUser(user);
+        }
+        
         String validKey = getValidKeyFromRequest(user, key);
 
         identityService.setUserInfo(user.getId(), validKey, null);

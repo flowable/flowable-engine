@@ -16,14 +16,13 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
 import org.flowable.form.engine.FormEngineConfiguration;
 
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class FormDefinitionEntityImpl extends AbstractEntityNoRevision implements FormDefinitionEntity, Serializable {
+public class FormDefinitionEntityImpl extends AbstractFormEngineNoRevisionEntity implements FormDefinitionEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -33,7 +32,6 @@ public class FormDefinitionEntityImpl extends AbstractEntityNoRevision implement
     protected int version;
     protected String category;
     protected String deploymentId;
-    protected String parentDeploymentId;
     protected String resourceName;
     protected String tenantId = FormEngineConfiguration.NO_TENANT_ID;
 
@@ -85,16 +83,6 @@ public class FormDefinitionEntityImpl extends AbstractEntityNoRevision implement
     @Override
     public void setDeploymentId(String deploymentId) {
         this.deploymentId = deploymentId;
-    }
-
-    @Override
-    public String getParentDeploymentId() {
-        return parentDeploymentId;
-    }
-
-    @Override
-    public void setParentDeploymentId(String parentDeploymentId) {
-        this.parentDeploymentId = parentDeploymentId;
     }
 
     @Override

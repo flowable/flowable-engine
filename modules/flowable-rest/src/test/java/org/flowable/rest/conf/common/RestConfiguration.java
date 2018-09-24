@@ -15,18 +15,24 @@ package org.flowable.rest.conf.common;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
 import org.flowable.common.rest.resolver.DefaultContentTypeResolver;
 import org.flowable.rest.service.api.RestResponseFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Joram Barrez
  */
 @Configuration
 public class RestConfiguration {
+    
+    @Autowired
+    protected ObjectMapper objectMapper;
 
     @Bean()
     public RestResponseFactory restResponseFactory() {
-        RestResponseFactory restResponseFactory = new RestResponseFactory();
+        RestResponseFactory restResponseFactory = new RestResponseFactory(objectMapper);
         return restResponseFactory;
     }
 

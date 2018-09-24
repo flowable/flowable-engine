@@ -32,8 +32,6 @@
 						<tr class="property">
 							<td class="property-name" translate="PROCESS-DEFINITION.DEPLOYMENT"></td>
 							<td><a ng-click="openDeployment(definition.deploymentId)"><i class="glyphicon glyphicon-zoom-in"></i> {{definition.deploymentId}}</a></td>
-							<td class="property-name" translate="PROCESS-DEFINITION.SUSPENDED"></td>
-							<td>{{definition.suspended &amp;&amp; ('GENERAL.YES' | translate) || ('GENERAL.NO' | translate)}}</td>
 						</tr>
 						<tr class="property">
 							<td class="property-name" translate="PROCESS-DEFINITION.START-FORM-DEFINED"></td>
@@ -46,6 +44,8 @@
 						<tr class="property">
                             <td class="property-name" translate="PROCESS-DEFINITION.TENANT"></td>
                             <td>{{definition.tenantId | empty}}</td>
+                            <td class="property-name" translate="PROCESS-DEFINITION.SUSPENDED"></td>
+                            <td>{{definition.suspended &amp;&amp; ('GENERAL.YES' | translate) || ('GENERAL.NO' | translate)}}</td>
                         </tr>
 					</table>
 				</div>

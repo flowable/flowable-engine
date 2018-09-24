@@ -12,9 +12,9 @@
  */
 package org.flowable.idm.engine.impl.db;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableWrongDbException;
-import org.flowable.engine.common.impl.db.ServiceSqlScriptBasedDbSchemaManager;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableWrongDbException;
+import org.flowable.common.engine.impl.db.ServiceSqlScriptBasedDbSchemaManager;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.util.CommandContextUtil;
@@ -53,7 +53,7 @@ public class IdmDbSchemaManager extends ServiceSqlScriptBasedDbSchemaManager {
    protected void internalDbSchemaCreate() {
        // User and Group tables can already have been created by the process engine in an earlier version
        if (isIdmGroupTablePresent()) {
-           dbSchemaUpdate();
+           schemaUpdate();
 
        } else {
            super.internalDbSchemaCreate();
@@ -73,7 +73,7 @@ public class IdmDbSchemaManager extends ServiceSqlScriptBasedDbSchemaManager {
        return isTablePresent("ACT_ID_GROUP");
    }
    
-   public void dbSchemaCheckVersion() {
+   public void schemaCheckVersion() {
        try {
            String dbVersion = getSchemaVersion();
            if (!IdmEngine.VERSION.equals(dbVersion)) {
@@ -138,20 +138,20 @@ public class IdmDbSchemaManager extends ServiceSqlScriptBasedDbSchemaManager {
        String databaseSchemaUpdate = CommandContextUtil.getIdmEngineConfiguration().getDatabaseSchemaUpdate();
        if (IdmEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
            try {
-               dbSchemaDrop();
+               schemaDrop();
            } catch (RuntimeException e) {
                // ignore
            }
        }
        if (IdmEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate) || IdmEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)
                || IdmEngineConfiguration.DB_SCHEMA_UPDATE_CREATE.equals(databaseSchemaUpdate)) {
-           dbSchemaCreate();
+           schemaCreate();
 
        } else if (IdmEngineConfiguration.DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
-           dbSchemaCheckVersion();
+           schemaCheckVersion();
 
        } else if (IdmEngineConfiguration.DB_SCHEMA_UPDATE_TRUE.equals(databaseSchemaUpdate)) {
-           dbSchemaUpdate();
+           schemaUpdate();
        }
    }
 

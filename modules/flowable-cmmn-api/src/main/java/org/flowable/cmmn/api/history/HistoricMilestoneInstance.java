@@ -25,5 +25,6 @@ public interface HistoricMilestoneInstance {
     String getCaseInstanceId();
     String getCaseDefinitionId();
     String getElementId();
+    String getTenantId();
     
 }

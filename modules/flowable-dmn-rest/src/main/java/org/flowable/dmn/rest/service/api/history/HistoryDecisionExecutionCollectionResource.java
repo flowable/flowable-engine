@@ -12,17 +12,20 @@
  */
 package org.flowable.dmn.rest.service.api.history;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.dmn.api.DmnHistoricDecisionExecutionQuery;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryProperty;
+import org.flowable.dmn.rest.service.api.DmnRestApiInterceptor;
 import org.flowable.dmn.rest.service.api.DmnRestResponseFactory;
-import org.flowable.engine.common.api.query.QueryProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -57,6 +60,9 @@ public class HistoryDecisionExecutionCollectionResource {
 
     @Autowired
     protected DmnHistoryService dmnHistoryService;
+    
+    @Autowired(required=false)
+    protected DmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "List of historic decision executions", nickname ="listHistoricDecisionExecutions", tags = { "Historic Decision Executions" })
     @ApiImplicitParams({
@@ -115,7 +121,12 @@ public class HistoryDecisionExecutionCollectionResource {
         if (allRequestParams.containsKey("tenantIdLike")) {
             historicDecisionExecutionQuery.tenantIdLike(allRequestParams.get("tenantIdLike"));
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDecisionHistoryInfoWithQuery(historicDecisionExecutionQuery);
+        }
 
-        return new HistoricDecisionExecutionsDmnPaginateList(dmnRestResponseFactory).paginateList(allRequestParams, historicDecisionExecutionQuery, "startTime", properties);
+        return paginateList(allRequestParams, historicDecisionExecutionQuery, "startTime", properties,
+            dmnRestResponseFactory::createHistoricDecisionExecutionResponseList);
     }
 }

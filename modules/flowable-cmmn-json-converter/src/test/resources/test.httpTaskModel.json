@@ -59,6 +59,7 @@
             "httptaskrequestmethod": "httptaskrequestmethod",
             "httptaskrequesturl": "httptaskrequesturl",
             "httptaskrequestheaders": "httptaskrequestheaders",
+            "httptaskrequestbodyencoding": "httptaskrequestbodyencoding",
             "httptaskrequesttimeout": "httptaskrequesttimeout",
             "httptaskdisallowredirects": "httptaskdisallowredirects",
             "httptaskfailstatuscodes": "httptaskfailstatuscodes",

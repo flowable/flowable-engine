@@ -21,7 +21,8 @@ import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 
 /**
@@ -68,7 +69,7 @@ public interface CmmnRuntimeService {
     
     void setLocalVariables(String planItemInstanceId, Map<String, Object> variables);
     
-    void setLocalVariable(String caseInstanceId, String variableName, Object variableValue);
+    void setLocalVariable(String planItemInstanceId, String variableName, Object variableValue);
     
     void removeVariable(String caseInstanceId, String variableName);
     
@@ -146,5 +147,15 @@ public interface CmmnRuntimeService {
      * Retrieves the {@link IdentityLink}s associated with the given case instance. Such an identity link informs how a certain user is involved with a case instance.
      */
     List<IdentityLink> getIdentityLinksForCaseInstance(String instanceId);
+
+    /**
+     * Gets a Form model instance of the start form of a specific case definition or case instance
+     *
+     * @param caseDefinitionId
+     *            id of case definition for which the start form should be retrieved.
+     * @param casesInstanceId
+     *            id of case instance for which the start form should be retrieved.
+     */
+    FormInfo getStartFormModel(String caseDefinitionId, String caseInstanceId);
     
 }

@@ -23,8 +23,10 @@ import org.flowable.cmmn.model.Stage;
  */
 public abstract class PlanItemDefinitiomXmlConverter extends CaseElementXmlConverter {
     
+    @Override
     public abstract String getXMLElementName();
     
+    @Override
     public BaseElement convertToCmmnModel(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         PlanItemDefinition planItemDefinition = (PlanItemDefinition) super.convertToCmmnModel(xtr, conversionHelper);
         conversionHelper.addPlanItemDefinition(planItemDefinition);

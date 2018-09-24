@@ -20,11 +20,11 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.IOUtils;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.exception.FlowableContentNotSupportedException;
 import org.flowable.engine.RuntimeService;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
@@ -66,8 +66,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
                 variableScope = RestVariableScope.LOCAL;
                 variableFound = true;
             } else {
-                // Revert to execution-variable when not present local on the
-                // task
+                // Revert to execution-variable when not present local on the task
                 Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
                 if (task.getExecutionId() != null && runtimeService.hasVariable(task.getExecutionId(), variableName)) {
                     value = runtimeService.getVariable(task.getExecutionId(), variableName);
@@ -188,7 +187,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
         } catch (IOException ioe) {
             throw new FlowableIllegalArgumentException("Error getting binary variable", ioe);
         } catch (ClassNotFoundException ioe) {
-            throw new FlowableContentNotSupportedException("The provided body contains a serialized object for which the class is nog found: " + ioe.getMessage());
+            throw new FlowableContentNotSupportedException("The provided body contains a serialized object for which the class was not found: " + ioe.getMessage());
         }
 
     }

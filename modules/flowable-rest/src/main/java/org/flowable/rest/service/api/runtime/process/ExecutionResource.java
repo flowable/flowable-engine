@@ -16,7 +16,7 @@ package org.flowable.rest.service.api.runtime.process;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.runtime.Execution;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,6 +61,10 @@ public class ExecutionResource extends ExecutionBaseResource {
     public ExecutionResponse performExecutionAction(@ApiParam(name = "executionId") @PathVariable String executionId, @RequestBody ExecutionActionRequest actionRequest, HttpServletRequest request, HttpServletResponse response) {
 
         Execution execution = getExecutionFromRequest(executionId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.doExecutionActionRequest(actionRequest);
+        }
 
         if (ExecutionActionRequest.ACTION_SIGNAL.equals(actionRequest.getAction())
                 || ExecutionActionRequest.ACTION_TRIGGER.equals(actionRequest.getAction())) {
@@ -93,8 +97,7 @@ public class ExecutionResource extends ExecutionBaseResource {
             throw new FlowableIllegalArgumentException("Invalid action: '" + actionRequest.getAction() + "'.");
         }
 
-        // Re-fetch the execution, could have changed due to action or even
-        // completed
+        // Re-fetch the execution, could have changed due to action or even completed
         execution = runtimeService.createExecutionQuery().executionId(execution.getId()).singleResult();
         if (execution == null) {
             // Execution is finished, return empty body to inform user
@@ -114,6 +117,10 @@ public class ExecutionResource extends ExecutionBaseResource {
     @PostMapping(value = "/runtime/executions/{executionId}/change-state", produces = "application/json")
     public void changeActivityState(@ApiParam(name = "executionId") @PathVariable String executionId,
             @RequestBody ExecutionChangeActivityStateRequest activityStateRequest, HttpServletRequest request) {
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.changeActivityState(activityStateRequest);
+        }
 
         runtimeService.createChangeActivityStateBuilder()
                 .moveSingleExecutionToActivityIds(executionId, activityStateRequest.getStartActivityIds())

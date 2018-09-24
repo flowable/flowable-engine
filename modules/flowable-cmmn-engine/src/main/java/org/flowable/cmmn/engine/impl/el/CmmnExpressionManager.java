@@ -14,8 +14,8 @@ package org.flowable.cmmn.engine.impl.el;
 
 import java.util.Map;
 
-import org.flowable.engine.common.api.variable.VariableContainer;
-import org.flowable.engine.common.impl.javax.el.ELResolver;
+import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.flowable.variable.service.impl.el.VariableScopeExpressionManager;
 
 /**

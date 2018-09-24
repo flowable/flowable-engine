@@ -16,12 +16,11 @@ package org.flowable.cmmn.rest.service.api.management;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.RestActionRequest;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.job.api.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -44,7 +43,7 @@ import io.swagger.annotations.Authorization;
  */
 @RestController
 @Api(tags = { "Jobs" }, description = "Manage Jobs", authorizations = { @Authorization(value = "basicAuth") })
-public class JobResource {
+public class JobResource extends JobBaseResource {
 
     private static final String EXECUTE_ACTION = "execute";
     private static final String MOVE_ACTION = "move";
@@ -53,11 +52,8 @@ public class JobResource {
     protected CmmnRestResponseFactory restResponseFactory;
 
     @Autowired
-    protected CmmnManagementService managementService;
-    
-    @Autowired
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
-
+    
     @ApiOperation(value = "Get a single job", tags = { "Jobs" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the job exists and is returned."),
@@ -65,12 +61,7 @@ public class JobResource {
     })
     @GetMapping(value = "/cmmn-management/jobs/{jobId}", produces = "application/json")
     public JobResponse getJob(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletRequest request) {
-        Job job = managementService.createJobQuery().jobId(jobId).singleResult();
-
-        if (job == null) {
-            throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
-        }
-
+        Job job = getJobById(jobId);
         return restResponseFactory.createJobResponse(job);
     }
 
@@ -81,12 +72,7 @@ public class JobResource {
     })
     @GetMapping(value = "/cmmn-management/timer-jobs/{jobId}", produces = "application/json")
     public JobResponse getTimerJob(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletRequest request) {
-        Job job = managementService.createTimerJobQuery().jobId(jobId).singleResult();
-
-        if (job == null) {
-            throw new FlowableObjectNotFoundException("Could not find a timer job with id '" + jobId + "'.", Job.class);
-        }
-
+        Job job = getTimerJobById(jobId);
         return restResponseFactory.createJobResponse(job);
     }
 
@@ -97,12 +83,7 @@ public class JobResource {
     })
     @GetMapping(value = "/cmmn-management/suspended-jobs/{jobId}", produces = "application/json")
     public JobResponse getSuspendedJob(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletRequest request) {
-        Job job = managementService.createSuspendedJobQuery().jobId(jobId).singleResult();
-
-        if (job == null) {
-            throw new FlowableObjectNotFoundException("Could not find a suspended job with id '" + jobId + "'.", Job.class);
-        }
-
+        Job job = getSuspendedJobById(jobId);
         return restResponseFactory.createJobResponse(job);
     }
 
@@ -113,12 +94,7 @@ public class JobResource {
     })
     @GetMapping(value = "/cmmn-management/deadletter-jobs/{jobId}", produces = "application/json")
     public JobResponse getDeadletterJob(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletRequest request) {
-        Job job = managementService.createDeadLetterJobQuery().jobId(jobId).singleResult();
-
-        if (job == null) {
-            throw new FlowableObjectNotFoundException("Could not find a deadletter job with id '" + jobId + "'.", Job.class);
-        }
-
+        Job job = getDeadLetterJobById(jobId);
         return restResponseFactory.createJobResponse(job);
     }
 
@@ -129,8 +105,9 @@ public class JobResource {
     })
     @DeleteMapping("/cmmn-management/jobs/{jobId}")
     public void deleteJob(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
+        Job job = getJobById(jobId);
         try {
-            managementService.deleteJob(jobId);
+            managementService.deleteJob(job.getId());
         } catch (FlowableObjectNotFoundException aonfe) {
             // Re-throw to have consistent error-messaging across REST-api
             throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
@@ -145,8 +122,9 @@ public class JobResource {
     })
     @DeleteMapping("/cmmn-management/timer-jobs/{jobId}")
     public void deleteTimerJob(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
+        Job job = getTimerJobById(jobId);
         try {
-            managementService.deleteTimerJob(jobId);
+            managementService.deleteTimerJob(job.getId());
         } catch (FlowableObjectNotFoundException aonfe) {
             // Re-throw to have consistent error-messaging across REST-api
             throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
@@ -161,8 +139,9 @@ public class JobResource {
     })
     @DeleteMapping("/cmmn-management/suspended-jobs/{jobId}")
     public void deleteSuspendeJob(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
+        Job job = getSuspendedJobById(jobId);
         try {
-            managementService.deleteSuspendedJob(jobId);
+            managementService.deleteSuspendedJob(job.getId());
         } catch (FlowableObjectNotFoundException aonfe) {
             // Re-throw to have consistent error-messaging across REST-api
             throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
@@ -177,8 +156,9 @@ public class JobResource {
     })
     @DeleteMapping("/cmmn-management/deadletter-jobs/{jobId}")
     public void deleteDeadLetterJob(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
+        Job job = getDeadLetterJobById(jobId);
         try {
-            managementService.deleteDeadLetterJob(jobId);
+            managementService.deleteDeadLetterJob(job.getId());
         } catch (FlowableObjectNotFoundException aonfe) {
             // Re-throw to have consistent error-messaging across REST-api
             throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
@@ -197,9 +177,11 @@ public class JobResource {
         if (actionRequest == null || !EXECUTE_ACTION.equals(actionRequest.getAction())) {
             throw new FlowableIllegalArgumentException("Invalid action, only 'execute' is supported.");
         }
+        
+        Job job = getJobById(jobId);
 
         try {
-            managementService.executeJob(jobId);
+            managementService.executeJob(job.getId());
         } catch (FlowableObjectNotFoundException aonfe) {
             // Re-throw to have consistent error-messaging across REST-api
             throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
@@ -219,9 +201,11 @@ public class JobResource {
         if (actionRequest == null || !MOVE_ACTION.equals(actionRequest.getAction())) {
             throw new FlowableIllegalArgumentException("Invalid action, only 'move' is supported.");
         }
+        
+        Job job = getTimerJobById(jobId);
 
         try {
-            managementService.moveTimerToExecutableJob(jobId);
+            managementService.moveTimerToExecutableJob(job.getId());
         } catch (FlowableObjectNotFoundException aonfe) {
             // Re-throw to have consistent error-messaging across REST-api
             throw new FlowableObjectNotFoundException("Could not find a timer job with id '" + jobId + "'.", Job.class);
@@ -241,9 +225,11 @@ public class JobResource {
         if (actionRequest == null || !MOVE_ACTION.equals(actionRequest.getAction())) {
             throw new FlowableIllegalArgumentException("Invalid action, only 'move' is supported.");
         }
+        
+        Job job = getDeadLetterJobById(jobId);
 
         try {
-            managementService.moveDeadLetterJobToExecutableJob(jobId, cmmnEngineConfiguration.getAsyncExecutorNumberOfRetries());
+            managementService.moveDeadLetterJobToExecutableJob(job.getId(), cmmnEngineConfiguration.getAsyncExecutorNumberOfRetries());
         } catch (FlowableObjectNotFoundException aonfe) {
             // Re-throw to have consistent error-messaging across REST-api
             throw new FlowableObjectNotFoundException("Could not find a dead letter job with id '" + jobId + "'.", Job.class);
@@ -251,5 +237,4 @@ public class JobResource {
 
         response.setStatus(HttpStatus.NO_CONTENT.value());
     }
-
 }

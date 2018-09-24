@@ -19,6 +19,9 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.test.TestHelper;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.TaskQuery;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Testcase for the non-spec extensions to the task candidate use case.
@@ -27,7 +30,7 @@ import org.flowable.task.api.TaskQuery;
  */
 public class TaskAssignmentExtensionsTest extends PluggableFlowableTestCase {
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
         identityService.saveUser(identityService.newUser("kermit"));
         identityService.saveUser(identityService.newUser("gonzo"));
@@ -41,7 +44,7 @@ public class TaskAssignmentExtensionsTest extends PluggableFlowableTestCase {
         identityService.createMembership("fozzie", "management");
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
         identityService.deleteGroup("accountancy");
         identityService.deleteGroup("management");
@@ -50,6 +53,7 @@ public class TaskAssignmentExtensionsTest extends PluggableFlowableTestCase {
         identityService.deleteUser("kermit");
     }
 
+    @Test
     @Deployment
     public void testAssigneeExtension() {
         runtimeService.startProcessInstanceByKey("assigneeExtension");
@@ -58,6 +62,7 @@ public class TaskAssignmentExtensionsTest extends PluggableFlowableTestCase {
         assertEquals("my task", tasks.get(0).getName());
     }
 
+    @Test
     public void testDuplicateAssigneeDeclaration() {
         try {
             String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testDuplicateAssigneeDeclaration");
@@ -68,6 +73,7 @@ public class TaskAssignmentExtensionsTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testOwnerExtension() {
         runtimeService.startProcessInstanceByKey("ownerExtension");
@@ -76,6 +82,7 @@ public class TaskAssignmentExtensionsTest extends PluggableFlowableTestCase {
         assertEquals("my task", tasks.get(0).getName());
     }
 
+    @Test
     @Deployment
     public void testCandidateUsersExtension() {
         runtimeService.startProcessInstanceByKey("candidateUsersExtension");
@@ -85,6 +92,7 @@ public class TaskAssignmentExtensionsTest extends PluggableFlowableTestCase {
         assertEquals(1, tasks.size());
     }
 
+    @Test
     @Deployment
     public void testCandidateGroupsExtension() {
         runtimeService.startProcessInstanceByKey("candidateGroupsExtension");
@@ -107,6 +115,7 @@ public class TaskAssignmentExtensionsTest extends PluggableFlowableTestCase {
 
     // Test where the candidate user extension is used together
     // with the spec way of defining candidate users
+    @Test
     @Deployment
     public void testMixedCandidateUserDefinition() {
         runtimeService.startProcessInstanceByKey("mixedCandidateUser");

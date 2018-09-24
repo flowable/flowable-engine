@@ -12,7 +12,7 @@
  */
 package org.flowable.spring.boot;
 
-import org.flowable.spring.common.SpringEngineConfiguration;
+import org.flowable.common.spring.SpringEngineConfiguration;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.transaction.PlatformTransactionManager;
 

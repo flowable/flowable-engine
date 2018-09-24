@@ -15,10 +15,11 @@ package org.flowable.examples.bpmn.gateway;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * Example of using the exclusive gateway.
@@ -31,6 +32,7 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
      * The test process has an XOR gateway where, the 'input' variable is used to select one of the outgoing sequence flow. Every one of those sequence flow goes to another task, allowing us to test
      * the decision very easily.
      */
+    @Test
     @Deployment
     public void testDecisionFunctionality() {
 

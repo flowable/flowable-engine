@@ -12,7 +12,7 @@
  */
 package org.flowable.idm.engine.impl;
 
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.IdmManagementService;
 import org.flowable.idm.engine.IdmEngine;
@@ -41,8 +41,8 @@ public class IdmEngineImpl implements IdmEngine {
         this.managementService = engineConfiguration.getIdmManagementService();
         this.commandExecutor = engineConfiguration.getCommandExecutor();
 
-        if (engineConfiguration.isUsingRelationalDatabase() && engineConfiguration.getDatabaseSchemaUpdate() != null) {
-            commandExecutor.execute(engineConfiguration.getSchemaCommandConfig(), new SchemaOperationsIdmEngineBuild());
+        if (engineConfiguration.getSchemaManagementCmd() != null) {
+            engineConfiguration.getCommandExecutor().execute(engineConfiguration.getSchemaCommandConfig(), engineConfiguration.getSchemaManagementCmd());
         }
 
         if (name == null) {

@@ -12,24 +12,36 @@
  */
 package org.flowable.cmmn.rest.conf.common;
 
-import org.flowable.cmmn.rest.security.BasicAuthenticationProvider;
+import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.spring.security.FlowableAuthenticationProvider;
+import org.flowable.spring.security.FlowableUserDetailsService;
+import org.flowable.spring.security.SpringSecurityAuthenticationContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.firewall.DefaultHttpFirewall;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.firewall.HttpFirewall;
+import org.springframework.security.web.firewall.StrictHttpFirewall;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private IdmIdentityService idmIdentityService;
+
+    public SecurityConfiguration() {
+        Authentication.setAuthenticationContext(new SpringSecurityAuthenticationContext());
+    }
 
     @Bean
     @Override
@@ -38,13 +50,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider() {
-        return new BasicAuthenticationProvider();
+    public FlowableAuthenticationProvider authenticationProvider(IdmIdentityService idmIdentityService, UserDetailsService userDetailsService) {
+        return new FlowableAuthenticationProvider(idmIdentityService, userDetailsService);
     }
     
+    @Bean
+    public FlowableUserDetailsService userDetailsService(IdmIdentityService identityService) {
+        return new FlowableUserDetailsService(identityService);
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authenticationProvider(authenticationProvider())
+        http.authenticationProvider(authenticationProvider(idmIdentityService, userDetailsService(idmIdentityService)))
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and().csrf().disable()
             .authorizeRequests()
@@ -55,7 +72,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     /* Needed for allowing slashes in urls, needed for getting deployment resources */
     @Bean
     public HttpFirewall defaultFireWall() {
-        DefaultHttpFirewall firewall = new DefaultHttpFirewall();
+        StrictHttpFirewall firewall = new StrictHttpFirewall();
         firewall.setAllowUrlEncodedSlash(true);
         return firewall;
     }

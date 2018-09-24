@@ -7,6 +7,7 @@ create table ACT_RE_DEPLOYMENT (
     DEPLOY_TIME_ timestamp NULL,
     DERIVED_FROM_ varchar(64),
     DERIVED_FROM_ROOT_ varchar(64),
+    PARENT_DEPLOYMENT_ID_ varchar(255),
     ENGINE_VERSION_ varchar(255),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
@@ -296,7 +297,7 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
     
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.3.1.0', 1);   
+values ('schema.version', '6.4.0.0', 1);   
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.3.1.0)', 1);  
+values ('schema.history', 'create(6.3.2.0)', 1);  

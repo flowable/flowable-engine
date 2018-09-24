@@ -16,8 +16,8 @@ package org.flowable.rest.conf;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.RepositoryService;
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.Privilege;

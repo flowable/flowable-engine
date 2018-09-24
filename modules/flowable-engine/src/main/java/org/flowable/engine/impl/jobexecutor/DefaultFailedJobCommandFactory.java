@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.impl.jobexecutor;
 
-import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.cmd.JobRetryCmd;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 

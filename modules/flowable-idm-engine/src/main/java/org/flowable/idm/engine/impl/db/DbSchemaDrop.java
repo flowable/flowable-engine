@@ -13,10 +13,10 @@
 
 package org.flowable.idm.engine.impl.db;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngines;
 import org.flowable.idm.engine.impl.util.CommandContextUtil;
@@ -33,7 +33,7 @@ public class DbSchemaDrop {
         commandExecutor.execute(config, new Command<Object>() {
             @Override
             public Object execute(CommandContext commandContext) {
-                CommandContextUtil.getIdmEngineConfiguration(commandContext).getDbSchemaManager().dbSchemaDrop();
+                CommandContextUtil.getIdmEngineConfiguration(commandContext).getDbSchemaManager().schemaDrop();
                 return null;
             }
         });

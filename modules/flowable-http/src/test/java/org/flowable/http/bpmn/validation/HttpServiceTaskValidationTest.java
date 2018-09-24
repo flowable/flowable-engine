@@ -12,9 +12,10 @@
  */
 package org.flowable.http.bpmn.validation;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.test.Deployment;
 import org.flowable.http.bpmn.HttpServiceTaskTestCase;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +30,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * @author Harsha Teja Kanna
  */
 public class HttpServiceTaskValidationTest extends HttpServiceTaskTestCase {
+    @Test
     @Deployment
     public void testInvalidProcess() {
         try {
@@ -40,6 +42,7 @@ public class HttpServiceTaskValidationTest extends HttpServiceTaskTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testInvalidHeaders() {
         try {
@@ -51,6 +54,7 @@ public class HttpServiceTaskValidationTest extends HttpServiceTaskTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testInvalidFlags() {
         try {
@@ -62,6 +66,7 @@ public class HttpServiceTaskValidationTest extends HttpServiceTaskTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testInvalidTimeout() {
         Map<String, Object> variables = new HashMap<>();

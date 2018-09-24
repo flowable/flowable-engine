@@ -13,7 +13,7 @@
 package org.flowable.http.bpmn;
 
 import org.apache.http.client.HttpClient;
-import org.flowable.engine.common.api.variable.VariableContainer;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.http.HttpRequest;
 import org.flowable.http.delegate.HttpRequestHandler;
 

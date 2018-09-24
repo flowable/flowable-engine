@@ -16,12 +16,14 @@ import java.sql.SQLException;
 
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.test.AbstractTestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
  */
 public class NoDbConnectionTest extends AbstractTestCase {
 
+    @Test
     public void testNoDbConnection() {
         try {
             ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("org/flowable/standalone/initialization/nodbconnection.flowable.cfg.xml").buildProcessEngine();

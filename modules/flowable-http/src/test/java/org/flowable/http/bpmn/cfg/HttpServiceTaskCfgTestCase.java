@@ -14,6 +14,7 @@ package org.flowable.http.bpmn.cfg;
 
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.http.bpmn.HttpServiceTaskTestServer;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * Http Server and API to test HTTP Service Task config
@@ -26,9 +27,8 @@ public abstract class HttpServiceTaskCfgTestCase extends ResourceFlowableTestCas
         super(configPath);
     }
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         HttpServiceTaskTestServer.setUp();
     }
 }

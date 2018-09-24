@@ -15,9 +15,9 @@ package org.flowable.engine.test.api.nonpublic;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
 import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
@@ -29,12 +29,14 @@ import org.flowable.engine.runtime.EventSubscriptionQuery;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Daniel Meyer
  */
 public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
 
+    @Test
     public void testQueryByEventName() {
 
         processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
@@ -67,6 +69,7 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     public void testQueryByEventType() {
 
         processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
@@ -99,6 +102,7 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     public void testQueryByActivityId() {
 
         processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
@@ -134,6 +138,7 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     public void testQueryByEventSubscriptionId() {
 
         processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
@@ -167,6 +172,7 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testQueryByExecutionId() {
 

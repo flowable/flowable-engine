@@ -21,7 +21,7 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.flowable.engine.common.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

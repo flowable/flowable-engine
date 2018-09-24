@@ -35,6 +35,7 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     protected String callbackId;
     protected String callbackType;
     protected String tenantId;
+    protected String overrideDefinitionTenantId;
     protected Map<String, Object> variables;
     protected Map<String, Object> transientVariables;
 
@@ -87,6 +88,12 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     @Override
     public ProcessInstanceBuilder tenantId(String tenantId) {
         this.tenantId = tenantId;
+        return this;
+    }
+    
+    @Override
+    public ProcessInstanceBuilder overrideProcessDefinitionTenantId(String tenantId) {
+        this.overrideDefinitionTenantId = tenantId;
         return this;
     }
 
@@ -169,6 +176,10 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
 
     public String getTenantId() {
         return tenantId;
+    }
+
+    public String getOverrideDefinitionTenantId() {
+        return overrideDefinitionTenantId;
     }
 
     public Map<String, Object> getVariables() {

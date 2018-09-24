@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.task.api.Task;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,7 +57,7 @@ public class TaskIdentityLinkCollectionResource extends TaskBaseResource {
             notes = "It's possible to add either a user or a group.")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the task was found and the identity link was created."),
-            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task doesn’t have the requested identityLink. The status contains additional information about this error.")
+            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task does not have the requested identityLink. The status contains additional information about this error.")
     })
     @PostMapping(value = "/cmmn-runtime/tasks/{taskId}/identitylinks", produces = "application/json")
     public RestIdentityLink createIdentityLink(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @RequestBody RestIdentityLink identityLink, HttpServletRequest request, HttpServletResponse response) {

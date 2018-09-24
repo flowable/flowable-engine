@@ -15,9 +15,9 @@ package org.flowable.dmn.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.engine.impl.DecisionTableQueryImpl;
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 
 /**
  * @author Joram Barrez
@@ -27,11 +27,6 @@ public interface DecisionTableEntityManager extends EntityManager<DecisionTableE
     DecisionTableEntity findLatestDecisionTableByKey(String decisionTableKey);
 
     DecisionTableEntity findLatestDecisionTableByKeyAndTenantId(String decisionTableKey, String tenantId);
-
-    DecisionTableEntity findLatestDecisionTableByKeyAndParentDeploymentId(String decisionTableKey, String parentDeploymentId);
-
-    DecisionTableEntity findLatestDecisionTableByKeyParentDeploymentIdAndTenantId(String decisionTableKey,
-            String parentDeploymentId, String tenantId);
 
     List<DmnDecisionTable> findDecisionTablesByQueryCriteria(DecisionTableQueryImpl decisionTableQuery);
 

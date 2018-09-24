@@ -22,10 +22,11 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.entity.ContentType;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
+import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -38,6 +39,9 @@ public class BaseDeploymentResourceDataResource {
 
     @Autowired
     protected CmmnRepositoryService repositoryService;
+    
+    @Autowired(required=false)
+    protected CmmnRestApiInterceptor restApiInterceptor;
 
     protected byte[] getDeploymentResourceData(String deploymentId, String resourceName, HttpServletResponse response) {
 
@@ -52,6 +56,10 @@ public class BaseDeploymentResourceDataResource {
         CmmnDeployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
         if (deployment == null) {
             throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.", CmmnDeployment.class);
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDeploymentById(deployment);
         }
 
         List<String> resourceList = repositoryService.getDeploymentResourceNames(deploymentId);

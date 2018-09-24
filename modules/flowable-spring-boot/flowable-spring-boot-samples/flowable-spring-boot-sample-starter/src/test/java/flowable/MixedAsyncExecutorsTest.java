@@ -16,6 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
 
+import org.flowable.app.api.AppRepositoryService;
+import org.flowable.app.engine.test.FlowableAppRule;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -48,13 +50,20 @@ public class MixedAsyncExecutorsTest {
     @Rule
     @Autowired
     public FlowableCmmnRule cmmnRule;
+    
+    @Rule
+    @Autowired
+    public FlowableAppRule appRule;
+    
     private CmmnRuntimeService cmmnRuntimeService;
     private CmmnTaskService cmmnTaskService;
+    private AppRepositoryService appRepositoryService;
 
     @Before
     public void setUp() {
         cmmnRuntimeService = cmmnRule.getCmmnRuntimeService();
         cmmnTaskService = cmmnRule.getCmmnEngine().getCmmnTaskService();
+        appRepositoryService = appRule.getAppRepositoryService();
     }
 
     @CmmnDeployment(resources = "stageAfterTimer.cmmn")
@@ -78,12 +87,17 @@ public class MixedAsyncExecutorsTest {
         // Timer fires after 1 day, so setting it to 1 day + 1 second
         setClockTo(new Date(startTime.getTime() + (24 * 60 * 60 * 1000 + 1)));
 
-        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnRule.getCmmnEngine(), 5000L, 200L, true);
-        JobTestHelper.waitForJobExecutorToProcessAllJobs(processRule, 5000L, 200L);
+        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnRule.getCmmnEngine(), 7000L, 200L, true);
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processRule, 7000L, 200L);
 
         // User task should be active after the timer has triggered
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(2);
         assertThat(processRule.getTaskService().createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+    }
+    
+    @Test
+    public void testAppDefinitions() {
+        assertThat(appRepositoryService.createAppDefinitionQuery().count()).isEqualTo(0);
     }
 
     protected void setClockTo(Date time) {

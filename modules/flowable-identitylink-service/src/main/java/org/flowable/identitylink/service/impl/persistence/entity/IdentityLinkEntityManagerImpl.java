@@ -17,11 +17,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.identitylink.service.IdentityLinkEventHandler;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.event.impl.FlowableIdentityLinkEventBuilder;
 import org.flowable.identitylink.service.impl.persistence.entity.data.IdentityLinkDataManager;
 
@@ -42,6 +43,26 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
     @Override
     protected DataManager<IdentityLinkEntity> getDataManager() {
         return identityLinkDataManager;
+    }
+
+    @Override
+    public void insert(IdentityLinkEntity entity, boolean fireCreateEvent) {
+        super.insert(entity, fireCreateEvent);
+
+        IdentityLinkEventHandler identityLinkEventHandler = getIdentityLinkEventHandler();
+        if (identityLinkEventHandler != null) {
+            identityLinkEventHandler.handleIdentityLinkAddition(entity);
+        }
+    }
+
+    @Override
+    public void delete(IdentityLinkEntity entity, boolean fireDeleteEvent) {
+        super.delete(entity, fireDeleteEvent);
+
+        IdentityLinkEventHandler identityLinkEventHandler = getIdentityLinkEventHandler();
+        if (identityLinkEventHandler != null) {
+            getIdentityLinkEventHandler().handleIdentityLinkDeletion(entity);
+        }
     }
 
     @Override
@@ -291,6 +312,10 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
 
     public void setIdentityLinkDataManager(IdentityLinkDataManager identityLinkDataManager) {
         this.identityLinkDataManager = identityLinkDataManager;
+    }
+
+    protected IdentityLinkEventHandler getIdentityLinkEventHandler() {
+        return getIdentityLinkServiceConfiguration().getIdentityLinkEventHandler();
     }
 
 }

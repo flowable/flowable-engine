@@ -15,21 +15,21 @@ package org.flowable.engine.test.api.runtime;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.task.Event;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.identitylink.service.IdentityLinkType;
-
-import junit.framework.AssertionFailedError;
+import org.flowable.identitylink.api.IdentityLinkType;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Wendel Kerr
  */
 public class ProcessInstanceIdentityLinksTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/runtime/IdentityLinksProcess.bpmn20.xml")
     public void testParticipantUserLink() {
         runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
@@ -53,6 +53,7 @@ public class ProcessInstanceIdentityLinksTest extends PluggableFlowableTestCase 
         assertEquals(0, runtimeService.getIdentityLinksForProcessInstance(processInstanceId).size());
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/runtime/IdentityLinksProcess.bpmn20.xml")
     public void testCandidateGroupLink() {
         runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
@@ -104,9 +105,10 @@ public class ProcessInstanceIdentityLinksTest extends PluggableFlowableTestCase 
                 return event;
             }
         }
-        throw new AssertionFailedError("no process instance event found with action " + action);
+        throw new AssertionError("no process instance event found with action " + action);
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/runtime/IdentityLinksProcess.bpmn20.xml")
     public void testCustomTypeUserLink() {
         runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
@@ -130,6 +132,7 @@ public class ProcessInstanceIdentityLinksTest extends PluggableFlowableTestCase 
         assertEquals(0, runtimeService.getIdentityLinksForProcessInstance(processInstanceId).size());
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/runtime/IdentityLinksProcess.bpmn20.xml")
     public void testCustomLinkGroupLink() {
         runtimeService.startProcessInstanceByKey("IdentityLinksProcess");

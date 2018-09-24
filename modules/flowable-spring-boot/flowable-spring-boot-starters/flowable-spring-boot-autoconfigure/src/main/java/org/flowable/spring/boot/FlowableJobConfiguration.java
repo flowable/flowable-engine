@@ -12,18 +12,17 @@
  */
 package org.flowable.spring.boot;
 
-import org.flowable.spring.job.service.SpringCallerRunsRejectedJobsHandler;
-import org.flowable.spring.job.service.SpringRejectedJobsHandler;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * Common configuration for engines that need the job executions setup.
  *
  * @author Filip Hrisafov
+ * @author Joram Barrez
  */
 @Configuration
 public class FlowableJobConfiguration {
@@ -31,12 +30,15 @@ public class FlowableJobConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public TaskExecutor taskExecutor() {
-        return new SimpleAsyncTaskExecutor();
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(100);
+        executor.setThreadNamePrefix("flowable-task-Executor-");
+        executor.setAwaitTerminationSeconds(30);
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.initialize();
+        return executor;
     }
 
-    @Bean
-    @ConditionalOnMissingBean
-    public SpringRejectedJobsHandler springRejectedJobsHandler() {
-        return new SpringCallerRunsRejectedJobsHandler();
-    }
 }

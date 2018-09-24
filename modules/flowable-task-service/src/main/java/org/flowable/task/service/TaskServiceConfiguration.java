@@ -15,12 +15,12 @@ package org.flowable.task.service;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.impl.AbstractServiceConfiguration;
-import org.flowable.engine.common.impl.cfg.IdGenerator;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.impl.AbstractServiceConfiguration;
 import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.task.api.TaskQueryInterceptor;
+import org.flowable.task.api.history.HistoricTaskQueryInterceptor;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
 import org.flowable.task.service.impl.HistoricTaskServiceImpl;
 import org.flowable.task.service.impl.TaskServiceImpl;
@@ -66,24 +66,20 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
     protected boolean enableTaskRelationshipCounts;
     protected boolean enableLocalization;
     
+    protected TaskQueryInterceptor taskQueryInterceptor;
+    protected HistoricTaskQueryInterceptor historicTaskQueryInterceptor;
     protected int taskQueryLimit;
     protected int historicTaskQueryLimit;
-    
-    protected IdGenerator idGenerator;
+
+    protected TaskPostProcessor taskPostProcessor;
 
     // init
     // /////////////////////////////////////////////////////////////////////
 
     public void init() {
-        checkIdGenerator();
         initDataManagers();
         initEntityManagers();
-    }
-
-    protected void checkIdGenerator() {
-        if (this.idGenerator == null) {
-            throw new FlowableException("Id generator for task configuration must be initialized");
-        }
+        initTaskPostProcessor();
     }
 
     // Data managers
@@ -104,6 +100,12 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         }
         if (historicTaskInstanceEntityManager == null) {
             historicTaskInstanceEntityManager = new HistoricTaskInstanceEntityManagerImpl(this, historicTaskInstanceDataManager);
+        }
+    }
+
+    public void initTaskPostProcessor() {
+        if (taskPostProcessor == null) {
+            taskPostProcessor = taskBuilder -> taskBuilder;
         }
     }
 
@@ -223,6 +225,24 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         return this;
     }
 
+    public TaskQueryInterceptor getTaskQueryInterceptor() {
+        return taskQueryInterceptor;
+    }
+
+    public TaskServiceConfiguration setTaskQueryInterceptor(TaskQueryInterceptor taskQueryInterceptor) {
+        this.taskQueryInterceptor = taskQueryInterceptor;
+        return this;
+    }
+
+    public HistoricTaskQueryInterceptor getHistoricTaskQueryInterceptor() {
+        return historicTaskQueryInterceptor;
+    }
+
+    public TaskServiceConfiguration setHistoricTaskQueryInterceptor(HistoricTaskQueryInterceptor historicTaskQueryInterceptor) {
+        this.historicTaskQueryInterceptor = historicTaskQueryInterceptor;
+        return this;
+    }
+
     public int getTaskQueryLimit() {
         return taskQueryLimit;
     }
@@ -265,12 +285,12 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         return this;
     }
 
-    public TaskServiceConfiguration setIdGenerator(IdGenerator idGenerator) {
-        this.idGenerator = idGenerator;
-        return this;
+    public TaskPostProcessor getTaskPostProcessor() {
+        return taskPostProcessor;
     }
 
-    public IdGenerator getIdGenerator() {
-        return idGenerator;
+    public TaskServiceConfiguration setTaskPostProcessor(TaskPostProcessor processor) {
+        this.taskPostProcessor = processor;
+        return this;
     }
 }

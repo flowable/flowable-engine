@@ -13,20 +13,23 @@
 
 package org.flowable.idm.rest.service.api.user;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.exception.FlowableConflictException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
 import org.flowable.idm.api.UserQueryProperty;
+import org.flowable.idm.rest.service.api.IdmRestApiInterceptor;
 import org.flowable.idm.rest.service.api.IdmRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -48,6 +51,7 @@ import io.swagger.annotations.Authorization;
 /**
  * @author Frederik Heremans
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 @RestController
 @Api(tags = { "Users" }, description = "Manage Users", authorizations = { @Authorization(value = "basicAuth") })
@@ -59,6 +63,7 @@ public class UserCollectionResource {
         properties.put("id", UserQueryProperty.USER_ID);
         properties.put("firstName", UserQueryProperty.FIRST_NAME);
         properties.put("lastName", UserQueryProperty.LAST_NAME);
+        properties.put("displayName", UserQueryProperty.DISPLAY_NAME);
         properties.put("email", UserQueryProperty.EMAIL);
     }
 
@@ -67,18 +72,23 @@ public class UserCollectionResource {
 
     @Autowired
     protected IdmIdentityService identityService;
+    
+    @Autowired(required=false)
+    protected IdmRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "List users", nickname = "listUsers", tags = { "Users" })
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return group with the given id", paramType = "query"),
             @ApiImplicitParam(name = "firstName", dataType = "string", value = "Only return users with the given firstname", paramType = "query"),
             @ApiImplicitParam(name = "lastName", dataType = "string", value = "Only return users with the given lastname", paramType = "query"),
+            @ApiImplicitParam(name = "displayName", dataType = "string", value = "Only return users with the given displayName", paramType = "query"),
             @ApiImplicitParam(name = "email", dataType = "string", value = "Only return users with the given email", paramType = "query"),
             @ApiImplicitParam(name = "firstNameLike", dataType = "string", value = "Only return users with a firstname like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "lastNameLike", dataType = "string", value = "Only return users with a lastname like the given value. ", paramType = "query"),
+            @ApiImplicitParam(name = "displayNameLike", dataType = "string", value = "Only return users with a displayName like the given value. ", paramType = "query"),
             @ApiImplicitParam(name = "emailLike", dataType = "string", value = "Only return users with an email like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "memberOfGroup", dataType = "string", value = "Only return users which are a member of the given group.", paramType = "query"),
-            @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,firstName,lastname,email", paramType = "query"),
+            @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,firstName,lastname,email,displayName", paramType = "query"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the group exists and is returned.")
@@ -96,6 +106,9 @@ public class UserCollectionResource {
         if (allRequestParams.containsKey("lastName")) {
             query.userLastName(allRequestParams.get("lastName"));
         }
+        if (allRequestParams.containsKey("displayName")) {
+            query.userDisplayName(allRequestParams.get("displayName"));
+        }
         if (allRequestParams.containsKey("email")) {
             query.userEmail(allRequestParams.get("email"));
         }
@@ -105,14 +118,21 @@ public class UserCollectionResource {
         if (allRequestParams.containsKey("lastNameLike")) {
             query.userLastNameLike(allRequestParams.get("lastNameLike"));
         }
+        if (allRequestParams.containsKey("displayNameLike")) {
+            query.userDisplayNameLike(allRequestParams.get("displayNameLike"));
+        }
         if (allRequestParams.containsKey("emailLike")) {
             query.userEmailLike(allRequestParams.get("emailLike"));
         }
         if (allRequestParams.containsKey("memberOfGroup")) {
             query.memberOfGroup(allRequestParams.get("memberOfGroup"));
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessUserInfoWithQuery(query);
+        }
 
-        return new UserPaginateList(idmRestResponseFactory).paginateList(allRequestParams, query, "id", properties);
+        return paginateList(allRequestParams, query, "id", properties, idmRestResponseFactory::createUserResponseList);
     }
 
     @ApiOperation(value = "Create a user", tags = { "Users" })
@@ -136,7 +156,13 @@ public class UserCollectionResource {
         created.setEmail(userRequest.getEmail());
         created.setFirstName(userRequest.getFirstName());
         created.setLastName(userRequest.getLastName());
+        created.setDisplayName(userRequest.getDisplayName());
         created.setPassword(userRequest.getPassword());
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.createNewUser(created);
+        }
+        
         identityService.saveUser(created);
 
         response.setStatus(HttpStatus.CREATED.value());

@@ -28,7 +28,6 @@ import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
 import org.junit.After;
@@ -48,6 +47,8 @@ public abstract class FlowableCmmnTestCase {
 
     public static String FLOWABLE_CMMN_CFG_XML = "flowable.cmmn.cfg.xml";
 
+    protected static CmmnEngine cmmnEngine;
+    
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
     protected CmmnManagementService cmmnManagementService;
     protected CmmnRepositoryService cmmnRepositoryService;
@@ -66,12 +67,10 @@ public abstract class FlowableCmmnTestCase {
 
     protected static void initCmmnEngine() {
         try (InputStream inputStream = FlowableCmmnTestCase.class.getClassLoader().getResourceAsStream(FLOWABLE_CMMN_CFG_XML)) {
-            CmmnEngine cmmnEngine = null;
             if (inputStream != null) {
                 cmmnEngine = CmmnEngineConfiguration.createCmmnEngineConfigurationFromInputStream(inputStream).buildCmmnEngine();
             } else {
-                LOGGER.info("No " + FLOWABLE_CMMN_CFG_XML + " configuration found. Using default in-memory standalone configuration.");
-                cmmnEngine = new StandaloneInMemCmmnEngineConfiguration().buildCmmnEngine();
+               throw new RuntimeException("No " + FLOWABLE_CMMN_CFG_XML + " file found on the classpath");
             }
             CmmnTestRunner.setCmmnEngineConfiguration(cmmnEngine.getCmmnEngineConfiguration());
         } catch (IOException e) {
@@ -91,7 +90,7 @@ public abstract class FlowableCmmnTestCase {
     }
 
     @After
-    public void cleanupDeployment() {
+    public void cleanup() {
         if (deploymentId != null) {
            cmmnRepositoryService.deleteDeployment(deploymentId, true);
         }
@@ -121,6 +120,13 @@ public abstract class FlowableCmmnTestCase {
         cmmnEngineConfiguration.getClock().setCurrentTime(date);
     }
 
+    protected Date forwardClock(long milliseconds) {
+        long currentMillis = cmmnEngineConfiguration.getClock().getCurrentTime().getTime();
+        Date date = new Date(currentMillis + milliseconds);
+        cmmnEngineConfiguration.getClock().setCurrentTime(date);
+        return date;
+    }
+
     protected void assertCaseInstanceEnded(CaseInstance caseInstance) {
         assertEquals("Plan item found for case instance", 0, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count());
         assertEquals("Runtime case instance found", 0, cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count());
@@ -140,7 +146,11 @@ public abstract class FlowableCmmnTestCase {
     }
     
     protected void waitForJobExecutorToProcessAllJobs() {
-        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 10000L, 100L, true);
+        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 10000L, 200L, true);
+    }
+    
+    protected void waitForAsyncHistoryExecutorToProcessAllJobs() {
+        CmmnJobTestHelper.waitForAsyncHistoryExecutorToProcessAllJobs(cmmnEngineConfiguration, 10000L, 200L, true);
     }
 
 }

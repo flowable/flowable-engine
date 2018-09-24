@@ -15,7 +15,7 @@ package org.flowable.form.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.engine.impl.FormDefinitionQueryImpl;
 
@@ -27,10 +27,6 @@ public interface FormDefinitionEntityManager extends EntityManager<FormDefinitio
     FormDefinitionEntity findLatestFormDefinitionByKey(String formDefinitionKey);
 
     FormDefinitionEntity findLatestFormDefinitionByKeyAndTenantId(String formDefinitionKey, String tenantId);
-
-    FormDefinitionEntity findLatestFormDefinitionByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId);
-
-    FormDefinitionEntity findLatestFormDefinitionByKeyParentDeploymentIdAndTenantId(String formDefinitionKey, String parentDeploymentId, String tenantId);
 
     List<FormDefinition> findFormDefinitionsByQueryCriteria(FormDefinitionQueryImpl formQuery);
 

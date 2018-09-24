@@ -13,19 +13,20 @@
 
 package org.flowable.rest.service.api.repository;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.repository.ProcessDefinition;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Frederik Heremans
@@ -46,7 +47,7 @@ public class ProcessDefinitionResourceDataResource extends BaseDeploymentResourc
     }
 
     /**
-     * Returns the {@link ProcessDefinition} that is requested. Throws the right exceptions when bad request was made or definition is not found.
+     * Returns the {@link ProcessDefinition} that is requested. Throws the right exceptions when bad request was made or definition was not found.
      */
     protected ProcessDefinition getProcessDefinitionFromRequest(String processDefinitionId) {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
@@ -54,6 +55,11 @@ public class ProcessDefinitionResourceDataResource extends BaseDeploymentResourc
         if (processDefinition == null) {
             throw new FlowableObjectNotFoundException("Could not find a process definition with id '" + processDefinitionId + "'.", ProcessDefinition.class);
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessProcessDefinitionById(processDefinition);
+        }
+        
         return processDefinition;
     }
 }

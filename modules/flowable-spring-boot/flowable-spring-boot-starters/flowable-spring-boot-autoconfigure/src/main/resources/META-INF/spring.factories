@@ -1,5 +1,6 @@
 
 org.springframework.boot.env.EnvironmentPostProcessor=\
+  org.flowable.spring.boot.environment.FlowableDefaultPropertiesEnvironmentPostProcessor,\
   org.flowable.spring.boot.environment.FlowableLiquibaseEnvironmentPostProcessor
 
 # Flowable auto-configurations
@@ -8,8 +9,11 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
     org.flowable.spring.boot.actuate.info.FlowableInfoAutoConfiguration,\
     org.flowable.spring.boot.EndpointAutoConfiguration,\
     org.flowable.spring.boot.RestApiAutoConfiguration,\
+    org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration,\
+    org.flowable.spring.boot.app.AppEngineAutoConfiguration,\
+    org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration,\
     org.flowable.spring.boot.ProcessEngineAutoConfiguration,\
-    org.flowable.spring.boot.FlowableTransactionAutoConfiguration,\
+    org.flowable.spring.boot.FlowableJpaAutoConfiguration,\
     org.flowable.spring.boot.form.FormEngineAutoConfiguration,\
     org.flowable.spring.boot.form.FormEngineServicesAutoConfiguration,\
     org.flowable.spring.boot.content.ContentEngineAutoConfiguration,\
@@ -21,4 +25,4 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
     org.flowable.spring.boot.cmmn.CmmnEngineAutoConfiguration,\
     org.flowable.spring.boot.cmmn.CmmnEngineServicesAutoConfiguration,\
     org.flowable.spring.boot.ldap.FlowableLdapAutoConfiguration,\
-    org.flowable.spring.boot.SecurityAutoConfiguration
+    org.flowable.spring.boot.FlowableSecurityAutoConfiguration

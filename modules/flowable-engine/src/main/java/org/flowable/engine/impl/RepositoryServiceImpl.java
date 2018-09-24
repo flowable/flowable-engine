@@ -18,11 +18,13 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.app.AppModel;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.ActivateProcessDefinitionCmd;
 import org.flowable.engine.impl.cmd.AddEditorSourceExtraForModelCmd;
 import org.flowable.engine.impl.cmd.AddEditorSourceForModelCmd;
@@ -53,6 +55,7 @@ import org.flowable.engine.impl.cmd.IsProcessDefinitionSuspendedCmd;
 import org.flowable.engine.impl.cmd.SaveModelCmd;
 import org.flowable.engine.impl.cmd.SetDeploymentCategoryCmd;
 import org.flowable.engine.impl.cmd.SetDeploymentKeyCmd;
+import org.flowable.engine.impl.cmd.SetDeploymentParentDeploymentIdCmd;
 import org.flowable.engine.impl.cmd.SetProcessDefinitionCategoryCmd;
 import org.flowable.engine.impl.cmd.SuspendProcessDefinitionCmd;
 import org.flowable.engine.impl.cmd.ValidateBpmnModelCmd;
@@ -78,7 +81,7 @@ import org.flowable.validation.ValidationError;
  * @author Falko Menge
  * @author Joram Barrez
  */
-public class RepositoryServiceImpl extends ServiceImpl implements RepositoryService {
+public class RepositoryServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfigurationImpl> implements RepositoryService {
 
     @Override
     public DeploymentBuilder createDeployment() {
@@ -116,6 +119,11 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
     @Override
     public void setDeploymentKey(String deploymentId, String key) {
         commandExecutor.execute(new SetDeploymentKeyCmd(deploymentId, key));
+    }
+    
+    @Override
+    public void changeDeploymentParentDeploymentId(String deploymentId, String newParentDeploymentId) {
+        commandExecutor.execute(new SetDeploymentParentDeploymentIdCmd(deploymentId, newParentDeploymentId));
     }
 
     @Override

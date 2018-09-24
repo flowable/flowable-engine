@@ -24,6 +24,19 @@ import javax.sql.DataSource;
 
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
+import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
+import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
+import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
+import org.flowable.common.engine.impl.el.DefaultExpressionManager;
+import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.interceptor.SessionFactory;
+import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
+import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnManagementService;
@@ -35,9 +48,9 @@ import org.flowable.dmn.engine.impl.DmnManagementServiceImpl;
 import org.flowable.dmn.engine.impl.DmnRepositoryServiceImpl;
 import org.flowable.dmn.engine.impl.DmnRuleServiceImpl;
 import org.flowable.dmn.engine.impl.RuleEngineExecutorImpl;
-import org.flowable.dmn.engine.impl.ServiceImpl;
 import org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.cfg.StandaloneInMemDmnEngineConfiguration;
+import org.flowable.dmn.engine.impl.cmd.SchemaOperationsDmnEngineBuild;
 import org.flowable.dmn.engine.impl.db.DmnDbSchemaManager;
 import org.flowable.dmn.engine.impl.db.EntityDependencyOrder;
 import org.flowable.dmn.engine.impl.deployer.CachingAndArtifactsManager;
@@ -45,9 +58,13 @@ import org.flowable.dmn.engine.impl.deployer.DmnDeployer;
 import org.flowable.dmn.engine.impl.deployer.DmnDeploymentHelper;
 import org.flowable.dmn.engine.impl.deployer.ParsedDeploymentBuilderFactory;
 import org.flowable.dmn.engine.impl.el.FlowableAddDateFunctionDelegate;
+import org.flowable.dmn.engine.impl.el.FlowableAllOfFunctionDelegate;
+import org.flowable.dmn.engine.impl.el.FlowableAnyOfFunctionDelegate;
 import org.flowable.dmn.engine.impl.el.FlowableContainsAnyFunctionDelegate;
 import org.flowable.dmn.engine.impl.el.FlowableContainsFunctionDelegate;
 import org.flowable.dmn.engine.impl.el.FlowableCurrentDateFunctionDelegate;
+import org.flowable.dmn.engine.impl.el.FlowableNoneOfFunctionDelegate;
+import org.flowable.dmn.engine.impl.el.FlowableNotAllOfFunctionDelegate;
 import org.flowable.dmn.engine.impl.el.FlowableNotContainsAnyFunctionDelegate;
 import org.flowable.dmn.engine.impl.el.FlowableNotContainsFunctionDelegate;
 import org.flowable.dmn.engine.impl.el.FlowableSubtractDateFunctionDelegate;
@@ -61,7 +78,6 @@ import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyPriority;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyRuleOrder;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyUnique;
 import org.flowable.dmn.engine.impl.parser.DmnParseFactory;
-import org.flowable.dmn.engine.impl.persistence.GenericManagerFactory;
 import org.flowable.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
 import org.flowable.dmn.engine.impl.persistence.deploy.Deployer;
 import org.flowable.dmn.engine.impl.persistence.deploy.DeploymentManager;
@@ -83,28 +99,14 @@ import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDecision
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDmnDeploymentDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDmnResourceDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisHistoricDecisionExecutionDataManager;
-import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
-import org.flowable.engine.common.impl.AbstractEngineConfiguration;
-import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
-import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
-import org.flowable.engine.common.impl.el.DefaultExpressionManager;
-import org.flowable.engine.common.impl.el.ExpressionManager;
-import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.engine.common.impl.interceptor.SessionFactory;
-import org.flowable.engine.common.impl.persistence.cache.EntityCache;
-import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
-import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
-import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.engine.common.impl.runtime.Clock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-public class DmnEngineConfiguration extends AbstractEngineConfiguration implements DmnEngineConfigurationApi {
+public class DmnEngineConfiguration extends AbstractEngineConfiguration
+        implements DmnEngineConfigurationApi, HasExpressionManagerEngineConfiguration {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(DmnEngineConfiguration.class);
 
@@ -223,6 +225,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
     // /////////////////////////////////////////////////////////////////////
 
     protected void init() {
+        initEngineConfigurations();
         initFunctionDelegates();
         initExpressionManager();
         initCommandContextFactory();
@@ -232,8 +235,11 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
 
         if (usingRelationalDatabase) {
             initDataSource();
-            initDbSchemaManager();
-            initDbSchema();
+        }
+        
+        if (usingRelationalDatabase || usingSchemaMgmt) {
+            initSchemaManager();
+            initSchemaManagementCommand();
         }
 
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
@@ -263,12 +269,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         initService(dmnRepositoryService);
         initService(ruleService);
         initService(dmnHistoryService);
-    }
-
-    protected void initService(Object service) {
-        if (service instanceof ServiceImpl) {
-            ((ServiceImpl) service).setCommandExecutor(commandExecutor);
-        }
     }
 
     // Data managers
@@ -310,37 +310,22 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
     // data model
     // ///////////////////////////////////////////////////////////////
 
-    public void initDbSchemaManager() {
-        if (this.dbSchemaManager == null) {
-            this.dbSchemaManager = new DmnDbSchemaManager();
+    @Override
+    public void initSchemaManager() {
+        if (this.schemaManager == null) {
+            this.schemaManager = new DmnDbSchemaManager();
         }
     }
 
-    public void initDbSchema() {
-        ((DmnDbSchemaManager) this.dbSchemaManager).initSchema(this);
+    public void initSchemaManagementCommand() {
+        if (schemaManagementCmd == null) {
+            if (usingRelationalDatabase && databaseSchemaUpdate != null) {
+                this.schemaManagementCmd = new SchemaOperationsDmnEngineBuild();
+            }
+        }
     }
 
     // session factories ////////////////////////////////////////////////////////
-
-    public void initSessionFactories() {
-        if (sessionFactories == null) {
-            sessionFactories = new HashMap<>();
-
-            if (usingRelationalDatabase) {
-                initDbSqlSessionFactory();
-            }
-
-            addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
-
-            commandContextFactory.setSessionFactories(sessionFactories);
-        }
-
-        if (customSessionFactories != null) {
-            for (SessionFactory sessionFactory : customSessionFactories) {
-                addSessionFactory(sessionFactory);
-            }
-        }
-    }
 
     @Override
     public void initDbSqlSessionFactory() {
@@ -359,7 +344,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
 
     @Override
     public DbSqlSessionFactory createDbSqlSessionFactory() {
-        return new DbSqlSessionFactory();
+        return new DbSqlSessionFactory(usePrefixId);
     }
 
     @Override
@@ -398,6 +383,11 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
             this.flowableFunctionDelegates.add(new FlowableAddDateFunctionDelegate());
             this.flowableFunctionDelegates.add(new FlowableCurrentDateFunctionDelegate());
             // collections
+            this.flowableFunctionDelegates.add(new FlowableAllOfFunctionDelegate());
+            this.flowableFunctionDelegates.add(new FlowableNoneOfFunctionDelegate());
+            this.flowableFunctionDelegates.add(new FlowableAnyOfFunctionDelegate());
+            this.flowableFunctionDelegates.add(new FlowableNotAllOfFunctionDelegate());
+            // deprecated collections
             this.flowableFunctionDelegates.add(new FlowableContainsFunctionDelegate());
             this.flowableFunctionDelegates.add(new FlowableNotContainsFunctionDelegate());
             this.flowableFunctionDelegates.add(new FlowableContainsAnyFunctionDelegate());
@@ -464,6 +454,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         dmnDeployer.setParsedDeploymentBuilderFactory(parsedDeploymentBuilderFactory);
         dmnDeployer.setDmnDeploymentHelper(dmnDeploymentHelper);
         dmnDeployer.setCachingAndArtifactsManager(cachingAndArtifactsManager);
+        dmnDeployer.setUsePrefixId(usePrefixId);
 
         defaultDeployers.add(dmnDeployer);
         return defaultDeployers;
@@ -544,7 +535,22 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
     // rule engine executor
     /////////////////////////////////////////////////////////////
     public void initRuleEngineExecutor() {
-        ruleEngineExecutor = new RuleEngineExecutorImpl(hitPolicyBehaviors, expressionManager, objectMapper);
+    	if (ruleEngineExecutor == null) {
+	        ruleEngineExecutor = new RuleEngineExecutorImpl(hitPolicyBehaviors, expressionManager, objectMapper);
+	        
+    	} else {
+    	    if (ruleEngineExecutor.getExpressionManager() == null) {
+    	        ruleEngineExecutor.setExpressionManager(expressionManager);
+    	    }
+    	    
+    	    if (ruleEngineExecutor.getHitPolicyBehaviors() == null) {
+    	        ruleEngineExecutor.setHitPolicyBehaviors(hitPolicyBehaviors);
+    	    }
+    	    
+    	    if (ruleEngineExecutor.getObjectMapper() == null) {
+    	        ruleEngineExecutor.setObjectMapper(objectMapper);
+    	    }
+    	}
     }
 
 
@@ -708,10 +714,12 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         return this;
     }
 
+    @Override
     public ExpressionManager getExpressionManager() {
         return expressionManager;
     }
 
+    @Override
     public DmnEngineConfiguration setExpressionManager(ExpressionManager expressionManager) {
         this.expressionManager = expressionManager;
         return this;

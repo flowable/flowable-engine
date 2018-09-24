@@ -270,8 +270,41 @@ In addition to using the values listed above for +deploymentMode+, you may requi
 
 === Unit testing
 
-When integrating with Spring, business processes can be tested very easily using the standard <<apiUnitTesting,Flowable testing facilities>>. The following example shows how a business process is tested in a typical Spring-based unit test:
+When integrating with Spring, business processes can be tested very easily using the standard <<apiUnitTesting,Flowable testing facilities>>.
+The following examples show how a business process is tested in typical Spring-based JUnit 4 and 5 test:
 
+.JUnit 5 test
+[source,java,linenums]
+----
+@ExtendWith(FlowableSpringExtension.class)
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = SpringJunitJupiterTest.TestConfiguration.class)
+public class MyBusinessProcessTest {
+
+  @Autowired
+  private RuntimeService runtimeService;
+
+  @Autowired
+  private TaskService taskService;
+
+  @Test
+  @Deployment
+  void simpleProcessTest() {
+    runtimeService.startProcessInstanceByKey("simpleProcess");
+    Task task = taskService.createTaskQuery().singleResult();
+    assertEquals("My Task", task.getName());
+
+    taskService.complete(task.getId());
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+  }
+}
+----
+
+Using the +FlowableSpringExtension+ allows the usage of the +Deployment+ annotation.
+
+
+.JUnit 4 test
 [source,java,linenums]
 ----
 @RunWith(SpringJUnit4ClassRunner.class)

@@ -16,7 +16,7 @@ package org.flowable.cmmn.api.repository;
 import java.util.List;
 
 import org.flowable.cmmn.api.CmmnRepositoryService;
-import org.flowable.engine.common.api.query.Query;
+import org.flowable.common.engine.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link CmmnDeployment}s.
@@ -98,6 +98,11 @@ public interface CmmnDeploymentQuery extends Query<CmmnDeploymentQuery, CmmnDepl
      * Only select deployments with a parent deployment id like the given one.
      */
     CmmnDeploymentQuery parentDeploymentIdLike(String parentDeploymentIdLike);
+    
+    /**
+     * Only select deployments with a parent deployment id that is the same as one of the given deployment identifiers.
+     */
+    CmmnDeploymentQuery parentDeploymentIds(List<String> parentDeploymentIds);
     
     /**
      * Only select deployments where the deployment time is the latest value. Can only be used together with the deployment key.

@@ -20,7 +20,6 @@ import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryIfPart;
 import org.flowable.cmmn.model.Stage;
-import org.junit.Test;
 
 import java.util.List;
 

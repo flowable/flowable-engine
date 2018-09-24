@@ -19,14 +19,13 @@ import java.util.Map;
 import org.activiti.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti.engine.impl.el.ExpressionManager;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.activiti.engine.impl.task.TaskDefinition;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventListener;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Process;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.impl.event.FlowableEventSupport;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.event.FlowableEventSupport;
 import org.flowable.engine.impl.bpmn.data.IOSpecification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +65,7 @@ public class ProcessParseHandler extends AbstractBpmnParseHandler<Process> {
         currentProcessDefinition.setCategory(bpmnParse.getBpmnModel().getTargetNamespace());
         currentProcessDefinition.setDescription(process.getDocumentation());
         currentProcessDefinition.setProperty(PROPERTYNAME_DOCUMENTATION, process.getDocumentation()); // Kept for backwards compatibility. See ACT-1020
-        currentProcessDefinition.setTaskDefinitions(new HashMap<String, TaskDefinition>());
+        currentProcessDefinition.setTaskDefinitions(new HashMap<>());
         currentProcessDefinition.setDeploymentId(bpmnParse.getDeployment().getId());
         createEventListeners(bpmnParse, process.getEventListeners());
         createExecutionListenersOnScope(bpmnParse, process.getExecutionListeners(), currentProcessDefinition);

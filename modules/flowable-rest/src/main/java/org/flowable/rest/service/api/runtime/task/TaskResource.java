@@ -13,18 +13,15 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.flowable.common.rest.exception.FlowableForbiddenException;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableForbiddenException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.task.api.Task;
 import org.springframework.http.HttpStatus;
@@ -38,10 +35,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.Map;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Frederik Heremans
@@ -104,6 +105,10 @@ public class TaskResource extends TaskBaseResource {
         }
 
         Task task = getTaskFromRequest(taskId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.executeTaskAction(task, actionRequest);
+        }
 
         if (TaskActionRequest.ACTION_COMPLETE.equals(actionRequest.getAction())) {
             completeTask(task, actionRequest);

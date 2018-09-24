@@ -15,14 +15,16 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.form.TaskFormData;
 import org.flowable.engine.impl.form.FormHandlerHelper;
 import org.flowable.engine.impl.form.TaskFormHandler;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
@@ -44,6 +46,11 @@ public class GetTaskFormCmd implements Command<TaskFormData>, Serializable {
         TaskEntity task = CommandContextUtil.getTaskService().getTask(taskId);
         if (task == null) {
             throw new FlowableObjectNotFoundException("No task found for taskId '" + taskId + "'", Task.class);
+        }
+        
+        if (task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
+            Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+            return compatibilityHandler.getTaskFormData(taskId);
         }
 
         FormHandlerHelper formHandlerHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getFormHandlerHelper();

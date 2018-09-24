@@ -12,9 +12,9 @@
  */
 package org.flowable.engine.test.cfg.taskcount;
 
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.ValidateTaskRelatedEntityCountCfgCmd;
 import org.flowable.engine.impl.persistence.entity.PropertyEntity;
@@ -23,6 +23,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,11 +52,10 @@ public class ChangeTaskCountConfigAndRebootEngineTest extends ResourceFlowableTe
     protected void rebootEngine(boolean newTaskRelationshipCountValue) {
         LOGGER.info("Rebooting engine");
         this.newTaskRelationshipCountValue = newTaskRelationshipCountValue;
-        closeDownProcessEngine();
-        initializeProcessEngine();
-        initializeServices();
+        rebootEngine();
     }
 
+    @Test
     @Deployment
     public void testChangeTaskCountSettingAndRebootengine() {
 

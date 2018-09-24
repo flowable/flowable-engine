@@ -12,20 +12,24 @@
  */
 package org.flowable.form.rest.service.api.form;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletRequest;
+
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.form.api.FormInstance;
 import org.flowable.form.api.FormService;
+import org.flowable.form.rest.FormRestApiInterceptor;
 import org.flowable.form.rest.FormRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Yvo Swillens
@@ -39,6 +43,9 @@ public class FormInstanceResource {
 
     @Autowired
     protected FormRestResponseFactory formRestResponseFactory;
+    
+    @Autowired(required=false)
+    protected FormRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get a form instance", tags = { "Form Instances" }, nickname = "getFormInstance")
     @ApiResponses(value = {
@@ -47,6 +54,16 @@ public class FormInstanceResource {
     })
     @GetMapping(value = "/form/form-instance/{formInstanceId}", produces = "application/json")
     public FormInstanceResponse getFormInstance(@ApiParam(name = "formInstanceId") @PathVariable String formInstanceId, HttpServletRequest request) {
-        return formRestResponseFactory.createFormInstanceResponse(formService.createFormInstanceQuery().id(formInstanceId).singleResult());
+        FormInstance formInstance = formService.createFormInstanceQuery().id(formInstanceId).singleResult();
+        
+        if (formInstance == null) {
+            throw new FlowableObjectNotFoundException("Could not find a form instance");
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessFormInstanceById(formInstance);
+        }
+        
+        return formRestResponseFactory.createFormInstanceResponse(formInstance);
     }
 }

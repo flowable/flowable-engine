@@ -32,8 +32,8 @@ import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
 import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.TerminateEventDefinition;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.delegate.DelegateExecution;
 
 /**
@@ -162,7 +162,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
             rootExecution = rootExecution.getParent() != null ? rootExecution.getParent() : rootExecution.getSuperExecution();
         }
 
-        return orderExecutionsRootToLeaf(rootExecution, new ArrayList<ExecutionEntity>());
+        return orderExecutionsRootToLeaf(rootExecution, new ArrayList<>());
     }
 
     protected List<ExecutionEntity> orderExecutionsRootToLeaf(ExecutionEntity rootExecution, List<ExecutionEntity> orderedExecutions) {

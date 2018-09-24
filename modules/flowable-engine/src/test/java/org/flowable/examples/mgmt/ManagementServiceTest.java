@@ -16,13 +16,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.management.TableMetaData;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ManagementService;
-import org.flowable.engine.common.api.management.TableMetaData;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test case for the various operations of the {@link ManagementService}
@@ -32,6 +35,9 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
  */
 public class ManagementServiceTest extends PluggableFlowableTestCase {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ManagementServiceTest.class);
+
+    @Test
     public void testTableCount() {
         Map<String, Long> tableCount = managementService.getTableCount();
 
@@ -62,6 +68,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_RU_IDENTITYLINK"));
     }
 
+    @Test
     public void testGetTableMetaData() {
 
         String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();

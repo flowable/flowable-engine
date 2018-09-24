@@ -15,20 +15,22 @@ package org.flowable.engine.test.api.identity;
 
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class GroupQueryTest extends PluggableFlowableTestCase {
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @BeforeEach
+    public void setUp() throws Exception {
 
         createGroup("muppets", "Muppet show characters", "user");
         createGroup("frogs", "Famous frogs", "user");
@@ -60,8 +62,8 @@ public class GroupQueryTest extends PluggableFlowableTestCase {
         return group;
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @AfterEach
+    public void tearDown() throws Exception {
         identityService.deleteUser("kermit");
         identityService.deleteUser("fozzie");
         identityService.deleteUser("mispiggy");
@@ -71,14 +73,15 @@ public class GroupQueryTest extends PluggableFlowableTestCase {
         identityService.deleteGroup("frogs");
         identityService.deleteGroup("admin");
 
-        super.tearDown();
     }
 
+    @Test
     public void testQueryById() {
         GroupQuery query = identityService.createGroupQuery().groupId("muppets");
         verifyQueryResults(query, 1);
     }
 
+    @Test
     public void testQueryByInvalidId() {
         GroupQuery query = identityService.createGroupQuery().groupId("invalid");
         verifyQueryResults(query, 0);
@@ -90,6 +93,7 @@ public class GroupQueryTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testQueryByName() {
         GroupQuery query = identityService.createGroupQuery().groupName("Muppet show characters");
         verifyQueryResults(query, 1);
@@ -98,6 +102,7 @@ public class GroupQueryTest extends PluggableFlowableTestCase {
         verifyQueryResults(query, 1);
     }
 
+    @Test
     public void testQueryByInvalidName() {
         GroupQuery query = identityService.createGroupQuery().groupName("invalid");
         verifyQueryResults(query, 0);
@@ -109,6 +114,7 @@ public class GroupQueryTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testQueryByNameLike() {
         GroupQuery query = identityService.createGroupQuery().groupNameLike("%Famous%");
         verifyQueryResults(query, 2);
@@ -120,6 +126,7 @@ public class GroupQueryTest extends PluggableFlowableTestCase {
         verifyQueryResults(query, 1);
     }
 
+    @Test
     public void testQueryByInvalidNameLike() {
         GroupQuery query = identityService.createGroupQuery().groupNameLike("%invalid%");
         verifyQueryResults(query, 0);
@@ -131,6 +138,7 @@ public class GroupQueryTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testQueryByType() {
         GroupQuery query = identityService.createGroupQuery().groupType("user");
         verifyQueryResults(query, 3);
@@ -139,6 +147,7 @@ public class GroupQueryTest extends PluggableFlowableTestCase {
         verifyQueryResults(query, 0);
     }
 
+    @Test
     public void testQueryByInvalidType() {
         GroupQuery query = identityService.createGroupQuery().groupType("invalid");
         verifyQueryResults(query, 0);
@@ -150,6 +159,7 @@ public class GroupQueryTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testQueryByMember() {
         GroupQuery query = identityService.createGroupQuery().groupMember("fozzie");
         verifyQueryResults(query, 2);
@@ -171,6 +181,7 @@ public class GroupQueryTest extends PluggableFlowableTestCase {
         assertEquals("muppets", groups.get(1).getId());
     }
 
+    @Test
     public void testQueryByInvalidMember() {
         GroupQuery query = identityService.createGroupQuery().groupMember("invalid");
         verifyQueryResults(query, 0);
@@ -182,6 +193,7 @@ public class GroupQueryTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testQuerySorting() {
         // asc
         assertEquals(4, identityService.createGroupQuery().orderByGroupId().asc().count());
@@ -209,6 +221,7 @@ public class GroupQueryTest extends PluggableFlowableTestCase {
         assertEquals("frogs", groups.get(3).getId());
     }
 
+    @Test
     public void testQueryInvalidSortingUsage() {
         try {
             identityService.createGroupQuery().orderByGroupId().list();
@@ -244,6 +257,7 @@ public class GroupQueryTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testNativeQuery() {
         String baseQuerySql = "SELECT * FROM ACT_ID_GROUP";
 

@@ -119,7 +119,7 @@
     select * from ${prefix}ACT_HI_IDENTITYLINK where PROC_INST_ID_ = #{parameter}
   </select>
   
-  <select id="selectHistoricIdentityLinksByScopeIdAndType" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historicIdentityLinkResultMap">
+  <select id="selectHistoricIdentityLinksByScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicIdentityLinkResultMap">
     select * from ${prefix}ACT_HI_IDENTITYLINK where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType}
   </select>
   
@@ -127,7 +127,7 @@
     select * from ${prefix}ACT_HI_IDENTITYLINK
   </select>
   
-  <select id="selectHistoricIdentityLinkByTaskUserGroupAndType" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historicIdentityLinkResultMap">
+  <select id="selectHistoricIdentityLinkByTaskUserGroupAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicIdentityLinkResultMap">
     select * 
     from ${prefix}ACT_HI_IDENTITYLINK 
     where TASK_ID_ = #{parameter.taskId}

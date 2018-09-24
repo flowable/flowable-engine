@@ -16,8 +16,8 @@ package org.flowable.rest.service.api.repository;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

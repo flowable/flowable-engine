@@ -15,9 +15,10 @@ package org.flowable.examples.runtime;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class shows an example of configurable agenda usage.
@@ -28,6 +29,7 @@ public class WatchDogAgendaTest extends ResourceFlowableTestCase {
         super("org/flowable/examples/runtime/WatchDogAgendaTest.flowable.cfg.xml");
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
     public void testWatchDogWithOneTaskProcess() {
         this.runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -36,6 +38,7 @@ public class WatchDogAgendaTest extends ResourceFlowableTestCase {
         assertThat(this.runtimeService.createProcessInstanceQuery().count(), is(0L));
     }
 
+    @Test
     @Deployment(resources = "org/flowable/examples/runtime/WatchDogAgendaTest-endlessloop.bpmn20.xml")
     public void testWatchDogWithEndLessLoop() {
         try {

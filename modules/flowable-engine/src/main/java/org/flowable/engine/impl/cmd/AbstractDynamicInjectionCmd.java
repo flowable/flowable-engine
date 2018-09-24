@@ -21,9 +21,9 @@ import java.util.Map;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.GraphicInfo;
-import org.flowable.engine.common.impl.EngineDeployer;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.util.io.BytesStreamSource;
+import org.flowable.common.engine.impl.EngineDeployer;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.util.io.BytesStreamSource;
 import org.flowable.engine.impl.dynamic.BaseDynamicSubProcessInjectUtil;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityManager;
@@ -92,7 +92,7 @@ public abstract class AbstractDynamicInjectionCmd {
     protected ProcessDefinitionEntity deployDerivedDeploymentEntity(CommandContext commandContext, 
             DeploymentEntity deploymentEntity, ProcessDefinitionEntity originalProcessDefinitionEntity) {
 
-        Map<String, Object> deploymentSettings = new HashMap<String, Object>();
+        Map<String, Object> deploymentSettings = new HashMap<>();
         deploymentSettings.put(DeploymentSettings.IS_DERIVED_DEPLOYMENT, true);
         deploymentSettings.put(DeploymentSettings.DERIVED_PROCESS_DEFINITION_ID, originalProcessDefinitionEntity.getId());
         if (originalProcessDefinitionEntity.getDerivedFromRoot() != null) {

@@ -14,8 +14,9 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItemTransition;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
@@ -38,7 +39,7 @@ public class EnablePlanItemInstanceOperation extends AbstractChangePlanItemInsta
     
     @Override
     protected void internalExecute() {
-        // Nothing extra to do
+        CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceEnabled(planItemInstanceEntity);
     }
     
 }

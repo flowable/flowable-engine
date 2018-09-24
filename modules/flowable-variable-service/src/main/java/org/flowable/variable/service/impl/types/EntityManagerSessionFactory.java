@@ -15,10 +15,10 @@ package org.flowable.variable.service.impl.types;
 
 import javax.persistence.EntityManagerFactory;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.Session;
-import org.flowable.engine.common.impl.interceptor.SessionFactory;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Session;
+import org.flowable.common.engine.impl.interceptor.SessionFactory;
 
 /**
  * @author Frederik Heremans

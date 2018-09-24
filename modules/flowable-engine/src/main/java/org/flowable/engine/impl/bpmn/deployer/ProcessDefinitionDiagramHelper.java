@@ -13,8 +13,8 @@
 package org.flowable.engine.impl.bpmn.deployer;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.impl.util.IoUtil;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;

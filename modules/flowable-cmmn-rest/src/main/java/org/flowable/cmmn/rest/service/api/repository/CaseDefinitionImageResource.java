@@ -17,8 +17,8 @@ import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

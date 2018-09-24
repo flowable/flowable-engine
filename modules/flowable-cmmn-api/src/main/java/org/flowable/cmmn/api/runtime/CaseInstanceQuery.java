@@ -16,7 +16,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
-import org.flowable.engine.common.api.query.Query;
+import org.flowable.common.engine.api.query.Query;
 
 /**
  * @author Joram Barrez
@@ -43,6 +43,16 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
     CaseInstanceQuery caseInstanceTenantId(String tenantId);
     CaseInstanceQuery caseInstanceTenantIdLike(String tenantIdLike);
     CaseInstanceQuery caseInstanceWithoutTenantId();
+
+    /**
+     * Select the case instances with which the user with the given id is involved.
+     */
+    CaseInstanceQuery involvedUser(String userId);
+
+    /**
+     * Select the case instances with which the groups with the given ids are involved.
+     */
+    CaseInstanceQuery involvedGroups(Set<String> groupIds);
 
     /**
      * Only select case instances which have a global variable with the given value. The type of variable is determined based on the value.
@@ -182,6 +192,16 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
      * @return caseInstanceQuery with the flag to retrieve case variables into the response.
      */
     CaseInstanceQuery includeCaseVariables();
+
+    /**
+     * Begin an OR statement. Make sure you invoke the endOr method at the end of your OR statement.
+     */
+    CaseInstanceQuery or();
+
+    /**
+     * End an OR statement.
+     */
+    CaseInstanceQuery endOr();
 
     /**
      * Limit case instance variables

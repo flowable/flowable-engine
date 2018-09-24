@@ -23,17 +23,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.el.VariableContainerWrapper;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.editor.form.converter.FormJsonConverter;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.engine.common.impl.el.VariableContainerWrapper;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormInstance;
 import org.flowable.form.api.FormInstanceInfo;
 import org.flowable.form.api.FormInstanceQuery;
 import org.flowable.form.engine.FormEngineConfiguration;
+import org.flowable.form.engine.impl.FormDeploymentQueryImpl;
 import org.flowable.form.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.form.engine.impl.persistence.deploy.FormDefinitionCacheEntry;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
@@ -70,6 +72,8 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceInfo>, Seria
     protected String formDefinitionId;
     protected String taskId;
     protected String processInstanceId;
+    protected String scopeId;
+    protected String scopeType;
     protected String tenantId;
     protected Map<String, Object> variables;
 
@@ -96,10 +100,17 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceInfo>, Seria
         initializeValues(formDefinitionKey, parentDeploymentId, formDefinitionId, tenantId, taskId, processInstanceId, variables);
     }
 
+    public GetFormInstanceModelCmd(String formDefinitionKey, String parentDeploymentId, String scopeId, String scopeType, String tenantId) {
+
+        initializeValues(formDefinitionKey, parentDeploymentId, null, tenantId, null, null, null);
+        this.scopeId = scopeId;
+        this.scopeType = scopeType;
+    }
+
     @Override
     public FormInstanceInfo execute(CommandContext commandContext) {
-        if (formInstanceId == null && (taskId == null && processInstanceId == null)) {
-            throw new FlowableException("A processtask id or process instance id should be provided");
+        if (formInstanceId == null && (taskId == null && processInstanceId == null && scopeId == null)) {
+            throw new FlowableException("A processtask id or process instance id or scope id should be provided");
         }
 
         FormDefinitionCacheEntry formDefinitionCacheEntry = resolveFormDefinition(commandContext);
@@ -269,7 +280,13 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceInfo>, Seria
 
         } else if (formDefinitionKey != null && (tenantId == null || FormEngineConfiguration.NO_TENANT_ID.equals(tenantId)) && parentDeploymentId != null) {
 
-            formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKeyAndParentDeploymentId(formDefinitionKey, parentDeploymentId);
+            List<FormDeployment> formDeployments = deploymentManager.getDeploymentEntityManager().findDeploymentsByQueryCriteria(
+                            new FormDeploymentQueryImpl().parentDeploymentId(parentDeploymentId));
+            
+            if (formDeployments != null && formDeployments.size() > 0) {
+                formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKeyAndDeploymentId(formDefinitionKey, formDeployments.get(0).getId());
+            }
+            
             if (formDefinitionEntity == null) {
                 throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey +
                         "' for parent deployment id " + parentDeploymentId, FormDefinitionEntity.class);
@@ -277,7 +294,14 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceInfo>, Seria
 
         } else if (formDefinitionKey != null && tenantId != null && !FormEngineConfiguration.NO_TENANT_ID.equals(tenantId) && parentDeploymentId != null) {
 
-            formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKeyParentDeploymentIdAndTenantId(formDefinitionKey, parentDeploymentId, tenantId);
+            List<FormDeployment> formDeployments = deploymentManager.getDeploymentEntityManager().findDeploymentsByQueryCriteria(
+                            new FormDeploymentQueryImpl().parentDeploymentId(parentDeploymentId).deploymentTenantId(tenantId));
+            
+            if (formDeployments != null && formDeployments.size() > 0) {
+                formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKeyDeploymentIdAndTenantId(
+                                formDefinitionKey, formDeployments.get(0).getId(), tenantId);
+            }
+            
             if (formDefinitionEntity == null) {
                 throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey +
                         "' for parent deployment id '" + parentDeploymentId + "' and for tenant identifier " + tenantId, FormDefinitionEntity.class);
@@ -303,7 +327,17 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceInfo>, Seria
             
         } else if (processInstanceId != null) {
             formInstanceQuery.processInstanceId(processInstanceId);
-        
+
+            if (taskId == null) {
+                formInstanceQuery.withoutTaskId();
+            }
+        } else if (scopeId != null) {
+            formInstanceQuery.scopeId(scopeId);
+            formInstanceQuery.scopeType(scopeType);
+
+            if (taskId == null) {
+                formInstanceQuery.withoutTaskId();
+            }
         } else {
             return null;
         }

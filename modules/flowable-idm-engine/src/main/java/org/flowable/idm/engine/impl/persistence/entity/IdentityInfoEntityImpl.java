@@ -17,12 +17,10 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
-
 /**
  * @author Tom Baeyens
  */
-public class IdentityInfoEntityImpl extends AbstractEntity implements IdentityInfoEntity, Serializable {
+public class IdentityInfoEntityImpl extends AbstractIdmEngineEntity implements IdentityInfoEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

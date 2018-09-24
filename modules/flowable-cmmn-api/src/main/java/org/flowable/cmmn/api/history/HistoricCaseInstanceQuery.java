@@ -17,7 +17,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.flowable.engine.common.api.query.Query;
+import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
+import org.flowable.common.engine.api.query.Query;
 
 /**
  * @author Joram Barrez
@@ -149,7 +150,27 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
      * Only select historic case instances that have no tenant identifier.
      */
     HistoricCaseInstanceQuery caseInstanceWithoutTenantId();
-    
+
+    /**
+     * Begin an OR statement. Make sure you invoke the endOr method at the end of your OR statement. Only one OR statement is allowed, for the second call to this method an exception will be thrown.
+     */
+    HistoricCaseInstanceQuery or();
+
+    /**
+     * End an OR statement. Only one OR statement is allowed, for the second call to this method an exception will be thrown.
+     */
+    HistoricCaseInstanceQuery endOr();
+
+    /**
+     * Select the historic case instances with which the user with the given id is involved.
+     */
+    HistoricCaseInstanceQuery involvedUser(String userId);
+
+    /**
+     * Select the historic case instances with which the groups with the given ids are involved.
+     */
+    HistoricCaseInstanceQuery involvedGroups(Set<String> groupIds);
+
     /**
      * Only select case instances which had a global variable with the given value when they ended. 
      * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.

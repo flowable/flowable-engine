@@ -18,10 +18,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.AbstractQuery;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.AbstractQuery;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.form.api.FormInstance;
 import org.flowable.form.api.FormInstanceQuery;
 import org.flowable.form.engine.impl.util.CommandContextUtil;
@@ -54,6 +54,7 @@ public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, Form
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
+    protected boolean withoutTaskId;
 
     public FormInstanceQueryImpl() {
     }
@@ -198,6 +199,12 @@ public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, Form
         return this;
     }
 
+    @Override
+    public FormInstanceQueryImpl withoutTaskId() {
+        this.withoutTaskId = true;
+        return this;
+    }
+
     // sorting ////////////////////////////////////////////////////////
 
     @Override
@@ -308,5 +315,9 @@ public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, Form
 
     public boolean isWithoutTenantId() {
         return withoutTenantId;
+    }
+
+    public boolean isWithoutTaskId() {
+        return withoutTaskId;
     }
 }

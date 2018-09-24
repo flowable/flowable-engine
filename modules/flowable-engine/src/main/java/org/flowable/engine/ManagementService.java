@@ -16,13 +16,13 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.management.TableMetaData;
-import org.flowable.engine.common.api.management.TablePage;
-import org.flowable.engine.common.api.management.TablePageQuery;
-import org.flowable.engine.common.impl.cmd.CustomSqlExecution;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.management.TableMetaData;
+import org.flowable.common.engine.api.management.TablePage;
+import org.flowable.common.engine.api.management.TablePageQuery;
+import org.flowable.common.engine.impl.cmd.CustomSqlExecution;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.HistoryJobQuery;
@@ -91,7 +91,8 @@ public interface ManagementService {
     HistoryJobQuery createHistoryJobQuery();
 
     /**
-     * Forced synchronous execution of a job (eg. for administration or testing) The job will be executed, even if the process definition and/or the process instance is in suspended state.
+     * Forced synchronous execution of a job (eg. for administration or testing).
+     * The job will be executed, even if the process definition and/or the process instance is in suspended state.
      * 
      * @param jobId
      *            id of the job to execute, cannot be null.
@@ -99,6 +100,16 @@ public interface ManagementService {
      *             when there is no job with the given id.
      */
     void executeJob(String jobId);
+    
+    /**
+     * Forced synchronous execution of a history job (eg. for administration or testing).
+     * 
+     * @param historyJobId
+     *            id of the history job to execute, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when there is no historyJob with the given id.
+     */
+    void executeHistoryJob(String historyJobId);
 
     /**
      * Moves a timer job to the executable job table (eg. for administration or testing). The timer job will be moved, even if the process definition and/or the process instance is in suspended state.

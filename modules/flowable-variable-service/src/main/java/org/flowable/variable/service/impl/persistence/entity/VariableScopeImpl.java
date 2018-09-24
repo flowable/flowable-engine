@@ -22,12 +22,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.javax.el.ELContext;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.javax.el.ELContext;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.VariableType;
@@ -86,12 +86,12 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
     @Override
     public Map<String, Object> getVariables() {
-        return collectVariables(new HashMap<String, Object>());
+        return collectVariables(new HashMap<>());
     }
 
     @Override
     public Map<String, VariableInstance> getVariableInstances() {
-        return collectVariableInstances(new HashMap<String, VariableInstance>());
+        return collectVariableInstances(new HashMap<>());
     }
 
     @Override
@@ -451,7 +451,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
     @Override
     public Set<String> getVariableNames() {
-        return collectVariableNames(new HashSet<String>());
+        return collectVariableNames(new HashSet<>());
     }
 
     @Override
@@ -653,7 +653,13 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
     @Override
     public void setVariable(String variableName, Object value) {
-        setVariable(variableName, value, true);
+        if (isExpression(variableName)) {
+            CommandContextUtil.getExpressionManager().
+                    createExpression(variableName).
+                    setValue(value, this);
+        } else {
+            setVariable(variableName, value, true);
+        }
     }
 
     /**
@@ -977,7 +983,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
     @Override
     public Map<String, Object> getTransientVariables() {
-        return collectTransientVariables(new HashMap<String, Object>());
+        return collectTransientVariables(new HashMap<>());
     }
 
     protected Map<String, Object> collectTransientVariables(HashMap<String, Object> variables) {
@@ -1055,4 +1061,9 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
     public <T> T getVariableLocal(String variableName, Class<T> variableClass) {
         return variableClass.cast(getVariableLocal(variableName));
     }
+
+    protected boolean isExpression(String variableName) {
+        return variableName.startsWith("${") || variableName.startsWith("#{");
+    }
+
 }

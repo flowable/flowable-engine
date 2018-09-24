@@ -22,7 +22,7 @@ angular.module('flowableApp')
 
             $scope.selectedTask = { id: $routeParams.taskId };
 
-            $scope.deploymentKey = $routeParams.deploymentKey;
+            $scope.appDefinitionKey = $routeParams.appDefinitionKey;
 
             $scope.$on('task-completed', function (event, data) {
                 $rootScope.addAlertPromise($translate('TASK.ALERT.COMPLETED', data));
@@ -144,6 +144,7 @@ angular.module('flowableApp')
         if(newValue && newValue.id) {
             $scope.model.taskUpdating = true;
             $scope.model.task = newValue;
+            $scope.model.claimButtonDisabled = false;
             if ($scope.model.task.formKey) {
                 $scope.resetModel();
             }

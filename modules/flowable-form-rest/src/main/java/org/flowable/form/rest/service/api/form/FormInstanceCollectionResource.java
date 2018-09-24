@@ -16,9 +16,9 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.api.DataResponse;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormInfo;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -139,6 +139,10 @@ public class FormInstanceCollectionResource extends BaseFormInstanceResource {
     public void storeFormInstance(@RequestBody FormRequest formRequest, HttpServletRequest request) {
 
         FormInfo formModel;
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.storeFormInstance(formRequest);
+        }
 
         if (formRequest.getFormDefinitionKey() != null) {
             formModel = formService.getFormModelWithVariablesByKey(

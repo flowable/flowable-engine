@@ -24,12 +24,29 @@ import org.flowable.cmmn.converter.CmmnXmlConverter;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.model.*;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.repository.EngineResource;
-import org.flowable.engine.common.impl.el.ExpressionManager;
-import org.flowable.engine.common.impl.util.io.InputStreamSource;
-import org.flowable.engine.common.impl.util.io.StreamSource;
+import org.flowable.cmmn.model.Case;
+import org.flowable.cmmn.model.CaseTask;
+import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.DecisionTask;
+import org.flowable.cmmn.model.HttpServiceTask;
+import org.flowable.cmmn.model.HumanTask;
+import org.flowable.cmmn.model.ImplementationType;
+import org.flowable.cmmn.model.Milestone;
+import org.flowable.cmmn.model.PlanFragment;
+import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.cmmn.model.ProcessTask;
+import org.flowable.cmmn.model.ScriptServiceTask;
+import org.flowable.cmmn.model.ServiceTask;
+import org.flowable.cmmn.model.Stage;
+import org.flowable.cmmn.model.Task;
+import org.flowable.cmmn.model.TimerEventListener;
+import org.flowable.cmmn.model.UserEventListener;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.util.io.InputStreamSource;
+import org.flowable.common.engine.impl.util.io.StreamSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +60,7 @@ public class CmmnParserImpl implements CmmnParser {
     protected CmmnActivityBehaviorFactory activityBehaviorFactory;
     protected ExpressionManager expressionManager;
 
+    @Override
     public CmmnParseResult parse(EngineResource resourceEntity) {
         CmmnParseResult parseResult = new CmmnParseResult();
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(resourceEntity.getBytes())) {
@@ -107,7 +125,7 @@ public class CmmnParserImpl implements CmmnParser {
             PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
             if (planItemDefinition instanceof Stage) {
                 Stage stage = (Stage) planItemDefinition;
-                planItem.setBehavior(activityBehaviorFactory.createStageActivityBehavoir(planItem, stage));
+                planItem.setBehavior(activityBehaviorFactory.createStageActivityBehavior(planItem, stage));
 
             } else if (planItemDefinition instanceof HumanTask) {
                 HumanTask humanTask = (HumanTask) planItemDefinition;

@@ -27,26 +27,12 @@ public class Application {
                 group.setType("security-role");
                 identityService.saveGroup(group);
 
-                User joram = identityService.newUser("jbarrez");
-                joram.setFirstName("Joram");
-                joram.setLastName("Barrez");
-                joram.setPassword("password");
-                identityService.saveUser(joram);
-
-                User filip = identityService.newUser("filiphr");
-                filip.setFirstName("Filip");
-                filip.setLastName("Hrisafov");
-                filip.setPassword("password");
-                identityService.saveUser(filip);
-
                 User josh = identityService.newUser("jlong");
                 josh.setFirstName("Josh");
                 josh.setLastName("Long");
                 josh.setPassword("password");
                 identityService.saveUser(josh);
 
-                identityService.createMembership("jbarrez", "user");
-                identityService.createMembership("filiphr", "user");
                 identityService.createMembership("jlong", "user");
             }
         };

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+
+
+    <case id="scriptCase">
+        <casePlanModel id="myScriptPlanModel" name="My Script CasePlanModel">
+            <planItem id="blockerPlanItem" definitionRef="caseBlocker"/>
+            <planItem id="taskBlocker" definitionRef="startTaskEvent"/>
+            <planItem id="planItemTaskA" name="Plan Item One" definitionRef="taskA">
+                <entryCriterion sentryRef="startTask"/>
+            </planItem>
+            <sentry id="startTask">
+                <planItemOnPart sourceRef="taskBlocker">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <task id="taskA" name="Script Task Item" flowable:type="script" flowable:scriptFormat="JavaScript">
+                <documentation>This is a test documentation</documentation>
+                <extensionElements>
+                    <flowable:field name="script">
+                        <string>
+                            <![CDATA[var a = 5;planItemInstance.setVariable("aInt",a);planItemInstance.setVariable("aString","value set in the script");]]></string>
+                    </flowable:field>
+                </extensionElements>
+            </task>
+            <userEventListener id="startTaskEvent"/>
+            <userEventListener id="caseBlocker"/>
+        </casePlanModel>
+    </case>
+</definitions>

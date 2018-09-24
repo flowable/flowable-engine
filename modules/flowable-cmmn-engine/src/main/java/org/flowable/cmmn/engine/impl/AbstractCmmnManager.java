@@ -20,12 +20,13 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityMana
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityManager;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.db.DbSqlSession;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManager;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityManager;
@@ -90,6 +91,10 @@ public abstract class AbstractCmmnManager {
     
     protected HistoricMilestoneInstanceEntityManager getHistoricMilestoneInstanceEntityManager() {
         return cmmnEngineConfiguration.getHistoricMilestoneInstanceEntityManager();
+    }
+
+    protected HistoricPlanItemInstanceEntityManager getHistoricPlanItemInstanceEntityManager() {
+        return cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager();
     }
     
     protected VariableInstanceEntityManager getVariableInstanceEntityManager() {

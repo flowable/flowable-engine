@@ -20,8 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
+import org.flowable.common.engine.impl.context.Context;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.util.CommandContextUtil;
@@ -32,7 +31,7 @@ import org.flowable.variable.service.impl.persistence.entity.HistoricVariableIns
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class HistoricTaskInstanceEntityImpl extends AbstractEntity implements HistoricTaskInstanceEntity {
+public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity implements HistoricTaskInstanceEntity {
 
     private static final long serialVersionUID = 1L;
 
@@ -493,4 +492,10 @@ public class HistoricTaskInstanceEntityImpl extends AbstractEntity implements Hi
     public void setQueryIdentityLinks(List<HistoricIdentityLinkEntity> identityLinks) {
         queryIdentityLinks = identityLinks;
     }
+    
+    @Override
+    public String toString() {
+        return "HistoricTaskInstanceEntity[id=" + id + "]";
+    }
+
 }

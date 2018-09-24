@@ -12,18 +12,20 @@
  */
 package org.flowable.form.rest.service.api.management;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.EngineInfo;
+import org.flowable.form.engine.FormEngine;
+import org.flowable.form.engine.FormEngines;
+import org.flowable.form.rest.FormRestApiInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.EngineInfo;
-import org.flowable.form.engine.FormEngine;
-import org.flowable.form.engine.FormEngines;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Yvo Swillens
@@ -31,6 +33,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Api(tags = { "Engine" }, description = "Manage Form Engine", authorizations = { @Authorization(value = "basicAuth") })
 public class FormEngineResource {
+    
+    @Autowired(required=false)
+    protected FormRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get form engine info", tags = { "Engine" }, notes = "Returns a read-only view of the engine that is used in this REST-service.")
     @ApiResponses(value = {
@@ -38,6 +43,10 @@ public class FormEngineResource {
     })
     @GetMapping(value = "/form-management/engine", produces = "application/json")
     public FormEngineInfoResponse getEngineInfo() {
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessFormManagementInfo();
+        }
+        
         FormEngineInfoResponse response = new FormEngineInfoResponse();
 
         try {

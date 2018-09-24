@@ -12,28 +12,29 @@
  */
 package org.flowable.cmmn.engine.configurator;
 
-import org.flowable.cmmn.api.PlanItemInstanceCallbackType;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.configurator.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.configurator.impl.process.DefaultProcessInstanceService;
 import org.flowable.cmmn.engine.impl.callback.ChildProcessInstanceStateChangeCallback;
 import org.flowable.cmmn.engine.impl.db.EntityDependencyOrder;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.AbstractEngineConfiguration;
-import org.flowable.engine.common.impl.AbstractEngineConfigurator;
-import org.flowable.engine.common.impl.EngineDeployer;
-import org.flowable.engine.common.impl.HasTaskIdGeneratorEngineConfiguration;
-import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.AbstractEngineConfigurator;
+import org.flowable.common.engine.impl.EngineDeployer;
+import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 
 /**
  * @author Joram Barrez
@@ -56,6 +57,21 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
     protected String getMybatisCfgPath() {
         return CmmnEngineConfiguration.DEFAULT_MYBATIS_MAPPING_FILE;
     }
+    
+    @Override
+    public void beforeInit(AbstractEngineConfiguration engineConfiguration) {
+        super.beforeInit(engineConfiguration);
+        
+        // When async history is enabled on the bpmn engine, it also gets enabled on the cmmn engine.
+        // The same async history executor will be shared between the engine instances (see in the configure method),
+        // which will be instantiated by the bpmn engine. However, some properties need to be set here (before instantiation)
+        // to have an async history executor that works for both engines
+        ProcessEngineConfigurationImpl processEngineConfiguration = getProcessEngineConfiguration(engineConfiguration);
+        if (processEngineConfiguration != null && processEngineConfiguration.isAsyncHistoryEnabled()) {
+            processEngineConfiguration.setHistoryJobExecutionScope(JobServiceConfiguration.JOB_EXECUTION_SCOPE_ALL);
+        }
+        
+    }
 
     @Override
     public void configure(AbstractEngineConfiguration engineConfiguration) {
@@ -65,21 +81,52 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
 
         initialiseCommonProperties(engineConfiguration, cmmnEngineConfiguration);
 
-        ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) engineConfiguration;
-        initProcessInstanceService(processEngineConfiguration);
-        initProcessInstanceStateChangedCallbacks(processEngineConfiguration);
+        ProcessEngineConfigurationImpl processEngineConfiguration = getProcessEngineConfiguration(engineConfiguration);
+        if (processEngineConfiguration != null) {
+            copyProcessEngineProperties(processEngineConfiguration);
+            
+        }
 
         cmmnEngineConfiguration.setExecuteServiceDbSchemaManagers(false);
+
+        initCmmnEngine();
+
+        initServiceConfigurations(engineConfiguration, cmmnEngineConfiguration);
+    }
+
+    protected void copyProcessEngineProperties(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        initProcessInstanceService(processEngineConfiguration);
+        initProcessInstanceStateChangedCallbacks(processEngineConfiguration);
+        
         cmmnEngineConfiguration.setEnableTaskRelationshipCounts(processEngineConfiguration.getPerformanceSettings().isEnableTaskRelationshipCounts());
         cmmnEngineConfiguration.setTaskQueryLimit(processEngineConfiguration.getTaskQueryLimit());
         cmmnEngineConfiguration.setHistoricTaskQueryLimit(processEngineConfiguration.getHistoricTaskQueryLimit());
         // use the same query limit for executions/processes and cases
         cmmnEngineConfiguration.setCaseQueryLimit(processEngineConfiguration.getExecutionQueryLimit());
         cmmnEngineConfiguration.setHistoricCaseQueryLimit(processEngineConfiguration.getHistoricProcessInstancesQueryLimit());
-
-        initCmmnEngine();
-
-        initServiceConfigurations(engineConfiguration, cmmnEngineConfiguration);
+        
+        if (processEngineConfiguration.isAsyncHistoryEnabled()) {
+            AsyncExecutor asyncHistoryExecutor = processEngineConfiguration.getAsyncHistoryExecutor();
+            
+            // Inject the async history executor from the process engine. 
+            // The job handlers will be added in the CmmnEngineConfiguration itself
+            cmmnEngineConfiguration.setAsyncHistoryEnabled(true);
+            cmmnEngineConfiguration.setAsyncHistoryExecutor(asyncHistoryExecutor);
+            cmmnEngineConfiguration.setAsyncHistoryJsonGroupingEnabled(processEngineConfiguration.isAsyncHistoryJsonGroupingEnabled());
+            cmmnEngineConfiguration.setAsyncHistoryJsonGroupingThreshold(processEngineConfiguration.getAsyncHistoryJsonGroupingThreshold());
+            cmmnEngineConfiguration.setAsyncHistoryJsonGzipCompressionEnabled(processEngineConfiguration.isAsyncHistoryJsonGzipCompressionEnabled());
+            
+            // See the beforeInit
+            ((CmmnEngineConfiguration) cmmnEngineConfiguration).setHistoryJobExecutionScope(JobServiceConfiguration.JOB_EXECUTION_SCOPE_ALL);
+        }
+    }
+    
+    protected ProcessEngineConfigurationImpl getProcessEngineConfiguration(AbstractEngineConfiguration engineConfiguration) {
+        if (engineConfiguration.getEngineConfigurations().containsKey(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG)) {
+            return (ProcessEngineConfigurationImpl) engineConfiguration.getEngineConfigurations()
+                            .get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+        }
+        return null;
     }
 
     protected void initProcessInstanceService(ProcessEngineConfigurationImpl processEngineConfiguration) {
@@ -88,13 +135,13 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
 
     protected void initProcessInstanceStateChangedCallbacks(ProcessEngineConfigurationImpl processEngineConfiguration) {
         if (processEngineConfiguration.getProcessInstanceStateChangedCallbacks() == null) {
-            processEngineConfiguration.setProcessInstanceStateChangedCallbacks(new HashMap<String, List<RuntimeInstanceStateChangeCallback>>());
+            processEngineConfiguration.setProcessInstanceStateChangedCallbacks(new HashMap<>());
         }
         Map<String, List<RuntimeInstanceStateChangeCallback>> callbacks = processEngineConfiguration.getProcessInstanceStateChangedCallbacks();
-        if (!callbacks.containsKey(PlanItemInstanceCallbackType.CHILD_PROCESS)) {
-            callbacks.put(PlanItemInstanceCallbackType.CHILD_PROCESS, new ArrayList<RuntimeInstanceStateChangeCallback>());
+        if (!callbacks.containsKey(CallbackTypes.PLAN_ITEM_CHILD_PROCESS)) {
+            callbacks.put(CallbackTypes.PLAN_ITEM_CHILD_PROCESS, new ArrayList<>());
         }
-        callbacks.get(PlanItemInstanceCallbackType.CHILD_PROCESS).add(new ChildProcessInstanceStateChangeCallback(cmmnEngineConfiguration));
+        callbacks.get(CallbackTypes.PLAN_ITEM_CHILD_PROCESS).add(new ChildProcessInstanceStateChangeCallback(cmmnEngineConfiguration));
     }
 
     @Override
@@ -113,21 +160,6 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
         }
 
         return cmmnEngineConfiguration.buildCmmnEngine();
-    }
-
-    @Override
-    protected void initIdGenerator(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
-        super.initIdGenerator(engineConfiguration, targetEngineConfiguration);
-        if (targetEngineConfiguration instanceof HasTaskIdGeneratorEngineConfiguration) {
-            HasTaskIdGeneratorEngineConfiguration targetEgineConfiguration = (HasTaskIdGeneratorEngineConfiguration) targetEngineConfiguration;
-            if (targetEgineConfiguration.getTaskIdGenerator() == null) {
-                if (engineConfiguration instanceof HasTaskIdGeneratorEngineConfiguration) {
-                    targetEgineConfiguration.setTaskIdGenerator(((HasTaskIdGeneratorEngineConfiguration) engineConfiguration).getTaskIdGenerator());
-                } else {
-                    targetEgineConfiguration.setTaskIdGenerator(engineConfiguration.getIdGenerator());
-                }
-            }
-        }
     }
 
     public CmmnEngineConfiguration getCmmnEngineConfiguration() {

@@ -12,28 +12,31 @@
  */
 package org.flowable.form.rest.service.api.repository;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.io.InputStream;
+import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.IOUtils;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormRepositoryService;
+import org.flowable.form.rest.FormRestApiInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.InputStream;
-import java.util.List;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Yvo Swillens
@@ -47,6 +50,9 @@ public class FormDeploymentResourceDataResource {
 
     @Autowired
     protected FormRepositoryService formRepositoryService;
+    
+    @Autowired(required=false)
+    protected FormRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get a form deployment resource content", tags = {"Form Deployments" }, nickname = "getFormDeploymentResource",
             notes = "The response body will contain the binary resource-content for the requested resource. The response content-type will be the same as the type returned in the resources mimeType property. Also, a content-disposition header is set, allowing browsers to download the file instead of displaying it.")
@@ -58,6 +64,7 @@ public class FormDeploymentResourceDataResource {
     public byte[] getFormDeploymentResource(@ApiParam(name = "deploymentId") @PathVariable("deploymentId") String deploymentId,
             @ApiParam(name = "resourceName") @PathVariable("resourceName") String resourceName,
             HttpServletResponse response) {
+        
         if (deploymentId == null) {
             throw new FlowableIllegalArgumentException("No deployment id provided");
         }
@@ -69,6 +76,10 @@ public class FormDeploymentResourceDataResource {
         FormDeployment deployment = formRepositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
         if (deployment == null) {
             throw new FlowableObjectNotFoundException("Could not find a form deployment with id '" + deploymentId);
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDeploymentById(deployment);
         }
 
         List<String> resourceList = formRepositoryService.getDeploymentResourceNames(deploymentId);

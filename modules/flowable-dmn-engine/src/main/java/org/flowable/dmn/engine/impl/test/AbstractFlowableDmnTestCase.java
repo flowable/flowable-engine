@@ -26,8 +26,6 @@ import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.test.DmnTestHelper;
 import org.junit.Assert;
 
-import junit.framework.AssertionFailedError;
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -80,7 +78,7 @@ public abstract class AbstractFlowableDmnTestCase extends AbstractDmnTestCase {
 
             super.runBare();
 
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             LOGGER.error(EMPTY_LINE);
             LOGGER.error("ASSERTION FAILED: {}", e, e);
             exception = e;

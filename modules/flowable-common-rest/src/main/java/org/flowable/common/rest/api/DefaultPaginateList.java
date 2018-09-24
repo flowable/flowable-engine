@@ -17,7 +17,9 @@ import java.util.List;
 
 /**
  * @author Tijs Rademakers
+ * @deprecated use {@link PaginateListUtil} and the appropriate {@link ListProcessor} instead
  */
+@Deprecated
 public class DefaultPaginateList<T> extends AbstractPaginateList<T, T> {
 
     @Override

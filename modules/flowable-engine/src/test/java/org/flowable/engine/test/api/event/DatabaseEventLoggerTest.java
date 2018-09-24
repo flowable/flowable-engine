@@ -18,15 +18,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.impl.identity.Authentication;
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.event.logger.EventLogger;
 import org.flowable.engine.impl.event.logger.handler.Fields;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -42,24 +45,23 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
 
         // Database event logger setup
         databaseEventLogger = new EventLogger(processEngineConfiguration.getClock(), processEngineConfiguration.getObjectMapper());
         runtimeService.addEventListener(databaseEventLogger);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
 
         // Database event logger teardown
         runtimeService.removeEventListener(databaseEventLogger);
 
-        super.tearDown();
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/event/DatabaseEventLoggerProcess.bpmn20.xml" })
     public void testDatabaseEvents() throws IOException {
 
@@ -437,6 +439,7 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     public void testDatabaseEventsNoTenant() throws IOException {
 
         String deploymentId = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/event/DatabaseEventLoggerProcess.bpmn20.xml").deploy().getId();
@@ -535,6 +538,7 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     public void testStandaloneTaskEvents() throws JsonParseException, JsonMappingException, IOException {
 
         org.flowable.task.api.Task task = taskService.newTask();

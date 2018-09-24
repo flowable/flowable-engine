@@ -16,7 +16,7 @@ package org.flowable.cmmn.rest.service.api.repository;
 import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;

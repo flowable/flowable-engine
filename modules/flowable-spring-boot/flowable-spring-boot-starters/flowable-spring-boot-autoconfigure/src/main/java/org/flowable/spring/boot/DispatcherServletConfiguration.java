@@ -47,7 +47,7 @@ public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
     private static final Logger LOGGER = LoggerFactory.getLogger(DispatcherServletConfiguration.class);
 
     @Autowired
-    private ObjectMapper objectMapper;
+    protected ObjectMapper objectMapper;
 
     @Bean
     public SessionLocaleResolver localeResolver() {

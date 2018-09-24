@@ -23,7 +23,7 @@ import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery;
-import org.flowable.cmmn.engine.impl.ServiceImpl;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.AddIdentityLinkForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.CompleteCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.CompleteStagePlanItemInstanceCmd;
@@ -34,6 +34,7 @@ import org.flowable.cmmn.engine.impl.cmd.EvaluateCriteriaCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetIdentityLinksForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetLocalVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetLocalVariablesCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetStartFormModelCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.HasCaseInstanceVariableCmd;
@@ -50,12 +51,18 @@ import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceWithFormCmd;
 import org.flowable.cmmn.engine.impl.cmd.StartPlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TerminateCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TriggerPlanItemInstanceCmd;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
+import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 
 /**
  * @author Joram Barrez
  */
-public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeService {
+public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfiguration> implements CmmnRuntimeService {
+
+    public CmmnRuntimeServiceImpl(CmmnEngineConfiguration engineConfiguration) {
+        super(engineConfiguration);
+    }
 
     @Override
     public CaseInstanceBuilder createCaseInstanceBuilder() {
@@ -68,6 +75,11 @@ public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeSe
     
     public CaseInstance startCaseInstanceWithForm(CaseInstanceBuilder caseInstanceBuilder) {
         return commandExecutor.execute(new StartCaseInstanceWithFormCmd(caseInstanceBuilder));
+    }
+
+    @Override
+    public FormInfo getStartFormModel(String caseDefinitionId, String caseInstanceId) {
+        return commandExecutor.execute(new GetStartFormModelCmd(caseDefinitionId, caseInstanceId));
     }
 
     @Override public void triggerPlanItemInstance(String planItemInstanceId) {
@@ -181,22 +193,22 @@ public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeSe
 
     @Override
     public CaseInstanceQuery createCaseInstanceQuery() {
-        return cmmnEngineConfiguration.getCaseInstanceEntityManager().createCaseInstanceQuery();
+        return configuration.getCaseInstanceEntityManager().createCaseInstanceQuery();
     }
 
     @Override
     public PlanItemInstanceQuery createPlanItemInstanceQuery() {
-        return cmmnEngineConfiguration.getPlanItemInstanceEntityManager().createPlanItemInstanceQuery();
+        return configuration.getPlanItemInstanceEntityManager().createPlanItemInstanceQuery();
     }
 
     @Override
     public MilestoneInstanceQuery createMilestoneInstanceQuery() {
-        return cmmnEngineConfiguration.getMilestoneInstanceEntityManager().createMilestoneInstanceQuery();
+        return configuration.getMilestoneInstanceEntityManager().createMilestoneInstanceQuery();
     }
 
     @Override
     public UserEventListenerInstanceQuery createUserEventListenerInstanceQuery() {
-        return new UserEventListenerInstanceQueryImpl(cmmnEngineConfiguration.getCommandExecutor());
+        return new UserEventListenerInstanceQueryImpl(configuration.getCommandExecutor());
     }
 
     @Override

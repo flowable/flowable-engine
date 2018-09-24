@@ -17,10 +17,10 @@ package org.flowable.engine;
  * 
  * @author Jorg Heymans
  * @author Falko Menge
- * @deprecated use {@link org.flowable.engine.common.api.FlowableTaskAlreadyClaimedException}
+ * @deprecated use {@link org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException}
  */
 @Deprecated
-public class FlowableTaskAlreadyClaimedException extends org.flowable.engine.common.api.FlowableTaskAlreadyClaimedException {
+public class FlowableTaskAlreadyClaimedException extends org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException {
 
     private static final long serialVersionUID = 1L;
 

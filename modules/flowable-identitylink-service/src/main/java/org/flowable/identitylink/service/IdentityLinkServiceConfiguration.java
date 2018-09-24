@@ -12,8 +12,8 @@
  */
 package org.flowable.identitylink.service;
 
-import org.flowable.engine.common.impl.AbstractServiceConfiguration;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.AbstractServiceConfiguration;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.identitylink.service.impl.HistoricIdentityLinkServiceImpl;
 import org.flowable.identitylink.service.impl.IdentityLinkServiceImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManager;
@@ -51,6 +51,9 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
     
     protected IdentityLinkEntityManager identityLinkEntityManager;
     protected HistoricIdentityLinkEntityManager historicIdentityLinkEntityManager;
+
+    /** IdentityLink event handler */
+    protected IdentityLinkEventHandler identityLinkEventHandler;
     
     protected HistoryLevel historyLevel;
     
@@ -182,6 +185,15 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
     @Override
     public IdentityLinkServiceConfiguration setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
+        return this;
+    }
+
+    public IdentityLinkEventHandler getIdentityLinkEventHandler() {
+        return identityLinkEventHandler;
+    }
+
+    public IdentityLinkServiceConfiguration setIdentityLinkEventHandler(IdentityLinkEventHandler identityLinkEventHandler) {
+        this.identityLinkEventHandler = identityLinkEventHandler;
         return this;
     }
 }

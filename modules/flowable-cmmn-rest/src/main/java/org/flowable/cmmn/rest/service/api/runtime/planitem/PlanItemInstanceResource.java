@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.rest.service.api.RestActionRequest;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -62,6 +62,10 @@ public class PlanItemInstanceResource extends PlanItemInstanceBaseResource {
                     @RequestBody RestActionRequest actionRequest, HttpServletRequest request, HttpServletResponse response) {
 
         PlanItemInstance planItemInstance = getPlanItemInstanceFromRequest(planItemInstanceId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.doPlanItemInstanceAction(planItemInstance, actionRequest);
+        }
 
         if (RestActionRequest.TRIGGER.equals(actionRequest.getAction())) {
             runtimeService.triggerPlanItemInstance(planItemInstance.getId());

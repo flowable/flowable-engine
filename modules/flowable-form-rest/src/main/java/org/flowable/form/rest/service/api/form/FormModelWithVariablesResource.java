@@ -14,10 +14,11 @@ package org.flowable.form.rest.service.api.form;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormService;
+import org.flowable.form.rest.FormRestApiInterceptor;
 import org.flowable.form.rest.FormRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,6 +43,9 @@ public class FormModelWithVariablesResource {
 
     @Autowired
     protected FormRestResponseFactory formRestResponseFactory;
+    
+    @Autowired(required=false)
+    protected FormRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get a populated form model", tags = { "Form Models" }, notes = "Provide variables needed to pre populated form fields " +
             "and to render expression based form fields")
@@ -56,8 +60,8 @@ public class FormModelWithVariablesResource {
 
         if (formRequest.getParentDeploymentId() != null) {
             formModel = formService.getFormModelWithVariablesByKeyAndParentDeploymentId(
-                    formRequest.getParentDeploymentId(),
                     formRequest.getFormDefinitionKey(),
+                    formRequest.getParentDeploymentId(),
                     formRequest.getTaskId(),
                     formRequest.getVariables(),
                     formRequest.getTenantId());
@@ -82,6 +86,10 @@ public class FormModelWithVariablesResource {
 
         if (formModel == null) {
             throw new FlowableObjectNotFoundException("Could not find a form model");
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessFormInfoById(formModel, formRequest);
         }
 
         return formRestResponseFactory.createFormModelResponse(formModel);

@@ -43,6 +43,46 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
         graphicInfo.setXmlRowNumber(location.getLineNumber());
         graphicInfo.setXmlColumnNumber(location.getColumnNumber());
     }
+    
+    public static ExtensionElement parseExtensionElement(XMLStreamReader xtr) throws Exception {
+        ExtensionElement extensionElement = new ExtensionElement();
+        extensionElement.setName(xtr.getLocalName());
+        if (StringUtils.isNotEmpty(xtr.getNamespaceURI())) {
+            extensionElement.setNamespace(xtr.getNamespaceURI());
+        }
+        if (StringUtils.isNotEmpty(xtr.getPrefix())) {
+            extensionElement.setNamespacePrefix(xtr.getPrefix());
+        }
+
+        for (int i = 0; i < xtr.getAttributeCount(); i++) {
+            ExtensionAttribute extensionAttribute = new ExtensionAttribute();
+            extensionAttribute.setName(xtr.getAttributeLocalName(i));
+            extensionAttribute.setValue(xtr.getAttributeValue(i));
+            if (StringUtils.isNotEmpty(xtr.getAttributeNamespace(i))) {
+                extensionAttribute.setNamespace(xtr.getAttributeNamespace(i));
+            }
+            if (StringUtils.isNotEmpty(xtr.getAttributePrefix(i))) {
+                extensionAttribute.setNamespacePrefix(xtr.getAttributePrefix(i));
+            }
+            extensionElement.addAttribute(extensionAttribute);
+        }
+
+        boolean readyWithExtensionElement = false;
+        while (!readyWithExtensionElement && xtr.hasNext()) {
+            xtr.next();
+            if (xtr.isCharacters() || XMLStreamReader.CDATA == xtr.getEventType()) {
+                if (StringUtils.isNotEmpty(xtr.getText().trim())) {
+                    extensionElement.setElementText(xtr.getText().trim());
+                }
+            } else if (xtr.isStartElement()) {
+                ExtensionElement childExtensionElement = parseExtensionElement(xtr);
+                extensionElement.addChildElement(childExtensionElement);
+            } else if (xtr.isEndElement() && extensionElement.getName().equalsIgnoreCase(xtr.getLocalName())) {
+                readyWithExtensionElement = true;
+            }
+        }
+        return extensionElement;
+    }
 
     public static void writeDefaultAttribute(String attributeName, String value, XMLStreamWriter xtw) throws Exception {
         if (StringUtils.isNotEmpty(value) && !"null".equalsIgnoreCase(value)) {
@@ -63,7 +103,7 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
     public static boolean writeExtensionElements(BaseElement baseElement, boolean didWriteExtensionStartElement, Map<String, String> namespaceMap, XMLStreamWriter xtw) throws Exception {
         if (!baseElement.getExtensionElements().isEmpty()) {
             if (!didWriteExtensionStartElement) {
-                xtw.writeStartElement(ELEMENT_EXTENSIONS);
+                xtw.writeStartElement(ELEMENT_EXTENSION_ELEMENTS);
                 didWriteExtensionStartElement = true;
             }
 
@@ -142,7 +182,7 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
     }
 
     public static void writeCustomAttributes(Collection<List<ExtensionAttribute>> attributes, XMLStreamWriter xtw, List<ExtensionAttribute>... blackLists) throws XMLStreamException {
-        writeCustomAttributes(attributes, xtw, new LinkedHashMap<String, String>(), blackLists);
+        writeCustomAttributes(attributes, xtw, new LinkedHashMap<>(), blackLists);
     }
 
     /**

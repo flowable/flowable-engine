@@ -16,8 +16,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.runtime.Clock;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.springframework.beans.factory.FactoryBean;
 
 /**

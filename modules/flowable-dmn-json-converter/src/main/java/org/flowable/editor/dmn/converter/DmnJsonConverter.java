@@ -456,7 +456,7 @@ public class DmnJsonConverter {
                             expressionValue = expressionValueNode.asText();
                         }
 
-                        if (complexExpressionIds.contains(id)) {
+                        if (complexExpressionIds.contains(id) || expressionValue.startsWith("${") || expressionValue.startsWith("#{")) {
                             outputEntry.setText(expressionValue);
                         } else {
                             if ("string".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())

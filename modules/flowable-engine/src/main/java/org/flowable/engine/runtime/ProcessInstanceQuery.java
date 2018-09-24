@@ -17,8 +17,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.flowable.common.engine.api.query.Query;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link ProcessInstance}s.
@@ -127,6 +127,11 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Select the process instances with which the user with the given id is involved.
      */
     ProcessInstanceQuery involvedUser(String userId);
+
+    /**
+     * Select the process instances with which the {@link org.flowable.idm.api.Group}s with the given ids are involved.
+     */
+    ProcessInstanceQuery involvedGroups(Set<String> groupIds);
 
     /**
      * Only select process instances which have a global variable with the given value. The type of variable is determined based on the value, using types configured in

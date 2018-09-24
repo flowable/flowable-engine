@@ -14,12 +14,12 @@ package org.flowable.job.service.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.InternalJobCompatibilityManager;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -82,7 +82,7 @@ public class DeleteJobCmd implements Command<Object>, Serializable {
         }
 
         // We need to check if the job was locked, ie acquired by the job acquisition thread
-        // This happens if the the job was already acquired, but not yet executed.
+        // This happens if the job was already acquired, but not yet executed.
         // In that case, we can't allow to delete the job.
         if (job.getLockOwner() != null) {
             throw new FlowableException("Cannot delete job when the job is being executed. Try again later.");

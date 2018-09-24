@@ -16,11 +16,11 @@ package org.flowable.dmn.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.DecisionTableQueryImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.data.DecisionTableDataManager;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Tijs Rademakers
@@ -53,18 +53,6 @@ public class DecisionTableEntityManagerImpl extends AbstractEntityManager<Decisi
     @Override
     public void deleteDecisionTablesByDeploymentId(String deploymentId) {
         decisionTableDataManager.deleteDecisionTablesByDeploymentId(deploymentId);
-    }
-
-    @Override
-    public DecisionTableEntity findLatestDecisionTableByKeyAndParentDeploymentId(String decisionTableKey, String parentDeploymentId) {
-        return decisionTableDataManager.findLatestDecisionTableByKeyAndParentDeploymentId(decisionTableKey, parentDeploymentId);
-    }
-
-    @Override
-    public DecisionTableEntity findLatestDecisionTableByKeyParentDeploymentIdAndTenantId(String decisionTableKey,
-            String parentDeploymentId, String tenantId) {
-
-        return decisionTableDataManager.findLatestDecisionTableByKeyParentDeploymentIdAndTenantId(decisionTableKey, parentDeploymentId, tenantId);
     }
 
     @Override

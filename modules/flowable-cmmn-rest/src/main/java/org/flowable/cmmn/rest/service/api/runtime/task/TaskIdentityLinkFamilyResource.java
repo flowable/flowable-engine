@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.task.api.Task;
 import org.springframework.web.bind.annotation.GetMapping;

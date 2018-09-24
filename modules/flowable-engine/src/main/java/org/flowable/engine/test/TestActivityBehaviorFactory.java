@@ -49,7 +49,7 @@ import org.flowable.bpmn.model.ThrowEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.Transaction;
 import org.flowable.bpmn.model.UserTask;
-import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.AdhocSubProcessActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryCancelEventActivityBehavior;
@@ -114,6 +114,7 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
 
     protected boolean allServiceTasksNoOp;
     protected Map<String, String> mockedClassDelegatesMapping = new HashMap<>();
+    protected Map<String, String> mockedClassTaskIdDelegatesMapping = new HashMap<>();
     protected Set<String> noOpServiceTaskIds = new HashSet<>();
     protected Set<String> noOpServiceTaskClassNames = new HashSet<>();
 
@@ -169,6 +170,8 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
 
             return new ClassDelegate(mockedClassDelegatesMapping.get(serviceTask.getImplementation()), createFieldDeclarations(serviceTask.getFieldExtensions()));
 
+        } else if (serviceTask.getId() != null && mockedClassTaskIdDelegatesMapping.containsKey(serviceTask.getId())) {
+            return new ClassDelegate(mockedClassTaskIdDelegatesMapping.get(serviceTask.getId()), createFieldDeclarations(serviceTask.getFieldExtensions()));
         }
 
         return wrappedActivityBehaviorFactory.createClassDelegateServiceTask(serviceTask);
@@ -432,6 +435,14 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
 
     public void addClassDelegateMock(String originalClassFqn, String mockedClassFqn) {
         mockedClassDelegatesMapping.put(originalClassFqn, mockedClassFqn);
+    }
+
+    public void addClassDelegateMockByTaskId(String serviceTaskId, Class<?> mockedClass) {
+        addClassDelegateMockByTaskId(serviceTaskId, mockedClass.getName());
+    }
+
+    public void addClassDelegateMockByTaskId(String serviceTaskId, String mockedClassFqn) {
+        mockedClassTaskIdDelegatesMapping.put(serviceTaskId, mockedClassFqn);
     }
 
     public void addNoOpServiceTaskById(String id) {

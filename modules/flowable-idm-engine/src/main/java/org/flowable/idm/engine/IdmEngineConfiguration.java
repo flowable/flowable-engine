@@ -14,7 +14,6 @@ package org.flowable.idm.engine;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -22,21 +21,19 @@ import java.util.Set;
 
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.impl.AbstractEngineConfiguration;
-import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
-import org.flowable.engine.common.impl.cfg.IdGenerator;
-import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
-import org.flowable.engine.common.impl.event.FlowableEventDispatcherImpl;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
-import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.engine.common.impl.interceptor.SessionFactory;
-import org.flowable.engine.common.impl.persistence.GenericManagerFactory;
-import org.flowable.engine.common.impl.persistence.cache.EntityCache;
-import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
-import org.flowable.engine.common.impl.runtime.Clock;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
+import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
+import org.flowable.common.engine.impl.event.FlowableEventDispatcherImpl;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.interceptor.SessionFactory;
+import org.flowable.common.engine.impl.runtime.Clock;
+import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.IdmManagementService;
 import org.flowable.idm.api.PasswordEncoder;
@@ -45,7 +42,7 @@ import org.flowable.idm.api.event.FlowableIdmEventType;
 import org.flowable.idm.engine.impl.IdmEngineImpl;
 import org.flowable.idm.engine.impl.IdmIdentityServiceImpl;
 import org.flowable.idm.engine.impl.IdmManagementServiceImpl;
-import org.flowable.idm.engine.impl.ServiceImpl;
+import org.flowable.idm.engine.impl.SchemaOperationsIdmEngineBuild;
 import org.flowable.idm.engine.impl.authentication.BlankSalt;
 import org.flowable.idm.engine.impl.authentication.ClearTextPasswordEncoder;
 import org.flowable.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration;
@@ -93,7 +90,7 @@ import org.flowable.idm.engine.impl.persistence.entity.data.impl.MybatisUserData
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class IdmEngineConfiguration extends AbstractEngineConfiguration {
+public class IdmEngineConfiguration extends AbstractEngineConfiguration implements IdmEngineConfigurationApi {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(IdmEngineConfiguration.class);
 
@@ -177,6 +174,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
     // /////////////////////////////////////////////////////////////////////
 
     protected void init() {
+        initEngineConfigurations();
         initCommandContextFactory();
         initTransactionContextFactory();
         initCommandExecutors();
@@ -184,7 +182,11 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
 
         if (usingRelationalDatabase) {
             initDataSource();
-            initDbSchemaManager();
+        }
+        
+        if (usingRelationalDatabase || usingSchemaMgmt) {
+            initSchemaManager();
+            initSchemaManagementCommand();
         }
 
         initBeans();
@@ -203,9 +205,18 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
         initEventDispatcher();
     }
 
-    public void initDbSchemaManager() {
-        if (this.dbSchemaManager == null) {
-            this.dbSchemaManager = new IdmDbSchemaManager();
+    @Override
+    public void initSchemaManager() {
+        if (this.schemaManager == null) {
+            this.schemaManager = new IdmDbSchemaManager();
+        }
+    }
+    
+    public void initSchemaManagementCommand() {
+        if (schemaManagementCmd == null) {
+            if (usingRelationalDatabase && databaseSchemaUpdate != null) {
+                this.schemaManagementCmd = new SchemaOperationsIdmEngineBuild();
+            }
         }
     }
 
@@ -215,12 +226,6 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
     protected void initServices() {
         initService(idmIdentityService);
         initService(idmManagementService);
-    }
-
-    protected void initService(Object service) {
-        if (service instanceof ServiceImpl) {
-            ((ServiceImpl) service).setCommandExecutor(commandExecutor);
-        }
     }
 
     // Data managers
@@ -291,26 +296,6 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
 
     // session factories ////////////////////////////////////////////////////////
 
-    public void initSessionFactories() {
-        if (sessionFactories == null) {
-            sessionFactories = new HashMap<>();
-
-            if (usingRelationalDatabase) {
-                initDbSqlSessionFactory();
-            }
-
-            addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
-
-            commandContextFactory.setSessionFactories(sessionFactories);
-        }
-
-        if (customSessionFactories != null) {
-            for (SessionFactory sessionFactory : customSessionFactories) {
-                addSessionFactory(sessionFactory);
-            }
-        }
-    }
-
     @Override
     public void initDbSqlSessionFactory() {
         if (dbSqlSessionFactory == null) {
@@ -328,7 +313,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
 
     @Override
     public DbSqlSessionFactory createDbSqlSessionFactory() {
-        return new DbSqlSessionFactory();
+        return new DbSqlSessionFactory(usePrefixId);
     }
 
     @Override
@@ -528,6 +513,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
+    @Override
     public IdmIdentityService getIdmIdentityService() {
         return idmIdentityService;
     }
@@ -537,6 +523,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
+    @Override
     public IdmManagementService getIdmManagementService() {
         return idmManagementService;
     }

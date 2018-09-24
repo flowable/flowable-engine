@@ -60,11 +60,11 @@ angular.module('flowableApp')
             }
         };
 
-        $scope.deploymentKey = $routeParams.deploymentKey;
-        $scope.missingAppdefinition = $scope.deploymentKey === false;
+        $scope.appDefinitionKey = $routeParams.appDefinitionKey;
+        $scope.missingAppdefinition = $scope.appDefinitionKey === false;
 
-        // In case of viewing process instances in an app-context, need to make filter aware of this
-        $scope.model.filter.param.deploymentKey = $scope.deploymentKey;
+        // In case of viewing case instances in an app-context, need to make filter aware of this
+        $scope.model.filter.param.appDefinitionKey = $scope.appDefinitionKey;
 
         // The filter is stored on the rootScope, which allows the user to switch back and forth without losing the filter.
         if ($rootScope.caseFilter !== null && $rootScope.caseFilter !== undefined) {
@@ -74,7 +74,7 @@ angular.module('flowableApp')
         }
 
         // Update app on rootScope. If app id present, it will fetch definition if not already fetched to update view and navigation accordingly
-        AppDefinitionService.setActiveDeploymentKey($scope.deploymentKey);
+        AppDefinitionService.setActiveAppDefinitionKey($scope.appDefinitionKey);
 
         $scope.selectCaseInstance = function (caseInstance) {
             $scope.selectedCaseInstance = caseInstance;
@@ -92,7 +92,7 @@ angular.module('flowableApp')
         $scope.$watch("model.filter.param", function (newValue) {
             if (newValue) {
                 if ($scope.model.initialLoad) {
-                    $scope.loadProcessInstances();
+                    $scope.loadCaseInstances();
                 }
 
                 if (newValue.state.id === 'completed' || newValue.state.id === 'all') {
@@ -128,8 +128,8 @@ angular.module('flowableApp')
                 page: $scope.model.page
             };
 
-            if (params.deploymentKey) {
-                instanceQueryData.deploymentKey = params.deploymentKey;
+            if (params.appDefinitionKey) {
+                instanceQueryData.appDefinitionKey = params.appDefinitionKey;
             }
 
             if (params.state) {
@@ -189,7 +189,7 @@ angular.module('flowableApp')
                                 }
                             }
                         }
-                       // Always reset when loading process instance
+                       // Always reset when loading case instance
                         $scope.newCaseInstance = undefined;
                     }
 
@@ -263,7 +263,7 @@ angular.module('flowableApp')
 
         $scope.selectDefaultDefinition = function() {
             // Select first non-default definition, if any
-            CaseService.getCaseDefinitions($scope.deploymentKey).then(function(response) {
+            CaseService.getCaseDefinitions($scope.appDefinitionKey).then(function(response) {
             	$rootScope.root.caseDefinitions = response.data;
 	            if ($scope.root.caseDefinitions && $scope.root.caseDefinitions.length > 0) {
 	                for (var i=0; i< $scope.root.caseDefinitions.length; i++) {
@@ -298,7 +298,7 @@ angular.module('flowableApp')
                 $scope.loadCaseInstances();
             }
 
-            // In case we're coming from the task page, no process instances have been loaded
+            // In case we're coming from the task page, no case instances have been loaded
             if ($scope.model.caseInstances === null || $scope.model.caseInstances === undefined) {
                 $scope.loadCaseInstances();
             }
@@ -344,7 +344,7 @@ angular.module('flowableApp')
                 });
         };
 
-        $rootScope.loadCaseDefinitions($scope.deploymentKey);
+        $rootScope.loadCaseDefinitions($scope.appDefinitionKey);
 
         // If 'createCaseInstance' is set (eg from the task page)
         if ($rootScope.createCaseInstance) {

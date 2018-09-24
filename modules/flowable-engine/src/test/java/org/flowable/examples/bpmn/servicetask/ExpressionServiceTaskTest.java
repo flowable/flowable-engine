@@ -17,13 +17,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -33,6 +34,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 public class ExpressionServiceTaskTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testSetServiceResultToProcessVariables() {
         Map<String, Object> variables = new HashMap<>();
@@ -41,6 +43,7 @@ public class ExpressionServiceTaskTest extends PluggableFlowableTestCase {
         assertEquals("ok", runtimeService.getVariable(pi.getId(), "result"));
     }
 
+    @Test
     @Deployment
     public void testSetServiceResultToProcessVariablesWithSkipExpression() {
         Map<String, Object> variables = new HashMap<>();
@@ -72,6 +75,7 @@ public class ExpressionServiceTaskTest extends PluggableFlowableTestCase {
         assertEquals("okBean", runtimeService.getVariable(pi3.getId(), "result"));
     }
 
+    @Test
     @Deployment
     public void testBackwardsCompatibleExpression() {
         Map<String, Object> variables = new HashMap<>();
@@ -80,6 +84,7 @@ public class ExpressionServiceTaskTest extends PluggableFlowableTestCase {
         assertEquals("...---...", runtimeService.getVariable(pi.getId(), "result"));
     }
 
+    @Test
     @Deployment
     public void testSetServiceResultWithParallelMultiInstance() {
         Map<String, Object> variables = new HashMap<>();
@@ -98,6 +103,7 @@ public class ExpressionServiceTaskTest extends PluggableFlowableTestCase {
         assertThat(tasks.get(0).getTaskDefinitionKey(), is("processWaitState"));
     }
 
+    @Test
     @Deployment
     public void testSetServiceLocalScopedResultWithParallelMultiInstance() {
         Map<String, Object> variables = new HashMap<>();

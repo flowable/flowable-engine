@@ -116,6 +116,11 @@ public interface CmmnStencilConstants {
     String PROPERTY_CASE_REFERENCE = "casetaskcasereference";
 
     String PROPERTY_PROCESS_REFERENCE = "processtaskprocessreference";
+    String PROPERTY_PROCESS_IN_PARAMETERS = "processtaskinparameters";
+    String PROPERTY_PROCESS_OUT_PARAMETERS = "processtaskoutparameters";
+
+    String PROPERTY_IN_PARAMETERS = "inParameters";
+    String PROPERTY_OUT_PARAMETERS = "outParameters";
 
     String PROPERTY_IF_PART_CONDITION = "ifpartcondition";
 
@@ -125,6 +130,7 @@ public interface CmmnStencilConstants {
     String PROPERTY_HTTPTASK_REQ_URL = "httptaskrequesturl";
     String PROPERTY_HTTPTASK_REQ_HEADERS = "httptaskrequestheaders";
     String PROPERTY_HTTPTASK_REQ_BODY  = "httptaskrequestbody";
+    String PROPERTY_HTTPTASK_REQ_BODY_ENCODING  = "httptaskrequestbodyencoding";
     String PROPERTY_HTTPTASK_REQ_TIMEOUT = "httptaskrequesttimeout";
     String PROPERTY_HTTPTASK_REQ_DISALLOW_REDIRECTS = "httptaskdisallowredirects";
     String PROPERTY_HTTPTASK_REQ_FAIL_STATUS_CODES = "httptaskfailstatuscodes";

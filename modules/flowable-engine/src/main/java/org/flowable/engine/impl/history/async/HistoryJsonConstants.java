@@ -12,9 +12,41 @@
  */
 package org.flowable.engine.impl.history.async;
 
+import java.util.Arrays;
+import java.util.List;
+
 public interface HistoryJsonConstants {
     
+    String JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY = "async-history"; // Backwards compatibility: process engine used this first before the handler was reused
+    
+    String JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED = "async-history-zipped"; // Backwards compatibility: process engine used this first before the handler was reused
+    
     String TYPE = "type";
+    
+    List<String> ORDERED_TYPES = Arrays.asList(
+            HistoryJsonConstants.TYPE_PROCESS_INSTANCE_START,
+            HistoryJsonConstants.TYPE_PROCESS_INSTANCE_PROPERTY_CHANGED,
+            HistoryJsonConstants.TYPE_ACTIVITY_START,
+            HistoryJsonConstants.TYPE_ACTIVITY_END,
+            HistoryJsonConstants.TYPE_ACTIVITY_FULL,
+            HistoryJsonConstants.TYPE_TASK_CREATED,
+            HistoryJsonConstants.TYPE_TASK_ASSIGNEE_CHANGED,
+            HistoryJsonConstants.TYPE_TASK_OWNER_CHANGED,
+            HistoryJsonConstants.TYPE_TASK_PROPERTY_CHANGED,
+            HistoryJsonConstants.TYPE_TASK_ENDED,
+            HistoryJsonConstants.TYPE_VARIABLE_CREATED,
+            HistoryJsonConstants.TYPE_VARIABLE_UPDATED,
+            HistoryJsonConstants.TYPE_VARIABLE_REMOVED,
+            HistoryJsonConstants.TYPE_HISTORIC_DETAIL_VARIABLE_UPDATE,
+            HistoryJsonConstants.TYPE_FORM_PROPERTIES_SUBMITTED,
+            HistoryJsonConstants.TYPE_SET_PROCESS_DEFINITION,
+            HistoryJsonConstants.TYPE_SUBPROCESS_INSTANCE_START,
+            HistoryJsonConstants.TYPE_IDENTITY_LINK_CREATED,
+            HistoryJsonConstants.TYPE_IDENTITY_LINK_DELETED,
+            HistoryJsonConstants.TYPE_PROCESS_INSTANCE_DELETED_BY_PROCDEF_ID,
+            HistoryJsonConstants.TYPE_PROCESS_INSTANCE_DELETED,
+            HistoryJsonConstants.TYPE_PROCESS_INSTANCE_END
+    );
     
     String TYPE_PROCESS_INSTANCE_START = "process-instance-start";
     String TYPE_SUBPROCESS_INSTANCE_START = "subprocess-instance-start";
@@ -43,7 +75,7 @@ public interface HistoryJsonConstants {
     String DATA = "data";
 
     String ID = "id";
-
+    
     String NAME = "name";
 
     String DESCRIPTION = "description";
@@ -71,7 +103,15 @@ public interface HistoryJsonConstants {
     String PROCESS_DEFINITION_NAME = "processDefinitionName";
 
     String PROCESS_DEFINITION_VERSION = "processDefinitionVersion";
+    
+    String PROCESS_DEFINITION_CATEGORY = "processDefinitionCategory";
 
+    String PROCESS_DEFINITIN_DERIVED_FROM = "processDefinitionDerivedFrom";
+    
+    String PROCESS_DEFINITIN_DERIVED_FROM_ROOT = "processDefinitionDerivedFromRoot";
+    
+    String PROCESS_DEFINITIN_DERIVED_VERSION = "processDefinitionDerivedVersion";
+    
     String DEPLOYMENT_ID = "deploymentId";
 
     String START_TIME = "startTime";

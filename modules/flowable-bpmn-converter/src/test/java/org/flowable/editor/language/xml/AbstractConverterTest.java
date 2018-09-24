@@ -29,23 +29,22 @@ import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.GraphicInfo;
+import org.flowable.common.engine.impl.util.io.InputStreamSource;
 
 public abstract class AbstractConverterTest implements BpmnXMLConstants {
 
     protected BpmnModel readXMLFile() throws Exception {
         InputStream xmlStream = this.getClass().getClassLoader().getResourceAsStream(getResource());
-        XMLInputFactory xif = XMLInputFactory.newInstance();
-        InputStreamReader in = new InputStreamReader(xmlStream, "UTF-8");
-        XMLStreamReader xtr = xif.createXMLStreamReader(in);
-        return new BpmnXMLConverter().convertToBpmnModel(xtr);
+        return readXMLFile(xmlStream);
+    }
+    
+    protected BpmnModel readXMLFile(InputStream inputStream) throws Exception {
+        return new BpmnXMLConverter().convertToBpmnModel(new InputStreamSource(inputStream), true, false, "UTF-8");
     }
 
     protected BpmnModel exportAndReadXMLFile(BpmnModel bpmnModel) throws Exception {
         byte[] xml = new BpmnXMLConverter().convertToXML(bpmnModel);
-        XMLInputFactory xif = XMLInputFactory.newInstance();
-        InputStreamReader in = new InputStreamReader(new ByteArrayInputStream(xml), "UTF-8");
-        XMLStreamReader xtr = xif.createXMLStreamReader(in);
-        return new BpmnXMLConverter().convertToBpmnModel(xtr);
+        return new BpmnXMLConverter().convertToBpmnModel(new InputStreamSource(new ByteArrayInputStream(xml)), true, false, "UTF-8");
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -161,14 +160,6 @@ public abstract class AbstractConverterTest implements BpmnXMLConstants {
 				}
 			}
 		}
-    }
-
-    protected void deployProcess(BpmnModel bpmnModel) {
-        /*
-         * byte[] xml = new BpmnXMLConverter().convertToXML(bpmnModel); ProcessEngineConfiguration configuration = ProcessEngineConfiguration. createStandaloneInMemProcessEngineConfiguration();
-         * ProcessEngine processEngine = configuration.buildProcessEngine(); try { Deployment deployment = processEngine.getRepositoryService().createDeployment().name
-         * ("test").addString("test.bpmn20.xml", new String(xml)).deploy(); processEngine .getRepositoryService().deleteDeployment(deployment.getId()); } finally { processEngine.close(); }
-         */
     }
 
     protected abstract String getResource();

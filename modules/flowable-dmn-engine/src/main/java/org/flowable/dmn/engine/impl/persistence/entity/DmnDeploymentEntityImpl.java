@@ -20,15 +20,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.flowable.engine.common.api.repository.EngineResource;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
 
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class DmnDeploymentEntityImpl extends AbstractEntityNoRevision implements DmnDeploymentEntity, Serializable {
+public class DmnDeploymentEntityImpl extends AbstractDmnEngineNoRevisionEntity implements DmnDeploymentEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -67,6 +66,7 @@ public class DmnDeploymentEntityImpl extends AbstractEntityNoRevision implements
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("category", this.category);
         persistentState.put("tenantId", tenantId);
+        persistentState.put("parentDeploymentId", parentDeploymentId);
         return persistentState;
     }
 

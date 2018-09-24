@@ -13,25 +13,27 @@
 
 package org.flowable.engine.test.db;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Daniel Meyer
  * @author Joram Barrez
  */
-public class DatabaseTablePrefixTest extends TestCase {
+public class DatabaseTablePrefixTest {
 
+    @Test
     public void testPerformDatabaseSchemaOperationCreate() throws Exception {
 
         DataSource dataSource = createDataSourceAndSchema();
@@ -89,8 +91,8 @@ public class DatabaseTablePrefixTest extends TestCase {
 
         // create two schemas is the database
         Connection connection = pooledDataSource.getConnection();
-        connection.createStatement().execute("drop schema if exists SCHEMA1");
-        connection.createStatement().execute("drop schema if exists SCHEMA2");
+        connection.createStatement().execute("drop schema if exists SCHEMA1 cascade");
+        connection.createStatement().execute("drop schema if exists SCHEMA2 cascade");
         connection.createStatement().execute("create schema SCHEMA1");
         connection.createStatement().execute("create schema SCHEMA2");
         connection.close();
@@ -98,6 +100,7 @@ public class DatabaseTablePrefixTest extends TestCase {
     }
     
     
+    @Test
     public void testProcessEngineReboot() throws Exception {
         
         ProcessEngine processEngine1 = null;

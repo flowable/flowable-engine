@@ -18,6 +18,39 @@
         #{parentDeploymentId, jdbcType=VARCHAR}
     )
   </insert>
+  
+  <insert id="bulkInsertCmmnDeployment" parameterType="java.util.List">
+        insert into ${prefix}ACT_CMMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_)
+        values
+        <foreach collection="list" item="deployment" index="index" separator=",">
+            (
+                #{deployment.id, jdbcType=VARCHAR},
+                #{deployment.name, jdbcType=VARCHAR},
+                #{deployment.category, jdbcType=VARCHAR},
+                #{deployment.key, jdbcType=VARCHAR},
+                #{deployment.tenantId, jdbcType=VARCHAR},
+                #{deployment.deploymentTime, jdbcType=TIMESTAMP},
+                #{deployment.parentDeploymentId, jdbcType=VARCHAR}
+            )
+        </foreach>
+  </insert>
+  
+  <insert id="bulkInsertCmmnDeployment" databaseId="oracle" parameterType="java.util.List">
+        INSERT ALL
+        <foreach collection="list" item="deployment" index="index">
+            into ${prefix}ACT_CMMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_) values
+            (
+                #{deployment.id, jdbcType=VARCHAR},
+                #{deployment.name, jdbcType=VARCHAR},
+                #{deployment.category, jdbcType=VARCHAR},
+                #{deployment.key, jdbcType=VARCHAR},
+                #{deployment.tenantId, jdbcType=VARCHAR},
+                #{deployment.deploymentTime, jdbcType=TIMESTAMP},
+                #{deployment.parentDeploymentId, jdbcType=VARCHAR}
+            )
+        </foreach>
+        SELECT * FROM dual
+    </insert>
 
   <!-- DEPLOYMENT UPDATE -->
   
@@ -31,7 +64,10 @@
         KEY_ = #{key, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.tenantId != tenantId">
-        TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+        TENANT_ID_ = #{tenantId, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.parentDeploymentId != parentDeploymentId">
+        PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId, jdbcType=VARCHAR}
       </if>
     </set>  
     where ID_ = #{id, jdbcType=VARCHAR}
@@ -57,7 +93,7 @@
 
   <!-- DEPLOYMENT SELECT -->
 
-  <select id="selectCmmnDeploymentsByName" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="cmmnDeploymentResultMap">
+  <select id="selectCmmnDeploymentsByName" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="cmmnDeploymentResultMap">
     select * from ${prefix}ACT_CMMN_DEPLOYMENT D where NAME_=#{parameter} order by D.DEPLOY_TIME_ desc
   </select>
   
@@ -67,14 +103,14 @@
   
   <select id="selectCmmnDeploymentsByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryImpl" resultMap="cmmnDeploymentResultMap">
     <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select distinct RES.* <if test="nullHandlingColumn != null">, ${nullHandlingColumn}</if> <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    select RES.* <if test="nullHandlingColumn != null">, ${nullHandlingColumn}</if> <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectCmmnDeploymentsByQueryCriteriaSql"/>
     ${orderBy}
     <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
 
   <select id="selectCmmnDeploymentCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    select count(RES.ID_)
     <include refid="selectCmmnDeploymentsByQueryCriteriaSql"/>
   </select>
   
@@ -115,7 +151,14 @@
       <if test="parentDeploymentIdLike != null">
         and RES.PARENT_DEPLOYMENT_ID_ like #{parentDeploymentIdLike}
       </if>
-       <if test="tenantId != null">
+      <if test="parentDeploymentIds != null &amp;&amp; parentDeploymentIds.size() &gt; 0">
+        and RES.PARENT_DEPLOYMENT_ID_ IN
+        <foreach item="parentDeploymentId" index="index" collection="parentDeploymentIds" 
+                 open="(" separator="," close=")">
+          #{parentDeploymentId}
+        </foreach>
+      </if>
+      <if test="tenantId != null">
         and RES.TENANT_ID_ = #{tenantId}
       </if>
       <if test="tenantIdLike != null">

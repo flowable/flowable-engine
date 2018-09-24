@@ -19,12 +19,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
-
 /**
  * @author Tom Baeyens
  */
-public class CommentEntityImpl extends AbstractEntityNoRevision implements CommentEntity, Serializable {
+public class CommentEntityImpl extends AbstractBpmnEngineNoRevisionEntity implements CommentEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

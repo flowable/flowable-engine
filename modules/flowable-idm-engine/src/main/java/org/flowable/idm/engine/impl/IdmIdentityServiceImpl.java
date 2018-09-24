@@ -14,7 +14,8 @@ package org.flowable.idm.engine.impl;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.identity.Authentication;
+import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.IdmIdentityService;
@@ -29,6 +30,7 @@ import org.flowable.idm.api.Token;
 import org.flowable.idm.api.TokenQuery;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
+import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.cmd.AddPrivilegeMappingCmd;
 import org.flowable.idm.engine.impl.cmd.CheckPassword;
 import org.flowable.idm.engine.impl.cmd.CreateGroupCmd;
@@ -64,7 +66,7 @@ import org.flowable.idm.engine.impl.persistence.entity.IdentityInfoEntity;
 /**
  * @author Tijs Rademakers
  */
-public class IdmIdentityServiceImpl extends ServiceImpl implements IdmIdentityService {
+public class IdmIdentityServiceImpl extends CommonEngineServiceImpl<IdmEngineConfiguration> implements IdmIdentityService {
 
     @Override
     public Group newGroup(String groupId) {

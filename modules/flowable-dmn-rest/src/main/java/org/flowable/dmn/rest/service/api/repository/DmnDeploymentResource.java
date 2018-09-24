@@ -12,16 +12,13 @@
  */
 package org.flowable.dmn.rest.service.api.repository;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletResponse;
+
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnRepositoryService;
+import org.flowable.dmn.rest.service.api.DmnRestApiInterceptor;
 import org.flowable.dmn.rest.service.api.DmnRestResponseFactory;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,7 +26,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Yvo Swillens
@@ -43,6 +45,9 @@ public class DmnDeploymentResource {
 
     @Autowired
     protected DmnRepositoryService dmnRepositoryService;
+    
+    @Autowired(required=false)
+    protected DmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get a decision table deployment", tags = { "Deployment" }, nickname = "getDecisionTableDeployment")
     @ApiResponses(value = {
@@ -56,6 +61,10 @@ public class DmnDeploymentResource {
         if (deployment == null) {
             throw new FlowableObjectNotFoundException("Could not find a DMN deployment with id '" + deploymentId);
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDeploymentById(deployment);
+        }
 
         return dmnRestResponseFactory.createDmnDeploymentResponse(deployment);
     }
@@ -67,6 +76,16 @@ public class DmnDeploymentResource {
     })
     @DeleteMapping(value = "/dmn-repository/deployments/{deploymentId}", produces = "application/json")
     public void deleteDmnDeployment(@ApiParam(name = "deploymentId") @PathVariable String deploymentId, HttpServletResponse response) {
+        
+        DmnDeployment deployment = dmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
+
+        if (deployment == null) {
+            throw new FlowableObjectNotFoundException("Could not find a DMN deployment with id '" + deploymentId);
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteDeployment(deployment);
+        }
 
         dmnRepositoryService.deleteDeployment(deploymentId);
 

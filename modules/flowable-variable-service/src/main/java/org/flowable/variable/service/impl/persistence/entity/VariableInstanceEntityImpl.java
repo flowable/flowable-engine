@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
 
@@ -26,7 +25,7 @@ import org.flowable.variable.api.types.VariableType;
  * @author Marcus Klimstra (CGI)
  * @author Joram Barrez
  */
-public class VariableInstanceEntityImpl extends AbstractEntity implements VariableInstanceEntity, ValueFields, Serializable {
+public class VariableInstanceEntityImpl extends AbstractVariableServiceEntity implements VariableInstanceEntity, ValueFields, Serializable {
 
     private static final long serialVersionUID = 1L;
 

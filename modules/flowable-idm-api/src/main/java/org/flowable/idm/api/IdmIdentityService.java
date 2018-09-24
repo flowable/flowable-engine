@@ -14,7 +14,7 @@ package org.flowable.idm.api;
 
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 
 /**
  * Service to manage {@link User}s and {@link Group}s.
@@ -59,13 +59,13 @@ public interface IdmIdentityService {
     UserQuery createUserQuery();
 
     /**
-     * Returns a new {@link org.flowable.engine.common.api.query.NativeQuery} for tasks.
+     * Returns a new {@link org.flowable.common.engine.api.query.NativeQuery} for tasks.
      */
     NativeUserQuery createNativeUserQuery();
 
     /**
      * @param userId
-     *            id of user to delete, cannot be null. When an id is passed for an unexisting user, this operation is ignored.
+     *            id of user to delete, cannot be null. When an id is passed for a non-existent user, this operation is ignored.
      */
     void deleteUser(String userId);
 
@@ -83,7 +83,7 @@ public interface IdmIdentityService {
     GroupQuery createGroupQuery();
 
     /**
-     * Returns a new {@link org.flowable.engine.common.api.query.NativeQuery} for tasks.
+     * Returns a new {@link org.flowable.common.engine.api.query.NativeQuery} for tasks.
      */
     NativeGroupQuery createNativeGroupQuery();
 
@@ -141,7 +141,7 @@ public interface IdmIdentityService {
      * @param userId
      * @param picture
      *            can be null to delete the picture.
-     * @throws org.flowable.engine.common.api.FlowableObjectNotFoundException
+     * @throws org.flowable.common.engine.api.FlowableObjectNotFoundException
      *             if the user doesn't exist.
      */
     void setUserPicture(String userId, Picture picture);
@@ -152,7 +152,7 @@ public interface IdmIdentityService {
      * @param userId
      * @return null if the user doesn't have a picture.
      *
-     * @throws org.flowable.engine.common.api.FlowableObjectNotFoundException
+     * @throws org.flowable.common.engine.api.FlowableObjectNotFoundException
      *             if the user doesn't exist.
      */
     Picture getUserPicture(String userId);
@@ -175,7 +175,7 @@ public interface IdmIdentityService {
 
     /**
      * @param tokenId
-     *            id of token to delete, cannot be null. When an id is passed for an unexisting token, this operation is ignored.
+     *            id of token to delete, cannot be null. When an id is passed for an non-existent token, this operation is ignored.
      */
     void deleteToken(String tokenId);
 
@@ -185,7 +185,7 @@ public interface IdmIdentityService {
     TokenQuery createTokenQuery();
 
     /**
-     * Returns a new {@link org.flowable.engine.common.api.query.NativeQuery} for tokens.
+     * Returns a new {@link org.flowable.common.engine.api.query.NativeQuery} for tokens.
      */
     NativeTokenQuery createNativeTokenQuery();
 

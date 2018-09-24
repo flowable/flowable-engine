@@ -212,11 +212,14 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_TASK_RULE_CLASS = "class";
 
     public static final String ATTRIBUTE_CALL_ACTIVITY_CALLEDELEMENT = "calledElement";
+    public static final String ATTRIBUTE_CALL_ACTIVITY_CALLEDELEMENTTYPE = "calledElementType";
+    public static final String ATTRIBUTE_CALL_ACTIVITY_PROCESS_INSTANCE_NAME = "processInstanceName";
     public static final String ATTRIBUTE_CALL_ACTIVITY_BUSINESS_KEY = "businessKey";
     public static final String ATTRIBUTE_CALL_ACTIVITY_INHERIT_BUSINESS_KEY = "inheritBusinessKey";
     public static final String ATTRIBUTE_CALL_ACTIVITY_INHERITVARIABLES = "inheritVariables";
     public static final String ATTRIBUTE_CALL_ACTIVITY_SAME_DEPLOYMENT = "sameDeployment";
     public static final String ATTRIBUTE_CALL_ACTIVITY_USE_LOCALSCOPE_FOR_OUTPARAMETERS = "useLocalScopeForOutParameters";
+    public static final String ATTRIBUTE_CALL_ACTIVITY_COMPLETE_ASYNC = "completeAsync";
     public static final String ELEMENT_CALL_ACTIVITY_IN_PARAMETERS = "in";
     public static final String ELEMENT_CALL_ACTIVITY_OUT_PARAMETERS = "out";
     public static final String ATTRIBUTE_IOPARAMETER_SOURCE = "source";
@@ -324,5 +327,6 @@ public interface BpmnXMLConstants {
     public static final String MAP_EXCEPTION = "mapException";
     public static final String MAP_EXCEPTION_ERRORCODE = "errorCode";
     public static final String MAP_EXCEPTION_ANDCHILDREN = "includeChildExceptions";
+    public static final String MAP_EXCEPTION_ROOTCAUSE = "rootCause";
 
 }

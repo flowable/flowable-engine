@@ -14,7 +14,7 @@ package org.flowable.variable.service.impl.persistence.entity.data.impl.cachemat
 
 import java.util.Map;
 
-import org.flowable.engine.common.impl.db.SingleCachedEntityMatcher;
+import org.flowable.common.engine.impl.db.SingleCachedEntityMatcher;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
@@ -22,6 +22,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  */
 public class VariableInstanceByScopeIdAndScopeTypeAndVariableNameMatcher implements SingleCachedEntityMatcher<VariableInstanceEntity> {
 
+    @Override
     public boolean isRetained(VariableInstanceEntity entity, Object param) {
         Map<String, String> params = (Map<String, String>) param;
         return params.get("scopeId").equals(entity.getScopeId())

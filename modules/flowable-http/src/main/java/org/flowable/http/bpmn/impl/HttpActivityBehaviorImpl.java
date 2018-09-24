@@ -38,9 +38,9 @@ import org.flowable.bpmn.model.HttpServiceTask;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.bpmn.model.ServiceTask;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.cfg.HttpClientConfig;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
@@ -77,6 +77,8 @@ public class HttpActivityBehaviorImpl extends AbstractBpmnActivityBehavior {
     protected Expression requestHeaders;
     // HttpRequest body expression (Optional)
     protected Expression requestBody;
+    // HttpRequest body encoding expression, for example UTF-8 (Optional)
+    protected Expression requestBodyEncoding;
     // Timeout in seconds for the body (Optional)
     protected Expression requestTimeout;
     // HttpRequest retry disable HTTP redirects (Optional)
@@ -148,6 +150,7 @@ public class HttpActivityBehaviorImpl extends AbstractBpmnActivityBehavior {
             request.setUrl(getStringFromField(requestUrl, execution));
             request.setHeaders(getStringFromField(requestHeaders, execution));
             request.setBody(getStringFromField(requestBody, execution));
+            request.setBodyEncoding(getStringFromField(requestBodyEncoding, execution));
             request.setTimeout(getIntFromField(requestTimeout, execution));
             request.setNoRedirects(getBooleanFromField(disallowRedirects, execution));
             request.setIgnoreErrors(getBooleanFromField(ignoreException, execution));
@@ -177,6 +180,7 @@ public class HttpActivityBehaviorImpl extends AbstractBpmnActivityBehavior {
                 execution.setVariable(request.getPrefix() + "RequestUrl", request.getUrl());
                 execution.setVariable(request.getPrefix() + "RequestHeaders", request.getHeaders());
                 execution.setVariable(request.getPrefix() + "RequestBody", request.getBody());
+                execution.setVariable(request.getPrefix() + "RequestBodyEncoding", request.getBodyEncoding());
                 execution.setVariable(request.getPrefix() + "RequestTimeout", request.getTimeout());
                 execution.setVariable(request.getPrefix() + "DisallowRedirects", request.isNoRedirects());
                 execution.setVariable(request.getPrefix() + "FailStatusCodes", failCodes);

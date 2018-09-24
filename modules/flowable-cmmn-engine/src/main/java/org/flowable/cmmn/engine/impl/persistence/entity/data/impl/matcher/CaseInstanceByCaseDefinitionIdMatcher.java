@@ -13,13 +13,14 @@
 package org.flowable.cmmn.engine.impl.persistence.entity.data.impl.matcher;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
-import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcherAdapter;
+import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcherAdapter;
 
 /**
  * @author Joram Barrez
  */
 public class CaseInstanceByCaseDefinitionIdMatcher extends CachedEntityMatcherAdapter<CaseInstanceEntity> {
 
+    @Override
     public boolean isRetained(CaseInstanceEntity entity, Object param) {
         return entity.getCaseDefinitionId().equals(param);
     }

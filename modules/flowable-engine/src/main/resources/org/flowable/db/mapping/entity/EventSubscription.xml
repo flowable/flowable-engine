@@ -44,7 +44,7 @@
   </select>
 
   <select id="selectEventSubscriptionCountByQueryCriteria" parameterType="org.flowable.engine.impl.EventSubscriptionQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    select count(RES.ID_)
     <include refid="selectEventSubscriptionByQueryCriteriaSql"/>
   </select>
   
@@ -87,7 +87,7 @@
     </where>
   </sql>
   
-  <select id="selectMessageEventSubscriptionsByProcessInstanceAndEventName" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+  <select id="selectMessageEventSubscriptionsByProcessInstanceAndEventName" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR EVT
     where (EVENT_TYPE_ = 'message')
@@ -95,7 +95,7 @@
         and PROC_INST_ID_ = #{parameter.processInstanceId}
   </select>
   
-  <select id="selectSignalEventSubscriptionsByEventName" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+  <select id="selectSignalEventSubscriptionsByEventName" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR EVT
     left outer join ${prefix}ACT_RU_EXECUTION EXC on EVT.EXECUTION_ID_ = EXC.ID_
@@ -114,7 +114,7 @@
     </if>   
   </select>
   
-  <select id="selectSignalEventSubscriptionsByProcessInstanceAndEventName" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+  <select id="selectSignalEventSubscriptionsByProcessInstanceAndEventName" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR EVT
     where (EVENT_TYPE_ = 'signal')
@@ -122,7 +122,7 @@
         and PROC_INST_ID_ = #{parameter.processInstanceId}
   </select> 
   
-  <select id="selectSignalEventSubscriptionsByNameAndExecution" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+  <select id="selectSignalEventSubscriptionsByNameAndExecution" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EVENT_TYPE_ = 'signal')
@@ -130,20 +130,20 @@
     	and (EVENT_NAME_ = #{parameter.eventName})
   </select>
   
-  <select id="selectEventSubscriptionsByExecution" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+  <select id="selectEventSubscriptionsByExecution" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EXECUTION_ID_ = #{parameter})
   </select>
       
-  <select id="selectEventSubscriptionsByExecutionAndType" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+  <select id="selectEventSubscriptionsByExecutionAndType" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EVENT_TYPE_ = #{parameter.eventType})
     	and (EXECUTION_ID_ = #{parameter.executionId})
   </select>
   
-  <select id="selectEventSubscriptionsByExecutionTypeAndActivity" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+  <select id="selectEventSubscriptionsByExecutionTypeAndActivity" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EVENT_TYPE_ = #{parameter.eventType})
@@ -151,7 +151,7 @@
     	and (ACTIVITY_ID_ = #{parameter.activityId})
   </select>
   
-  <select id="selectEventSubscriptionsByProcessInstanceTypeAndActivity" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+  <select id="selectEventSubscriptionsByProcessInstanceTypeAndActivity" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EVENT_TYPE_ = #{parameter.eventType})
@@ -159,7 +159,7 @@
     	and (ACTIVITY_ID_ = #{parameter.activityId})
   </select>
   
-  <select id="selectEventSubscriptionsByTypeAndProcessDefinitionId" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+  <select id="selectEventSubscriptionsByTypeAndProcessDefinitionId" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
     <where>
@@ -178,7 +178,7 @@
     </where>   
   </select>
   
-  <select id="selectEventSubscriptionsByName" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+  <select id="selectEventSubscriptionsByName" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EVENT_TYPE_ = #{parameter.eventType})
@@ -191,7 +191,7 @@
     </if>   	
   </select>
   
-  <select id="selectEventSubscriptionsByNameAndExecution" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+  <select id="selectEventSubscriptionsByNameAndExecution" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EVENT_TYPE_ = #{parameter.eventType})
@@ -312,16 +312,16 @@
     <set>
        REV_ =  #{revisionNext, jdbcType=INTEGER},
        <if test="originalPersistentState.eventName != eventName">
-           EVENT_NAME_ = #{eventName, jdbcType=INTEGER},
+           EVENT_NAME_ = #{eventName, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.executionId != executionId">
-           EXECUTION_ID_ = #{executionId, jdbcType=INTEGER},
+           EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.processInstanceId != processInstanceId">
-           PROC_INST_ID_ = #{processInstanceId, jdbcType=INTEGER},
+           PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.activityId != activityId">
-           ACTIVITY_ID_ = #{activityId, jdbcType=INTEGER},
+           ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.configuration != configuration">
            CONFIGURATION_ = #{configuration, jdbcType=VARCHAR},  
@@ -439,16 +439,16 @@
     <set>
        REV_ =  #{revisionNext, jdbcType=INTEGER},
        <if test="originalPersistentState.eventName != eventName">
-           EVENT_NAME_ = #{eventName, jdbcType=INTEGER},
+           EVENT_NAME_ = #{eventName, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.executionId != executionId">
-           EXECUTION_ID_ = #{executionId, jdbcType=INTEGER},
+           EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.processInstanceId != processInstanceId">
-           PROC_INST_ID_ = #{processInstanceId, jdbcType=INTEGER},
+           PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.activityId != activityId">
-           ACTIVITY_ID_ = #{activityId, jdbcType=INTEGER},
+           ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.configuration != configuration">
            CONFIGURATION_ = #{configuration, jdbcType=VARCHAR},  
@@ -563,16 +563,16 @@
     <set>
        REV_ =  #{revisionNext, jdbcType=INTEGER},
        <if test="originalPersistentState.eventName != eventName">
-           EVENT_NAME_ = #{eventName, jdbcType=INTEGER},
+           EVENT_NAME_ = #{eventName, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.executionId != executionId">
-           EXECUTION_ID_ = #{executionId, jdbcType=INTEGER},
+           EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.processInstanceId != processInstanceId">
-           PROC_INST_ID_ = #{processInstanceId, jdbcType=INTEGER},
+           PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.activityId != activityId">
-           ACTIVITY_ID_ = #{activityId, jdbcType=INTEGER},
+           ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.configuration != configuration">
            CONFIGURATION_ = #{configuration, jdbcType=VARCHAR},  

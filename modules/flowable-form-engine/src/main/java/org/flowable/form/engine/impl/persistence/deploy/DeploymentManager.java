@@ -14,9 +14,9 @@ package org.flowable.form.engine.impl.persistence.deploy;
 
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.FormDefinitionQueryImpl;
@@ -89,23 +89,23 @@ public class DeploymentManager {
         return formDefinition;
     }
 
-    public FormDefinitionEntity findDeployedLatestFormDefinitionByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId) {
-        FormDefinitionEntity formDefinition = formDefinitionEntityManager.findLatestFormDefinitionByKeyAndParentDeploymentId(formDefinitionKey, parentDeploymentId);
+    public FormDefinitionEntity findDeployedLatestFormDefinitionByKeyAndDeploymentId(String formDefinitionKey, String deploymentId) {
+        FormDefinitionEntity formDefinition = formDefinitionEntityManager.findFormDefinitionByDeploymentAndKey(deploymentId, formDefinitionKey);
 
         if (formDefinition == null) {
             throw new FlowableObjectNotFoundException("no form definitions deployed with key '" + formDefinitionKey +
-                    "' for parent deployment id '" + parentDeploymentId + "'");
+                    "' for deployment id '" + deploymentId + "'");
         }
         formDefinition = resolveFormDefinition(formDefinition).getFormDefinitionEntity();
         return formDefinition;
     }
 
-    public FormDefinitionEntity findDeployedLatestFormDefinitionByKeyParentDeploymentIdAndTenantId(String formDefinitionKey, String parentDeploymentId, String tenantId) {
-        FormDefinitionEntity formDefinition = formDefinitionEntityManager.findLatestFormDefinitionByKeyParentDeploymentIdAndTenantId(formDefinitionKey, parentDeploymentId, tenantId);
+    public FormDefinitionEntity findDeployedLatestFormDefinitionByKeyDeploymentIdAndTenantId(String formDefinitionKey, String deploymentId, String tenantId) {
+        FormDefinitionEntity formDefinition = formDefinitionEntityManager.findFormDefinitionByDeploymentAndKeyAndTenantId(deploymentId, formDefinitionKey, tenantId);
 
         if (formDefinition == null) {
             throw new FlowableObjectNotFoundException("no form definitions deployed with key '" + formDefinitionKey +
-                    "' for parent deployment id '" + parentDeploymentId + "' and tenant identifier '" + tenantId + "'");
+                    "' for deployment id '" + deploymentId + "' and tenant identifier '" + tenantId + "'");
         }
         formDefinition = resolveFormDefinition(formDefinition).getFormDefinitionEntity();
         return formDefinition;

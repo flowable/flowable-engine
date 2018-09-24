@@ -16,14 +16,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -31,6 +32,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testCatchErrorOnEmbeddedSubprocess() {
         runtimeService.startProcessInstanceByKey("boundaryErrorOnEmbeddedSubprocess");
@@ -45,6 +47,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertEquals("task after catching the error", task.getName());
     }
 
+    @Test
     public void testThrowErrorWithEmptyErrorCode() {
         try {
             repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.testThrowErrorWithEmptyErrorCode.bpmn20.xml").deploy();
@@ -53,16 +56,19 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testCatchErrorOnEmbeddedSubprocessWithEmptyErrorCode() {
         testCatchErrorOnEmbeddedSubprocess();
     }
 
+    @Test
     @Deployment
     public void testCatchErrorOnEmbeddedSubprocessWithoutErrorCode() {
         testCatchErrorOnEmbeddedSubprocess();
     }
 
+    @Test
     @Deployment
     public void testCatchErrorOfInnerSubprocessOnOuterSubprocess() {
         runtimeService.startProcessInstanceByKey("boundaryErrorTest");
@@ -79,11 +85,13 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertEquals("task outside subprocess", taskAfterError.getName());
     }
 
+    @Test
     @Deployment
     public void testCatchErrorInConcurrentEmbeddedSubprocesses() {
         assertErrorCaughtInConcurrentEmbeddedSubprocesses("boundaryEventTestConcurrentSubprocesses");
     }
 
+    @Test
     @Deployment
     public void testCatchErrorInConcurrentEmbeddedSubprocessesThrownByScriptTask() {
         assertErrorCaughtInConcurrentEmbeddedSubprocesses("catchErrorInConcurrentEmbeddedSubprocessesThrownByScriptTask");
@@ -123,6 +131,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertEquals("task D", task.getName());
     }
 
+    @Test
     @Deployment
     public void testDeeplyNestedErrorThrown() {
 
@@ -147,6 +156,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(procId);
     }
 
+    @Test
     @Deployment
     public void testDeeplyNestedErrorThrownOnlyAutomaticSteps() {
         // input == 1 -> error2 is thrown -> caught on subprocess2 -> end event
@@ -170,6 +180,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorOnCallActivity-parent.bpmn20.xml",
             "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.subprocess.bpmn20.xml" })
     public void testCatchErrorOnCallActivity() {
@@ -188,6 +199,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(procId);
     }
     
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.multipleErrorsCatch.bpmn20.xml",
         "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.multipleErrorsThrow.bpmn20.xml" })
     public void testCatchMultipleErrorsOnCallActivity() {
@@ -200,6 +212,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(procId);
     }
     
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.multipleErrorsCatch.bpmn20.xml",
         "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.multipleErrorsThrow2.bpmn20.xml" })
     public void testCatchMultipleErrorsOnCallActivityNoSpecificError() {
@@ -212,6 +225,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(procId);
     }
     
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.callActivityWithErrorEndEventCatch.bpmn20.xml",
         "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.callActivityWithErrorEndEventThrow.bpmn20.xml" })
     public void testCatchErrorEndEventOnCallActivity() {
@@ -224,6 +238,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(procId);
     }
     
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.callActivityWithErrorEndEventCatch.bpmn20.xml",
         "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.callActivityWithErrorEndEventThrow2.bpmn20.xml" })
     public void testCatchErrorEndEventOnCallActivityNoSpecificError() {
@@ -236,6 +251,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(procId);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.subprocess.bpmn20.xml" })
     public void testUncaughtError() {
         runtimeService.startProcessInstanceByKey("simpleSubProcess");
@@ -251,6 +267,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.testUncaughtErrorOnCallActivity-parent.bpmn20.xml",
             "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.subprocess.bpmn20.xml" })
     public void testUncaughtErrorOnCallActivity() {
@@ -267,6 +284,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByCallActivityOnSubprocess.bpmn20.xml",
             "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.subprocess.bpmn20.xml" })
     public void testCatchErrorThrownByCallActivityOnSubprocess() {
@@ -285,6 +303,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(procId);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByCallActivityOnCallActivity.bpmn20.xml",
             "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.subprocess2ndLevel.bpmn20.xml", "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.subprocess.bpmn20.xml" })
     public void testCatchErrorThrownByCallActivityOnCallActivity() throws InterruptedException {
@@ -303,6 +322,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(procId);
     }
 
+    @Test
     @Deployment
     public void testCatchErrorOnParallelMultiInstance() {
         String procId = runtimeService.startProcessInstanceByKey("catchErrorOnParallelMi").getId();
@@ -323,6 +343,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(procId);
     }
 
+    @Test
     @Deployment
     public void testCatchErrorOnSequentialMultiInstance() {
         String procId = runtimeService.startProcessInstanceByKey("catchErrorOnSequentialMi").getId();
@@ -341,36 +362,42 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(procId);
     }
 
+    @Test
     @Deployment
     public void testCatchErrorThrownByJavaDelegateOnServiceTask() {
         String procId = runtimeService.startProcessInstanceByKey("catchErrorThrownByJavaDelegateOnServiceTask").getId();
         assertThatErrorHasBeenCaught(procId);
     }
 
+    @Test
     @Deployment
     public void testCatchErrorThrownByJavaDelegateOnServiceTaskNotCancelActivity() {
         String procId = runtimeService.startProcessInstanceByKey("catchErrorThrownByJavaDelegateOnServiceTaskNotCancelActiviti").getId();
         assertThatErrorHasBeenCaught(procId);
     }
 
+    @Test
     @Deployment
     public void testCatchErrorThrownByJavaDelegateOnServiceTaskWithErrorCode() {
         String procId = runtimeService.startProcessInstanceByKey("catchErrorThrownByJavaDelegateOnServiceTaskWithErrorCode").getId();
         assertThatErrorHasBeenCaught(procId);
     }
 
+    @Test
     @Deployment
     public void testCatchErrorThrownByJavaDelegateOnEmbeddedSubProcess() {
         String procId = runtimeService.startProcessInstanceByKey("catchErrorThrownByJavaDelegateOnEmbeddedSubProcess").getId();
         assertThatErrorHasBeenCaught(procId);
     }
 
+    @Test
     @Deployment
     public void testCatchErrorThrownByJavaDelegateOnEmbeddedSubProcessInduction() {
         String procId = runtimeService.startProcessInstanceByKey("catchErrorThrownByJavaDelegateOnEmbeddedSubProcessInduction").getId();
         assertThatErrorHasBeenCaught(procId);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByJavaDelegateOnCallActivity-parent.bpmn20.xml",
             "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByJavaDelegateOnCallActivity-child.bpmn20.xml" })
     public void testCatchErrorThrownByJavaDelegateOnCallActivity() {
@@ -378,6 +405,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertThatErrorHasBeenCaught(procId);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByJavaDelegateOnCallActivity-child.bpmn20.xml" })
     public void testUncaughtErrorThrownByJavaDelegateOnServiceTask() {
         try {
@@ -387,6 +415,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.testUncaughtErrorThrownByJavaDelegateOnCallActivity-parent.bpmn20.xml",
             "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByJavaDelegateOnCallActivity-child.bpmn20.xml" })
     public void testUncaughtErrorThrownByJavaDelegateOnCallActivity() {
@@ -397,24 +426,28 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorOnGroovyScriptTask.bpmn20.xml" })
     public void testCatchErrorOnGroovyScriptTask() {
         String procId = runtimeService.startProcessInstanceByKey("catchErrorOnScriptTask").getId();
         assertProcessEnded(procId);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorOnJavaScriptScriptTask.bpmn20.xml" })
     public void testCatchErrorOnJavaScriptScriptTask() {
         String procId = runtimeService.startProcessInstanceByKey("catchErrorOnScriptTask").getId();
         assertProcessEnded(procId);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.testUncaughtErrorOnScriptTaskWithEmptyErrorEventDefinition.bpmn20.xml" })
     public void testUncaughtErrorOnScriptTaskWithEmptyErrorEventDefinition() {
         String procId = runtimeService.startProcessInstanceByKey("uncaughtErrorOnScriptTaskWithEmptyErrorEventDefinition").getId();
         assertProcessEnded(procId);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.testUncaughtErrorOnScriptTask.bpmn20.xml" })
     public void testUncaughtErrorOnScriptTask() {
         try {
@@ -426,6 +459,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testCatchErrorThrownByJavaDelegateOnMultiInstanceServiceTaskSequential() {
         Map<String, Object> variables = new HashMap<>();
@@ -434,6 +468,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertThatErrorHasBeenCaught(procId);
     }
 
+    @Test
     @Deployment
     public void testCatchErrorThrownByJavaDelegateOnMultiInstanceServiceTaskParallel() {
         Map<String, Object> variables = new HashMap<>();
@@ -442,6 +477,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertThatErrorHasBeenCaught(procId);
     }
 
+    @Test
     @Deployment
     public void testErrorThrownByJavaDelegateNotCaughtByOtherEventType() {
         String procId = runtimeService.startProcessInstanceByKey("testErrorThrownByJavaDelegateNotCaughtByOtherEventType").getId();
@@ -460,6 +496,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(procId);
     }
 
+    @Test
     @Deployment
     public void testConcurrentExecutionsInterruptedOnDestroyScope() {
 
@@ -472,6 +509,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("process");
     }
 
+    @Test
     @Deployment
     public void testCatchErrorThrownByExpressionOnServiceTask() {
         HashMap<String, Object> variables = new HashMap<>();
@@ -480,6 +518,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertThatErrorHasBeenCaught(procId);
     }
 
+    @Test
     @Deployment
     public void testCatchErrorThrownByDelegateExpressionOnServiceTask() {
         HashMap<String, Object> variables = new HashMap<>();
@@ -488,6 +527,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertThatErrorHasBeenCaught(procId);
     }
 
+    @Test
     @Deployment
     public void testCatchErrorThrownByJavaDelegateProvidedByDelegateExpressionOnServiceTask() {
         HashMap<String, Object> variables = new HashMap<>();

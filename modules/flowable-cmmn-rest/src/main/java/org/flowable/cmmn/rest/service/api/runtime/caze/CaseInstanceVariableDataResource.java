@@ -40,7 +40,7 @@ public class CaseInstanceVariableDataResource extends BaseVariableResource {
     @ApiOperation(value = "Get the binary data for a variable", tags = { "Case Instance Variables" }, nickname = "getCaseInstanceVariableData")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the case instance was found and the requested variables are returned."),
-            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task doesn’t have a variable with the given name (in the given scope). Status message provides additional information.")
+            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task does not have a variable with the given name (in the given scope). Status message provides additional information.")
     })
     @ResponseBody
     @GetMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/variables/{variableName}/data")

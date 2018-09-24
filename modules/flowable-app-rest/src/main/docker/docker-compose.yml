@@ -1,0 +1,29 @@
+version: '3.6'
+services:
+    flowable-rest-app:
+        image: flowable/flowable-rest
+        depends_on:
+            - flowable-rest-db
+        environment:
+            - SERVER_PORT=8080
+            - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://flowable-rest-db:5432/flowable
+            - SPRING_DATASOURCE_USERNAME=flowable
+            - SPRING_DATASOURCE_PASSWORD=flowable
+            - FLOWABLE_REST_APP_ADMIN_USER-ID=rest-admin
+            - FLOWABLE_REST_APP_ADMIN_PASSWORD=test
+            - FLOWABLE_REST_APP_ADMIN_FIRST-NAME=Rest
+            - FLOWABLE_REST_APP_ADMIN_LAST-NAME=Admin
+        ports:
+            - 8080:8080
+        entrypoint: ["./wait-for-something.sh", "flowable-rest-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
+    flowable-rest-db:
+        image: postgres:9.6-alpine
+        container_name: flowable-rest-postgres
+        environment:
+            - POSTGRES_PASSWORD=flowable
+            - POSTGRES_USER=flowable
+            - POSTGRES_DB=flowable
+        ports:
+            - 5433:5432
+        command: postgres

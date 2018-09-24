@@ -12,13 +12,13 @@
  */
 package org.flowable.form.spring.configurator;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.spring.SpringEngineConfiguration;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.configurator.FormEngineConfigurator;
 import org.flowable.form.spring.SpringFormEngineConfiguration;
 import org.flowable.form.spring.SpringFormExpressionManager;
-import org.flowable.spring.common.SpringEngineConfiguration;
 
 /**
  * @author Tijs Rademakers

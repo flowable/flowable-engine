@@ -19,11 +19,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.bpmn.model.ValuedDataObject;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -44,6 +44,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
     protected Map<String, Object> transientVariables;
     protected String businessKey;
     protected String tenantId;
+    protected String overrideDefinitionTenantId;
     protected String processInstanceName;
     protected String callbackId;
     protected String callbackType;
@@ -67,7 +68,9 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
                 processInstanceBuilder.getBusinessKey(),
                 processInstanceBuilder.getVariables(),
                 processInstanceBuilder.getTenantId());
+        
         this.processInstanceName = processInstanceBuilder.getProcessInstanceName();
+        this.overrideDefinitionTenantId = processInstanceBuilder.getOverrideDefinitionTenantId();
         this.transientVariables = processInstanceBuilder.getTransientVariables();
         this.callbackId = processInstanceBuilder.getCallbackId();
         this.callbackType = processInstanceBuilder.getCallbackType();
@@ -105,17 +108,10 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
         }
 
         processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
-        ProcessInstance processInstance = createAndStartProcessInstance(processDefinition, businessKey, processInstanceName, 
-                variables, transientVariables, callbackId, callbackType);
+        ProcessInstance processInstance = processInstanceHelper.createProcessInstance(processDefinition, businessKey, processInstanceName, 
+                        overrideDefinitionTenantId, variables, transientVariables, callbackId, callbackType, true);
 
         return processInstance;
-    }
-
-    protected ProcessInstance createAndStartProcessInstance(ProcessDefinition processDefinition, String businessKey, String processInstanceName, 
-                    Map<String, Object> variables, Map<String, Object> transientVariables, String callbackId, String callbackType) {
-        
-        return processInstanceHelper.createProcessInstance(processDefinition, businessKey, processInstanceName, variables, 
-                        transientVariables, callbackId, callbackType, true);
     }
 
     protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {

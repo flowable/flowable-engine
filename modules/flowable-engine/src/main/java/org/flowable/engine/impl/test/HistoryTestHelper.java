@@ -16,10 +16,10 @@ package org.flowable.engine.impl.test;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.test.FlowableRule;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
@@ -52,17 +52,21 @@ public class HistoryTestHelper {
         waitForJobExecutorToProcessAllHistoryJobs(activitiRule.getProcessEngine().getProcessEngineConfiguration(), activitiRule.getManagementService(), maxMillisToWait, intervalMillis);
     }
 
-    public static void waitForJobExecutorToProcessAllHistoryJobs(ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService, long maxMillisToWait, long intervalMillis) {
+    public static void waitForJobExecutorToProcessAllHistoryJobs(ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService, 
+            long maxMillisToWait, long intervalMillis) {
         waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, maxMillisToWait, intervalMillis, true);
     }
 
-    public static void waitForJobExecutorToProcessAllHistoryJobs(ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService, long maxMillisToWait, long intervalMillis,
-            boolean shutdownExecutorWhenFinished) {
+    public static void waitForJobExecutorToProcessAllHistoryJobs(ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService, 
+            long maxMillisToWait, long intervalMillis, boolean shutdownExecutorWhenFinished) {
 
         ProcessEngineConfigurationImpl processEngineConfigurationImpl = (ProcessEngineConfigurationImpl) processEngineConfiguration;
         if (processEngineConfigurationImpl.isAsyncHistoryEnabled()) {
             AsyncExecutor asyncHistoryExecutor = processEngineConfiguration.getAsyncHistoryExecutor();
-            asyncHistoryExecutor.start();
+            
+            if (!asyncHistoryExecutor.isActive()) {
+                asyncHistoryExecutor.start();
+            }
     
             try {
                 Timer timer = new Timer();

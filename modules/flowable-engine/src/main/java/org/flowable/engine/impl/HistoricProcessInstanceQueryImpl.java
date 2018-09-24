@@ -18,13 +18,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -69,6 +70,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     protected Integer processDefinitionVersion;
     protected Set<String> processInstanceIds;
     protected String involvedUser;
+    protected Set<String> involvedGroups;
     protected boolean includeProcessVariables;
     protected Integer processInstanceVariablesLimit;
     protected boolean withJobException;
@@ -342,6 +344,22 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
             this.currentOrQueryObject.involvedUser = involvedUser;
         } else {
             this.involvedUser = involvedUser;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricProcessInstanceQuery involvedGroups(Set<String> involvedGroups) {
+        if (involvedGroups == null) {
+            throw new FlowableIllegalArgumentException("involvedGroups are null");
+        }
+        if (involvedGroups.isEmpty()) {
+            throw new FlowableIllegalArgumentException("involvedGroups are empty");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.involvedGroups = involvedGroups;
+        } else {
+            this.involvedGroups = involvedGroups;
         }
         return this;
     }
@@ -667,6 +685,12 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
         ensureVariablesInitialized();
+        
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        if (processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor() != null) {
+            processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor().beforeHistoricProcessInstanceQueryExecute(this);
+        }
+        
         return CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext).findHistoricProcessInstanceCountByQueryCriteria(this);
     }
 
@@ -675,16 +699,26 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         checkQueryOk();
         ensureVariablesInitialized();
         List<HistoricProcessInstance> results = null;
+        
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        if (processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor() != null) {
+            processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor().beforeHistoricProcessInstanceQueryExecute(this);
+        }
+        
         if (includeProcessVariables) {
             results = CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext).findHistoricProcessInstancesAndVariablesByQueryCriteria(this);
         } else {
             results = CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext).findHistoricProcessInstancesByQueryCriteria(this);
         }
 
-        if (CommandContextUtil.getProcessEngineConfiguration().getPerformanceSettings().isEnableLocalization()) {
+        if (processEngineConfiguration.getPerformanceSettings().isEnableLocalization()) {
             for (HistoricProcessInstance processInstance : results) {
                 localize(processInstance, commandContext);
             }
+        }
+        
+        if (processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor() != null) {
+            processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor().afterHistoricProcessInstanceQueryExecute(this, results);
         }
 
         return results;
@@ -810,6 +844,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
     public String getInvolvedUser() {
         return involvedUser;
+    }
+
+    public Set<String> getInvolvedGroups() {
+        return involvedGroups;
     }
 
     public String getName() {

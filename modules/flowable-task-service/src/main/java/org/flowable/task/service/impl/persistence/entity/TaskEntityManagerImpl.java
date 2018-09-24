@@ -16,14 +16,18 @@ package org.flowable.task.service.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.service.TaskServiceConfiguration;
+import org.flowable.task.service.event.impl.FlowableTaskEventBuilder;
 import org.flowable.task.service.impl.TaskQueryImpl;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.data.TaskDataManager;
-import org.flowable.task.service.impl.util.CountingTaskUtil;
+import org.flowable.task.service.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -47,10 +51,59 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     public TaskEntity create() {
         TaskEntity taskEntity = super.create();
         taskEntity.setCreateTime(getClock().getCurrentTime());
-        if (CountingTaskUtil.isTaskRelatedEntityCountEnabledGlobally()) {
+        if (taskServiceConfiguration.isEnableTaskRelationshipCounts()) {
             ((CountingTaskEntity) taskEntity).setCountEnabled(true);
         }
         return taskEntity;
+    }
+
+    @Override
+    public TaskEntity createTask(TaskBuilder taskBuilder) {
+        // create and insert task
+        TaskEntity taskEntity = create();
+        taskEntity.setId(taskBuilder.getId());
+        taskEntity.setName(taskBuilder.getName());
+        taskEntity.setDescription(taskBuilder.getDescription());
+        taskEntity.setPriority(taskBuilder.getPriority());
+        taskEntity.setOwner(taskBuilder.getOwner());
+        taskEntity.setAssignee(taskBuilder.getAssignee());
+        taskEntity.setDueDate(taskBuilder.getDueDate());
+        taskEntity.setCategory(taskBuilder.getCategory());
+        taskEntity.setParentTaskId(taskBuilder.getParentTaskId());
+        taskEntity.setTenantId(taskBuilder.getTenantId());
+        taskEntity.setFormKey(taskBuilder.getFormKey());
+        taskEntity.setTaskDefinitionId(taskBuilder.getTaskDefinitionId());
+        taskEntity.setTaskDefinitionKey(taskBuilder.getTaskDefinitionKey());
+        taskEntity.setScopeId(taskBuilder.getScopeId());
+        taskEntity.setScopeType(taskBuilder.getScopeType());
+        insert(taskEntity);
+
+        TaskEntity enrichedTaskEntity = this.taskServiceConfiguration.getTaskPostProcessor().enrich(taskEntity);
+        update(enrichedTaskEntity, false);
+        taskBuilder.getIdentityLinks().forEach(
+                identityLink -> {
+                    if (identityLink.getGroupId() != null) {
+                        enrichedTaskEntity.addGroupIdentityLink(identityLink.getGroupId(), identityLink.getType());
+                    } else if (identityLink.getUserId() != null) {
+                        enrichedTaskEntity.addUserIdentityLink(identityLink.getUserId(), identityLink.getType());
+                    }
+                }
+        );
+
+        if (getEventDispatcher() != null && getEventDispatcher().isEnabled() && taskEntity.getAssignee() != null) {
+            getEventDispatcher().dispatchEvent(
+                    FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, taskEntity));
+        }
+
+        if (taskServiceConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+            taskServiceConfiguration.getHistoricTaskService().recordTaskCreated(taskEntity);
+        }
+
+        return enrichedTaskEntity;
+    }
+
+    protected IdentityLinkService getIdentityLinkService() {
+        return CommandContextUtil.getIdentityLinkServiceConfiguration().getIdentityLinkService();
     }
 
     @Override
@@ -144,14 +197,6 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     @Override
     public void deleteTasksByExecutionId(String executionId) {
         taskDataManager.deleteTasksByExecutionId(executionId);
-    }
-
-    @Override
-    public void insert(TaskEntity taskEntity, boolean fireCreateEvent) {
-        if (StringUtils.isEmpty(taskEntity.getId())) {
-            taskEntity.setId(this.taskServiceConfiguration.getIdGenerator().getNextId());
-        }
-        super.insert(taskEntity, fireCreateEvent);
     }
 
     public TaskDataManager getTaskDataManager() {

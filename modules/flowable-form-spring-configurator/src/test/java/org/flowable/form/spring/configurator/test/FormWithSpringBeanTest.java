@@ -15,7 +15,7 @@ package org.flowable.form.spring.configurator.test;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.form.api.FormDeployment;
@@ -24,6 +24,7 @@ import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.model.ExpressionFormField;
 import org.flowable.form.model.SimpleFormModel;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -32,6 +33,7 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration("classpath:flowable-context.xml")
 public class FormWithSpringBeanTest extends SpringFormFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/form/spring/configurator/test/oneTaskWithFormKeyProcess.bpmn20.xml",
         "org/flowable/form/spring/configurator/test/simple.form" })
     public void testFormOnUserTask() {

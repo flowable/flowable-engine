@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.util;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 
@@ -22,16 +23,16 @@ import org.flowable.bpmn.model.Event;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.impl.calendar.BusinessCalendar;
-import org.flowable.engine.common.impl.calendar.CycleBusinessCalendar;
-import org.flowable.engine.common.impl.calendar.DueDateBusinessCalendar;
-import org.flowable.engine.common.impl.calendar.DurationBusinessCalendar;
-import org.flowable.engine.common.impl.el.ExpressionManager;
-import org.flowable.engine.common.impl.runtime.Clock;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.calendar.BusinessCalendar;
+import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
+import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
+import org.flowable.common.engine.impl.calendar.DurationBusinessCalendar;
+import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
@@ -115,6 +116,8 @@ public class TimerUtil {
             // JodaTime support
             duedate = ((DateTime) dueDateValue).toDate();
 
+        } else if (dueDateValue instanceof Duration) {
+        	dueDateString = ((Duration) dueDateValue).toString();
         } else if (dueDateValue instanceof Instant) {
             duedate = Date.from((Instant) dueDateValue);
             

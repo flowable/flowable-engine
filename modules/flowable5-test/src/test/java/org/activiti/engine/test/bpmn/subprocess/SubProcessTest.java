@@ -20,8 +20,8 @@ import java.util.Map;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.impl.runtime.Clock;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -75,7 +75,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         // Setting the clock forward 2 hours 1 second (timer fires in 2 hours) and fire up the job executor
         clock.setCurrentTime(new Date(startTime.getTime() + (2 * 60 * 60 * 1000) + 1000));
         processEngineConfiguration.setClock(clock);
-        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(5000L, 100L);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(7000L, 100L);
 
         // The subprocess should be left, and the escalated task should be active
         org.flowable.task.api.Task escalationTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
@@ -164,7 +164,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         // Setting the clock forward 1 hour 1 second (timer fires in 1 hour) and fire up the job executor
         clock.setCurrentTime(new Date(startTime.getTime() + (60 * 60 * 1000) + 1000));
         processEngineConfiguration.setClock(clock);
-        waitForJobExecutorToProcessAllJobs(5000L, 50L);
+        waitForJobExecutorToProcessAllJobs(7000L, 50L);
 
         // The inner subprocess should be destroyed, and the escalated task should be active
         org.flowable.task.api.Task escalationTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();

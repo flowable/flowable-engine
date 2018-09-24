@@ -12,11 +12,13 @@
  */
 package org.flowable.cmmn.converter.export;
 
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
+import org.flowable.cmmn.converter.util.CmmnXmlUtil;
+import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanItemDefinition;
-
-import javax.xml.stream.XMLStreamWriter;
 
 public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinition> implements CmmnXmlConstants {
 
@@ -33,13 +35,17 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
      * @param xtw                the XML to write the definition to
      * @throws Exception in case of write exception
      */
-    public void writePlanItemDefinition(T planItemDefinition, XMLStreamWriter xtw) throws Exception {
+    public void writePlanItemDefinition(CmmnModel model, T planItemDefinition, XMLStreamWriter xtw) throws Exception {
         writePlanItemDefinitionStartElement(planItemDefinition, xtw);
         writePlanItemDefinitionCommonAttributes(planItemDefinition, xtw);
         writePlanItemDefinitionSpecificAttributes(planItemDefinition, xtw);
-        writePlanItemDefinitionCommonElements(planItemDefinition, xtw);
+        boolean didWriteExtensionElement = writePlanItemDefinitionCommonElements(model, planItemDefinition, xtw);
+        didWriteExtensionElement = writePlanItemDefinitionExtensionElements(model, planItemDefinition, didWriteExtensionElement, xtw);
+        if (didWriteExtensionElement) {
+            xtw.writeEndElement();
+        }
         writePlanItemDefinitionDefaultItemControl(planItemDefinition, xtw);
-        writePlanItemDefinitionBody(planItemDefinition, xtw);
+        writePlanItemDefinitionBody(model, planItemDefinition, xtw);
         writePlanItemDefinitionEndElement(xtw);
     }
 
@@ -48,7 +54,7 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
     }
 
     /**
-     * Subclasses must override this methoe to provide the xml element tag value of this planItemDefintion
+     * Subclasses must override this method to provide the xml element tag value of this planItemDefintion
      *
      * @param planItemDefinition the plan item definition to write
      * @return the value of the xml element tag to write
@@ -83,12 +89,18 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
      * @param xtw                the XML to write the definition to
      * @throws Exception in case of write exception
      */
-    protected void writePlanItemDefinitionCommonElements(T planItemDefinition, XMLStreamWriter xtw) throws Exception {
+    protected boolean writePlanItemDefinitionCommonElements(CmmnModel model, T planItemDefinition, XMLStreamWriter xtw) throws Exception {
         if (StringUtils.isNotEmpty(planItemDefinition.getDocumentation())) {
             xtw.writeStartElement(ELEMENT_DOCUMENTATION);
             xtw.writeCharacters(planItemDefinition.getDocumentation());
             xtw.writeEndElement();
         }
+        
+        return CmmnXmlUtil.writeExtensionElements(planItemDefinition, false, model.getNamespaces(), xtw);
+    }
+    
+    protected boolean writePlanItemDefinitionExtensionElements(CmmnModel model, T planItemDefinition, boolean didWriteExtensionElement, XMLStreamWriter xtw) throws Exception {
+        return didWriteExtensionElement;
     }
 
     protected void writePlanItemDefinitionDefaultItemControl(T planItemDefinition, XMLStreamWriter xtw) throws Exception {
@@ -104,7 +116,7 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
      * @param xtw                the XML to write the definition to
      * @throws Exception in case of write exception
      */
-    protected void writePlanItemDefinitionBody(T planItemDefinition, XMLStreamWriter xtw) throws Exception {
+    protected void writePlanItemDefinitionBody(CmmnModel model, T planItemDefinition, XMLStreamWriter xtw) throws Exception {
 
     }
 

@@ -51,8 +51,8 @@ import org.activiti.engine.impl.interceptor.Session;
 import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.activiti.engine.impl.variable.DeserializedObject;
 import org.apache.ibatis.session.SqlSession;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.variable.api.event.FlowableVariableEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,7 +104,7 @@ public class DbSqlSession implements Session {
 
         Class<? extends PersistentObject> clazz = persistentObject.getClass();
         if (!insertedObjects.containsKey(clazz)) {
-            insertedObjects.put(clazz, new ArrayList<PersistentObject>());
+            insertedObjects.put(clazz, new ArrayList<>());
         }
 
         insertedObjects.get(clazz).add(persistentObject);

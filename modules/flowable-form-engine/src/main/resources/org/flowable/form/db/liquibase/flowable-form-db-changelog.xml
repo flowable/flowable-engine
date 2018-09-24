@@ -98,5 +98,11 @@
         </addColumn>
     
     </changeSet>
+    
+    <changeSet id="3" author="flowable">
+    
+        <dropColumn columnName="PARENT_DEPLOYMENT_ID_" tableName="ACT_FO_FORM_DEFINITION" />
+        
+    </changeSet>
 
 </databaseChangeLog>

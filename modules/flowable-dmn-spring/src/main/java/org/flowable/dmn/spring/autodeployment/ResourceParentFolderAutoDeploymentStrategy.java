@@ -20,9 +20,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.engine.common.api.FlowableException;
 import org.springframework.core.io.Resource;
 
 /**
@@ -78,7 +78,7 @@ public class ResourceParentFolderAutoDeploymentStrategy extends AbstractAutoDepl
         for (final Resource resource : resources) {
             final String parentFolderName = determineGroupName(resource);
             if (resourcesMap.get(parentFolderName) == null) {
-                resourcesMap.put(parentFolderName, new HashSet<Resource>());
+                resourcesMap.put(parentFolderName, new HashSet<>());
             }
             resourcesMap.get(parentFolderName).add(resource);
         }

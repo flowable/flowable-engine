@@ -12,12 +12,13 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.StateTransition;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemTransition;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
@@ -34,15 +35,12 @@ public abstract class AbstractDeletePlanItemInstanceOperation extends AbstractCh
         
         boolean isRepeating = isRepeatingOnDelete();
         if (isRepeating) {
-            
+
             // Create new repeating instance
-            PlanItemInstanceEntity newPlanItemInstanceEntity = createNewPlanItemInstance();
-            CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(newPlanItemInstanceEntity);
-            
-            // Set repetition counter
-            int counter = getRepetitionCounter(planItemInstanceEntity);
-            setRepetitionCounter(newPlanItemInstanceEntity, ++counter);
-            
+            PlanItemInstanceEntity newPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, true);
+            newPlanItemInstanceEntity.setState(PlanItemInstanceState.WAITING_FOR_REPETITION);
+            // Plan item creation "for Repetition"
+            CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceForRepetitionOperation(newPlanItemInstanceEntity);
             // Plan item doesn't have entry criteria (checked in the if condition) and immediately goes to ACTIVE
             CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(newPlanItemInstanceEntity);
         }
@@ -51,9 +49,12 @@ public abstract class AbstractDeletePlanItemInstanceOperation extends AbstractCh
         CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).delete(planItemInstanceEntity);
     }
 
-    protected PlanItemInstanceEntity createNewPlanItemInstance() {
-        return copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity);
-    }
+    /**
+     * Implementing classes should be aware that unlike extending from AbstractChangePlanItemInstanceStateOperation, this
+     * method will be executed just before the deleting the entity
+     */
+    @Override
+    protected abstract void internalExecute();
 
     protected boolean isRepeatingOnDelete() {
         

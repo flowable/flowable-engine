@@ -25,15 +25,17 @@ import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.UserTask;
-import org.flowable.engine.common.impl.util.io.InputStreamSource;
+import org.flowable.common.engine.impl.util.io.InputStreamSource;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
  */
 public class EventJavaTest extends PluggableFlowableTestCase {
 
+    @Test
     public void testStartEventWithExecutionListener() throws Exception {
         BpmnModel bpmnModel = new BpmnModel();
         Process process = new Process();

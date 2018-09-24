@@ -19,9 +19,9 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.dynamic.DynamicEmbeddedSubProcessBuilder;
 import org.flowable.engine.impl.dynamic.DynamicSubProcessParallelInjectUtil;
@@ -56,8 +56,9 @@ public class InjectEmbeddedSubProcessInProcessInstanceCmd extends AbstractDynami
                         originalProcessDefinitionEntity, newDeploymentEntity, commandContext);
     }
 
+    @Override
     protected void updateExecutions(CommandContext commandContext, ProcessDefinitionEntity processDefinitionEntity,
-            ExecutionEntity processInstance, List<ExecutionEntity> childExecutions) {
+                                    ExecutionEntity processInstance, List<ExecutionEntity> childExecutions) {
 
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         

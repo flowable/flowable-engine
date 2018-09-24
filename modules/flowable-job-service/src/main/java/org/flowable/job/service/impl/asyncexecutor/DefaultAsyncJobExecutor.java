@@ -20,9 +20,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
@@ -35,9 +35,35 @@ import org.slf4j.LoggerFactory;
 public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultAsyncJobExecutor.class);
-
-    protected Thread timerJobAcquisitionThread;
+    
+    /**
+     * If true (default), the thread for acquiring async jobs will be started.
+     */
+    protected boolean isAsyncJobAcquisitionEnabled = true;
+    
+    /**
+     * If true (default), the thread for acquiring timer jobs will be started.
+     */
+    protected boolean isTimerJobAcquisitionEnabled = true;
+    
+    /**
+     * If true (default), the thread for acquiring expired jobs will be started.
+     */
+    protected boolean isResetExpiredJobEnabled = true;
+    
+    /**
+     * Thread responsible for async job acquisition.
+     */
     protected Thread asyncJobAcquisitionThread;
+
+    /**
+     * Thread responsible for timer job acquisition.
+     */
+    protected Thread timerJobAcquisitionThread;
+    
+    /**
+     * Thread responsible for resetting the expired jobs.
+     */
     protected Thread resetExpiredJobThread;
 
     /**
@@ -72,6 +98,8 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
      * The time (in seconds) that is waited to gracefully shut down the threadpool used for job execution
      */
     protected long secondsToWaitOnShutdown = 60L;
+    
+    protected String threadPoolNamingPattern = "flowable-async-job-executor-thread-%d";
 
     @Override
     protected boolean executeAsyncJob(final JobInfo job, Runnable runnable) {
@@ -79,33 +107,36 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
             executorService.execute(runnable);
             return true;
         } catch (RejectedExecutionException e) {
+            unacquireJobAfterRejection(job);
 
-            // When a RejectedExecutionException is caught, this means that the queue for holding the jobs
-            // that are to be executed is full and can't store more.
-            // The job is now 'unlocked', meaning that the lock owner/time is set to null,
-            // so other executors can pick the job up (or this async executor, the next time the
-            // acquire query is executed.
-
-            // This can happen while already in a command context (for example in a transaction listener
-            // after the async executor has been hinted that a new async job is created)
-            // or not (when executed in the acquire thread runnable)
-
-            CommandContext commandContext = Context.getCommandContext();
-            if (commandContext != null) {
-                CommandContextUtil.getJobManager(commandContext).unacquire(job);
-
-            } else {
-                jobServiceConfiguration.getCommandExecutor().execute(new Command<Void>() {
-                    @Override
-                    public Void execute(CommandContext commandContext) {
-                        CommandContextUtil.getJobManager(commandContext).unacquire(job);
-                        return null;
-                    }
-                });
-            }
-
-            // Job queue full, returning true so (if wanted) the acquiring can be throttled
+            // Job queue full, returning false so (if wanted) the acquiring can be throttled
             return false;
+        }
+    }
+
+    protected void unacquireJobAfterRejection(final JobInfo job) {
+        // When a RejectedExecutionException is caught, this means that the queue for holding the jobs
+        // that are to be executed is full and can't store more.
+        // The job is now 'unlocked', meaning that the lock owner/time is set to null,
+        // so other executors can pick the job up (or this async executor, the next time the
+        // acquire query is executed.
+
+        // This can happen while already in a command context (for example in a transaction listener
+        // after the async executor has been hinted that a new async job is created)
+        // or not (when executed in the acquire thread runnable)
+
+        CommandContext commandContext = Context.getCommandContext();
+        if (commandContext != null) {
+            CommandContextUtil.getJobManager(commandContext).unacquire(job);
+
+        } else {
+            jobServiceConfiguration.getCommandExecutor().execute(new Command<Void>() {
+                @Override
+                public Void execute(CommandContext commandContext) {
+                    CommandContextUtil.getJobManager(commandContext).unacquire(job);
+                    return null;
+                }
+            });
         }
     }
 
@@ -143,7 +174,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
         if (executorService == null) {
             LOGGER.info("Creating executor service with corePoolSize {}, maxPoolSize {} and keepAliveTime {}", corePoolSize, maxPoolSize, keepAliveTime);
 
-            BasicThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("flowable-async-job-executor-thread-%d").build();
+            BasicThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern(threadPoolNamingPattern).build();
             executorService = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MILLISECONDS, threadPoolQueue, threadFactory);
         }
     }
@@ -169,17 +200,21 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
 
     /** Starts the acquisition thread */
     protected void startJobAcquisitionThread() {
-        if (asyncJobAcquisitionThread == null) {
-            asyncJobAcquisitionThread = new Thread(asyncJobsDueRunnable);
+        if (isAsyncJobAcquisitionEnabled) {
+            if (asyncJobAcquisitionThread == null) {
+                asyncJobAcquisitionThread = new Thread(asyncJobsDueRunnable);
+            }
+            asyncJobAcquisitionThread.start();
         }
-        asyncJobAcquisitionThread.start();
     }
 
     protected void startTimerAcquisitionThread() {
-        if (timerJobAcquisitionThread == null) {
-            timerJobAcquisitionThread = new Thread(timerJobRunnable);
+        if (isTimerJobAcquisitionEnabled) {
+            if (timerJobAcquisitionThread == null) {
+                timerJobAcquisitionThread = new Thread(timerJobRunnable);
+            }
+            timerJobAcquisitionThread.start();
         }
-        timerJobAcquisitionThread.start();
     }
 
     /** Stops the acquisition thread */
@@ -207,10 +242,12 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
 
     /** Starts the reset expired jobs thread */
     protected void startResetExpiredJobsThread() {
-        if (resetExpiredJobThread == null) {
-            resetExpiredJobThread = new Thread(resetExpiredJobsRunnable);
+        if (isResetExpiredJobEnabled) {
+            if (resetExpiredJobThread == null) {
+                resetExpiredJobThread = new Thread(resetExpiredJobsRunnable);
+            }
+            resetExpiredJobThread.start();
         }
-        resetExpiredJobThread.start();
     }
 
     /** Stops the reset expired jobs thread */
@@ -224,6 +261,30 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
 
             resetExpiredJobThread = null;
         }
+    }
+    
+    public boolean isAsyncJobAcquisitionEnabled() {
+        return isAsyncJobAcquisitionEnabled;
+    }
+
+    public void setAsyncJobAcquisitionEnabled(boolean isAsyncJobAcquisitionEnabled) {
+        this.isAsyncJobAcquisitionEnabled = isAsyncJobAcquisitionEnabled;
+    }
+
+    public boolean isTimerJobAcquisitionEnabled() {
+        return isTimerJobAcquisitionEnabled;
+    }
+
+    public void setTimerJobAcquisitionEnabled(boolean isTimerJobAcquisitionEnabled) {
+        this.isTimerJobAcquisitionEnabled = isTimerJobAcquisitionEnabled;
+    }
+
+    public boolean isResetExpiredJobEnabled() {
+        return isResetExpiredJobEnabled;
+    }
+
+    public void setResetExpiredJobEnabled(boolean isResetExpiredJobEnabled) {
+        this.isResetExpiredJobEnabled = isResetExpiredJobEnabled;
     }
 
     public Thread getTimerJobAcquisitionThread() {
@@ -324,4 +385,12 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
         this.executorService = executorService;
     }
 
+    public String getThreadPoolNamingPattern() {
+        return threadPoolNamingPattern;
+    }
+
+    public void setThreadPoolNamingPattern(String threadPoolNamingPattern) {
+        this.threadPoolNamingPattern = threadPoolNamingPattern;
+    }
+    
 }

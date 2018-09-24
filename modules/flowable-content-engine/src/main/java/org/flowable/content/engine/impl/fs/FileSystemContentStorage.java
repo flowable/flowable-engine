@@ -77,8 +77,8 @@ public class FileSystemContentStorage implements ContentStorage {
         BigInteger id = fetchNewId();
         File contentFile = new File(rootFolder, converter.getPathForId(id).getPath());
         long length = -1;
-        try {
-            length = IOUtils.copy(contentStream, new FileOutputStream(contentFile, false));
+        try (FileOutputStream fos = new FileOutputStream(contentFile, false)) {
+            length = IOUtils.copy(contentStream, fos);
         } catch (FileNotFoundException e) {
             throw new ContentStorageException("Content file was deleted or no longer accessible prior to writing: " + contentFile, e);
         } catch (IOException e) {
@@ -128,9 +128,9 @@ public class FileSystemContentStorage implements ContentStorage {
             tempFileCreated = true;
 
             // Write the actual content to the file
-            FileOutputStream tempOutputStream = new FileOutputStream(tempContentFile);
-            length = IOUtils.copy(contentStream, tempOutputStream);
-            IOUtils.closeQuietly(tempOutputStream);
+            try (FileOutputStream tempOutputStream = new FileOutputStream(tempContentFile)) {
+                length = IOUtils.copy(contentStream, tempOutputStream);
+            }
 
             // Rename the content file first
             if (contentFile.renameTo(oldContentFile)) {

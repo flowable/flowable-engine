@@ -16,12 +16,13 @@ package org.flowable.task.service.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.scope.ScopeTypes;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -88,6 +89,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String candidateGroup;
     private List<String> candidateGroups;
     protected String involvedUser;
+    protected Set<String> involvedGroups;
     protected boolean ignoreAssigneeValue;
     protected Integer taskPriority;
     protected Integer taskMinPriority;
@@ -118,6 +120,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected boolean includeIdentityLinks;
     protected List<HistoricTaskInstanceQueryImpl> orQueryObjects = new ArrayList<>();
     protected HistoricTaskInstanceQueryImpl currentOrQueryObject;
+
     protected boolean inOrStatement;
 
     public HistoricTaskInstanceQueryImpl() {
@@ -136,6 +139,12 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
         checkQueryOk();
+        
+        TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration(commandContext);
+        if (taskServiceConfiguration.getHistoricTaskQueryInterceptor() != null) {
+            taskServiceConfiguration.getHistoricTaskQueryInterceptor().beforeHistoricTaskQueryExecute(this);
+        }
+        
         return CommandContextUtil.getHistoricTaskInstanceEntityManager(commandContext).findHistoricTaskInstanceCountByQueryCriteria(this);
     }
 
@@ -144,17 +153,26 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         ensureVariablesInitialized();
         checkQueryOk();
         List<HistoricTaskInstance> tasks = null;
+        
+        TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration(commandContext);
+        if (taskServiceConfiguration.getHistoricTaskQueryInterceptor() != null) {
+            taskServiceConfiguration.getHistoricTaskQueryInterceptor().beforeHistoricTaskQueryExecute(this);
+        }
+        
         if (includeTaskLocalVariables || includeProcessVariables || includeIdentityLinks) {
             tasks = CommandContextUtil.getHistoricTaskInstanceEntityManager(commandContext).findHistoricTaskInstancesAndRelatedEntitiesByQueryCriteria(this);
         } else {
             tasks = CommandContextUtil.getHistoricTaskInstanceEntityManager(commandContext).findHistoricTaskInstancesByQueryCriteria(this);
         }
 
-        TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
         if (tasks != null && taskServiceConfiguration.getInternalTaskLocalizationManager() != null && taskServiceConfiguration.isEnableLocalization()) {
             for (HistoricTaskInstance task : tasks) {
                 taskServiceConfiguration.getInternalTaskLocalizationManager().localize(task, locale, withLocalizationFallback);
             }
+        }
+        
+        if (taskServiceConfiguration.getHistoricTaskQueryInterceptor() != null) {
+            taskServiceConfiguration.getHistoricTaskQueryInterceptor().afterHistoricTaskQueryExecute(this, tasks);
         }
 
         return tasks;
@@ -1257,6 +1275,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     @Override
     public HistoricTaskInstanceQuery taskInvolvedUser(String involvedUser) {
+        if (involvedUser == null) {
+            throw new FlowableIllegalArgumentException("involved user is null");
+        }
+
         if (inOrStatement) {
             this.currentOrQueryObject.involvedUser = involvedUser;
         } else {
@@ -1264,7 +1286,23 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         }
         return this;
     }
-    
+
+    @Override
+    public HistoricTaskInstanceQuery taskInvolvedGroups(Set<String> involvedGroups) {
+        if (involvedGroups == null) {
+            throw new FlowableIllegalArgumentException("Involved groups are null");
+        }
+        if (involvedGroups.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Involved groups are empty");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.involvedGroups = involvedGroups;
+        } else {
+            this.involvedGroups = involvedGroups;
+        }
+        return this;
+    }
+
     @Override
     public HistoricTaskInstanceQuery ignoreAssigneeValue() {
         if (inOrStatement) {
@@ -1815,6 +1853,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public String getInvolvedUser() {
         return involvedUser;
+    }
+
+    public Set<String> getInvolvedGroups() {
+        return involvedGroups;
     }
 
     public boolean isIgnoreAssigneeValue() {

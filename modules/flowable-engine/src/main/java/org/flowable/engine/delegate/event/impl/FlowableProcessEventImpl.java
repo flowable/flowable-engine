@@ -12,9 +12,9 @@
  */
 package org.flowable.engine.delegate.event.impl;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.impl.event.FlowableEventImpl;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.event.FlowableEngineEventImpl;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.FlowableProcessEngineEvent;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -22,7 +22,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 /**
  * @author Joram Barrez
  */
-public class FlowableProcessEventImpl extends FlowableEventImpl implements FlowableProcessEngineEvent {
+public class FlowableProcessEventImpl extends FlowableEngineEventImpl implements FlowableProcessEngineEvent {
 
     public FlowableProcessEventImpl(FlowableEngineEventType type) {
         super(type);

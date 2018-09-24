@@ -16,7 +16,7 @@ package org.flowable.cmmn.rest.service.api.repository;
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,7 +47,7 @@ public class CaseDefinitionResourceDataResource extends BaseDeploymentResourceDa
     }
 
     /**
-     * Returns the {@link CaseDefinition} that is requested. Throws the right exceptions when bad request was made or definition is not found.
+     * Returns the {@link CaseDefinition} that is requested. Throws the right exceptions when bad request was made or definition was not found.
      */
     protected CaseDefinition getCaseDefinitionFromRequest(String caseDefinitionId) {
         CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionId).singleResult();

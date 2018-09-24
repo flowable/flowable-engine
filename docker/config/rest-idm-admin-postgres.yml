@@ -1,4 +1,4 @@
-version: '2'
+version: '3.6'
 services:
     flowable-rest-app:
         image: flowable/flowable-rest
@@ -10,15 +10,13 @@ services:
             - SPRING_DATASOURCE_URL=jdbc:postgresql://flowable-db:5432/flowable
             - SPRING_DATASOURCE_USERNAME=flowable
             - SPRING_DATASOURCE_PASSWORD=flowable
-            - FLOWABLE.REST.APP.ADMIN.USER-ID=rest-admin
-            - FLOWABLE.REST.APP.ADMIN.PASSWORD=test
-            - FLOWABLE.REST.APP.ADMIN.FIRST-NAME=Rest
-            - FLOWABLE.REST.APP.ADMIN.LAST-NAME=Admin
+            - FLOWABLE_REST_APP_ADMIN_USER-ID=rest-admin
+            - FLOWABLE_REST_APP_ADMIN_PASSWORD=test
+            - FLOWABLE_REST_APP_ADMIN_FIRST-NAME=Rest
+            - FLOWABLE_REST_APP_ADMIN_LAST-NAME=Admin
         ports:
             - 9977:9977
-        depends_on:
-            - flowable-db
-        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-rest.war"]
+        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
     flowable-admin-app:
         image: flowable/flowable-admin
         depends_on:
@@ -33,8 +31,8 @@ services:
             - SPRING_DATASOURCE_PASSWORD=flowable
             - FLOWABLE_COMMON_APP_IDM-URL=http://flowable-idm-app:8080/flowable-idm
             - FLOWABLE_COMMON_APP_IDM-REDIRECT-URL=http://localhost:8080/flowable-idm
-            - FLOWABLE_COMMON_APP_IDM-ADMIN.USER=admin
-            - FLOWABLE_COMMON_APP_IDM-ADMIN.PASSWORD=test
+            - FLOWABLE_COMMON_APP_IDM-ADMIN_USER=admin
+            - FLOWABLE_COMMON_APP_IDM-ADMIN_PASSWORD=test
             - FLOWABLE_ADMIN_APP_SERVER-CONFIG_PROCESS_SERVER-ADDRESS=http://flowable-rest-app
             - FLOWABLE_ADMIN_APP_SERVER-CONFIG_PROCESS_PORT=9977
             - FLOWABLE_ADMIN_APP_SERVER-CONFIG_PROCESS_CONTEXT-ROOT=flowable-rest
@@ -55,9 +53,13 @@ services:
             - FLOWABLE_ADMIN_APP_SERVER-CONFIG_CONTENT_PORT=9977
             - FLOWABLE_ADMIN_APP_SERVER-CONFIG_CONTENT_CONTEXT-ROOT=flowable-rest
             - FLOWABLE_ADMIN_APP_SERVER-CONFIG_CONTENT_REST-ROOT=content-api
+            - FLOWABLE_ADMIN_APP_SERVER-CONFIG_APP_SERVER-ADDRESS=http://flowable-task-app
+            - FLOWABLE_ADMIN_APP_SERVER-CONFIG_APP_PORT=9977
+            - FLOWABLE_ADMIN_APP_SERVER-CONFIG_APP_CONTEXT-ROOT=flowable-task
+            - FLOWABLE_ADMIN_APP_SERVER-CONFIG_APP_REST-ROOT=app-api
         ports:
             - 9988:9988
-        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-admin.war"]
+        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
     flowable-idm-app:
         image: flowable/flowable-idm
         depends_on:
@@ -70,8 +72,14 @@ services:
             - SPRING_DATASOURCE_PASSWORD=flowable
         ports:
             - 8080:8080
-        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-idm.war"]
+        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
     flowable-db:
-        extends:
-            file: postgres.yml
-            service: flowable-postgres
+        image: postgres:9.6-alpine
+        container_name: flowable-postgres
+        environment:
+            - POSTGRES_PASSWORD=flowable
+            - POSTGRES_USER=flowable
+            - POSTGRES_DB=flowable
+        ports:
+            - 5433:5432
+        command: postgres

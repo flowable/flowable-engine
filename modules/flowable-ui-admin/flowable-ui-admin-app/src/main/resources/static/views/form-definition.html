@@ -20,8 +20,8 @@
 						<tr class="property">
 							<td class="property-name" translate="FORM-DEFINITION.DEPLOYMENT-ID"></td>
 							<td><a ng-href="#/form-deployment/{{form.deploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{form.deploymentId}}</a></td>
-							<td class="property-name" translate="FORM-DEFINITION.PARENT-DEPLOYMENT-ID"></td>
-							<td><a ng-href="#/deployment/{{form.parentDeploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{form.parentDeploymentId}}</a></td>
+							<td ng-if="form.parentDeploymentId" class="property-name" translate="FORM-DEFINITION.PARENT-DEPLOYMENT-ID"></td>
+							<td ng-if="form.parentDeploymentId"><a ng-href="#/app-deployment/{{form.parentDeploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{form.parentDeploymentId}}</a></td>
 						</tr>
 						<tr class="property">
 							<td class="property-name" translate="FORM-DEFINITION.DESCRIPTION"></td>

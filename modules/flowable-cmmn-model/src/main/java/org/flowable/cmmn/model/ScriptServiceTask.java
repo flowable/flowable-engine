@@ -12,9 +12,9 @@
  */
 package org.flowable.cmmn.model;
 
-import org.flowable.engine.common.api.FlowableException;
-
 import java.util.Optional;
+
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * @author Dennis

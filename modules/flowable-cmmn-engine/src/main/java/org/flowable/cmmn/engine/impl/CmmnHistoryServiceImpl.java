@@ -17,12 +17,15 @@ import java.util.List;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstanceQuery;
+import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricVariableInstanceQuery;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricTaskInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricIdentityLinksForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricIdentityLinksForTaskCmd;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoricVariableInstanceQueryImpl;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
@@ -30,16 +33,20 @@ import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
 /**
  * @author Joram Barrez
  */
-public class CmmnHistoryServiceImpl extends ServiceImpl implements CmmnHistoryService {
-    
+public class CmmnHistoryServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfiguration> implements CmmnHistoryService {
+
+    public CmmnHistoryServiceImpl(CmmnEngineConfiguration engineConfiguration) {
+        super(engineConfiguration);
+    }
+
     @Override
     public HistoricCaseInstanceQuery createHistoricCaseInstanceQuery() {
-        return cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().createHistoricCaseInstanceQuery();
+        return configuration.getHistoricCaseInstanceEntityManager().createHistoricCaseInstanceQuery();
     }
 
     @Override
     public HistoricMilestoneInstanceQuery createHistoricMilestoneInstanceQuery() {
-        return cmmnEngineConfiguration.getHistoricMilestoneInstanceEntityManager().createHistoricMilestoneInstanceQuery();
+        return configuration.getHistoricMilestoneInstanceEntityManager().createHistoricMilestoneInstanceQuery();
     }
     
     @Override
@@ -47,7 +54,11 @@ public class CmmnHistoryServiceImpl extends ServiceImpl implements CmmnHistorySe
         return new CmmnHistoricVariableInstanceQueryImpl(commandExecutor);
     }
 
-    
+    @Override
+    public HistoricPlanItemInstanceQuery createHistoricPlanItemInstanceQuery() {
+        return configuration.getHistoricPlanItemInstanceEntityManager().createHistoricPlanItemInstanceQuery();
+    }
+
     @Override
     public void deleteHistoricCaseInstance(String caseInstanceId) {
         commandExecutor.execute(new DeleteHistoricCaseInstanceCmd(caseInstanceId));

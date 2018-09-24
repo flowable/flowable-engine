@@ -466,7 +466,7 @@
       }
     },
     {
-      "sourceType": "org.flowable.spring.boot.dmn.FlowableDmnProperties",
+      "sourceType": "org.flowable.spring.boot.FlowableProperties",
       "name": "flowable.process-definition-location-suffixes",
       "defaultValue": "**.bpmn20.xml,**.bpmn"
     },

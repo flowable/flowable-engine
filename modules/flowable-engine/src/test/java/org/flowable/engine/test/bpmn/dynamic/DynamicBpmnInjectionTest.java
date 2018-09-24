@@ -19,7 +19,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.GraphicInfo;
 import org.flowable.bpmn.model.SubProcess;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.dynamic.DynamicEmbeddedSubProcessBuilder;
@@ -33,9 +33,11 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.Test;
 
 public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
 
+    @Test
     public void testInjectUserTaskInProcessInstance() {
         deployOneTaskTestProcess();
 
@@ -58,6 +60,7 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     public void testInjectParallelTask() {
         deployOneTaskTestProcess();
 
@@ -88,6 +91,7 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
     
+    @Test
     @org.flowable.engine.test.Deployment
     public void testOneTaskDi() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -157,6 +161,7 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());  
     }
 
+    @Test
     public void testInjectParallelTaskNoJoin() {
         deployOneTaskTestProcess();
 
@@ -191,6 +196,7 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     public void testInjectParallelSubProcessSimple() {
         deployOneTaskTestProcess();
         Deployment deployment = repositoryService.createDeployment()
@@ -228,6 +234,7 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     public void testInjectParallelSubProcessComplex() {
         Deployment deployment = repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/engine/test/bpmn/dynamic/dynamic_test_process01.bpmn")
@@ -287,6 +294,7 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
     
+    @Test
     public void testInjectParallelTask2Times() {
         deployOneTaskTestProcess();
 
@@ -337,6 +345,7 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     public void testInjectParallelSubProcessComplexNoJoin() {
         Deployment deployment = repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/engine/test/bpmn/dynamic/dynamic_test_process01.bpmn")

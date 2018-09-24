@@ -13,7 +13,10 @@
 
 package org.flowable.engine.test.api.history;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.flowable.engine.impl.test.HistoryTestHelper;
@@ -23,6 +26,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
@@ -30,11 +34,12 @@ import org.flowable.variable.api.history.HistoricVariableInstance;
 public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
 
   @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelNoneProcess.bpmn20.xml" })
+  @Test
   public void testNoneHistoryLevel() {
     // With a clean ProcessEngine, no instances should be available
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     
-    HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+    HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
     
     assertTrue(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count() == 0);
 
@@ -50,7 +55,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
     taskService.setVariableLocal(task.getId(), "localVar1", "test2");
     taskService.complete(task.getId());
     
-    HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+    HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
     
     assertTrue(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count() == 0);
     assertTrue(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count() == 0);
@@ -59,11 +64,12 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
   }
   
   @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelActivityProcess.bpmn20.xml" })
+  @Test
   public void testActivityHistoryLevel() {
     // With a clean ProcessEngine, no instances should be available
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     
-    HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+    HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
     
     assertTrue(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count() == 1);
 
@@ -83,7 +89,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
     taskService.setVariableLocal(task.getId(), "localVar1", "test2");
     taskService.complete(task.getId());
     
-    HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+    HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
     
     assertTrue(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count() == 1);
     assertTrue(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count() == 0);
@@ -116,11 +122,12 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
   }
   
   @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelAuditProcess.bpmn20.xml" })
+  @Test
   public void testAuditHistoryLevel() {
     // With a clean ProcessEngine, no instances should be available
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     
-    HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+    HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
     
     assertTrue(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count() == 1);
 
@@ -134,13 +141,13 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
     taskService.setOwner(task.getId(), "test");
     taskService.setAssignee(task.getId(), "anotherTest");
     taskService.setPriority(task.getId(), 40);
-    Date dueDateValue = new Date();
-    taskService.setDueDate(task.getId(), dueDateValue);
+    Calendar dueDateCalendar = new GregorianCalendar();
+    taskService.setDueDate(task.getId(), dueDateCalendar.getTime());
     taskService.setVariable(task.getId(), "var1", "test");
     taskService.setVariableLocal(task.getId(), "localVar1", "test2");
     taskService.complete(task.getId());
     
-    HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+    HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
     
     assertTrue(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count() == 1);
     assertTrue(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count() == 1);
@@ -150,7 +157,9 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
     assertEquals("test", historicTask.getOwner());
     assertEquals("anotherTest", historicTask.getAssignee());
     assertEquals(40, historicTask.getPriority());
-    assertEquals(dueDateValue, historicTask.getDueDate());
+    
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    assertEquals(simpleDateFormat.format(dueDateCalendar.getTime()), simpleDateFormat.format(historicTask.getDueDate()));
     
     assertEquals(2, historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count());
     
@@ -179,11 +188,12 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
   }
   
   @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelFullProcess.bpmn20.xml" })
+  @Test
   public void testFullHistoryLevel() {
     // With a clean ProcessEngine, no instances should be available
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     
-    HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+    HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
     
     assertTrue(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count() == 1);
 
@@ -203,7 +213,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
     taskService.setVariableLocal(task.getId(), "localVar1", "test2");
     taskService.complete(task.getId());
     
-    HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+    HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
     
     assertTrue(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count() == 1);
     assertTrue(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count() == 1);
@@ -213,7 +223,9 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
     assertEquals("test", historicTask.getOwner());
     assertEquals("anotherTest", historicTask.getAssignee());
     assertEquals(40, historicTask.getPriority());
-    assertEquals(dueDateValue, historicTask.getDueDate());
+    
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    assertEquals(simpleDateFormat.format(dueDateValue), simpleDateFormat.format(historicTask.getDueDate()));
     
     assertEquals(2, historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count());
     

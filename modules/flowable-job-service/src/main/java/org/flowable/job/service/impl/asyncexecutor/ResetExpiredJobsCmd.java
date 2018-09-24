@@ -14,9 +14,8 @@ package org.flowable.job.service.impl.asyncexecutor;
 
 import java.util.Collection;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.job.api.Job;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntityManager;
 import org.flowable.job.service.impl.util.CommandContextUtil;
@@ -37,7 +36,7 @@ public class ResetExpiredJobsCmd implements Command<Void> {
     @Override
     public Void execute(CommandContext commandContext) {
         for (String jobId : jobIds) {
-            Job job = CommandContextUtil.getJobEntityManager(commandContext).findById(jobId);
+            JobInfoEntity job = jobEntityManager.findById(jobId);
             CommandContextUtil.getJobManager(commandContext).unacquire(job);
             jobEntityManager.resetExpiredJob(jobId);
         }

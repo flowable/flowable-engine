@@ -16,10 +16,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * Example of using the exclusive gateway.
@@ -36,6 +37,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
     /**
      * The test process has an OR gateway where, the 'input' variable is used to select the expected outgoing sequence flow.
      */
+    @Test
     @Deployment
     public void testDecisionFunctionality() {
 

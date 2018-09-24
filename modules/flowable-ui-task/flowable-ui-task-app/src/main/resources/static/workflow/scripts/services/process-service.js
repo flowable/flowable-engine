@@ -28,10 +28,10 @@ angular.module('flowableApp').service('ProcessService', ['$http', '$q', '$rootSc
             return deferred.promise;
         };
 
-        this.getProcessDefinitions = function(deploymentKey) {
+        this.getProcessDefinitions = function(appDefinitionKey) {
             var url = FLOWABLE.CONFIG.contextRoot + '/app/rest/process-definitions?latest=true';
-            if (deploymentKey) {
-                url += '&deploymentKey=' + deploymentKey;
+            if (appDefinitionKey) {
+                url += '&appDefinitionKey=' + appDefinitionKey;
             }
             return httpAsPromise(
                 {

@@ -190,22 +190,10 @@
       <if test="withoutTenantId">
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
       </if>
+      <if test="withoutTaskId">
+        and (RES.TASK_ID_ is null)
+      </if>
     </where>
   </sql>
     
-  <!-- mysql specific sql -->
-  <select id="selectFormInstancesByQueryCriteria" databaseId="mysql" parameterType="org.flowable.form.engine.impl.FormInstanceQueryImpl" resultMap="formInstanceResultMap">
-  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
-    <include refid="selectFormInstancesByQueryCriteriaSql"/>
-    ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
-  </select>
-
-  <!-- mysql specific sql -->
-  <select id="selectFormInstancesCountByQueryCriteria" databaseId="mysql" parameterType="org.flowable.form.engine.impl.FormInstanceQueryImpl" resultType="long">
-    select distinct count(RES.ID_)
-    <include refid="selectFormInstancesByQueryCriteriaSql"/>
-  </select>
-
 </mapper>

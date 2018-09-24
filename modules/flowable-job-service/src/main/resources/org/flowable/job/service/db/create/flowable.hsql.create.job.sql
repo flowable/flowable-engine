@@ -114,6 +114,7 @@ create table ACT_RU_HISTORY_JOB (
     CUSTOM_VALUES_ID_ varchar(64),
     ADV_HANDLER_CFG_ID_ varchar(64),
     CREATE_TIME_ timestamp,
+    SCOPE_TYPE_ varchar(255),
     TENANT_ID_ varchar(255) default '',
     primary key (ID_)
 );
@@ -186,4 +187,4 @@ create index ACT_IDX_DJOB_SCOPE on ACT_RU_DEADLETTER_JOB(SCOPE_ID_, SCOPE_TYPE_)
 create index ACT_IDX_DJOB_SUB_SCOPE on ACT_RU_DEADLETTER_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_DJOB_SCOPE_DEF on ACT_RU_DEADLETTER_JOB(SCOPE_DEFINITION_ID_, SCOPE_TYPE_); 
 
-insert into ACT_GE_PROPERTY values ('job.schema.version', '6.3.1.0', 1);
+insert into ACT_GE_PROPERTY values ('job.schema.version', '6.4.0.0', 1);

@@ -14,9 +14,9 @@ package org.flowable.engine.test.cfg.executioncount;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.ValidateExecutionRelatedEntityCountCfgCmd;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
@@ -26,6 +26,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,11 +57,10 @@ public class ChangeConfigAndRebootEngineTest extends ResourceFlowableTestCase {
     protected void rebootEngine(boolean newExecutionRelationshipCountValue) {
         LOGGER.info("Rebooting engine");
         this.newExecutionRelationshipCountValue = newExecutionRelationshipCountValue;
-        closeDownProcessEngine();
-        initializeProcessEngine();
-        initializeServices();
+        rebootEngine();
     }
 
+    @Test
     @Deployment
     public void testChangeExecutionCountSettingAndRebootengine() {
 

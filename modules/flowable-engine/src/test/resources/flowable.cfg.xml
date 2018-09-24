@@ -10,7 +10,7 @@
     <property name="jdbcDriver" value="org.h2.Driver" />
     <property name="jdbcUsername" value="sa" />
     <property name="jdbcPassword" value="" />
-    
+
     <!-- Database configurations -->
     <property name="databaseSchemaUpdate" value="drop-create" />
 
@@ -24,12 +24,12 @@
     <!-- job executor configurations -->
     <property name="asyncExecutor" ref="asyncExecutor" />
     <property name="asyncExecutorActivate" value="false" />
-    
+
     <property name="asyncFailedJobWaitTime" value="1" />
 
     <!-- mail server configurations -->
     <property name="mailServerPort" value="5025" />
-    
+
     <property name="mailServers">
       <map>
         <entry key="myEmailTenant">
@@ -45,7 +45,7 @@
         </entry>
       </map>
     </property>
-    
+
     <property name="history" value="full" />
     <property name="asyncHistoryEnabled" value="false" />
     <property name="enableProcessDefinitionHistoryLevel" value="true" />
@@ -53,7 +53,7 @@
     <property name="enableProcessDefinitionInfoCache" value="true" />
 
     <property name="clock">
-        <bean class="org.flowable.engine.common.impl.util.TestClockImpl" />
+        <bean class="org.flowable.common.engine.impl.util.TestClockImpl" />
     </property>
   </bean>
   

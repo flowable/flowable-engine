@@ -13,14 +13,11 @@
 package org.flowable.job.service.impl.persistence.entity;
 
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
 
@@ -30,7 +27,7 @@ import org.flowable.job.service.JobServiceConfiguration;
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEntity, Serializable {
+public class HistoryJobEntityImpl extends AbstractJobServiceEntity implements HistoryJobEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -44,11 +41,12 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
     protected JobByteArrayRef exceptionByteArrayRef;
     protected String exceptionMessage;
 
-    protected String tenantId = JobServiceConfiguration.NO_TENANT_ID;
-
     protected String lockOwner;
     protected Date lockExpirationTime;
     protected Date createTime;
+    protected String scopeType;
+    
+    protected String tenantId = JobServiceConfiguration.NO_TENANT_ID;
 
     @Override
     public Object getPersistentState() {
@@ -63,6 +61,8 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
 
         persistentState.put("lockOwner", lockOwner);
         persistentState.put("lockExpirationTime", lockExpirationTime);
+        
+        persistentState.put("scopeType", scopeType);
 
         return persistentState;
     }
@@ -231,6 +231,14 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
     @Override
     public void setLockExpirationTime(Date claimedUntil) {
         this.lockExpirationTime = claimedUntil;
+    }
+    
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
     }
 
     private String getJobByteArrayRefAsString(JobByteArrayRef jobByteArrayRef) {

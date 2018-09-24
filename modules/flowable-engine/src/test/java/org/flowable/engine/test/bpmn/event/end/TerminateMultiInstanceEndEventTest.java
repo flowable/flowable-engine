@@ -14,17 +14,19 @@ package org.flowable.engine.test.bpmn.event.end;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testMultiInstanceEmbeddedSubprocess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("terminateMi");
@@ -53,6 +55,7 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         assertEquals(0, runtimeService.createExecutionQuery().count());
     }
 
+    @Test
     @Deployment
     public void testMultiInstanceEmbeddedSubprocessSequential() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("terminateMi");
@@ -79,6 +82,7 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         assertEquals(0, runtimeService.createExecutionQuery().count());
     }
 
+    @Test
     @Deployment
     public void testMultiInstanceEmbeddedSubprocess2() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("terminateMi");
@@ -109,6 +113,7 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         assertEquals(0, runtimeService.createExecutionQuery().count());
     }
 
+    @Test
     @Deployment
     public void testMultiInstanceEmbeddedSubprocess2Sequential() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("terminateMi");
@@ -138,6 +143,7 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         assertEquals(0, runtimeService.createExecutionQuery().count());
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/bpmn/event/end/TerminateMultiInstanceEndEventTest.testTerminateMiCallactivity-parentProcess.bpmn20.xml",
             "org/flowable/engine/test/bpmn/event/end/TerminateMultiInstanceEndEventTest.testTerminateMiCallactivity-calledProcess.bpmn20.xml"
@@ -172,6 +178,7 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         assertEquals("Parallel task", afterMiTasks.get(1).getName());
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/bpmn/event/end/TerminateMultiInstanceEndEventTest.testTerminateMiCallactivity-parentProcessSequential.bpmn20.xml",
             "org/flowable/engine/test/bpmn/event/end/TerminateMultiInstanceEndEventTest.testTerminateMiCallactivity-calledProcess.bpmn20.xml"
@@ -201,6 +208,7 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         assertEquals("Parallel task", afterMiTasks.get(1).getName());
     }
 
+    @Test
     @Deployment
     public void testTerminateNestedMiEmbeddedSubprocess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
@@ -248,6 +256,7 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         assertEquals(0, runtimeService.createExecutionQuery().count());
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/event/end/TerminateMultiInstanceEndEventTest.testTerminateNestedMiEmbeddedSubprocess.bpmn20.xml")
     public void testTerminateNestedMiEmbeddedSubprocess2() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
@@ -260,6 +269,7 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
 
     }
 
+    @Test
     @Deployment
     public void testTerminateNestedMiEmbeddedSubprocessWithOneLoopCardinality() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(

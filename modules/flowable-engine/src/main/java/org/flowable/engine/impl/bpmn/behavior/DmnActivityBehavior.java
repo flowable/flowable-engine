@@ -18,19 +18,20 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.Task;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.DelegateHelper;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -47,7 +48,6 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
     protected static final String EXPRESSION_DECISION_TABLE_RESPONCE_HANDLER = "decisionTaskReponseHandler";
 
     protected Task task;
-    
     protected DmnResponseHandler handler;
 
     public DmnActivityBehavior(Task task) {
@@ -94,12 +94,13 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         }
 
         ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(execution.getProcessDefinitionId());
+        Deployment deployment = CommandContextUtil.getDeploymentEntityManager().findById(processDefinition.getDeploymentId());
 
         DmnRuleService ruleService = CommandContextUtil.getDmnRuleService();
 
         DecisionExecutionAuditContainer decisionExecutionAuditContainer = ruleService.createExecuteDecisionBuilder()
                 .decisionKey(finaldecisionTableKeyValue)
-                .parentDeploymentId(processDefinition.getDeploymentId())
+                .parentDeploymentId(deployment.getParentDeploymentId())
                 .instanceId(execution.getProcessInstanceId())
                 .executionId(execution.getId())
                 .activityId(task.getId())
@@ -130,38 +131,48 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
                     Expression expression = expressionManager.createExpression(throwErrorString);
                     Object expressionValue = expression.getValue(execution);
                     
-                    if (expressionValue != null && expressionValue instanceof Boolean && ((Boolean) expressionValue)) {
+                    if (expressionValue instanceof Boolean && ((Boolean) expressionValue)) {
                         throw new FlowableException("DMN decision table with key " + finaldecisionTableKeyValue + " did not hit any rules for the provided input.");
                     }
                 }
             }
         }
-        //Call custom decision table response handler if present
-        FieldExtension handlerFieldExtension = DelegateHelper.getFlowElementField(execution, EXPRESSION_DECISION_TABLE_RESPONCE_HANDLER);
-        boolean handlerFound = false;
-        if(handlerFieldExtension != null) {
-	        String handlerName = handlerFieldExtension.getStringValue();
-	        if(!StringUtils.isBlank(handlerName)) {
-		        try {
+        
+		// Call custom decision table response handler if present
+		FieldExtension handlerFieldExtension = DelegateHelper.getFlowElementField(execution,
+				EXPRESSION_DECISION_TABLE_RESPONCE_HANDLER);
+		boolean handlerFound = false;
+		if (handlerFieldExtension != null) {
+			String handlerName = handlerFieldExtension.getStringValue();
+			if (!StringUtils.isBlank(handlerName)) {
+				try {
 					Class<?> handlerClass = Class.forName(handlerName);
 					handler = (DmnResponseHandler) handlerClass.newInstance();
-					handler.handleResponse(execution, decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue);
+					handler.handleResponse(execution, decisionExecutionAuditContainer.getDecisionResult(),
+							finaldecisionTableKeyValue);
 					handlerFound = true;
 				} catch (ClassNotFoundException e) {
-	                throw new FlowableException("DMN response handler with reference " + handlerName + " is not found.");
+					throw new FlowableException(
+							"DMN response handler with reference " + handlerName + " is not found.");
 				} catch (InstantiationException e) {
-					throw new FlowableException("DMN response handler with reference " + handlerName + " could not be instatiated.");
+					throw new FlowableException(
+							"DMN response handler with reference " + handlerName + " could not be instatiated.");
 				} catch (IllegalAccessException e) {
-					throw new FlowableException("DMN response handler with reference " + handlerName + " is not accessible.");
+					throw new FlowableException(
+							"DMN response handler with reference " + handlerName + " is not accessible.");
 				} catch (ClassCastException e) {
-					throw new FlowableException("DMN response handler with reference " + handlerName + " is not an instance of DmnResponseHandler.");
+					throw new FlowableException("DMN response handler with reference " + handlerName
+							+ " is not an instance of DmnResponseHandler.");
 				}
-	        }
-        }
-        if(!handlerFound && handler != null) {
-			handler.handleResponse(execution, decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue);
-        }
+			}
+		}
+		if (!handlerFound && handler != null) {
+			handler.handleResponse(execution, decisionExecutionAuditContainer.getDecisionResult(),
+					finaldecisionTableKeyValue);
+		}
+
         setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue, execution, processEngineConfiguration.getObjectMapper());
+
         leave(execution);
     }
 
@@ -169,6 +180,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         if (executionResult == null || executionResult.isEmpty()) {
             return;
         }
+
         // multiple rule results
         // put on execution as JSON array; each entry contains output id (key) and output value (value)
         if (executionResult.size() > 1) {

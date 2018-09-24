@@ -12,20 +12,23 @@
  */
 package org.flowable.cmmn.converter.export;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.Task;
 import org.flowable.cmmn.model.TaskWithFieldExtensions;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
 public class TaskExport extends AbstractPlanItemDefinitionExport<Task> {
 
 
-    protected static <T extends TaskWithFieldExtensions> void writeTaskFieldExtensions(T task, XMLStreamWriter xtw) throws XMLStreamException {
+    protected static <T extends TaskWithFieldExtensions> boolean writeTaskFieldExtensions(T task, boolean didWriteExtensionElement, XMLStreamWriter xtw) throws XMLStreamException {
         if (task.getFieldExtensions().size() > 0) {
-            xtw.writeStartElement(ELEMENT_EXTENSIONS);
+            if (!didWriteExtensionElement) {
+                xtw.writeStartElement(ELEMENT_EXTENSION_ELEMENTS);
+                didWriteExtensionElement = true;
+            }
 
             for (FieldExtension fieldExtension : task.getFieldExtensions()) {
                 xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_FIELD, FLOWABLE_EXTENSIONS_NAMESPACE);
@@ -41,9 +44,9 @@ public class TaskExport extends AbstractPlanItemDefinitionExport<Task> {
                 xtw.writeEndElement();
                 xtw.writeEndElement();
             }
-
-            xtw.writeEndElement();
         }
+        
+        return didWriteExtensionElement;
     }
 
     protected static <T extends Task> void writeCommonTaskAttributes(T task, XMLStreamWriter xtw) throws Exception {

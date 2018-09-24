@@ -106,7 +106,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
         }
 
         if (urls == null) {
-            urls = Collections.enumeration(new ArrayList<URL>());
+            urls = Collections.enumeration(new ArrayList<>());
         }
 
         return urls;

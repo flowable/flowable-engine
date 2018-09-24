@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="testSimpleCaseFlow">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+            <planItem id="planItemStageOne" name="PlanItem Stage One" definitionRef="stageOne">
+                <entryCriterion id="stageOneCriterion" sentryRef="sentryStageOne"/>
+            </planItem>
+            <planItem id="planItemTaskA" name="PlanItem Task A" definitionRef="taskA">
+                <itemControl>
+                    <manualActivationRule></manualActivationRule>
+                </itemControl>
+            </planItem>
+            <planItem id="planItemMilestoneOne" name="PlanItem Milestone One" definitionRef="milestoneOne">
+                <entryCriterion id="milestoneOneCriterion" sentryRef="sentryMilestoneOne"/>
+            </planItem>
+            <sentry id="sentryMilestoneOne">
+                <planItemOnPart sourceRef="planItemTaskA">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="sentryStageOne">
+                <planItemOnPart sourceRef="planItemMilestoneOne">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <task id="taskA" name="A"/>
+            <milestone id="milestoneOne" name="Milestone One"/>
+            <stage id="stageOne">
+                <planItem id="planItemTaskB" name="PlanItem Task B" definitionRef="taskB"/>
+                <task id="taskB" name="B"/>
+            </stage>
+        </casePlanModel>
+    </case>
+</definitions>

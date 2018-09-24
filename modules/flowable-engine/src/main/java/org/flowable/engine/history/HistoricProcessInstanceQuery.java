@@ -18,8 +18,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.flowable.common.engine.api.query.Query;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.api.query.Query;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 
 /**
@@ -100,6 +100,11 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
      * Only select the historic process instances with which the user with the given id is involved.
      */
     HistoricProcessInstanceQuery involvedUser(String userId);
+
+    /**
+     * Only select the historic process instances with which the group with the given ids are involved.
+     */
+    HistoricProcessInstanceQuery involvedGroups(Set<String> groups);
 
     /**
      * Only select process instances which had a global variable with the given value when they ended. The type only applies to already ended process instances, otherwise use a

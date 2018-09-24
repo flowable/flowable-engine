@@ -17,30 +17,31 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.impl.cfg.TransactionState;
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.impl.cfg.TransactionState;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
-import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class TransactionEventListenerTest extends PluggableFlowableTestCase {
 
     protected TestTransactionEventListener onCommitListener;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
 
         onCommitListener = new TestTransactionEventListener(TransactionState.COMMITTED.name());
         processEngineConfiguration.getEventDispatcher().addEventListener(onCommitListener);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         TestTransactionEventListener.eventsReceived.clear();
         if (onCommitListener != null) {
@@ -48,9 +49,9 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
             onCommitListener = null;
         }
 
-        super.tearDown();
     }
 
+    @Test
     public void testRegularProcessExecution() {
 
         assertEquals(0, TestTransactionEventListener.eventsReceived.size());
@@ -66,7 +67,7 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
             expectedCreatedEvents = 7;
         }
         if (processEngineConfiguration.isAsyncHistoryEnabled()) {
-            waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+            waitForHistoryJobExecutorToProcessAllJobs(7000L, 200L);
         }
 
         assertEquals(expectedCreatedEvents, TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.ENTITY_CREATED.name()).size());
@@ -79,8 +80,13 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
         taskService.complete(taskService.createTaskQuery().singleResult().getId());
         assertEquals(1, TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.TASK_COMPLETED.name()).size());
         assertEquals(1, TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.PROCESS_COMPLETED.name()).size());
+        
+        if (processEngineConfiguration.isAsyncHistoryEnabled()) {
+            waitForHistoryJobExecutorToProcessAllJobs(7000L, 200L);
+        }
     }
 
+    @Test
     @Deployment
     public void testProcessExecutionWithRollback() {
 
@@ -103,6 +109,7 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
         assertEquals(1, runtimeService.createProcessInstanceQuery().count());
     }
 
+    @Test
     @Deployment
     public void testProcessDefinitionDefinedEventListener() {
 

@@ -1,0 +1,13 @@
+{
+    "key": "ruleUsageExample",
+    "name": "Form for rule usage example",
+    "fields": [
+        {
+            "id": "input1",
+            "name": "Input1",
+            "type": "text",
+            "required": false,
+            "placeholder": "empty"
+        }
+    ]
+}

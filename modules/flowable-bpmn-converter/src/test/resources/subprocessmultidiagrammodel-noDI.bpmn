@@ -11,7 +11,7 @@
     <startEvent id="start1"></startEvent>
     <endEvent id="sid-194696BA-1A7D-47D7-95A9-A77390D25048"></endEvent>
     <userTask id="userTask1" name="User task 1" activiti:async="true" activiti:exclusive="false" activiti:candidateUsers="kermit" activiti:candidateGroups="management"></userTask>
-    <subProcess id="subprocess1" name="Sub Process" isExpanded="false">
+    <subProcess id="subprocess1" name="Sub Process">
       <dataObject id="dObj7" name="StringSubTest" itemSubjectRef="xsd:string"/>
       <dataObject id="dObj8" name="BooleanSubTest" itemSubjectRef="xsd:boolean"/>
       <dataObject id="dObj9" name="DateSubTest" itemSubjectRef="xsd:datetime"/>

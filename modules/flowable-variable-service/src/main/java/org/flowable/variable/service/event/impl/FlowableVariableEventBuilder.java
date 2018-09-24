@@ -12,10 +12,10 @@
  */
 package org.flowable.variable.service.event.impl;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.impl.event.FlowableEntityEventImpl;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
 import org.flowable.variable.api.event.FlowableVariableEvent;
 import org.flowable.variable.api.types.VariableType;
 

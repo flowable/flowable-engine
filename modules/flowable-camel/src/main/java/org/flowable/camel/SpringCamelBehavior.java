@@ -14,9 +14,9 @@ package org.flowable.camel;
 
 import org.apache.camel.CamelContext;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.context.Context;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.util.Flowable5Util;
@@ -31,7 +31,8 @@ public abstract class SpringCamelBehavior extends CamelBehavior {
     
 	private static final long serialVersionUID = 1L;
 
-	protected void setAppropriateCamelContext(DelegateExecution execution) {
+	@Override
+    protected void setAppropriateCamelContext(DelegateExecution execution) {
         // Get the appropriate String representation of the CamelContext object
         // from ActivityExecution (if available).
         String camelContextValue = getStringFromField(camelContext, execution);

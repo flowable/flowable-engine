@@ -16,10 +16,10 @@ package org.flowable.form.engine.impl;
 import java.util.List;
 import java.util.Set;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.AbstractQuery;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.AbstractQuery;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDefinitionQuery;
 import org.flowable.form.engine.impl.util.CommandContextUtil;
@@ -40,8 +40,6 @@ public class FormDefinitionQueryImpl extends AbstractQuery<FormDefinitionQuery, 
     protected String nameLike;
     protected String deploymentId;
     protected Set<String> deploymentIds;
-    protected String parentDeploymentId;
-    protected String parentDeploymentIdLike;
     protected String key;
     protected String keyLike;
     protected String resourceName;
@@ -139,24 +137,6 @@ public class FormDefinitionQueryImpl extends AbstractQuery<FormDefinitionQuery, 
             throw new FlowableIllegalArgumentException("ids are null");
         }
         this.deploymentIds = deploymentIds;
-        return this;
-    }
-
-    @Override
-    public FormDefinitionQueryImpl parentDeploymentId(String parentDeploymentId) {
-        if (parentDeploymentId == null) {
-            throw new FlowableIllegalArgumentException("parentDeploymentId is null");
-        }
-        this.parentDeploymentId = parentDeploymentId;
-        return this;
-    }
-
-    @Override
-    public FormDefinitionQueryImpl parentDeploymentIdLike(String parentDeploymentIdLike) {
-        if (parentDeploymentIdLike == null) {
-            throw new FlowableIllegalArgumentException("parentDeploymentIdLike is null");
-        }
-        this.parentDeploymentIdLike = parentDeploymentIdLike;
         return this;
     }
 

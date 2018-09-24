@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.test;
 
+import java.util.Date;
+
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
@@ -19,12 +21,13 @@ import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.repository.Deployment;
 import org.junit.After;
 import org.junit.Before;
@@ -46,6 +49,7 @@ public abstract class AbstractProcessEngineIntegrationTest {
     protected CmmnHistoryService cmmnHistoryService;
     protected CmmnManagementService cmmnManagementService;
 
+    protected ManagementService processEngineManagementService;
     protected RepositoryService processEngineRepositoryService;
     protected RuntimeService processEngineRuntimeService;
     protected TaskService processEngineTaskService;
@@ -68,6 +72,7 @@ public abstract class AbstractProcessEngineIntegrationTest {
         this.cmmnHistoryService = cmmnEngineConfiguration.getCmmnHistoryService();
         this.cmmnManagementService = cmmnEngineConfiguration.getCmmnManagementService();
 
+        this.processEngineManagementService = processEngine.getManagementService();
         this.processEngineRepositoryService = processEngine.getRepositoryService();
         this.processEngineRuntimeService = processEngine.getRuntimeService();
         this.processEngineTaskService = processEngine.getTaskService();
@@ -78,6 +83,12 @@ public abstract class AbstractProcessEngineIntegrationTest {
         for (Deployment deployment : processEngineRepositoryService.createDeploymentQuery().list()) {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
         }
+    }
+    
+    protected Date setCmmnClockFixedToCurrentTime() {
+        Date date = new Date();
+        cmmnEngineConfiguration.getClock().setCurrentTime(date);
+        return date;
     }
 
 }

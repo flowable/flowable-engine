@@ -22,10 +22,10 @@ import org.flowable.bpmn.model.Event;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.TimerEventDefinition;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.engine.common.impl.calendar.BusinessCalendar;
-import org.flowable.engine.common.impl.calendar.CycleBusinessCalendar;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.calendar.BusinessCalendar;
+import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
@@ -104,7 +104,7 @@ public class DefaultInternalJobManager implements InternalJobManager {
                 }
 
             } else {
-                // In case the job has an executionId, but the Execution is not found,
+                // In case the job has an executionId, but the Execution was not found,
                 // it means that for example for a boundary timer event on a user task,
                 // the task has been completed and the Execution and job have been removed.
                 return false;

@@ -18,11 +18,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.common.impl.runtime.Clock;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.ldap.LDAPIdentityServiceImpl;
 import org.junit.After;

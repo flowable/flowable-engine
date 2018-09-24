@@ -12,7 +12,7 @@
  */
 package org.flowable.job.service.impl.asyncexecutor.multitenant;
 
-import org.flowable.engine.common.impl.cfg.multitenant.TenantInfoHolder;
+import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.ResetExpiredJobsRunnable;
 

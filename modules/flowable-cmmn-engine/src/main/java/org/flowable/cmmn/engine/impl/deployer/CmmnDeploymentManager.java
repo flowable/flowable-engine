@@ -24,12 +24,12 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionQueryImpl;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.repository.EngineDeployment;
-import org.flowable.engine.common.impl.EngineDeployer;
-import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.repository.EngineDeployment;
+import org.flowable.common.engine.impl.EngineDeployer;
+import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 
 public class CmmnDeploymentManager {
 
@@ -71,7 +71,7 @@ public class CmmnDeploymentManager {
         CaseDefinition caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKey(caseDefinitionKey);
 
         if (caseDefinition == null) {
-            throw new FlowableObjectNotFoundException("no cases deployed with key '" + caseDefinitionKey + "'", CaseDefinition.class);
+            throw new FlowableObjectNotFoundException("no case definition deployed with key '" + caseDefinitionKey + "'", CaseDefinition.class);
         }
         caseDefinition = resolveCaseDefinition(caseDefinition).getCaseDefinition();
         return caseDefinition;
@@ -80,7 +80,7 @@ public class CmmnDeploymentManager {
     public CaseDefinition findDeployedLatestCaseDefinitionByKeyAndTenantId(String caseDefinitionKey, String tenantId) {
         CaseDefinition caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, tenantId);
         if (caseDefinition == null) {
-            throw new FlowableObjectNotFoundException("no casees deployed with key '" + caseDefinitionKey + "' for tenant identifier '" + tenantId + "'", CaseDefinition.class);
+            throw new FlowableObjectNotFoundException("no case definition deployed with key '" + caseDefinitionKey + "' for tenant identifier '" + tenantId + "'", CaseDefinition.class);
         }
         caseDefinition = resolveCaseDefinition(caseDefinition).getCaseDefinition();
         return caseDefinition;
@@ -90,7 +90,7 @@ public class CmmnDeploymentManager {
         CaseDefinition caseDefinition = (CaseDefinitionEntity) caseDefinitionEntityManager
                 .findCaseDefinitionByKeyAndVersionAndTenantId(caseDefinitionKey, caseDefinitionVersion, tenantId);
         if (caseDefinition == null) {
-            throw new FlowableObjectNotFoundException("no casees deployed with key = '" + caseDefinitionKey + "' and version = '" + caseDefinitionVersion + "'", CaseDefinition.class);
+            throw new FlowableObjectNotFoundException("no case definition deployed with key = '" + caseDefinitionKey + "' and version = '" + caseDefinitionVersion + "'", CaseDefinition.class);
         }
         caseDefinition = resolveCaseDefinition(caseDefinition).getCaseDefinition();
         return caseDefinition;

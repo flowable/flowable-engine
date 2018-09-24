@@ -22,14 +22,13 @@ import java.util.Map;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.api.repository.EngineResource;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
+import org.flowable.common.engine.api.repository.EngineResource;
 
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class CmmnDeploymentEntityImpl extends AbstractEntityNoRevision implements CmmnDeploymentEntity, Serializable {
+public class CmmnDeploymentEntityImpl extends AbstractCmmnEngineNoRevisionEntity implements CmmnDeploymentEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -51,6 +50,7 @@ public class CmmnDeploymentEntityImpl extends AbstractEntityNoRevision implement
 
     }
 
+    @Override
     public void addResource(CmmnResourceEntity resource) {
         if (resources == null) {
             resources = new HashMap<>();
@@ -58,6 +58,7 @@ public class CmmnDeploymentEntityImpl extends AbstractEntityNoRevision implement
         resources.put(resource.getName(), resource);
     }
 
+    @Override
     public Map<String, EngineResource> getResources() {
         if (resources == null && id != null) {
             List<CmmnResourceEntity> resourcesList = CommandContextUtil.getCmmnResourceEntityManager().findResourcesByDeploymentId(id);
@@ -69,15 +70,18 @@ public class CmmnDeploymentEntityImpl extends AbstractEntityNoRevision implement
         return resources;
     }
 
+    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("category", this.category);
         persistentState.put("tenantId", tenantId);
+        persistentState.put("parentDeploymentId", parentDeploymentId);
         return persistentState;
     }
 
     // Deployed artifacts manipulation ////////////////////////////////////////////
 
+    @Override
     public void addDeployedArtifact(Object deployedArtifact) {
         if (deployedArtifacts == null) {
             deployedArtifacts = new HashMap<>();
@@ -93,6 +97,7 @@ public class CmmnDeploymentEntityImpl extends AbstractEntityNoRevision implement
         artifacts.add(deployedArtifact);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <T> List<T> getDeployedArtifacts(Class<T> clazz) {
         for (Class<?> deployedArtifactsClass : deployedArtifacts.keySet()) {
@@ -105,62 +110,77 @@ public class CmmnDeploymentEntityImpl extends AbstractEntityNoRevision implement
 
     // getters and setters ////////////////////////////////////////////////////////
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public String getCategory() {
         return category;
     }
 
+    @Override
     public void setCategory(String category) {
         this.category = category;
     }
 
+    @Override
     public String getKey() {
         return key;
     }
 
+    @Override
     public void setKey(String key) {
         this.key = key;
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
 
+    @Override
     public String getParentDeploymentId() {
         return parentDeploymentId;
     }
 
+    @Override
     public void setParentDeploymentId(String parentDeploymentId) {
         this.parentDeploymentId = parentDeploymentId;
     }
 
+    @Override
     public void setResources(Map<String, EngineResource> resources) {
         this.resources = resources;
     }
 
+    @Override
     public Date getDeploymentTime() {
         return deploymentTime;
     }
 
+    @Override
     public void setDeploymentTime(Date deploymentTime) {
         this.deploymentTime = deploymentTime;
     }
 
+    @Override
     public boolean isNew() {
         return isNew;
     }
 
+    @Override
     public void setNew(boolean isNew) {
         this.isNew = isNew;
     }
@@ -175,6 +195,7 @@ public class CmmnDeploymentEntityImpl extends AbstractEntityNoRevision implement
         return null;
     }
 
+    @Override
     public String getEngineVersion() {
         return null;
     }

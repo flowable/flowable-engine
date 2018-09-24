@@ -15,8 +15,8 @@ package org.flowable.engine.test.api.v6;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
@@ -26,9 +26,11 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testOneTaskProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -81,6 +83,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testOneNestedTaskProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneNestedTaskProcess");
@@ -187,6 +190,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testSubProcessWithTimer() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessWithTimer");
@@ -293,6 +297,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testSubProcessEvents() {
         SubProcessEventListener listener = new SubProcessEventListener();

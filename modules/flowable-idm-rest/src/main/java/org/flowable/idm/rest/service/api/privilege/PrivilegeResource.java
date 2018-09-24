@@ -17,11 +17,12 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.User;
+import org.flowable.idm.rest.service.api.IdmRestApiInterceptor;
 import org.flowable.idm.rest.service.api.IdmRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,6 +48,9 @@ public class PrivilegeResource {
 
     @Autowired
     protected IdmIdentityService identityService;
+    
+    @Autowired(required=false)
+    protected IdmRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get a single privilege", tags = { "Privileges" })
     @ApiResponses(value = {
@@ -59,6 +63,10 @@ public class PrivilegeResource {
         
         if (privilege == null) {
             throw new FlowableObjectNotFoundException("Could not find privilege with id " + privilegeId, Privilege.class);
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessPrivilegeInfoById(privilege);
         }
         
         List<User> users = identityService.getUsersWithPrivilege(privilege.getId());

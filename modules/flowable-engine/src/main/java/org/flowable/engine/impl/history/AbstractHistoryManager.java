@@ -22,10 +22,10 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SequenceFlow;
-import org.flowable.engine.common.impl.cfg.IdGenerator;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.impl.identity.Authentication;
-import org.flowable.engine.common.impl.persistence.cache.EntityCache;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.AbstractManager;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
@@ -44,11 +44,13 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
 
     protected HistoryLevel historyLevel;
     protected boolean enableProcessDefinitionHistoryLevel;
+    protected boolean usePrefixId;
 
-    public AbstractHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration, HistoryLevel historyLevel) {
+    public AbstractHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration, HistoryLevel historyLevel, boolean usePrefixId) {
         super(processEngineConfiguration);
         this.historyLevel = historyLevel;
         this.enableProcessDefinitionHistoryLevel = processEngineConfiguration.isEnableProcessDefinitionHistoryLevel();
+        this.usePrefixId = usePrefixId;
     }
     
     @Override
@@ -312,7 +314,12 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
         String processInstanceId = execution.getProcessInstanceId();
 
         HistoricActivityInstanceEntity historicActivityInstance = getHistoricActivityInstanceEntityManager().create();
-        historicActivityInstance.setId(idGenerator.getNextId());
+        if (usePrefixId) {
+            historicActivityInstance.setId(historicActivityInstance.getIdPrefix() + idGenerator.getNextId());
+        } else {
+            historicActivityInstance.setId(idGenerator.getNextId());
+        }
+        
         historicActivityInstance.setProcessDefinitionId(processDefinitionId);
         historicActivityInstance.setProcessInstanceId(processInstanceId);
         historicActivityInstance.setExecutionId(execution.getId());

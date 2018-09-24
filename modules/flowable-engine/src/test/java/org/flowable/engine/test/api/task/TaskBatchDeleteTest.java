@@ -15,12 +15,14 @@ package org.flowable.engine.test.api.task;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 public class TaskBatchDeleteTest extends PluggableFlowableTestCase {
 
     /**
      * Validating fix for ACT-2070
      */
+    @Test
     @Deployment
     public void testDeleteTaskWithChildren() throws Exception {
 
@@ -44,6 +46,7 @@ public class TaskBatchDeleteTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testDeleteCancelledMultiInstanceTasks() throws Exception {
 
@@ -64,7 +67,7 @@ public class TaskBatchDeleteTest extends PluggableFlowableTestCase {
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(processInstance);
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         
     }
 }

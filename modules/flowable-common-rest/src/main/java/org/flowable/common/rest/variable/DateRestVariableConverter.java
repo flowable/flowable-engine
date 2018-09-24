@@ -16,7 +16,7 @@ package org.flowable.common.rest.variable;
 import java.text.ParseException;
 import java.util.Date;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 

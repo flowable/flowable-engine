@@ -23,13 +23,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.scope.ScopeTypes;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.db.SuspensionState;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.db.SuspensionState;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
 import org.flowable.task.api.DelegationState;
@@ -48,7 +48,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
  * @author Falko Menge
  * @author Tijs Rademakers
  */
-public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, CountingTaskEntity, Serializable {
+public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity implements TaskEntity, CountingTaskEntity, Serializable {
 
     public static final String DELETE_REASON_COMPLETED = "completed";
     public static final String DELETE_REASON_DELETED = "deleted";
@@ -89,7 +89,6 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     protected String taskDefinitionKey;
     protected String formKey;
 
-    protected boolean isDeleted;
     protected boolean isCanceled;
 
     private boolean isCountEnabled;
@@ -133,6 +132,9 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         }
         if (taskDefinitionId != null) {
             persistentState.put("taskDefinitionId", this.taskDefinitionId);
+        }
+        if (taskDefinitionKey != null) {
+            persistentState.put("taskDefinitionKey", this.taskDefinitionKey);
         }
         if (scopeId != null) {
             persistentState.put("scopeId", this.scopeId);
@@ -816,10 +818,12 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         return identityLinkCount;
     }
 
+    @Override
     public int getSubTaskCount() {
         return subTaskCount;
     }
 
+    @Override
     public void setSubTaskCount(int subTaskCount) {
         this.subTaskCount = subTaskCount;
     }

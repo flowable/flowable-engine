@@ -13,6 +13,8 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.caze;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,13 +23,14 @@ import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryProperty;
+import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable;
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable.QueryVariableOperation;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.query.QueryProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -49,6 +52,9 @@ public class BaseCaseInstanceResource {
 
     @Autowired
     protected CmmnRuntimeService runtimeService;
+    
+    @Autowired(required=false)
+    protected CmmnRestApiInterceptor restApiInterceptor;
 
     protected DataResponse<CaseInstanceResponse> getQueryResponse(CaseInstanceQueryRequest queryRequest, Map<String, String> requestParams) {
 
@@ -93,8 +99,25 @@ public class BaseCaseInstanceResource {
         if (Boolean.TRUE.equals(queryRequest.getWithoutTenantId())) {
             query.caseInstanceWithoutTenantId();
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessCaseInstanceInfoWithQuery(query);
+        }
 
-        return new CaseInstancePaginateList(restResponseFactory).paginateList(requestParams, queryRequest, query, "id", allowedSortProperties);
+        return paginateList(requestParams, queryRequest, query, "id", allowedSortProperties, restResponseFactory::createCaseInstanceResponseList);
+    }
+    
+    protected CaseInstance getCaseInstanceFromRequest(String caseInstanceId) {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
+        if (caseInstance == null) {
+            throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.");
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessCaseInstanceInfoById(caseInstance);
+        }
+        
+        return caseInstance;
     }
 
     protected void addVariables(CaseInstanceQuery caseInstanceQuery, List<QueryVariable> variables) {
@@ -173,13 +196,5 @@ public class BaseCaseInstanceResource {
                 throw new FlowableIllegalArgumentException("Unsupported variable query operation: " + variable.getVariableOperation());
             }
         }
-    }
-
-    protected CaseInstance getCaseInstanceFromRequest(String caseInstanceId) {
-        CaseInstance caseInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
-        if (caseInstance == null) {
-            throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.");
-        }
-        return caseInstance;
     }
 }

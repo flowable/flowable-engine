@@ -1,0 +1,43 @@
+version: '3.6'
+services:
+    flowable-admin-app:
+        image: flowable/flowable-admin
+        depends_on:
+            - flowable-admin-db
+            - flowable-idm-app
+        environment:
+            - SERVER_PORT=9988
+            - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://flowable-admin-db:5432/flowable
+            - SPRING_DATASOURCE_USERNAME=flowable
+            - SPRING_DATASOURCE_PASSWORD=flowable
+            - FLOWABLE_COMMON_APP_IDM-URL=http://flowable-idm-app:8080/flowable-idm
+            - FLOWABLE_COMMON_APP_IDM-REDIRECT-URL=http://localhost:8080/flowable-idm
+            - FLOWABLE_COMMON_APP_IDM-ADMIN_USER=admin
+            - FLOWABLE_COMMON_APP_IDM-ADMIN_PASSWORD=test
+        ports:
+            - 9988:9988
+        entrypoint: ["./wait-for-something.sh", "flowable-admin-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
+    flowable-idm-app:
+        image: flowable/flowable-idm
+        depends_on:
+            - flowable-admin-db
+        environment:
+            - SERVER_PORT=8080
+            - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://flowable-admin-db:5432/flowable
+            - SPRING_DATASOURCE_USERNAME=flowable
+            - SPRING_DATASOURCE_PASSWORD=flowable
+        ports:
+            - 8080:8080
+        entrypoint: ["./wait-for-something.sh", "flowable-admin-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
+    flowable-admin-db:
+        image: postgres:9.6-alpine
+        container_name: flowable-admin-postgres
+        environment:
+            - POSTGRES_PASSWORD=flowable
+            - POSTGRES_USER=flowable
+            - POSTGRES_DB=flowable
+        ports:
+            - 5433:5432
+        command: postgres

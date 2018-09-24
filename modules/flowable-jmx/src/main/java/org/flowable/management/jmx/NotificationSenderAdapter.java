@@ -15,7 +15,7 @@ package org.flowable.management.jmx;
 import javax.management.Notification;
 import javax.management.modelmbean.ModelMBeanNotificationBroadcaster;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * @author Saeid Mirzaei

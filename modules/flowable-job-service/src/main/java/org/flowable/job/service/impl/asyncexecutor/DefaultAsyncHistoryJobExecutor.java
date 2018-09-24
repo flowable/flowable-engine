@@ -18,6 +18,7 @@ public class DefaultAsyncHistoryJobExecutor extends DefaultAsyncJobExecutor {
         setTimerRunnableNeeded(false);
         setAcquireRunnableThreadName("flowable-acquire-history-jobs");
         setResetExpiredRunnableName("flowable-reset-expired-history-jobs");
+        setThreadPoolNamingPattern("flowable-async-history-job-executor-thread-%d");
         setAsyncRunnableExecutionExceptionHandler(new UnacquireAsyncHistoryJobExceptionHandler());
     }
     

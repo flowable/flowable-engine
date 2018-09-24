@@ -38,8 +38,13 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.junit.Test;
 
 /**
@@ -804,6 +809,30 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
         caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertEquals("test name", caseInstance.getName());
         assertEquals("test business key", caseInstance.getBusinessKey());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testCaseInstanceStarterIdentityLink() {
+        Authentication.setAuthenticatedUserId("testUser");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        Authentication.setAuthenticatedUserId(null);
+        
+        List<IdentityLink> caseIdentityLinks = cmmnRuntimeService.getIdentityLinksForCaseInstance(caseInstance.getId());
+        assertEquals(1, caseIdentityLinks.size());
+        assertEquals(caseInstance.getId(), caseIdentityLinks.get(0).getScopeId());
+        assertEquals(ScopeTypes.CMMN, caseIdentityLinks.get(0).getScopeType());
+        assertEquals(IdentityLinkType.STARTER, caseIdentityLinks.get(0).getType());
+        assertEquals("testUser", caseIdentityLinks.get(0).getUserId());
+        
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+            List<HistoricIdentityLink> historicIdentityLinks = cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstance.getId());
+            assertEquals(1, historicIdentityLinks.size());
+            assertEquals(caseInstance.getId(), historicIdentityLinks.get(0).getScopeId());
+            assertEquals(ScopeTypes.CMMN, historicIdentityLinks.get(0).getScopeType());
+            assertEquals(IdentityLinkType.STARTER, historicIdentityLinks.get(0).getType());
+            assertEquals("testUser", historicIdentityLinks.get(0).getUserId());
+        }
     }
 
 }

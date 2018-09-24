@@ -12,6 +12,25 @@
  */
 package org.flowable.dmn.rest.service.api.repository;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.flowable.common.engine.api.query.QueryProperty;
+import org.flowable.common.rest.api.DataResponse;
+import org.flowable.dmn.api.DmnDecisionTableQuery;
+import org.flowable.dmn.api.DmnRepositoryService;
+import org.flowable.dmn.engine.impl.DecisionTableQueryProperty;
+import org.flowable.dmn.rest.service.api.DmnRestApiInterceptor;
+import org.flowable.dmn.rest.service.api.DmnRestResponseFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -20,21 +39,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-
-import org.flowable.common.rest.api.DataResponse;
-import org.flowable.dmn.api.DmnDecisionTableQuery;
-import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.engine.impl.DecisionTableQueryProperty;
-import org.flowable.dmn.rest.service.api.DmnRestResponseFactory;
-import org.flowable.engine.common.api.query.QueryProperty;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Yvo Swillens
@@ -60,6 +64,9 @@ public class DecisionTableCollectionResource {
 
     @Autowired
     protected DmnRepositoryService dmnRepositoryService;
+    
+    @Autowired(required=false)
+    protected DmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "List of decision tables", tags = { "Decision Tables" }, nickname = "listDecisionTables")
     @ApiImplicitParams({
@@ -133,7 +140,11 @@ public class DecisionTableCollectionResource {
         if (allRequestParams.containsKey("tenantIdLike")) {
             decisionTableQuery.decisionTableTenantIdLike(allRequestParams.get("tenantIdLike"));
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDecisionTableInfoWithQuery(decisionTableQuery);
+        }
 
-        return new DecisionTablesDmnPaginateList(dmnRestResponseFactory).paginateList(allRequestParams, decisionTableQuery, "name", properties);
+        return paginateList(allRequestParams, decisionTableQuery, "name", properties, dmnRestResponseFactory::createDecisionTableResponseList);
     }
 }

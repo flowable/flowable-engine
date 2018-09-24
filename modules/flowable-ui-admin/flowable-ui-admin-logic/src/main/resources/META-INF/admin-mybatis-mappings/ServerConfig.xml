@@ -2,9 +2,9 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="org.flowable.admin.domain.ServerConfig">
+<mapper namespace="org.flowable.ui.admin.domain.ServerConfig">
 
-	<resultMap id="serverConfigResultMap" type="org.flowable.admin.domain.ServerConfig">
+	<resultMap id="serverConfigResultMap" type="org.flowable.ui.admin.domain.ServerConfig">
 		<id property="id" column="ID_" jdbcType="VARCHAR" />
 		<result property="name" column="NAME_" jdbcType="VARCHAR" />
 		<result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
@@ -18,7 +18,7 @@
 		<result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
 	</resultMap>
 	
-    <insert id="insertServerConfig" parameterType="org.flowable.admin.domain.ServerConfig">
+    <insert id="insertServerConfig" parameterType="org.flowable.ui.admin.domain.ServerConfig">
         insert into ${prefix}ACT_ADM_SERVER_CONFIG (
             ID_,
             NAME_,
@@ -46,7 +46,7 @@
           )
     </insert>
     
-    <update id="updateServerConfig" parameterType="org.flowable.admin.domain.ServerConfig">
+    <update id="updateServerConfig" parameterType="org.flowable.ui.admin.domain.ServerConfig">
         update ${prefix}ACT_ADM_SERVER_CONFIG
         <set>
             NAME_ = #{name, jdbcType=VARCHAR},

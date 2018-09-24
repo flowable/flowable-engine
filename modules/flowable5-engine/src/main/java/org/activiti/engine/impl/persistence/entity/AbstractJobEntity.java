@@ -223,6 +223,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         this.processDefinitionId = processDefinitionId;
     }
     
+    @Override
     public String getScopeId() {
         return scopeId;
     }
@@ -231,6 +232,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         this.scopeId = scopeId;
     }
 
+    @Override
     public String getSubScopeId() {
         return subScopeId;
     }
@@ -239,6 +241,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         this.subScopeId = subScopeId;
     }
 
+    @Override
     public String getScopeType() {
         return scopeType;
     }
@@ -247,6 +250,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         this.scopeType = scopeType;
     }
 
+    @Override
     public String getScopeDefinitionId() {
         return scopeDefinitionId;
     }

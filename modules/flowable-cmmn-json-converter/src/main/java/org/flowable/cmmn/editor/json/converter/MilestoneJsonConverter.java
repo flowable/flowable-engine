@@ -43,6 +43,7 @@ public class MilestoneJsonConverter extends BaseCmmnJsonConverter {
         convertersToJsonMap.put(Milestone.class, MilestoneJsonConverter.class);
     }
 
+    @Override
     protected String getStencilId(BaseElement baseElement) {
         return STENCIL_MILESTONE;
     }

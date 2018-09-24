@@ -12,8 +12,8 @@
  */
 package org.flowable.variable.api.event;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.variable.api.types.VariableType;
 
 /**

@@ -28,10 +28,10 @@ import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.UserTask;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.util.io.BytesStreamSource;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.util.io.BytesStreamSource;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;
@@ -50,7 +50,7 @@ public class DynamicSubProcessJoinInjectUtil extends BaseDynamicSubProcessInject
         
         TaskEntity taskEntity = CommandContextUtil.getTaskService().getTask(taskId);
         FlowElement taskFlowElement = process.getFlowElement(taskEntity.getTaskDefinitionKey(), true);
-        if (taskFlowElement == null || !(taskFlowElement instanceof UserTask)) {
+        if (!(taskFlowElement instanceof UserTask)) {
             throw new FlowableException("No UserTask instance found for task definition key " + taskEntity.getTaskDefinitionKey());
         }
         UserTask userTask = (UserTask) taskFlowElement;
@@ -76,8 +76,8 @@ public class DynamicSubProcessJoinInjectUtil extends BaseDynamicSubProcessInject
         }
         parentSubProcess.setOutgoingFlows(userTask.getOutgoingFlows());
         
-        userTask.setIncomingFlows(new ArrayList<SequenceFlow>());
-        userTask.setOutgoingFlows(new ArrayList<SequenceFlow>());
+        userTask.setIncomingFlows(new ArrayList<>());
+        userTask.setOutgoingFlows(new ArrayList<>());
         
         if (elementGraphicInfo != null) {
             elementGraphicInfo.setExpanded(false);

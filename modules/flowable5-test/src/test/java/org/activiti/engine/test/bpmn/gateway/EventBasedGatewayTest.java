@@ -16,7 +16,7 @@ package org.activiti.engine.test.bpmn.gateway;
 import java.util.Date;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.impl.runtime.Clock;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.EventSubscription;

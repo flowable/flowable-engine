@@ -33,10 +33,10 @@ import org.activiti.engine.impl.pvm.delegate.SubProcessActivityBehavior;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.runtime.AtomicOperation;
 import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
-import org.flowable.engine.common.api.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,7 +141,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         } else if (collectionVariable != null) {
             Object obj = execution.getVariable(collectionVariable);
             if (obj == null) {
-                throw new ActivitiIllegalArgumentException("Variable " + collectionVariable + " is not found");
+                throw new ActivitiIllegalArgumentException("Variable " + collectionVariable + " was not found");
             }
             if (!(obj instanceof Collection)) {
                 throw new ActivitiIllegalArgumentException("Variable " + collectionVariable + "' is not a Collection");

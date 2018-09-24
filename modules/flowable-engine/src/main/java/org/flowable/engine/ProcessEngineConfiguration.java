@@ -19,18 +19,17 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.cfg.MailServerInfo;
-import org.flowable.engine.common.impl.AbstractEngineConfiguration;
-import org.flowable.engine.common.impl.HasTaskIdGeneratorEngineConfiguration;
-import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
-import org.flowable.engine.common.impl.cfg.IdGenerator;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.impl.runtime.Clock;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.flowable.image.ProcessDiagramGenerator;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.task.service.TaskPostProcessor;
 
 /**
  * Configuration information from which a process engine can be build.
@@ -79,7 +78,7 @@ import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
  * @see ProcessEngines
  * @author Tom Baeyens
  */
-public abstract class ProcessEngineConfiguration extends AbstractEngineConfiguration implements HasTaskIdGeneratorEngineConfiguration {
+public abstract class ProcessEngineConfiguration extends AbstractEngineConfiguration {
 
     protected String processEngineName = ProcessEngines.NAME_DEFAULT;
     protected int idBlockSize = 2500;
@@ -94,6 +93,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected boolean useSSL;
     protected boolean useTLS;
     protected String mailServerDefaultFrom = "flowable@localhost";
+    protected String mailServerForceTo;
     protected String mailSessionJndi;
     protected Map<String, MailServerInfo> mailServers = new HashMap<>();
     protected Map<String, String> mailSessionsJndi = new HashMap<>();
@@ -138,10 +138,8 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
 
     protected boolean enableProcessDefinitionInfoCache;
 
-    /**
-     * generator used to generate task ids
-     */
-    protected IdGenerator taskIdGenerator;
+    /** postprocessor for a task builder */
+    protected TaskPostProcessor taskPostProcessor = null;
 
     /** use one of the static createXxxx methods instead */
     protected ProcessEngineConfiguration() {
@@ -299,6 +297,15 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
 
     public ProcessEngineConfiguration setMailServerDefaultFrom(String mailServerDefaultFrom) {
         this.mailServerDefaultFrom = mailServerDefaultFrom;
+        return this;
+    }
+
+    public String getMailServerForceTo() {
+        return mailServerForceTo;
+    }
+
+    public ProcessEngineConfiguration setMailServerForceTo(String mailServerForceTo) {
+        this.mailServerForceTo = mailServerForceTo;
         return this;
     }
 
@@ -681,20 +688,11 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
         return this;
     }
 
-    public void initIdGenerator() {
-        super.initIdGenerator();
-        if (taskIdGenerator == null) {
-            taskIdGenerator = idGenerator;
-        }
+    public TaskPostProcessor getTaskPostProcessor() {
+        return taskPostProcessor;
     }
 
-    @Override
-    public IdGenerator getTaskIdGenerator() {
-        return taskIdGenerator;
-    }
-
-    @Override
-    public void setTaskIdGenerator(IdGenerator taskIdGenerator) {
-        this.taskIdGenerator = taskIdGenerator;
+    public void setTaskPostProcessor(TaskPostProcessor processor) {
+        this.taskPostProcessor = processor;
     }
 }

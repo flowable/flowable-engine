@@ -18,13 +18,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.flowable.engine.common.api.FlowableTaskAlreadyClaimedException;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
@@ -37,6 +38,13 @@ public interface CmmnTaskService {
     
     Task newTask(String taskId);
 
+    /**
+     * Create a builder for the task
+     *
+     * @return task builder
+     */
+    TaskBuilder createTaskBuilder();
+    
     void saveTask(Task task);
 
     void complete(String taskId);

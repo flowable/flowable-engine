@@ -22,8 +22,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,7 +51,7 @@ public class TaskVariableDataResource extends TaskVariableBaseResource {
     @ApiImplicitParams(@ApiImplicitParam(name = "scope", dataType = "string", value = "Scope of variable to be returned. When local, only task-local variable value is returned. When global, only variable value from the task’s parent execution-hierarchy are returned. When the parameter is omitted, a local variable will be returned if it exists, otherwise a global variable.", paramType = "query"))
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task was found and the requested variables are returned."),
-            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task doesn’t have a variable with the given name (in the given scope). Status message provides additional information.")
+            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task does not have a variable with the given name (in the given scope). Status message provides additional information.")
     })
     @GetMapping(value = "/cmmn-runtime/tasks/{taskId}/variables/{variableName}/data", produces = "application/json")
     @ResponseBody

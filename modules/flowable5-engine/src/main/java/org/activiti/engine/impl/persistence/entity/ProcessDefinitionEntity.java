@@ -34,8 +34,8 @@ import org.activiti.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
 import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.task.IdentityLinkType;
-import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.repository.ProcessDefinition;
 
 /**
@@ -86,7 +86,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
             processInstance = (ExecutionEntity) super.createProcessInstanceForInitial(initial);
         }
 
-        processInstance.setExecutions(new ArrayList<ExecutionEntity>());
+        processInstance.setExecutions(new ArrayList<>());
         processInstance.setProcessDefinition(processDefinition);
         // Do not initialize variable map (let it happen lazily)
 
@@ -249,14 +249,17 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     }
     
     // only valid in Flowable 6
+    @Override
     public String getDerivedFrom() {
         return null;
     }
 
+    @Override
     public String getDerivedFromRoot() {
         return null;
     }
 
+    @Override
     public int getDerivedVersion() {
         return 0;
     }

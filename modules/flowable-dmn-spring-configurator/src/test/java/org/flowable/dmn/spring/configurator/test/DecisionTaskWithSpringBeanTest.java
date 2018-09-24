@@ -15,11 +15,12 @@ package org.flowable.dmn.spring.configurator.test;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -28,6 +29,7 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration("classpath:flowable-context.xml")
 public class DecisionTaskWithSpringBeanTest extends SpringDmnFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/dmn/spring/configurator/test/oneDecisionTaskProcess.bpmn20.xml",
         "org/flowable/dmn/spring/configurator/test/simple.dmn" })
     public void testDecisionTask() {

@@ -18,8 +18,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -28,6 +28,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -35,6 +36,7 @@ import org.flowable.task.api.history.HistoricTaskInstance;
  */
 public class SubProcessTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testSimpleSubProcess() {
 
@@ -52,6 +54,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     /**
      * Same test case as before, but now with all automatic steps
      */
+    @Test
     @Deployment
     public void testSimpleAutomaticSubProcess() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcessAutomatic");
@@ -59,6 +62,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         assertProcessEnded(pi.getId());
     }
 
+    @Test
     @Deployment
     public void testSimpleSubProcessWithTimer() {
 
@@ -72,7 +76,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         // Setting the clock forward 2 hours 1 second (timer fires in 2 hours) and fire up the job executor
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + (2 * 60 * 60 * 1000) + 1000));
         assertEquals(1, managementService.createTimerJobQuery().count());
-        waitForJobExecutorToProcessAllJobs(5000L, 500L);
+        waitForJobExecutorToProcessAllJobs(7000L, 500L);
 
         // The subprocess should be left, and the escalated task should be active
         org.flowable.task.api.Task escalationTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
@@ -121,6 +125,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     /**
      * Test case where the simple sub process of previous test cases is nested within another subprocess.
      */
+    @Test
     @Deployment
     public void testNestedSimpleSubProcess() {
 
@@ -144,6 +149,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         assertProcessEnded(pi.getId());
     }
 
+    @Test
     @Deployment
     public void testNestedSimpleSubprocessWithTimerOnInnerSubProcess() {
         Date startTime = new Date();
@@ -156,7 +162,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         // Setting the clock forward 1 hour 1 second (timer fires in 1 hour) and
         // fire up the job executor
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + (60 * 60 * 1000) + 1000));
-        waitForJobExecutorToProcessAllJobs(5000L, 50L);
+        waitForJobExecutorToProcessAllJobs(7000L, 50L);
 
         // The inner subprocess should be destroyed, and the escalated task should be active
         org.flowable.task.api.Task escalationTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
@@ -172,6 +178,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     /**
      * Test case where the simple sub process of previous test cases is nested within two other sub processes
      */
+    @Test
     @Deployment
     public void testDoubleNestedSimpleSubProcess() {
         // After staring the process, the task in the inner subprocess must be active
@@ -187,6 +194,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         assertEquals("Task after subprocesses", taskAfterSubProcesses.getName());
     }
 
+    @Test
     @Deployment
     public void testSimpleParallelSubProcess() {
 
@@ -208,6 +216,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         assertEquals("Task after sub process", taskAfterSubProcess.getName());
     }
 
+    @Test
     @Deployment
     public void testSimpleParallelSubProcessWithTimer() {
 
@@ -236,6 +245,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment
     public void testTwoSubProcessInParallel() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("twoSubProcessInParallel");
@@ -268,6 +278,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         assertProcessEnded(pi.getId());
     }
 
+    @Test
     @Deployment
     public void testTwoSubProcessInParallelWithinSubProcess() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("twoSubProcessInParallelWithinSubProcess");
@@ -292,6 +303,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         assertProcessEnded(pi.getId());
     }
 
+    @Test
     @Deployment
     public void testTwoNestedSubProcessesInParallelWithTimer() {
 
@@ -310,7 +322,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         // Firing the timer should destroy all three subprocesses and activate the task after the timer
         // processEngineConfiguration.getClock().setCurrentTime(new
         // Date(startTime.getTime() + (2 * 60 * 60 * 1000 ) + 1000));
-        // waitForJobExecutorToProcessAllJobs(5000L, 50L);
+        // waitForJobExecutorToProcessAllJobs(7000L, 50L);
         Job job = managementService.createTimerJobQuery().singleResult();
         managementService.moveTimerToExecutableJob(job.getId());
         managementService.executeJob(job.getId());
@@ -326,6 +338,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     /**
      * @see <a href="https://activiti.atlassian.net/browse/ACT-1072">https://activiti.atlassian.net/browse/ACT-1072</a>
      */
+    @Test
     @Deployment
     public void testNestedSimpleSubProcessWithoutEndEvent() {
         testNestedSimpleSubProcess();
@@ -334,6 +347,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     /**
      * @see <a href="https://activiti.atlassian.net/browse/ACT-1072">https://activiti.atlassian.net/browse/ACT-1072</a>
      */
+    @Test
     @Deployment
     public void testSimpleSubProcessWithoutEndEvent() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("testSimpleSubProcessWithoutEndEvent");
@@ -343,6 +357,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     /**
      * @see <a href="https://activiti.atlassian.net/browse/ACT-1072">https://activiti.atlassian.net/browse/ACT-1072</a>
      */
+    @Test
     @Deployment
     public void testNestedSubProcessesWithoutEndEvents() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("testNestedSubProcessesWithoutEndEvents");
@@ -352,6 +367,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     /**
      * @see <a href="https://activiti.atlassian.net/browse/ACT-1847">https://activiti.atlassian.net/browse/ACT-1847</a>
      */
+    @Test
     @Deployment
     public void testDataObjectScope() {
 

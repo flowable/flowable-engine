@@ -13,12 +13,15 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
+import static java.util.Comparator.comparing;
+
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.engine.common.impl.db.HasRevision;
-import org.flowable.engine.common.impl.persistence.entity.AlwaysUpdatedPersistentObject;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.db.HasRevision;
+import org.flowable.common.engine.impl.persistence.entity.AlwaysUpdatedPersistentObject;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -36,6 +39,8 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
  */
 
 public interface ExecutionEntity extends DelegateExecution, Execution, ProcessInstance, Entity, AlwaysUpdatedPersistentObject, HasRevision {
+
+    Comparator<ExecutionEntity> EXECUTION_ENTITY_START_TIME_ASC_COMPARATOR = comparing(ProcessInstance::getStartTime);
 
     void setBusinessKey(String businessKey);
 

@@ -15,9 +15,14 @@ package org.flowable.job.service.impl;
 import java.util.Collection;
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.job.api.DeadLetterJobQuery;
+import org.flowable.job.api.HistoryJobQuery;
 import org.flowable.job.api.JobInfo;
+import org.flowable.job.api.JobQuery;
+import org.flowable.job.api.SuspendedJobQuery;
+import org.flowable.job.api.TimerJobQuery;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
@@ -34,14 +39,35 @@ import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityManage
  */
 public class JobServiceImpl extends ServiceImpl implements JobService {
 
-    public JobServiceImpl() {
-
-    }
-
     public JobServiceImpl(JobServiceConfiguration jobServiceConfiguration) {
         super(jobServiceConfiguration);
     }
     
+    @Override
+    public JobQuery createJobQuery() {
+        return new JobQueryImpl(getCommandExecutor());
+    }
+
+    @Override
+    public TimerJobQuery createTimerJobQuery() {
+        return new TimerJobQueryImpl(getCommandExecutor());
+    }
+
+    @Override
+    public SuspendedJobQuery createSuspendedJobQuery() {
+        return new SuspendedJobQueryImpl(getCommandExecutor());
+    }
+
+    @Override
+    public DeadLetterJobQuery createDeadLetterJobQuery() {
+        return new DeadLetterJobQueryImpl(getCommandExecutor());
+    }
+
+    @Override
+    public HistoryJobQuery createHistoryJobQuery() {
+        return new HistoryJobQueryImpl(getCommandExecutor());
+    }
+
     @Override
     public void scheduleAsyncJob(JobEntity job) {
         getJobManager().scheduleAsyncJob(job);
@@ -92,7 +118,7 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
     
     @Override
     public AbstractRuntimeJobEntity activateSuspendedJob(SuspendedJobEntity job) {
-        if (jobServiceConfiguration.getJobParentStateResolver().isSuspended(job)) {
+        if (configuration.getJobParentStateResolver().isSuspended(job)) {
             throw new FlowableIllegalArgumentException("Can not activate job "+ job.getId() +". Parent is suspended.");
         }
         return getJobManager().activateSuspendedJob(job);

@@ -22,6 +22,7 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.engine.impl.RepositoryServiceImpl;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
@@ -29,6 +30,7 @@ import org.flowable.engine.repository.ProcessDefinition;
  */
 public class ProcessDefinitionPersistenceTest extends PluggableFlowableTestCase {
 
+    @Test
     public void testProcessDefinitionPersistence() {
         String deploymentId = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/db/processOne.bpmn20.xml")
                 .addClasspathResource("org/flowable/engine/test/db/processTwo.bpmn20.xml").deploy().getId();
@@ -40,6 +42,7 @@ public class ProcessDefinitionPersistenceTest extends PluggableFlowableTestCase 
         repositoryService.deleteDeployment(deploymentId);
     }
 
+    @Test
     public void testProcessDefinitionIntrospection() {
         String deploymentId = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/db/processOne.bpmn20.xml").deploy().getId();
 
@@ -72,6 +75,7 @@ public class ProcessDefinitionPersistenceTest extends PluggableFlowableTestCase 
         repositoryService.deleteDeployment(deploymentId);
     }
 
+    @Test
     public void testProcessDefinitionQuery() {
         String deployment1Id = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/db/processOne.bpmn20.xml")
                 .addClasspathResource("org/flowable/engine/test/db/processTwo.bpmn20.xml").deploy().getId();
@@ -90,6 +94,7 @@ public class ProcessDefinitionPersistenceTest extends PluggableFlowableTestCase 
         repositoryService.deleteDeployment(deployment2Id);
     }
 
+    @Test
     public void testProcessDefinitionGraphicalNotationFlag() {
         String deploymentId = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/db/process-with-di.bpmn20.xml")
                 .addClasspathResource("org/flowable/engine/test/db/process-without-di.bpmn20.xml").deploy().getId();

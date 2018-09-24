@@ -14,6 +14,10 @@ package org.flowable.cmmn.editor.json.converter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
@@ -27,9 +31,6 @@ import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ScriptServiceTask;
 import org.flowable.cmmn.model.ServiceTask;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Tijs Rademakers
@@ -65,7 +66,7 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
         if (baseElement instanceof PlanItem) {
             PlanItem planItem = (PlanItem) baseElement;
             PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
-            if (planItemDefinition != null && planItemDefinition instanceof ServiceTask) {
+            if (planItemDefinition instanceof ServiceTask) {
                 ServiceTask serviceTask = (ServiceTask) planItemDefinition;
                 String stencilId = TYPE_TO_STENCILSET.get(serviceTask.getType());
                 if (stencilId != null) {
@@ -90,6 +91,7 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
             setPropertyFieldValue(PROPERTY_HTTPTASK_REQ_URL, "requestUrl", serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_HTTPTASK_REQ_HEADERS, "requestHeaders", serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_HTTPTASK_REQ_BODY, "requestBody", serviceTask, propertiesNode);
+            setPropertyFieldValue(PROPERTY_HTTPTASK_REQ_BODY_ENCODING, "requestBodyEncoding", serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_HTTPTASK_REQ_TIMEOUT, "requestTimeout", serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_HTTPTASK_REQ_DISALLOW_REDIRECTS, "disallowRedirects", serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_HTTPTASK_REQ_FAIL_STATUS_CODES, "failStatusCodes", serviceTask, propertiesNode);

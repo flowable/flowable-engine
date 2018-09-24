@@ -351,6 +351,7 @@
             "EDIT": "Modifier les propriétés du modèle",
             "DELETE": "Supprimer le formulaire",
             "CREATE-CONFIRM": "Créer un nouveau formulaire",
+            "DUPLICATE": "Dupliquer ce formulaire",
             "DUPLICATE-CONFIRM": "Dupliquer le formulaire",
             "OPEN-IN-EDITOR": "Editeur de formulaire",
             "EDIT-CONFIRM": "Sauvegarder",
@@ -416,6 +417,12 @@
             "RULE ORDER": "Ordre des règles",
             "OUTPUT ORDER": "Ordre de résultats",
             "COLLECT": "Collecte"
+        },
+        "COLLECT-OPERATORS": {
+            "SUM": "Sum",
+            "MIN": "Min",
+            "MAX": "Max",
+            "COUNT": "Count"
         },
         "POPUP": {
             "CREATE-TITLE": "Créer une nouvelle table de décision",
@@ -537,8 +544,8 @@
     "FORM-BUILDER": {
         "PALLETTE": {
             "TEXT": "Texte",
-            "PASSWORD": "Mot de passe",
             "MULTILINE-TEXT": "Texte Multiligne",
+            "PASSWORD": "Mot de passe",
             "NUMBER": "Nombre",
             "CHECKBOX": "Case à cocher",
             "DATE": "Date",
@@ -549,7 +556,11 @@
             "UPLOAD": "Téléchargement",
             "EXPRESSION": "Expression",
             "DECIMAL": "Décimal",
-	    "HYPERLINK": "Lien Hypertexte"
+	    	"HYPERLINK": "Lien Hypertexte",
+	    	"SPACER": "Spacer",
+			"HORIZONTAL-LINE": "Horizontal line",
+			"HEADLINE": "Headline",
+			"HEADLINE-WITH-LINE":"Headline"
         },
         "TABS": {
             "GENERAL": "Général",
@@ -792,6 +803,16 @@
     "PROPERTY.FIELDS.STRING.PLACEHOLDER" : "Entrer a string",
     "PROPERTY.FIELDS.IMPLEMENTATION" : "Implémentation",
 
+    "PROPERTY.DATAPROPERTIES.VALUES" : "{{length}} data objects",
+    "PROPERTY.DATAPROPERTIES.EMPTY" : "Aucun objet de données configuré",
+    "PROPERTY.DATAPROPERTIES.ID" : "Id",
+    "PROPERTY.DATAPROPERTIES.ID.PLACEHOLDER" : "Entrer une id",
+    "PROPERTY.DATAPROPERTIES.NAME" : "Nom",
+    "PROPERTY.DATAPROPERTIES.NAME.PLACEHOLDER" : "Entrer a nom",
+    "PROPERTY.DATAPROPERTIES.TYPE" : "Type",
+    "PROPERTY.DATAPROPERTIES.VALUE.PLACEHOLDER" : "Entrer une value (optionnel)",
+    "PROPERTY.DATAPROPERTIES.VALUE" : "Valeur par défaut",
+
     "PROPERTY.FORMPROPERTIES.VALUE" : "{{length}} propriétés de formulaire",
     "PROPERTY.FORMPROPERTIES.EMPTY" : "Aucune propriété du formulaire sélectionné",
     "PROPERTY.FORMPROPERTIES.ID" : "Identifiant",
@@ -829,11 +850,11 @@
     "PROPERTY.PARAMETER.TARGET.PLACEHOLDER" : "Entrer une Cible",
     "PROPERTY.PARAMETER.EMPTY" : "Aucun paramètre sélectionné",
 
-    "PROPERTY.SUBPROCESSREFERENCE.EMPTY" : "Aucune référence sélectionnée",
-    "PROPERTY.SUBPROCESSREFERENCE.TITLE" : "Référence de sous-processus",
-    "PROPERTY.SUBPROCESSREFERENCE.ERROR.SUBPROCESS" : "Une erreur a été rencontré lors du chargement des sous-processus. Veuillez réessayer ultérieurement",
-    "PROPERTY.SUBPROCESSREFERENCE.SUBPROCESS.LOADING" : "Chargement des sous-processus...",
-    "PROPERTY.SUBPROCESSREFERENCE.SUBPROCESS.EMPTY" : "Ce répertoire ne contient pas de sous-processus",
+    "PROPERTY.PROCESSREFERENCE.EMPTY" : "Aucune référence sélectionnée",
+    "PROPERTY.PROCESSREFERENCE.TITLE" : "Référence de processus",
+    "PROPERTY.PROCESSREFERENCE.ERROR.SUBPROCESS" : "Une erreur a été rencontré lors du chargement des processus. Veuillez réessayer ultérieurement",
+    "PROPERTY.PROCESSREFERENCE.PROCESS.LOADING" : "Chargement des processus...",
+    "PROPERTY.PROCESSREFERENCE.PROCESS.EMPTY" : "Ce répertoire ne contient pas de processus",
 
     "PROPERTY.FORMREFERENCE.EMPTY" : "Aucune reference sélectionnée",
     "PROPERTY.FORMREFERENCE.TITLE" : "Référence de formulaire",
@@ -950,5 +971,11 @@
     "PROPERTY.DECISIONTABLEREFERENCE.TITLE" : "Référence de la table de décision",
     "PROPERTY.DECISIONTABLEREFERENCE.ERROR.FORM" : "Une erreur s'est produite lors du chargement des tables de décision. Veuillez réessayer ultérieurement",
     "PROPERTY.DECISIONTABLEREFERENCE.DECISIONTABLE.LOADING" : "Chargement des tables de décision...",
-    "PROPERTY.DECISIONTABLEREFERENCE.DECISIONTABLE.EMPTY" : "Ce répertoire ne contient pas de tables de décision"
+    "PROPERTY.DECISIONTABLEREFERENCE.DECISIONTABLE.EMPTY" : "Ce répertoire ne contient pas de tables de décision",
+
+    "PROPERTY.CASEREFERENCE.EMPTY" : "Aucune référence sélectionné",
+    "PROPERTY.CASEREFERENCE.TITLE" : "Réference du modèle de cas",
+    "PROPERTY.CASEREFERENCE.ERROR.FORM" : "Une erreur a été rencontré lors du chargement des modèles de cas.  Veuillez réessayer ultérieurement",
+    "PROPERTY.CASEREFERENCE.CASE.LOADING" : "Chargement des modèles de cas...",
+    "PROPERTY.CASEREFERENCE.CASE.EMPTY" : "Ce répertoire ne contient pas de modèle de cas"
 }

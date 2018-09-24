@@ -1,15 +1,16 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.flowable.engine.impl;
 
 import java.util.ArrayList;
@@ -20,12 +21,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.flowable.bpmn.model.FlowNode;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.engine.RuntimeService;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.form.FormData;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.ActivateProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.AddEventListenerCommand;
 import org.flowable.engine.impl.cmd.AddIdentityLinkForProcessInstanceCmd;
@@ -53,6 +56,8 @@ import org.flowable.engine.impl.cmd.GetStartFormCmd;
 import org.flowable.engine.impl.cmd.GetStartFormModelCmd;
 import org.flowable.engine.impl.cmd.HasExecutionVariableCmd;
 import org.flowable.engine.impl.cmd.MessageEventReceivedCmd;
+import org.flowable.engine.impl.cmd.ProcessInstanceMigrationCmd;
+import org.flowable.engine.impl.cmd.ProcessInstanceMigrationValidationCmd;
 import org.flowable.engine.impl.cmd.RemoveEventListenerCommand;
 import org.flowable.engine.impl.cmd.RemoveExecutionVariablesCmd;
 import org.flowable.engine.impl.cmd.SetExecutionVariablesCmd;
@@ -64,8 +69,12 @@ import org.flowable.engine.impl.cmd.StartProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.StartProcessInstanceWithFormCmd;
 import org.flowable.engine.impl.cmd.SuspendProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.TriggerCmd;
+import org.flowable.engine.impl.migration.ProcessInstanceMigrationBuilderImpl;
+import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
+import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
+import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.runtime.EventSubscriptionQuery;
@@ -79,14 +88,14 @@ import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Event;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer
  */
-public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
+public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfigurationImpl> implements RuntimeService {
 
     @Override
     public ProcessInstance startProcessInstanceByKey(String processDefinitionKey) {
@@ -294,12 +303,12 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     }
 
     @Override
-    public void setVariables(String executionId, Map<String, ? extends Object> variables) {
+    public void setVariables(String executionId, Map<String, ?> variables) {
         commandExecutor.execute(new SetExecutionVariablesCmd(executionId, variables, false));
     }
 
     @Override
-    public void setVariablesLocal(String executionId, Map<String, ? extends Object> variables) {
+    public void setVariablesLocal(String executionId, Map<String, ?> variables) {
         commandExecutor.execute(new SetExecutionVariablesCmd(executionId, variables, true));
     }
 
@@ -648,7 +657,7 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     public ChangeActivityStateBuilder createChangeActivityStateBuilder() {
         return new ChangeActivityStateBuilderImpl(this);
     }
-    
+
     @Override
     public Execution addMultiInstanceExecution(String activityId, String parentExecutionId, Map<String, Object> executionVariables) {
         return commandExecutor.execute(new AddMultiInstanceExecutionCmd(activityId, parentExecutionId, executionVariables));
@@ -658,7 +667,7 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     public void deleteMultiInstanceExecution(String executionId, boolean executionIsCompleted) {
         commandExecutor.execute(new DeleteMultiInstanceExecutionCmd(executionId, executionIsCompleted));
     }
-    
+
     public ProcessInstance startProcessInstance(ProcessInstanceBuilderImpl processInstanceBuilder) {
         if (processInstanceBuilder.getProcessDefinitionId() != null || processInstanceBuilder.getProcessDefinitionKey() != null) {
             return commandExecutor.execute(new StartProcessInstanceCmd<ProcessInstance>(processInstanceBuilder));
@@ -672,4 +681,45 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     public void changeActivityState(ChangeActivityStateBuilderImpl changeActivityStateBuilder) {
         commandExecutor.execute(new ChangeActivityStateCmd(changeActivityStateBuilder));
     }
+
+    @Override
+    public ProcessInstanceMigrationBuilder createProcessInstanceMigrationBuilder() {
+        return new ProcessInstanceMigrationBuilderImpl(this);
+    }
+
+    @Override
+    public ProcessInstanceMigrationBuilder createProcessInstanceMigrationBuilderFromProcessInstanceMigrationDocument(ProcessInstanceMigrationDocument document) {
+        return createProcessInstanceMigrationBuilder().fromProcessInstanceMigrationDocument(document);
+    }
+
+    @Override
+    public ProcessInstanceMigrationValidationResult validateMigrationForProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
+        return commandExecutor.execute(ProcessInstanceMigrationValidationCmd.forProcessDefinition(processInstanceId, processInstanceMigrationDocument));
+    }
+
+    @Override
+    public ProcessInstanceMigrationValidationResult validateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
+        return commandExecutor.execute(ProcessInstanceMigrationValidationCmd.forProcessDefinition(processDefinitionId, processInstanceMigrationDocument));
+    }
+
+    @Override
+    public ProcessInstanceMigrationValidationResult validateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
+        return commandExecutor.execute(ProcessInstanceMigrationValidationCmd.forProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, processInstanceMigrationDocument));
+    }
+
+    @Override
+    public void migrateProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
+        commandExecutor.execute(ProcessInstanceMigrationCmd.forProcessInstance(processInstanceId, processInstanceMigrationDocument));
+    }
+
+    @Override
+    public void migrateProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
+        commandExecutor.execute(ProcessInstanceMigrationCmd.forProcessDefinition(processDefinitionId, processInstanceMigrationDocument));
+    }
+
+    @Override
+    public void migrateProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
+        commandExecutor.execute(ProcessInstanceMigrationCmd.forProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, processInstanceMigrationDocument));
+    }
+
 }

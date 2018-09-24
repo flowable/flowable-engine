@@ -14,9 +14,10 @@ package org.flowable.http.bpmn.cfg;
 
 import javax.net.ssl.SSLHandshakeException;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +39,7 @@ public class HttpServiceTaskCfgTest extends HttpServiceTaskCfgTestCase {
                 .setDisableCertVerify(false);
     }
 
+    @Test
     @Deployment
     public void testHttpsSelfSignedFail() {
         try {

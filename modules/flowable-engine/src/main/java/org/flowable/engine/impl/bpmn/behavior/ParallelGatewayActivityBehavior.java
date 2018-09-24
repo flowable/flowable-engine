@@ -21,7 +21,7 @@ import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.ParallelGateway;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
@@ -92,7 +92,8 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
 
             // Fork
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("parallel gateway '{}' activates: {} of {} joined", execution.getCurrentActivityId(), nbrOfExecutionsCurrentlyJoined, nbrOfExecutionsToJoin);
+                LOGGER.debug("parallel gateway '{}' ({}) activates: {} of {} joined", execution.getCurrentActivityId(), 
+                        execution.getId(), nbrOfExecutionsCurrentlyJoined, nbrOfExecutionsToJoin);
             }
 
             if (parallelGateway.getIncomingFlows().size() > 1) {
@@ -113,7 +114,8 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
             CommandContextUtil.getAgenda().planTakeOutgoingSequenceFlowsOperation((ExecutionEntity) execution, false); // false -> ignoring conditions on parallel gw
 
         } else if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("parallel gateway '{}' does not activate: {} of {} joined", execution.getCurrentActivityId(), nbrOfExecutionsCurrentlyJoined, nbrOfExecutionsToJoin);
+            LOGGER.debug("parallel gateway '{}' ({}) does not activate: {} of {} joined", execution.getCurrentActivityId(), 
+                    execution.getId(), nbrOfExecutionsCurrentlyJoined, nbrOfExecutionsToJoin);
         }
 
     }

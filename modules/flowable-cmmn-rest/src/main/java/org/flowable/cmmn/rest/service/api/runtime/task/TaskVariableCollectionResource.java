@@ -25,8 +25,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable.RestVariableScope;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.exception.FlowableConflictException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.task.api.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -214,8 +214,7 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
             Map<String, Object> rawVariables = runtimeService.getVariables(task.getScopeId());
             List<RestVariable> globalVariables = restResponseFactory.createRestVariables(rawVariables, task.getId(), CmmnRestResponseFactory.VARIABLE_TASK, RestVariableScope.GLOBAL);
 
-            // Overlay global variables over local ones. In case they are
-            // present the values are not overridden,
+            // Overlay global variables over local ones. In case they are present the values are not overridden,
             // since local variables get precedence over global ones at all times.
             for (RestVariable var : globalVariables) {
                 if (!variableMap.containsKey(var.getName())) {

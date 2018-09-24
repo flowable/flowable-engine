@@ -13,13 +13,14 @@
 
 package org.flowable.rest.service.api.runtime;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.RuntimeService;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.runtime.process.SignalEventReceivedRequest;
@@ -29,9 +30,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.Map;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * Resource for notifying the engine a signal event has been received, independent of an execution.
@@ -47,6 +50,9 @@ public class SignalResource {
 
     @Autowired
     protected RuntimeService runtimeService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Signal event received", tags = { "Runtime" })
     @ApiResponses(value = {
@@ -58,6 +64,10 @@ public class SignalResource {
     public void signalEventReceived(@RequestBody SignalEventReceivedRequest signalRequest, HttpServletResponse response) {
         if (signalRequest.getSignalName() == null) {
             throw new FlowableIllegalArgumentException("signalName is required");
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.sendSignal(signalRequest);
         }
 
         Map<String, Object> signalVariables = null;

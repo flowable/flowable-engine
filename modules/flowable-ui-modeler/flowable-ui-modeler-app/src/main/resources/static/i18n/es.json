@@ -445,7 +445,11 @@
             "GROUP-OF-PEOPLE": "Grupo de personas",
             "UPLOAD": "Upload",
             "EXPRESSION": "Expresion",
-	    "HYPERLINK": "Hipervínculo"
+	    	"HYPERLINK": "Hipervínculo",
+	    	"SPACER": "Spacer",
+			"HORIZONTAL-LINE": "Horizontal line",
+			"HEADLINE": "Headline",
+			"HEADLINE-WITH-LINE":"Headline"
         },
         "TABS": {
             "GENERAL": "General",

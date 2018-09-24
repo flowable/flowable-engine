@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
 
@@ -27,7 +26,7 @@ import org.flowable.job.service.JobServiceConfiguration;
  *
  * @author Tijs Rademakers
  */
-public abstract class AbstractJobEntityImpl extends AbstractEntity implements AbstractRuntimeJobEntity, Serializable {
+public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity implements AbstractRuntimeJobEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -154,34 +153,42 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
         this.processDefinitionId = processDefinitionId;
     }
     
+    @Override
     public String getScopeId() {
         return scopeId;
     }
 
+    @Override
     public void setScopeId(String scopeId) {
         this.scopeId = scopeId;
     }
 
+    @Override
     public String getSubScopeId() {
         return subScopeId;
     }
 
+    @Override
     public void setSubScopeId(String subScopeId) {
         this.subScopeId = subScopeId;
     }
 
+    @Override
     public String getScopeType() {
         return scopeType;
     }
 
+    @Override
     public void setScopeType(String scopeType) {
         this.scopeType = scopeType;
     }
 
+    @Override
     public String getScopeDefinitionId() {
         return scopeDefinitionId;
     }
 
+    @Override
     public void setScopeDefinitionId(String scopeDefinitionId) {
         this.scopeDefinitionId = scopeDefinitionId;
     }
@@ -284,6 +291,7 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
         if (exceptionByteArrayRef == null) {
             exceptionByteArrayRef = new JobByteArrayRef();
         }
+
         exceptionByteArrayRef.setValue("stacktrace", exception);
     }
 

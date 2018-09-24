@@ -56,6 +56,10 @@ public class CallActivityJsonConverter extends BaseBpmnJsonConverter {
             propertiesNode.put(PROPERTY_CALLACTIVITY_CALLEDELEMENT, callActivity.getCalledElement());
         }
 
+        if (StringUtils.isNotEmpty(callActivity.getCalledElementType())) {
+            propertiesNode.put(PROPERTY_CALLACTIVITY_CALLEDELEMENTTYPE, callActivity.getCalledElementType());
+        }
+
         if (callActivity.isInheritVariables()) {
             propertiesNode.put(PROPERTY_CALLACTIVITY_INHERIT_VARIABLES, callActivity.isInheritVariables());
         }
@@ -63,13 +67,25 @@ public class CallActivityJsonConverter extends BaseBpmnJsonConverter {
         if (callActivity.isSameDeployment()) {
             propertiesNode.put(PROPERTY_CALLACTIVITY_SAME_DEPLOYMENT, callActivity.isSameDeployment());
         }
+        
+        if (StringUtils.isNotEmpty(callActivity.getProcessInstanceName())) {
+            propertiesNode.put(PROPERTY_CALLACTIVITY_PROCESS_INSTANCE_NAME, callActivity.getProcessInstanceName());
+        }
+        
+        if (StringUtils.isNotEmpty(callActivity.getBusinessKey())) {
+            propertiesNode.put(PROPERTY_CALLACTIVITY_BUSINESS_KEY, callActivity.getBusinessKey());
+        }
 
         if (callActivity.isInheritBusinessKey()) {
             propertiesNode.put(PROPERTY_CALLACTIVITY_INHERIT_BUSINESS_KEY, callActivity.isInheritBusinessKey());
         }
-
+        
         if (callActivity.isUseLocalScopeForOutParameters()) {
             propertiesNode.put(PROPERTY_CALLACTIVITY_USE_LOCALSCOPE_FOR_OUTPARAMETERS, callActivity.isUseLocalScopeForOutParameters());
+        }
+        
+        if (callActivity.isCompleteAsync()) {
+            propertiesNode.put(PROPERTY_CALLACTIVITY_COMPLETE_ASYNC, callActivity.isCompleteAsync());
         }
 
         addJsonParameters(PROPERTY_CALLACTIVITY_IN, "inParameters", callActivity.getInParameters(), propertiesNode);
@@ -111,6 +127,10 @@ public class CallActivityJsonConverter extends BaseBpmnJsonConverter {
             callActivity.setCalledElement(getPropertyValueAsString(PROPERTY_CALLACTIVITY_CALLEDELEMENT, elementNode));
         }
 
+        if (StringUtils.isNotEmpty(getPropertyValueAsString(PROPERTY_CALLACTIVITY_CALLEDELEMENTTYPE, elementNode))) {
+            callActivity.setCalledElementType(getPropertyValueAsString(PROPERTY_CALLACTIVITY_CALLEDELEMENTTYPE, elementNode));
+        }
+
         if (getPropertyValueAsBoolean(PROPERTY_CALLACTIVITY_INHERIT_VARIABLES, elementNode)) {
             callActivity.setInheritVariables(true);
         }
@@ -118,13 +138,27 @@ public class CallActivityJsonConverter extends BaseBpmnJsonConverter {
         if (getPropertyValueAsBoolean(PROPERTY_CALLACTIVITY_SAME_DEPLOYMENT, elementNode)) {
             callActivity.setSameDeployment(true);
         }
-
+        
+        String processInstanceName = getPropertyValueAsString(PROPERTY_CALLACTIVITY_PROCESS_INSTANCE_NAME, elementNode);
+        if (StringUtils.isNotEmpty(processInstanceName)) {
+            callActivity.setProcessInstanceName(processInstanceName);
+        }
+        
+        String businessKey = getPropertyValueAsString(PROPERTY_CALLACTIVITY_BUSINESS_KEY, elementNode);
+        if (StringUtils.isNotEmpty(businessKey)) {
+            callActivity.setBusinessKey(businessKey);
+        }
+        
         if (getPropertyValueAsBoolean(PROPERTY_CALLACTIVITY_INHERIT_BUSINESS_KEY, elementNode)) {
             callActivity.setInheritBusinessKey(true);
         }
-
+        
         if (getPropertyValueAsBoolean(PROPERTY_CALLACTIVITY_USE_LOCALSCOPE_FOR_OUTPARAMETERS, elementNode)) {
             callActivity.setUseLocalScopeForOutParameters(true);
+        }
+        
+        if (getPropertyValueAsBoolean(PROPERTY_CALLACTIVITY_COMPLETE_ASYNC, elementNode)) {
+            callActivity.setCompleteAsync(true);
         }
 
         callActivity.getInParameters().addAll(convertToIOParameters(PROPERTY_CALLACTIVITY_IN, "inParameters", elementNode));

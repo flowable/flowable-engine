@@ -720,9 +720,9 @@ This are the Modeler UI App specific properties.
 
 |flowable.modeler.app.deployment-api-url
 |deployment.api.url
-|http://localhost:8080/flowable-task/process-api
+|http://localhost:8080/flowable-task/app-api
 |The root URI to the REST services of the Flowable engine, used by the Flowable Modeler application to deploy the application definition BAR file to the engine.
- Default url for the Flowable Task application is http://localhost:8080/flowable-task/process-api
+ Default url for the Flowable Task application is http://localhost:8080/flowable-task/app-api
 
 |flowable.modeler.app.rest-enabled
 |rest.modeler-app.enabled
@@ -854,14 +854,14 @@ An example of the BPMN Engine REST properties is shown below:
 
 [source,linenums]
 ----
-flowable.admin.app.server-config.process.app.name=Flowable Process app
+flowable.admin.app.server-config.process.name=Flowable Process app
 flowable.admin.app.server-config.process.description=Flowable Process REST config
 flowable.admin.app.server-config.process.server-address=http://localhost
-flowable.admin.app.server-config.process.app.port=8080
+flowable.admin.app.server-config.process.port=8080
 flowable.admin.app.server-config.process.context-root=flowable-task
 flowable.admin.app.server-config.process.rest-root=process-api
-flowable.admin.app.server-config.process.app.user=admin
-flowable.admin.app.server-config.process.app.password=test
+flowable.admin.app.server-config.process.user-name=admin
+flowable.admin.app.server-config.process.password=test
 ----
 
 These values can be used when the Flowable Task app (with all the Flowable engines included) is managed by the Flowable Admin application.

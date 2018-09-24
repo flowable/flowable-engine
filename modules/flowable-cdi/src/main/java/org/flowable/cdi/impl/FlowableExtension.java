@@ -33,8 +33,8 @@ import org.flowable.cdi.impl.util.BeanManagerLookup;
 import org.flowable.cdi.impl.util.FlowableServices;
 import org.flowable.cdi.impl.util.ProgrammaticBeanLookup;
 import org.flowable.cdi.spi.ProcessEngineLookup;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.common.api.FlowableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

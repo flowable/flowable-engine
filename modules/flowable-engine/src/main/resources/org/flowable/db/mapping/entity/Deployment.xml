@@ -7,12 +7,12 @@
   <!-- DEPLOYMENT INSERT -->
   
   <insert id="insertDeployment" parameterType="org.flowable.engine.impl.persistence.entity.DeploymentEntityImpl">
-    insert into ${prefix}ACT_RE_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, DERIVED_FROM_, DERIVED_FROM_ROOT_, ENGINE_VERSION_)
-    values(#{id, jdbcType=VARCHAR}, #{name, jdbcType=VARCHAR}, #{category, jdbcType=VARCHAR}, #{key, jdbcType=VARCHAR}, #{tenantId, jdbcType=VARCHAR}, #{deploymentTime, jdbcType=TIMESTAMP}, #{derivedFrom, jdbcType=VARCHAR}, #{derivedFromRoot, jdbcType=VARCHAR}, #{engineVersion, jdbcType=VARCHAR})
+    insert into ${prefix}ACT_RE_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, DERIVED_FROM_, DERIVED_FROM_ROOT_, PARENT_DEPLOYMENT_ID_, ENGINE_VERSION_)
+    values(#{id, jdbcType=VARCHAR}, #{name, jdbcType=VARCHAR}, #{category, jdbcType=VARCHAR}, #{key, jdbcType=VARCHAR}, #{tenantId, jdbcType=VARCHAR}, #{deploymentTime, jdbcType=TIMESTAMP}, #{derivedFrom, jdbcType=VARCHAR}, #{derivedFromRoot, jdbcType=VARCHAR}, #{parentDeploymentId, jdbcType=VARCHAR}, #{engineVersion, jdbcType=VARCHAR})
   </insert>
 
   <insert id="bulkInsertDeployment" parameterType="java.util.List">
-    insert into ${prefix}ACT_RE_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, DERIVED_FROM_, DERIVED_FROM_ROOT_, ENGINE_VERSION_)
+    insert into ${prefix}ACT_RE_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, DERIVED_FROM_, DERIVED_FROM_ROOT_, PARENT_DEPLOYMENT_ID_, ENGINE_VERSION_)
     values
       <foreach collection="list" item="deployment" index="index" separator=",">
         (#{deployment.id, jdbcType=VARCHAR},
@@ -23,6 +23,7 @@
          #{deployment.deploymentTime, jdbcType=TIMESTAMP},
          #{deployment.derivedFrom, jdbcType=VARCHAR},
          #{deployment.derivedFromRoot, jdbcType=VARCHAR},
+         #{deployment.parentDeploymentId, jdbcType=VARCHAR},
          #{deployment.engineVersion, jdbcType=VARCHAR})
       </foreach>
   </insert>
@@ -30,7 +31,7 @@
   <insert id="bulkInsertDeployment" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL 
       <foreach collection="list" item="deployment" index="index">
-        into ${prefix}ACT_RE_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, DERIVED_FROM_, DERIVED_FROM_ROOT_, ENGINE_VERSION_) VALUES 
+        into ${prefix}ACT_RE_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, DERIVED_FROM_, DERIVED_FROM_ROOT_, PARENT_DEPLOYMENT_ID_, ENGINE_VERSION_) VALUES 
           (#{deployment.id, jdbcType=VARCHAR},
            #{deployment.name, jdbcType=VARCHAR},
            #{deployment.category, jdbcType=VARCHAR},
@@ -39,6 +40,7 @@
            #{deployment.deploymentTime, jdbcType=TIMESTAMP},
            #{deployment.derivedFrom, jdbcType=VARCHAR},
            #{deployment.derivedFromRoot, jdbcType=VARCHAR},
+           #{deployment.parentDeploymentId, jdbcType=VARCHAR},
            #{deployment.engineVersion, jdbcType=VARCHAR})
       </foreach>
     SELECT * FROM dual
@@ -57,6 +59,9 @@
           </if>
           <if test="originalPersistentState.tenantId != tenantId">
               TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+          </if>
+          <if test="originalPersistentState.parentDeploymentId != parentDeploymentId">
+              PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId, jdbcType=VARCHAR}
           </if>
       </set>
     where ID_ = #{id, jdbcType=VARCHAR}
@@ -79,6 +84,7 @@
     <result property="deploymentTime" column="DEPLOY_TIME_" jdbcType="TIMESTAMP"/>
     <result property="derivedFrom" column="DERIVED_FROM_" jdbcType="VARCHAR" />
     <result property="derivedFromRoot" column="DERIVED_FROM_ROOT_" jdbcType="VARCHAR" />
+    <result property="parentDeploymentId" column="PARENT_DEPLOYMENT_ID_" jdbcType="VARCHAR" />
     <result property="engineVersion" column="ENGINE_VERSION_" jdbcType="VARCHAR" />
   </resultMap>
 
@@ -86,22 +92,19 @@
 
   <select id="selectDeploymentsByQueryCriteria" parameterType="org.flowable.engine.impl.DeploymentQueryImpl" resultMap="deploymentResultMap">
   	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectDeploymentsByQueryCriteriaSql"/>
     ${orderBy}
     <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
 
   <select id="selectDeploymentCountByQueryCriteria" parameterType="org.flowable.engine.impl.DeploymentQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    select count(RES.ID_)
     <include refid="selectDeploymentsByQueryCriteriaSql"/>
   </select>
   
   <sql id="selectDeploymentsByQueryCriteriaSql">  
     from ${prefix}ACT_RE_DEPLOYMENT RES
-    <if test="processDefinitionKey != null or processDefinitionKeyLike != null">
-    	inner join ${prefix}ACT_RE_PROCDEF PROCDEF on RES.ID_ = PROCDEF.DEPLOYMENT_ID_
-    </if>
     <where>
       <if test="deploymentId != null">
         RES.ID_ = #{deploymentId}
@@ -146,14 +149,31 @@
       <if test="derivedFrom != null">
         and (RES.DERIVED_FROM_ = #{derivedFrom} or RES.DERIVED_FROM_ROOT_ = #{derivedFrom})
       </if>
+      <if test="parentDeploymentId != null">
+        and (RES.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId})
+      </if>
+      <if test="parentDeploymentIdLike != null">
+        and RES.PARENT_DEPLOYMENT_ID_ like #{parentDeploymentIdLike}${wildcardEscapeClause}
+      </if>
+      <if test="parentDeploymentIds != null &amp;&amp; parentDeploymentIds.size() &gt; 0">
+        and RES.PARENT_DEPLOYMENT_ID_ IN
+        <foreach item="parentDeploymentId" index="index" collection="parentDeploymentIds" 
+                 open="(" separator="," close=")">
+          #{parentDeploymentId}
+        </foreach>
+      </if>
       <if test="engineVersion != null">
         and RES.ENGINE_VERSION_ = #{engineVersion}
       </if>
-      <if test="processDefinitionKey != null">
-        and PROCDEF.KEY_ = #{processDefinitionKey}
-      </if>
-      <if test="processDefinitionKeyLike != null">
-        and PROCDEF.KEY_ like #{processDefinitionKeyLike}${wildcardEscapeClause}
+      <if test="processDefinitionKey != null || processDefinitionKeyLike != null">
+        and exists(select 1 from ${prefix}ACT_RE_PROCDEF PROCDEF where RES.ID_ = PROCDEF.DEPLOYMENT_ID_ 
+            <if test="processDefinitionKey != null">
+              and PROCDEF.KEY_ = #{processDefinitionKey}
+            </if>
+            <if test="processDefinitionKeyLike != null">
+              and PROCDEF.KEY_ like #{processDefinitionKeyLike}${wildcardEscapeClause}
+            </if>
+        )
       </if>
       <if test="latest">
         and RES.DEPLOY_TIME_ = (select max(DEPLOY_TIME_) from ${prefix}ACT_RE_DEPLOYMENT where KEY_ = RES.KEY_ 
@@ -182,21 +202,6 @@
     
   <select id="selectDeployment" parameterType="string" resultMap="deploymentResultMap">
     select * from ${prefix}ACT_RE_DEPLOYMENT where ID_ = #{id, jdbcType=VARCHAR}
-  </select>
-
-  <!-- mysql specific -->
-  <select id="selectDeploymentsByQueryCriteria" databaseId="mysql" parameterType="org.flowable.engine.impl.DeploymentQueryImpl" resultMap="deploymentResultMap">
-  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
-    <include refid="selectDeploymentsByQueryCriteriaSql"/>
-   	${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
-  </select>
-  
-  <!-- mysql specific -->
-  <select id="selectDeploymentCountByQueryCriteria" databaseId="mysql" parameterType="org.flowable.engine.impl.DeploymentQueryImpl" resultType="long">
-    select distinct count(RES.ID_)
-    <include refid="selectDeploymentsByQueryCriteriaSql"/>
   </select>
 
   <select id="selectDeploymentByNativeQuery" parameterType="java.util.Map" resultMap="deploymentResultMap">

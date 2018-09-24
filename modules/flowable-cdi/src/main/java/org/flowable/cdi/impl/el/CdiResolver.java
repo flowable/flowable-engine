@@ -21,8 +21,8 @@ import javax.enterprise.inject.spi.BeanManager;
 
 import org.flowable.cdi.impl.util.BeanManagerLookup;
 import org.flowable.cdi.impl.util.ProgrammaticBeanLookup;
-import org.flowable.engine.common.impl.javax.el.ELContext;
-import org.flowable.engine.common.impl.javax.el.ELResolver;
+import org.flowable.common.engine.impl.javax.el.ELContext;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
 
 /**
  * Resolver wrapping an instance of javax.el.ELResolver obtained from the {@link BeanManager}. Allows flowable-engine to resolve Cdi-Beans.

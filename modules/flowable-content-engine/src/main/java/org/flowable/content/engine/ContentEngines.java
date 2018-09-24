@@ -28,9 +28,9 @@ import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.EngineInfo;
-import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.EngineInfo;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,16 +159,12 @@ public abstract class ContentEngines {
     }
 
     protected static ContentEngine buildContentEngine(URL resource) {
-        InputStream inputStream = null;
-        try {
-            inputStream = resource.openStream();
+        try (InputStream inputStream = resource.openStream()) {
             ContentEngineConfiguration contentEngineConfiguration = ContentEngineConfiguration.createContentEngineConfigurationFromInputStream(inputStream);
             return contentEngineConfiguration.buildContentEngine();
 
         } catch (IOException e) {
             throw new FlowableException("couldn't open resource stream: " + e.getMessage(), e);
-        } finally {
-            IOUtils.closeQuietly(inputStream);
         }
     }
 

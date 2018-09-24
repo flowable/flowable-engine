@@ -15,24 +15,27 @@ package org.flowable.engine.test.api.task;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.TaskInfoQueryWrapper;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class TaskInfoQueryTest extends PluggableFlowableTestCase {
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
             taskService.deleteTask(task.getId(), true);
         }
     }
 
+    @Test
     public void testTaskInfoQuery() {
         Date now = processEngineConfiguration.getClock().getCurrentTime();
 

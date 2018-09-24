@@ -21,7 +21,6 @@ import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,7 +38,7 @@ import io.swagger.annotations.Authorization;
  */
 @RestController
 @Api(tags = { "Cmmn Deployment" }, description = "Manage Cmmn Deployment", authorizations = { @Authorization(value = "basicAuth") })
-public class DeploymentResourceCollectionResource {
+public class DeploymentResourceCollectionResource extends BaseDeploymentResource {
 
     @Autowired
     protected CmmnRestResponseFactory restResponseFactory;
@@ -59,12 +58,9 @@ public class DeploymentResourceCollectionResource {
     @GetMapping(value = "/cmmn-repository/deployments/{deploymentId}/resources", produces = "application/json")
     public List<DeploymentResourceResponse> getDeploymentResources(@ApiParam(name = "deploymentId") @PathVariable String deploymentId, HttpServletRequest request) {
         // Check if deployment exists
-        CmmnDeployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
-        if (deployment == null) {
-            throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.", CmmnDeployment.class);
-        }
+        CmmnDeployment deployment = getCmmnDeployment(deploymentId);
 
-        List<String> resourceList = repositoryService.getDeploymentResourceNames(deploymentId);
+        List<String> resourceList = repositoryService.getDeploymentResourceNames(deployment.getId());
 
         return restResponseFactory.createDeploymentResourceResponseList(deploymentId, resourceList, contentTypeResolver);
     }

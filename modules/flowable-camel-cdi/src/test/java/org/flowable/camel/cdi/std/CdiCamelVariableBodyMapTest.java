@@ -45,6 +45,7 @@ public class CdiCamelVariableBodyMapTest extends StdCamelCdiFlowableTestCase {
     @Inject
     protected CamelContext camelContext;
 
+    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();

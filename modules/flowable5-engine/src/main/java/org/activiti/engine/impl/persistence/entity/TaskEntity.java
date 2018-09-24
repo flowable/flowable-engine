@@ -39,7 +39,7 @@ import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.engine.task.Task;
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.identitylink.api.IdentityLink;
@@ -414,48 +414,58 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         return potentialOwners;
     }
 
+    @Override
     public void addCandidateUser(String userId) {
         addIdentityLink(userId, null, IdentityLinkType.CANDIDATE);
     }
 
+    @Override
     public void addCandidateUsers(Collection<String> candidateUsers) {
         for (String candidateUser : candidateUsers) {
             addCandidateUser(candidateUser);
         }
     }
 
+    @Override
     public void addCandidateGroup(String groupId) {
         addIdentityLink(null, groupId, IdentityLinkType.CANDIDATE);
     }
 
+    @Override
     public void addCandidateGroups(Collection<String> candidateGroups) {
         for (String candidateGroup : candidateGroups) {
             addCandidateGroup(candidateGroup);
         }
     }
 
+    @Override
     public void addGroupIdentityLink(String groupId, String identityLinkType) {
         addIdentityLink(null, groupId, identityLinkType);
     }
 
+    @Override
     public void addUserIdentityLink(String userId, String identityLinkType) {
         addIdentityLink(userId, null, identityLinkType);
     }
 
+    @Override
     public void deleteCandidateGroup(String groupId) {
         deleteGroupIdentityLink(groupId, IdentityLinkType.CANDIDATE);
     }
 
+    @Override
     public void deleteCandidateUser(String userId) {
         deleteUserIdentityLink(userId, IdentityLinkType.CANDIDATE);
     }
 
+    @Override
     public void deleteGroupIdentityLink(String groupId, String identityLinkType) {
         if (groupId != null) {
             deleteIdentityLink(null, groupId, identityLinkType);
         }
     }
 
+    @Override
     public void deleteUserIdentityLink(String userId, String identityLinkType) {
         if (userId != null) {
             deleteIdentityLink(userId, null, identityLinkType);

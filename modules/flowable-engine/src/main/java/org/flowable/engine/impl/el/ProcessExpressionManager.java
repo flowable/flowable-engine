@@ -15,12 +15,12 @@ package org.flowable.engine.impl.el;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.engine.common.api.variable.VariableContainer;
-import org.flowable.engine.common.impl.el.DynamicBeanPropertyELResolver;
-import org.flowable.engine.common.impl.javax.el.BeanELResolver;
-import org.flowable.engine.common.impl.javax.el.ELResolver;
-import org.flowable.engine.common.impl.javax.el.ValueExpression;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.common.engine.impl.el.DynamicBeanPropertyELResolver;
+import org.flowable.common.engine.impl.javax.el.BeanELResolver;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
+import org.flowable.common.engine.impl.javax.el.ValueExpression;
 import org.flowable.engine.impl.bpmn.data.ItemInstance;
 import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
 import org.flowable.engine.impl.interceptor.DelegateInterceptor;

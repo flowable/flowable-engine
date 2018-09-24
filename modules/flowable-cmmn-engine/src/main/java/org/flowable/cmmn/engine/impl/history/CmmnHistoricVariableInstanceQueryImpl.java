@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.cmmn.api.history.HistoricVariableInstanceQuery;
-import org.flowable.engine.common.api.query.QueryProperty;
-import org.flowable.engine.common.api.scope.ScopeTypes;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.api.query.QueryProperty;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
 

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,11 +28,11 @@ import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import org.apache.commons.mail.MultiPartEmail;
 import org.apache.commons.mail.SimpleEmail;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.cfg.MailServerInfo;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
  * @author Joram Barrez
  * @author Frederik Heremans
  * @author Tim Stephenson
+ * @author Filip Hrisafov
  */
 public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
 
@@ -50,11 +51,13 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
     private static final Logger LOGGER = LoggerFactory.getLogger(MailActivityBehavior.class);
 
     private static final Class<?>[] ALLOWED_ATT_TYPES = new Class<?>[] { File.class, File[].class, String.class, String[].class, DataSource.class, DataSource[].class };
+    private static final String NEWLINE_REGEX = "\\r?\\n";
 
     protected Expression to;
     protected Expression from;
     protected Expression cc;
     protected Expression bcc;
+    protected Expression headers;
     protected Expression subject;
     protected Expression text;
     protected Expression textVar;
@@ -72,6 +75,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         String exceptionVariable = getStringFromField(exceptionVariableName, execution);
         Email email = null;
         try {
+            String headersStr = getStringFromField(headers, execution);
             String toStr = getStringFromField(to, execution);
             String fromStr = getStringFromField(from, execution);
             String ccStr = getStringFromField(cc, execution);
@@ -85,10 +89,11 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
             getFilesFromFields(attachments, execution, files, dataSources);
 
             email = createEmail(textStr, htmlStr, attachmentsExist(files, dataSources));
-            addTo(email, toStr);
+            addHeader(email, headersStr);
+            addTo(email, toStr, execution.getTenantId());
             setFrom(email, fromStr, execution.getTenantId());
-            addCc(email, ccStr);
-            addBcc(email, bccStr);
+            addCc(email, ccStr, execution.getTenantId());
+            addBcc(email, bccStr, execution.getTenantId());
             setSubject(email, subjectStr);
             setMailServerProperties(email, execution.getTenantId());
             setCharset(email, charSetStr);
@@ -103,6 +108,21 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
 
         leave(execution);
+    }
+
+    protected void addHeader(Email email, String headersStr) {
+        if (headersStr == null) {
+            return;
+        }
+        for (String headerEntry : headersStr.split(NEWLINE_REGEX)) {
+            String[] split = headerEntry.split(":");
+            if (split.length != 2) {
+                throw new FlowableIllegalArgumentException("When using email headers name and value must be defined colon separated. (e.g. X-Attribute: value");
+            }
+            String name = split[0].trim();
+            String value = split[1].trim();
+            email.addHeader(name, value);
+        }
     }
 
     private boolean attachmentsExist(List<File> files, List<DataSource> dataSources) {
@@ -156,8 +176,16 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
     }
 
-    protected void addTo(Email email, String to) {
-        String[] tos = splitAndTrim(to);
+    protected void addTo(Email email, String to, String tenantId) {
+        if (to == null) {
+            // To has to be set, otherwise it can fallback to the forced To and then it won't be noticed early on
+            throw new FlowableException("No recipient could be found for sending email");
+        }
+        String newTo = getForceTo(tenantId);
+        if (newTo == null) {
+            newTo = to;
+        }
+        String[] tos = splitAndTrim(newTo);
         if (tos != null) {
             for (String t : tos) {
                 try {
@@ -197,8 +225,16 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
     }
 
-    protected void addCc(Email email, String cc) {
-        String[] ccs = splitAndTrim(cc);
+    protected void addCc(Email email, String cc, String tenantId) {
+        if (cc == null) {
+            return;
+        }
+
+        String newCc = getForceTo(tenantId);
+        if (newCc == null) {
+            newCc = cc;
+        }
+        String[] ccs = splitAndTrim(newCc);
         if (ccs != null) {
             for (String c : ccs) {
                 try {
@@ -210,8 +246,15 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
     }
 
-    protected void addBcc(Email email, String bcc) {
-        String[] bccs = splitAndTrim(bcc);
+    protected void addBcc(Email email, String bcc, String tenantId) {
+        if (bcc == null) {
+            return;
+        }
+        String newBcc = getForceTo(tenantId);
+        if (newBcc == null) {
+            newBcc = bcc;
+        }
+        String[] bccs = splitAndTrim(newBcc);
         if (bccs != null) {
             for (String b : bccs) {
                 try {
@@ -406,5 +449,22 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
                 throw new FlowableException(msg, e);
             }
         }
+    }
+
+    protected String getForceTo(String tenantId) {
+        String forceTo = null;
+        if (tenantId != null && tenantId.length() > 0) {
+            Map<String, MailServerInfo> mailServers = CommandContextUtil.getProcessEngineConfiguration().getMailServers();
+            if (mailServers != null && mailServers.containsKey(tenantId)) {
+                MailServerInfo mailServerInfo = mailServers.get(tenantId);
+                forceTo = mailServerInfo.getMailServerForceTo();
+            }
+        }
+
+        if (forceTo == null) {
+            forceTo = CommandContextUtil.getProcessEngineConfiguration().getMailServerForceTo();
+        }
+
+        return forceTo;
     }
 }

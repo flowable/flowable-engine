@@ -15,9 +15,9 @@ package org.flowable.engine.impl.bpmn.listener;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.common.impl.scripting.ScriptingEngines;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 
 public class ScriptExecutionListener implements ExecutionListener {
 

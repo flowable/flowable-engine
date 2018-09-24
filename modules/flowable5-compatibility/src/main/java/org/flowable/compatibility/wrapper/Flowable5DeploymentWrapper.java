@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.Map;
 
 import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
-import org.flowable.engine.common.api.repository.EngineResource;
+import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.repository.Deployment;
 
@@ -78,6 +78,11 @@ public class Flowable5DeploymentWrapper implements Deployment {
 
     @Override
     public String getDerivedFromRoot() {
+        return null;
+    }
+    
+    @Override
+    public String getParentDeploymentId() {
         return null;
     }
 

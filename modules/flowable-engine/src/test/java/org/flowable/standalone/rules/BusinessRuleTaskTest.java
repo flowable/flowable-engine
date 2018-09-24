@@ -15,12 +15,14 @@ package org.flowable.standalone.rules;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
  */
 public class BusinessRuleTaskTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testBusinessRuleTask() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("customRule");

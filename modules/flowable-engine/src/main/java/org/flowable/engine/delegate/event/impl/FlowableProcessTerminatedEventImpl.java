@@ -12,8 +12,8 @@
  */
 package org.flowable.engine.delegate.event.impl;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableProcessTerminatedEvent;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 

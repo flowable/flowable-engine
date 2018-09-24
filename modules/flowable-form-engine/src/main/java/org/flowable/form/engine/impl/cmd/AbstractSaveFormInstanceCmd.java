@@ -16,9 +16,10 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormInstance;
 import org.flowable.form.engine.FormEngineConfiguration;
@@ -164,8 +165,10 @@ public abstract class AbstractSaveFormInstanceCmd implements Command<FormInstanc
             formInstanceEntity.setScopeType(scopeType);
             formInstanceEntity.setScopeDefinitionId(scopeDefinitionId);
         }
-        
+
         formInstanceEntity.setSubmittedDate(new Date());
+        formInstanceEntity.setSubmittedBy(Authentication.getAuthenticatedUserId());
+
         try {
             formInstanceEntity.setFormValueBytes(objectMapper.writeValueAsBytes(submittedFormValuesJson));
         } catch (Exception e) {

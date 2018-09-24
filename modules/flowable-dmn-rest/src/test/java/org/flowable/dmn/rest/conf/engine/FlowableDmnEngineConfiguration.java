@@ -12,13 +12,13 @@
  */
 package org.flowable.dmn.rest.conf.engine;
 
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.cfg.StandaloneInMemDmnEngineConfiguration;
-import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

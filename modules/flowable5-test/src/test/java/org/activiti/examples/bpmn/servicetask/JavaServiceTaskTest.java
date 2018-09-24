@@ -17,8 +17,8 @@ import java.util.Map;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
-import org.flowable.engine.common.api.FlowableClassLoadingException;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableClassLoadingException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;

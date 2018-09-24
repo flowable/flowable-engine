@@ -16,16 +16,18 @@ package org.flowable.standalone.calendar;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.flowable.engine.common.impl.calendar.DurationBusinessCalendar;
-import org.flowable.engine.common.impl.runtime.Clock;
-import org.flowable.engine.common.impl.util.DefaultClockImpl;
+import org.flowable.common.engine.impl.calendar.DurationBusinessCalendar;
+import org.flowable.common.engine.impl.runtime.Clock;
+import org.flowable.common.engine.impl.util.DefaultClockImpl;
 import org.flowable.engine.impl.test.AbstractTestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
  */
 public class DurationBusinessCalendarTest extends AbstractTestCase {
 
+    @Test
     public void testSimpleDuration() throws Exception {
         Clock testingClock = new DefaultClockImpl();
         DurationBusinessCalendar businessCalendar = new DurationBusinessCalendar(testingClock);

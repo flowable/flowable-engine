@@ -12,14 +12,15 @@
  */
 package org.flowable.task.service.impl.util;
 
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.db.DbSqlSession;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManager;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
+import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityManager;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityManager;
@@ -36,6 +37,18 @@ public class CommandContextUtil {
         if (commandContext != null) {
             return (TaskServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
                             .get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
+        }
+        return null;
+    }
+    
+    public static IdmEngineConfigurationApi getIdmEngineConfiguration() {
+        return getIdmEngineConfiguration(getCommandContext());
+    }
+    
+    public static IdmEngineConfigurationApi getIdmEngineConfiguration(CommandContext commandContext) {
+        if (commandContext != null) {
+            return (IdmEngineConfigurationApi) commandContext.getCurrentEngineConfiguration().getEngineConfigurations()
+                            .get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
         }
         return null;
     }

@@ -15,7 +15,6 @@ package org.flowable.engine.impl.util;
 import java.util.List;
 
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -51,13 +50,13 @@ public class IdentityLinkUtil {
         }
         processInstanceEntity.getIdentityLinks().removeAll(removedIdentityLinkEntities);
     }
-    
+
     public static void handleTaskIdentityLinkAdditions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinkEntities) {
         for (IdentityLinkEntity identityLinkEntity : identityLinkEntities) {
             handleTaskIdentityLinkAddition(taskEntity, identityLinkEntity);
         }
     }
-    
+
     public static void handleTaskIdentityLinkAddition(TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity) {
         CommandContextUtil.getHistoryManager().recordIdentityLinkCreated(identityLinkEntity);
 
@@ -67,20 +66,11 @@ public class IdentityLinkUtil {
                 countingTaskEntity.setIdentityLinkCount(countingTaskEntity.getIdentityLinkCount() + 1);
             }
         }
-        
+
         taskEntity.getIdentityLinks().add(identityLinkEntity);
-        if (identityLinkEntity.getUserId() != null && taskEntity.getProcessInstanceId() != null) {
-            ExecutionEntity executionEntity = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getProcessInstanceId());
-            for (IdentityLinkEntity identityLink : executionEntity.getIdentityLinks()) {
-                if (identityLink.isUser() && identityLink.getUserId().equals(identityLinkEntity.getUserId())) {
-                    return;
-                }
-            }
-            
-            IdentityLinkUtil.createProcessInstanceIdentityLink(executionEntity, identityLinkEntity.getUserId(), null, IdentityLinkType.PARTICIPANT);
-        }
+        CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLinkToParent(taskEntity, identityLinkEntity.getUserId());
     }
-    
+
     public static void handleTaskIdentityLinkDeletions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinks, boolean cascadeHistory, boolean updateTaskCounts) {
         for (IdentityLinkEntity identityLinkEntity : identityLinks) {
             if (cascadeHistory) {

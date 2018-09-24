@@ -14,8 +14,8 @@ package org.flowable.engine.impl.persistence.entity.data.impl.cachematcher;
 
 import java.util.Collection;
 
-import org.flowable.engine.common.impl.persistence.cache.CachedEntity;
-import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcher;
+import org.flowable.common.engine.impl.persistence.cache.CachedEntity;
+import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 /**

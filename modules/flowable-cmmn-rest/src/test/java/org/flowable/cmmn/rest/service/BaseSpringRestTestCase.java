@@ -20,7 +20,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +32,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -59,13 +57,12 @@ import org.flowable.cmmn.rest.conf.ApplicationConfiguration;
 import org.flowable.cmmn.rest.service.api.RestUrlBuilder;
 import org.flowable.cmmn.rest.util.TestServerUtil;
 import org.flowable.cmmn.rest.util.TestServerUtil.TestServer;
-import org.flowable.engine.common.impl.db.DbSchemaManager;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.db.SchemaManager;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
+import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Assert;
@@ -73,15 +70,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
-public class BaseSpringRestTestCase extends TestCase {
+public abstract class BaseSpringRestTestCase extends TestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseSpringRestTestCase.class);
     
@@ -175,7 +170,7 @@ public class BaseSpringRestTestCase extends TestCase {
 
             super.runTest();
 
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             LOGGER.error(EMPTY_LINE);
             LOGGER.error("ASSERTION FAILED: {}", e, e);
             throw e;
@@ -200,7 +195,7 @@ public class BaseSpringRestTestCase extends TestCase {
 
             super.runBare();
 
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             LOGGER.error(EMPTY_LINE);
             LOGGER.error("ASSERTION FAILED: {}", e, e);
             exception = e;
@@ -250,13 +245,12 @@ public class BaseSpringRestTestCase extends TestCase {
     }
 
     protected CloseableHttpResponse internalExecuteRequest(HttpUriRequest request, int expectedStatusCode, boolean addJsonContentType) {
-        CloseableHttpResponse response = null;
         try {
             if (addJsonContentType && request.getFirstHeader(HttpHeaders.CONTENT_TYPE) == null) {
                 // Revert to default content-type
                 request.addHeader(new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json"));
             }
-            response = client.execute(request);
+            CloseableHttpResponse response = client.execute(request);
             Assert.assertNotNull(response.getStatusLine());
 
             int responseStatusCode = response.getStatusLine().getStatusCode();
@@ -271,8 +265,6 @@ public class BaseSpringRestTestCase extends TestCase {
             httpResponses.add(response);
             return response;
 
-        } catch (ClientProtocolException e) {
-            Assert.fail(e.getMessage());
         } catch (IOException e) {
             Assert.fail(e.getMessage());
         }
@@ -319,14 +311,11 @@ public class BaseSpringRestTestCase extends TestCase {
             LOGGER.info("dropping and recreating db");
 
             CommandExecutor commandExecutor = cmmnEngine.getCmmnEngineConfiguration().getCommandExecutor();
-            commandExecutor.execute(new Command<Object>() {
-                @Override
-                public Object execute(CommandContext commandContext) {
-                    DbSchemaManager dbSchemaManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDbSchemaManager();
-                    dbSchemaManager.dbSchemaDrop();
-                    dbSchemaManager.dbSchemaCreate();
-                    return null;
-                }
+            commandExecutor.execute(commandContext -> {
+                SchemaManager dbSchemaManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDbSchemaManager();
+                dbSchemaManager.schemaDrop();
+                dbSchemaManager.schemaCreate();
+                return null;
             });
 
             if (exception != null) {
@@ -367,14 +356,14 @@ public class BaseSpringRestTestCase extends TestCase {
         CaseInstance caseInstance = cmmnEngine.getCmmnRuntimeService().createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
 
         if (caseInstance != null) {
-            throw new AssertionFailedError("Expected finished case instance '" + caseInstanceId + "' but it was still in the db");
+            throw new AssertionError("Expected finished case instance '" + caseInstanceId + "' but it was still in the db");
         }
     }
 
     /**
      * Checks if the returned "data" array (child-node of root-json node returned by invoking a GET on the given url) contains entries with the given ID's.
      */
-    protected void assertResultsPresentInDataResponse(String url, String... expectedResourceIds) throws JsonProcessingException, IOException {
+    protected void assertResultsPresentInDataResponse(String url, String... expectedResourceIds) throws IOException {
         int numberOfResultsExpected = expectedResourceIds.length;
 
         // Do the actual call
@@ -387,15 +376,14 @@ public class BaseSpringRestTestCase extends TestCase {
 
         // Check presence of ID's
         List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));
-        Iterator<JsonNode> it = dataNode.iterator();
-        while (it.hasNext()) {
-            String id = it.next().get("id").textValue();
+        for (JsonNode aDataNode : dataNode) {
+            String id = aDataNode.get("id").textValue();
             toBeFound.remove(id);
         }
         assertTrue("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
     }
 
-    protected void assertEmptyResultsPresentInDataResponse(String url) throws JsonProcessingException, IOException {
+    protected void assertEmptyResultsPresentInDataResponse(String url) throws IOException {
         // Do the actual call
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
 
@@ -408,11 +396,11 @@ public class BaseSpringRestTestCase extends TestCase {
     /**
      * Checks if the returned "data" array (child-node of root-json node returned by invoking a POST on the given url) contains entries with the given ID's.
      */
-    protected void assertResultsPresentInPostDataResponse(String url, ObjectNode body, String... expectedResourceIds) throws JsonProcessingException, IOException {
+    protected void assertResultsPresentInPostDataResponse(String url, ObjectNode body, String... expectedResourceIds) throws IOException {
         assertResultsPresentInPostDataResponseWithStatusCheck(url, body, HttpStatus.SC_OK, expectedResourceIds);
     }
 
-    protected void assertResultsPresentInPostDataResponseWithStatusCheck(String url, ObjectNode body, int expectedStatusCode, String... expectedResourceIds) throws JsonProcessingException, IOException {
+    protected void assertResultsPresentInPostDataResponseWithStatusCheck(String url, ObjectNode body, int expectedStatusCode, String... expectedResourceIds) throws IOException {
         int numberOfResultsExpected = 0;
         if (expectedResourceIds != null) {
             numberOfResultsExpected = expectedResourceIds.length;
@@ -432,9 +420,8 @@ public class BaseSpringRestTestCase extends TestCase {
             // Check presence of ID's
             if (expectedResourceIds != null) {
                 List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));
-                Iterator<JsonNode> it = dataNode.iterator();
-                while (it.hasNext()) {
-                    String id = it.next().get("id").textValue();
+                for (JsonNode aDataNode : dataNode) {
+                    String id = aDataNode.get("id").textValue();
                     toBeFound.remove(id);
                 }
                 assertTrue("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
@@ -472,6 +459,13 @@ public class BaseSpringRestTestCase extends TestCase {
         TimeZone tz = TimeZone.getTimeZone("UTC");
         longDateFormat.setTimeZone(tz);
         return longDateFormat.format(time);
+    }
+
+    protected String getISODateStringWithTZ(Date date) {
+        if (date == null) {
+            return null;
+        }
+        return ISODateTimeFormat.dateTime().print(new DateTime(date));
     }
 
     protected String buildUrl(String[] fragments, Object... arguments) {

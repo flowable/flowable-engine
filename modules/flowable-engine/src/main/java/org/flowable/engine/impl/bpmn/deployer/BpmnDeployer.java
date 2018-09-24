@@ -27,15 +27,15 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.bpmn.model.ValuedDataObject;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.repository.EngineDeployment;
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.EngineDeployer;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.DynamicBpmnService;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.repository.EngineDeployment;
-import org.flowable.engine.common.api.repository.EngineResource;
-import org.flowable.engine.common.impl.EngineDeployer;
-import org.flowable.engine.common.impl.cfg.IdGenerator;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.DeploymentSettings;
@@ -64,6 +64,7 @@ public class BpmnDeployer implements EngineDeployer {
     protected BpmnDeploymentHelper bpmnDeploymentHelper;
     protected CachingAndArtifactsManager cachingAndArtifactsManager;
     protected ProcessDefinitionDiagramHelper processDefinitionDiagramHelper;
+    protected boolean usePrefixId;
 
     @Override
     public void deploy(EngineDeployment deployment, Map<String, Object> deploymentSettings) {
@@ -176,7 +177,7 @@ public class BpmnDeployer implements EngineDeployer {
     protected Map<ProcessDefinitionEntity, ProcessDefinitionEntity> getPreviousDerivedFromVersionsOfProcessDefinitions(
             ParsedDeployment parsedDeployment) {
 
-        Map<ProcessDefinitionEntity, ProcessDefinitionEntity> result = new LinkedHashMap<ProcessDefinitionEntity, ProcessDefinitionEntity>();
+        Map<ProcessDefinitionEntity, ProcessDefinitionEntity> result = new LinkedHashMap<>();
 
         for (ProcessDefinitionEntity newDefinition : parsedDeployment.getAllProcessDefinitions()) {
             ProcessDefinitionEntity existingDefinition = bpmnDeploymentHelper.getMostRecentDerivedVersionOfProcessDefinition(newDefinition);
@@ -239,7 +240,12 @@ public class BpmnDeployer implements EngineDeployer {
             
             processDefinition.setVersion(0);
             processDefinition.setDerivedVersion(derivedVersion);
-            processDefinition.setId(idGenerator.getNextId());
+            if (usePrefixId) {
+                processDefinition.setId(processDefinition.getIdPrefix() + idGenerator.getNextId());
+            } else {
+                processDefinition.setId(idGenerator.getNextId());
+            }
+            
             processDefinition.setDerivedFrom((String) deploymentSettings.get(DeploymentSettings.DERIVED_PROCESS_DEFINITION_ID));
             processDefinition.setDerivedFromRoot((String) deploymentSettings.get(DeploymentSettings.DERIVED_PROCESS_DEFINITION_ROOT_ID));
 
@@ -299,9 +305,14 @@ public class BpmnDeployer implements EngineDeployer {
      * Process definition ids NEED to be unique across the whole engine!
      */
     protected String getIdForNewProcessDefinition(ProcessDefinitionEntity processDefinition) {
+        String prefixId = "";
+        if (usePrefixId) {
+            prefixId = processDefinition.getIdPrefix();
+        } 
+        
         String nextId = idGenerator.getNextId();
 
-        String result = processDefinition.getKey() + ":" + processDefinition.getVersion() + ":" + nextId; // ACT-505
+        String result = prefixId + processDefinition.getKey() + ":" + processDefinition.getVersion() + ":" + nextId; // ACT-505
         // ACT-115: maximum id length is 64 characters
         if (result.length() > 64) {
             result = nextId;
@@ -524,5 +535,13 @@ public class BpmnDeployer implements EngineDeployer {
 
     public void setProcessDefinitionDiagramHelper(ProcessDefinitionDiagramHelper processDefinitionDiagramHelper) {
         this.processDefinitionDiagramHelper = processDefinitionDiagramHelper;
+    }
+
+    public boolean isUsePrefixId() {
+        return usePrefixId;
+    }
+
+    public void setUsePrefixId(boolean usePrefixId) {
+        this.usePrefixId = usePrefixId;
     }
 }

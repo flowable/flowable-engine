@@ -10,7 +10,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>6.3.1-SNAPSHOT</version>
+        <version>6.4.0-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -60,6 +60,10 @@
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
+            <artifactId>flowable-idm-engine-configurator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
             <artifactId>flowable-cmmn-api</artifactId>
         </dependency>
         <dependency>
@@ -100,6 +104,21 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
             <scope>provided</scope>
@@ -115,8 +134,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>persistence-api</artifactId>
+            <!-- no official JPA 2.1 Jar was ever published, so we have to use a vendor implementation :( -->
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.1-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -140,8 +160,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.openjpa</groupId>
-            <artifactId>openjpa</artifactId>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -169,6 +189,7 @@
             <artifactId>java-uuid-generator</artifactId>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <!-- required for DiagramQueryTest -->
             <groupId>commons-io</groupId>
@@ -232,6 +253,8 @@
             javax.transaction;resolution:=optional,
             javax.enterprise.concurrent;resolution:=optional,
         </flowable.osgi.import.additional>
+        <exclude.tests>nothing-to-exclude</exclude.tests>
+        <exclude.tests2>nothing-to-exclude</exclude.tests2>
     </properties>
 
     <build>
@@ -242,6 +265,8 @@
                     <excludes>
                         <exclude>**/*TestCase.java</exclude>
                         <exclude>**/RepeatingServiceTaskTest.java</exclude>
+                        <exclude>${exclude.tests}</exclude>
+                        <exclude>${exclude.tests2}</exclude>
                     </excludes>
                     <runOrder>alphabetical</runOrder>
                 </configuration>
@@ -535,12 +560,15 @@
                     <name>databaseasynchistory</name>
                 </property>
             </activation>
-            <build>
+            <properties>
+                <exclude.tests>**/ProcessInstanceMigration*Test.java</exclude.tests>
+                <exclude.tests2>**/ChangeState*Test.java</exclude.tests2>
+            </properties>
+            <!-- <build>
                 <plugins>
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be 
-                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        
                         <version>1.4</version>
                         <executions>
                             <execution>
@@ -582,7 +610,7 @@
                         </executions>
                     </plugin>
                 </plugins>
-            </build>
+            </build> -->
         </profile>
 
         <profile>
@@ -592,6 +620,10 @@
                     <name>databasewithschemaasynchistory</name>
                 </property>
             </activation>
+            <properties>
+                <exclude.tests>**/ProcessInstanceMigration*Test.java</exclude.tests>
+                <exclude.tests2>**/ChangeState*Test.java</exclude.tests2>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -649,6 +681,10 @@
                     <name>databasemssqlasynchistory</name>
                 </property>
             </activation>
+            <properties>
+                <exclude.tests>**/ProcessInstanceMigration*Test.java</exclude.tests>
+                <exclude.tests2>**/ChangeState*Test.java</exclude.tests2>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -1109,6 +1145,7 @@
                                 <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
                                 <exclude>**/Historic*InstanceTest.java</exclude>
                                 <exclude>**/HistoryServiceTest.java</exclude>
+                                <exclude>**/HistoryLevelServiceTest.java</exclude>
                                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                                 <exclude>**/ProcessInstanceLogQueryTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
@@ -1459,6 +1496,44 @@
                                         <copy
                                             file="${basedir}/../../qa/logging/log4j.properties"
                                             todir="target/test-classes"
+                                            overwrite="true" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        
+        <profile>
+            <id>mongodb</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.flowable</groupId>
+                    <artifactId>flowable-mongodb</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>change config</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="updating flowable configuration to mongodb.flowable.cfg.xml" />
+                                        <copy
+                                            file="${basedir}/../../qa/mongodb/mongodb.flowable.cfg.xml"
+                                            tofile="target/test-classes/flowable.cfg.xml"
                                             overwrite="true" />
                                     </tasks>
                                 </configuration>

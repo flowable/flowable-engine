@@ -16,9 +16,9 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
-import org.flowable.engine.impl.asyncexecutor.message.AbstractMessageBasedJobManager;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.JobInfo;
+import org.flowable.job.service.impl.asyncexecutor.message.AbstractMessageBasedJobManager;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 

@@ -13,13 +13,13 @@
 
 package org.flowable.rest.service.api.history;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.flowable.engine.HistoryService;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,16 +27,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Tijs Rademakers
  */
 @RestController
 @Api(tags = { "History Process" }, description = "Manage History Process Instances", authorizations = { @Authorization(value = "basicAuth") })
-public class HistoricProcessInstanceIdentityLinkCollectionResource {
+public class HistoricProcessInstanceIdentityLinkCollectionResource extends HistoricProcessInstanceBaseResource {
 
     @Autowired
     protected RestResponseFactory restResponseFactory;
@@ -50,8 +53,9 @@ public class HistoricProcessInstanceIdentityLinkCollectionResource {
             @ApiResponse(code = 404, message = "Indicates the process instance could not be found..") })
     @GetMapping(value = "/history/historic-process-instances/{processInstanceId}/identitylinks", produces = "application/json")
     public List<HistoricIdentityLinkResponse> getProcessIdentityLinks(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
-
-        List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForProcessInstance(processInstanceId);
+        HistoricProcessInstance processInstance = getHistoricProcessInstanceFromRequest(processInstanceId);
+        
+        List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId());
 
         if (identityLinks != null) {
             return restResponseFactory.createHistoricIdentityLinkResponseList(identityLinks);

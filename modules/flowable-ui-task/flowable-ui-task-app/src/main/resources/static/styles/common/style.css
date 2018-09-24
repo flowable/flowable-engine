@@ -53,6 +53,10 @@ body pre {
     background: transparent;
 }
 
+hr {
+	border-top: 1px solid #606b7d; 
+}
+
 .form-wrapper textarea {
     width: 100%;
     max-width: 100%;

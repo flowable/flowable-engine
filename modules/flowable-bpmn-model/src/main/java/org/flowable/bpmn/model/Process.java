@@ -100,6 +100,7 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
         this.lanes = lanes;
     }
 
+    @Override
     public Map<String, FlowElement> getFlowElementMap() {
         return flowElementMap;
     }

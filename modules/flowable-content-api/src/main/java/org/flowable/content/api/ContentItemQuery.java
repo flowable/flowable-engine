@@ -16,7 +16,7 @@ package org.flowable.content.api;
 import java.util.Date;
 import java.util.Set;
 
-import org.flowable.engine.common.api.query.Query;
+import org.flowable.common.engine.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link ContentItem}s.

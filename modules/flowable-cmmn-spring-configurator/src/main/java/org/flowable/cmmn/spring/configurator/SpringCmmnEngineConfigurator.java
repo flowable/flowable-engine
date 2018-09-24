@@ -16,8 +16,10 @@ import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.configurator.CmmnEngineConfigurator;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
 import org.flowable.cmmn.spring.SpringCmmnExpressionManager;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.spring.SpringEngineConfiguration;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 
 /**
@@ -38,17 +40,25 @@ public class SpringCmmnEngineConfigurator extends CmmnEngineConfigurator {
 
         initialiseCommonProperties(engineConfiguration, cmmnEngineConfiguration);
 
-        SpringProcessEngineConfiguration springProcessEngineConfiguration = (SpringProcessEngineConfiguration) engineConfiguration;
-        initProcessInstanceService(springProcessEngineConfiguration);
-        initProcessInstanceStateChangedCallbacks(springProcessEngineConfiguration);
+        SpringEngineConfiguration springEngineConfiguration = (SpringEngineConfiguration) engineConfiguration;
+        
+        SpringProcessEngineConfiguration springProcessEngineConfiguration = null;
+        if (springEngineConfiguration instanceof SpringProcessEngineConfiguration) {
+            springProcessEngineConfiguration = (SpringProcessEngineConfiguration) springEngineConfiguration;
+        } else {
+            AbstractEngineConfiguration processEngineConfiguration = engineConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+            if (processEngineConfiguration instanceof SpringProcessEngineConfiguration) {
+                springProcessEngineConfiguration = (SpringProcessEngineConfiguration) processEngineConfiguration;
+            }
+        }
+        
+        if (springProcessEngineConfiguration != null) {
+           copyProcessEngineProperties(springProcessEngineConfiguration);
+        }
 
-        cmmnEngineConfiguration.setEnableTaskRelationshipCounts(springProcessEngineConfiguration.getPerformanceSettings().isEnableTaskRelationshipCounts());
-        cmmnEngineConfiguration.setTaskQueryLimit(springProcessEngineConfiguration.getTaskQueryLimit());
-        cmmnEngineConfiguration.setHistoricTaskQueryLimit(springProcessEngineConfiguration.getHistoricTaskQueryLimit());
-
-        ((SpringCmmnEngineConfiguration) cmmnEngineConfiguration).setTransactionManager(springProcessEngineConfiguration.getTransactionManager());
+        ((SpringCmmnEngineConfiguration) cmmnEngineConfiguration).setTransactionManager(springEngineConfiguration.getTransactionManager());
         cmmnEngineConfiguration.setExpressionManager(new SpringCmmnExpressionManager(
-                        springProcessEngineConfiguration.getApplicationContext(), springProcessEngineConfiguration.getBeans()));
+                        springEngineConfiguration.getApplicationContext(), springEngineConfiguration.getBeans()));
 
         initCmmnEngine();
 

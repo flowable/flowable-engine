@@ -14,9 +14,9 @@ package org.flowable.content.engine.impl.persistence.entity;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.engine.impl.ContentItemQueryImpl;
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 
 /**
  * @author Joram Barrez

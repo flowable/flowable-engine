@@ -16,9 +16,10 @@ package org.flowable.idm.rest.service.api.user;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
+import org.flowable.idm.rest.service.api.IdmRestApiInterceptor;
 import org.flowable.idm.rest.service.api.IdmRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,6 +39,7 @@ import io.swagger.annotations.Authorization;
 
 /**
  * @author Frederik Heremans
+ * @author Filip Hrisafov
  */
 @RestController
 @Api(tags = { "Users" }, description = "Manage Users", authorizations = { @Authorization(value = "basicAuth") })
@@ -48,6 +50,9 @@ public class UserResource {
 
     @Autowired
     protected IdmIdentityService identityService;
+    
+    @Autowired(required=false)
+    protected IdmRestApiInterceptor restApiInterceptor;
 
     protected User getUserFromRequest(String userId) {
         User user = identityService.createUserQuery().userId(userId).singleResult();
@@ -55,6 +60,11 @@ public class UserResource {
         if (user == null) {
             throw new FlowableObjectNotFoundException("Could not find a user with id '" + userId + "'.", User.class);
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessUserInfoById(user);
+        }
+        
         return user;
     }
 
@@ -89,6 +99,9 @@ public class UserResource {
         if (userRequest.isLastNameChanged()) {
             user.setLastName(userRequest.getLastName());
         }
+        if (userRequest.isDisplayNameChanged()) {
+            user.setDisplayName(userRequest.getDisplayName());
+        }
         if (userRequest.isPasswordChanged()) {
             user.setPassword(userRequest.getPassword());
             identityService.updateUserPassword(user);
@@ -107,6 +120,11 @@ public class UserResource {
     @DeleteMapping("/users/{userId}")
     public void deleteUser(@ApiParam(name = "userId") @PathVariable String userId, HttpServletResponse response) {
         User user = getUserFromRequest(userId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteUser(user);
+        }
+        
         identityService.deleteUser(user.getId());
         response.setStatus(HttpStatus.NO_CONTENT.value());
     }

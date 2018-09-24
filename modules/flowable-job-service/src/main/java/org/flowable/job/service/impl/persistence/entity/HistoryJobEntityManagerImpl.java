@@ -15,8 +15,9 @@ package org.flowable.job.service.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
@@ -64,7 +65,8 @@ public class HistoryJobEntityManagerImpl extends JobInfoEntityManagerImpl<Histor
         deleteByteArrayRef(jobEntity.getCustomValuesByteArrayRef());
 
         // Send event
-        if (getEventDispatcher().isEnabled()) {
+        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+        if (eventDispatcher != null && getEventDispatcher().isEnabled()) {
             getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
         }
     }
@@ -72,7 +74,8 @@ public class HistoryJobEntityManagerImpl extends JobInfoEntityManagerImpl<Histor
     @Override
     public void deleteNoCascade(HistoryJobEntity historyJobEntity) {
         super.delete(historyJobEntity);
-        if (getEventDispatcher().isEnabled()) {
+        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
         }
     }

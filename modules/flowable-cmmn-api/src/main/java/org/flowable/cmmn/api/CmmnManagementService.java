@@ -15,8 +15,9 @@ package org.flowable.cmmn.api;
 import java.util.Collection;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.job.api.DeadLetterJobQuery;
+import org.flowable.job.api.HistoryJobQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
 import org.flowable.job.api.SuspendedJobQuery;
@@ -214,5 +215,20 @@ public interface CmmnManagementService {
      *             when no job exists with the given id.
      */
     String getDeadLetterJobExceptionStacktrace(String jobId);
+    
+    /**
+     * Returns a new HistoryJobQuery implementation, that can be used to dynamically query the history jobs.
+     */
+    HistoryJobQuery createHistoryJobQuery();
+    
+    /**
+     * Forced synchronous execution of a historyJob (eg. for administration or testing).
+     * 
+     * @param historyJobId
+     *            id of the historyjob to execute, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when there is no historyJob with the given id.
+     */
+    void executeHistoryJob(String historyJobId);
 
 }

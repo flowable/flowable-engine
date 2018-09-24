@@ -34,7 +34,6 @@ public class BasicAuthenticationProvider implements AuthenticationProvider {
             for (Group group : groups) {
                 grantedAuthorities.add(new SimpleGrantedAuthority(group.getId()));
             }
-            identityService.setAuthenticatedUserId(name);
             return new UsernamePasswordAuthenticationToken(name, password, grantedAuthorities);
         } else {
             throw new BadCredentialsException("Authentication failed for this username and password");

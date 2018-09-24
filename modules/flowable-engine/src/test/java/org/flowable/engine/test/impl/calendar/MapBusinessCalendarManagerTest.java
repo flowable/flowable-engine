@@ -15,23 +15,25 @@ package org.flowable.engine.test.impl.calendar;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.calendar.BusinessCalendar;
-import org.flowable.engine.common.impl.calendar.CycleBusinessCalendar;
-import org.flowable.engine.common.impl.calendar.MapBusinessCalendarManager;
-
-import junit.framework.TestCase;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.calendar.BusinessCalendar;
+import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
+import org.flowable.common.engine.impl.calendar.MapBusinessCalendarManager;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created by martin.grofcik
  */
-public class MapBusinessCalendarManagerTest extends TestCase {
+public class MapBusinessCalendarManagerTest {
 
+    @Test
     public void testMapConstructor() {
         Map<String, BusinessCalendar> calendars = new HashMap<>(1);
         CycleBusinessCalendar calendar = new CycleBusinessCalendar(null);
@@ -41,6 +43,7 @@ public class MapBusinessCalendarManagerTest extends TestCase {
         assertEquals(calendar, businessCalendarManager.getBusinessCalendar("someKey"));
     }
 
+    @Test
     public void testInvalidCalendarNameRequest() {
         @SuppressWarnings("unchecked")
         MapBusinessCalendarManager businessCalendarManager = new MapBusinessCalendarManager(Collections.EMPTY_MAP);
@@ -53,6 +56,7 @@ public class MapBusinessCalendarManagerTest extends TestCase {
         }
     }
 
+    @Test
     public void testNullCalendars() {
         try {
             new MapBusinessCalendarManager(null);

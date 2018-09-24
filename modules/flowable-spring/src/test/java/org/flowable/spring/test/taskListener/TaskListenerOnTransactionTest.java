@@ -16,12 +16,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -30,6 +31,7 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration("classpath:org/flowable/spring/test/executionListener/TransactionDependentListenerTest-context.xml")
 public class TaskListenerOnTransactionTest extends SpringFlowableTestCase {
 
+    @Test
     @Deployment
     public void testOnCompleteCommitted() {
         CurrentTaskTransactionDependentTaskListener.clear();
@@ -57,6 +59,7 @@ public class TaskListenerOnTransactionTest extends SpringFlowableTestCase {
         assertNotNull(currentTasks.get(0).getProcessInstanceId());
     }
 
+    @Test
     @Deployment
     public void testOnCompleteRolledBack() {
         CurrentTaskTransactionDependentTaskListener.clear();
@@ -99,6 +102,7 @@ public class TaskListenerOnTransactionTest extends SpringFlowableTestCase {
         assertNotNull(currentTasks.get(1).getProcessInstanceId());
     }
 
+    @Test
     @Deployment
     public void testOnCompleteExecutionVariables() {
 
@@ -128,6 +132,7 @@ public class TaskListenerOnTransactionTest extends SpringFlowableTestCase {
         assertEquals("test2", currentTasks.get(1).getExecutionVariables().get("injectedExecutionVariable"));
     }
 
+    @Test
     @Deployment
     public void testOnCompleteTransactionalOperation() {
         CurrentTaskTransactionDependentTaskListener.clear();
@@ -162,6 +167,7 @@ public class TaskListenerOnTransactionTest extends SpringFlowableTestCase {
         assertEquals("User Task 1", currentTasks.get(0).getTaskName());
     }
 
+    @Test
     @Deployment
     public void testOnCompleteCustomPropertiesResolver() {
         CurrentTaskTransactionDependentTaskListener.clear();

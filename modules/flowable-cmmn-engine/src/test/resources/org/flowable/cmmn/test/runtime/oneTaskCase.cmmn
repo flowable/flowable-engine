@@ -6,7 +6,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
     targetNamespace="http://flowable.org/cmmn">
 
-    <case id="oneTaskCase">
+    <case id="oneTaskCase" name="oneTaskCaseName">
         <casePlanModel id="myPlanModel" name="My CasePlanModel">
             <planItem id="planItem1" name="The Task" definitionRef="theTask" />
             <task id="theTask" isBlocking="true" />

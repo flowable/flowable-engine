@@ -12,7 +12,7 @@
  */
 package org.flowable.idm.engine;
 
-import org.flowable.engine.common.impl.FlowableVersions;
+import org.flowable.common.engine.impl.FlowableVersions;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.IdmManagementService;
 

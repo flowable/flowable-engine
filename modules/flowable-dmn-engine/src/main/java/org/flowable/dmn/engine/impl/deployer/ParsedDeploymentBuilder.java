@@ -18,13 +18,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.dmn.engine.impl.DeploymentSettings;
 import org.flowable.dmn.engine.impl.parser.DmnParse;
 import org.flowable.dmn.engine.impl.parser.DmnParseFactory;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.api.repository.EngineResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

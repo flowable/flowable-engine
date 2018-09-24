@@ -16,8 +16,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.db.HasRevision;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
+import org.flowable.common.engine.impl.db.HasRevision;
 import org.flowable.idm.api.Picture;
 
 /**
@@ -25,12 +24,13 @@ import org.flowable.idm.api.Picture;
  * @author Arkadiy Gornovoy
  * @author Joram Barrez
  */
-public class UserEntityImpl extends AbstractEntity implements UserEntity, Serializable, HasRevision {
+public class UserEntityImpl extends AbstractIdmEngineEntity implements UserEntity, Serializable, HasRevision {
 
     private static final long serialVersionUID = 1L;
 
     protected String firstName;
     protected String lastName;
+    protected String displayName;
     protected String email;
     protected String password;
     protected String tenantId;
@@ -45,6 +45,7 @@ public class UserEntityImpl extends AbstractEntity implements UserEntity, Serial
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("firstName", firstName);
         persistentState.put("lastName", lastName);
+        persistentState.put("displayName", displayName);
         persistentState.put("email", email);
         persistentState.put("password", password);
         persistentState.put("tenantId", tenantId);
@@ -104,6 +105,16 @@ public class UserEntityImpl extends AbstractEntity implements UserEntity, Serial
     @Override
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+    
+    @Override
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    @Override
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     @Override

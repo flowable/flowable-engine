@@ -13,14 +13,13 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
@@ -33,12 +32,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Tijs Rademakers
@@ -87,6 +88,9 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiImplicitParam(name = "active", dataType = "boolean", value = "If true, only return tasks that are not suspended (either part of a process that is not suspended or not part of a process at all). If false, only tasks that are part of suspended process instances are returned.", paramType = "query"),
             @ApiImplicitParam(name = "includeTaskLocalVariables", dataType = "boolean", value = "Indication to include task local variables in the result.", paramType = "query"),
             @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "Indication to include process variables in the result.", paramType = "query"),
+            @ApiImplicitParam(name = "scopeDefinitionId", dataType = "string", value = "Only return tasks with the given scopeDefinitionId.", paramType = "query"),
+            @ApiImplicitParam(name = "scopeId", dataType = "string", value = "Only return tasks with the given scopeId.", paramType = "query"),
+            @ApiImplicitParam(name = "scopeType", dataType = "string", value = "Only return tasks with the given scopeType.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return tasks with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return tasks with a tenantId like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns tasks without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
@@ -257,6 +261,18 @@ public class TaskCollectionResource extends TaskBaseResource {
         if (requestParams.containsKey("includeProcessVariables")) {
             request.setIncludeProcessVariables(Boolean.valueOf(requestParams.get("includeProcessVariables")));
         }
+        
+        if (requestParams.containsKey("scopeDefinitionId")) {
+            request.setScopeDefinitionId(requestParams.get("scopeDefinitionId"));
+        }
+        
+        if (requestParams.containsKey("scopeId")) {
+            request.setScopeId(requestParams.get("scopeId"));
+        }
+        
+        if (requestParams.containsKey("scopeType")) {
+            request.setScopeType(requestParams.get("scopeType"));
+        }
 
         if (requestParams.containsKey("tenantId")) {
             request.setTenantId(requestParams.get("tenantId"));
@@ -296,6 +312,11 @@ public class TaskCollectionResource extends TaskBaseResource {
         if (taskRequest.isTenantIdSet()) {
             ((TaskEntity) task).setTenantId(taskRequest.getTenantId());
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.createTask(task);
+        }
+        
         taskService.saveTask(task);
 
         response.setStatus(HttpStatus.CREATED.value());

@@ -15,8 +15,9 @@ package org.flowable.standalone.event;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test getProcess on ProcessDefinition {@link FlowableEngineEventType#ENTITY_INITIALIZED} event
@@ -32,6 +33,7 @@ public class GetProcessOnProcessDefinitionInitializesEventTest extends ResourceF
     /**
      * Test to verify process is accessible on processDefinitionEntityInitialized event.
      */
+    @Test
     public void testProcessAccessibleProcessDefinitionEntityInitializedEvent() throws Exception {
         // deploy any process
         this.deployOneTaskTestProcess();

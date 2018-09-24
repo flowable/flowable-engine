@@ -15,14 +15,16 @@ package org.flowable.task.service.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.scope.ScopeTypes;
-import org.flowable.engine.common.impl.db.SuspensionState;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.db.SuspensionState;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.idm.api.Group;
+import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
@@ -60,6 +62,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String assigneeLikeIgnoreCase;
     protected List<String> assigneeIds;
     protected String involvedUser;
+    protected Set<String> involvedGroups;
     protected String owner;
     protected String ownerLike;
     protected String ownerLikeIgnoreCase;
@@ -363,7 +366,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             throw new FlowableIllegalArgumentException("AssigneeLike is null");
         }
         if (orActive) {
-            currentOrQueryObject.assigneeLike = assignee;
+            currentOrQueryObject.assigneeLike = assigneeLike;
         } else {
             this.assigneeLike = assigneeLike;
         }
@@ -506,6 +509,22 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             currentOrQueryObject.involvedUser = involvedUser;
         } else {
             this.involvedUser = involvedUser;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQueryImpl taskInvolvedGroups(Set<String> involvedGroups) {
+        if (involvedGroups == null) {
+            throw new FlowableIllegalArgumentException("Involved groups are null");
+        }
+        if (involvedGroups.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Involved groups are empty");
+        }
+        if (orActive) {
+            currentOrQueryObject.involvedGroups = involvedGroups;
+        } else {
+            this.involvedGroups = involvedGroups;
         }
         return this;
     }
@@ -1406,11 +1425,14 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     protected List<String> getGroupsForCandidateUser(String candidateUser) {
         List<String> groupIds = new ArrayList<>();
-        IdmIdentityService idmIdentityService = CommandContextUtil.getTaskServiceConfiguration().getIdmIdentityService();
-        if (idmIdentityService != null) {
-            List<Group> groups = idmIdentityService.createGroupQuery().groupMember(candidateUser).list();
-            for (Group group : groups) {
-                groupIds.add(group.getId());
+        IdmEngineConfigurationApi idmEngineConfiguration = CommandContextUtil.getIdmEngineConfiguration();
+        if (idmEngineConfiguration != null) {
+            IdmIdentityService idmIdentityService = idmEngineConfiguration.getIdmIdentityService();
+            if (idmIdentityService != null) {
+                List<Group> groups = idmIdentityService.createGroupQuery().groupMember(candidateUser).list();
+                for (Group group : groups) {
+                    groupIds.add(group.getId());
+                }
             }
         }
         return groupIds;
@@ -1550,17 +1572,25 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         ensureVariablesInitialized();
         checkQueryOk();
         List<Task> tasks = null;
+        TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration(commandContext);
+        if (taskServiceConfiguration.getTaskQueryInterceptor() != null) {
+            taskServiceConfiguration.getTaskQueryInterceptor().beforeTaskQueryExecute(this);
+        }
+        
         if (includeTaskLocalVariables || includeProcessVariables || includeIdentityLinks) {
             tasks = CommandContextUtil.getTaskEntityManager(commandContext).findTasksWithRelatedEntitiesByQueryCriteria(this);
         } else {
             tasks = CommandContextUtil.getTaskEntityManager(commandContext).findTasksByQueryCriteria(this);
         }
 
-        TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
         if (tasks != null && taskServiceConfiguration.getInternalTaskLocalizationManager() != null && taskServiceConfiguration.isEnableLocalization()) {
             for (Task task : tasks) {
                 taskServiceConfiguration.getInternalTaskLocalizationManager().localize(task, locale, withLocalizationFallback);
             }
+        }
+        
+        if (taskServiceConfiguration.getTaskQueryInterceptor() != null) {
+            taskServiceConfiguration.getTaskQueryInterceptor().afterTaskQueryExecute(this, tasks);
         }
 
         return tasks;
@@ -1570,6 +1600,12 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
         checkQueryOk();
+        
+        TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration(commandContext);
+        if (taskServiceConfiguration.getTaskQueryInterceptor() != null) {
+            taskServiceConfiguration.getTaskQueryInterceptor().beforeTaskQueryExecute(this);
+        }
+        
         return CommandContextUtil.getTaskEntityManager(commandContext).findTaskCountByQueryCriteria(this);
     }
 
@@ -1753,6 +1789,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public String getInvolvedUser() {
         return involvedUser;
+    }
+
+    public Set<String> getInvolvedGroups() {
+        return involvedGroups;
     }
 
     public String getOwner() {

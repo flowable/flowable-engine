@@ -25,8 +25,8 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
-import org.flowable.engine.common.api.scope.ScopeTypes;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
 import org.flowable.job.service.impl.JobQueryImpl;
@@ -87,6 +87,8 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
 
         // Variables
         getVariableInstanceEntityManager().deleteByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
+        
+        // Identity links
         getIdentityLinkEntityManager().deleteIdentityLinksByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
         
         // Tasks
@@ -104,6 +106,7 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
 
         // Plan item instances
         PlanItemInstanceEntityManager planItemInstanceEntityManager = getPlanItemInstanceEntityManager();
+        
         // Plan item instances are removed per stage, in reversed order
         ArrayList<PlanItemInstanceEntity> stagePlanItemInstances = new ArrayList<>();
         collectStagePlanItemInstances(caseInstanceEntity, stagePlanItemInstances);

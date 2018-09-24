@@ -22,8 +22,8 @@ import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.flowable.engine.common.impl.javax.el.ELContext;
-import org.flowable.engine.common.impl.javax.el.ELResolver;
+import org.flowable.common.engine.impl.javax.el.ELContext;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.osgi.service.blueprint.container.BlueprintContainer;
 
 /**

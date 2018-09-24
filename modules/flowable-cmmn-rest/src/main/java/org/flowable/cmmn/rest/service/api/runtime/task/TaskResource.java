@@ -20,9 +20,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
-import org.flowable.common.rest.exception.FlowableForbiddenException;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableForbiddenException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.task.api.Task;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -105,6 +105,10 @@ public class TaskResource extends TaskBaseResource {
         }
 
         Task task = getTaskFromRequest(taskId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.executeTaskAction(task, actionRequest);
+        }
 
         if (TaskActionRequest.ACTION_COMPLETE.equals(actionRequest.getAction())) {
             completeTask(task, actionRequest);
@@ -141,6 +145,10 @@ public class TaskResource extends TaskBaseResource {
         if (taskToDelete.getScopeId() != null) {
             // Can't delete a task that is part of a process instance
             throw new FlowableForbiddenException("Cannot delete a task that is part of a case instance.");
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteTask(taskToDelete);
         }
 
         if (cascadeHistory != null) {

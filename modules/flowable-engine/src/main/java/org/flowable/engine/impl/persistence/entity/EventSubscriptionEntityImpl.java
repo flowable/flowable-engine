@@ -17,14 +17,13 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public abstract class EventSubscriptionEntityImpl extends AbstractEntity implements EventSubscriptionEntity, Serializable {
+public abstract class EventSubscriptionEntityImpl extends AbstractBpmnEngineEntity implements EventSubscriptionEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

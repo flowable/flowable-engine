@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntityImpl;
 import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntityImpl;
 import org.flowable.form.engine.impl.persistence.entity.FormInstanceEntityImpl;

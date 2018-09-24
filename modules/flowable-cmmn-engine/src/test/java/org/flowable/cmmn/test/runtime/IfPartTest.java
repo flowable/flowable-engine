@@ -24,7 +24,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.junit.Test;
 
 /**

@@ -1,12 +1,15 @@
 package org.flowable.engine.test.api.event;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
@@ -14,11 +17,17 @@ import org.flowable.engine.delegate.event.FlowableCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.event.logger.EventLogger;
+import org.flowable.engine.impl.jobexecutor.AsyncCompleteCallActivityJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class CallActivityTest extends PluggableFlowableTestCase {
 
@@ -26,9 +35,10 @@ public class CallActivityTest extends PluggableFlowableTestCase {
 
     protected EventLogger databaseEventLogger;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
+        listener = new CallActivityEventListener();
+        processEngineConfiguration.getEventDispatcher().addEventListener(listener);
 
         // Database event logger setup
         databaseEventLogger = new EventLogger(processEngineConfiguration.getClock(),
@@ -36,7 +46,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         runtimeService.addEventListener(databaseEventLogger);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
 
         if (listener != null) {
@@ -52,17 +62,9 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         // Database event logger teardown
         runtimeService.removeEventListener(databaseEventLogger);
 
-        super.tearDown();
     }
 
-    @Override
-    protected void initializeServices() {
-        super.initializeServices();
-
-        listener = new CallActivityEventListener();
-        processEngineConfiguration.getEventDispatcher().addEventListener(listener);
-    }
-
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/event/CallActivityTest.testCallActivity.bpmn20.xml",
             "org/flowable/engine/test/api/event/CallActivityTest.testCalledActivity.bpmn20.xml" })
@@ -246,6 +248,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertEquals(26, mylistener.getEventsReceived().size());
     }
     
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/event/CallActivityTest.testCallActivity.bpmn20.xml",
             "org/flowable/engine/test/api/event/CallActivityTest.testCalledActivity.bpmn20.xml" })
@@ -368,6 +371,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertEquals(17, mylistener.getEventsReceived().size());
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityTerminateEnd.bpmn20.xml",
             "org/flowable/engine/test/api/event/CallActivityTest.testCalledActivityTerminateEnd.bpmn20.xml" })
@@ -551,10 +555,12 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertEquals(idx, mylistener.getEventsReceived().size());
     }
     
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/event/CallActivityTest.testCallActivity.bpmn20.xml",
             "org/flowable/engine/test/api/event/CallActivityTest.testCalledActivity.bpmn20.xml" })
     public void testDeleteParentProcessWithCallActivity() throws Exception {
+        
         CallActivityEventListener mylistener = new CallActivityEventListener();
         processEngineConfiguration.getEventDispatcher().addEventListener(mylistener);
 
@@ -590,6 +596,96 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertEquals(processInstance.getId(), processCancelledEvent.getProcessInstanceId());
         
         System.out.println("the end");
+    }
+    
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityProcessInstanceName.bpmn20.xml",
+            "org/flowable/engine/test/api/event/CallActivityTest.testCalledActivity.bpmn20.xml"
+    })
+    public void testCallActivityProcessInstanceName() {
+        runtimeService.startProcessInstanceByKey("testCallActivityProcessInstanceName", 
+                CollectionUtil.singletonMap("theCollection", Arrays.asList("A", "B", "C", "D")));
+        
+        List<ProcessInstance> childProcessInstances = runtimeService.createProcessInstanceQuery().list().stream()
+            .filter(processInstance -> (processInstance.getSuperExecutionId() != null))
+            .sorted((p1, p2) -> p1.getName().compareTo(p2.getName()))
+            .collect(Collectors.toList());
+        
+        assertEquals(4, childProcessInstances.size());
+        assertEquals("Process instance A", childProcessInstances.get(0).getName());
+        assertEquals("Process instance B", childProcessInstances.get(1).getName());
+        assertEquals("Process instance C", childProcessInstances.get(2).getName());
+        assertEquals("Process instance D", childProcessInstances.get(3).getName());
+    }
+    
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityAsyncComplete.bpmn20.xml",
+            "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityAsyncComplete_subprocess.bpmn20.xml"
+    })
+    public void testCallActivityAsyncComplete() {
+        runtimeService.startProcessInstanceByKey("testAsyncComplete");
+        
+        // 1 async service task
+        List<Job> jobs = managementService.createJobQuery().list();
+        assertEquals(1, jobs.size());
+        jobs.forEach(job -> managementService.executeJob(job.getId()));
+        
+        // 5 async multi instance call activities after start
+        jobs = managementService.createJobQuery().list();
+        assertEquals(5, jobs.size());
+        for (Job job : jobs) {
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(job.getProcessDefinitionId()).singleResult();
+            assertEquals("testAsyncComplete", processDefinition.getKey());
+        }
+        jobs.forEach(job -> managementService.executeJob(job.getId()));
+        
+        // 1 job for each step1 in subprocess, so 5 in total
+        jobs = managementService.createJobQuery().list();
+        assertEquals(5, jobs.size());
+        for (Job job : jobs) {
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(job.getProcessDefinitionId()).singleResult();
+            assertEquals("subProcess", processDefinition.getKey());
+        }
+        jobs.forEach(job -> managementService.executeJob(job.getId()));
+
+        // Step 2
+        jobs = managementService.createJobQuery().list();
+        assertEquals(5, jobs.size());
+        jobs.forEach(job -> managementService.executeJob(job.getId()));
+        
+        // Step 3 will trigger the async complete
+        jobs = managementService.createJobQuery().list();
+        assertEquals(5, jobs.size());
+        jobs.forEach(job -> managementService.executeJob(job.getId()));
+        
+        // Async complete
+        jobs = managementService.createJobQuery().list();
+        assertEquals(5, jobs.size());
+        for (Job job : jobs) {
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(job.getProcessDefinitionId()).singleResult();
+            assertEquals("subProcess", processDefinition.getKey()); // context is the subprocess, as the EndExecution will be scheduled for that process definition
+            
+            assertEquals(AsyncCompleteCallActivityJobHandler.TYPE, job.getJobHandlerType());
+        }
+        
+        // Completing ends the process instance
+        jobs.forEach(job -> managementService.executeJob(job.getId()));
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+    }
+    
+    // Same as testCallActivityAsyncComplete, but now using the real job executor instead of fetching and executing jobs manually
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityAsyncComplete.bpmn20.xml",
+            "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityAsyncComplete_subprocess.bpmn20.xml"
+    })
+    public void testCallActivityAsyncCompleteRealExecutor() {
+        runtimeService.startProcessInstanceByKey("testAsyncComplete");
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(10000L, 100L);
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     }
 
     class CallActivityEventListener extends AbstractFlowableEngineEventListener {

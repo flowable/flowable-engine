@@ -14,17 +14,19 @@ package org.flowable.engine.test.api.history;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testLocalization() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("historicProcessLocalization");
@@ -84,6 +86,7 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
         }
     }
     
+    @Test
     public void testQueryByDeploymentId() {
         deployOneTaskTestProcess();
         String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();

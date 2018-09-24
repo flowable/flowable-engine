@@ -13,7 +13,7 @@
 
 package org.flowable.job.api;
 
-import org.flowable.engine.common.api.query.Query;
+import org.flowable.common.engine.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link HistoryJob}s.
@@ -34,6 +34,11 @@ public interface HistoryJobQuery extends Query<HistoryJobQuery, HistoryJob> {
 
     /** Only select jobs that failed due to an exception with the given message. */
     HistoryJobQuery exceptionMessage(String exceptionMessage);
+    
+    /**
+     * Only select jobs with the given scope type.
+     */
+    HistoryJobQuery scopeType(String scopeType);
 
     /**
      * Only select jobs that have the given tenant id.

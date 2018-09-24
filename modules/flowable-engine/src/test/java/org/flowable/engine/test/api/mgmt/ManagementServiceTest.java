@@ -15,11 +15,11 @@ package org.flowable.engine.test.api.mgmt;
 
 import java.util.Date;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.management.TableMetaData;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.management.TableMetaData;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -28,6 +28,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobNotFoundException;
 import org.flowable.job.service.impl.cmd.AcquireTimerJobsCmd;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Frederik Heremans
@@ -37,11 +38,13 @@ import org.flowable.job.service.impl.cmd.AcquireTimerJobsCmd;
  */
 public class ManagementServiceTest extends PluggableFlowableTestCase {
 
+    @Test
     public void testGetMetaDataForUnexistingTable() {
         TableMetaData metaData = managementService.getTableMetaData("unexistingtable");
         assertNull(metaData);
     }
 
+    @Test
     public void testGetMetaDataNullTableName() {
         try {
             managementService.getTableMetaData(null);
@@ -51,6 +54,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testExecuteJobNullJobId() {
         try {
             managementService.executeJob(null);
@@ -60,6 +64,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testExecuteJobUnexistingJob() {
         try {
             managementService.executeJob("unexistingjob");
@@ -70,6 +75,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testGetJobExceptionStacktrace() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
@@ -101,6 +107,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         assertTextPresent("This is an exception thrown from scriptTask", exceptionStack);
     }
 
+    @Test
     public void testgetJobExceptionStacktraceUnexistingJobId() {
         try {
             managementService.getJobExceptionStacktrace("unexistingjob");
@@ -111,6 +118,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testgetJobExceptionStacktraceNullJobId() {
         try {
             managementService.getJobExceptionStacktrace(null);
@@ -120,6 +128,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml" })
     public void testSetJobRetries() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
@@ -139,6 +148,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         assertEquals(duedate, timerJob.getDuedate());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/mgmt/ManagementServiceTest.testFailingAsyncJob.bpmn20.xml" })
     public void testAsyncJobWithNoRetriesLeft() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
@@ -197,6 +207,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         assertEquals(5, asyncJob.getRetries());
     }
 
+    @Test
     public void testSetJobRetriesUnexistingJobId() {
         try {
             managementService.setJobRetries("unexistingjob", 5);
@@ -207,6 +218,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testSetJobRetriesEmptyJobId() {
         try {
             managementService.setJobRetries("", 5);
@@ -216,6 +228,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testSetJobRetriesJobIdNull() {
         try {
             managementService.setJobRetries(null, 5);
@@ -225,6 +238,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testSetJobRetriesNegativeNumberOfRetries() {
         try {
             managementService.setJobRetries("unexistingjob", -1);
@@ -234,6 +248,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testDeleteJobNullJobId() {
         try {
             managementService.deleteJob(null);
@@ -243,6 +258,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testDeleteJobUnexistingJob() {
         try {
             managementService.deleteJob("unexistingjob");
@@ -253,6 +269,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/mgmt/timerOnTask.bpmn20.xml" })
     public void testDeleteJobDeletion() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerOnTask");
@@ -265,6 +282,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         assertNull("There should be no job now. It was deleted", timerJob);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/mgmt/timerOnTask.bpmn20.xml" })
     public void testDeleteJobThatWasAlreadyAcquired() {
         processEngineConfiguration.getClock().setCurrentTime(new Date());
@@ -296,6 +314,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
 
     // https://jira.codehaus.org/browse/ACT-1816:
     // ManagementService doesn't seem to give actual table Name for EventSubscriptionEntity.class
+    @Test
     public void testGetTableName() {
         String table = managementService.getTableName(EventSubscriptionEntity.class);
         assertEquals("ACT_RU_EVENT_SUBSCR", table);

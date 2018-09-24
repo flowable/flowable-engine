@@ -16,7 +16,7 @@ package org.flowable.form.api;
 import java.util.Date;
 import java.util.Set;
 
-import org.flowable.engine.common.api.query.Query;
+import org.flowable.common.engine.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link FormInstance}s.
@@ -129,6 +129,11 @@ public interface FormInstanceQuery extends Query<FormInstanceQuery, FormInstance
      * Only select submitted forms that do not have a tenant id.
      */
     FormInstanceQuery deploymentWithoutTenantId();
+
+    /**
+     * Only select submitted forms that do not have a task id.
+     */
+    FormInstanceQuery withoutTaskId();
 
     // sorting ////////////////////////////////////////////////////////
 

@@ -24,11 +24,11 @@ import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable.RestVariableScope;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.rest.exception.FlowableContentNotSupportedException;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.task.api.Task;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +55,8 @@ public class TaskVariableBaseResource extends TaskBaseResource {
     }
 
     public RestVariable getVariableFromRequest(String taskId, String variableName, String scope, boolean includeBinary) {
+        Task task = getTaskFromRequest(taskId);
+        
         boolean variableFound = false;
         Object value = null;
         RestVariableScope variableScope = RestVariable.getScopeFromString(scope);
@@ -66,7 +68,6 @@ public class TaskVariableBaseResource extends TaskBaseResource {
                 variableFound = true;
             } else {
                 // Revert to execution-variable when not present local on the task
-                Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
                 if (ScopeTypes.CMMN.equals(task.getScopeType()) && task.getScopeId() != null && runtimeService.hasVariable(task.getScopeId(), variableName)) {
                     value = runtimeService.getVariable(task.getScopeId(), variableName);
                     variableScope = RestVariableScope.GLOBAL;
@@ -75,7 +76,6 @@ public class TaskVariableBaseResource extends TaskBaseResource {
             }
 
         } else if (variableScope == RestVariableScope.GLOBAL) {
-            Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
             if (ScopeTypes.CMMN.equals(task.getScopeType()) && task.getScopeId() != null && runtimeService.hasVariable(task.getScopeId(), variableName)) {
                 value = runtimeService.getVariable(task.getScopeId(), variableName);
                 variableFound = true;
@@ -186,7 +186,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
         } catch (IOException ioe) {
             throw new FlowableIllegalArgumentException("Error getting binary variable", ioe);
         } catch (ClassNotFoundException ioe) {
-            throw new FlowableContentNotSupportedException("The provided body contains a serialized object for which the class is nog found: " + ioe.getMessage());
+            throw new FlowableContentNotSupportedException("The provided body contains a serialized object for which the class was not found: " + ioe.getMessage());
         }
 
     }

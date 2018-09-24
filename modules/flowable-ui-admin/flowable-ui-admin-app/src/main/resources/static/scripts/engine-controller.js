@@ -52,6 +52,10 @@ flowableAdminApp.controller('EngineController', ['$rootScope', '$scope', '$http'
         $scope.editCmmnEndpointConfig = function () {
             editEndpointConfig(5);
         };
+        
+        $scope.editAppEndpointConfig = function () {
+            editEndpointConfig(6);
+        };
 
         var editEndpointConfig = function (endpointType) {
 
@@ -67,6 +71,8 @@ flowableAdminApp.controller('EngineController', ['$rootScope', '$scope', '$http'
                 selectedServer = $rootScope.activeServers['content'];
             } else if (endpointType === 5) {
                 selectedServer = $rootScope.activeServers['cmmn'];
+            } else if (endpointType === 6) {
+                selectedServer = $rootScope.activeServers['app'];
             }
 
             if (selectedServer) {
@@ -108,6 +114,8 @@ flowableAdminApp.controller('EngineController', ['$rootScope', '$scope', '$http'
                             $rootScope.activeServers['content'] = result;
                         } else if (endpointType === 5) {
                             $rootScope.activeServers['cmmn'] = result;
+                        } else if (endpointType === 6) {
+                            $rootScope.activeServers['app'] = result;
                         }
                     }
                 });
@@ -132,6 +140,10 @@ flowableAdminApp.controller('EngineController', ['$rootScope', '$scope', '$http'
         
         $scope.checkCmmnEndpointConfig = function () {
             checkEndpointConfig(5);
+        };
+        
+        $scope.checkAppEndpointConfig = function () {
+            checkEndpointConfig(6);
         };
 
         var checkEndpointConfig = function (endpointType) {

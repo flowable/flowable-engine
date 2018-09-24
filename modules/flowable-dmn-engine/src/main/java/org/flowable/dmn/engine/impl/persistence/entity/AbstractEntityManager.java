@@ -12,11 +12,11 @@
  */
 package org.flowable.dmn.engine.impl.persistence.entity;
 
+import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.persistence.AbstractManager;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Joram Barrez

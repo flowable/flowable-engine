@@ -63,7 +63,7 @@ public class FlowableRuleJunit4Test {
         // now there should be one job in the database:
         assertEquals(1, managementService.createJobQuery().count());
 
-        JobTestHelper.waitForJobExecutorToProcessAllJobs(activitiRule, 5000L, 500L);
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(activitiRule, 7000L, 500L);
 
         // the job is done
         assertEquals(0, managementService.createJobQuery().count());

@@ -12,9 +12,9 @@
  */
 package org.flowable.engine.impl.cmd;
 
-import org.flowable.engine.common.impl.db.IdBlock;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.db.IdBlock;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 

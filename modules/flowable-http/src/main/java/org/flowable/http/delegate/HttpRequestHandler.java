@@ -16,7 +16,7 @@ package org.flowable.http.delegate;
 import java.io.Serializable;
 
 import org.apache.http.client.HttpClient;
-import org.flowable.engine.common.api.variable.VariableContainer;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.http.HttpRequest;
 
 /**

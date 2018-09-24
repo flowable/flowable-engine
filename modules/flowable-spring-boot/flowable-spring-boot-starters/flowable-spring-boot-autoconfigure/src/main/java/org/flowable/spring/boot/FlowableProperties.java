@@ -15,7 +15,7 @@ package org.flowable.spring.boot;
 import java.util.Arrays;
 import java.util.List;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 
@@ -36,6 +36,12 @@ public class FlowableProperties {
      * Whether the async executor should be activated.
      */
     private boolean asyncExecutorActivate = true;
+    
+    /**
+     * Whether the async history executor should be activated.
+     */
+    private boolean asyncHistoryExecutorActivate = true;
+    
     private boolean restApiEnabled;
 
     /**
@@ -95,6 +101,14 @@ public class FlowableProperties {
 
     public void setAsyncExecutorActivate(boolean asyncExecutorActivate) {
         this.asyncExecutorActivate = asyncExecutorActivate;
+    }
+    
+    public boolean isAsyncHistoryExecutorActivate() {
+        return asyncHistoryExecutorActivate;
+    }
+
+    public void setAsyncHistoryExecutorActivate(boolean asyncHistoryExecutorActivate) {
+        this.asyncHistoryExecutorActivate = asyncHistoryExecutorActivate;
     }
 
     public boolean isRestApiEnabled() {

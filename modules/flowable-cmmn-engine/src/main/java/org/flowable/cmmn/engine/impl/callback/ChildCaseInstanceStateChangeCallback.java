@@ -15,9 +15,9 @@ package org.flowable.cmmn.engine.impl.callback;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.impl.callback.CallbackData;
-import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.callback.CallbackData;
+import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez

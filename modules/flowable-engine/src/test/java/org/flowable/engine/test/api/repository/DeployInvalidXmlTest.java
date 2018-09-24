@@ -16,25 +16,27 @@ import org.flowable.bpmn.exceptions.XMLException;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class DeployInvalidXmlTest extends PluggableFlowableTestCase {
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
 
         processEngineConfiguration.setEnableSafeBpmnXml(true); // Needs to be enabled to test this
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         processEngineConfiguration.setEnableSafeBpmnXml(false); // set back to default
-        super.tearDown();
     }
 
+    @Test
     public void testDeployNonSchemaConformantXml() {
         try {
             repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/repository/nonSchemaConformantXml.bpmn20.xml").deploy().getId();
@@ -45,6 +47,7 @@ public class DeployInvalidXmlTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     public void testDeployWithMissingWaypointsForSequenceflowInDiagramInterchange() {
         try {
             repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/repository/noWayPointsForSequenceFlowInDiagramInterchange.bpmn20.xml").deploy().getId();
@@ -68,6 +71,7 @@ public class DeployInvalidXmlTest extends PluggableFlowableTestCase {
             + " <userTask id='theTask' name='my task' />" + " <sequenceFlow id='flow2' sourceRef='theTask' targetRef='theEnd' />" + " <endEvent id='theEnd' />" + "</process>" + "</definitions>";
 
     // See https://activiti.atlassian.net/browse/ACT-1579?focusedCommentId=319886#comment-319886
+    @Test
     public void testProcessEngineDenialOfServiceAttackUsingUnsafeXmlTest() throws InterruptedException {
 
         // Putting this in a Runnable so we can time it out
@@ -108,6 +112,7 @@ public class DeployInvalidXmlTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     public void testExternalEntityResolvingTest() {
         String deploymentId = repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/engine/test/api/repository/DeployInvalidXmlTest.testExternalEntityResolvingTest.bpmn20.xml")

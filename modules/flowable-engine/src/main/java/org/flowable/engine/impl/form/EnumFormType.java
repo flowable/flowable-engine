@@ -15,7 +15,7 @@ package org.flowable.engine.impl.form;
 
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.form.AbstractFormType;
 
 /**

@@ -17,12 +17,14 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Frederik Heremans
  */
 public class HistoricTaskInstanceUpdateTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testHistoricTaskInstanceUpdate() {
         runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest").getId();
@@ -38,7 +40,7 @@ public class HistoricTaskInstanceUpdateTest extends PluggableFlowableTestCase {
 
         taskService.complete(task.getId());
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().count());
 
@@ -60,7 +62,7 @@ public class HistoricTaskInstanceUpdateTest extends PluggableFlowableTestCase {
 
         taskService.complete(task.getId());
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().processInstanceId(secondInstance.getId()).count());
 

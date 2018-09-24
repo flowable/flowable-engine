@@ -16,7 +16,7 @@ package org.flowable.idm.rest.service.api.group;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.idm.api.Group;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -84,6 +84,11 @@ public class GroupResource extends BaseGroupResource {
     @DeleteMapping("/groups/{groupId}")
     public void deleteGroup(@ApiParam(name = "groupId") @PathVariable String groupId, HttpServletResponse response) {
         Group group = getGroupFromRequest(groupId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteGroup(group);
+        }
+        
         identityService.deleteGroup(group.getId());
         response.setStatus(HttpStatus.NO_CONTENT.value());
     }

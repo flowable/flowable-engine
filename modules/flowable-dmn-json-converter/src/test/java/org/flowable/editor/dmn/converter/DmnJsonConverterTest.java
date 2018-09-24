@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.IOUtils;
 import org.flowable.dmn.model.Decision;
@@ -59,7 +58,7 @@ public class DmnJsonConverterTest {
     private static final String JSON_RESOURCE_6 = "org/flowable/editor/dmn/converter/decisiontable_entries.json";
     private static final String JSON_RESOURCE_7 = "org/flowable/editor/dmn/converter/decisiontable_dates.json";
     private static final String JSON_RESOURCE_8 = "org/flowable/editor/dmn/converter/decisiontable_empty_operator.json";
-    private static final String JSON_RESOURCE_9 = "org/flowable/editor/dmn/converter/decisiontable_complex_output_expression.json";
+    private static final String JSON_RESOURCE_9 = "org/flowable/editor/dmn/converter/decisiontable_complex_output_expression_regression.json";
     private static final String JSON_RESOURCE_10 = "org/flowable/editor/dmn/converter/decisiontable_regression_model_v1.json";
     private static final String JSON_RESOURCE_11 = "org/flowable/editor/dmn/converter/decisiontable_regression_model_v1_no_type.json";
     private static final String JSON_RESOURCE_12 = "org/flowable/editor/dmn/converter/decisiontable_regression_model_v1_no_type2.json";
@@ -70,6 +69,8 @@ public class DmnJsonConverterTest {
     private static final String JSON_RESOURCE_17 = "org/flowable/editor/dmn/converter/decisiontable_custom_input_expression.json";
     private static final String JSON_RESOURCE_18 = "org/flowable/editor/dmn/converter/decisiontable_collections_collection_input.json";
     private static final String JSON_RESOURCE_19 = "org/flowable/editor/dmn/converter/decisiontable_collections_collection_compare.json";
+    private static final String JSON_RESOURCE_20 = "org/flowable/editor/dmn/converter/decisiontable_complex_output_expression.json";
+
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -369,12 +370,24 @@ public class DmnJsonConverterTest {
     }
 
     @Test
-    public void testConvertJsonToDmnComplexOutputExpression() {
+    public void testConvertJsonToDmnComplexOutputExpressionRegression() {
         JsonNode testJsonResource = parseJson(JSON_RESOURCE_9);
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
 
         DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
         assertEquals("refVar1 * refVar2", decisionTable.getRules().get(0).getOutputEntries().get(0).getOutputEntry().getText());
+
+        ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
+        assertNotNull(modelerJson);
+    }
+
+    @Test
+    public void testConvertJsonToDmnComplexOutputExpression() {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_20);
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
+
+        DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
+        assertEquals("${refVar1 * refVar2}", decisionTable.getRules().get(0).getOutputEntries().get(0).getOutputEntry().getText());
 
         ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
         assertNotNull(modelerJson);
@@ -520,33 +533,33 @@ public class DmnJsonConverterTest {
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
         DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
 
-        assertEquals("${collection:notContains(collection1, \"testValue\")}",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("${collection:contains(collection1, \"testValue\")}",  decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("${collection:contains(collection1, 'testVar1,testVar2')}",  decisionTable.getRules().get(2).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("${collection:contains(collection1, '\"testValue1\",\"testValue2\"')}",  decisionTable.getRules().get(3).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("${collection:contains(collection1, '10,20')}",  decisionTable.getRules().get(4).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("${collection:contains(collection1, 10)}",  decisionTable.getRules().get(5).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:noneOf(collection1, \"testValue\")}",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:allOf(collection1, \"testValue\")}",  decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:allOf(collection1, 'testVar1,testVar2')}",  decisionTable.getRules().get(2).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:allOf(collection1, '\"testValue1\",\"testValue2\"')}",  decisionTable.getRules().get(3).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:allOf(collection1, '10,20')}",  decisionTable.getRules().get(4).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:allOf(collection1, 10)}",  decisionTable.getRules().get(5).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("-",  decisionTable.getRules().get(6).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("${collection:notContains(collection1, \"testValue\")}",  decisionTable.getRules().get(7).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:noneOf(collection1, \"testValue\")}",  decisionTable.getRules().get(7).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("-",  decisionTable.getRules().get(8).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("${collection:containsAny(collection1, \"testValue\")}",  decisionTable.getRules().get(9).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:anyOf(collection1, \"testValue\")}",  decisionTable.getRules().get(9).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("-",  decisionTable.getRules().get(10).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("== \"testValue\"",  decisionTable.getRules().get(11).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("== testCollection",  decisionTable.getRules().get(12).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("!= \"testValue\"",  decisionTable.getRules().get(13).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("${collection:contains(collection1, '\"test,Value1\",\"test,Value2\"')}",  decisionTable.getRules().get(14).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:allOf(collection1, '\"test,Value1\",\"test,Value2\"')}",  decisionTable.getRules().get(14).getInputEntries().get(0).getInputEntry().getText());
 
         // extension elements
-        assertEquals("NOT IN",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
+        assertEquals("NONE OF",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
         assertEquals("\"testValue\"",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getExtensionElements().get("expression").get(0).getElementText());
 
         ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
         assertNotNull(modelerJson);
-        assertEquals("NOT IN", modelerJson.get("rules").get(0).get("inputExpression_1_operator").asText());
+        assertEquals("NONE OF", modelerJson.get("rules").get(0).get("inputExpression_1_operator").asText());
         assertEquals("\"testValue\"", modelerJson.get("rules").get(0).get("inputExpression_1_expression").asText());
-        assertEquals("IN", modelerJson.get("rules").get(1).get("inputExpression_1_operator").asText());
+        assertEquals("ALL OF", modelerJson.get("rules").get(1).get("inputExpression_1_operator").asText());
         assertEquals("\"testValue\"", modelerJson.get("rules").get(1).get("inputExpression_1_expression").asText());
-        assertEquals("IN", modelerJson.get("rules").get(2).get("inputExpression_1_operator").asText());
+        assertEquals("ALL OF", modelerJson.get("rules").get(2).get("inputExpression_1_operator").asText());
         assertEquals("testVar1, testVar2", modelerJson.get("rules").get(2).get("inputExpression_1_expression").asText());
     }
 
@@ -556,44 +569,40 @@ public class DmnJsonConverterTest {
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
         DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
 
-        assertEquals("${collection:notContains(\"testValue\", input1)}",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("${collection:contains(\"testValue\", input1)}",  decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("${collection:contains('testVar1,testVar2', input1)}",  decisionTable.getRules().get(2).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("${collection:contains('\"testValue1\",\"testValue2\"', input1)}",  decisionTable.getRules().get(3).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("${collection:contains('10,20', input1)}",  decisionTable.getRules().get(4).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("${collection:contains(10, input1)}",  decisionTable.getRules().get(5).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:noneOf(\"testValue\", input1)}",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:allOf(\"testValue\", input1)}",  decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:allOf('testVar1,testVar2', input1)}",  decisionTable.getRules().get(2).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:allOf('\"testValue1\",\"testValue2\"', input1)}",  decisionTable.getRules().get(3).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:allOf('10,20', input1)}",  decisionTable.getRules().get(4).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:allOf(10, input1)}",  decisionTable.getRules().get(5).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("-",  decisionTable.getRules().get(6).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("${collection:notContains(\"testValue\", input1)}",  decisionTable.getRules().get(7).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:noneOf(\"testValue\", input1)}",  decisionTable.getRules().get(7).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("-",  decisionTable.getRules().get(8).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("${collection:containsAny(\"testValue\", input1)}",  decisionTable.getRules().get(9).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:allOf(\"testValue\", input1)}",  decisionTable.getRules().get(9).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("-",  decisionTable.getRules().get(10).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("${collection:contains('\"test,Value1\",\"test,Value2\"', input1)}",  decisionTable.getRules().get(11).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:allOf('\"test,Value1\",\"test,Value2\"', input1)}",  decisionTable.getRules().get(11).getInputEntries().get(0).getInputEntry().getText());
 
         // extension elements
-        assertEquals("NOT IN",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
+        assertEquals("IS NOT IN",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
         assertEquals("\"testValue\"",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getExtensionElements().get("expression").get(0).getElementText());
 
         ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
         assertNotNull(modelerJson);
-        assertEquals("NOT IN", modelerJson.get("rules").get(0).get("inputExpression_1_operator").asText());
+        assertEquals("IS NOT IN", modelerJson.get("rules").get(0).get("inputExpression_1_operator").asText());
         assertEquals("\"testValue\"", modelerJson.get("rules").get(0).get("inputExpression_1_expression").asText());
-        assertEquals("IN", modelerJson.get("rules").get(1).get("inputExpression_1_operator").asText());
+        assertEquals("IS IN", modelerJson.get("rules").get(1).get("inputExpression_1_operator").asText());
         assertEquals("\"testValue\"", modelerJson.get("rules").get(1).get("inputExpression_1_expression").asText());
-        assertEquals("IN", modelerJson.get("rules").get(2).get("inputExpression_1_operator").asText());
+        assertEquals("IS IN", modelerJson.get("rules").get(2).get("inputExpression_1_operator").asText());
         assertEquals("testVar1, testVar2", modelerJson.get("rules").get(2).get("inputExpression_1_expression").asText());
     }
 
     /* Helper methods */
     protected String readJsonToString(String resource) {
-        InputStream is = null;
-        try {
-            is = this.getClass().getClassLoader().getResourceAsStream(resource);
+        try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(resource)) {
             return IOUtils.toString(is);
         } catch (IOException e) {
             fail("Could not read " + resource + " : " + e.getMessage());
             return null;
-        } finally {
-            IOUtils.closeQuietly(is);
         }
     }
 

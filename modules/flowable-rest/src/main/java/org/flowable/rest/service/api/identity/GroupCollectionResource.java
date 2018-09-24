@@ -13,23 +13,23 @@
 
 package org.flowable.rest.service.api.identity;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.exception.FlowableConflictException;
 import org.flowable.engine.IdentityService;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.GroupQueryProperty;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,10 +39,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.Map;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Frederik Heremans
@@ -64,6 +68,9 @@ public class GroupCollectionResource {
 
     @Autowired
     protected IdentityService identityService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "List groups", nickname="listGroups", tags = { "Groups" }, produces = "application/json")
     @ApiImplicitParams({
@@ -97,8 +104,12 @@ public class GroupCollectionResource {
         if (allRequestParams.containsKey("member")) {
             query.groupMember(allRequestParams.get("member"));
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessGroupInfoWithQuery(query);
+        }
 
-        return new GroupPaginateList(restResponseFactory).paginateList(allRequestParams, query, "id", properties);
+        return paginateList(allRequestParams, query, "id", properties, restResponseFactory::createGroupResponseList);
     }
 
     @ApiOperation(value = "Create a group", tags = { "Groups" })
@@ -110,6 +121,10 @@ public class GroupCollectionResource {
     public GroupResponse createGroup(@RequestBody GroupRequest groupRequest, HttpServletRequest httpRequest, HttpServletResponse response) {
         if (groupRequest.getId() == null) {
             throw new FlowableIllegalArgumentException("Id cannot be null.");
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.createGroup(groupRequest);
         }
 
         // Check if a user with the given ID already exists so we return a CONFLICT

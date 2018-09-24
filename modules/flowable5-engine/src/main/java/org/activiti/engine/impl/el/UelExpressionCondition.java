@@ -16,9 +16,9 @@ package org.activiti.engine.impl.el;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.Condition;
 import org.activiti.engine.impl.context.Context;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.common.api.delegate.Expression;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -53,10 +53,10 @@ public class UelExpressionCondition implements Condition {
         Object result = expression.getValue(execution);
 
         if (result == null) {
-            throw new ActivitiException("condition expression returns null");
+            throw new ActivitiException("condition expression returns null (sequenceFlowId: " + sequenceFlowId + ")" );
         }
         if (!(result instanceof Boolean)) {
-            throw new ActivitiException("condition expression returns non-Boolean: " + result + " (" + result.getClass().getName() + ")");
+            throw new ActivitiException("condition expression returns non-Boolean (sequenceFlowId: " + sequenceFlowId + "): " + result + " (" + result.getClass().getName() + ")");
         }
         return (Boolean) result;
     }

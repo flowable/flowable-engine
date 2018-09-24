@@ -14,14 +14,13 @@ package org.flowable.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class PropertyEntityImpl extends AbstractEntity implements PropertyEntity, Serializable {
+public class PropertyEntityImpl extends AbstractBpmnEngineEntity implements PropertyEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

@@ -13,14 +13,10 @@
 
 package org.flowable.rest.service.api.history;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.flowable.engine.HistoryService;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,22 +26,26 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Tijs Rademakers
  */
 @RestController
 @Api(tags = { "History Task" }, description = "Manage History Task Instances", authorizations = { @Authorization(value = "basicAuth") })
-public class HistoricTaskInstanceResource {
+public class HistoricTaskInstanceResource extends HistoricTaskInstanceBaseResource {
 
     @Autowired
     protected RestResponseFactory restResponseFactory;
 
     @Autowired
     protected HistoryService historyService;
-
+    
     @ApiOperation(value = "Get a single historic task instance", tags = { "History Task" }, notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates that the historic task instances could be found."),
@@ -61,15 +61,13 @@ public class HistoricTaskInstanceResource {
             @ApiResponse(code = 404, message = "Indicates that the historic task instance could not be found.") })
     @DeleteMapping(value = "/history/historic-task-instances/{taskId}")
     public void deleteTaskInstance(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletResponse response) {
+        HistoricTaskInstance task = getHistoricTaskInstanceFromRequest(taskId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteHistoricTask(task);
+        }
+        
         historyService.deleteHistoricTaskInstance(taskId);
         response.setStatus(HttpStatus.NO_CONTENT.value());
-    }
-
-    protected HistoricTaskInstance getHistoricTaskInstanceFromRequest(String taskId) {
-        HistoricTaskInstance taskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
-        if (taskInstance == null) {
-            throw new FlowableObjectNotFoundException("Could not find a task instance with id '" + taskId + "'.", HistoricTaskInstance.class);
-        }
-        return taskInstance;
     }
 }

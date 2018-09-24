@@ -15,8 +15,8 @@ package org.flowable.dmn.api;
 
 import java.util.Set;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.query.Query;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link DmnDecisionTable}s.
@@ -72,16 +72,6 @@ public interface DmnDecisionTableQuery extends Query<DmnDecisionTableQuery, DmnD
      * Select decision tables that are deployed in deployments with the given set of ids
      */
     DmnDecisionTableQuery deploymentIds(Set<String> deploymentIds);
-
-    /**
-     * Only select decision tables that are deployed in a deployment with the given parent deployment id
-     */
-    DmnDecisionTableQuery parentDeploymentId(String parentDeploymentId);
-
-    /**
-     * Only select decision tables that are deployed in a deployment like the given parent deployment id
-     */
-    DmnDecisionTableQuery parentDeploymentIdLike(String parentDeploymentIdLike);
 
     /**
      * Only select decision table with the given key.

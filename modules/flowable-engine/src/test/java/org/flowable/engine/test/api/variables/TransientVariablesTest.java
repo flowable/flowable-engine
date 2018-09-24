@@ -18,10 +18,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -29,12 +29,14 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.service.delegate.DelegateTask;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class TransientVariablesTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testSetTransientVariableInServiceTask() {
 
@@ -50,6 +52,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.getVariable(processInstance.getId(), "response"));
     }
 
+    @Test
     @Deployment
     public void testUseTransientVariableInExclusiveGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transientVarsTest");
@@ -60,6 +63,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.getVariable(processInstance.getId(), "response"));
     }
 
+    @Test
     @Deployment
     public void testTaskCompleteWithTransientVariables() {
         Map<String, Object> persistentVars = new HashMap<>();
@@ -89,6 +93,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.getVariable(processInstance.getId(), "thirdTransientVar"));
     }
 
+    @Test
     @Deployment
     public void testTaskResolveWithTransientVariables() {
         Map<String, Object> persistentVars = new HashMap<>();
@@ -118,6 +123,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.getVariable(processInstance.getId(), "thirdTransientVar"));
     }
 
+    @Test
     @Deployment
     public void testTaskListenerWithTransientVariables() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transientVarsTest");
@@ -129,6 +135,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertEquals("transientVar01transientVar02transientVar03", mergedResult);
     }
 
+    @Test
     @Deployment
     public void testTransientVariableShadowsPersistentVariable() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transientVarsTest", CollectionUtil.singletonMap("theVar", "Hello World"));
@@ -137,6 +144,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertEquals("I am shadowed", varValue);
     }
 
+    @Test
     @Deployment
     public void testTriggerWithTransientVars() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transientVarsTest");
@@ -154,6 +162,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.getVariable(processInstance.getId(), "transientVar"));
     }
 
+    @Test
     @Deployment
     public void testStartProcessInstanceByKey() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
@@ -181,6 +190,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.getVariables(processInstance.getId()).size());
     }
 
+    @Test
     @Deployment
     public void testStartProcessInstanceById() {
 
@@ -211,6 +221,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.getVariables(processInstance.getId()).size());
     }
 
+    @Test
     @Deployment
     public void testStartProcessInstanceByMessage() {
 
@@ -239,6 +250,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.getVariables(processInstance.getId()).size());
     }
 
+    @Test
     @Deployment
     public void testLoopingExclusiveGateway() {
 
@@ -248,7 +260,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertEquals("task1", task.getTaskDefinitionKey());
         Map<String, Object> transientVarMap = new HashMap<>();
         transientVarMap.put("status", 201);
-        taskService.complete(task.getId(), new HashMap<String, Object>(), transientVarMap);
+        taskService.complete(task.getId(), new HashMap<>(), transientVarMap);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("task2", task.getTaskDefinitionKey());
@@ -258,13 +270,13 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertEquals("task1", task.getTaskDefinitionKey());
         transientVarMap.clear();
         transientVarMap.put("status", 200);
-        taskService.complete(task.getId(), new HashMap<String, Object>(), transientVarMap);
+        taskService.complete(task.getId(), new HashMap<>(), transientVarMap);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("task3", task.getTaskDefinitionKey());
         transientVarMap.clear();
         transientVarMap.put("status2", 200);
-        taskService.complete(task.getId(), new HashMap<String, Object>(), transientVarMap);
+        taskService.complete(task.getId(), new HashMap<>(), transientVarMap);
     }
 
     /* Service task class for previous tests */

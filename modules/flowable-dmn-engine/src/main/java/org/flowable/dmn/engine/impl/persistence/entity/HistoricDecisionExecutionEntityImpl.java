@@ -18,12 +18,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
 
 /**
  * @author Tijs Rademakers
  */
-public class HistoricDecisionExecutionEntityImpl extends AbstractEntityNoRevision implements HistoricDecisionExecutionEntity, Serializable {
+public class HistoricDecisionExecutionEntityImpl extends AbstractDmnEngineNoRevisionEntity implements HistoricDecisionExecutionEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

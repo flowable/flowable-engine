@@ -21,8 +21,8 @@ import org.apache.http.entity.ContentType;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,7 +40,7 @@ import io.swagger.annotations.Authorization;
  */
 @RestController
 @Api(tags = { "Cmmn Deployment" }, description = "Manage Cmmn Deployment", authorizations = { @Authorization(value = "basicAuth") })
-public class DeploymentResourceResource {
+public class DeploymentResourceResource extends BaseDeploymentResource {
 
     @Autowired
     protected CmmnRestResponseFactory restResponseFactory;
@@ -71,15 +71,12 @@ public class DeploymentResourceResource {
         // See also https://stackoverflow.com/questions/31421061/how-to-handle-requests-that-includes-forward-slashes/42403361#42403361
 
         // Check if deployment exists
-        CmmnDeployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
-        if (deployment == null) {
-            throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.");
-        }
+        CmmnDeployment deployment = getCmmnDeployment(deploymentId);
 
         String pathInfo = request.getPathInfo();
-        String resourceName = pathInfo.replace("/cmmn-repository/deployments/" + deploymentId + "/resources/", "");
+        String resourceName = pathInfo.replace("/cmmn-repository/deployments/" + deployment.getId() + "/resources/", "");
 
-        List<String> resourceList = repositoryService.getDeploymentResourceNames(deploymentId);
+        List<String> resourceList = repositoryService.getDeploymentResourceNames(deployment.getId());
 
         if (resourceList.contains(resourceName)) {
             // Build resource representation

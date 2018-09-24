@@ -19,13 +19,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.http.bpmn.HttpServiceTaskTestServer.HttpServiceTaskTestServlet;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,12 +39,14 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
 
     private ObjectMapper mapper = new ObjectMapper();
 
+    @Test
     @Deployment
     public void testSimpleGetOnly() {
         String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
         assertProcessEnded(procId);
     }
 
+    @Test
     @Deployment
     public void testGetWithVariableName() {
         String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
@@ -54,6 +58,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         assertProcessEnded(procId);
     }
 
+    @Test
     @Deployment
     public void testGetWithoutVariableName() {
         String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
@@ -65,6 +70,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         assertProcessEnded(procId);
     }
 
+    @Test
     @Deployment
     public void testGetWithResponseHandler() {
         String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
@@ -86,6 +92,29 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         assertProcessEnded(procId);
     }
 
+    @Test
+    @Deployment
+    public void testGetWithParametrizedResponseHandler() {
+        String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
+        List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(procId).list();
+        assertEquals(2, variables.size());
+        String firstName = null;
+        String lastName = null;
+
+        for (HistoricVariableInstance historicVariableInstance : variables) {
+            if ("firstName".equals(historicVariableInstance.getVariableName())) {
+                firstName = (String) historicVariableInstance.getValue();
+            } else if ("lastName".equals(historicVariableInstance.getVariableName())) {
+                lastName = (String) historicVariableInstance.getValue();
+            }
+        }
+
+        assertEquals("John", firstName);
+        assertEquals("Doe", lastName);
+        assertProcessEnded(procId);
+    }
+
+    @Test
     @Deployment
     public void testGetWithRequestHandler() {
         String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
@@ -97,12 +126,38 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         assertProcessEnded(procId);
     }
 
+    @Test
+    @Deployment
+    public void testGetWithBpmnThrowingResponseHandler() {
+        String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
+        final HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
+            .processInstanceId(procId)
+            .singleResult();
+
+        assertEquals("theEnd2", processInstance.getEndActivityId());
+        assertProcessEnded(procId);
+    }
+
+    @Test
+    @Deployment
+    public void testGetWithBpmnThrowingRequestHandler() {
+        String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
+        final HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
+            .processInstanceId(procId)
+            .singleResult();
+
+        assertEquals("theEnd2", processInstance.getEndActivityId());
+        assertProcessEnded(procId);
+    }
+
+    @Test
     @Deployment
     public void testHttpsSelfSigned() {
         String procId = runtimeService.startProcessInstanceByKey("httpsSelfSigned").getId();
         assertProcessEnded(procId);
     }
 
+    @Test
     @Deployment
     public void testConnectTimeout() {
         try {
@@ -114,6 +169,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testRequestTimeout() {
         try {
@@ -126,6 +182,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = "org/flowable/http/bpmn/HttpServiceTaskTest.testRequestTimeout2.bpmn20.xml" )
     public void testRequestTimeoutFromProcessModelHasPrecedence() {
         // set up timeout for test
@@ -150,7 +207,8 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         this.processEngineConfiguration.getHttpClientConfig().setConnectTimeout(defaultConnectTimeOut);
         this.processEngineConfiguration.getHttpClientConfig().setConnectionRequestTimeout(defaultRequestTimeOut);
     }
-    
+
+    @Test
     @Deployment(resources = "org/flowable/http/bpmn/HttpServiceTaskTest.testRequestTimeout3.bpmn20.xml" )
     public void testRequestTimeoutFromProcessModelHasPrecedenceSuccess() {
         // set up timeout for test
@@ -172,6 +230,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         this.processEngineConfiguration.getHttpClientConfig().setConnectionRequestTimeout(defaultRequestTimeOut);
     }
 
+    @Test
     @Deployment
     public void testDisallowRedirects() {
         try {
@@ -183,6 +242,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testFailStatusCodes() {
         ProcessInstance process = null;
@@ -196,24 +256,28 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         assertNull("Process instance was not started.", process);
     }
 
+    @Test
     @Deployment
     public void testHandleStatusCodes() {
         String procId = runtimeService.startProcessInstanceByKey("handleStatusCodes").getId();
         assertProcessEnded(procId);
     }
 
+    @Test
     @Deployment
     public void testIgnoreException() {
         String procId = runtimeService.startProcessInstanceByKey("ignoreException").getId();
         assertProcessEnded(procId);
     }
 
+    @Test
     @Deployment
     public void testMapException() {
         String procId = runtimeService.startProcessInstanceByKey("mapException").getId();
         assertProcessEnded(procId);
     }
 
+    @Test
     @Deployment
     public void testHttpGet2XX() throws Exception {
         ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpGet2XX");
@@ -239,6 +303,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         continueProcess(process);
     }
 
+    @Test
     @Deployment
     public void testHttpGet3XX() {
         ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpGet3XX");
@@ -250,6 +315,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         continueProcess(process);
     }
 
+    @Test
     @Deployment
     public void testHttpGet4XX() {
         try {
@@ -261,6 +327,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testHttpGet5XX() {
         ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpGet5XX");
@@ -282,6 +349,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         continueProcess(process);
     }
 
+    @Test
     @Deployment
     public void testHttpPost2XX() throws Exception {
         ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpPost2XX");
@@ -308,6 +376,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         continueProcess(process);
     }
 
+    @Test
     @Deployment
     public void testHttpPost3XX() {
         ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpPost3XX");
@@ -319,6 +388,31 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         continueProcess(process);
     }
 
+    @Test
+    @Deployment
+    public void testHttpPostBodyEncoding() throws Exception {
+        ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpPostBodyEncoding");
+        assertFalse(process.isEnded());
+
+        // Request assertions
+        Map<String, Object> request = new HashMap<>();
+        request.put("httpPostRequestMethod", "POST");
+        request.put("httpPostRequestUrl", "http://localhost:9798/hello");
+        request.put("httpPostRequestHeaders", "Content-Type: application/json; charset=utf-8");
+        request.put("httpPostRequestBody", "{\"name\":\"Alen Turković\"}");
+        assertEquals(process.getId(), request);
+        // Response assertions
+        Map<String, Object> response = new HashMap<>();
+        response.put("httpPostResponseStatusCode", 200);
+        assertEquals(process.getId(), response);
+        // Response body assertions
+        String responseBody = (String) runtimeService.getVariable(process.getId(), "httpPostResponseBody");
+        assertNotNull(responseBody);
+        assertEquals("{\"result\":\"Hello Alen Turković\"}", responseBody.trim());
+        continueProcess(process);
+    }
+
+    @Test
     @Deployment
     public void testHttpDelete4XX() {
         ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpDelete4XX");
@@ -331,6 +425,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         continueProcess(process);
     }
 
+    @Test
     @Deployment
     public void testHttpPut5XX() throws Exception {
 
@@ -371,6 +466,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         continueProcess(process);
     }
     
+    @Test
     @Deployment
     public void testTransientJsonResponseVariable() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testTransientJsonResponseVariable");
@@ -382,6 +478,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         assertEquals("Hello John", ((JsonNode) variables.get("postResponse")).get("result").asText());
     }
     
+    @Test
     @Deployment
     public void testArrayNodeResponse() {
         runtimeService.startProcessInstanceByKey("testArrayNodeResponse");
