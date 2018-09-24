@@ -109,11 +109,9 @@ The following code snippet shows an example of using the JUnit 4 style of testin
 [source,java,linenums]
 ----
 @ExtendWith(FlowableFormExtension.class)
+// In case a custom form configuration is needed the part below should be uncommented
+//@FormConfigurationResource("custom1.flowable.form.cfg.xml")
 class MyFormDefinitionTest {
-
-  //In case a custom form configuration is needed the part below should be uncommented
-  //@RegisterExtension
-  //protected final FlowableFormExtension flowableFormExtension = new FlowableFormExtension("custom1.flowable.form.cfg.xml");
 
   private FormEngine formEngine;
 

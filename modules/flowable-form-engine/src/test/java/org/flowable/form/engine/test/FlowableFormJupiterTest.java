@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.engine.FormEngine;
+import org.flowable.form.engine.FormEngines;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,6 +52,8 @@ public class FlowableFormJupiterTest {
 
         FormDeployment formDeployment = formEngine.getFormRepositoryService().createDeploymentQuery().singleResult();
         assertThat(formDeployment.getName()).isEqualTo("FlowableFormJupiterTest.ruleUsageExample");
+
+        assertThat(formEngine.getName()).as("form engine name").isEqualTo(FormEngines.NAME_DEFAULT);
     }
 
     @Test

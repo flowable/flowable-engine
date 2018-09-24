@@ -364,7 +364,7 @@ In the JUnit 5 style one needs to use the +org.flowable.engine.test.FlowableTest
 The +FlowableTest+ annotation is just a meta annotation and the does the registration of the +FlowableExtension+ (i.e. it does +@ExtendWith(FlowableExtension.class)+).
 This will make the ProcessEngine and the services available as parameters into the test and lifecycle methods (+@BeforeAll+, +@BeforeEach+, +@AfterEach+, +@AfterAll+).
 Before each test the processEngine will be initialized by default with the +flowable.cfg.xml+ resource on the classpath.
-In order to specify a different configuration file the +FlowableExtension+ needs to be registered with +@RegisterExtension+ (see second example).
+In order to specify a different configuration file the +org.flowable.engine.test.ConfigurationResource+ annotation needs to be used (see second example).
 Process engines are cached statically over multiple unit tests when the configuration resource is the same.
 
 By using +FlowableExtension+, you can annotate test methods with +org.flowable.engine.test.Deployment+.
@@ -414,10 +414,9 @@ With JUnit 5 you can also inject the id of the deployment (with +org.flowable.en
 .JUnit 5 test with a custom resource file
 [source,java,linenums]
 ----
+@FlowableTest
+@ConfigurationResource("flowable.custom.cfg.xml")
 class MyBusinessProcessTest {
-
-  @RegisterExtension
-  protected final FlowableExtension flowableExtension = new FlowableExtension("custom-flowable.cfg.xml");
 
   private ProcessEngine procesEngine;
   private RuntimeService runtimeService;

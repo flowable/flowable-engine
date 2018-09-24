@@ -69,8 +69,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * The ProcessEngine and the services will be made available to the test class through the parameter resolution (BeforeEach, AfterEach, test methods).
  * The ProcessEngine will be initialized by default with the flowable.cfg.xml resource on the classpath.
- * To specify a different configuration file, pass the resource location in {@link #FlowableExtension(String) the appropriate constructor}.
- * If a custom resource is needed then {@link org.junit.jupiter.api.extension.RegisterExtension RegisterExtension} should be used.
+ * To specify a different configuration file, annotate your class witn {@link ConfigurationResource}.
  * Process engines will be cached as part of the JUnit Jupiter Extension context.
  * Right before the first time the setUp is called for a given configuration resource, the process engine will be constructed.
  * </p>
@@ -92,6 +91,8 @@ import org.slf4j.LoggerFactory;
  */
 public class FlowableExtension implements ParameterResolver, BeforeEachCallback, AfterEachCallback {
 
+    public static final String DEFAULT_CONFIGURATION_RESOURCE = "flowable.cfg.xml";
+
     private static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(FlowableExtension.class);
 
     private static final Set<Class<?>> SUPPORTED_PARAMETERS = new HashSet<>(Arrays.asList(
@@ -107,15 +108,6 @@ public class FlowableExtension implements ParameterResolver, BeforeEachCallback,
     ));
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-    protected final String configurationResource;
-
-    public FlowableExtension() {
-        this("flowable.cfg.xml");
-    }
-
-    public FlowableExtension(String configurationResource) {
-        this.configurationResource = configurationResource;
-    }
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
@@ -191,13 +183,19 @@ public class FlowableExtension implements ParameterResolver, BeforeEachCallback,
         }
     }
 
+    protected String getConfigurationResource(ExtensionContext context) {
+        return AnnotationSupport.findAnnotation(context.getTestClass(), ConfigurationResource.class)
+            .map(ConfigurationResource::value)
+            .orElse(DEFAULT_CONFIGURATION_RESOURCE);
+    }
+
     protected FlowableTestHelper getTestHelper(ExtensionContext context) {
         return getStore(context)
             .getOrComputeIfAbsent(context.getRequiredTestClass(), key -> new FlowableTestHelper(createProcessEngine(context)), FlowableTestHelper.class);
     }
 
     protected ProcessEngine createProcessEngine(ExtensionContext context) {
-        return TestHelper.getProcessEngine(configurationResource);
+        return TestHelper.getProcessEngine(getConfigurationResource(context));
     }
 
     protected ExtensionContext.Store getStore(ExtensionContext context) {
