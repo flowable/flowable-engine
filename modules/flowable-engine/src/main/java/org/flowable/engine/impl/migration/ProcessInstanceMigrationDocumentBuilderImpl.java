@@ -13,10 +13,13 @@
 
 package org.flowable.engine.impl.migration;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.engine.migration.ProcessInstanceActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocumentBuilder;
 
@@ -27,9 +30,10 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
 
     protected String migrateToProcessDefinitionId;
     protected String migrateToProcessDefinitionKey;
-    protected int migrateToProcessDefinitionVersion;
+    protected Integer migrateToProcessDefinitionVersion;
     protected String migrateToProcessDefinitionTenantId;
-    protected Map<String, String> activityMigrationMappings = new LinkedHashMap<>();
+    protected List<ProcessInstanceActivityMigrationMapping> activityMigrationMappings = new ArrayList<>();
+    protected Map<String, Object> processInstanceVariables = new HashMap<>();
 
     @Override
     public ProcessInstanceMigrationDocumentBuilder setProcessDefinitionToMigrateTo(String processDefinitionId) {
@@ -51,20 +55,26 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
     }
 
     @Override
-    public ProcessInstanceMigrationDocumentBuilder addActivityMigrationMappings(Map<String, String> activityMigrationMappings) {
-        this.activityMigrationMappings.putAll(activityMigrationMappings);
+    public ProcessInstanceMigrationDocumentBuilder addActivityMigrationMappings(List<ProcessInstanceActivityMigrationMapping> activityMigrationMappings) {
+        this.activityMigrationMappings.addAll(activityMigrationMappings);
         return this;
     }
 
     @Override
-    public ProcessInstanceMigrationDocumentBuilder addActivityMigrationMapping(String fromActivityId, String toActivityId) {
-        if (fromActivityId == null) {
-            throw new FlowableException("From process activity id mapping cannot be null");
-        }
-        if (toActivityId == null) {
-            throw new FlowableException("To process activity id mapping cannot be null");
-        }
-        this.activityMigrationMappings.put(fromActivityId, toActivityId);
+    public ProcessInstanceMigrationDocumentBuilder addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping activityMigrationMapping) {
+        this.activityMigrationMappings.add(activityMigrationMapping);
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationDocumentBuilder addProcessInstanceVariable(String variableName, Object variableValue) {
+        this.processInstanceVariables.put(variableName, variableValue);
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationDocumentBuilder addProcessInstanceVariables(Map<String, Object> processInstanceVariables) {
+        this.processInstanceVariables.putAll(processInstanceVariables);
         return this;
     }
 
@@ -75,7 +85,7 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
             if (migrateToProcessDefinitionKey == null) {
                 throw new FlowableException("Process definition key cannot be null");
             }
-            if (migrateToProcessDefinitionVersion < 0) {
+            if (migrateToProcessDefinitionVersion == null || migrateToProcessDefinitionVersion < 0) {
                 throw new FlowableException("Process definition version must be a positive number");
             }
         }
@@ -84,6 +94,7 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
         document.setMigrateToProcessDefinitionId(migrateToProcessDefinitionId);
         document.setMigrateToProcessDefinition(migrateToProcessDefinitionKey, migrateToProcessDefinitionVersion, migrateToProcessDefinitionTenantId);
         document.setActivityMigrationMappings(activityMigrationMappings);
+        document.setProcessInstanceVariables(processInstanceVariables);
 
         return document;
     }

@@ -14,11 +14,21 @@
 package org.flowable.engine.impl.migration;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.engine.migration.ProcessInstanceActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,13 +36,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * @author Dennis Federico
  */
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigrationDocument {
 
     protected String migrateToProcessDefinitionId;
     protected String migrateToProcessDefinitionKey;
-    protected int migrateToProcessDefinitionVersion;
+    protected Integer migrateToProcessDefinitionVersion;
     protected String migrateToProcessDefinitionTenantId;
-    protected Map<String, String> activityMigrationMappings;
+    protected List<ProcessInstanceActivityMigrationMapping> activityMigrationMappings;
+    protected Map<String, Map<String, Object>> activitiesLocalVariables;
+    protected Map<String, Object> processInstanceVariables;
+    protected Set<String> mappedFromActivities;
 
     public static ProcessInstanceMigrationDocument fromProcessInstanceMigrationDocumentJson(String processInstanceMigrationDocumentJson) {
         try {
@@ -40,6 +54,9 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             return objectMapper.readValue(processInstanceMigrationDocumentJson, ProcessInstanceMigrationDocumentImpl.class);
         } catch (IOException e) {
+            if (e.getCause() instanceof FlowableException) {
+                throw (FlowableException) e.getCause();
+            }
             throw new FlowableIllegalArgumentException("Low level I/O problem with Json argument", e);
         }
     }
@@ -48,20 +65,20 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
         this.migrateToProcessDefinitionId = processDefinitionId;
     }
 
-    @Override
-    public String getMigrateToProcessDefinitionId() {
-        return migrateToProcessDefinitionId;
-    }
-
-    public void setMigrateToProcessDefinition(String processDefinitionKey, int processDefinitionVersion) {
+    public void setMigrateToProcessDefinition(String processDefinitionKey, Integer processDefinitionVersion) {
         this.migrateToProcessDefinitionKey = processDefinitionKey;
         this.migrateToProcessDefinitionVersion = processDefinitionVersion;
     }
 
-    public void setMigrateToProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId) {
+    public void setMigrateToProcessDefinition(String processDefinitionKey, Integer processDefinitionVersion, String processDefinitionTenantId) {
         this.migrateToProcessDefinitionKey = processDefinitionKey;
         this.migrateToProcessDefinitionVersion = processDefinitionVersion;
         this.migrateToProcessDefinitionTenantId = processDefinitionTenantId;
+    }
+
+    @Override
+    public String getMigrateToProcessDefinitionId() {
+        return migrateToProcessDefinitionId;
     }
 
     @Override
@@ -70,7 +87,7 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
     }
 
     @Override
-    public int getMigrateToProcessDefinitionVersion() {
+    public Integer getMigrateToProcessDefinitionVersion() {
         return migrateToProcessDefinitionVersion;
     }
 
@@ -79,13 +96,82 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
         return migrateToProcessDefinitionTenantId;
     }
 
-    public void setActivityMigrationMappings(Map<String, String> activityMigrationMappings) {
-        this.activityMigrationMappings = activityMigrationMappings;
+    public void setActivityMigrationMappings(List<ProcessInstanceActivityMigrationMapping> activityMigrationMappings) {
+        List<String> duplicates = findDuplicatedFromActivityIds(activityMigrationMappings);
+        if (duplicates.isEmpty()) {
+            this.activityMigrationMappings = activityMigrationMappings;
+            this.activitiesLocalVariables = buildActivitiesLocalVariablesMap(activityMigrationMappings);
+            this.mappedFromActivities = extractMappedFromActivities(activityMigrationMappings);
+        } else {
+            throw new FlowableException("From activity '" + Arrays.toString(duplicates.toArray()) + "' is mapped more than once");
+        }
+    }
+
+    protected static List<String> findDuplicatedFromActivityIds(List<ProcessInstanceActivityMigrationMapping> activityMigrationMappings) {
+        //Frequency Map
+        Map<String, Long> frequencyMap = activityMigrationMappings.stream()
+            .flatMap(mapping -> mapping.getFromActivityIds().stream())
+            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        //Duplicates
+        List<String> duplicatedActivityIds = frequencyMap.entrySet()
+            .stream()
+            .filter(entry -> entry.getValue() > 1)
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toList());
+
+        return duplicatedActivityIds;
+    }
+
+    protected static Map<String, Map<String, Object>> buildActivitiesLocalVariablesMap(List<ProcessInstanceActivityMigrationMapping> activityMigrationMappings) {
+
+        Map<String, Map<String, Object>> variablesMap = new HashMap<>();
+        activityMigrationMappings.forEach(mapping -> {
+            mapping.getToActivityIds().forEach(activityId -> {
+                Map<String, Object> mappedLocalVariables = null;
+                if (mapping instanceof ProcessInstanceActivityMigrationMapping.OneToOneMapping) {
+                    mappedLocalVariables = ((ProcessInstanceActivityMigrationMapping.OneToOneMapping) mapping).getActivityLocalVariables();
+                }
+                if (mapping instanceof ProcessInstanceActivityMigrationMapping.ManyToOneMapping) {
+                    mappedLocalVariables = ((ProcessInstanceActivityMigrationMapping.ManyToOneMapping) mapping).getActivityLocalVariables();
+                }
+                if (mapping instanceof ProcessInstanceActivityMigrationMapping.OneToManyMapping) {
+                    mappedLocalVariables = ((ProcessInstanceActivityMigrationMapping.OneToManyMapping) mapping).getActivitiesLocalVariables().get(activityId);
+                }
+                if (mappedLocalVariables != null && !mappedLocalVariables.isEmpty()) {
+                    Map<String, Object> activityLocalVariables = variablesMap.computeIfAbsent(activityId, key -> new HashMap<>());
+                    activityLocalVariables.putAll(mappedLocalVariables);
+                }
+            });
+        });
+        return variablesMap;
+    }
+
+    protected static Set<String> extractMappedFromActivities(List<ProcessInstanceActivityMigrationMapping> activityMigrationMappings) {
+        Set<String> fromActivities = activityMigrationMappings.stream()
+            .flatMap(mapping -> mapping.getFromActivityIds().stream())
+            .collect(Collectors.toSet());
+        return fromActivities;
     }
 
     @Override
-    public Map<String, String> getActivityMigrationMappings() {
+    public List<ProcessInstanceActivityMigrationMapping> getActivityMigrationMappings() {
         return activityMigrationMappings;
+    }
+
+    @Override
+    @JsonIgnore
+    public Map<String, Map<String, Object>> getActivitiesLocalVariables() {
+        return activitiesLocalVariables;
+    }
+
+    public void setProcessInstanceVariables(Map<String, Object> processInstanceVariables) {
+        this.processInstanceVariables = processInstanceVariables;
+    }
+
+    @Override
+    public Map<String, Object> getProcessInstanceVariables() {
+        return processInstanceVariables;
     }
 
     @Override

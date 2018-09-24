@@ -13,6 +13,7 @@
 
 package org.flowable.engine.migration;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,9 +27,13 @@ public interface ProcessInstanceMigrationDocumentBuilder {
 
     ProcessInstanceMigrationDocumentBuilder setTenantId(String processDefinitionTenantId);
 
-    ProcessInstanceMigrationDocumentBuilder addActivityMigrationMappings(Map<String, String> activityMigrationMappings);
+    ProcessInstanceMigrationDocumentBuilder addActivityMigrationMappings(List<ProcessInstanceActivityMigrationMapping> activityMigrationMappings);
 
-    ProcessInstanceMigrationDocumentBuilder addActivityMigrationMapping(String fromActivityId, String toActivityId);
+    ProcessInstanceMigrationDocumentBuilder addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping activityMigrationMapping);
+
+    ProcessInstanceMigrationDocumentBuilder addProcessInstanceVariable(String variableName, Object variableValue);
+
+    ProcessInstanceMigrationDocumentBuilder addProcessInstanceVariables(Map<String, Object> processInstanceVariables);
 
     ProcessInstanceMigrationDocument build();
 

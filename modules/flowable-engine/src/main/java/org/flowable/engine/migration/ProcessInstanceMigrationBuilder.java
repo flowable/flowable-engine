@@ -13,6 +13,7 @@
 
 package org.flowable.engine.migration;
 
+import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
@@ -32,21 +33,24 @@ public interface ProcessInstanceMigrationBuilder {
 
     ProcessInstanceMigrationBuilder withMigrateToProcessDefinitionTenantId(String processDefinitionTenantId);
 
-    ProcessInstanceMigrationBuilder addActivityMigrationMapping(String fromActivityId, String toActivityId);
+    ProcessInstanceMigrationBuilder addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping mapping);
 
-    ProcessInstanceMigrationBuilder addActivityMigrationMappings(Map<String, String> activityMigrationMappings);
+    ProcessInstanceMigrationBuilder withProcessInstanceVariable(String variableName, Object variableValue);
+
+    ProcessInstanceMigrationBuilder withProcessInstanceVariables(Map<String, Object> variables);
 
     ProcessInstanceMigrationDocument getProcessInstanceMigrationDocument();
 
     void migrate(String processInstanceId);
-    
+
     ProcessInstanceMigrationValidationResult validateMigration(String processInstanceId);
-    
+
     void migrateProcessInstances(String processDefinitionId);
 
     ProcessInstanceMigrationValidationResult validateMigrationOfProcessInstances(String processDefinitionId);
 
     void migrateProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId);
-    
+
     ProcessInstanceMigrationValidationResult validateMigrationOfProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId);
+
 }

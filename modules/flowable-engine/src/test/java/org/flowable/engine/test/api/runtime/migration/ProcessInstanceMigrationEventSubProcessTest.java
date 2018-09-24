@@ -15,9 +15,14 @@ package org.flowable.engine.test.api.runtime.migration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Arrays;
 import java.util.List;
 
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.migration.ProcessInstanceActivityMigrationMapping;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.Execution;
@@ -25,8 +30,10 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.api.runtime.changestate.ChangeStateEventListener;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -70,7 +77,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("userTask1Id", "eventSubProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -83,9 +90,34 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).isEmpty();
 
-        //-- TODO CHECK HISTORY AND EVENTS
-
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("eventSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            System.out.println();
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("eventSubProcess");
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("eventSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -112,7 +144,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("userTask1Id", "eventSubProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -125,7 +157,30 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).isEmpty();
 
-        //-- TODO CHECK HISTORY AND EVENTS
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("eventSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("eventSubProcess");
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("eventSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
 
         completeProcessInstanceTasks(processInstance.getId());
         assertProcessEnded(processInstance.getId());
@@ -154,7 +209,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("userTask1Id", "eventSubProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -167,7 +222,30 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         Job job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(job);
 
-        //-- TODO CHECK HISTORY AND EVENTS
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("eventSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("eventSubProcess");
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("eventSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
 
         completeProcessInstanceTasks(processInstance.getId());
         assertProcessEnded(processInstance.getId());
@@ -196,7 +274,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("userTask1Id", "eventSubProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -211,6 +289,32 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).isEmpty();
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("eventSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("eventSubProcess");
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("eventSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -237,7 +341,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("userTask1Id", "eventSubProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -252,6 +356,32 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).isEmpty();
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("eventSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("eventSubProcess");
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("eventSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -278,7 +408,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("userTask1Id", "eventSubProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -294,6 +424,32 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         assertNull(job);
 
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("eventSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("eventSubProcess");
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("eventSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -325,7 +481,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("parallelTask", "eventSubProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -338,9 +494,33 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).isEmpty();
 
-        //-- TODO CHECK HISTORY AND EVENTS
-
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("eventSubProcess");
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask", "eventSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -372,7 +552,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("parallelTask", "eventSubProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -385,9 +565,33 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).isEmpty();
 
-        //-- TODO CHECK HISTORY AND EVENTS
-
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("eventSubProcess");
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask", "eventSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -419,7 +623,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("parallelTask", "eventSubProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -432,9 +636,33 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(job);
 
-        //-- TODO CHECK HISTORY AND EVENTS
-
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("eventSubProcess");
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask", "eventSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -466,7 +694,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("parallelTask", "eventSubProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -493,9 +721,33 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
         assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("eventSignal");
 
-        //-- TODO CHECK HISTORY AND EVENTS
-
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcessTask", "eventSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("eventSubProcess");
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask", "eventSubProcessTask", "eventSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -527,7 +779,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("parallelTask", "eventSubProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -555,9 +807,33 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
         assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("someMessage");
 
-        //-- TODO CHECK HISTORY AND EVENTS
-
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcessTask", "eventSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("eventSubProcess");
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask", "eventSubProcessTask", "eventSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -589,7 +865,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("parallelTask", "eventSubProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -613,9 +889,33 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(job).extracting(this::getJobActivityId).isEqualTo("eventSubProcessStart");
 
-        //-- TODO CHECK HISTORY AND EVENTS
-
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcessTask", "eventSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("eventSubProcess");
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask", "eventSubProcessTask", "eventSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -642,7 +942,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("userTask1Id", "subProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -659,7 +959,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
 
         //Fire the signal
         runtimeService.signalEventReceived("someSignal");
-
+        
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("subProcess", "nestedSignalEventSubProcess", "nestedSignalEventSubProcessTask", "nestedSignalEventSubProcessStart");
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
@@ -668,6 +968,31 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         eventSubscriptions.isEmpty();
 
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("subProcessTask", "nestedSignalEventSubProcessTask", "afterSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).isEmpty();
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("subProcessTask", "nestedSignalEventSubProcessTask", "afterSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -694,7 +1019,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("userTask1Id", "subProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -721,6 +1046,31 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         eventSubscriptions.isEmpty();
 
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("subProcessTask", "nestedMessageEventSubProcessTask", "afterSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).isEmpty();
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("subProcessTask", "nestedMessageEventSubProcessTask", "afterSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -747,7 +1097,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("userTask1Id", "subProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -770,8 +1120,34 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("nestedTimerEventSubProcessTask");
         job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(job);
-
+        
         completeProcessInstanceTasks(processInstance.getId());
+
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("subProcessTask", "nestedTimerEventSubProcessTask", "afterSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).isEmpty();
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("subProcessTask", "nestedTimerEventSubProcessTask", "afterSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -798,7 +1174,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("userTask1Id", "subProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -811,8 +1187,6 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("nestedSignalEventSubProcessStart");
         assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
-
-        //-- TODO CHECK HISTORY AND EVENTS
 
         //Check that the trigger works
         runtimeService.signalEventReceived("someSignal");
@@ -829,6 +1203,31 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
 
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("subProcessTask", "nestedSignalEventSubProcessTask", "afterSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).isEmpty();
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("subProcessTask", "nestedSignalEventSubProcessTask", "afterSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -855,7 +1254,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("userTask1Id", "subProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -868,8 +1267,6 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("nestedMessageEventSubProcessStart");
         assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
-
-        //-- TODO CHECK HISTORY AND EVENTS
 
         //Trigger the event
         Execution messageCatchExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).messageEventSubscriptionName("someMessage").singleResult();
@@ -886,6 +1283,31 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
 
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("subProcessTask", "nestedMessageEventSubProcessTask", "afterSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).isEmpty();
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("subProcessTask", "nestedMessageEventSubProcessTask", "afterSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -912,7 +1334,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("userTask1Id", "subProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -924,8 +1346,6 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignal.getId());
         Job job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(job).extracting(this::getJobActivityId).isEqualTo("nestedTimerEventSubProcessStart");
-
-        //-- TODO CHECK HISTORY AND EVENTS
 
         //Check that the trigger works
         managementService.moveTimerToExecutableJob(job.getId());
@@ -942,6 +1362,31 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         assertThat(job).extracting(this::getJobActivityId).isEqualTo("nestedTimerEventSubProcessStart");
 
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("subProcessTask", "nestedTimerEventSubProcessTask", "afterSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).isEmpty();
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("subProcessTask", "nestedTimerEventSubProcessTask", "afterSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -973,8 +1418,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("processTask", "beforeSubProcessTask")
-            .addActivityMigrationMapping("parallelTask", "nestedSignalEventSubProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "beforeSubProcessTask"))
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "nestedSignalEventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -988,9 +1433,33 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).isEmpty();
 
-        //-- TODO CHECK HISTORY AND EVENTS
-
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("beforeSubProcessTask", "nestedSignalEventSubProcessTask", "subProcessTask", "afterSubProcessTask", "afterSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("nestedSignalEventSubProcess");
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("beforeSubProcessTask", "nestedSignalEventSubProcessTask", "subProcessTask", "afterSubProcessTask", "afterSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1022,8 +1491,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("processTask", "subProcessTask")
-            .addActivityMigrationMapping("parallelTask", "nestedSignalEventSubProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "subProcessTask"))
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "nestedSignalEventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1037,9 +1506,33 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).isEmpty();
 
-        //-- TODO CHECK HISTORY AND EVENTS
-
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("subProcessTask", "nestedSignalEventSubProcessTask", "afterSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("nestedSignalEventSubProcess");
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("subProcessTask", "nestedSignalEventSubProcessTask", "afterSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1071,8 +1564,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("processTask", "beforeSubProcessTask")
-            .addActivityMigrationMapping("parallelTask", "nestedMessageEventSubProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "beforeSubProcessTask"))
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "nestedMessageEventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1086,9 +1579,33 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).isEmpty();
 
-        //-- TODO CHECK HISTORY AND EVENTS
-
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("beforeSubProcessTask", "nestedMessageEventSubProcessTask", "subProcessTask", "afterSubProcessTask", "afterSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("nestedMessageEventSubProcess");
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("beforeSubProcessTask", "nestedMessageEventSubProcessTask", "subProcessTask", "afterSubProcessTask", "afterSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1120,8 +1637,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("processTask", "subProcessTask")
-            .addActivityMigrationMapping("parallelTask", "nestedMessageEventSubProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "subProcessTask"))
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "nestedMessageEventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1135,9 +1652,33 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).isEmpty();
 
-        //-- TODO CHECK HISTORY AND EVENTS
-
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("subProcessTask", "nestedMessageEventSubProcessTask", "afterSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("nestedMessageEventSubProcess");
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("subProcessTask", "nestedMessageEventSubProcessTask", "afterSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1169,8 +1710,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("processTask", "beforeSubProcessTask")
-            .addActivityMigrationMapping("parallelTask", "nestedTimerEventSubProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "beforeSubProcessTask"))
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "nestedTimerEventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1184,9 +1725,33 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(job);
 
-        //-- TODO CHECK HISTORY AND EVENTS
-
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("beforeSubProcessTask", "nestedTimerEventSubProcessTask", "subProcessTask", "afterSubProcessTask", "afterSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("nestedTimerEventSubProcess");
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("beforeSubProcessTask", "nestedTimerEventSubProcessTask", "subProcessTask", "afterSubProcessTask", "afterSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1218,8 +1783,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("processTask", "subProcessTask")
-            .addActivityMigrationMapping("parallelTask", "nestedTimerEventSubProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "subProcessTask"))
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "nestedTimerEventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1233,9 +1798,33 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(job);
 
-        //-- TODO CHECK HISTORY AND EVENTS
-
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("subProcessTask", "nestedTimerEventSubProcessTask", "afterSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("nestedTimerEventSubProcess");
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("subProcessTask", "nestedTimerEventSubProcessTask", "afterSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1267,8 +1856,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("processTask", "beforeSubProcessTask")
-            .addActivityMigrationMapping("parallelTask", "nestedSignalEventSubProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "beforeSubProcessTask"))
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "nestedSignalEventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1282,9 +1871,33 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).isEmpty();
 
-        //-- TODO CHECK HISTORY AND EVENTS
-
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("beforeSubProcessTask", "nestedSignalEventSubProcessTask", "subProcessTask", "afterSubProcessTask", "afterSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("nestedSignalEventSubProcess");
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("beforeSubProcessTask", "nestedSignalEventSubProcessTask", "subProcessTask", "afterSubProcessTask", "afterSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1316,8 +1929,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("processTask", "subProcessTask")
-            .addActivityMigrationMapping("parallelTask", "nestedSignalEventSubProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "subProcessTask"))
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "nestedSignalEventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1349,9 +1962,33 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
         assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("someSignal");
 
-        //-- TODO CHECK HISTORY AND EVENTS
-
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("subProcessTask", "nestedSignalEventSubProcessTask", "nestedSignalEventSubProcessTask", "afterSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("nestedSignalEventSubProcess");
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("subProcessTask", "nestedSignalEventSubProcessTask", "nestedSignalEventSubProcessTask", "afterSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1383,8 +2020,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("processTask", "beforeSubProcessTask")
-            .addActivityMigrationMapping("parallelTask", "nestedMessageEventSubProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "beforeSubProcessTask"))
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "nestedMessageEventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1398,9 +2035,34 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).isEmpty();
 
-        //-- TODO CHECK HISTORY AND EVENTS
-
         completeProcessInstanceTasks(processInstance.getId());
+
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("beforeSubProcessTask", "nestedMessageEventSubProcessTask", "subProcessTask", "afterSubProcessTask", "afterSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("nestedMessageEventSubProcess");
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("beforeSubProcessTask", "nestedMessageEventSubProcessTask", "subProcessTask", "afterSubProcessTask", "afterSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1432,8 +2094,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("processTask", "subProcessTask")
-            .addActivityMigrationMapping("parallelTask", "nestedMessageEventSubProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "subProcessTask"))
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "nestedMessageEventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1467,9 +2129,33 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
         assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("someMessage");
 
-        //-- TODO CHECK HISTORY AND EVENTS
-
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("subProcessTask", "nestedMessageEventSubProcessTask", "nestedMessageEventSubProcessTask", "afterSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("nestedMessageEventSubProcess");
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("subProcessTask", "nestedMessageEventSubProcessTask", "nestedMessageEventSubProcessTask", "afterSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1501,8 +2187,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("processTask", "beforeSubProcessTask")
-            .addActivityMigrationMapping("parallelTask", "nestedTimerEventSubProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "beforeSubProcessTask"))
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "nestedTimerEventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1516,10 +2202,34 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Behaves like interrupting since theres no execution in the parentScop
         job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(job);
-
-        //-- TODO CHECK HISTORY AND EVENTS
-
+        
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("beforeSubProcessTask", "nestedTimerEventSubProcessTask", "subProcessTask", "afterSubProcessTask", "afterSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("nestedTimerEventSubProcess");
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("beforeSubProcessTask", "nestedTimerEventSubProcessTask", "subProcessTask", "afterSubProcessTask", "afterSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1552,8 +2262,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping("processTask", "subProcessTask")
-            .addActivityMigrationMapping("parallelTask", "nestedTimerEventSubProcessTask")
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "subProcessTask"))
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "nestedTimerEventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1582,9 +2292,492 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(job).extracting(this::getJobActivityId).isEqualTo("nestedTimerEventSubProcessStart");
 
-        //-- TODO CHECK HISTORY AND EVENTS
-
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("subProcessTask", "nestedTimerEventSubProcessTask", "nestedTimerEventSubProcessTask", "afterSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("nestedTimerEventSubProcess");
+            assertThat(eventSubProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("subProcessTask", "nestedTimerEventSubProcessTask", "nestedTimerEventSubProcessTask", "afterSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+            }
+        }
+        
         assertProcessEnded(processInstance.getId());
     }
+
+    @Test
+    public void testMigrateInterruptingEventSubProcessToInterruptingEventSubProcessOfDifferentEventType() {
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/interrupting-signal-event-subprocess.bpmn20.xml");
+        ProcessDefinition procWithMessage = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/interrupting-message-event-subprocess.bpmn20.xml");
+
+        //Start the processInstance
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procWithSignal.getId());
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcessStart");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("processTask");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignal.getId());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("eventSubProcessStart");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("eventSignal");
+
+        //Migrate only with autoMapping
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procWithMessage.getId())
+            .migrate(processInstance.getId());
+
+        //Confirm migration
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcessStart");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithMessage.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("processTask");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithMessage.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("eventSubProcessStart");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("someMessage");
+
+        //Trigger the event
+        EventSubscription eventExecution = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).eventName("someMessage").singleResult();
+        runtimeService.messageEventReceived("someMessage", eventExecution.getExecutionId());
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("eventSubProcess", "eventSubProcessTask", "eventSubProcessStart");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithMessage.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("eventSubProcessTask");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithMessage.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).isEmpty();
+
+        completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithMessage.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).isEmpty();
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask", "eventSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithMessage.getId());
+            }
+        }
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testMigrateNonInterruptingEventSubProcessToNonInterruptingEventSubProcessOfDifferentEventType() {
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/non-interrupting-signal-event-subprocess.bpmn20.xml");
+        ProcessDefinition procWithMessage = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/non-interrupting-message-event-subprocess.bpmn20.xml");
+
+        //Start the processInstance
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procWithSignal.getId());
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcessStart");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("processTask");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignal.getId());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("eventSubProcessStart");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("eventSignal");
+
+        //Migrate only with autoMapping
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procWithMessage.getId())
+            .migrate(processInstance.getId());
+
+        //Confirm migration
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcessStart");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithMessage.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("processTask");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithMessage.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("eventSubProcessStart");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("someMessage");
+
+        //Trigger the event
+        EventSubscription eventExecution = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).eventName("someMessage").singleResult();
+        runtimeService.messageEventReceived("someMessage", eventExecution.getExecutionId());
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcess", "eventSubProcessTask", "eventSubProcessStart");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithMessage.getId());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask", "eventSubProcessTask");
+        assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procWithMessage.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("eventSubProcessStart");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("someMessage");
+
+        //Trigger the event again
+        eventExecution = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).eventName("someMessage").singleResult();
+        runtimeService.messageEventReceived("someMessage", eventExecution.getExecutionId());
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcess", "eventSubProcess", "eventSubProcessTask", "eventSubProcessStart", "eventSubProcessTask");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithMessage.getId());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask", "eventSubProcessTask", "eventSubProcessTask");
+        assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procWithMessage.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("eventSubProcessStart");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("someMessage");
+
+        completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcessTask", "eventSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithMessage.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).isEmpty();
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask", "eventSubProcessTask", "eventSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithMessage.getId());
+            }
+        }
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testMigrateInterruptingEventSubProcessToNonInterruptingEventSubProcessOfDifferentEventType() {
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/interrupting-signal-event-subprocess.bpmn20.xml");
+        ProcessDefinition procWithMessage = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/non-interrupting-message-event-subprocess.bpmn20.xml");
+
+        //Start the processInstance
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procWithSignal.getId());
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcessStart");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("processTask");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignal.getId());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("eventSubProcessStart");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("eventSignal");
+
+        //Migrate only with autoMapping
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procWithMessage.getId())
+            .migrate(processInstance.getId());
+
+        //Confirm migration
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcessStart");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithMessage.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("processTask");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithMessage.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("eventSubProcessStart");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("someMessage");
+
+        //Trigger the event
+        EventSubscription eventExecution = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).eventName("someMessage").singleResult();
+        runtimeService.messageEventReceived("someMessage", eventExecution.getExecutionId());
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcess", "eventSubProcessTask", "eventSubProcessStart");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithMessage.getId());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask", "eventSubProcessTask");
+        assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procWithMessage.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("eventSubProcessStart");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("someMessage");
+
+        //Trigger the event again
+        eventExecution = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).eventName("someMessage").singleResult();
+        runtimeService.messageEventReceived("someMessage", eventExecution.getExecutionId());
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcess", "eventSubProcess", "eventSubProcessTask", "eventSubProcessStart", "eventSubProcessTask");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithMessage.getId());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask", "eventSubProcessTask", "eventSubProcessTask");
+        assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procWithMessage.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("eventSubProcessStart");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("someMessage");
+
+        completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcessTask", "eventSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithMessage.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).isEmpty();
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask", "eventSubProcessTask", "eventSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithMessage.getId());
+            }
+        }
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testMigrateNonInterruptingEventSubProcessToInterruptingEventSubProcessOfDifferentEventType() {
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/non-interrupting-signal-event-subprocess.bpmn20.xml");
+        ProcessDefinition procWithMessage = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/interrupting-message-event-subprocess.bpmn20.xml");
+
+        //Start the processInstance
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procWithSignal.getId());
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcessStart");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("processTask");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignal.getId());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("eventSubProcessStart");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("eventSignal");
+
+        //Migrate only with autoMapping
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procWithMessage.getId())
+            .migrate(processInstance.getId());
+
+        //Confirm migration
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).size().isEqualTo(2);
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcessStart");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithMessage.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("processTask");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithMessage.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("eventSubProcessStart");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("someMessage");
+
+        //Trigger the event
+        EventSubscription eventExecution = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).eventName("someMessage").singleResult();
+        runtimeService.messageEventReceived("someMessage", eventExecution.getExecutionId());
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("eventSubProcess", "eventSubProcessTask", "eventSubProcessStart");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithMessage.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("eventSubProcessTask");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithMessage.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).isEmpty();
+
+        completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcessTask");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithMessage.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).isEmpty();
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask", "eventSubProcessTask");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithMessage.getId());
+            }
+        }
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testMigrateProcessActivityWithActiveEventSubProcessStart() {
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/interrupting-signal-event-subprocess.bpmn20.xml");
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+
+        //Start the processInstance
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procWithSignal.getId());
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcessStart");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("processTask");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignal.getId());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("eventSubProcessStart");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("eventSignal");
+
+        changeStateEventListener.clear();
+
+        //Migrate only the user task
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procDefOneTask.getId())
+            //This is still a "valid" migration of the Event SubProcess Start execution, doing it along with the task activity execution that requires migration, but is not a "direct" migration of the task
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor(Arrays.asList("processTask", "eventSubProcessStart"), "userTask1Id"))
+            .migrate(processInstance.getId());
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("userTask1Id");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefOneTask.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).isEmpty();
+
+        completeProcessInstanceTasks(processInstance.getId());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("userTask")
+                .list();
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("processTask", "userTask1Id");
+            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
+
+            List<HistoricActivityInstance> eventSubProcExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("eventSubProcess")
+                .list();
+            assertThat(eventSubProcExecution).isEmpty();
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask", "userTask1Id");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
+            }
+        }
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Disabled("Will work when manual and auto-cancelling of activities is implemented. To cancel SubProcessStartEvent when there's no counter-part in the new definition and allow direct migration og processTask")
+    public void testMigrateProcessActivityWithActiveEventSubProcessStartUsingCancel() {
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/interrupting-signal-event-subprocess.bpmn20.xml");
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+
+        //Start the processInstance
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procWithSignal.getId());
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcessStart");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("processTask");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignal.getId());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("eventSubProcessStart");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("eventSignal");
+
+        changeStateEventListener.clear();
+
+        //Migrate only the user task
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procDefOneTask.getId())
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "userTask1Id"))
+            //.deleteActivityExcution("eventSubProcessStart")
+            .migrate(processInstance.getId());
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("userTask1Id");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefOneTask.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).isEmpty();
+
+        completeProcessInstanceTasks(processInstance.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
 }

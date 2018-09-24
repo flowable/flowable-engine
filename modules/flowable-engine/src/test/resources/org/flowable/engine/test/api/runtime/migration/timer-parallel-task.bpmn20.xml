@@ -10,7 +10,7 @@
                 <timeCycle>R/PT15M</timeCycle>
             </timerEventDefinition>
         </boundaryEvent>
-        <sequenceFlow id="sid-010924B1-4782-404F-AB7B-8961589B113B" sourceRef="timerBound" targetRef="parallelTask"></sequenceFlow>
+        <sequenceFlow id="sid-010924B1-4782-404F-AB7B-8961589B113B" sourceRef="timerBound" targetRef="parallelTask"/>
         <sequenceFlow id="sid-F8AF2DCF-E4A9-4165-8979-B5080DF20A7D" sourceRef="processStart" targetRef="processTask"/>
         <userTask id="parallelTask" name="parallelTask"/>
         <sequenceFlow id="sid-4C32419F-EC7F-4221-922D-B5C2422AF854" sourceRef="processTask" targetRef="processEnd"/>
