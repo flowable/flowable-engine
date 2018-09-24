@@ -231,15 +231,23 @@ public class HistoricTaskInstanceBaseResource {
         if (queryRequest.getProcessVariables() != null) {
             addProcessVariables(query, queryRequest.getProcessVariables());
         }
+        
+        if (queryRequest.getScopeDefinitionId() != null) {
+            query.scopeDefinitionId(queryRequest.getScopeDefinitionId());
+        }
+        if (queryRequest.getScopeId() != null) {
+            query.scopeId(queryRequest.getScopeId());
+        }
+        if (queryRequest.getScopeType() != null) {
+            query.scopeType(queryRequest.getScopeType());
+        }
 
         if (queryRequest.getTenantId() != null) {
             query.taskTenantId(queryRequest.getTenantId());
         }
-
         if (queryRequest.getTenantIdLike() != null) {
             query.taskTenantIdLike(queryRequest.getTenantIdLike());
         }
-
         if (Boolean.TRUE.equals(queryRequest.getWithoutTenantId())) {
             query.taskWithoutTenantId();
         }

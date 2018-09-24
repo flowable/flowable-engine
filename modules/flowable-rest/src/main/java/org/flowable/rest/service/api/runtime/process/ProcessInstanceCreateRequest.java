@@ -34,13 +34,15 @@ import java.util.List;
 @ApiModel(description = "Only one of processDefinitionId, processDefinitionKey or message can be used in the request body")
 public class ProcessInstanceCreateRequest {
 
-    private String processDefinitionId;
-    private String processDefinitionKey;
-    private String message;
-    private String businessKey;
-    private List<RestVariable> variables;
-    private List<RestVariable> transientVariables;
-    private String tenantId;
+    protected String processDefinitionId;
+    protected String processDefinitionKey;
+    protected String message;
+    protected String name;
+    protected String businessKey;
+    protected List<RestVariable> variables;
+    protected List<RestVariable> transientVariables;
+    protected String tenantId;
+    protected String overrideDefinitionTenantId;
 
     // Added by Ryan Johnston
     private boolean returnVariables;
@@ -61,6 +63,15 @@ public class ProcessInstanceCreateRequest {
 
     public void setProcessDefinitionKey(String processDefinitionKey) {
         this.processDefinitionKey = processDefinitionKey;
+    }
+
+    @ApiModelProperty(example = "myProcessInstanceName")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @ApiModelProperty(example = "myBusinessKey")
@@ -88,6 +99,15 @@ public class ProcessInstanceCreateRequest {
     @ApiModelProperty(example = "tenant1")
     public String getTenantId() {
         return tenantId;
+    }
+    
+    @ApiModelProperty(example = "overrideTenant1")
+    public String getOverrideDefinitionTenantId() {
+        return overrideDefinitionTenantId;
+    }
+
+    public void setOverrideDefinitionTenantId(String overrideDefinitionTenantId) {
+        this.overrideDefinitionTenantId = overrideDefinitionTenantId;
     }
 
     @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)

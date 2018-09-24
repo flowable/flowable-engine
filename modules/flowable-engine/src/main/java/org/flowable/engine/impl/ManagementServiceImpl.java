@@ -247,7 +247,7 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
                 DbSqlSessionFactory dbSqlSessionFactory = (DbSqlSessionFactory) commandContext.getSessionFactories().get(DbSqlSession.class);
                 DbSqlSession dbSqlSession = new DbSqlSession(dbSqlSessionFactory, CommandContextUtil.getEntityCache(commandContext), connection, catalog, schema);
                 commandContext.getSessions().put(DbSqlSession.class, dbSqlSession);
-                return CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager().dbSchemaUpdate();
+                return CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager().schemaUpdate();
             }
         });
     }

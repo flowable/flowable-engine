@@ -230,6 +230,7 @@ public interface StencilConstants {
     final String PROPERTY_CALLACTIVITY_BUSINESS_KEY = "callactivitybusinesskey";
     final String PROPERTY_CALLACTIVITY_INHERIT_BUSINESS_KEY = "callactivityinheritbusinesskey";
     final String PROPERTY_CALLACTIVITY_USE_LOCALSCOPE_FOR_OUTPARAMETERS = "callactivityuselocalscopeforoutparameters";
+    final String PROPERTY_CALLACTIVITY_COMPLETE_ASYNC = "callactivitycompleteasync";
     final String PROPERTY_IOPARAMETER_SOURCE = "source";
     final String PROPERTY_IOPARAMETER_SOURCE_EXPRESSION = "sourceExpression";
     final String PROPERTY_IOPARAMETER_TARGET = "target";

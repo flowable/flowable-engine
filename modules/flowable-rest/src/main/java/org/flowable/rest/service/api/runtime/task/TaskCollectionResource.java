@@ -88,6 +88,9 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiImplicitParam(name = "active", dataType = "boolean", value = "If true, only return tasks that are not suspended (either part of a process that is not suspended or not part of a process at all). If false, only tasks that are part of suspended process instances are returned.", paramType = "query"),
             @ApiImplicitParam(name = "includeTaskLocalVariables", dataType = "boolean", value = "Indication to include task local variables in the result.", paramType = "query"),
             @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "Indication to include process variables in the result.", paramType = "query"),
+            @ApiImplicitParam(name = "scopeDefinitionId", dataType = "string", value = "Only return tasks with the given scopeDefinitionId.", paramType = "query"),
+            @ApiImplicitParam(name = "scopeId", dataType = "string", value = "Only return tasks with the given scopeId.", paramType = "query"),
+            @ApiImplicitParam(name = "scopeType", dataType = "string", value = "Only return tasks with the given scopeType.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return tasks with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return tasks with a tenantId like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns tasks without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
@@ -257,6 +260,18 @@ public class TaskCollectionResource extends TaskBaseResource {
 
         if (requestParams.containsKey("includeProcessVariables")) {
             request.setIncludeProcessVariables(Boolean.valueOf(requestParams.get("includeProcessVariables")));
+        }
+        
+        if (requestParams.containsKey("scopeDefinitionId")) {
+            request.setScopeDefinitionId(requestParams.get("scopeDefinitionId"));
+        }
+        
+        if (requestParams.containsKey("scopeId")) {
+            request.setScopeId(requestParams.get("scopeId"));
+        }
+        
+        if (requestParams.containsKey("scopeType")) {
+            request.setScopeType(requestParams.get("scopeType"));
         }
 
         if (requestParams.containsKey("tenantId")) {

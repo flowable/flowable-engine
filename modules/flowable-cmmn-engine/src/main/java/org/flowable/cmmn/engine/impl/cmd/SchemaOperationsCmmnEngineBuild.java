@@ -24,7 +24,7 @@ public class SchemaOperationsCmmnEngineBuild implements Command<Void> {
 
     @Override
     public Void execute(CommandContext commandContext) {
-        ((CmmnDbSchemaManager) CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDbSchemaManager()).initSchema();
+        ((CmmnDbSchemaManager) CommandContextUtil.getCmmnEngineConfiguration(commandContext).getSchemaManager()).initSchema();
         return null;
     }
 

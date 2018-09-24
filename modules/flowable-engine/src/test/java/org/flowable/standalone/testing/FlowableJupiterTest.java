@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessEngines;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
@@ -48,6 +49,7 @@ class FlowableJupiterTest {
 
         taskService.complete(task.getId());
         assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0);
+        assertThat(processEngine.getName()).as("process engine  name").isEqualTo(ProcessEngines.NAME_DEFAULT);
     }
 
     @Test

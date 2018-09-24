@@ -291,6 +291,7 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
         if (exceptionByteArrayRef == null) {
             exceptionByteArrayRef = new JobByteArrayRef();
         }
+
         exceptionByteArrayRef.setValue("stacktrace", exception);
     }
 

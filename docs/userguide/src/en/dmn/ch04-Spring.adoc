@@ -70,8 +70,39 @@ In addition to using the values listed above for +deploymentMode+, you may want 
 
 === Unit testing
 
-When integrating with Spring, decisions can be tested very easily using the standard <<apiUnitTesting,Flowable testing facilities>>. The following example shows how a decision is tested in a typical Spring-based unit test:
+When integrating with Spring, decisions can be tested very easily using the standard <<apiUnitTesting,Flowable testing facilities>>.
+The following examples show how a decision is tested in typical Spring-based JUnit 4 and 5 tests:
 
+
+.JUnit 5 test
+[source,java,linenums]
+----
+@ExtendWith(FlowableDmnSpringExtension.class)
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = DmnSpringJunitJupiterTest.TestConfiguration.class)
+public class SpringJunit4Test {
+
+    @Autowired
+    private DmnEngine dmnEngine;
+
+    @Autowired
+    private DmnRuleService ruleService;
+
+    @Test
+    @DmnDeploymentAnnotation
+    public void simpleDecisionTest() {
+        Map<String, Object> executionResult = ruleService.createExecuteDecisionBuilder()
+            .decisionKey("extensionUsage")
+            .variable("inputVariable1", 2)
+            .variable("inputVariable2", "test2")
+            .executeWithSingleResult();
+
+        Assertions.assertThat(executionResult).containsEntry("output1", "test1");
+    }
+}
+----
+
+.JUnit 4 test
 [source,java,linenums]
 ----
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -91,12 +122,13 @@ public class SpringJunit4Test {
     @Test
     @DmnDeploymentAnnotation
     public void simpleDecisionTest() {
-        Map<String, Object> inputVariables = new HashMap<>();
-        inputVariables.put("input1", "testString");
+        Map<String, Object> executionResult = ruleService.createExecuteDecisionBuilder()
+                .decisionKey("extensionUsage")
+                .variable("inputVariable1", 2)
+                .variable("inputVariable2", "test2")
+                .executeWithSingleResult();
 
-        RuleEngineExecutionResult executionResult = ruleService.executeDecisionByKey("decision1", inputVariables);
-
-        assertEquals("test1", executionResult.getResultVariables().get("output1"));
+        Assertions.assertThat(executionResult).containsEntry("output1", "test1");
     }
 }
 ----

@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
-import org.flowable.common.engine.impl.db.DbSchemaManager;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -75,6 +75,22 @@ public abstract class DmnTestHelper {
             deploymentId = deployResourceFromAnnotation(dmnEngine, testClass, methodName, method, deploymentAnnotation2.resources());
         }
 
+        return deploymentId;
+    }
+
+    public static String annotationDeploymentSetUp(DmnEngine dmnEngine, Class<?> testClass, Method method, DmnDeployment dmnDeploymentAnnotation) {
+        String deploymentId = null;
+        if (dmnDeploymentAnnotation != null) {
+            deploymentId = deployResourceFromAnnotation(dmnEngine, testClass, method.getName(), method, dmnDeploymentAnnotation.resources());
+        }
+        return deploymentId;
+    }
+
+    public static String annotationDeploymentSetUp(DmnEngine dmnEngine, Class<?> testClass, Method method, DmnDeploymentAnnotation dmnDeploymentAnnotation) {
+        String deploymentId = null;
+        if (dmnDeploymentAnnotation != null) {
+            deploymentId = deployResourceFromAnnotation(dmnEngine, testClass, method.getName(), method, dmnDeploymentAnnotation.resources());
+        }
         return deploymentId;
     }
 
@@ -179,9 +195,9 @@ public abstract class DmnTestHelper {
             commandExecutor.execute(config, new Command<Object>() {
                 @Override
                 public Object execute(CommandContext commandContext) {
-                    DbSchemaManager dbSchemaManager = CommandContextUtil.getDmnEngineConfiguration().getDbSchemaManager();
-                    dbSchemaManager.dbSchemaDrop();
-                    dbSchemaManager.dbSchemaCreate();
+                    SchemaManager dbSchemaManager = CommandContextUtil.getDmnEngineConfiguration().getDbSchemaManager();
+                    dbSchemaManager.schemaDrop();
+                    dbSchemaManager.schemaCreate();
                     return null;
                 }
             });

@@ -61,8 +61,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * The FormEngine and the services will be made available to the test class through the parameter resolution (BeforeEach, AfterEach, test methods).
  * The FormEngine will be initialized by default with the flowable.form.cfg.xml resource on the classpath.
- * To specify a different configuration file, pass the resource location in {@link #FlowableFormExtension(String) the appropriate constructor}.
- * If a custom resource is needed then {@link org.junit.jupiter.api.extension.RegisterExtension RegisterExtension} should be used.
+ * To specify a different configuration file, annotate your class with {@link FormConfigurationResource}.
  * Form engines will be cached as part of the JUnit Jupiter Extension context.
  * Right before the first time the setUp is called for a given configuration resource, the form engine will be constructed.
  * </p>
@@ -83,6 +82,8 @@ import org.slf4j.LoggerFactory;
  * @author Filip Hrisafov
  */
 public class FlowableFormExtension implements ParameterResolver, BeforeEachCallback, AfterEachCallback {
+
+    public static final String DEFAULT_CONFIGURATION_RESOURCE = "flowable.form.cfg.xml";
 
     private static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(FlowableFormExtension.class);
 
@@ -161,13 +162,19 @@ public class FlowableFormExtension implements ParameterResolver, BeforeEachCallb
         }
     }
 
+    protected String getConfigurationResource(ExtensionContext context) {
+        return AnnotationSupport.findAnnotation(context.getTestClass(), FormConfigurationResource.class)
+            .map(FormConfigurationResource::value)
+            .orElse(DEFAULT_CONFIGURATION_RESOURCE);
+    }
+
     protected FlowableFormTestHelper getTestHelper(ExtensionContext context) {
         return getStore(context)
             .getOrComputeIfAbsent(context.getRequiredTestClass(), key -> new FlowableFormTestHelper(createFormEngine(context)), FlowableFormTestHelper.class);
     }
 
     protected FormEngine createFormEngine(ExtensionContext context) {
-        return FormTestHelper.getFormEngine(configurationResource);
+        return FormTestHelper.getFormEngine(getConfigurationResource(context));
     }
 
     protected ExtensionContext.Store getStore(ExtensionContext context) {

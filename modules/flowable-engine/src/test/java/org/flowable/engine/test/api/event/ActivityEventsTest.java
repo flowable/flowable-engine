@@ -464,9 +464,8 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         assertTrue(listener.getEventsReceived().get(0) instanceof FlowableActivityEvent);
         FlowableActivityEvent activityEvent = (FlowableActivityEvent) listener.getEventsReceived().get(0);
         assertEquals(FlowableEngineEventType.ACTIVITY_COMPENSATE, activityEvent.getType());
-        assertEquals("compensate", activityEvent.getActivityId());
-        // A new execution is created for the compensation-event, this should be
-        // visible in the event
+        assertEquals("usertask", activityEvent.getActivityId());
+        // A new execution is created for the compensation-event, this should be visible in the event
         assertFalse(processInstance.getId().equals(activityEvent.getExecutionId()));
         assertEquals(processInstance.getProcessInstanceId(), activityEvent.getProcessInstanceId());
         assertEquals(processInstance.getProcessDefinitionId(), activityEvent.getProcessDefinitionId());

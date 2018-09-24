@@ -40,11 +40,11 @@ public class AppEngineImpl implements AppEngine {
         this.appManagementService = appEngineConfiguration.getAppManagementService();
         this.appRepositoryService = appEngineConfiguration.getAppRepositoryService();
         
-        if (appEngineConfiguration.isUsingRelationalDatabase() && appEngineConfiguration.getDatabaseSchemaUpdate() != null) {
+        if (appEngineConfiguration.getSchemaManagementCmd() != null) {
             CommandExecutor commandExecutor = appEngineConfiguration.getCommandExecutor();
-            commandExecutor.execute(appEngineConfiguration.getSchemaCommandConfig(), new SchemaOperationsAppEngineBuild());
+            commandExecutor.execute(appEngineConfiguration.getSchemaCommandConfig(), appEngineConfiguration.getSchemaManagementCmd());
         }
-
+        
         LOGGER.info("AppEngine {} created", name);
         
         AppEngines.registerAppEngine(this);

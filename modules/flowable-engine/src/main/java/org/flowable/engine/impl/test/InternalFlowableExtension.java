@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
-import org.flowable.common.engine.impl.db.DbSchemaManager;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -93,6 +93,7 @@ public abstract class InternalFlowableExtension implements AfterEachCallback, Be
     @Override
     public void afterEach(ExtensionContext context) throws Exception {
         ProcessEngine processEngine = getProcessEngine(context);
+
         // Always reset authenticated user to avoid any mistakes
         processEngine.getIdentityService().setAuthenticatedUserId(null);
 
@@ -138,7 +139,11 @@ public abstract class InternalFlowableExtension implements AfterEachCallback, Be
 
             AnnotationSupport.findAnnotation(context.getTestMethod(), CleanTest.class)
                 .ifPresent(cleanTest -> removeDeployments(processEngine.getRepositoryService()));
-            if (context.getTestInstanceLifecycle().orElse(TestInstance.Lifecycle.PER_METHOD) == lifecycleForClean) {
+
+            AbstractFlowableTestCase.cleanDeployments(processEngine);
+            
+            if (context.getTestInstanceLifecycle().orElse(TestInstance.Lifecycle.PER_METHOD) == lifecycleForClean
+                    && processEngineConfiguration.isUsingRelationalDatabase()) { // the logic only is applicable to a relational database with tables
                 cleanTestAndAssertAndEnsureCleanDb(context, processEngine);
             }
 
@@ -194,9 +199,9 @@ public abstract class InternalFlowableExtension implements AfterEachCallback, Be
 
                     @Override
                     public Object execute(CommandContext commandContext) {
-                        DbSchemaManager dbSchemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager();
-                        dbSchemaManager.dbSchemaDrop();
-                        dbSchemaManager.dbSchemaCreate();
+                        SchemaManager dbSchemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager();
+                        dbSchemaManager.schemaDrop();
+                        dbSchemaManager.schemaCreate();
                         return null;
                     }
                 });

@@ -19,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.impl.db.DbSchemaManager;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +33,7 @@ import liquibase.exception.DatabaseException;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
-public class AppDbSchemaManager implements DbSchemaManager {
+public class AppDbSchemaManager implements SchemaManager {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(AppDbSchemaManager.class);
 
@@ -51,18 +51,17 @@ public class AppDbSchemaManager implements DbSchemaManager {
         Liquibase liquibase = null;
         try {
             if (AppEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)) {
-                dbSchemaCreate();
+                schemaCreate();
                 
             } else if (AppEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
-                dbSchemaDrop();
-                dbSchemaCreate();
+                schemaDrop();
+                schemaCreate();
                 
             } else if (AppEngineConfiguration.DB_SCHEMA_UPDATE_TRUE.equals(databaseSchemaUpdate)) {
-                dbSchemaUpdate();
+                schemaUpdate();
                 
             } else if (AppEngineConfiguration.DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
-                liquibase = createLiquibaseInstance(appEngineConfiguration);
-                liquibase.validate();
+               schemaCheckVersion();
                 
             }
         } catch (Exception e) {
@@ -118,13 +117,13 @@ public class AppDbSchemaManager implements DbSchemaManager {
     }
 
     @Override
-    public void dbSchemaCreate() {
+    public void schemaCreate() {
         Liquibase liquibase = null;
         try {
             
-            getCommonDbSchemaManager().dbSchemaCreate();
-            getIdentityLinkDbSchemaManager().dbSchemaCreate();
-            getVariableDbSchemaManager().dbSchemaCreate();
+            getCommonDbSchemaManager().schemaCreate();
+            getIdentityLinkDbSchemaManager().schemaCreate();
+            getVariableDbSchemaManager().schemaCreate();
             
             liquibase = createLiquibaseInstance(CommandContextUtil.getAppEngineConfiguration());
             liquibase.update("app");
@@ -136,7 +135,7 @@ public class AppDbSchemaManager implements DbSchemaManager {
     }
 
     @Override
-    public void dbSchemaDrop() {
+    public void schemaDrop() {
         Liquibase liquibase = null;
         try {
             liquibase = createLiquibaseInstance(CommandContextUtil.getAppEngineConfiguration());
@@ -148,34 +147,34 @@ public class AppDbSchemaManager implements DbSchemaManager {
         }
         
         try {
-            getVariableDbSchemaManager().dbSchemaDrop();
+            getVariableDbSchemaManager().schemaDrop();
         } catch (Exception e) {
             LOGGER.info("Error dropping variable tables", e);
         }
         
         try {
-            getIdentityLinkDbSchemaManager().dbSchemaDrop();
+            getIdentityLinkDbSchemaManager().schemaDrop();
         } catch (Exception e) {
             LOGGER.info("Error dropping identity link tables", e);
         }
         
         try {
-            getCommonDbSchemaManager().dbSchemaDrop();
+            getCommonDbSchemaManager().schemaDrop();
         } catch (Exception e) {
             LOGGER.info("Error dropping common tables", e);
         }
     }
 
     @Override
-    public String dbSchemaUpdate() {
+    public String schemaUpdate() {
         Liquibase liquibase = null;
         try {
             
-            getCommonDbSchemaManager().dbSchemaUpdate();
+            getCommonDbSchemaManager().schemaUpdate();
             
             if (CommandContextUtil.getAppEngineConfiguration().isExecuteServiceDbSchemaManagers()) {
-                getIdentityLinkDbSchemaManager().dbSchemaUpdate();
-                getVariableDbSchemaManager().dbSchemaUpdate();
+                getIdentityLinkDbSchemaManager().schemaUpdate();
+                getVariableDbSchemaManager().schemaUpdate();
             }
             
             liquibase = createLiquibaseInstance(CommandContextUtil.getAppEngineConfiguration());
@@ -189,15 +188,28 @@ public class AppDbSchemaManager implements DbSchemaManager {
         return null;
     }
     
-    protected DbSchemaManager getCommonDbSchemaManager() {
+    @Override
+    public void schemaCheckVersion() {
+        Liquibase liquibase = null;
+        try {
+            liquibase = createLiquibaseInstance(CommandContextUtil.getAppEngineConfiguration());
+            liquibase.validate();
+        } catch (Exception e) {
+            throw new FlowableException("Error validating app engine schema", e);
+        } finally {
+            closeDatabase(liquibase);
+        }
+    }
+    
+    protected SchemaManager getCommonDbSchemaManager() {
         return CommandContextUtil.getAppEngineConfiguration().getCommonDbSchemaManager();
     }
     
-    protected DbSchemaManager getIdentityLinkDbSchemaManager() {
+    protected SchemaManager getIdentityLinkDbSchemaManager() {
         return CommandContextUtil.getAppEngineConfiguration().getIdentityLinkDbSchemaManager();
     }
     
-    protected DbSchemaManager getVariableDbSchemaManager() {
+    protected SchemaManager getVariableDbSchemaManager() {
         return CommandContextUtil.getAppEngineConfiguration().getVariableDbSchemaManager();
     }
     

@@ -57,7 +57,7 @@ import org.flowable.cmmn.rest.conf.ApplicationConfiguration;
 import org.flowable.cmmn.rest.service.api.RestUrlBuilder;
 import org.flowable.cmmn.rest.util.TestServerUtil;
 import org.flowable.cmmn.rest.util.TestServerUtil.TestServer;
-import org.flowable.common.engine.impl.db.DbSchemaManager;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
@@ -312,9 +312,9 @@ public abstract class BaseSpringRestTestCase extends TestCase {
 
             CommandExecutor commandExecutor = cmmnEngine.getCmmnEngineConfiguration().getCommandExecutor();
             commandExecutor.execute(commandContext -> {
-                DbSchemaManager dbSchemaManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDbSchemaManager();
-                dbSchemaManager.dbSchemaDrop();
-                dbSchemaManager.dbSchemaCreate();
+                SchemaManager dbSchemaManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDbSchemaManager();
+                dbSchemaManager.schemaDrop();
+                dbSchemaManager.schemaCreate();
                 return null;
             });
 

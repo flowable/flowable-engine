@@ -33,7 +33,7 @@ public class DbSchemaUpdate {
         commandExecutor.execute(config, new Command<Object>() {
             @Override
             public Object execute(CommandContext commandContext) {
-                CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager().dbSchemaUpdate();
+                CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager().schemaUpdate();
                 return null;
             }
         });
