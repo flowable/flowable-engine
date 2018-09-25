@@ -24,7 +24,7 @@ public class SchemaOperationsAppEngineBuild implements Command<Void> {
 
     @Override
     public Void execute(CommandContext commandContext) {
-        ((AppDbSchemaManager) CommandContextUtil.getAppEngineConfiguration(commandContext).getDbSchemaManager()).initSchema();
+        ((AppDbSchemaManager) CommandContextUtil.getAppEngineConfiguration(commandContext).getSchemaManager()).initSchema();
         return null;
     }
 

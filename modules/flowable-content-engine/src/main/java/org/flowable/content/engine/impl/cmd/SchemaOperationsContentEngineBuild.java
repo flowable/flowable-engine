@@ -26,7 +26,7 @@ public class SchemaOperationsContentEngineBuild implements Command<Void> {
     @Override
     public Void execute(CommandContext commandContext) {
         ContentEngineConfiguration configuration = CommandContextUtil.getContentEngineConfiguration(commandContext);
-        ((ContentDbSchemaManager)configuration.getDbSchemaManager()).initSchema(configuration, configuration.getDatabaseSchemaUpdate());
+        ((ContentDbSchemaManager)configuration.getSchemaManager()).initSchema(configuration, configuration.getDatabaseSchemaUpdate());
         return null;
     }
 

@@ -28,7 +28,7 @@ public class SchemaOperationProcessEngineClose implements Command<Void> {
     public Void execute(CommandContext commandContext) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (processEngineConfiguration.isUsingRelationalDatabase()) {
-            ((ProcessDbSchemaManager) (processEngineConfiguration.getDbSchemaManager())).performSchemaOperationsProcessEngineClose();
+            ((ProcessDbSchemaManager) (processEngineConfiguration.getSchemaManager())).performSchemaOperationsProcessEngineClose();
         }
         return null;
     }

@@ -87,7 +87,7 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
             
         }
 
-        cmmnEngineConfiguration.setExecuteServiceDbSchemaManagers(false);
+        cmmnEngineConfiguration.setExecuteServiceSchemaManagers(false);
 
         initCmmnEngine();
 

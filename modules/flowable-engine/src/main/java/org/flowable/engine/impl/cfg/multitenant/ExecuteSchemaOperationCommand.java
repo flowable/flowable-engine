@@ -13,11 +13,11 @@
 package org.flowable.engine.impl.cfg.multitenant;
 
 import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.db.ProcessDbSchemaManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
@@ -37,10 +37,10 @@ public class ExecuteSchemaOperationCommand implements Command<Void> {
 
     @Override
     public Void execute(CommandContext commandContext) {
-        ProcessDbSchemaManager processDbSchemaManager = (ProcessDbSchemaManager) CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager();
+        SchemaManager processSchemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getSchemaManager();
         if (ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE.equals(schemaOperation)) {
             try {
-                processDbSchemaManager.schemaDrop();
+                processSchemaManager.schemaDrop();
             } catch (RuntimeException e) {
                 // ignore
             }
@@ -48,13 +48,13 @@ public class ExecuteSchemaOperationCommand implements Command<Void> {
         if (org.flowable.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(schemaOperation)
                 || ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE.equals(schemaOperation)
                 || ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_CREATE.equals(schemaOperation)) {
-            processDbSchemaManager.schemaCreate();
+            processSchemaManager.schemaCreate();
 
         } else if (org.flowable.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE.equals(schemaOperation)) {
-            processDbSchemaManager.schemaCheckVersion();
+            processSchemaManager.schemaCheckVersion();
 
         } else if (ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE.equals(schemaOperation)) {
-            processDbSchemaManager.schemaUpdate();
+            processSchemaManager.schemaUpdate();
         }
 
         return null;
