@@ -334,16 +334,16 @@
             "NO-COMPLETED-USER-EVENT-LISTENERS":"没有完成的事件监听器",
             "USER-EVENT-LISTENER-NO-NAME": "没有名称的事件监听器 Event Listener",
             "USER-EVENT-LISTENER-COMPLETED": "完成",
-            "ENABLED-PLAN-ITEM_INSTANCE-NO-NAME": "No name",
-            "START-PLAN-ITEM-INSTANCE": "Start"
+            "ENABLED-PLAN-ITEM_INSTANCE-NO-NAME": "没有名称",
+            "START-PLAN-ITEM-INSTANCE": "启动"
         },
         "ACTION" : {
             "CREATE": "+ 启动一个case",
             "BACK-TO-LIST": "返回到case实例列表",
             "SHOW-DIAGRAM": "显示图",
-            "CANCEL": "取消 case",
+            "CANCEL": "取消case",
             "DELETE": "删除case",
-            "TRIGGER-USER-EVENT-LISTENER": "Trigger",
+            "TRIGGER-USER-EVENT-LISTENER": "触发",
             "AUDIT-LOG": "审核日志"
         },
         "FIELD": {
@@ -353,7 +353,7 @@
             "STARTED": "Started",
             "STARTED-BY": "Started by",
             "ENDED": "结束",
-            "NAME": "Case 实例名称",
+            "NAME": "Case实例名称",
             "NAME-PLACEHOLDER" : "为正在启动的case输入一个可选的名称"
         },
         "SECTION": {
@@ -365,8 +365,8 @@
             "REACHED-MILESTONES": "可达到的里程碑（milestones）",
             "AVAILABLE-USER-EVENT-LISTENERS": "可以用的用户事件监听器",
             "COMPLETED-USER-EVENT-LISTENERS": "已经完成的用户事件监听器",
-            "CONTENT" : "Content",
-            "ENABLED-PLAN-ITEM-INSTANCES": "Enabled plan item instances"
+            "CONTENT" : "内容",
+            "ENABLED-PLAN-ITEM-INSTANCES": "启用计划项目实例"
         },
         "POPUP": {
             "CANCEL-TITLE": "取消case?",
