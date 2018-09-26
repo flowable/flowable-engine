@@ -33,7 +33,7 @@ public class DbSchemaDrop {
         commandExecutor.execute(config, new Command<Object>() {
             @Override
             public Object execute(CommandContext commandContext) {
-                CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager().dbSchemaDrop();
+                CommandContextUtil.getProcessEngineConfiguration(commandContext).getSchemaManager().schemaDrop();
                 return null;
             }
         });

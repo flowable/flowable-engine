@@ -32,6 +32,9 @@ public class FormInstanceInfo extends FormInfo {
     protected String taskId;
     protected String processInstanceId;
     protected String processDefinitionId;
+    protected String scopeId;
+    protected String scopeType;
+    protected String scopeDefinitionId;
     protected String tenantId;
 
     public String getFormInstanceId() {
@@ -88,6 +91,30 @@ public class FormInstanceInfo extends FormInfo {
 
     public void setProcessDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
+    }
+
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
+    }
+
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
     }
 
     public String getTenantId() {

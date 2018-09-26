@@ -156,7 +156,21 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
         assertEquals(2, query.list().size());
         assertEquals(2, query.count());
     }
+    
+    @Test
+    public void testQueryByProcessDefinitionKeyLikeMultipleProcessDefinitions() {
+        String deploymentId = repositoryService.createDeployment().name("org/flowable/engine/test/repository/one.bpmn20.xml")
+                .addClasspathResource("org/flowable/engine/test/repository/one.bpmn20.xml")
+                .addClasspathResource("org/flowable/engine/test/repository/two.bpmn20.xml")
+                .deploy().getId();
 
+        DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentId(deploymentId).processDefinitionKeyLike("%o%");
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+        
+        repositoryService.deleteDeployment(deploymentId, true);
+    }
+    
     @Test
     public void testQueryByInvalidProcessDefinitionKeyLike() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().processDefinitionKeyLike("invalid");

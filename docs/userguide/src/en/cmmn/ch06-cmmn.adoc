@@ -884,27 +884,27 @@ Here, user task D is required and user task B is manually activated.
 
 ==== Item control: Completion Neutral Rule
 
-_Completion Neutral Rule_ is not a CMMN 1.1 Standard. The completion neutral rule impacts the interpretation of the *AVAILABLE* state of plan items that have it, when evaluating whether or not a Stage containing such plan items can complete.
+Plan items on the case model can have a _completion neutral rule_: an expression that can be used to indicate a certain plan item is _neutral with regards to the completion of its parent stage (or plan model)_. This can be used to indicate which plan items of the case model are required to be executed and which are optional, as a more flexible alternative in some use cases to using the _required rule_ and _autoComplete_ .
 
-Following the specification, a stage with a plan item in state *AVAILABLE* does not complete unless its _autoComplete_ attribute is set _true_.
-But an _autoCompletable_ stage would _ignore_, for the purposes of completing, *all* plan items in _ENABLE_ and _AVAILABLE_ state that are _not required_ (*requiredRule* not present or evaluates to _false_).
+Note that the _Completion Neutral Rule_ is not a CMMN 1.1 Standard, but a Flowable-specific addition.
 
-_Completion Neutral_ offers the flexibility to mark only some containing plan items without setting the containing parent stage as _autoComplete_.
+Following the specification, a stage with a plan item in state *AVAILABLE* does not complete unless its _autoComplete_ attribute is set _true_ and the plan item is not required. For example, a plan item that has an unsatisfied sentry remains in *AVAILABLE* until the sentry is satisfied. This means that the parent stage would not complete, unless the plan item is marked as _not required_ and the stage is set to _autoComplete_. The downside is that once a stage is marked as to autoComplete, all child plan items need to have a configuration for the _required_ rule, which is in some use cases tedious and lots of work.
 
-_Required Rule_ takes precedence when plan items with both rules both evaluate to _true_.
+The _Completion Neutral Rule_, contrary to the autoComplete-required mechanism, works from "bottom-up": a plan item can be marked individually to be _neutral wrt the completion of its parent_ without having to mark any other plan item.
 
-As a summary:
+The _Required Rule_ takes precedence when plan items with both rules both evaluate to _true_.
 
-* a plan item configured to be _"completion neutral"_ will not prevent a stage from completing if it's in *AVAILABLE* state (in other words, waiting for an entry criterion sentry),
-meaning that such a plan item is neutral with respect to its parent stage completion evaluation.
+To summarize:
+
+* a plan item configured to be _"completion neutral"_ will allow a stage to complete automatically if it's in *AVAILABLE* state (e.g. waiting for an entry criterion sentry),meaning that such a plan item is neutral with respect to its parent stage completion evaluation.
 
 * a stage will remain *ACTIVE* on any of these conditions:
     1. It has at least one plan item in *ACTIVE* state
     2. It has at least one plan item with _requiredRule_ in *AVAILABLE* or *ENABLE* state
-    3. It isn't _autoComplete_ and has at least one plan item in *ENABLED* state (irrespective of its _requiredRule_)
-    4. It isn't _autoComplete_ and has at least one plan item in *AVAILABLE* state that is *not* _completionNeutral_
+    3. It is not marked as _autoComplete_ and has at least one plan item in *ENABLED* state (irrespective of its _requiredRule_)
+    4. It is not marked as  _autoComplete_ and has at least one plan item in *AVAILABLE* state that is *not* _completionNeutral_
 
 * a stage will *COMPLETE* if:
-    1. It contains *no* plan items or all child plan items are in a _Terminal_ or _Semi-terminal_ state (CLOSED, COMPLETED, DISABLED, FAILED)
-    2. It isn't _autoComplete_ and all remaining plan items (not _Terminal_ or _Semi-terminal_ state) are in *AVAILABLE* state and are _completionNeutral_ and not _required_
-    3. It is _autoComplete_ and all remaining plan items (not _Terminal_ or _Semi-terminal) are _not required_ in *ENABLED* or *AVAILABLE* state (regardless of its completion neutrality)
+    1. It contains no plan items or all child plan items are in a _Terminal_ or _Semi-terminal_ state (CLOSED, COMPLETED, DISABLED, FAILED)
+    2. It is not marked as _autoComplete_ and all remaining child plan items are in *AVAILABLE* state and are _completionNeutral_ and not _required_
+    3. It is _autoComplete_ and all remaining plan items are _not required_ in *ENABLED* or *AVAILABLE* state (regardless of its completion neutrality, as required rule gets precedence)

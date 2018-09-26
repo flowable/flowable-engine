@@ -33,6 +33,13 @@ public class HistoricIdentityLinkEntityManagerImpl extends AbstractEntityManager
     }
 
     @Override
+    public HistoricIdentityLinkEntity create() {
+        HistoricIdentityLinkEntity identityLinkEntity = super.create();
+        identityLinkEntity.setCreateTime(identityLinkServiceConfiguration.getClock().getCurrentTime());
+        return identityLinkEntity;
+    }
+
+    @Override
     protected DataManager<HistoricIdentityLinkEntity> getDataManager() {
         return historicIdentityLinkDataManager;
     }

@@ -108,7 +108,7 @@ public class MessageThrowingEventListenerTest extends PluggableFlowableTestCase 
             org.flowable.task.api.Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("boundaryTask").singleResult();
             assertNotNull(boundaryTask);
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
             
         } finally {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);

@@ -50,12 +50,13 @@ import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.cfg.TransactionContextFactory;
 import org.flowable.common.engine.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
 import org.flowable.common.engine.impl.db.CommonDbSchemaManager;
-import org.flowable.common.engine.impl.db.DbSchemaManager;
 import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
 import org.flowable.common.engine.impl.db.LogSqlExecutionTimePlugin;
 import org.flowable.common.engine.impl.db.MybatisTypeAliasConfigurator;
 import org.flowable.common.engine.impl.db.MybatisTypeHandlerConfigurator;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.event.EventDispatchAction;
+import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContextFactory;
 import org.flowable.common.engine.impl.interceptor.CommandContextInterceptor;
@@ -117,8 +118,9 @@ public abstract class AbstractEngineConfiguration {
     protected int jdbcPingConnectionNotUsedFor;
     protected int jdbcDefaultTransactionIsolationLevel;
     protected DataSource dataSource;
-    protected DbSchemaManager commonDbSchemaManager;
-    protected DbSchemaManager dbSchemaManager;
+    protected SchemaManager commonSchemaManager;
+    protected SchemaManager schemaManager;
+    protected Command<Void> schemaManagementCmd;
 
     protected String databaseSchemaUpdate = DB_SCHEMA_UPDATE_FALSE;
 
@@ -190,8 +192,7 @@ public abstract class AbstractEngineConfiguration {
     protected boolean transactionsExternallyManaged;
 
     /**
-     * Flag that can be set to configure or not a relational database is used. This is useful for custom implementations that do not use relational databases
-     * at all.
+     * Flag that can be set to configure or not a relational database is used. This is useful for custom implementations that do not use relational databases at all.
      *
      * If true (default), the {@link AbstractEngineConfiguration#getDatabaseSchemaUpdate()} value will be used to determine what needs to happen wrt the database schema.
      *
@@ -199,6 +200,12 @@ public abstract class AbstractEngineConfiguration {
      * correct. The {@link AbstractEngineConfiguration#getDatabaseSchemaUpdate()} value will not be used.
      */
     protected boolean usingRelationalDatabase = true;
+    
+    /**
+     * Flag that can be set to configure whether or not a schema is used. This is usefil for custom implementations that do not use relational databases at all.
+     * Setting {@link #usingRelationalDatabase} to true will automotically imply using a schema.
+     */
+    protected boolean usingSchemaMgmt = true;
 
     /**
      * Allows configuring a database table prefix which is used for all runtime operations of the process engine. For example, if you specify a prefix named 'PRE1.', Flowable will query for executions
@@ -410,9 +417,9 @@ public abstract class AbstractEngineConfiguration {
         }
     }
 
-    public void initDbSchemaManager() {
-        if (this.commonDbSchemaManager == null) {
-            this.commonDbSchemaManager = new CommonDbSchemaManager();
+    public void initSchemaManager() {
+        if (this.commonSchemaManager == null) {
+            this.commonSchemaManager = new CommonDbSchemaManager();
         }
     }
 
@@ -894,21 +901,30 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
-    public DbSchemaManager getDbSchemaManager() {
-        return dbSchemaManager;
+    public SchemaManager getSchemaManager() {
+        return schemaManager;
     }
 
-    public AbstractEngineConfiguration setDbSchemaManager(DbSchemaManager dbSchemaManager) {
-        this.dbSchemaManager = dbSchemaManager;
+    public AbstractEngineConfiguration setSchemaManager(SchemaManager schemaManager) {
+        this.schemaManager = schemaManager;
         return this;
     }
 
-    public DbSchemaManager getCommonDbSchemaManager() {
-        return commonDbSchemaManager;
+    public SchemaManager getCommonSchemaManager() {
+        return commonSchemaManager;
     }
 
-    public AbstractEngineConfiguration setCommonDbSchemaManager(DbSchemaManager commonDbSchemaManager) {
-        this.commonDbSchemaManager = commonDbSchemaManager;
+    public AbstractEngineConfiguration setCommonSchemaManager(SchemaManager commonSchemaManager) {
+        this.commonSchemaManager = commonSchemaManager;
+        return this;
+    }
+    
+    public Command<Void> getSchemaManagementCmd() {
+        return schemaManagementCmd;
+    }
+
+    public AbstractEngineConfiguration setSchemaManagementCmd(Command<Void> schemaManagementCmd) {
+        this.schemaManagementCmd = schemaManagementCmd;
         return this;
     }
 
@@ -1305,6 +1321,15 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setUsingRelationalDatabase(boolean usingRelationalDatabase) {
         this.usingRelationalDatabase = usingRelationalDatabase;
+        return this;
+    }
+    
+    public boolean isUsingSchemaMgmt() {
+        return usingSchemaMgmt;
+    }
+
+    public AbstractEngineConfiguration setUsingSchemaMgmt(boolean usingSchema) {
+        this.usingSchemaMgmt = usingSchema;
         return this;
     }
 

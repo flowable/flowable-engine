@@ -14,19 +14,20 @@ package org.activiti.engine.impl.el;
 
 import java.util.Map;
 
-import org.activiti.engine.impl.javax.el.ArrayELResolver;
-import org.activiti.engine.impl.javax.el.BeanELResolver;
-import org.activiti.engine.impl.javax.el.CompositeELResolver;
-import org.activiti.engine.impl.javax.el.DynamicBeanPropertyELResolver;
-import org.activiti.engine.impl.javax.el.ELContext;
-import org.activiti.engine.impl.javax.el.ELResolver;
-import org.activiti.engine.impl.javax.el.ExpressionFactory;
-import org.activiti.engine.impl.javax.el.ListELResolver;
-import org.activiti.engine.impl.javax.el.MapELResolver;
-import org.activiti.engine.impl.javax.el.ValueExpression;
-import org.activiti.engine.impl.juel.ExpressionFactoryImpl;
 import org.activiti.engine.impl.persistence.entity.VariableScopeImpl;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.de.odysseus.el.ExpressionFactoryImpl;
+import org.flowable.common.engine.impl.el.DynamicBeanPropertyELResolver;
+import org.flowable.common.engine.impl.el.JsonNodeELResolver;
+import org.flowable.common.engine.impl.javax.el.ArrayELResolver;
+import org.flowable.common.engine.impl.javax.el.BeanELResolver;
+import org.flowable.common.engine.impl.javax.el.CompositeELResolver;
+import org.flowable.common.engine.impl.javax.el.ELContext;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
+import org.flowable.common.engine.impl.javax.el.ExpressionFactory;
+import org.flowable.common.engine.impl.javax.el.ListELResolver;
+import org.flowable.common.engine.impl.javax.el.MapELResolver;
+import org.flowable.common.engine.impl.javax.el.ValueExpression;
 import org.flowable.engine.impl.bpmn.data.ItemInstance;
 import org.flowable.variable.api.delegate.VariableScope;
 
@@ -114,6 +115,7 @@ public class ExpressionManager {
         elResolver.add(new ArrayELResolver());
         elResolver.add(new ListELResolver());
         elResolver.add(new MapELResolver());
+        elResolver.add(new JsonNodeELResolver());
         elResolver.add(new DynamicBeanPropertyELResolver(ItemInstance.class, "getFieldValue", "setFieldValue")); // TODO: needs verification
         elResolver.add(new BeanELResolver());
         return elResolver;

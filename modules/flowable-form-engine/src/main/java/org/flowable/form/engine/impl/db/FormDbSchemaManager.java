@@ -16,7 +16,7 @@ import java.sql.Connection;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.impl.db.DbSchemaManager;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.util.CommandContextUtil;
@@ -31,14 +31,38 @@ import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.DatabaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
-public class FormDbSchemaManager implements DbSchemaManager {
+public class FormDbSchemaManager implements SchemaManager {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(FormDbSchemaManager.class);
     
     public static String LIQUIBASE_CHANGELOG = "org/flowable/form/db/liquibase/flowable-form-db-changelog.xml";
     
+    public void initSchema(FormEngineConfiguration formEngineConfiguration) {
+        Liquibase liquibase = null;
+        try {
+            liquibase = createLiquibaseInstance(formEngineConfiguration);
+
+            String databaseSchemaUpdate = formEngineConfiguration.getDatabaseSchemaUpdate();
+            if (FormEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
+                LOGGER.debug("Dropping and creating schema FORM");
+                liquibase.dropAll();
+                liquibase.update("form");
+            } else if (FormEngineConfiguration.DB_SCHEMA_UPDATE_TRUE.equals(databaseSchemaUpdate)) {
+                LOGGER.debug("Updating schema FORM");
+                liquibase.update("form");
+            } else if (FormEngineConfiguration.DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
+                LOGGER.debug("Validating schema FORM");
+                liquibase.validate();
+            }
+        } catch (Exception e) {
+            throw new FlowableException("Error initialising form data schema", e);
+        } finally {
+            closeDatabase(liquibase);
+        }
+    }
+    
     @Override
-    public void dbSchemaCreate() {
+    public void schemaCreate() {
         Liquibase liquibase = createLiquibaseInstance();
         try {
             liquibase.update("form");
@@ -50,7 +74,7 @@ public class FormDbSchemaManager implements DbSchemaManager {
     }
 
     @Override
-    public void dbSchemaDrop() {
+    public void schemaDrop() {
         Liquibase liquibase = createLiquibaseInstance();
         try {
             liquibase.dropAll();
@@ -62,18 +86,34 @@ public class FormDbSchemaManager implements DbSchemaManager {
     }
     
     @Override
-    public String dbSchemaUpdate() {
-        dbSchemaCreate();
+    public String schemaUpdate() {
+        schemaCreate();
         return null;
+    }
+    
+    @Override
+    public void schemaCheckVersion() {
+        Liquibase liquibase = null;
+        try {
+            liquibase = createLiquibaseInstance(CommandContextUtil.getFormEngineConfiguration());
+            liquibase.validate();
+        } catch (Exception e) {
+            throw new FlowableException("Error validating app engine schema", e);
+        } finally {
+            closeDatabase(liquibase);
+        }
     }
 
     protected static Liquibase createLiquibaseInstance() {
+        return createLiquibaseInstance(CommandContextUtil.getFormEngineConfiguration());
+    }
+    
+    protected static Liquibase createLiquibaseInstance(FormEngineConfiguration formEngineConfiguration) {
         try {
             Connection jdbcConnection = null;
             CommandContext commandContext = CommandContextUtil.getCommandContext();
-            FormEngineConfiguration formEngineConfiguration = CommandContextUtil.getFormEngineConfiguration(commandContext);
             if (commandContext == null) {
-                jdbcConnection = CommandContextUtil.getFormEngineConfiguration(commandContext).getDataSource().getConnection();
+                jdbcConnection = formEngineConfiguration.getDataSource().getConnection();
             } else {
                 jdbcConnection = CommandContextUtil.getDbSqlSession(commandContext).getSqlSession().getConnection();
             }

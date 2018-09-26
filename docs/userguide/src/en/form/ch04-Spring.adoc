@@ -69,8 +69,37 @@ In addition to using the values listed above for +deploymentMode+, you may requi
 
 === Unit testing
 
-When integrating with Spring, forms can be tested very easily using the standard <<apiUnitTesting,Flowable testing facilities>>. The following example shows how a form is tested in a typical Spring-based unit test:
+When integrating with Spring, forms can be tested very easily using the standard <<apiUnitTesting,Flowable testing facilities>>.
+The following examples show how a form is tested in a typical Spring-based JUnit 4 and 5 tests:
 
+.JUnit 5 test
+[source,java,linenums]
+----
+@ExtendWith(FlowableFormSpringExtension.class)
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = SpringJunitJupiterTest.TestConfiguration.class)
+public class SpringJunit4Test {
+
+    @Autowired
+    private FormEngine formEngine;
+
+    @Autowired
+    private FormService formService;
+
+    @Test
+    @FormDeploymentAnnotation
+    public void simpleFormInstanceTest() {
+        FormInstance result = formService.getFormInstanceModelById(
+            "f7689f79-f1cc-11e6-8549-acde48001122", null);
+
+        Assertions.assertNotNull(result));
+    }
+}
+----
+
+Using the +FlowableFormSpringExtension+ allows the usage of the +Deployment+ annotation.
+
+.JUnit 4 test
 [source,java,linenums]
 ----
 @RunWith(SpringJUnit4ClassRunner.class)

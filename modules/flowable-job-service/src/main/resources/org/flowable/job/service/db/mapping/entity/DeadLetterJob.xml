@@ -201,7 +201,7 @@
     </select>
 
     <select id="selectDeadLetterJobCountByQueryCriteria" parameterType="org.flowable.job.service.impl.JobQueryImpl" resultType="long">
-        select count(distinct RES.ID_)
+        select count(RES.ID_)
         <include refid="selectDeadLetterJobByQueryCriteriaSql"/>
     </select>
 

@@ -92,22 +92,19 @@
 
   <select id="selectDeploymentsByQueryCriteria" parameterType="org.flowable.engine.impl.DeploymentQueryImpl" resultMap="deploymentResultMap">
   	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectDeploymentsByQueryCriteriaSql"/>
     ${orderBy}
     <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
 
   <select id="selectDeploymentCountByQueryCriteria" parameterType="org.flowable.engine.impl.DeploymentQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    select count(RES.ID_)
     <include refid="selectDeploymentsByQueryCriteriaSql"/>
   </select>
   
   <sql id="selectDeploymentsByQueryCriteriaSql">  
     from ${prefix}ACT_RE_DEPLOYMENT RES
-    <if test="processDefinitionKey != null or processDefinitionKeyLike != null">
-    	inner join ${prefix}ACT_RE_PROCDEF PROCDEF on RES.ID_ = PROCDEF.DEPLOYMENT_ID_
-    </if>
     <where>
       <if test="deploymentId != null">
         RES.ID_ = #{deploymentId}
@@ -168,11 +165,15 @@
       <if test="engineVersion != null">
         and RES.ENGINE_VERSION_ = #{engineVersion}
       </if>
-      <if test="processDefinitionKey != null">
-        and PROCDEF.KEY_ = #{processDefinitionKey}
-      </if>
-      <if test="processDefinitionKeyLike != null">
-        and PROCDEF.KEY_ like #{processDefinitionKeyLike}${wildcardEscapeClause}
+      <if test="processDefinitionKey != null || processDefinitionKeyLike != null">
+        and exists(select 1 from ${prefix}ACT_RE_PROCDEF PROCDEF where RES.ID_ = PROCDEF.DEPLOYMENT_ID_ 
+            <if test="processDefinitionKey != null">
+              and PROCDEF.KEY_ = #{processDefinitionKey}
+            </if>
+            <if test="processDefinitionKeyLike != null">
+              and PROCDEF.KEY_ like #{processDefinitionKeyLike}${wildcardEscapeClause}
+            </if>
+        )
       </if>
       <if test="latest">
         and RES.DEPLOY_TIME_ = (select max(DEPLOY_TIME_) from ${prefix}ACT_RE_DEPLOYMENT where KEY_ = RES.KEY_ 
@@ -201,21 +202,6 @@
     
   <select id="selectDeployment" parameterType="string" resultMap="deploymentResultMap">
     select * from ${prefix}ACT_RE_DEPLOYMENT where ID_ = #{id, jdbcType=VARCHAR}
-  </select>
-
-  <!-- mysql specific -->
-  <select id="selectDeploymentsByQueryCriteria" databaseId="mysql" parameterType="org.flowable.engine.impl.DeploymentQueryImpl" resultMap="deploymentResultMap">
-  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
-    <include refid="selectDeploymentsByQueryCriteriaSql"/>
-   	${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
-  </select>
-  
-  <!-- mysql specific -->
-  <select id="selectDeploymentCountByQueryCriteria" databaseId="mysql" parameterType="org.flowable.engine.impl.DeploymentQueryImpl" resultType="long">
-    select distinct count(RES.ID_)
-    <include refid="selectDeploymentsByQueryCriteriaSql"/>
   </select>
 
   <select id="selectDeploymentByNativeQuery" parameterType="java.util.Map" resultMap="deploymentResultMap">

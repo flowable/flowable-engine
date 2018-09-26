@@ -242,6 +242,60 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
     }
+    
+    @Test
+    public void testStartProcessInstanceByProcessInstanceBuilderWithOverrideTenantId() {
+        org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment()
+                        .addClasspathResource("org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+                        .tenantId("flowable")
+                        .deploy();
+        
+        try {
+            ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
+
+            ProcessInstance processInstance = processInstanceBuilder.processDefinitionKey("oneTaskProcess")
+                            .businessKey("123")
+                            .tenantId("flowable")
+                            .overrideProcessDefinitionTenantId("customTenant")
+                            .start();
+            
+            assertNotNull(processInstance);
+            assertEquals("123", processInstance.getBusinessKey());
+            assertEquals("customTenant", processInstance.getTenantId());
+
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(task.getTenantId(), is("customTenant"));
+            
+        } finally {
+            repositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+    
+    @Test
+    public void testStartProcessInstanceByProcessInstanceBuilderWithDefaultDefinitionTenantId() {
+        org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment()
+                        .addClasspathResource("org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+                        .deploy();
+        
+        try {
+            ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
+
+            ProcessInstance processInstance = processInstanceBuilder.processDefinitionKey("oneTaskProcess")
+                            .businessKey("123")
+                            .overrideProcessDefinitionTenantId("customTenant")
+                            .start();
+            
+            assertNotNull(processInstance);
+            assertEquals("123", processInstance.getBusinessKey());
+            assertEquals("customTenant", processInstance.getTenantId());
+
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(task.getTenantId(), is("customTenant"));
+            
+        } finally {
+            repositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
@@ -1091,7 +1145,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
             assertEquals(3, runtimeService.getVariables(processInstance.getId(), Arrays.asList("var1", "var2", "var3")).size());
             assertNotNull(runtimeService.getVariable(processInstance.getId(), "var2"));
 
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             // Verify history
             assertEquals(3, historyService.createHistoricVariableInstanceQuery().list().size());
@@ -1100,7 +1154,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
             // Remove one variable
             runtimeService.removeVariable(processInstance.getId(), "var2");
 
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             // Verify runtime
             assertEquals(2, runtimeService.getVariables(processInstance.getId()).size());

@@ -22,6 +22,7 @@ import org.flowable.form.api.FormInstanceQuery;
 import org.flowable.form.api.FormService;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.cmd.CreateFormInstanceCmd;
+import org.flowable.form.engine.impl.cmd.GetFormInstanceByScopeModelCmd;
 import org.flowable.form.engine.impl.cmd.GetFormInstanceModelCmd;
 import org.flowable.form.engine.impl.cmd.GetFormModelWithVariablesCmd;
 import org.flowable.form.engine.impl.cmd.GetVariablesFromFormSubmissionCmd;
@@ -152,12 +153,31 @@ public class FormServiceImpl extends CommonEngineServiceImpl<FormEngineConfigura
         return commandExecutor.execute(new GetFormInstanceModelCmd(formDefinitionKey, parentDeploymentId, null,
                 taskId, processInstanceId, tenantId, variables));
     }
+    
+    @Override
+    public FormInstanceInfo getFormInstanceModelByKeyAndScopeId(String formDefinitionKey, String scopeId, String scopeType, Map<String, Object> variables) {
+        return commandExecutor.execute(new GetFormInstanceByScopeModelCmd(formDefinitionKey, scopeId, scopeType, null, variables));
+    }
+
+    @Override
+    public FormInstanceInfo getFormInstanceModelByKeyAndScopeId(String formDefinitionKey, String scopeId, String scopeType, Map<String, Object> variables, String tenantId) {
+        return commandExecutor.execute(new GetFormInstanceByScopeModelCmd(formDefinitionKey, scopeId, scopeType, tenantId, variables));
+    }
 
     @Override
     public FormInstanceInfo getFormInstanceModelByKeyAndParentDeploymentIdAndScopeId(String formDefinitionKey, String parentDeploymentId,
-        String scopeId, String scopeType, String tenantId) {
+        String scopeId, String scopeType, Map<String, Object> variables) {
 
-        return commandExecutor.execute(new GetFormInstanceModelCmd(formDefinitionKey, parentDeploymentId, scopeId, scopeType, tenantId));
+        return commandExecutor.execute(new GetFormInstanceByScopeModelCmd(formDefinitionKey, parentDeploymentId, 
+                        scopeId, scopeType, null, variables));
+    }
+
+    @Override
+    public FormInstanceInfo getFormInstanceModelByKeyAndParentDeploymentIdAndScopeId(String formDefinitionKey, String parentDeploymentId,
+        String scopeId, String scopeType, Map<String, Object> variables, String tenantId) {
+
+        return commandExecutor.execute(new GetFormInstanceByScopeModelCmd(formDefinitionKey, parentDeploymentId, 
+                        scopeId, scopeType, tenantId, variables));
     }
 
     @Override

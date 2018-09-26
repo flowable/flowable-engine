@@ -84,6 +84,11 @@ public class WatchDogAgendaFactory implements FlowableEngineAgendaFactory {
         public void planEndExecutionOperation(ExecutionEntity execution) {
             agenda.planEndExecutionOperation(execution);
         }
+        
+        @Override
+        public void planEndExecutionOperationSynchronous(ExecutionEntity execution) {
+            agenda.planEndExecutionOperationSynchronous(execution);
+        }
 
         @Override
         public void planTriggerExecutionOperation(ExecutionEntity execution) {

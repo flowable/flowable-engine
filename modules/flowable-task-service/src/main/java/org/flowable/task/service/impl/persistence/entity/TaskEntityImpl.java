@@ -89,7 +89,6 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     protected String taskDefinitionKey;
     protected String formKey;
 
-    protected boolean isDeleted;
     protected boolean isCanceled;
 
     private boolean isCountEnabled;
@@ -133,6 +132,9 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
         }
         if (taskDefinitionId != null) {
             persistentState.put("taskDefinitionId", this.taskDefinitionId);
+        }
+        if (taskDefinitionKey != null) {
+            persistentState.put("taskDefinitionKey", this.taskDefinitionKey);
         }
         if (scopeId != null) {
             persistentState.put("scopeId", this.scopeId);

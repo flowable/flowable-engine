@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author Tijs Rademakwrs
+ * @author Tijs Rademakers
  */
 public class DbSchemaDrop {
     
@@ -42,7 +42,7 @@ public class DbSchemaDrop {
             commandExecutor.execute(config, new Command<Object>() {
                 @Override
                 public Object execute(CommandContext commandContext) {
-                    CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDbSchemaManager().dbSchemaDrop();
+                    CommandContextUtil.getCmmnEngineConfiguration(commandContext).getSchemaManager().schemaDrop();
                     return null;
                 }
             });

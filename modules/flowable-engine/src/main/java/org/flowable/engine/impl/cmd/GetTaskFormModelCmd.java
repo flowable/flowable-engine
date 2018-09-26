@@ -13,6 +13,7 @@
 package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,9 @@ import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
+import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
+import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 
@@ -41,9 +44,11 @@ public class GetTaskFormModelCmd implements Command<FormInfo>, Serializable {
     private static final long serialVersionUID = 1L;
 
     protected String taskId;
+    protected boolean ignoreVariables;
 
-    public GetTaskFormModelCmd(String taskId) {
+    public GetTaskFormModelCmd(String taskId, boolean ignoreVariables) {
         this.taskId = taskId;
+        this.ignoreVariables = ignoreVariables;
     }
 
     @Override
@@ -54,13 +59,21 @@ public class GetTaskFormModelCmd implements Command<FormInfo>, Serializable {
             throw new FlowableIllegalArgumentException("Form engine is not initialized");
         }
 
-        HistoricTaskInstance task = CommandContextUtil.getHistoricTaskService().getHistoricTask(taskId);
+        TaskInfo task = CommandContextUtil.getTaskService().getTask(taskId);
+        Date endTime = null;
+        if (task == null) {
+            task = CommandContextUtil.getHistoricTaskService().getHistoricTask(taskId);
+            if (task != null) {
+                endTime = ((HistoricTaskInstance) task).getEndTime();
+            }
+        }
+        
         if (task == null) {
             throw new FlowableObjectNotFoundException("Task not found with id " + taskId);
         }
 
         Map<String, Object> variables = new HashMap<>();
-        if (task.getProcessInstanceId() != null) {
+        if (!ignoreVariables && task.getProcessInstanceId() != null) {
             List<HistoricVariableInstance> variableInstances = processEngineConfiguration.getHistoryService()
                     .createHistoricVariableInstanceQuery()
                     .processInstanceId(task.getProcessInstanceId())
@@ -80,13 +93,32 @@ public class GetTaskFormModelCmd implements Command<FormInfo>, Serializable {
         }
         
         FormInfo formInfo = null;
-        if (task.getEndTime() != null) {
+        if (ignoreVariables) {
+            FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService();
+            formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId);
+            
+            // fallback to search for a form model without parent deployment id
+            if (formInfo == null && parentDeploymentId != null) {
+                formInfo = formRepositoryService.getFormModelByKey(task.getFormKey());
+            }
+            
+        } else if (endTime != null) {
             formInfo = formService.getFormInstanceModelByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId,
                             taskId, task.getProcessInstanceId(), variables, task.getTenantId());
+            
+            // fallback to search for a form model without parent deployment id
+            if (formInfo == null && parentDeploymentId != null) {
+                formInfo = formService.getFormInstanceModelByKey(task.getFormKey(), taskId, task.getProcessInstanceId(), variables, task.getTenantId());
+            }
 
         } else {
             formInfo = formService.getFormModelWithVariablesByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId,
                             taskId, variables, task.getTenantId());
+            
+            // fallback to search for a form model without parent deployment id
+            if (formInfo == null && parentDeploymentId != null) {
+                formInfo = formService.getFormModelWithVariablesByKey(task.getFormKey(), taskId, variables, task.getTenantId());
+            }
         }
 
         // If form does not exists, we don't want to leak out this info to just anyone

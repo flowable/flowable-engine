@@ -43,6 +43,10 @@ public class DmnEngineImpl implements DmnEngine {
         this.dmnRepositoryService = dmnEngineConfiguration.getDmnRepositoryService();
         this.dmnRuleService = dmnEngineConfiguration.getDmnRuleService();
         this.dmnHistoryService = dmnEngineConfiguration.getDmnHistoryService();
+        
+        if (dmnEngineConfiguration.getSchemaManagementCmd() != null) {
+            dmnEngineConfiguration.getCommandExecutor().execute(dmnEngineConfiguration.getSchemaCommandConfig(), dmnEngineConfiguration.getSchemaManagementCmd());
+        }
 
         if (name == null) {
             LOGGER.info("default flowable DmnEngine created");

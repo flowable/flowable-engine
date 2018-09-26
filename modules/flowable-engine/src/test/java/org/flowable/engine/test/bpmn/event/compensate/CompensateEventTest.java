@@ -17,11 +17,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
+import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -48,6 +52,56 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    @Deployment
+    public void testCompensateServiceTask() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+
+        assertEquals(1, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
+
+        Execution execution = runtimeService.createExecutionQuery().activityId("beforeEnd").singleResult();
+        runtimeService.trigger(execution.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+    
+    @Test
+    @Deployment
+    public void testCompensateServiceTaskStartBackwardsCompatible() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+
+        assertEquals(1, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
+
+        Execution execution = runtimeService.createExecutionQuery().activityId("beforeEnd").singleResult();
+        runtimeService.trigger(execution.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+    
+    @Test
+    @Deployment
+    public void testCompensateServiceTaskBackwardsCompatible() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+        
+        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) runtimeService.createEventSubscriptionQuery()
+                        .processInstanceId(processInstance.getId()).singleResult();
+        eventSubscription.setActivityId("undoBookHotel");
+        managementService.executeCommand(new Command<Void>() {
+
+            @Override
+            public Void execute(CommandContext commandContext) {
+                CommandContextUtil.getEventSubscriptionEntityManager(commandContext).update(eventSubscription);
+                return null;
+            }
+        });
+        
+        Execution execution = runtimeService.createExecutionQuery().activityId("firstWait").singleResult();
+        runtimeService.trigger(execution.getId());
+
+        assertEquals(1, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
+
+        execution = runtimeService.createExecutionQuery().activityId("beforeEnd").singleResult();
+        runtimeService.trigger(execution.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
     @Deployment
     public void testCompensateSubprocessWithoutActivityRef() {
 

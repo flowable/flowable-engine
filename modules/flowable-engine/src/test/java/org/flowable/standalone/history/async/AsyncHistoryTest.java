@@ -58,18 +58,20 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
 
     @AfterEach
     protected void tearDown() throws Exception {
-
         // The tests are doing deployments, which trigger async history. Therefore, we need to invoke them manually and then wait for the jobs to finish
         // so there can be clean data in the DB
-        cleanDeployments();
-        waitForHistoryJobExecutorToProcessAllJobs(5500, 100);
+        for (String autoDeletedDeploymentId : deploymentIdsForAutoCleanup) {
+            repositoryService.deleteDeployment(autoDeletedDeploymentId, true);
+        }
+        deploymentIdsForAutoCleanup.clear();
+        
+        waitForHistoryJobExecutorToProcessAllJobs(10000, 100);
         for (Job job : managementService.createJobQuery().list()) {
             if (job.getJobHandlerType().equals(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY)
                     || job.getJobHandlerType().equals(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED)) {
                 managementService.deleteJob(job.getId());
             }
         }
-
     }
 
     @Test
@@ -97,7 +99,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
                 assertNotNull(((HistoryJobEntity) job).getAdvancedJobHandlerConfigurationByteArrayRef());
             }
 
-            waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+            waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
 
             HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
             assertNotNull(historicProcessInstance);
@@ -160,7 +162,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         final List<HistoryJob> jobs = managementService.createHistoryJobQuery().list();
         assertTrue(jobs.size() > 0);
 
-        waitForHistoryJobExecutorToProcessAllJobs(50000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(70000L, 100L);
         assertNull(managementService.createHistoryJobQuery().singleResult());
 
         // 1002 -> (start, 1) + (end, 1) + (gateway, 500), + (service task, 500)
@@ -171,14 +173,14 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
     public void testTaskAssigneeChange() {
         Task task = startOneTaskprocess();
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery()
                         .activityId("theTask").singleResult();
         assertEquals("kermit", historicActivityInstance.getAssignee());
 
         task = taskService.createTaskQuery().singleResult();
         taskService.setAssignee(task.getId(), "johnDoe");
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("theTask").singleResult();
         assertEquals("johnDoe", historicActivityInstance.getAssignee());
 
@@ -189,14 +191,14 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
     public void testTaskAssigneeChangeToNull() {
         Task task = startOneTaskprocess();
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery()
                         .activityId("theTask").singleResult();
         assertEquals("kermit", historicActivityInstance.getAssignee());
 
         task = taskService.createTaskQuery().singleResult();
         taskService.setAssignee(task.getId(), null);
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("theTask").singleResult();
         assertNull(historicActivityInstance.getAssignee());
 
@@ -208,12 +210,12 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         Task task = startOneTaskprocess();
         taskService.setAssignee(task.getId(), null);
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
         assertNull(historicTaskInstance.getClaimTime());
 
         taskService.claim(historicTaskInstance.getId(), "johnDoe");
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(historicTaskInstance.getId()).singleResult();
         assertNotNull(historicTaskInstance.getClaimTime());
         assertNotNull(historicTaskInstance.getAssignee());
@@ -226,18 +228,18 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         Task task = startOneTaskprocess();
         assertNull(task.getOwner());
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
         assertNull(historicTaskInstance.getOwner());
 
         taskService.setOwner(task.getId(), "johnDoe");
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
         assertEquals("johnDoe", historicTaskInstance.getOwner());
 
         taskService.setOwner(task.getId(), null);
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(historicTaskInstance.getId()).singleResult();
         assertNull(historicTaskInstance.getOwner());
 
@@ -249,14 +251,14 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         Task task = startOneTaskprocess();
         assertEquals("The Task", task.getName());
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
         assertEquals("The Task", historicTaskInstance.getName());
 
         task.setName("new name");
         taskService.saveTask(task);
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
         assertEquals("new name", historicTaskInstance.getName());
 
@@ -268,14 +270,14 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         Task task = startOneTaskprocess();
         assertNull(task.getDescription());
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
         assertNull(historicTaskInstance.getDescription());
 
         task.setDescription("test description");
         taskService.saveTask(task);
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
         assertNotNull(historicTaskInstance.getDescription());
 
@@ -283,7 +285,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         task.setDescription(null);
         taskService.saveTask(task);
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(historicTaskInstance.getId()).singleResult();
         assertNull(historicTaskInstance.getDescription());
 
@@ -295,18 +297,18 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         Task task = startOneTaskprocess();
         assertNull(task.getDueDate());
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
         assertNull(historicTaskInstance.getDueDate());
 
         taskService.setDueDate(task.getId(), new Date());
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
         assertNotNull(historicTaskInstance.getDueDate());
 
         taskService.setDueDate(task.getId(), null);
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(historicTaskInstance.getId()).singleResult();
         assertNull(historicTaskInstance.getDueDate());
 
@@ -318,13 +320,13 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         Task task = startOneTaskprocess();
         assertEquals(Task.DEFAULT_PRIORITY, task.getPriority());
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
         assertEquals(Task.DEFAULT_PRIORITY, historicTaskInstance.getPriority());
 
         taskService.setPriority(task.getId(), 1);
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
         assertEquals(1, historicTaskInstance.getPriority());
 
@@ -336,14 +338,14 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         Task task = startOneTaskprocess();
         assertNull(task.getCategory());
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
         assertNull(historicTaskInstance.getCategory());
 
         task.setCategory("test category");
         taskService.saveTask(task);
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
         assertEquals("test category", historicTaskInstance.getCategory());
 
@@ -355,13 +357,13 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         Task task = startOneTaskprocess();
         assertNull(task.getFormKey());
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
         assertNull(historicTaskInstance.getFormKey());
         task.setFormKey("test form key");
         taskService.saveTask(task);
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
         assertEquals("test form key", historicTaskInstance.getFormKey());
 
@@ -385,7 +387,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         assertEquals(1, taskService.getSubTasks(parentTask1.getId()).size());
         assertEquals(0, taskService.getSubTasks(parentTask2.getId()).size());
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
 
         HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(childTask.getId()).singleResult();
         assertEquals(parentTask1.getId(), historicTaskInstance.getParentTaskId());
@@ -396,7 +398,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         assertEquals(0, taskService.getSubTasks(parentTask1.getId()).size());
         assertEquals(1, taskService.getSubTasks(parentTask2.getId()).size());
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
 
         historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(childTask.getId()).singleResult();
         assertEquals(parentTask2.getId(), historicTaskInstance.getParentTaskId());
@@ -446,7 +448,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
 
     protected void finishOneTaskProcess(Task task) {
         taskService.complete(task.getId());
-        waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         assertNull(managementService.createHistoryJobQuery().singleResult());
     }
 

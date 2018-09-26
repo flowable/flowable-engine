@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
-import org.flowable.common.engine.impl.db.DbSchemaManager;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -161,9 +161,9 @@ public abstract class InternalFlowableFormExtension implements AfterEachCallback
 
                     @Override
                     public Object execute(CommandContext commandContext) {
-                        DbSchemaManager dbSchemaManager = CommandContextUtil.getFormEngineConfiguration(commandContext).getDbSchemaManager();
-                        dbSchemaManager.dbSchemaDrop();
-                        dbSchemaManager.dbSchemaCreate();
+                        SchemaManager schemaManager = CommandContextUtil.getFormEngineConfiguration(commandContext).getSchemaManager();
+                        schemaManager.schemaDrop();
+                        schemaManager.schemaCreate();
                         return null;
                     }
                 });

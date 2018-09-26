@@ -163,7 +163,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
         // Force suspension by altering time
         cal.add(Calendar.HOUR, 1);
         processEngineConfiguration.getClock().setCurrentTime(cal.getTime());
-        waitForJobExecutorToProcessAllJobs(5000, 100);
+        waitForJobExecutorToProcessAllJobs(7000, 100);
 
         // Check if process-definition is suspended
         processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -260,7 +260,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
         // Force activation by altering time
         cal.add(Calendar.HOUR, 1);
         processEngineConfiguration.getClock().setCurrentTime(cal.getTime());
-        waitForJobExecutorToProcessAllJobs(5000, 100);
+        waitForJobExecutorToProcessAllJobs(7000, 100);
 
         // Check if process-definition is activated
         processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();

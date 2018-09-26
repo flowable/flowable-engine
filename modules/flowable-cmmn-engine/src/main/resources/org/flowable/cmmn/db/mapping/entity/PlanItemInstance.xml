@@ -276,7 +276,7 @@
             and RES.TENANT_ID_ = #{tenantId}
         </if>
         <if test="withoutTenantId">
-            and RES.TENANT_ID_ is null or RES.TENANT_ID_ = ''
+            and (RES.TENANT_ID_ is null or RES.TENANT_ID_ = '')
         </if>
         <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
         <choose>

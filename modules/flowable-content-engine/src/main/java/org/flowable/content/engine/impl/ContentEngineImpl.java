@@ -38,6 +38,10 @@ public class ContentEngineImpl implements ContentEngine {
         this.managementService = engineConfiguration.getContentManagementService();
         this.contentService = engineConfiguration.getContentService();
 
+        if (engineConfiguration.getSchemaManagementCmd() != null) {
+            engineConfiguration.getCommandExecutor().execute(engineConfiguration.getSchemaCommandConfig(), engineConfiguration.getSchemaManagementCmd());
+        }
+        
         if (name == null) {
             LOGGER.info("default flowable ContentEngine created");
         } else {

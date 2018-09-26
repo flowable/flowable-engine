@@ -75,7 +75,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
 
             assertProcessEnded(processInstance.getId());
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().list();
             assertEquals(1, variables.size());
@@ -95,7 +95,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProc");
             assertProcessEnded(processInstance.getId());
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().list();
             assertEquals(1, variables.size());
@@ -121,7 +121,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
 
             assertProcessEnded(processInstance.getId());
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery()
                     .processInstanceId(processInstance.getId())
@@ -149,7 +149,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProc");
             assertProcessEnded(processInstance.getId());
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery()
                     .processInstanceId(processInstance.getId())
@@ -171,7 +171,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoSubProcessInParallelWithinSubProcess");
             assertProcessEnded(processInstance.getId());
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery()
                     .processInstanceId(processInstance.getId())
@@ -198,7 +198,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
             assertProcessEnded(processInstance.getId());
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             assertEquals(4, historyService.createHistoricVariableInstanceQuery().count());
             assertEquals(4, historyService.createHistoricVariableInstanceQuery().list().size());
@@ -245,7 +245,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             taskService.setVariableLocal(tasks.get(i).getId(), "taskVar" + i, i);
         }
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
         // Verify historic variable instance queries
         List<HistoricVariableInstance> historicVariableInstances = historyService.createHistoricVariableInstanceQuery()
@@ -324,7 +324,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             }
         }
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
         assertEquals(2, historyService.createHistoricVariableInstanceQuery().executionIds(testProcessInstanceIds).count());
         assertEquals(2, historyService.createHistoricVariableInstanceQuery().executionIds(testProcessInstanceIds).list().size());
@@ -334,12 +334,21 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         assertEquals("hello", historicVariableInstances.get(0).getValue());
 
         historicVariableInstances = historyService.createHistoricVariableInstanceQuery().executionIds(processInstanceIds).list();
-        assertEquals("startVar", historicVariableInstances.get(0).getVariableName());
-        assertEquals("hello", historicVariableInstances.get(0).getValue());
-        assertEquals("startVar2", historicVariableInstances.get(1).getVariableName());
-        assertEquals("hello2", historicVariableInstances.get(1).getValue());
-        assertEquals("startVar", historicVariableInstances.get(2).getVariableName());
-        assertEquals("hello", historicVariableInstances.get(2).getValue());
+        int startVarCount = 0;
+        int startVar2Count = 0;
+        for (HistoricVariableInstance historicVariableInstance : historicVariableInstances) {
+            if ("startVar".equals(historicVariableInstance.getVariableName())) {
+                startVarCount++;
+                assertEquals("hello", historicVariableInstance.getValue());
+            
+            } else if ("startVar2".equals(historicVariableInstance.getVariableName())) {
+                startVar2Count++;
+                assertEquals("hello2", historicVariableInstance.getValue());
+            }
+        }
+        
+        assertEquals(2, startVarCount);
+        assertEquals(1, startVar2Count);
     }
 
     @Test
@@ -365,7 +374,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             taskService.setVariableLocal(task.getId(), "taskVar", "taskVar");
         }
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
         Set<String> processInstanceIds = new HashSet<>();
         processInstanceIds.add(processInstance.getId());
@@ -391,7 +400,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         taskService.setVariableLocal(tasks.get(0).getId(), "taskVar1", "hello1");
         taskService.setVariableLocal(tasks.get(1).getId(), "taskVar2", "hello2");
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
         Set<String> taskIds = new HashSet<>();
         taskIds.add(tasks.get(0).getId());
@@ -436,7 +445,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             taskIds.add(task.getId());
         }
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
         List<HistoricVariableInstance> historicVariableInstances = historyService.createHistoricVariableInstanceQuery().taskIds(taskIds).list();
         assertEquals(2, historicVariableInstances.size());
@@ -481,7 +490,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             // now we are ended
             assertProcessEnded(pi.getId());
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             // check history
             List<HistoricDetail> updates = historyService.createHistoricDetailQuery().processInstanceId(pi.getId()).variableUpdates().list();
@@ -537,7 +546,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("myProcess", variables);
             assertNotNull(processInstance2);
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             // check variables
             long count = historyService.createHistoricVariableInstanceQuery().count();
@@ -546,11 +555,11 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             // delete runtime execution of ONE process instance
             runtimeService.deleteProcessInstance(processInstance.getId(), "reason 1");
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
             
             historyService.deleteHistoricProcessInstance(processInstance.getId());
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             // recheck variables
             // this is a bug: all variables was deleted after delete a history process instance
@@ -585,7 +594,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProc", variables);
             assertNotNull(processInstance);
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             assertEquals(3, historyService.createNativeHistoricVariableInstanceQuery().sql(baseQuerySql).list().size());
 
@@ -619,7 +628,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProc", variables);
             assertNotNull(processInstance);
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             assertEquals(3, historyService.createNativeHistoricDetailQuery().sql(baseQuerySql).list().size());
 
@@ -635,7 +644,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             formDatas.put("field2", "field value 2");
             formService.submitTaskFormData(task.getId(), formDatas);
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             String countSql = "select count(*) from " + tableName + " where TYPE_ = #{type} and PROC_INST_ID_ = #{pid}";
             assertEquals(2, historyService.createNativeHistoricDetailQuery().sql(countSql).parameter("type", "FormProperty").parameter("pid", processInstance.getId()).count());
@@ -659,29 +668,29 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
 
             // no type change
             runtimeService.setVariable(processInstance.getId(), "firstVar", "123");
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
             assertEquals("123", getHistoricVariable("firstVar").getValue());
             
             runtimeService.setVariable(processInstance.getId(), "firstVar", "456");
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
             assertEquals("456", getHistoricVariable("firstVar").getValue());
             
             runtimeService.setVariable(processInstance.getId(), "firstVar", "789");
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
             assertEquals("789", getHistoricVariable("firstVar").getValue());
 
             // type is changed from text to integer and back again. same result expected(?)
             runtimeService.setVariable(processInstance.getId(), "secondVar", "123");
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
             assertEquals("123", getHistoricVariable("secondVar").getValue());
             
             runtimeService.setVariable(processInstance.getId(), "secondVar", 456);
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
             // there are now 2 historic variables, so the following does not work
             assertEquals(456, getHistoricVariable("secondVar").getValue());
             
             runtimeService.setVariable(processInstance.getId(), "secondVar", "789");
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
             // there are now 3 historic variables, so the following does not work
             assertEquals("789", getHistoricVariable("secondVar").getValue());
 
@@ -708,7 +717,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
 
             assertProcessEnded(processInstance.getId());
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().executionId(processInstance.getId()).list();
             assertEquals(1, variables.size());

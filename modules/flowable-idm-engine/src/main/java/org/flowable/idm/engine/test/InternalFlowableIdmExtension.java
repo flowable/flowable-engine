@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.flowable.common.engine.impl.db.DbSchemaManager;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -122,9 +122,9 @@ public abstract class InternalFlowableIdmExtension implements AfterEachCallback,
 
                     @Override
                     public Object execute(CommandContext commandContext) {
-                        DbSchemaManager dbSchemaManager = CommandContextUtil.getIdmEngineConfiguration(commandContext).getDbSchemaManager();
-                        dbSchemaManager.dbSchemaDrop();
-                        dbSchemaManager.dbSchemaCreate();
+                        SchemaManager schemaManager = CommandContextUtil.getIdmEngineConfiguration(commandContext).getSchemaManager();
+                        schemaManager.schemaDrop();
+                        schemaManager.schemaCreate();
                         return null;
                     }
                 });

@@ -10,7 +10,7 @@
     <groupId>org.flowable</groupId>
     <artifactId>flowable-root</artifactId>
     <relativePath>../..</relativePath>
-    <version>6.3.2-SNAPSHOT</version>
+    <version>6.4.0-SNAPSHOT</version>
   </parent>
   
   <properties>
@@ -263,12 +263,12 @@
       </build>
     </profile>
      <profile>
-        <id>java9+</id>
+        <id>java8+</id>
         <activation>
-            <jdk>[9,)</jdk>
+            <jdk>[1.8,)</jdk>
         </activation>
         <properties>
-            <!-- mule does not work on java 9 yet, see: https://forums.mulesoft.com/questions/76918/mule-java-9-any-issues.html !-->
+            <!-- mule does not work on java 9 yet, see: https://forums.mulesoft.com/questions/76918/mule-java-9-any-issues.html, also disabling for JDK 8 for Travis !-->
             <maven.test.skip>true</maven.test.skip>
         </properties>
     </profile>

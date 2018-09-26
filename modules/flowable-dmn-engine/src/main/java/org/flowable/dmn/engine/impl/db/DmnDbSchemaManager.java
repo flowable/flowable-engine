@@ -18,7 +18,7 @@ import java.sql.SQLException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.impl.db.DbSchemaManager;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
@@ -34,7 +34,7 @@ import liquibase.exception.DatabaseException;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
-public class DmnDbSchemaManager implements DbSchemaManager {
+public class DmnDbSchemaManager implements SchemaManager {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(DmnDbSchemaManager.class);
     
@@ -107,7 +107,7 @@ public class DmnDbSchemaManager implements DbSchemaManager {
     }
     
     @Override
-    public void dbSchemaCreate() {
+    public void schemaCreate() {
         Liquibase liquibase = null;
         try {
             liquibase = createLiquibaseInstance(CommandContextUtil.getDmnEngineConfiguration());
@@ -120,7 +120,7 @@ public class DmnDbSchemaManager implements DbSchemaManager {
     }
 
     @Override
-    public void dbSchemaDrop() {
+    public void schemaDrop() {
         Liquibase liquibase = null;
         try {
             liquibase = createLiquibaseInstance(CommandContextUtil.getDmnEngineConfiguration());
@@ -133,9 +133,22 @@ public class DmnDbSchemaManager implements DbSchemaManager {
     }
 
     @Override
-    public String dbSchemaUpdate() {
-        dbSchemaCreate();
+    public String schemaUpdate() {
+        schemaCreate();
         return null;
+    }
+    
+    @Override
+    public void schemaCheckVersion() {
+        Liquibase liquibase = null;
+        try {
+            liquibase = createLiquibaseInstance(CommandContextUtil.getDmnEngineConfiguration());
+            liquibase.validate();
+        } catch (Exception e) {
+            throw new FlowableException("Error validating app engine schema", e);
+        } finally {
+            closeDatabase(liquibase);
+        }
     }
 
     private void closeDatabase(Liquibase liquibase) {

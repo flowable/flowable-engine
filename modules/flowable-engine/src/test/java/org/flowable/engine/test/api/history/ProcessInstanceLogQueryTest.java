@@ -62,7 +62,7 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
             taskService.complete(task.getId());
         }
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
     }
 
     @AfterEach

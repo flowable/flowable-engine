@@ -67,7 +67,7 @@ public class IdmManagementServiceImpl extends CommonEngineServiceImpl<IdmEngineC
         return commandExecutor.execute(config, new Command<String>() {
             @Override
             public String execute(CommandContext commandContext) {
-                return CommandContextUtil.getIdmEngineConfiguration().getDbSchemaManager().dbSchemaUpdate();
+                return CommandContextUtil.getIdmEngineConfiguration().getSchemaManager().schemaUpdate();
             }
         });
     }

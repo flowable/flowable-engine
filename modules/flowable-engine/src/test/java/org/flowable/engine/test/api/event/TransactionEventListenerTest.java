@@ -67,7 +67,7 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
             expectedCreatedEvents = 7;
         }
         if (processEngineConfiguration.isAsyncHistoryEnabled()) {
-            waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+            waitForHistoryJobExecutorToProcessAllJobs(7000L, 200L);
         }
 
         assertEquals(expectedCreatedEvents, TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.ENTITY_CREATED.name()).size());
@@ -80,6 +80,10 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
         taskService.complete(taskService.createTaskQuery().singleResult().getId());
         assertEquals(1, TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.TASK_COMPLETED.name()).size());
         assertEquals(1, TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.PROCESS_COMPLETED.name()).size());
+        
+        if (processEngineConfiguration.isAsyncHistoryEnabled()) {
+            waitForHistoryJobExecutorToProcessAllJobs(7000L, 200L);
+        }
     }
 
     @Test

@@ -50,7 +50,7 @@ public class HistoricProcessInstanceQueryAndWithExceptionTest extends PluggableF
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             ProcessInstance processNoException = runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_NO_EXCEPTION);
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             HistoricProcessInstanceQuery queryNoException = historyService.createHistoricProcessInstanceQuery();
             assertEquals(1, queryNoException.count());
@@ -66,7 +66,7 @@ public class HistoricProcessInstanceQueryAndWithExceptionTest extends PluggableF
             assertEquals(1, jobQuery1.withException().count());
             assertEquals(1, jobQuery1.withException().list().size());
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
             assertEquals(1, queryWithException.withJobException().count());
             assertEquals(1, queryWithException.withJobException().list().size());
             assertEquals(processWithException1.getId(), queryWithException.withJobException().list().get(0).getId());
@@ -76,7 +76,7 @@ public class HistoricProcessInstanceQueryAndWithExceptionTest extends PluggableF
             assertEquals(2, jobQuery2.withException().count());
             assertEquals(2, jobQuery2.withException().list().size());
 
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
             assertEquals(2, queryWithException.withJobException().count());
             assertEquals(2, queryWithException.withJobException().list().size());
             assertEquals(processWithException1.getId(), queryWithException.withJobException().processDefinitionKey(PROCESS_DEFINITION_KEY_WITH_EXCEPTION_1).list().get(0).getId());

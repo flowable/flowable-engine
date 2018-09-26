@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -197,6 +198,38 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
 
         try {
             idmIdentityService.createGroupQuery().groupMember(null).list();
+            fail();
+        } catch (FlowableIllegalArgumentException e) {
+        }
+    }
+    
+    @Test
+    public void testQueryByGroupMembers() {
+        List<Group> groups = idmIdentityService.createGroupQuery().groupMembers(Arrays.asList("kermit", "fozzie")).orderByGroupId().asc().list();
+        assertEquals(4, groups.size());
+        assertEquals("admin", groups.get(0).getId());
+        assertEquals("frogs", groups.get(1).getId());
+        assertEquals("mammals", groups.get(2).getId());
+        assertEquals("muppets", groups.get(3).getId());
+        
+        groups = idmIdentityService.createGroupQuery().groupMembers(Arrays.asList("fozzie")).orderByGroupId().asc().list();
+        assertEquals(2, groups.size());
+        assertEquals("mammals", groups.get(0).getId());
+        assertEquals("muppets", groups.get(1).getId());
+        
+        groups = idmIdentityService.createGroupQuery().groupMembers(Arrays.asList("kermit", "fozzie")).orderByGroupId().asc().listPage(1, 2);
+        assertEquals(2, groups.size());
+        assertEquals("frogs", groups.get(0).getId());
+        assertEquals("mammals", groups.get(1).getId());
+    }
+    
+    @Test
+    public void testQueryByInvalidGroupMember() {
+        GroupQuery query = idmIdentityService.createGroupQuery().groupMembers(Arrays.asList("invalid"));
+        verifyQueryResults(query, 0);
+
+        try {
+            idmIdentityService.createGroupQuery().groupMembers(null).list();
             fail();
         } catch (FlowableIllegalArgumentException e) {
         }

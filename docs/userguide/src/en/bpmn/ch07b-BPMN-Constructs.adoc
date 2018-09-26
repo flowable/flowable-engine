@@ -5173,6 +5173,23 @@ image::images/bpmn.call.activity.sub.process.png[align="center"]
 
 There is nothing special about the process definition of the sub-process. It could as well be used without being called from another process.
 
+===== Async completion
+
+In some particular use cases, it's needed to make the completion of the call activity asynchronous (and exclusive).
+
+Take the following process definition. Let's assume the called process definition consists of _only service tasks which are marked as asynchronous and exclusive_.
+All the steps of these sub process instances will be executed asynchronously. When the last asynchronous service task is executed, the end event will be visited.
+At that point, the control will be passed back to the parent process instance. 
+
+image::images/bpmn.call.activity.async.complete.png[align="center"]
+
+The problem is that asynchronous locking happens on the process instance level. In this cases, the child process instances will be locked when the last service task and event event are visited.
+This means that when the control is passed back to the parent process instance, and thus when the call activity _completes_, the parent process instance is not locked. When multi-instance is used, this means that x number of instances try to complete the call activity. Even when using exclusive on all steps, this still would mean every child process instance concurrently will try to update the parent process instance, potentially leadinging to _FlowableOptimisticLockingExceptions_ as the 'wrong' process instance is used for the exclusive lock.
+
+The solution to this problem is to mark the _async complete_ flag for the call activity. When _true_, a new asynchronous job will be created, using the parent process instance.
+When the exclusive lock is created, it will be held for parent process instance and the multi instance completion of the call activity will be handled exclusively for each child execution separately. 
+
+
 
 [[bpmnConcurrencyAndTransactions]]
 

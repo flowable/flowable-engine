@@ -61,7 +61,7 @@ import org.osgi.framework.Constants;
 @ExamReactorStrategy(PerMethod.class)
 public class BlueprintBasicTest {
     
-    private static final String FLOWABLE_VERSION = "6.3.2-SNAPSHOT";
+    private static final String FLOWABLE_VERSION = "6.4.0-SNAPSHOT";
 
     @Inject
     protected BundleContext ctx;
@@ -106,7 +106,7 @@ public class BlueprintBasicTest {
                 mavenBundle().groupId("org.flowable").artifactId("flowable-cmmn-model").version(FLOWABLE_VERSION),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-cmmn-api").version(FLOWABLE_VERSION),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-engine").version(FLOWABLE_VERSION),
-                mavenBundle().groupId("org.apache.commons").artifactId("commons-lang3").version("3.8"),
+                mavenBundle().groupId("org.apache.commons").artifactId("commons-lang3").version("3.8.1"),
                 mavenBundle().groupId("com.fasterxml.uuid").artifactId("java-uuid-generator").version("3.1.5"),
                 mavenBundle().groupId("com.fasterxml.jackson.core").artifactId("jackson-core").version("2.9.3"),
                 mavenBundle().groupId("com.fasterxml.jackson.core").artifactId("jackson-databind").version("2.9.3"),

@@ -44,7 +44,7 @@
   </select>
 
   <select id="selectEventSubscriptionCountByQueryCriteria" parameterType="org.flowable.engine.impl.EventSubscriptionQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    select count(RES.ID_)
     <include refid="selectEventSubscriptionByQueryCriteriaSql"/>
   </select>
   
@@ -312,16 +312,16 @@
     <set>
        REV_ =  #{revisionNext, jdbcType=INTEGER},
        <if test="originalPersistentState.eventName != eventName">
-           EVENT_NAME_ = #{eventName, jdbcType=INTEGER},
+           EVENT_NAME_ = #{eventName, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.executionId != executionId">
-           EXECUTION_ID_ = #{executionId, jdbcType=INTEGER},
+           EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.processInstanceId != processInstanceId">
-           PROC_INST_ID_ = #{processInstanceId, jdbcType=INTEGER},
+           PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.activityId != activityId">
-           ACTIVITY_ID_ = #{activityId, jdbcType=INTEGER},
+           ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.configuration != configuration">
            CONFIGURATION_ = #{configuration, jdbcType=VARCHAR},  
@@ -439,16 +439,16 @@
     <set>
        REV_ =  #{revisionNext, jdbcType=INTEGER},
        <if test="originalPersistentState.eventName != eventName">
-           EVENT_NAME_ = #{eventName, jdbcType=INTEGER},
+           EVENT_NAME_ = #{eventName, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.executionId != executionId">
-           EXECUTION_ID_ = #{executionId, jdbcType=INTEGER},
+           EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.processInstanceId != processInstanceId">
-           PROC_INST_ID_ = #{processInstanceId, jdbcType=INTEGER},
+           PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.activityId != activityId">
-           ACTIVITY_ID_ = #{activityId, jdbcType=INTEGER},
+           ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.configuration != configuration">
            CONFIGURATION_ = #{configuration, jdbcType=VARCHAR},  
@@ -563,16 +563,16 @@
     <set>
        REV_ =  #{revisionNext, jdbcType=INTEGER},
        <if test="originalPersistentState.eventName != eventName">
-           EVENT_NAME_ = #{eventName, jdbcType=INTEGER},
+           EVENT_NAME_ = #{eventName, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.executionId != executionId">
-           EXECUTION_ID_ = #{executionId, jdbcType=INTEGER},
+           EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.processInstanceId != processInstanceId">
-           PROC_INST_ID_ = #{processInstanceId, jdbcType=INTEGER},
+           PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.activityId != activityId">
-           ACTIVITY_ID_ = #{activityId, jdbcType=INTEGER},
+           ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.configuration != configuration">
            CONFIGURATION_ = #{configuration, jdbcType=VARCHAR},  
