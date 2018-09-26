@@ -244,7 +244,12 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
 
     @Override
     public FormInfo getTaskFormModel(String taskId) {
-        return commandExecutor.execute(new GetTaskFormModelCmd(taskId));
+        return commandExecutor.execute(new GetTaskFormModelCmd(taskId, false));
+    }
+    
+    @Override
+    public FormInfo getTaskFormModel(String taskId, boolean ignoreVariables) {
+        return commandExecutor.execute(new GetTaskFormModelCmd(taskId, ignoreVariables));
     }
 
     @Override

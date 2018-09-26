@@ -124,7 +124,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
 
     protected boolean disableIdmEngine;
 
-    protected boolean executeServiceDbSchemaManagers = true;
+    protected boolean executeServiceSchemaManagers = true;
     
     protected AppDeployer appDeployer;
     protected AppDeploymentManager deploymentManager;
@@ -134,8 +134,8 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     protected DeploymentCache<AppDefinitionCacheEntry> appDefinitionCache;
 
     protected ExpressionManager expressionManager;
-    protected SchemaManager identityLinkDbSchemaManager;
-    protected SchemaManager variableDbSchemaManager;
+    protected SchemaManager identityLinkSchemaManager;
+    protected SchemaManager variableSchemaManager;
 
     // Identitylink support
     protected IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
@@ -228,11 +228,11 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     @Override
     public void initSchemaManager() {
         super.initSchemaManager();
-        initAppDbSchemaManager();
+        initAppSchemaManager();
 
-        if (executeServiceDbSchemaManagers) {
-            initIdentityLinkDbSchemaManager();
-            initVariableDbSchemaManager();
+        if (executeServiceSchemaManagers) {
+            initIdentityLinkSchemaManager();
+            initVariableSchemaManager();
         }
     }
     
@@ -244,21 +244,21 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         }
     }
 
-    protected void initAppDbSchemaManager() {
+    protected void initAppSchemaManager() {
         if (this.schemaManager == null) {
             this.schemaManager = new AppDbSchemaManager();
         }
     }
 
-    protected void initVariableDbSchemaManager() {
-        if (this.variableDbSchemaManager == null) {
-            this.variableDbSchemaManager = new VariableDbSchemaManager();
+    protected void initVariableSchemaManager() {
+        if (this.variableSchemaManager == null) {
+            this.variableSchemaManager = new VariableDbSchemaManager();
         }
     }
 
-    protected void initIdentityLinkDbSchemaManager() {
-        if (this.identityLinkDbSchemaManager == null) {
-            this.identityLinkDbSchemaManager = new IdentityLinkDbSchemaManager();
+    protected void initIdentityLinkSchemaManager() {
+        if (this.identityLinkSchemaManager == null) {
+            this.identityLinkSchemaManager = new IdentityLinkDbSchemaManager();
         }
     }
 
@@ -620,12 +620,12 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         return this;
     }
 
-    public boolean isExecuteServiceDbSchemaManagers() {
-        return executeServiceDbSchemaManagers;
+    public boolean isExecuteServiceSchemaManagers() {
+        return executeServiceSchemaManagers;
     }
 
-    public void setExecuteServiceDbSchemaManagers(boolean executeServiceDbSchemaManagers) {
-        this.executeServiceDbSchemaManagers = executeServiceDbSchemaManagers;
+    public void setExecuteServiceSchemaManagers(boolean executeServiceSchemaManagers) {
+        this.executeServiceSchemaManagers = executeServiceSchemaManagers;
     }
 
     @Override
@@ -639,21 +639,21 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         return this;
     }
 
-    public SchemaManager getIdentityLinkDbSchemaManager() {
-        return identityLinkDbSchemaManager;
+    public SchemaManager getIdentityLinkSchemaManager() {
+        return identityLinkSchemaManager;
     }
 
-    public AppEngineConfiguration setIdentityLinkDbSchemaManager(SchemaManager identityLinkDbSchemaManager) {
-        this.identityLinkDbSchemaManager = identityLinkDbSchemaManager;
+    public AppEngineConfiguration setIdentityLinkSchemaManager(SchemaManager identityLinkSchemaManager) {
+        this.identityLinkSchemaManager = identityLinkSchemaManager;
         return this;
     }
 
-    public SchemaManager getVariableDbSchemaManager() {
-        return variableDbSchemaManager;
+    public SchemaManager getVariableSchemaManager() {
+        return variableSchemaManager;
     }
 
-    public AppEngineConfiguration setVariableDbSchemaManager(SchemaManager variableDbSchemaManager) {
-        this.variableDbSchemaManager = variableDbSchemaManager;
+    public AppEngineConfiguration setVariableSchemaManager(SchemaManager variableSchemaManager) {
+        this.variableSchemaManager = variableSchemaManager;
         return this;
     }
 

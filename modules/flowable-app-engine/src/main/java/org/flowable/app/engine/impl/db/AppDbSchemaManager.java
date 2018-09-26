@@ -121,9 +121,9 @@ public class AppDbSchemaManager implements SchemaManager {
         Liquibase liquibase = null;
         try {
             
-            getCommonDbSchemaManager().schemaCreate();
-            getIdentityLinkDbSchemaManager().schemaCreate();
-            getVariableDbSchemaManager().schemaCreate();
+            getCommonSchemaManager().schemaCreate();
+            getIdentityLinkSchemaManager().schemaCreate();
+            getVariableSchemaManager().schemaCreate();
             
             liquibase = createLiquibaseInstance(CommandContextUtil.getAppEngineConfiguration());
             liquibase.update("app");
@@ -147,19 +147,19 @@ public class AppDbSchemaManager implements SchemaManager {
         }
         
         try {
-            getVariableDbSchemaManager().schemaDrop();
+            getVariableSchemaManager().schemaDrop();
         } catch (Exception e) {
             LOGGER.info("Error dropping variable tables", e);
         }
         
         try {
-            getIdentityLinkDbSchemaManager().schemaDrop();
+            getIdentityLinkSchemaManager().schemaDrop();
         } catch (Exception e) {
             LOGGER.info("Error dropping identity link tables", e);
         }
         
         try {
-            getCommonDbSchemaManager().schemaDrop();
+            getCommonSchemaManager().schemaDrop();
         } catch (Exception e) {
             LOGGER.info("Error dropping common tables", e);
         }
@@ -170,11 +170,11 @@ public class AppDbSchemaManager implements SchemaManager {
         Liquibase liquibase = null;
         try {
             
-            getCommonDbSchemaManager().schemaUpdate();
+            getCommonSchemaManager().schemaUpdate();
             
-            if (CommandContextUtil.getAppEngineConfiguration().isExecuteServiceDbSchemaManagers()) {
-                getIdentityLinkDbSchemaManager().schemaUpdate();
-                getVariableDbSchemaManager().schemaUpdate();
+            if (CommandContextUtil.getAppEngineConfiguration().isExecuteServiceSchemaManagers()) {
+                getIdentityLinkSchemaManager().schemaUpdate();
+                getVariableSchemaManager().schemaUpdate();
             }
             
             liquibase = createLiquibaseInstance(CommandContextUtil.getAppEngineConfiguration());
@@ -201,16 +201,16 @@ public class AppDbSchemaManager implements SchemaManager {
         }
     }
     
-    protected SchemaManager getCommonDbSchemaManager() {
-        return CommandContextUtil.getAppEngineConfiguration().getCommonDbSchemaManager();
+    protected SchemaManager getCommonSchemaManager() {
+        return CommandContextUtil.getAppEngineConfiguration().getCommonSchemaManager();
     }
     
-    protected SchemaManager getIdentityLinkDbSchemaManager() {
-        return CommandContextUtil.getAppEngineConfiguration().getIdentityLinkDbSchemaManager();
+    protected SchemaManager getIdentityLinkSchemaManager() {
+        return CommandContextUtil.getAppEngineConfiguration().getIdentityLinkSchemaManager();
     }
     
-    protected SchemaManager getVariableDbSchemaManager() {
-        return CommandContextUtil.getAppEngineConfiguration().getVariableDbSchemaManager();
+    protected SchemaManager getVariableSchemaManager() {
+        return CommandContextUtil.getAppEngineConfiguration().getVariableSchemaManager();
     }
     
     private void closeDatabase(Liquibase liquibase) {

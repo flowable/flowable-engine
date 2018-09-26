@@ -136,6 +136,9 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
         historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).list();
         assertNotNull(historicPlanItems);
         assertEquals(4, historicPlanItems.size());
+        assertEquals(1L, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceId(historicPlanItems.get(0).getId()).planItemInstanceWithoutTenantId().list().size());
+        assertEquals(1, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceId(historicPlanItems.get(0).getId()).planItemInstanceWithoutTenantId().count());
+
         //Check start timestamps of newly added timeStamp within the second of its original creation
         checkHistoryCreateTimestamp(currentPlanItems, historicPlanItems, 1000L);
 

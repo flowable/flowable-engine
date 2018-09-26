@@ -312,9 +312,9 @@ public abstract class BaseSpringRestTestCase extends TestCase {
 
             CommandExecutor commandExecutor = cmmnEngine.getCmmnEngineConfiguration().getCommandExecutor();
             commandExecutor.execute(commandContext -> {
-                SchemaManager dbSchemaManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDbSchemaManager();
-                dbSchemaManager.schemaDrop();
-                dbSchemaManager.schemaCreate();
+                SchemaManager schemaManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getSchemaManager();
+                schemaManager.schemaDrop();
+                schemaManager.schemaCreate();
                 return null;
             });
 
