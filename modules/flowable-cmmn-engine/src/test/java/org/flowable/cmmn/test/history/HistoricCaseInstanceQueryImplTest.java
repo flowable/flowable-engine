@@ -260,7 +260,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
     }
 
     @Test
-    public void getCaseInstanceByStartedBefore() throws InterruptedException {
+    public void getCaseInstanceByStartedBefore() {
         cmmnEngineConfiguration.getClock().setCurrentTime(new Date(0));
         try {
             cmmnRuntimeService.createCaseInstanceBuilder().
@@ -289,7 +289,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
     }
 
     @Test
-    public void getCaseInstanceByStartedAfter() throws InterruptedException {
+    public void getCaseInstanceByStartedAfter() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
             caseDefinitionKey("oneTaskCase").
             start();
@@ -670,5 +670,30 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
             endOr().
             list().size(), is(3));
     }
+
+    @Test
+    public void getCaseInstanceByIdWithoutTenant() {
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            name("testCaseInstance1").
+            start();
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            name("testCaseInstance2").
+            start();
+
+        try {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance1.getId()).caseInstanceWithoutTenantId().count(),
+                is(1L));
+        } finally {
+            cmmnRuntimeService.terminateCaseInstance(caseInstance2.getId());
+            cmmnHistoryService.deleteHistoricCaseInstance(caseInstance2.getId());
+            cmmnRuntimeService.terminateCaseInstance(caseInstance1.getId());
+            cmmnHistoryService.deleteHistoricCaseInstance(caseInstance1.getId());
+        }
+
+
+    }
+
 
 }
