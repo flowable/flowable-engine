@@ -81,10 +81,10 @@ public interface ProcessDiagramGenerator {
 
     public InputStream generatePngDiagram(BpmnModel bpmnModel, double scaleFactor,boolean enableIncludeSequenceNameWhenNoLableDi);
 
-    public InputStream generateJpgDiagram(BpmnModel bpmnModel,boolean enableIncludeSequenceNameWhenNoLableDi);
+    public InputStream generateJpgDiagram(BpmnModel bpmnModel);
 
     public InputStream generateJpgDiagram(BpmnModel bpmnModel, double scaleFactor,boolean enableIncludeSequenceNameWhenNoLableDi);
 
-    public BufferedImage generatePngImage(BpmnModel bpmnModel, double scaleFactor,boolean enableIncludeSequenceNameWhenNoLableDi);
+    public BufferedImage generatePngImage(BpmnModel bpmnModel, double scaleFactor);
 
 }

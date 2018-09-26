@@ -505,8 +505,8 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
     }
 
     @Override
-    public InputStream generateJpgDiagram(BpmnModel bpmnModel,boolean enableIncludeSequenceNameWhenNoLableDi) {
-        return generateJpgDiagram(bpmnModel, 1.0,enableIncludeSequenceNameWhenNoLableDi);
+    public InputStream generateJpgDiagram(BpmnModel bpmnModel) {
+        return generateJpgDiagram(bpmnModel, 1.0,false);
     }
 
     @Override
@@ -528,8 +528,8 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
     }
 
     @Override
-    public BufferedImage generatePngImage(BpmnModel bpmnModel, double scaleFactor,boolean enableIncludeSequenceNameWhenNoLableDi) {
-        return generateImage(bpmnModel, "png", Collections.<String>emptyList(), Collections.<String>emptyList(), scaleFactor,enableIncludeSequenceNameWhenNoLableDi);
+    public BufferedImage generatePngImage(BpmnModel bpmnModel, double scaleFactor) {
+        return generateImage(bpmnModel, "png", Collections.<String>emptyList(), Collections.<String>emptyList(), scaleFactor,false);
     }
 
     protected DefaultProcessDiagramCanvas generateProcessDiagram(BpmnModel bpmnModel, String imageType,
