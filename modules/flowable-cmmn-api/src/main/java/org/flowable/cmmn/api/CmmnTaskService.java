@@ -378,6 +378,8 @@ public interface CmmnTaskService {
 
     FormInfo getTaskFormModel(String taskId);
     
+    FormInfo getTaskFormModel(String taskId, boolean ignoreVariables);
+    
     /**
      * Changes the priority of the task.
      * 
