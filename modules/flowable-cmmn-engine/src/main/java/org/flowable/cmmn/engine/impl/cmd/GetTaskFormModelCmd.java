@@ -101,29 +101,13 @@ public class GetTaskFormModelCmd implements Command<FormInfo>, Serializable {
             FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService();
             formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId);
             
-            // fallback to search for a form model without parent deployment id
-            if (formInfo == null && parentDeploymentId != null) {
-                formInfo = formRepositoryService.getFormModelByKey(task.getFormKey());
-            }
-            
         } else if (endTime != null) {
             formInfo = formService.getFormInstanceModelByKeyAndParentDeploymentIdAndScopeId(task.getFormKey(), parentDeploymentId, task.getScopeId(), 
                             task.getScopeType(), variables, task.getTenantId());
-            
-            // fallback to search for a form model without parent deployment id
-            if (formInfo == null && parentDeploymentId != null) {
-                formInfo = formService.getFormInstanceModelByKeyAndScopeId(task.getFormKey(), task.getScopeId(), 
-                                task.getScopeType(), variables, task.getTenantId());
-            }
 
         } else {
             formInfo = formService.getFormModelWithVariablesByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId,
                             taskId, variables, task.getTenantId());
-            
-            // fallback to search for a form model without parent deployment id
-            if (formInfo == null && parentDeploymentId != null) {
-                formInfo = formService.getFormModelWithVariablesByKey(task.getFormKey(), taskId, variables, task.getTenantId());
-            }
         }
 
         // If form does not exists, we don't want to leak out this info to just anyone

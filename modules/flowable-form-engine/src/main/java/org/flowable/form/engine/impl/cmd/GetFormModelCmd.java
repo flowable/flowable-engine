@@ -92,8 +92,11 @@ public class GetFormModelCmd implements Command<FormInfo>, Serializable {
             }
             
             if (formDefinitionEntity == null) {
-                throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey +
-                        "' for parent deployment id " + parentDeploymentId, FormDefinitionEntity.class);
+                formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKey(formDefinitionKey);
+                if (formDefinitionEntity == null) {
+                    throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey +
+                            "' for parent deployment id " + parentDeploymentId, FormDefinitionEntity.class);
+                }
             }
 
         } else if (formDefinitionKey != null && tenantId != null && !FormEngineConfiguration.NO_TENANT_ID.equals(tenantId) && parentDeploymentId != null) {
@@ -107,8 +110,11 @@ public class GetFormModelCmd implements Command<FormInfo>, Serializable {
             }
             
             if (formDefinitionEntity == null) {
-                throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey +
-                        " for parent deployment id '" + parentDeploymentId + "' and for tenant identifier " + tenantId, FormDefinitionEntity.class);
+                formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, tenantId);
+                if (formDefinitionEntity == null) {
+                    throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey +
+                            " for parent deployment id '" + parentDeploymentId + "' and for tenant identifier " + tenantId, FormDefinitionEntity.class);
+                }
             }
 
         } else {
