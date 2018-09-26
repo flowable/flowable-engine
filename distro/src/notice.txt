@@ -149,5 +149,5 @@ org.springframework.security    spring-security-crypto      5.0.8.RELEASE   The 
 org.springframework.security    spring-security-web         5.0.8.RELEASE   The Apache Software License, Version 2.0
 org.tinyjee.jgraphx             jgraphx                     1.10.4.1        JGraph Ltd - 3 clause BSD license
 org.yaml                        snakeyaml                   1.17            The Apache Software License, Version 2.0
-xerces                          xercesImpl                  2.11.0          The Apache Software License, Version 2.0
+xerces                          xercesImpl                  2.12.0          The Apache Software License, Version 2.0
 xml-apis                        xml-apis                    1.4.01          The Apache Software License, Version 2.0-The SAX License-The W3C License
