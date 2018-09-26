@@ -127,11 +127,12 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected ProcessDiagramGenerator processDiagramGenerator;
 
     protected boolean isCreateDiagramOnDeploy = true;
+    
     /**
      *  include the sequence flow name in case there's no Label DI, 
      */
     protected boolean enableIncludeSequenceNameWhenNoLableDi = false;
-
+    
     protected String defaultCamelContext = "camelContext";
 
     protected String activityFontName = "Arial";

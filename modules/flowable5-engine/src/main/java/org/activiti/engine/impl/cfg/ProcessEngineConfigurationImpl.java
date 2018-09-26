@@ -2377,5 +2377,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.asyncExecutorLockRetryWaitTimeInMillis = asyncExecutorLockRetryWaitTimeInMillis;
         return this;
     }
+    
+    public boolean isEnableIncludeSequenceNameWhenNoLableDi() {
+        return enableIncludeSequenceNameWhenNoLableDi;
+    }
+    
+    public ProcessEngineConfiguration setEnableIncludeSequenceNameWhenNoLableDi(boolean enableIncludeSequenceNameWhenNoLableDi) {
+        this.enableIncludeSequenceNameWhenNoLableDi = enableIncludeSequenceNameWhenNoLableDi;
+        return this;
+    }
 
 }

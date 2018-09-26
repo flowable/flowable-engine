@@ -210,6 +210,11 @@ public abstract class ProcessEngineConfiguration {
     protected boolean tablePrefixIsSchema;
 
     protected boolean isCreateDiagramOnDeploy = true;
+    
+    /**
+     *  include the sequence flow name in case there's no Label DI, 
+     */
+    protected boolean enableIncludeSequenceNameWhenNoLableDi = false;
 
     protected String xmlEncoding = "UTF-8";
 
