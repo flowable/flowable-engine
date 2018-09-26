@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.cmmn.test.runtime;
+package org.flowable.cmmn.test.history;
 
 import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.nullValue;

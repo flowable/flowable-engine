@@ -15,9 +15,11 @@ package org.flowable.cmmn.api.history;
 import org.flowable.common.engine.api.query.Query;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Dennis Federico
+ * @author Joram Barrez
  */
 public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemInstanceQuery, HistoricPlanItemInstance> {
 
@@ -30,6 +32,7 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
     HistoricPlanItemInstanceQuery planItemInstanceElementId(String elementId);
     HistoricPlanItemInstanceQuery planItemInstanceDefinitionId(String planItemDefinitionId);
     HistoricPlanItemInstanceQuery planItemInstanceDefinitionType(String planItemDefinitionType);
+    HistoricPlanItemInstanceQuery planItemInstanceDefinitionTypes(List<String> planItemDefinitionTypes);
     HistoricPlanItemInstanceQuery planItemInstanceStartUserId(String startUserId);
     HistoricPlanItemInstanceQuery planItemInstanceReferenceId(String referenceId);
     HistoricPlanItemInstanceQuery planItemInstanceReferenceType(String referenceType);
