@@ -13,9 +13,12 @@
 
 package org.flowable.cmmn.rest.service.api.runtime;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
@@ -28,8 +31,44 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * Test for all REST-operations related to the plan item instance query resource.
  * 
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class PlanItemInstanceQueryResourceTest extends BaseSpringRestTestCase {
+
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/PlanItemInstanceQueryResourceTest.testQueryPlanItemInstances.cmmn" })
+    public void testQueryPlanItemInstances() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testPlanItemInstanceQuery").start();
+
+        // Type
+        List<PlanItemInstance> planItemInstanceList = runtimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+            .list();
+        assertEquals(2, planItemInstanceList.size());
+
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_QUERY);
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseInstanceId", caseInstance.getId());
+        requestNode.put("planItemDefinitionType", "humantask");
+        assertResultsPresentInPostDataResponse(url, requestNode, planItemInstanceList.get(0).getId(), planItemInstanceList.get(1).getId());
+
+        // Multiple types
+        planItemInstanceList = runtimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .planItemDefinitionTypes(Arrays.asList(PlanItemDefinitionType.HUMAN_TASK, PlanItemDefinitionType.STAGE))
+            .list();
+        assertEquals(4, planItemInstanceList.size());
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_QUERY);
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseInstanceId", caseInstance.getId());
+        requestNode.putArray("planItemDefinitionTypes").add("humantask").add("stage");
+        assertResultsPresentInPostDataResponse(url, requestNode,
+            planItemInstanceList.get(0).getId(),
+            planItemInstanceList.get(1).getId(),
+            planItemInstanceList.get(2).getId(),
+            planItemInstanceList.get(3).getId());
+    }
 
     /**
      * Test querying plan item instance based on variables. POST query/case-instances
