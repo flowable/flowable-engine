@@ -810,21 +810,21 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
         assertEquals("test name", caseInstance.getName());
         assertEquals("test business key", caseInstance.getBusinessKey());
     }
-    
+
     @Test
     @CmmnDeployment
     public void testCaseInstanceStarterIdentityLink() {
         Authentication.setAuthenticatedUserId("testUser");
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         Authentication.setAuthenticatedUserId(null);
-        
+
         List<IdentityLink> caseIdentityLinks = cmmnRuntimeService.getIdentityLinksForCaseInstance(caseInstance.getId());
         assertEquals(1, caseIdentityLinks.size());
         assertEquals(caseInstance.getId(), caseIdentityLinks.get(0).getScopeId());
         assertEquals(ScopeTypes.CMMN, caseIdentityLinks.get(0).getScopeType());
         assertEquals(IdentityLinkType.STARTER, caseIdentityLinks.get(0).getType());
         assertEquals("testUser", caseIdentityLinks.get(0).getUserId());
-        
+
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             List<HistoricIdentityLink> historicIdentityLinks = cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstance.getId());
             assertEquals(1, historicIdentityLinks.size());
@@ -833,6 +833,19 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
             assertEquals(IdentityLinkType.STARTER, historicIdentityLinks.get(0).getType());
             assertEquals("testUser", historicIdentityLinks.get(0).getUserId());
         }
+    }
+
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/test/runtime/RuntimeServiceTest.testStartSimplePassthroughCaseWithBlockingTask.cmmn" })
+    public void planItemQueryWithoutTenant() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("myCase")
+            .variable("var", "test")
+            .variable("numberVar", 10)
+            .start();
+
+        assertEquals(1, cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Task A").planItemInstanceWithoutTenantId().count());
+        assertEquals(1, cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Task A").planItemInstanceWithoutTenantId().list().size());
     }
 
 }
