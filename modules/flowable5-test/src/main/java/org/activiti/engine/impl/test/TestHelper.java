@@ -262,9 +262,9 @@ public abstract class TestHelper {
                     .getProcessEngineConfiguration().getCommandExecutor()
                     .execute(new Command<Object>() {
                         public Object execute(CommandContext commandContext) {
-                            SchemaManager dbSchemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager();
-                            dbSchemaManager.schemaDrop();
-                            dbSchemaManager.schemaCreate();
+                            SchemaManager schemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getSchemaManager();
+                            schemaManager.schemaDrop();
+                            schemaManager.schemaCreate();
                             return null;
                         }
                     });

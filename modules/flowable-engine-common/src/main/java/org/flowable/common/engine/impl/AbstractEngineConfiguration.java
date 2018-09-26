@@ -118,7 +118,7 @@ public abstract class AbstractEngineConfiguration {
     protected int jdbcPingConnectionNotUsedFor;
     protected int jdbcDefaultTransactionIsolationLevel;
     protected DataSource dataSource;
-    protected SchemaManager commonDbSchemaManager;
+    protected SchemaManager commonSchemaManager;
     protected SchemaManager schemaManager;
     protected Command<Void> schemaManagementCmd;
 
@@ -418,8 +418,8 @@ public abstract class AbstractEngineConfiguration {
     }
 
     public void initSchemaManager() {
-        if (this.commonDbSchemaManager == null) {
-            this.commonDbSchemaManager = new CommonDbSchemaManager();
+        if (this.commonSchemaManager == null) {
+            this.commonSchemaManager = new CommonDbSchemaManager();
         }
     }
 
@@ -901,23 +901,6 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
-    /**
-     * Use {@link #getSchemaManager()} instead.
-     */
-    @Deprecated
-    public SchemaManager getDbSchemaManager() {
-        return schemaManager;
-    }
-
-    /**
-     * Use {@link #setSchemaManager(SchemaManager)()} instead.
-     */
-    @Deprecated
-    public AbstractEngineConfiguration setDbSchemaManager(SchemaManager dbSchemaManager) {
-        this.schemaManager = dbSchemaManager;
-        return this;
-    }
-    
     public SchemaManager getSchemaManager() {
         return schemaManager;
     }
@@ -927,12 +910,12 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
-    public SchemaManager getCommonDbSchemaManager() {
-        return commonDbSchemaManager;
+    public SchemaManager getCommonSchemaManager() {
+        return commonSchemaManager;
     }
 
-    public AbstractEngineConfiguration setCommonDbSchemaManager(SchemaManager commonDbSchemaManager) {
-        this.commonDbSchemaManager = commonDbSchemaManager;
+    public AbstractEngineConfiguration setCommonSchemaManager(SchemaManager commonSchemaManager) {
+        this.commonSchemaManager = commonSchemaManager;
         return this;
     }
     

@@ -26,7 +26,7 @@ public class SchemaOperationsFormEngineBuild implements Command<Void> {
     @Override
     public Void execute(CommandContext commandContext) {
         FormEngineConfiguration configuration = CommandContextUtil.getFormEngineConfiguration(commandContext);
-        ((FormDbSchemaManager) configuration.getDbSchemaManager()).initSchema(configuration);
+        ((FormDbSchemaManager) configuration.getSchemaManager()).initSchema(configuration);
         return null;
     }
 
