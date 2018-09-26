@@ -451,90 +451,90 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
 
     @Override
     public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities, List<String> highLightedFlows,
-            String activityFontName, String labelFontName, String annotationFontName, ClassLoader customClassLoader, double scaleFactor) {
+            String activityFontName, String labelFontName, String annotationFontName, ClassLoader customClassLoader, double scaleFactor,boolean enableIncludeSequenceNameWhenNoLableDi) {
 
         return generateProcessDiagram(bpmnModel, imageType, highLightedActivities, highLightedFlows,
-                activityFontName, labelFontName, annotationFontName, customClassLoader, scaleFactor).generateImage(imageType);
+                activityFontName, labelFontName, annotationFontName, customClassLoader, scaleFactor,enableIncludeSequenceNameWhenNoLableDi).generateImage(imageType);
     }
 
     @Override
-    public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities, List<String> highLightedFlows) {
-        return generateDiagram(bpmnModel, imageType, highLightedActivities, highLightedFlows, null, null, null, null, 1.0);
+    public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities, List<String> highLightedFlows,boolean enableIncludeSequenceNameWhenNoLableDi) {
+        return generateDiagram(bpmnModel, imageType, highLightedActivities, highLightedFlows, null, null, null, null, 1.0,enableIncludeSequenceNameWhenNoLableDi);
     }
 
     @Override
     public InputStream generateDiagram(BpmnModel bpmnModel, String imageType,
-            List<String> highLightedActivities, List<String> highLightedFlows, double scaleFactor) {
-        return generateDiagram(bpmnModel, imageType, highLightedActivities, highLightedFlows, null, null, null, null, scaleFactor);
+            List<String> highLightedActivities, List<String> highLightedFlows, double scaleFactor,boolean enableIncludeSequenceNameWhenNoLableDi) {
+        return generateDiagram(bpmnModel, imageType, highLightedActivities, highLightedFlows, null, null, null, null, scaleFactor,enableIncludeSequenceNameWhenNoLableDi);
     }
 
     @Override
-    public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities) {
-        return generateDiagram(bpmnModel, imageType, highLightedActivities, Collections.<String>emptyList());
+    public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities,boolean enableIncludeSequenceNameWhenNoLableDi) {
+        return generateDiagram(bpmnModel, imageType, highLightedActivities, Collections.<String>emptyList(),enableIncludeSequenceNameWhenNoLableDi);
     }
 
     @Override
-    public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities, double scaleFactor) {
-        return generateDiagram(bpmnModel, imageType, highLightedActivities, Collections.<String>emptyList(), scaleFactor);
-    }
-
-    @Override
-    public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, String activityFontName,
-            String labelFontName, String annotationFontName, ClassLoader customClassLoader) {
-
-        return generateDiagram(bpmnModel, imageType, Collections.<String>emptyList(), Collections.<String>emptyList(),
-                activityFontName, labelFontName, annotationFontName, customClassLoader, 1.0);
+    public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities, double scaleFactor,boolean enableIncludeSequenceNameWhenNoLableDi) {
+        return generateDiagram(bpmnModel, imageType, highLightedActivities, Collections.<String>emptyList(), scaleFactor,enableIncludeSequenceNameWhenNoLableDi);
     }
 
     @Override
     public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, String activityFontName,
-            String labelFontName, String annotationFontName, ClassLoader customClassLoader, double scaleFactor) {
+            String labelFontName, String annotationFontName, ClassLoader customClassLoader,boolean enableIncludeSequenceNameWhenNoLableDi) {
 
         return generateDiagram(bpmnModel, imageType, Collections.<String>emptyList(), Collections.<String>emptyList(),
-                activityFontName, labelFontName, annotationFontName, customClassLoader, scaleFactor);
+                activityFontName, labelFontName, annotationFontName, customClassLoader, 1.0,enableIncludeSequenceNameWhenNoLableDi);
     }
 
     @Override
-    public InputStream generatePngDiagram(BpmnModel bpmnModel) {
-        return generatePngDiagram(bpmnModel, 1.0);
+    public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, String activityFontName,
+            String labelFontName, String annotationFontName, ClassLoader customClassLoader, double scaleFactor,boolean enableIncludeSequenceNameWhenNoLableDi) {
+
+        return generateDiagram(bpmnModel, imageType, Collections.<String>emptyList(), Collections.<String>emptyList(),
+                activityFontName, labelFontName, annotationFontName, customClassLoader, scaleFactor,enableIncludeSequenceNameWhenNoLableDi);
     }
 
     @Override
-    public InputStream generatePngDiagram(BpmnModel bpmnModel, double scaleFactor) {
-        return generateDiagram(bpmnModel, "png", Collections.<String>emptyList(), Collections.<String>emptyList(), scaleFactor);
+    public InputStream generatePngDiagram(BpmnModel bpmnModel,boolean enableIncludeSequenceNameWhenNoLableDi) {
+        return generatePngDiagram(bpmnModel, 1.0,enableIncludeSequenceNameWhenNoLableDi);
     }
 
     @Override
-    public InputStream generateJpgDiagram(BpmnModel bpmnModel) {
-        return generateJpgDiagram(bpmnModel, 1.0);
+    public InputStream generatePngDiagram(BpmnModel bpmnModel, double scaleFactor,boolean enableIncludeSequenceNameWhenNoLableDi) {
+        return generateDiagram(bpmnModel, "png", Collections.<String>emptyList(), Collections.<String>emptyList(), scaleFactor,enableIncludeSequenceNameWhenNoLableDi);
     }
 
     @Override
-    public InputStream generateJpgDiagram(BpmnModel bpmnModel, double scaleFactor) {
-        return generateDiagram(bpmnModel, "jpg", Collections.<String>emptyList(), Collections.<String>emptyList());
+    public InputStream generateJpgDiagram(BpmnModel bpmnModel,boolean enableIncludeSequenceNameWhenNoLableDi) {
+        return generateJpgDiagram(bpmnModel, 1.0,enableIncludeSequenceNameWhenNoLableDi);
+    }
+
+    @Override
+    public InputStream generateJpgDiagram(BpmnModel bpmnModel, double scaleFactor,boolean enableIncludeSequenceNameWhenNoLableDi) {
+        return generateDiagram(bpmnModel, "jpg", Collections.<String>emptyList(), Collections.<String>emptyList(),enableIncludeSequenceNameWhenNoLableDi);
     }
 
     public BufferedImage generateImage(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities, List<String> highLightedFlows,
-            String activityFontName, String labelFontName, String annotationFontName, ClassLoader customClassLoader, double scaleFactor) {
+            String activityFontName, String labelFontName, String annotationFontName, ClassLoader customClassLoader, double scaleFactor,boolean enableIncludeSequenceNameWhenNoLableDi) {
 
         return generateProcessDiagram(bpmnModel, imageType, highLightedActivities, highLightedFlows,
-                activityFontName, labelFontName, annotationFontName, customClassLoader, scaleFactor).generateBufferedImage(imageType);
+                activityFontName, labelFontName, annotationFontName, customClassLoader, scaleFactor,enableIncludeSequenceNameWhenNoLableDi).generateBufferedImage(imageType);
     }
 
     public BufferedImage generateImage(BpmnModel bpmnModel, String imageType,
-            List<String> highLightedActivities, List<String> highLightedFlows, double scaleFactor) {
+            List<String> highLightedActivities, List<String> highLightedFlows, double scaleFactor,boolean enableIncludeSequenceNameWhenNoLableDi) {
 
-        return generateImage(bpmnModel, imageType, highLightedActivities, highLightedFlows, null, null, null, null, scaleFactor);
+        return generateImage(bpmnModel, imageType, highLightedActivities, highLightedFlows, null, null, null, null, scaleFactor,enableIncludeSequenceNameWhenNoLableDi);
     }
 
     @Override
-    public BufferedImage generatePngImage(BpmnModel bpmnModel, double scaleFactor) {
-        return generateImage(bpmnModel, "png", Collections.<String>emptyList(), Collections.<String>emptyList(), scaleFactor);
+    public BufferedImage generatePngImage(BpmnModel bpmnModel, double scaleFactor,boolean enableIncludeSequenceNameWhenNoLableDi) {
+        return generateImage(bpmnModel, "png", Collections.<String>emptyList(), Collections.<String>emptyList(), scaleFactor,enableIncludeSequenceNameWhenNoLableDi);
     }
 
     protected DefaultProcessDiagramCanvas generateProcessDiagram(BpmnModel bpmnModel, String imageType,
             List<String> highLightedActivities, List<String> highLightedFlows,
-            String activityFontName, String labelFontName, String annotationFontName, ClassLoader customClassLoader, double scaleFactor) {
+            String activityFontName, String labelFontName, String annotationFontName, ClassLoader customClassLoader, double scaleFactor,boolean enableIncludeSequenceNameWhenNoLableDi) {
 
         prepareBpmnModel(bpmnModel);
 
@@ -558,7 +558,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
         for (Process process : bpmnModel.getProcesses()) {
             for (FlowNode flowNode : process.findFlowElementsOfType(FlowNode.class)) {
                 if (!isPartOfCollapsedSubProcess(flowNode, bpmnModel)) {
-                    drawActivity(processDiagramCanvas, bpmnModel, flowNode, highLightedActivities, highLightedFlows, scaleFactor);
+                    drawActivity(processDiagramCanvas, bpmnModel, flowNode, highLightedActivities, highLightedFlows, scaleFactor,enableIncludeSequenceNameWhenNoLableDi);
                 }
             }
         }
@@ -655,7 +655,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
     }
 
     protected void drawActivity(DefaultProcessDiagramCanvas processDiagramCanvas, BpmnModel bpmnModel,
-            FlowNode flowNode, List<String> highLightedActivities, List<String> highLightedFlows, double scaleFactor) {
+            FlowNode flowNode, List<String> highLightedActivities, List<String> highLightedFlows, double scaleFactor,Boolean enableIncludeSequenceNameWhenNoLableDi ) {
 
         ActivityDrawInstruction drawInstruction = activityDrawInstructions.get(flowNode.getClass());
         if (drawInstruction != null) {
@@ -742,8 +742,11 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                 if (labelGraphicInfo != null) {
                     processDiagramCanvas.drawLabel(sequenceFlow.getName(), labelGraphicInfo, false);
                 }else {
-                    GraphicInfo lineCenter = getLineCenter(graphicInfoList);
-                    processDiagramCanvas.drawLabel(sequenceFlow.getName(), lineCenter, false); 
+                    if (enableIncludeSequenceNameWhenNoLableDi) {
+                        GraphicInfo lineCenter = getLineCenter(graphicInfoList);
+                        processDiagramCanvas.drawLabel(sequenceFlow.getName(), lineCenter, false); 
+                    }
+                    
                 }
             }
         }
@@ -753,7 +756,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
             for (FlowElement nestedFlowElement : ((FlowElementsContainer) flowNode).getFlowElements()) {
                 if (nestedFlowElement instanceof FlowNode && !isPartOfCollapsedSubProcess(nestedFlowElement, bpmnModel)) {
                     drawActivity(processDiagramCanvas, bpmnModel, (FlowNode) nestedFlowElement,
-                            highLightedActivities, highLightedFlows, scaleFactor);
+                            highLightedActivities, highLightedFlows, scaleFactor,enableIncludeSequenceNameWhenNoLableDi);
                 }
             }
         }

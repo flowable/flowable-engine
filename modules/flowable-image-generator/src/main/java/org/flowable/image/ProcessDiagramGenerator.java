@@ -43,9 +43,11 @@ public interface ProcessDiagramGenerator {
      *            override the default label font
      * @param customClassLoader
      *            provide a custom classloader for retrieving icon images
+     * @param enableIncludeSequenceNameWhenNoLableDi
+     *            provide a option to also include the sequence flow name in case there's no Label DI
      */
     public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities, List<String> highLightedFlows,
-            String activityFontName, String labelFontName, String annotationFontName, ClassLoader customClassLoader, double scaleFactor);
+            String activityFontName, String labelFontName, String annotationFontName, ClassLoader customClassLoader, double scaleFactor,boolean enableIncludeSequenceNameWhenNoLableDi);
 
     /**
      * Generates a diagram of the given process definition, using the diagram interchange information of the process.
@@ -58,29 +60,31 @@ public interface ProcessDiagramGenerator {
      *            activities to highlight
      * @param highLightedFlows
      *            flows to highlight
+     * @param enableIncludeSequenceNameWhenNoLableDi
+     *            provide a option to also include the sequence flow name in case there's no Label DI
      */
-    public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities, List<String> highLightedFlows);
+    public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities, List<String> highLightedFlows,boolean enableIncludeSequenceNameWhenNoLableDi);
 
-    public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities, List<String> highLightedFlows, double scaleFactor);
+    public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities, List<String> highLightedFlows, double scaleFactor,boolean enableIncludeSequenceNameWhenNoLableDi);
 
-    public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities);
+    public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities,boolean enableIncludeSequenceNameWhenNoLableDi);
 
-    public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities, double scaleFactor);
-
-    public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, String activityFontName, String labelFontName,
-            String annotationFontName, ClassLoader customClassLoader);
+    public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities, double scaleFactor,boolean enableIncludeSequenceNameWhenNoLableDi);
 
     public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, String activityFontName, String labelFontName,
-            String annotationFontName, ClassLoader customClassLoader, double scaleFactor);
+            String annotationFontName, ClassLoader customClassLoader,boolean enableIncludeSequenceNameWhenNoLableDi);
 
-    public InputStream generatePngDiagram(BpmnModel bpmnModel);
+    public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, String activityFontName, String labelFontName,
+            String annotationFontName, ClassLoader customClassLoader, double scaleFactor,boolean enableIncludeSequenceNameWhenNoLableDi);
 
-    public InputStream generatePngDiagram(BpmnModel bpmnModel, double scaleFactor);
+    public InputStream generatePngDiagram(BpmnModel bpmnModel,boolean enableIncludeSequenceNameWhenNoLableDi);
 
-    public InputStream generateJpgDiagram(BpmnModel bpmnModel);
+    public InputStream generatePngDiagram(BpmnModel bpmnModel, double scaleFactor,boolean enableIncludeSequenceNameWhenNoLableDi);
 
-    public InputStream generateJpgDiagram(BpmnModel bpmnModel, double scaleFactor);
+    public InputStream generateJpgDiagram(BpmnModel bpmnModel,boolean enableIncludeSequenceNameWhenNoLableDi);
 
-    public BufferedImage generatePngImage(BpmnModel bpmnModel, double scaleFactor);
+    public InputStream generateJpgDiagram(BpmnModel bpmnModel, double scaleFactor,boolean enableIncludeSequenceNameWhenNoLableDi);
+
+    public BufferedImage generatePngImage(BpmnModel bpmnModel, double scaleFactor,boolean enableIncludeSequenceNameWhenNoLableDi);
 
 }
