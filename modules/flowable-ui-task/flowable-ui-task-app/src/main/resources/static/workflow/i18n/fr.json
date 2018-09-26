@@ -334,7 +334,9 @@
             "NO-AVAILABLE-USER-EVENT-LISTENERS":"Aucun événement utilisateur disponible",
             "NO-COMPLETED-USER-EVENT-LISTENERS":"Aucun événement utilisateur terminé",
             "USER-EVENT-LISTENER-NO-NAME": "Evénement utilisateur sans nom",
-            "USER-EVENT-LISTENER-COMPLETED": "Terminé"
+            "USER-EVENT-LISTENER-COMPLETED": "Terminé",
+            "ENABLED-PLAN-ITEM_INSTANCE-NO-NAME": "Sans nom",
+            "START-PLAN-ITEM-INSTANCE": "Démarrer"
         },
         "ACTION" : {
             "CREATE": "+ Démarrer un cas",
@@ -364,7 +366,8 @@
             "REACHED-MILESTONES": "Atteint des Jalons",
             "AVAILABLE-USER-EVENT-LISTENERS": "Evénement utilisateur disponible",
             "COMPLETED-USER-EVENT-LISTENERS": "Événement utilisateur terminé",
-            "CONTENT" : "Contenus"
+            "CONTENT" : "Contenus",
+            "ENABLED-PLAN-ITEM-INSTANCES": "Plan item instances activées"
         },
         "POPUP": {
             "CANCEL-TITLE": "Annuler le cas?",

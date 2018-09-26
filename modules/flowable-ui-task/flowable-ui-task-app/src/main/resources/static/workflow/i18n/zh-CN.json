@@ -333,7 +333,9 @@
             "NO-AVAILABLE-USER-EVENT-LISTENERS":"没有可用的事件监听器",
             "NO-COMPLETED-USER-EVENT-LISTENERS":"没有完成的事件监听器",
             "USER-EVENT-LISTENER-NO-NAME": "没有名称的事件监听器 Event Listener",
-            "USER-EVENT-LISTENER-COMPLETED": "完成"
+            "USER-EVENT-LISTENER-COMPLETED": "完成",
+            "ENABLED-PLAN-ITEM_INSTANCE-NO-NAME": "No name",
+            "START-PLAN-ITEM-INSTANCE": "Start"
         },
         "ACTION" : {
             "CREATE": "+ 启动一个case",
@@ -363,7 +365,8 @@
             "REACHED-MILESTONES": "可达到的里程碑（milestones）",
             "AVAILABLE-USER-EVENT-LISTENERS": "可以用的用户事件监听器",
             "COMPLETED-USER-EVENT-LISTENERS": "已经完成的用户事件监听器",
-            "CONTENT" : "Content"
+            "CONTENT" : "Content",
+            "ENABLED-PLAN-ITEM-INSTANCES": "Enabled plan item instances"
         },
         "POPUP": {
             "CANCEL-TITLE": "取消case?",
