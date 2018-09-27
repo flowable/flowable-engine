@@ -10,14 +10,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.task.service.impl;
+package org.flowable.cmmn.test.listener;
 
-import org.flowable.task.service.TaskPostProcessor;
-import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import java.util.Collections;
+import java.util.List;
 
-public class DefaultTaskPostProcessor implements TaskPostProcessor {
+import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
+
+/**
+ * @author Joram Barrez
+ */
+public class TestFilterTypesLifeCycleListener extends AbstractTestLifeCycleListener {
+
     @Override
-    public TaskEntity enrich(TaskEntity taskEntity) {
-        return taskEntity;
+    public List<String> getItemDefinitionTypes() {
+        return Collections.singletonList(PlanItemDefinitionType.HUMAN_TASK);
     }
+
+    @Override
+    public String getSourceState() {
+        return null;
+    }
+
+    @Override
+    public String getTargetState() {
+        return null;
+    }
+
 }

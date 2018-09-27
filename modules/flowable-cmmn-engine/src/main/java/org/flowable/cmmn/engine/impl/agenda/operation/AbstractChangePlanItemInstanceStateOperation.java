@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
+import org.flowable.cmmn.engine.impl.listener.PlanItemLifeCycleListenerUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.StateTransition;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -39,9 +40,12 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
             }
         }
 
-        planItemInstanceEntity.setState(getNewState());
+        String oldState = planItemInstanceEntity.getState();
+        String newState = getNewState();
+        planItemInstanceEntity.setState(newState);
+        PlanItemLifeCycleListenerUtil.callLifeCycleListeners(commandContext, planItemInstanceEntity, oldState, getNewState());
+
         CommandContextUtil.getAgenda(commandContext).planEvaluateCriteriaOperation(planItemInstanceEntity.getCaseInstanceId(), createPlanItemLifeCycleEvent());
-        
         internalExecute();
     }
     

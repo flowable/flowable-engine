@@ -33,6 +33,7 @@ import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
+import org.flowable.cmmn.api.listener.PlanItemInstanceLifeCycleListener;
 import org.flowable.cmmn.engine.impl.CmmnEngineImpl;
 import org.flowable.cmmn.engine.impl.CmmnHistoryServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
@@ -277,6 +278,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CmmnHistoryManager cmmnHistoryManager;
     protected ProcessInstanceService processInstanceService;
     protected Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks;
+    protected List<PlanItemInstanceLifeCycleListener> planItemInstanceLifeCycleListeners;
 
     protected boolean executeServiceDbSchemaManagers = true;
 
@@ -1857,6 +1859,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setCaseInstanceStateChangeCallbacks(Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks) {
         this.caseInstanceStateChangeCallbacks = caseInstanceStateChangeCallbacks;
+        return this;
+    }
+
+    public List<PlanItemInstanceLifeCycleListener> getPlanItemInstanceLifeCycleListeners() {
+        return planItemInstanceLifeCycleListeners;
+    }
+
+    public CmmnEngineConfiguration setPlanItemInstanceLifeCycleListeners(List<PlanItemInstanceLifeCycleListener> planItemInstanceLifeCycleListeners) {
+        this.planItemInstanceLifeCycleListeners = planItemInstanceLifeCycleListeners;
         return this;
     }
 
