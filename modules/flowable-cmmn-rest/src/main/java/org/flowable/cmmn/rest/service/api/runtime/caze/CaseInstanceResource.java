@@ -13,11 +13,14 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.caze;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.rest.service.api.RestActionRequest;
+import org.flowable.cmmn.rest.service.api.history.caze.StageResponse;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -37,6 +40,7 @@ import io.swagger.annotations.Authorization;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 @RestController
 @Api(tags = { "Case Instances" }, description = "Manage Case Instances", authorizations = { @Authorization(value = "basicAuth") })
@@ -103,4 +107,5 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
         runtimeService.terminateCaseInstance(caseInstance.getId());
         response.setStatus(HttpStatus.NO_CONTENT.value());
     }
+
 }

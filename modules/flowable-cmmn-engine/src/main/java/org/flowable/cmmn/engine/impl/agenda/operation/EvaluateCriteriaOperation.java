@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
+import org.flowable.cmmn.engine.impl.listener.PlanItemLifeCycleListenerUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CountingPlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.EntityWithSentryPartInstances;
@@ -123,7 +124,12 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                         if (isRepeating) {
 
                             PlanItemInstanceEntity childPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false);
-                            childPlanItemInstanceEntity.setState(PlanItemInstanceState.WAITING_FOR_REPETITION);
+
+                            String oldState = childPlanItemInstanceEntity.getState();
+                            String newState = PlanItemInstanceState.WAITING_FOR_REPETITION;
+                            childPlanItemInstanceEntity.setState(newState);
+                            PlanItemLifeCycleListenerUtil.callLifeCycleListeners(commandContext, planItemInstanceEntity, oldState, newState);
+
                             if (newChildPlanItemInstances == null) {
                                 newChildPlanItemInstances = new ArrayList<>(1);
                             }

@@ -128,21 +128,24 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
 
     @Override
     public void onStateTransition(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition) {
-        // The process task plan item will be deleted by the regular TerminatePlanItemOperation
-        if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
-            deleteProcessInstance(commandContext, planItemInstance);
-        } else if (PlanItemTransition.COMPLETE.equals(transition)) {
-            ProcessInstanceService processInstanceService = CommandContextUtil.getCmmnEngineConfiguration().getProcessInstanceService();
+        if (PlanItemInstanceState.ACTIVE.equals(planItemInstance.getState())) {
+            // The process task plan item will be deleted by the regular TerminatePlanItemOperation
+            if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
+                deleteProcessInstance(commandContext, planItemInstance);
+            } else if (PlanItemTransition.COMPLETE.equals(transition)) {
+                ProcessInstanceService processInstanceService = CommandContextUtil.getCmmnEngineConfiguration().getProcessInstanceService();
 
-            CaseInstance caseInstance = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(planItemInstance.getCaseInstanceId());
-            for (IOParameter ioParameter : outParameters) {
-                Object value = null;
-                if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
-                    value = processInstanceService.getVariables(planItemInstance.getReferenceId()).get(ioParameter.getSourceExpression());
-                } else if (StringUtils.isNotEmpty(ioParameter.getSource())) {
-                    value = processInstanceService.getVariables(planItemInstance.getReferenceId()).get(ioParameter.getSource());
+                CaseInstanceEntity caseInstance = CommandContextUtil.getCaseInstanceEntityManager(commandContext)
+                    .findById(planItemInstance.getCaseInstanceId());
+                for (IOParameter ioParameter : outParameters) {
+                    Object value = null;
+                    if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
+                        value = processInstanceService.getVariables(planItemInstance.getReferenceId()).get(ioParameter.getSourceExpression());
+                    } else if (StringUtils.isNotEmpty(ioParameter.getSource())) {
+                        value = processInstanceService.getVariables(planItemInstance.getReferenceId()).get(ioParameter.getSource());
+                    }
+                    caseInstance.setVariable(ioParameter.getTarget(), value);
                 }
-                ((CaseInstanceEntity) caseInstance).setVariable(ioParameter.getTarget(), value);
             }
         }
     }

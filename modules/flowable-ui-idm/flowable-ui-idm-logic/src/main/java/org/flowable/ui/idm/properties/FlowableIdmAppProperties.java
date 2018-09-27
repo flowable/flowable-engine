@@ -196,7 +196,7 @@ public class FlowableIdmAppProperties {
         private String domain;
 
         /**
-         * The refresh age of the cookie in seconds. Default is 1 day.
+         * The refresh age of the token in seconds. Default is 1 day.
          */
         private int refreshAge = 86400; // Default : 1 day;
 

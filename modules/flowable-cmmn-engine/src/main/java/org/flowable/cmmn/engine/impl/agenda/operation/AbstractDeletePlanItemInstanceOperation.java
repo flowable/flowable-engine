@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.impl.listener.PlanItemLifeCycleListenerUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.StateTransition;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -38,7 +39,12 @@ public abstract class AbstractDeletePlanItemInstanceOperation extends AbstractCh
 
             // Create new repeating instance
             PlanItemInstanceEntity newPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, true);
-            newPlanItemInstanceEntity.setState(PlanItemInstanceState.WAITING_FOR_REPETITION);
+
+            String oldState = newPlanItemInstanceEntity.getState();
+            String newState = PlanItemInstanceState.WAITING_FOR_REPETITION;
+            newPlanItemInstanceEntity.setState(newState);
+            PlanItemLifeCycleListenerUtil.callLifeCycleListeners(commandContext, newPlanItemInstanceEntity, oldState, newState);
+
             // Plan item creation "for Repetition"
             CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceForRepetitionOperation(newPlanItemInstanceEntity);
             // Plan item doesn't have entry criteria (checked in the if condition) and immediately goes to ACTIVE

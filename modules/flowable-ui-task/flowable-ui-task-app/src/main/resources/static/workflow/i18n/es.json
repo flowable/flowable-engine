@@ -316,7 +316,9 @@
             "NO-AVAILABLE-USER-EVENT-LISTENERS":"No hay eventos de usuario disponibles",
             "NO-COMPLETED-USER-EVENT-LISTENERS":"No hay eventos de usuario completados",
             "USER-EVENT-LISTENER-NO-NAME": "Evento de usuario sin nombre",
-            "USER-EVENT-LISTENER-COMPLETED": "Completado"
+            "USER-EVENT-LISTENER-COMPLETED": "Completado",
+            "ENABLED-PLAN-ITEM_INSTANCE-NO-NAME": "Sin nombre",
+            "START-PLAN-ITEM-INSTANCE": "Empezar"
         },
         "ACTION" : {
             "CREATE": "+ Comenzar un caso",
@@ -346,7 +348,8 @@
             "REACHED-MILESTONES": "Hitos alcanzados",
             "AVAILABLE-USER-EVENT-LISTENERS": "Eventos de usuario disponibles",
             "COMPLETED-USER-EVENT-LISTENERS": "Eventos de usuario completados",
-            "CONTENT" : "Contenido"
+            "CONTENT" : "Contenido",
+            "ENABLED-PLAN-ITEM-INSTANCES": "Instancia de plan item habilitado"
         },
         "POPUP": {
             "CANCEL-TITLE": "Cancelar el caso?",

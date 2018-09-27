@@ -685,8 +685,8 @@
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
-				<artifactId>groovy-all</artifactId>
-				<version>2.4.15</version>
+				<artifactId>groovy-jsr223</artifactId>
+				<version>2.5.2</version>
 			</dependency>
 			<dependency>
 				<groupId>org.drools</groupId>
@@ -887,7 +887,7 @@
 			<dependency>
 				<groupId>xerces</groupId>
 				<artifactId>xercesImpl</artifactId>
-				<version>2.11.0</version>
+				<version>2.12.0</version>
 			</dependency>
 			<dependency>
 				<groupId>joda-time</groupId>

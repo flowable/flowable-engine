@@ -35,6 +35,7 @@ public class PlanItemInstanceQueryRequest extends PaginateRequest {
     private String stageInstanceId;
     private String planItemDefinitionId;
     private String planItemDefinitionType;
+    private List<String> planItemDefinitionTypes;
     private String state;
     private Date startedBefore;
     private Date startedAfter;
@@ -126,6 +127,14 @@ public class PlanItemInstanceQueryRequest extends PaginateRequest {
 
     public void setPlanItemDefinitionType(String planItemDefinitionType) {
         this.planItemDefinitionType = planItemDefinitionType;
+    }
+
+    public List<String> getPlanItemDefinitionTypes() {
+        return planItemDefinitionTypes;
+    }
+
+    public void setPlanItemDefinitionTypes(List<String> planItemDefinitionTypes) {
+        this.planItemDefinitionTypes = planItemDefinitionTypes;
     }
 
     public String getState() {

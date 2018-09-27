@@ -78,6 +78,9 @@ public class PlanItemInstanceBaseResource {
         if (queryRequest.getPlanItemDefinitionType() != null) {
             query.planItemDefinitionType(queryRequest.getPlanItemDefinitionType());
         }
+        if (queryRequest.getPlanItemDefinitionTypes() != null) {
+            query.planItemDefinitionTypes(queryRequest.getPlanItemDefinitionTypes());
+        }
         if (queryRequest.getName() != null) {
             query.planItemInstanceName(queryRequest.getName());
         }

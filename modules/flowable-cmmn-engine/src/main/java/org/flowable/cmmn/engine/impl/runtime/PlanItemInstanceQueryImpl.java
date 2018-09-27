@@ -36,6 +36,7 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     protected String elementId;
     protected String planItemDefinitionId;
     protected String planItemDefinitionType;
+    protected List<String> planItemDefinitionTypes;
     protected String name;
     protected String state;
     protected Date startedBefore;
@@ -119,6 +120,18 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
             throw new FlowableIllegalArgumentException("Plan item definition type is null");
         }
         this.planItemDefinitionType = planItemDefinitionType;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemDefinitionTypes(List<String> planItemDefinitionTypes) {
+        if (planItemDefinitionTypes == null) {
+            throw new FlowableIllegalArgumentException("Plan item definition types is null");
+        }
+        if (planItemDefinitionTypes.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Plan item definition types is empty");
+        }
+        this.planItemDefinitionTypes = planItemDefinitionTypes;
         return this;
     }
 
@@ -355,6 +368,14 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     
     public String getPlanItemDefinitionType() {
         return planItemDefinitionType;
+    }
+
+    public List<String> getPlanItemDefinitionTypes() {
+        return planItemDefinitionTypes;
+    }
+
+    public void setPlanItemDefinitionTypes(List<String> planItemDefinitionTypes) {
+        this.planItemDefinitionTypes = planItemDefinitionTypes;
     }
 
     public String getName() {
