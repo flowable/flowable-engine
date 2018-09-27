@@ -131,7 +131,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     /**
      *  include the sequence flow name in case there's no Label DI, 
      */
-    protected boolean enableIncludeSequenceNameWhenNoLableDi = false;
+    protected boolean drawSequenceFlowNameWithNoLabelDI = false;
     
     protected String defaultCamelContext = "camelContext";
 
@@ -552,12 +552,12 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
         return this;
     }
     
-    public boolean isEnableIncludeSequenceNameWhenNoLableDi() {
-        return enableIncludeSequenceNameWhenNoLableDi;
+    public boolean isDrawSequenceFlowNameWithNoLabelDI() {
+        return drawSequenceFlowNameWithNoLabelDI;
     }
     
-    public ProcessEngineConfiguration setEnableIncludeSequenceNameWhenNoLableDi(boolean enableIncludeSequenceNameWhenNoLableDi) {
-        this.enableIncludeSequenceNameWhenNoLableDi = enableIncludeSequenceNameWhenNoLableDi;
+    public ProcessEngineConfiguration setDrawSequenceFlowNameWithNoLabelDI(boolean drawSequenceFlowNameWithNoLabelDI) {
+        this.drawSequenceFlowNameWithNoLabelDI = drawSequenceFlowNameWithNoLabelDI;
         return this;
     }
     
