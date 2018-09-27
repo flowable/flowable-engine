@@ -84,6 +84,8 @@ public interface CmmnStencilConstants {
     String PROPERTY_COMPLETION_NEUTRAL_ENABLED = "completionneutralenabled";
     String PROPERTY_COMPLETION_NEUTRAL_RULE_CONDITION = "completionneutralrulecondition";
 
+    String PROPERTY_DISPLAY_ORDER = "displayorder";
+
     String PROPERTY_USERTASK_ASSIGNMENT = "usertaskassignment";
     String PROPERTY_USERTASK_PRIORITY = "prioritydefinition";
     String PROPERTY_USERTASK_DUEDATE = "duedatedefinition";
