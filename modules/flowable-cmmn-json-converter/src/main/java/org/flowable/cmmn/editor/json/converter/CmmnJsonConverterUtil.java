@@ -150,6 +150,15 @@ public class CmmnJsonConverterUtil implements EditorJsonConstants, CmmnStencilCo
         }
         return propertyValue;
     }
+
+    public static Integer getPropertyValueAsInteger(String name, JsonNode jsonNode) {
+        Integer propertyValue = null;
+        JsonNode propertyNode = getProperty(name, jsonNode);
+        if (propertyNode != null && !propertyNode.isNull() && !"null".equalsIgnoreCase(propertyNode.asText())) {
+            propertyValue = propertyNode.asInt();
+        }
+        return propertyValue;
+    }
     
     public static boolean getPropertyValueAsBoolean(String name, JsonNode objectNode) {
         return getPropertyValueAsBoolean(name, objectNode, false);

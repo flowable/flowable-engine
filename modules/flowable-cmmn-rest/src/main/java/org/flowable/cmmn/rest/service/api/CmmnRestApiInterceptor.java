@@ -107,6 +107,8 @@ public interface CmmnRestApiInterceptor {
     void accessHistoryCaseInfoWithQuery(HistoricCaseInstanceQuery historicCaseInstanceQuery);
     
     void deleteHistoricCase(HistoricCaseInstance historicCaseInstance);
+
+    void accessStageOverview(HistoricCaseInstance historicCaseInstance);
     
     void accessHistoryMilestoneInfoById(HistoricMilestoneInstance historicMilestoneInstance);
     
