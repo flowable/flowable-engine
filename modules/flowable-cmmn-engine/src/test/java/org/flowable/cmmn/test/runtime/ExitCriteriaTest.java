@@ -20,6 +20,7 @@ import java.util.List;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.junit.Test;
@@ -167,6 +168,19 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
         assertEquals(4, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
         
         cmmnRepositoryService.deleteDeployment(oneTaskCaseDeploymentId, true);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testExitPlanModelUsingNestedEventListener() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testExitPlanModelUsingNestedEventListener").start();
+
+        UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery()
+            .caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId());
+
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
     }
     
 }
