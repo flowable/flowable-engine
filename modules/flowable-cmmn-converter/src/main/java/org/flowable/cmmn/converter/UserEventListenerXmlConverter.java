@@ -25,7 +25,7 @@ public class UserEventListenerXmlConverter extends PlanItemDefinitiomXmlConverte
 
     @Override
     public boolean hasChildElements() {
-        return false;
+        return true;
     }
 
     @Override
