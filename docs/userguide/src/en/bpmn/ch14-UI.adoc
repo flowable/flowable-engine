@@ -611,8 +611,8 @@ For other LDAP servers, like Active Directory, other configuration values are ne
 When LDAP is configured, authentication and group retrieval for a user will be done through the LDAP server. Only privileges will still be retrieved from the Flowable identity tables. So make sure each LDAP user has the correct privileges defined in the IDM application.
 
 If the IDM application is booted with LDAP configuration the bootstrap logic will check if there are already privileges present in the Flowable identity tables.
-If there are no privileges (only when booting the first time), the 4 default privileges will be created and the `flowable.common.app.idm-admin.user` property value (from application.properties or configured in the environment) will be used as the user id to get all 4 privileges.
-So make sure that the `flowable.common.app.idm-admin.user` property value is set to a valid LDAP user, otherwise nobody will be able to login to any of the Flowable UI apps.
+If there are no privileges (only when booting the first time), the 4 default privileges will be created and the `flowable.idm.app.admin.user-id` property value (from application.properties or configured in the environment) will be used as the user id to get all 4 privileges.
+So make sure that the `flowable.idm.app.admin.user-id` property value is set to a valid LDAP user, otherwise nobody will be able to login to any of the Flowable UI apps.
 
 [[flowableModelerApp]]
 
