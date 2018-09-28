@@ -36,12 +36,12 @@ The *DmnRuleService* provides methods for executing a decision. By providing par
 
 The *DmnManagementService* is typically not needed when coding custom application using Flowable DMN. It allows you to retrieve information about the engine version, database tables and table metadata.
 
-For more detailed information on the service operations and the DMN engine API, see link:$$flowable/index.html$$[the javadocs].
+For more detailed information on the service operations and the DMN engine API, see link:$$http://www.flowable.org/docs/javadocs/index.html$$[the javadocs].
 
 
 === Exception strategy
 
-The base exception in Flowable is the +org.flowable.engine.FlowableException+, an unchecked exception. This exception can be thrown at all times by the API, but 'expected' exceptions that happen in specific methods are documented in the link:$$http://www.flowable.org/docs/javadocs/index.html$$[ the javadocs]. For example, an extract from ++DmnRuleService++:
+The base exception in Flowable is the +org.flowable.engine.FlowableException+, an unchecked exception. This exception can be thrown at all times by the API, but 'expected' exceptions that happen in specific methods are documented in link:$$http://www.flowable.org/docs/javadocs/index.html$$[ the javadocs]. For example, an extract from ++DmnRuleService++:
 
 [source,java,linenums]
 ----

@@ -61,12 +61,12 @@ The *ManagementService* is typically not needed when coding custom application u
 
 The *DynamicBpmnService* can be used to change part of the process definition without needing to redeploy it. You can, for example, change the assignee definition for a user task in a process definition, or change the class name of a service task.
 
-For more detailed information on the service operations and the engine API, see link:$$flowable/index.html$$[the javadocs].
+For more detailed information on the service operations and the engine API, see link:$$http://www.flowable.org/docs/javadocs/index.html$$[ the javadocs].
 
 
 === Exception strategy
 
-The base exception in Flowable is the +org.flowable.engine.FlowableException+, an unchecked exception. This exception can be thrown at all times by the API, but 'expected' exceptions that happen in specific methods are documented in the link:$$http://www.flowable.org/docs/javadocs/index.html$$[ the javadocs]. For example, an extract from ++TaskService++:
+The base exception in Flowable is the +org.flowable.engine.FlowableException+, an unchecked exception. This exception can be thrown at all times by the API, but 'expected' exceptions that happen in specific methods are documented in link:$$http://www.flowable.org/docs/javadocs/index.html$$[ the javadocs]. For example, an extract from ++TaskService++:
 
 [source,java,linenums]
 ----
