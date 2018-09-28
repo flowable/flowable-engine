@@ -49,12 +49,12 @@ The *CmmnHistoryService* exposes all historical data gathered by the Flowable CM
 
 The *CmmnManagementService* gives access to low-level information about the database tables, allows to query for the different types of jobs and to execute them.
 
-For more detailed information on the service operations and the engine API, see link:$$flowable/index.html$$[the javadocs].
+For more detailed information on the service operations and the engine API, see link:$$http://www.flowable.org/docs/javadocs/index.html$$[the javadocs].
 
 
 === Exception strategy
 
-The base exception in Flowable is the +org.flowable.engine.common.api.FlowableException+, an unchecked exception. This exception can be thrown at all times by the API, but 'expected' exceptions that happen in specific methods are documented in the link:$$http://www.flowable.org/docs/javadocs/index.html$$[ the javadocs]. For example, an extract from ++CmmnTaskService++:
+The base exception in Flowable is the +org.flowable.engine.common.api.FlowableException+, an unchecked exception. This exception can be thrown at all times by the API, but 'expected' exceptions that happen in specific methods are documented in link:$$http://www.flowable.org/docs/javadocs/index.html$$[ the javadocs]. For example, an extract from ++CmmnTaskService++:
 
 [source,java,linenums]
 ----
