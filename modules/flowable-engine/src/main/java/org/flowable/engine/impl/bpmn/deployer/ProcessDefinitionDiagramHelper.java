@@ -50,7 +50,7 @@ public class ProcessDefinitionDiagramHelper {
                             processEngineConfiguration.getActivityFontName(),
                             processEngineConfiguration.getLabelFontName(),
                             processEngineConfiguration.getAnnotationFontName(),
-                            processEngineConfiguration.getClassLoader()),
+                            processEngineConfiguration.getClassLoader(),processEngineConfiguration.isDrawSequenceFlowNameWithNoLabelDI()),
                     null);
             String diagramResourceName = ResourceNameUtil.getProcessDiagramResourceName(
                     processDefinition.getResourceName(), processDefinition.getKey(), "png");
