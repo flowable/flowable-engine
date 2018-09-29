@@ -24,8 +24,6 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 
-import com.sun.tools.javac.comp.Flow;
-
 /**
  * @author Joram Barrez
  */
