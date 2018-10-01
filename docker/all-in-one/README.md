@@ -2,6 +2,10 @@
 
 This image contains all Flowable UI apps running on Tomcat.
 
+```
+docker run -p 8080:8080 flowable/all-in-one
+```
+
 ### Include Flowable apps
 * Flowable IDM  (http://localhost:8080/flowable-idm)
 * Flowable Modeler  (http://localhost:8080/flowable-modeler)
