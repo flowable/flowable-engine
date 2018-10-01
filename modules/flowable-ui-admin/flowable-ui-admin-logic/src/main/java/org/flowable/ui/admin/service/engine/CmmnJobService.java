@@ -80,7 +80,7 @@ public class CmmnJobService {
     }
 
     public void executeJob(ServerConfig serverConfig, String jobId) {
-        HttpPost post = clientUtil.createPost("management/jobs/" + jobId, serverConfig);
+        HttpPost post = clientUtil.createPost("cmmn-management/jobs/" + jobId, serverConfig);
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         node.put("action", "execute");
         post.setEntity(clientUtil.createStringEntity(node));
