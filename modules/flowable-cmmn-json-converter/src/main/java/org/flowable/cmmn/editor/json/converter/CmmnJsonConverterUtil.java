@@ -154,7 +154,9 @@ public class CmmnJsonConverterUtil implements EditorJsonConstants, CmmnStencilCo
     public static Integer getPropertyValueAsInteger(String name, JsonNode jsonNode) {
         Integer propertyValue = null;
         JsonNode propertyNode = getProperty(name, jsonNode);
-        if (propertyNode != null && !propertyNode.isNull() && !"null".equalsIgnoreCase(propertyNode.asText())) {
+        if (propertyNode != null && !propertyNode.isNull()
+                && !"null".equalsIgnoreCase(propertyNode.asText())
+                && StringUtils.isNotEmpty(propertyNode.asText())) {
             propertyValue = propertyNode.asInt();
         }
         return propertyValue;
