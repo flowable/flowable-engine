@@ -71,7 +71,7 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
         assertEquals(userEventListenerInstance.getElementId(), listenerInstance.getElementId());
         assertEquals(userEventListenerInstance.getName(), listenerInstance.getName());
         assertEquals(userEventListenerInstance.getPlanItemDefinitionId(), listenerInstance.getPlanItemDefinitionId());
-        assertEquals(userEventListenerInstance.getStageIntanceId(), listenerInstance.getStageInstanceId());
+        assertEquals(userEventListenerInstance.getStageInstanceId(), listenerInstance.getStageInstanceId());
         assertEquals(userEventListenerInstance.getState(), listenerInstance.getState());
         
         assertEquals(1, cmmnRuntimeService.createUserEventListenerInstanceQuery().count());
@@ -419,7 +419,7 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
         assertEquals(2, cmmnRuntimeService.createUserEventListenerInstanceQuery().stageInstanceId(stage2Id).count());
 
         //UserEventListenerIntances not in a Stage
-        assertEquals(2, events.stream().filter(e -> e.getStageIntanceId() == null).count());
+        assertEquals(2, events.stream().filter(e -> e.getStageInstanceId() == null).count());
 
         //Test query by elementId
         assertNotNull(cmmnRuntimeService.createUserEventListenerInstanceQuery().elementId("caseUserEventListenerOne").singleResult());
