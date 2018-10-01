@@ -74,14 +74,14 @@ public class BaseCaseInstanceResource {
             query.caseInstanceBusinessKey(queryRequest.getCaseBusinessKey());
         }
         if (queryRequest.getInvolvedUser() != null) {
-            //query.involvedUser(queryRequest.getInvolvedUser());
+            query.involvedUser(queryRequest.getInvolvedUser());
         }
         if (queryRequest.getCaseInstanceParentId() != null) {
             query.caseInstanceParentId(queryRequest.getCaseInstanceParentId());
         }
         if (queryRequest.getIncludeCaseVariables() != null) {
             if (queryRequest.getIncludeCaseVariables()) {
-                //query.includeCaseVariables();
+                query.includeCaseVariables();
             }
         }
         if (queryRequest.getVariables() != null) {
