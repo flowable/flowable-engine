@@ -63,4 +63,4 @@ cd $basePwd
 
 echo "Building Docker image"
 
-docker build -t flowable/all-in-one:latest .
+docker build -t flowable/all-in-one:latest -t flowable/all-in-one:6.4.0 .
