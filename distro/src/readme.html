@@ -39,6 +39,9 @@
     When you reference a variable in an expression like ${customerNumber > 40} and there is no customerNumber variable yet, an exception would be thrown.
     With the variable expression support this can be handled without an exception with ${variables:getOrDefault(customerNumber, 0) > 0}. 
     A similar expression is possible for strings with ${variables:get(customerName) == "test"}. The user guide describes the full set of available variable expressions.</li>
+    <li>A first version with support for MongoDB persistence has been added. The MongoDB module is available from a separate Git repository at <a href="https://github.com/flowable/flowable-mongodb">https://github.com/flowable/flowable-mongodb</a>.
+    The MongoDB module is made available in a separate repository, so that it can be released in a different pace than the full Flowable Engine releases.
+    The support of MongoDB already includes most BPMN constructs, but in the coming releases it will be extended to be on par with the relational database support.</li>
     <li>Upgrade to Spring 5.x for all the integration modules using Spring.</li>
     <li>Added plan item lifecycle listener to the CMMN engine, to allow for listening to plan item instance state changes</li>
     <li>In the Task app support for activating manual plan items and triggering user event listeners has been added</li>

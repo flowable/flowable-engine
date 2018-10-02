@@ -62,7 +62,7 @@ Add the following to your _pom.xml_ file:
   <dependency>
     <groupId>org.flowable</groupId>
     <artifactId>flowable-engine</artifactId>
-    <version>6.4.0-SNAPSHOT</version>
+    <version>6.4.0</version>
   </dependency>
   <dependency>
     <groupId>com.h2database</groupId>
