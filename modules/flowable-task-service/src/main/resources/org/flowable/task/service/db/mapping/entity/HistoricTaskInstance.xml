@@ -799,6 +799,9 @@
       <if test="category != null">
         and RES.CATEGORY_ = #{category}
       </if>
+      <if test="withFormKey">
+        and RES.FORM_KEY_ IS NOT NULL
+      </if>
       <if test="tenantId != null">
         and RES.TENANT_ID_ = #{tenantId}
       </if>
@@ -1161,6 +1164,9 @@
           </if>
           <if test="orQueryObject.category != null">
             or RES.CATEGORY_ = #{orQueryObject.category}
+          </if>
+          <if test="orQueryObject.withFormKey != null">
+            or RES.FORM_KEY_ = #{orQueryObject.withFormKey}
           </if>
           <if test="orQueryObject.tenantId != null">
             or RES.TENANT_ID_ = #{orQueryObject.tenantId}
