@@ -83,7 +83,7 @@ public class UserEventListenerInstanceImpl implements UserEventListenerInstance 
                 ", caseDefinitionId='" + getCaseDefinitionId() + '\'' +
                 ", elementId='" + getElementId() + '\'' +
                 ", planItemDefinitionId='" + getPlanItemDefinitionId() + '\'' +
-                ", stageIntanceId='" + getStageInstanceId() + '\'' +
+                ", stageInstanceId='" + getStageInstanceId() + '\'' +
                 '}';
     }
 }
