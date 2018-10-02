@@ -308,6 +308,16 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>docker-deps</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+            </dependencies>
+        </profile>
         <!-- docker image build and push -->
         <profile>
             <id>docker</id>
