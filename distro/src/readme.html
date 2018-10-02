@@ -32,10 +32,20 @@
 <h4>Highlights</h4>
 
 <ul>
+    <li>A first version of process instance migration has been added to the Flowable BPMN Engine. In the RuntimeService you can now use the createProcessInstanceMigrationBuilder to define and execute the process instance migration.
+    This first version supports migrating process instances with wait states, embedded (event) sub processes and boundary events. 
+    In the next version more support will be added for more complex cases like parallel and inclusive gateways, multi-instance activities and call activities.</li>
+    <li>Expression support have been added for the BPMN and CMMN engines to make it easier to work with variables and in specific variables that may not have been initialized yet.
+    When you reference a variable in an expression like ${customerNumber > 40} and there is no customerNumber variable yet, an exception would be thrown.
+    With the variable expression support this can be handled without an exception with ${variables:getOrDefault(customerNumber, 0) > 0}. 
+    A similar expression is possible for strings with ${variables:get(customerName) == "test"}. The user guide describes the full set of available variable expressions.</li>
     <li>Upgrade to Spring 5.x for all the integration modules using Spring.</li>
-    <li>Upgrade Java Persistence API to 2.1</li>
-    <li>Upgrade JMS API to 2.0.1</li>
-    <li>Support for using java.time.Duration variables and expressions for Timer durations</li>
+    <li>Added plan item lifecycle listener to the CMMN engine, to allow for listening to plan item instance state changes</li>
+    <li>In the Task app support for activating manual plan items and triggering user event listeners has been added</li>
+    <li>Added support for JUnit 5.</li>
+    <li>Support for using java.time.Duration variables and expressions for Timer durations.</li>
+    <li>Chinese translation has been added for the UI apps.</li>
+    <li>Various small bugfixes and improvements all around.</li>
 </ul>
 
 <h4>Upgrade notes</h4>
