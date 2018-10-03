@@ -38,7 +38,6 @@ public class MessageEventDefinitionWithExtensionElementsTest {
         @SuppressWarnings("unchecked")
         Map<String, List<ExtensionElement>> messageExtensionElementMapMock = Mockito.mock(Map.class);
         Collection<List<ExtensionElement>> messageExtensionElementListCollectionMock = Mockito.mock(List.class);
-        Map<String, List<ExtensionElement>> messageDefinitionExtensionElementMapMock = Mockito.mock(Map.class);
         Iterator<List<ExtensionElement>> collectionIteratorMock = Mockito.mock(Iterator.class);
         List<ExtensionElement> messageExtensionElementListMock = Mockito.mock(List.class);
         Iterator<ExtensionElement> extensionElementIteratorMock = Mockito.mock(Iterator.class);

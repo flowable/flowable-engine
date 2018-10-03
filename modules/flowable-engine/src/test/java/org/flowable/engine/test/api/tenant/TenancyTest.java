@@ -382,7 +382,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
     @Test
     public void testChangeDeploymentIdWithClash() {
         String processDefinitionIdWithTenant = deployTestProcessWithTestTenant("tenantA");
-        String processDefinitionIdNoTenant = deployOneTaskTestProcess();
+        deployOneTaskTestProcess();
 
         // Changing the one with tenant now back to one without should clash,
         // cause there already exists one
