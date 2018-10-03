@@ -359,7 +359,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         @Override
         public void notify(DelegateTask delegateTask) {
             Map<String, Object> transientVariables = delegateTask.getTransientVariables();
-            List<String> variableNames = new ArrayList(transientVariables.keySet());
+            List<String> variableNames = new ArrayList<>(transientVariables.keySet());
             Collections.sort(variableNames);
 
             StringBuilder strb = new StringBuilder();

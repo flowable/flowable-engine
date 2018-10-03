@@ -38,7 +38,7 @@ public class ProcessInstanceMigrationDocumentTest extends PluggableFlowableTestC
         String definitionKey = "MyProcessKey";
         int definitionVer = 9;
         String definitionTenantId = "admin";
-        HashMap activityMappings = new HashMap<String, String>() {
+        HashMap<String, String> activityMappings = new HashMap<String, String>() {
 
             {
                 put("originalActivity1", "newActivity1");
@@ -63,7 +63,7 @@ public class ProcessInstanceMigrationDocumentTest extends PluggableFlowableTestC
 
         String definitionId = "someProcessId";
         List<String> instancesIds = Arrays.asList("123", "234", "567");
-        HashMap activityMappings = new HashMap<String, String>() {
+        HashMap<String, String> activityMappings = new HashMap<String, String>() {
 
             {
                 put("originalActivity1", "newActivity1");
@@ -96,7 +96,7 @@ public class ProcessInstanceMigrationDocumentTest extends PluggableFlowableTestC
         String definitionKey = "MyProcessKey";
         int definitionVer = 5;
         String definitionTenantId = "admin";
-        HashMap activityMappings = new HashMap<String, String>() {
+        HashMap<String, String> activityMappings = new HashMap<String, String>() {
 
             {
                 put("originalActivity1", "newActivity1");
