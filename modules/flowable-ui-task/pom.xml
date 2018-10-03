@@ -54,13 +54,6 @@
                 <version>3.1.0</version>
                 <scope>provided</scope>
             </dependency>
-
-            <!-- EMAIL -->
-            <dependency>
-                <groupId>com.sun.mail</groupId>
-                <artifactId>javax.mail</artifactId>
-                <version>1.6.1</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
