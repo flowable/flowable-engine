@@ -342,7 +342,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
             ProcessDefinitionEntityManager processDefinitionEntityManager = CommandContextUtil.getProcessDefinitionEntityManager(commandContext);
             return processDefinitionEntityManager.findById(document.getMigrateToProcessDefinitionId());
         } else {
-            String nullableTenantId = document.getMigrateToProcessDefinitionTenantId();
+            document.getMigrateToProcessDefinitionTenantId();
             return resolveProcessDefinition(document.getMigrateToProcessDefinitionKey(), document.getMigrateToProcessDefinitionVersion(), document.getMigrateToProcessDefinitionTenantId(), commandContext);
         }
     }

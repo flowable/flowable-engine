@@ -16,9 +16,7 @@ package org.flowable.engine.test.api.runtime.migration;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationDocumentImpl;
@@ -62,7 +60,6 @@ public class ProcessInstanceMigrationDocumentTest extends PluggableFlowableTestC
     public void testSerializeDeSerializeProcessInstanceMigrationDocumentForDefinitionId() {
 
         String definitionId = "someProcessId";
-        List<String> instancesIds = Arrays.asList("123", "234", "567");
         HashMap activityMappings = new HashMap<String, String>() {
 
             {
