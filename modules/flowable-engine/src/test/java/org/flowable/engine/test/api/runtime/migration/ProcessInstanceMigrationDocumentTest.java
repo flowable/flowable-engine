@@ -62,7 +62,6 @@ public class ProcessInstanceMigrationDocumentTest extends PluggableFlowableTestC
     public void testSerializeDeSerializeProcessInstanceMigrationDocumentForDefinitionId() {
 
         String definitionId = "someProcessId";
-        List<String> instancesIds = Arrays.asList("123", "234", "567");
         HashMap activityMappings = new HashMap<String, String>() {
 
             {
