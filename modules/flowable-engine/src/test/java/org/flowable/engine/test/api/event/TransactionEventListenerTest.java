@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.api.event;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -101,10 +103,7 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
         TestTransactionEventListener.eventsReceived.clear();
 
         // When process execution rolls back, the events should not be thrown, as they are only thrown on commit.
-        try {
-            runtimeService.startProcessInstanceByKey("testProcessExecutionWithRollback", CollectionUtil.singletonMap("throwException", true));
-            fail();
-        } catch (Exception e) {}
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testProcessExecutionWithRollback", CollectionUtil.singletonMap("throwException", true)));
         assertEquals(0, TestTransactionEventListener.eventsReceived.size());
         assertEquals(1, runtimeService.createProcessInstanceQuery().count());
     }
