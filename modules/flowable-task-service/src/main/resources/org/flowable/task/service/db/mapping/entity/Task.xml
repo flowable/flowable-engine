@@ -1190,7 +1190,7 @@
             <if test="orQueryObject.category != null">
               or RES.CATEGORY_ = #{orQueryObject.category}
             </if>
-            <if test="orQueryObject.withFormKey != null">
+            <if test="orQueryObject.withFormKey">
               or RES.FORM_KEY_ IS NOT NULL
             </if>
             <if test="orQueryObject.excludeSubtasks">
