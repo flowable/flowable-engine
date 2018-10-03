@@ -2,7 +2,8 @@ package org.flowable.cmmn.test.runtime;
 
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -18,7 +19,7 @@ public class CmmnRuntimeServiceImplTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
-    public void crateCaseInstanceWithCallBacks() {
+    public void createCaseInstanceWithCallBacks() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
             caseDefinitionKey("oneTaskCase").
             callbackId("testCallBackId").
@@ -32,7 +33,7 @@ public class CmmnRuntimeServiceImplTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
-    public void crateCaseInstanceWithoutCallBacks() {
+    public void createCaseInstanceWithoutCallBacks() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
             caseDefinitionKey("oneTaskCase").
             start();
@@ -42,4 +43,40 @@ public class CmmnRuntimeServiceImplTest extends FlowableCmmnTestCase {
         assertThat(caseInstance.getCallbackId(), nullValue());
     }
 
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
+    public void updateCaseName() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            start();
+
+        // default name is empty
+        assertThat(caseInstance.getName(), nullValue());
+
+        cmmnRuntimeService.setCaseName(caseInstance.getId(), "My case name");
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertEquals(caseInstance.getName(), "My case name");
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
+    public void updateCaseNameSetEmpty() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            start();
+
+        // default name is empty
+        assertThat(caseInstance.getName(), nullValue());
+
+        cmmnRuntimeService.setCaseName(caseInstance.getId(), "My case name");
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertEquals(caseInstance.getName(), "My case name");
+
+        cmmnRuntimeService.setCaseName(caseInstance.getId(), null);
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(caseInstance.getName(), nullValue());
+    }
 }

@@ -79,6 +79,14 @@ public interface CmmnRuntimeService {
     
     void removeLocalVariables(String caseInstanceId, Collection<String> variableNames);
 
+    /**
+     * Set or change the name of the case instance.
+     *
+     * @param caseInstanceId the id of the case to set the name
+     * @param caseName the name to be set on the case
+     */
+    void setCaseName(String caseInstanceId, String caseName);
+
     CaseInstanceQuery createCaseInstanceQuery();
     
     PlanItemInstanceQuery createPlanItemInstanceQuery();
@@ -153,7 +161,7 @@ public interface CmmnRuntimeService {
      *
      * @param caseDefinitionId
      *            id of case definition for which the start form should be retrieved.
-     * @param casesInstanceId
+     * @param caseInstanceId
      *            id of case instance for which the start form should be retrieved.
      */
     FormInfo getStartFormModel(String caseDefinitionId, String caseInstanceId);
