@@ -109,6 +109,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected Date completedAfterDate;
     protected Date completedBeforeDate;
     protected String category;
+    protected boolean withFormKey;
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
@@ -1220,6 +1221,16 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     }
 
     @Override
+    public HistoricTaskInstanceQuery taskWithFormKey() {
+        if (inOrStatement) {
+            currentOrQueryObject.withFormKey = true;
+        } else {
+            this.withFormKey = true;
+        }
+        return this;
+    }
+
+    @Override
     public HistoricTaskInstanceQuery taskCandidateUser(String candidateUser) {
         if (candidateUser == null) {
             throw new FlowableIllegalArgumentException("Candidate user is null");
@@ -1737,6 +1748,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public String getCategory() {
         return category;
+    }
+
+    public boolean isWithFormKey() {
+        return withFormKey;
     }
 
     public String getTenantId() {

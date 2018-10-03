@@ -795,6 +795,9 @@
       <if test="category != null">
         and RES.CATEGORY_ = #{category}
       </if>
+      <if test="withFormKey">
+        and RES.FORM_KEY_ IS NOT NULL
+      </if>
       <if test="excludeSubtasks">
         and RES.PARENT_TASK_ID_ IS NULL
       </if>
@@ -1186,6 +1189,9 @@
             </if>
             <if test="orQueryObject.category != null">
               or RES.CATEGORY_ = #{orQueryObject.category}
+            </if>
+            <if test="orQueryObject.withFormKey">
+              or RES.FORM_KEY_ IS NOT NULL
             </if>
             <if test="orQueryObject.excludeSubtasks">
               or RES.PARENT_TASK_ID_ IS NULL
