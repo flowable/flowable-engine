@@ -385,7 +385,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().orderByProcessInstanceEndTime().desc().list();
         // only check for existence and assume that the SQL processing has ordered the values correctly
         // see https://github.com/flowable/flowable-engine/issues/8
-        ArrayList processInstance = new ArrayList(2);
+        List<String> processInstance = new ArrayList<>(2);
         processInstance.add(historicProcessInstances.get(0).getId());
         processInstance.add(historicProcessInstances.get(1).getId());
         assertTrue(processInstance.contains(processInstance1.getId()));
@@ -393,7 +393,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
 
         // Verify again, with variables included (bug reported on that)
         historicProcessInstances = historyService.createHistoricProcessInstanceQuery().orderByProcessInstanceEndTime().desc().includeProcessVariables().list();
-        processInstance = new ArrayList(4);
+        processInstance = new ArrayList<>(4);
         processInstance.add(historicProcessInstances.get(0).getId());
         processInstance.add(historicProcessInstances.get(1).getId());
         assertTrue(processInstance.contains(processInstance1.getId()));
