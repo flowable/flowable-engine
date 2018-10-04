@@ -1,7 +1,6 @@
 package org.flowable.rest.conf;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -49,6 +48,10 @@ import com.dj.flowable.CustomEventListener;
 public class FlowableEngineConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowableEngineConfiguration.class);
+    
+    
+    @Value("${url.dj.adapter:http://localhost:8080}")
+    private String defaulDjAdapterUrl;
     
     protected static final String PROP_FS_ROOT = "contentstorage.fs.rootFolder";
     protected static final String PROP_FS_CREATE_ROOT = "contentstorage.fs.createRoot";
@@ -99,8 +102,7 @@ public class FlowableEngineConfiguration {
     }
 
     
-    @Value("${url.dj.adapter:http://localhost:8080}")
-	private String defaulDjAdapterUrl;
+    
 	
     
     @Bean(name = "processEngineConfiguration")
