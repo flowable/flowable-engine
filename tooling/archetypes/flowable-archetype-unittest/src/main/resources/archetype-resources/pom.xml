@@ -10,11 +10,12 @@
 		<dependency>
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-engine</artifactId>
-			<version>6.4.0</version>
+			<version>6.4.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
+			<version>4.12</version>
 		</dependency>
 		<dependency>
 			<groupId>com.h2database</groupId>

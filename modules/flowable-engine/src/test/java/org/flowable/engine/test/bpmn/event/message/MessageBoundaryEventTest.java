@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.bpmn.event.message;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -107,12 +109,8 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         runtimeService.messageEventReceived("messageName_1", execution1.getId());
 
         // this should then throw an exception because execution2 no longer exists
-        try {
-            runtimeService.messageEventReceived("messageName_2", execution2.getId());
-            fail();
-        } catch (Exception e) {
-            // This is good
-        }
+        String execution2Id = execution2.getId();
+        assertThatThrownBy(() -> runtimeService.messageEventReceived("messageName_2", execution2Id));
 
         userTask = taskService.createTaskQuery().singleResult();
         assertNotNull(userTask);
@@ -162,14 +160,9 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         // both subscriptions
         runtimeService.messageEventReceived("messageName_1", execution1.getId());
 
-        // this should then throw an exception because execution2 no longer
-        // exists
-        try {
-            runtimeService.messageEventReceived("messageName_2", execution2.getId());
-            fail();
-        } catch (Exception e) {
-            // This is good
-        }
+        // this should then throw an exception because execution2 no longer exists
+        String execution2Id = execution2.getId();
+        assertThatThrownBy(() -> runtimeService.messageEventReceived("messageName_2", execution2Id));
 
         // only process instance and running execution left
         assertEquals(2, runtimeService.createExecutionQuery().count());

@@ -42,7 +42,7 @@ public class EventBasedGatewayTest extends PluggableFlowableTestCase {
         assertEquals(1, runtimeService.createProcessInstanceQuery().count());
         assertEquals(1, managementService.createTimerJobQuery().count());
 
-        ProcessInstance pi2 = runtimeService.startProcessInstanceByKey("throwSignal");
+        runtimeService.startProcessInstanceByKey("throwSignal");
 
         assertEquals(0, createEventSubscriptionQuery().count());
         assertEquals(1, runtimeService.createProcessInstanceQuery().count());

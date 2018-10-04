@@ -213,7 +213,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
 
         assertEquals(1, tasks.size());
 
-        String executionId = processEngine.getManagementService().executeCommand(new Command<String>() {
+        processEngine.getManagementService().executeCommand(new Command<String>() {
             @Override
             public String execute(CommandContext commandContext) {
                 EventSubscriptionQueryImpl q = new EventSubscriptionQueryImpl(commandContext);
@@ -243,7 +243,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId()).list();
         assertEquals(1, tasks.size());
 
-        executionId = processEngine.getManagementService().executeCommand(new Command<String>() {
+        processEngine.getManagementService().executeCommand(new Command<String>() {
             @Override
             public String execute(CommandContext commandContext) {
                 EventSubscriptionQueryImpl q = new EventSubscriptionQueryImpl(commandContext);
