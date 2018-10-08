@@ -28,19 +28,25 @@ public class DefaultHistoryVariableManager implements InternalHistoryVariableMan
     @Override
     public void recordVariableCreate(VariableInstanceEntity variable) {
         getHistoryManager().recordVariableCreate(variable);
-        getHistoryManager().recordHistoricDetailVariableCreate(variable, null, false);
+        if (variable.getProcessInstanceId() != null || variable.getExecutionId() != null || variable.getTaskId() != null) {
+            getHistoryManager().recordHistoricDetailVariableCreate(variable, null, false);
+        }
     }
 
     @Override
     public void recordVariableUpdate(VariableInstanceEntity variable) {
         getHistoryManager().recordVariableUpdate(variable);
-        getHistoryManager().recordHistoricDetailVariableCreate(variable, null, false);
+        if (variable.getProcessInstanceId() != null || variable.getExecutionId() != null || variable.getTaskId() != null) {
+            getHistoryManager().recordHistoricDetailVariableCreate(variable, null, false);
+        }
     }
 
     @Override
     public void recordVariableRemoved(VariableInstanceEntity variable) {
         getHistoryManager().recordVariableRemoved(variable);
-        getHistoryManager().recordHistoricDetailVariableCreate(variable, null, false);
+        if (variable.getProcessInstanceId() != null || variable.getExecutionId() != null || variable.getTaskId() != null) {
+            getHistoryManager().recordHistoricDetailVariableCreate(variable, null, false);
+        }
     }
     
     protected HistoryManager getHistoryManager() {
