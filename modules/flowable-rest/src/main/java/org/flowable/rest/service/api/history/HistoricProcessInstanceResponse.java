@@ -35,6 +35,8 @@ public class HistoricProcessInstanceResponse {
     protected String businessKey;
     protected String processDefinitionId;
     protected String processDefinitionUrl;
+    protected String processDefinitionName;
+    protected String processDefinitionDescription;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date startTime;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
@@ -102,6 +104,24 @@ public class HistoricProcessInstanceResponse {
 
     public void setProcessDefinitionUrl(String processDefinitionUrl) {
         this.processDefinitionUrl = processDefinitionUrl;
+    }
+    
+    @ApiModelProperty(example = "A process definition name")
+    public String getProcessDefinitionName() {
+        return processDefinitionName;
+    }
+
+    public void setProcessDefinitionName(String processDefinitionName) {
+        this.processDefinitionName = processDefinitionName;
+    }
+
+    @ApiModelProperty(example = "A process definition description")
+    public String getProcessDefinitionDescription() {
+        return processDefinitionDescription;
+    }
+
+    public void setProcessDefinitionDescription(String processDefinitionDescription) {
+        this.processDefinitionDescription = processDefinitionDescription;
     }
 
     @ApiModelProperty(example = "2013-04-17T10:17:43.902+0000")

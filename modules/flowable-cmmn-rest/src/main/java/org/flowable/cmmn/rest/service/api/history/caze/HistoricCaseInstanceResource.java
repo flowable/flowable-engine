@@ -25,6 +25,7 @@ import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.CmmnModel;
@@ -67,7 +68,15 @@ public class HistoricCaseInstanceResource extends HistoricCaseInstanceBaseResour
             @ApiResponse(code = 404, message = "Indicates that the historic process instances could not be found.") })
     @GetMapping(value = "/cmmn-history/historic-case-instances/{caseInstanceId}", produces = "application/json")
     public HistoricCaseInstanceResponse getCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId) {
-        return restResponseFactory.createHistoricCaseInstanceResponse(getHistoricCaseInstanceFromRequest(caseInstanceId));
+        HistoricCaseInstanceResponse caseInstanceResponse = restResponseFactory.createHistoricCaseInstanceResponse(getHistoricCaseInstanceFromRequest(caseInstanceId));
+        
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseInstanceResponse.getCaseDefinitionId()).singleResult();
+        if (caseDefinition != null) {
+            caseInstanceResponse.setCaseDefinitionName(caseDefinition.getName());
+            caseInstanceResponse.setCaseDefinitionDescription(caseDefinition.getDescription());
+        }
+        
+        return caseInstanceResponse;
     }
 
     @ApiOperation(value = " Delete a historic case instance", tags = { "History Case" }, nickname = "deleteHistoricCaseInstance")
@@ -93,6 +102,7 @@ public class HistoricCaseInstanceResource extends HistoricCaseInstanceBaseResour
         }
 
         List<HistoricPlanItemInstance> stagePlanItemInstances = cmmnhistoryService.createHistoricPlanItemInstanceQuery()
+            .planItemInstanceCaseInstanceId(caseInstanceId)
             .planItemInstanceDefinitionType(PlanItemDefinitionType.STAGE)
             .orderByEndedTime().asc()
             .list();

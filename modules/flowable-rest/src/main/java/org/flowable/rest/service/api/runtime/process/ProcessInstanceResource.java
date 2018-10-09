@@ -20,8 +20,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.exception.FlowableConflictException;
 import org.flowable.engine.DynamicBpmnService;
+import org.flowable.engine.RepositoryService;
 import org.flowable.engine.impl.dynamic.DynamicEmbeddedSubProcessBuilder;
 import org.flowable.engine.impl.dynamic.DynamicUserTaskBuilder;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -50,6 +52,9 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
     
     @Autowired
     protected DynamicBpmnService dynamicBpmnService;
+    
+    @Autowired
+    protected RepositoryService repositoryService;
 
     @ApiOperation(value = "Get a process instance", tags = { "Process Instances" }, nickname = "getProcessInstance")
     @ApiResponses(value = {
@@ -58,7 +63,16 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
     })
     @GetMapping(value = "/runtime/process-instances/{processInstanceId}", produces = "application/json")
     public ProcessInstanceResponse getProcessInstance(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
-        return restResponseFactory.createProcessInstanceResponse(getProcessInstanceFromRequest(processInstanceId));
+        ProcessInstanceResponse processInstanceResponse = restResponseFactory.createProcessInstanceResponse(getProcessInstanceFromRequest(processInstanceId));
+        
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processInstanceResponse.getProcessDefinitionId()).singleResult();
+        
+        if (processDefinition != null) {
+            processInstanceResponse.setProcessDefinitionName(processDefinition.getName());
+            processInstanceResponse.setProcessDefinitionDescription(processDefinition.getDescription());
+        }
+        
+        return processInstanceResponse;
     }
 
     @ApiOperation(value = "Delete a process instance", tags = { "Process Instances" }, nickname = "deleteProcessInstance")

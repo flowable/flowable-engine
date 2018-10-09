@@ -108,6 +108,7 @@ public class CmmnParserImpl implements CmmnParser {
             CaseDefinitionEntity caseDefinitionEntity = CommandContextUtil.getCaseDefinitionEntityManager().create();
             caseDefinitionEntity.setKey(caze.getId());
             caseDefinitionEntity.setName(caze.getName());
+            caseDefinitionEntity.setDescription(caze.getDocumentation());
             caseDefinitionEntity.setCategory(cmmnModel.getTargetNamespace());
             caseDefinitionEntity.setDeploymentId(resourceEntity.getDeploymentId());
             caseDefinitionEntities.add(caseDefinitionEntity);
