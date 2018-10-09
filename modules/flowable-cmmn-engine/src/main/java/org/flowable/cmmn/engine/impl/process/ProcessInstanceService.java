@@ -25,6 +25,6 @@ public interface ProcessInstanceService {
 
     void deleteProcessInstance(String processInstanceId);
 
-    Map<String, Object> getVariables(String execId);
+    Map<String, Object> getVariables(String executionId);
 
 }

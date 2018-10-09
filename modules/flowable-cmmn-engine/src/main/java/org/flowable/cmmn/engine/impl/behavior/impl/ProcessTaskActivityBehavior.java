@@ -17,6 +17,7 @@ import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -56,7 +57,8 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
 
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        ProcessInstanceService processInstanceService = CommandContextUtil.getCmmnEngineConfiguration().getProcessInstanceService();
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        ProcessInstanceService processInstanceService = cmmnEngineConfiguration.getProcessInstanceService();
         if (processInstanceService == null) {
             throw new FlowableException("Could not start process instance: no " + ProcessInstanceService.class + " implementation found");
         }
@@ -73,26 +75,34 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
             throw new FlowableException("Could not start process instance: no externalRef defined");
         }
 
-        String processInstanceId = null;
-        boolean blocking = evaluateIsBlocking(planItemInstanceEntity);
         Map<String, Object> inParametersMap = new HashMap<>();
         for (IOParameter ioParameter : inParameters) {
-            if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
-                inParametersMap.put(ioParameter.getTarget(), planItemInstanceEntity.getVariable(ioParameter.getSourceExpression()));
-            } else if (StringUtils.isNotEmpty(ioParameter.getSource())) {
-                inParametersMap.put(ioParameter.getTarget(), planItemInstanceEntity.getVariable(ioParameter.getSource()));
+
+            String variableName = null;
+            if (StringUtils.isNotEmpty(ioParameter.getTargetExpression())) {
+                Expression expression = cmmnEngineConfiguration.getExpressionManager().createExpression(ioParameter.getTargetExpression());
+                variableName = expression.getValue(planItemInstanceEntity).toString();
+
+            } else if (StringUtils.isNotEmpty(ioParameter.getTarget())){
+                variableName = ioParameter.getTarget();
+
             }
+
+            Object variableValue = null;
+            if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
+                Expression expression = cmmnEngineConfiguration.getExpressionManager().createExpression(ioParameter.getSourceExpression());
+                variableValue = expression.getValue(planItemInstanceEntity);
+
+            } else if (StringUtils.isNotEmpty(ioParameter.getSource())) {
+                variableValue = planItemInstanceEntity.getVariable(ioParameter.getSource());
+
+            }
+
+            inParametersMap.put(variableName, variableValue);
         }
 
-        for (IOParameter ioParameter : outParameters) {
-            Object value = null;
-            if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
-                value = planItemInstanceEntity.getVariable(ioParameter.getSourceExpression());
-            } else if (StringUtils.isNotEmpty(ioParameter.getSource())) {
-                value = planItemInstanceEntity.getVariable(ioParameter.getSource());
-            }
-            inParametersMap.put(ioParameter.getTarget(), value);
-        }
+        String processInstanceId = null;
+        boolean blocking = evaluateIsBlocking(planItemInstanceEntity);
         if (blocking) {
             processInstanceId = processInstanceService.startProcessInstanceByKey(externalRef, planItemInstanceEntity.getId(), planItemInstanceEntity.getTenantId(), inParametersMap);
         } else {
@@ -133,19 +143,36 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
             if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
                 deleteProcessInstance(commandContext, planItemInstance);
             } else if (PlanItemTransition.COMPLETE.equals(transition)) {
-                ProcessInstanceService processInstanceService = CommandContextUtil.getCmmnEngineConfiguration().getProcessInstanceService();
 
-                CaseInstanceEntity caseInstance = CommandContextUtil.getCaseInstanceEntityManager(commandContext)
-                    .findById(planItemInstance.getCaseInstanceId());
+                CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+                ProcessInstanceService processInstanceService = cmmnEngineConfiguration.getProcessInstanceService();
+
+                CaseInstanceEntity caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(planItemInstance.getCaseInstanceId());
+
                 for (IOParameter ioParameter : outParameters) {
-                    Object value = null;
-                    if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
-                        value = processInstanceService.getVariables(planItemInstance.getReferenceId()).get(ioParameter.getSourceExpression());
-                    } else if (StringUtils.isNotEmpty(ioParameter.getSource())) {
-                        value = processInstanceService.getVariables(planItemInstance.getReferenceId()).get(ioParameter.getSource());
+
+                    String variableName = null;
+                    if (StringUtils.isNotEmpty(ioParameter.getTarget()))  {
+                        variableName = ioParameter.getTarget();
+
+                    } else if (StringUtils.isNotEmpty(ioParameter.getTargetExpression())) {
+                        Expression expression = cmmnEngineConfiguration.getExpressionManager().createExpression(ioParameter.getTargetExpression());
+                        variableName = expression.getValue(planItemInstance).toString();
+
                     }
-                    caseInstance.setVariable(ioParameter.getTarget(), value);
+
+                    Object variableValue = null;
+                    if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
+                        Expression expression = cmmnEngineConfiguration.getExpressionManager().createExpression(ioParameter.getSourceExpression());
+                        variableValue = processInstanceService.getVariables(planItemInstance.getReferenceId()).get(expression.getValue(planItemInstance).toString());
+
+                    } else if (StringUtils.isNotEmpty(ioParameter.getSource())) {
+                        variableValue = processInstanceService.getVariables(planItemInstance.getReferenceId()).get(ioParameter.getSource());
+
+                    }
+                    caseInstance.setVariable(variableName, variableValue);
                 }
+
             }
         }
     }
