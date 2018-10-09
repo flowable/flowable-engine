@@ -38,4 +38,22 @@ public interface CaseInstance {
      */
     Map<String, Object> getCaseVariables();
 
+    /**
+     * Returns the variable with the requested name, if it exists and if the variables have been requested when fetching this case instance.
+     *
+     * @param variableName the name of the variable to return its value
+     * @return the variable value or {@code null} if it does not exist or if the variables have not been requested when fetching this  case
+     */
+    Object getVariable(String variableName);
+
+    /**
+     *
+     * Returns the variable with the requested name, if it exists and if the variables have been requested when fetching this case instance.
+     *
+     * @param variableName the name of the variable to return its value
+     * @param variableClass the expected class of the variable value for type safe access
+     * @param <T> the type of the variable value
+     * @return the variable value or {@code null} if it does not exist or if the variables have not been requested when fetching this  case
+     */
+    <T> T getVariable(String variableName, Class<T> variableClass);
 }
