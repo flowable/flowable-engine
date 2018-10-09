@@ -53,7 +53,7 @@ public class CmmnRuntimeServiceImplTest extends FlowableCmmnTestCase {
         // default name is empty
         assertThat(caseInstance.getName(), nullValue());
 
-        cmmnRuntimeService.setCaseName(caseInstance.getId(), "My case name");
+        cmmnRuntimeService.setCaseInstanceName(caseInstance.getId(), "My case name");
 
         caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertEquals(caseInstance.getName(), "My case name");
@@ -69,12 +69,12 @@ public class CmmnRuntimeServiceImplTest extends FlowableCmmnTestCase {
         // default name is empty
         assertThat(caseInstance.getName(), nullValue());
 
-        cmmnRuntimeService.setCaseName(caseInstance.getId(), "My case name");
+        cmmnRuntimeService.setCaseInstanceName(caseInstance.getId(), "My case name");
 
         caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertEquals(caseInstance.getName(), "My case name");
 
-        cmmnRuntimeService.setCaseName(caseInstance.getId(), null);
+        cmmnRuntimeService.setCaseInstanceName(caseInstance.getId(), null);
 
         caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(caseInstance.getName(), nullValue());

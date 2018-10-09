@@ -80,6 +80,18 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
         }
     }
     
+    @Override
+    public void recordUpdateCaseInstanceName(CaseInstanceEntity caseInstanceEntity, String name) {
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            Map<String, String> data = new HashMap<>();
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, caseInstanceEntity.getId());
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_NAME, caseInstanceEntity.getName());
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REVISION, caseInstanceEntity.getRevision());
+            
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_UPDATE_CASE_INSTANCE_NAME, data, caseInstanceEntity.getTenantId());
+        }
+    }
+    
     protected void addCommonCaseInstanceFields(CaseInstanceEntity caseInstanceEntity, Map<String, String> data) {
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, caseInstanceEntity.getId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REVISION, caseInstanceEntity.getRevision());

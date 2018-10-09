@@ -25,6 +25,7 @@ public interface CmmnAsyncHistoryConstants {
     
     String TYPE_CASE_INSTANCE_END = "cmmn-case-instance-end";
     String TYPE_CASE_INSTANCE_START = "cmmn-case-instance-start";
+    String TYPE_UPDATE_CASE_INSTANCE_NAME = "cmmn-update-case-instance-name";
     String TYPE_HISTORIC_CASE_INSTANCE_DELETED = "cmmn-historic-case-instance-deleted";
     String TYPE_IDENTITY_LINK_CREATED = "cmmn-identity-link-created";
     String TYPE_IDENTITY_LINK_DELETED = "cmmn-identity-link-deleted";
@@ -48,6 +49,7 @@ public interface CmmnAsyncHistoryConstants {
     
     List<String> ORDERED_TYPES = Arrays.asList(
             TYPE_CASE_INSTANCE_START,
+            TYPE_UPDATE_CASE_INSTANCE_NAME,
             TYPE_IDENTITY_LINK_CREATED,
             TYPE_IDENTITY_LINK_DELETED,
             TYPE_MILESTONE_REACHED,

@@ -27,6 +27,8 @@ public interface CmmnHistoryManager {
     void recordCaseInstanceStart(CaseInstanceEntity caseInstanceEntity);
 
     void recordCaseInstanceEnd(CaseInstanceEntity caseInstanceEntity, String state);
+    
+    void recordUpdateCaseInstanceName(CaseInstanceEntity caseInstanceEntity, String name);
 
     void recordMilestoneReached(MilestoneInstanceEntity milestoneInstanceEntity);
 
