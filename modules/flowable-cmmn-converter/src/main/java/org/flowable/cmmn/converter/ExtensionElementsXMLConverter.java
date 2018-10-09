@@ -219,21 +219,26 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
         String source = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_SOURCE);
         String sourceExpression = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION);
         String target = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TARGET);
-        if ((StringUtils.isNotEmpty(source) || StringUtils.isNotEmpty(sourceExpression)) && StringUtils.isNotEmpty(target)) {
-            IOParameter parameter = new IOParameter();
-            if (StringUtils.isNotEmpty(sourceExpression)) {
-                parameter.setSourceExpression(sourceExpression);
-            } else {
-                parameter.setSource(source);
-            }
+        String targetExpression = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION);
 
+        IOParameter parameter = new IOParameter();
+
+        if (StringUtils.isNotEmpty(sourceExpression)) {
+            parameter.setSourceExpression(sourceExpression);
+        } else {
+            parameter.setSource(source);
+        }
+
+        if (StringUtils.isNotEmpty(targetExpression)) {
+            parameter.setTargetExpression(targetExpression);
+        } else {
             parameter.setTarget(target);
-            
-            if (isInParameter) {
-                processTask.getInParameters().add(parameter);
-            } else {
-                processTask.getOutParameters().add(parameter);
-            }
+        }
+
+        if (isInParameter) {
+            processTask.getInParameters().add(parameter);
+        } else {
+            processTask.getOutParameters().add(parameter);
         }
     }
     

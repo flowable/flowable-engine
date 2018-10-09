@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -197,6 +198,25 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         assertEquals("Task Two", planItemInstances.get(0).getName());
         assertEquals(123, cmmnRuntimeService.getVariable(caseInstance.getId(), "num3"));
         assertEquals(1, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
+
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testProcessIOParameterExpressions() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionId(cmmnRepositoryService.createCaseDefinitionQuery().singleResult().getId())
+            .variable("processDefinitionKey", "oneTask")
+            .start();
+
+        Task task = processEngine.getTaskService().createTaskQuery().singleResult();
+        assertNotNull(task);
+
+        // Completing task will trigger completion of process task plan item
+        assertEquals(2L, ((Number) processEngine.getRuntimeService().getVariable(task.getProcessInstanceId(), "numberVariable")).longValue());
+        processEngine.getTaskService().complete(task.getId(), Collections.singletonMap("processVariable", "Hello World"));
+
+        assertEquals("Hello World", cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVariable"));
 
     }
     

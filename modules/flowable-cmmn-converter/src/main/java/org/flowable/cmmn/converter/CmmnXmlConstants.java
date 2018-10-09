@@ -106,6 +106,7 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_IOPARAMETER_SOURCE = "source";
     String ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION = "sourceExpression";
     String ATTRIBUTE_IOPARAMETER_TARGET = "target";
+    String ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION = "targetExpression";
 
     String ELEMENT_TIMER_EXPRESSION = "timerExpression";
     String ELEMENT_PLAN_ITEM_START_TRIGGER = "planItemStartTrigger";
