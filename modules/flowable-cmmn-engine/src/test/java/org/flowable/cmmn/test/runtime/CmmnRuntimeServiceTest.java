@@ -15,7 +15,7 @@ import org.junit.Test;
 /**
  * This class tests {@link CmmnRuntimeServiceImpl} implementation
  */
-public class CmmnRuntimeServiceImplTest extends FlowableCmmnTestCase {
+public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")

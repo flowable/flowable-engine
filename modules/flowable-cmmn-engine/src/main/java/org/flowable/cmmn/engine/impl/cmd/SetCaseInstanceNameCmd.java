@@ -46,7 +46,6 @@ public class SetCaseInstanceNameCmd implements Command<Void> {
         }
         caseInstanceEntity.setName(caseName);
 
-        CommandContextUtil.getCaseInstanceEntityManager(commandContext).update(caseInstanceEntity);
         CommandContextUtil.getCmmnHistoryManager().recordUpdateCaseInstanceName(caseInstanceEntity, caseName);
 
         return null;
