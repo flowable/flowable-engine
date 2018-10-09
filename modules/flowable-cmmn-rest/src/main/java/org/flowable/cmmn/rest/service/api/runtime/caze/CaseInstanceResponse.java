@@ -34,6 +34,8 @@ public class CaseInstanceResponse {
     protected boolean ended;
     protected String caseDefinitionId;
     protected String caseDefinitionUrl;
+    protected String caseDefinitionName;
+    protected String caseDefinitionDescription;
     protected List<RestVariable> variables = new ArrayList<>();
     protected String tenantId;
     protected boolean completed;
@@ -98,6 +100,24 @@ public class CaseInstanceResponse {
 
     public void setCaseDefinitionUrl(String caseDefinitionUrl) {
         this.caseDefinitionUrl = caseDefinitionUrl;
+    }
+    
+    @ApiModelProperty(example = "aCaseDefinitionName")
+    public String getCaseDefinitionName() {
+        return caseDefinitionName;
+    }
+
+    public void setCaseDefinitionName(String caseDefinitionName) {
+        this.caseDefinitionName = caseDefinitionName;
+    }
+
+    @ApiModelProperty(example = "A case definition description")
+    public String getCaseDefinitionDescription() {
+        return caseDefinitionDescription;
+    }
+
+    public void setCaseDefinitionDescription(String caseDefinitionDescription) {
+        this.caseDefinitionDescription = caseDefinitionDescription;
     }
 
     public List<RestVariable> getVariables() {

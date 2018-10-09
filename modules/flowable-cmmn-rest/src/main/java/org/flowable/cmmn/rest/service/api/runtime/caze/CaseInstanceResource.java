@@ -13,14 +13,12 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.caze;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.rest.service.api.RestActionRequest;
-import org.flowable.cmmn.rest.service.api.history.caze.StageResponse;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -53,7 +51,15 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
     })
     @GetMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}", produces = "application/json")
     public CaseInstanceResponse getCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request) {
-        return restResponseFactory.createCaseInstanceResponse(getCaseInstanceFromRequest(caseInstanceId));
+        CaseInstanceResponse caseInstanceResponse = restResponseFactory.createCaseInstanceResponse(getCaseInstanceFromRequest(caseInstanceId));
+        
+        CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().caseDefinitionId(caseInstanceResponse.getCaseDefinitionId()).singleResult();
+        if (caseDefinition != null) {
+            caseInstanceResponse.setCaseDefinitionName(caseDefinition.getName());
+            caseInstanceResponse.setCaseDefinitionDescription(caseDefinition.getDescription());
+        }
+        
+        return caseInstanceResponse;
     }
     
     @ApiOperation(value = "Execute an action on a case instance", tags = { "Plan Item Instances" }, notes = "")

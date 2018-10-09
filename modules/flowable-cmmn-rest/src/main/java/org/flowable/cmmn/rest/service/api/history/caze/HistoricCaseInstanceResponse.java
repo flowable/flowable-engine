@@ -13,15 +13,16 @@
 
 package org.flowable.cmmn.rest.service.api.history.caze;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.common.rest.util.DateToStringSerializer;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * @author Tijs Rademakers
@@ -30,9 +31,12 @@ public class HistoricCaseInstanceResponse {
 
     protected String id;
     protected String url;
+    protected String name;
     protected String businessKey;
     protected String caseDefinitionId;
     protected String caseDefinitionUrl;
+    protected String caseDefinitionName;
+    protected String caseDefinitionDescription;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date startTime;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
@@ -58,6 +62,15 @@ public class HistoricCaseInstanceResponse {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+    
+    @ApiModelProperty(example = "myName")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @ApiModelProperty(example = "myKey")
@@ -85,6 +98,24 @@ public class HistoricCaseInstanceResponse {
 
     public void setCaseDefinitionUrl(String caseDefinitionUrl) {
         this.caseDefinitionUrl = caseDefinitionUrl;
+    }
+
+    @ApiModelProperty(example = "aCaseDefinitionName")
+    public String getCaseDefinitionName() {
+        return caseDefinitionName;
+    }
+
+    public void setCaseDefinitionName(String caseDefinitionName) {
+        this.caseDefinitionName = caseDefinitionName;
+    }
+
+    @ApiModelProperty(example = "A case definition description")
+    public String getCaseDefinitionDescription() {
+        return caseDefinitionDescription;
+    }
+
+    public void setCaseDefinitionDescription(String caseDefinitionDescription) {
+        this.caseDefinitionDescription = caseDefinitionDescription;
     }
 
     @ApiModelProperty(example = "2013-04-17T10:17:43.902+0000")

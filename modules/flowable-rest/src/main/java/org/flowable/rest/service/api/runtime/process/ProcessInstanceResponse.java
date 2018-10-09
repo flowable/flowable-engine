@@ -40,6 +40,8 @@ public class ProcessInstanceResponse {
     protected boolean ended;
     protected String processDefinitionId;
     protected String processDefinitionUrl;
+    protected String processDefinitionName;
+    protected String processDefinitionDescription;
     protected String activityId;
     protected String startedBy;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
@@ -120,6 +122,24 @@ public class ProcessInstanceResponse {
 
     public void setProcessDefinitionUrl(String processDefinitionUrl) {
         this.processDefinitionUrl = processDefinitionUrl;
+    }
+    
+    @ApiModelProperty(example = "A process definition name")
+    public String getProcessDefinitionName() {
+        return processDefinitionName;
+    }
+
+    public void setProcessDefinitionName(String processDefinitionName) {
+        this.processDefinitionName = processDefinitionName;
+    }
+
+    @ApiModelProperty(example = "A process definition description")
+    public String getProcessDefinitionDescription() {
+        return processDefinitionDescription;
+    }
+
+    public void setProcessDefinitionDescription(String processDefinitionDescription) {
+        this.processDefinitionDescription = processDefinitionDescription;
     }
 
     @ApiModelProperty(example = "processTask")

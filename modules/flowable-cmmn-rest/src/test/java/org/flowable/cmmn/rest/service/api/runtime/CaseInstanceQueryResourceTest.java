@@ -29,9 +29,9 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * Test for all REST-operations related to the process instance query resource.
+ * Test for all REST-operations related to the case instance query resource.
  * 
- * @author Frederik Heremans
+ * @author Yvo Swillens
  */
 public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
 
@@ -176,7 +176,10 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
         dataNode = rootNode.get("data");
         assertEquals(1, dataNode.size());
-        assertEquals(caseInstance1.getId(), dataNode.get(0).get("id").asText());
+        JsonNode valueNode = dataNode.get(0);
+        assertEquals(caseInstance1.getId(), valueNode.get("id").asText());
+        assertEquals("One Human Task Case", valueNode.get("caseDefinitionName").asText());
+        assertEquals("A human task case", valueNode.get("caseDefinitionDescription").asText());
     }
 
 }

@@ -8,6 +8,7 @@
     targetNamespace="http://flowable.org/cmmn">
     
     <case id="myCase" name="Case 1">
+        <documentation>This is a sample description</documentation>
         <casePlanModel id="myPlanModel" name="My CasePlanModel">
         
             <planItem id="planItemTaskA" definitionRef="taskA" />

@@ -59,4 +59,10 @@ public class CaseDefinitionCategoryTest extends FlowableCmmnTestCase {
         caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId1).caseDefinitionCategory("testCategory").singleResult();
         assertNotNull(caseDefinition);
     }
+    
+    @Test
+    public void testDescriptionPersistency() {
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId1).singleResult();
+        assertEquals("This is a sample description", caseDefinition.getDescription());
+    }
 }
