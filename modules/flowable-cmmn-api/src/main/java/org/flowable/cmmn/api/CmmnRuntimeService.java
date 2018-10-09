@@ -85,7 +85,7 @@ public interface CmmnRuntimeService {
      * @param caseInstanceId the id of the case to set the name
      * @param caseName the name to be set on the case
      */
-    void setCaseName(String caseInstanceId, String caseName);
+    void setCaseInstanceName(String caseInstanceId, String caseName);
 
     CaseInstanceQuery createCaseInstanceQuery();
     

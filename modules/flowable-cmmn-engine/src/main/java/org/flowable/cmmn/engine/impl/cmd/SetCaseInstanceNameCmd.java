@@ -12,12 +12,12 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  *
  * @author Micha Kiener
  */
-public class SetCaseNameCmd implements Command<Void> {
+public class SetCaseInstanceNameCmd implements Command<Void> {
 
     protected String caseInstanceId;
     protected String caseName;
 
-    public SetCaseNameCmd(String caseInstanceId, String caseName) {
+    public SetCaseInstanceNameCmd(String caseInstanceId, String caseName) {
         this.caseInstanceId = caseInstanceId;
         this.caseName = caseName;
     }
@@ -28,13 +28,14 @@ public class SetCaseNameCmd implements Command<Void> {
             throw new FlowableIllegalArgumentException("You need to provide the case instance id in order to set its name");
         }
 
-        CaseInstanceEntity caseEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceId);
-        if (caseEntity == null) {
+        CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceId);
+        if (caseInstanceEntity == null) {
             throw new FlowableObjectNotFoundException("No case instance found for id " + caseInstanceId, CaseInstanceEntity.class);
         }
-        caseEntity.setName(caseName);
+        caseInstanceEntity.setName(caseName);
 
-        CommandContextUtil.getCaseInstanceEntityManager(commandContext).update(caseEntity);
+        CommandContextUtil.getCaseInstanceEntityManager(commandContext).update(caseInstanceEntity);
+        CommandContextUtil.getCmmnHistoryManager().recordUpdateCaseInstanceName(caseInstanceEntity, caseName);
 
         return null;
     }
