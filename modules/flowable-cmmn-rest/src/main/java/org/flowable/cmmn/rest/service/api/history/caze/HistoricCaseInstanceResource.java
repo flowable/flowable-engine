@@ -23,14 +23,18 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -61,6 +65,9 @@ public class HistoricCaseInstanceResource extends HistoricCaseInstanceBaseResour
 
     @Autowired
     protected CmmnHistoryService cmmnhistoryService;
+    
+    @Autowired
+    protected CmmnRuntimeService cmmnRuntimeService;
 
     @ApiOperation(value = "Get a historic case instance", tags = { "History Case" }, nickname = "getHistoricCaseInstance")
     @ApiResponses(value = {
@@ -96,34 +103,67 @@ public class HistoricCaseInstanceResource extends HistoricCaseInstanceBaseResour
 
     @GetMapping(value = "/cmmn-history/historic-case-instances/{caseInstanceId}/stage-overview", produces = "application/json")
     public List<StageResponse> getStageOverview(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId) {
-        HistoricCaseInstance historicCaseInstance = getHistoricCaseInstanceFromRequest(caseInstanceId);
-        if (restApiInterceptor != null) {
+        String caseDefinitionId = null;
+        HistoricCaseInstance historicCaseInstance = historyService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
+        if (historicCaseInstance != null && restApiInterceptor != null) {
             restApiInterceptor.accessStageOverview(historicCaseInstance);
         }
+        
+        List<PlanItemInstanceInfo> stageInfoList = new ArrayList<>();
+        if (historicCaseInstance == null) {
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
+            
+            if (caseInstance == null) {
+                throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.", HistoricCaseInstance.class);
+            }
+            
+            if (restApiInterceptor != null) {
+                restApiInterceptor.accessStageOverview(caseInstance);
+            }
+            
+            List<PlanItemInstance> stagePlanItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstanceId)
+                .planItemDefinitionType(PlanItemDefinitionType.STAGE)
+                .orderByStartTime().asc()
+                .list();
+            
+            for (PlanItemInstance planItemInstance : stagePlanItemInstances) {
+                stageInfoList.add(new PlanItemInstanceInfo(planItemInstance));
+            }
+            
+            caseDefinitionId = caseInstance.getCaseDefinitionId();
+            
+        } else {
+            List<HistoricPlanItemInstance> stagePlanItemInstances = cmmnhistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceCaseInstanceId(caseInstanceId)
+                .planItemInstanceDefinitionType(PlanItemDefinitionType.STAGE)
+                .orderByEndedTime().asc()
+                .list();
+            
+            for (HistoricPlanItemInstance historicPlanItemInstance : stagePlanItemInstances) {
+                stageInfoList.add(new PlanItemInstanceInfo(historicPlanItemInstance));
+            }
+            
+            caseDefinitionId = historicCaseInstance.getCaseDefinitionId();
+        }
 
-        List<HistoricPlanItemInstance> stagePlanItemInstances = cmmnhistoryService.createHistoricPlanItemInstanceQuery()
-            .planItemInstanceCaseInstanceId(caseInstanceId)
-            .planItemInstanceDefinitionType(PlanItemDefinitionType.STAGE)
-            .orderByEndedTime().asc()
-            .list();
-
-        CmmnModel cmmnModel = cmmnRepositoryService.getCmmnModel(historicCaseInstance.getCaseDefinitionId());
+        CmmnModel cmmnModel = cmmnRepositoryService.getCmmnModel(caseDefinitionId);
         List<Stage> stages = cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionsOfType(Stage.class, true);
 
         // If one stage has a display order, they are ordered by that.
         // Otherwise, the order as it comes back from the query is used.
         stages.sort(Comparator.comparing(Stage::getDisplayOrder, Comparator.nullsFirst(Comparator.naturalOrder()))
-            .thenComparing(stage -> getHistoricPlanItemInstanceEndTime(stagePlanItemInstances, stage), Comparator.nullsLast(Comparator.naturalOrder()))
+            .thenComparing(stage -> getPlanItemInstanceEndTime(stageInfoList, stage), Comparator.nullsLast(Comparator.naturalOrder()))
         );
         List<StageResponse> stageResponses = new ArrayList<>(stages.size());
         for (Stage stage : stages) {
             StageResponse stageResponse = new StageResponse(stage.getId(), stage.getName());
-            Optional<HistoricPlanItemInstance> historicPlanItemInstance = getHistoricPlanItemInstance(stagePlanItemInstances, stage);
+            Optional<PlanItemInstanceInfo> planItemInstance = getPlanItemInstance(stageInfoList, stage);
 
             // If not ended or current, it's implicitly a future one
-            if (historicPlanItemInstance.isPresent()) {
-                stageResponse.setEnded(historicPlanItemInstance.get().getEndedTime() != null);
-                stageResponse.setCurrent(PlanItemInstanceState.ACTIVE.equals(historicPlanItemInstance.get().getState()));
+            if (planItemInstance.isPresent()) {
+                stageResponse.setEnded(planItemInstance.get().getEndedTime() != null);
+                stageResponse.setCurrent(PlanItemInstanceState.ACTIVE.equals(planItemInstance.get().getState()));
             }
 
             stageResponses.add(stageResponse);
@@ -132,16 +172,56 @@ public class HistoricCaseInstanceResource extends HistoricCaseInstanceBaseResour
         return stageResponses;
     }
 
-    protected Date getHistoricPlanItemInstanceEndTime(List<HistoricPlanItemInstance> stagePlanItemInstances, Stage stage) {
-        return getHistoricPlanItemInstance(stagePlanItemInstances, stage)
-            .map(HistoricPlanItemInstance::getEndedTime)
+    protected Date getPlanItemInstanceEndTime(List<PlanItemInstanceInfo> stagePlanItemInstances, Stage stage) {
+        return getPlanItemInstance(stagePlanItemInstances, stage)
+            .map(PlanItemInstanceInfo::getEndedTime)
             .orElse(null);
     }
 
-    private Optional<HistoricPlanItemInstance> getHistoricPlanItemInstance(List<HistoricPlanItemInstance> stagePlanItemInstances, Stage stage) {
+    protected Optional<PlanItemInstanceInfo> getPlanItemInstance(List<PlanItemInstanceInfo> stagePlanItemInstances, Stage stage) {
         return stagePlanItemInstances.stream()
             .filter(s -> s.getPlanItemDefinitionId().equals(stage.getId()))
             .findFirst();
     }
 
+    protected class PlanItemInstanceInfo {
+        
+        protected PlanItemInstance planItemInstance;
+        protected HistoricPlanItemInstance historicPlanItemInstance;
+        protected boolean historic;
+        
+        public PlanItemInstanceInfo(PlanItemInstance planItemInstance) {
+            this.planItemInstance = planItemInstance;
+            historic = false;
+        }
+        
+        public PlanItemInstanceInfo(HistoricPlanItemInstance historicPlanItemInstance) {
+            this.historicPlanItemInstance = historicPlanItemInstance;
+            historic = true;
+        }
+        
+        public String getPlanItemDefinitionId() {
+            if (historic) {
+                return historicPlanItemInstance.getPlanItemDefinitionId();
+            } else {
+                return planItemInstance.getPlanItemDefinitionId();
+            }
+        }
+        
+        public String getState() {
+            if (historic) {
+                return historicPlanItemInstance.getState();
+            } else {
+                return planItemInstance.getState();
+            }
+        }
+        
+        public Date getEndedTime() {
+            if (historic) {
+                return historicPlanItemInstance.getEndedTime();
+            } else {
+                return null;
+            }
+        }
+    }
 }

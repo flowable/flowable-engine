@@ -219,6 +219,7 @@ public class CmmnRestResponseFactory {
         response.setName(caseDefinition.getName());
         response.setDescription(caseDefinition.getDescription());
         response.setGraphicalNotationDefined(caseDefinition.hasGraphicalNotation());
+        response.setStartFormDefined(caseDefinition.hasStartFormKey());
         response.setTenantId(caseDefinition.getTenantId());
 
         // Links to other resources
@@ -436,9 +437,15 @@ public class CmmnRestResponseFactory {
         result.setBusinessKey(caseInstance.getBusinessKey());
         result.setId(caseInstance.getId());
         result.setName(caseInstance.getName());
+        result.setStartTime(caseInstance.getStartTime());
+        result.setStartUserId(caseInstance.getStartUserId());
+        result.setState(caseInstance.getState());
         result.setCaseDefinitionId(caseInstance.getCaseDefinitionId());
         result.setCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId()));
         result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId()));
+        result.setParentId(caseInstance.getParentId());
+        result.setCallbackId(caseInstance.getCallbackId());
+        result.setCallbackType(caseInstance.getCallbackType());
         result.setTenantId(caseInstance.getTenantId());
 
         return result;
@@ -450,9 +457,16 @@ public class CmmnRestResponseFactory {
         CaseInstanceResponse result = new CaseInstanceResponse();
         result.setBusinessKey(caseInstance.getBusinessKey());
         result.setId(caseInstance.getId());
+        result.setName(caseInstance.getName());
+        result.setStartTime(caseInstance.getStartTime());
+        result.setStartUserId(caseInstance.getStartUserId());
+        result.setState(caseInstance.getState());
         result.setCaseDefinitionId(caseInstance.getCaseDefinitionId());
         result.setCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId()));
         result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId()));
+        result.setParentId(caseInstance.getParentId());
+        result.setCallbackId(caseInstance.getCallbackId());
+        result.setCallbackType(caseInstance.getCallbackType());
         result.setTenantId(caseInstance.getTenantId());
         result.setCompleted(false);
 
