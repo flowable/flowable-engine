@@ -84,4 +84,14 @@
 
     </changeSet>
 
+    <changeSet id="3" author="flowable">
+
+        <createIndex tableName="ACT_APP_APPDEF" indexName="ACT_IDX_APP_DEF_UNIQ" unique="true">
+            <column name="KEY_" />
+            <column name="VERSION_" />
+            <column name="TENANT_ID_" />
+        </createIndex>
+
+    </changeSet>
+
 </databaseChangeLog>

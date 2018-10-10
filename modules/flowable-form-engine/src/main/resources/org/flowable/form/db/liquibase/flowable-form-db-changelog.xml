@@ -112,4 +112,14 @@
 
     </changeSet>
 
+    <changeSet id="5" author="flowable">
+
+        <createIndex tableName="ACT_FO_FORM_DEFINITION" indexName="ACT_IDX_FORM_DEF_UNIQ" unique="true">
+            <column name="KEY_" />
+            <column name="VERSION_" />
+            <column name="TENANT_ID_" />
+        </createIndex>
+
+    </changeSet>
+
 </databaseChangeLog>

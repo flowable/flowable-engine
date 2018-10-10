@@ -408,5 +408,15 @@
         <modifyDataType tableName="ACT_CMMN_HI_PLAN_ITEM_INST" columnName="LAST_UPDATED_TIME_" newDataType="datetime(3)" />
 
     </changeSet>
+    
+    <changeSet id="6" author="flowable">
+        
+        <createIndex tableName="ACT_CMMN_CASEDEF" indexName="ACT_IDX_CASE_DEF_UNIQ" unique="true">
+            <column name="KEY_" />
+            <column name="VERSION_" />
+            <column name="TENANT_ID_" />
+        </createIndex>
+        
+    </changeSet>
 
 </databaseChangeLog>
