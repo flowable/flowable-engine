@@ -18,14 +18,20 @@ import java.io.IOException;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.api.DmnRepositoryService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 /**
- * Default implementation of {@link AutoDeploymentStrategy} that groups all {@link Resource}s into a single deployment. This implementation is equivalent to the previously used implementation.
+ * Default implementation of {@link AutoDeploymentStrategy} that groups all {@link Resource}s into a single deployment.
+ * This implementation is equivalent to the previously used implementation.
  * 
  * @author Tiese Barrell
+ * @author Joram Barrez
  */
 public class DefaultAutoDeploymentStrategy extends AbstractAutoDeploymentStrategy {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultAutoDeploymentStrategy.class);
 
     /**
      * The deployment mode this strategy handles.
@@ -40,21 +46,22 @@ public class DefaultAutoDeploymentStrategy extends AbstractAutoDeploymentStrateg
     @Override
     public void deployResources(final String deploymentNameHint, final Resource[] resources, final DmnRepositoryService repositoryService) {
 
-        // Create a single deployment for all resources using the name hint as the literal name
-        final DmnDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentNameHint);
+        try {
+            // Create a single deployment for all resources using the name hint as the literal name
+            final DmnDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentNameHint);
 
-        for (final Resource resource : resources) {
-            final String resourceName = determineResourceName(resource);
-
-            try {
-                deploymentBuilder.addInputStream(resourceName, resource.getInputStream());
-
-            } catch (IOException e) {
-                throw new FlowableException("couldn't auto deploy resource '" + resource + "': " + e.getMessage(), e);
+            for (final Resource resource : resources) {
+                deploymentBuilder.addInputStream(determineResourceName(resource), resource.getInputStream());
             }
-        }
 
-        deploymentBuilder.deploy();
+            deploymentBuilder.deploy();
+
+        } catch (Exception e) {
+            // Any exception should not stop the bootup of the engine
+            LOGGER.warn("Exception while autodeploying DMN definitions. "
+                + "This exception can be ignored if the root cause indicates a unique constraint violation, "
+                + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", e);
+        }
 
     }
 
