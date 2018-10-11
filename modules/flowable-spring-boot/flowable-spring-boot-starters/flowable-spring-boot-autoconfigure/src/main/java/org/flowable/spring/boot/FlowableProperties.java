@@ -43,6 +43,12 @@ public class FlowableProperties {
     private boolean asyncHistoryExecutorActivate = true;
     
     private boolean restApiEnabled;
+    
+    private String activityFontName = "Arial";
+    
+    private String labelFontName = "Arial";
+    
+    private String annotationFontName = "Arial";
 
     /**
      * The name of the auto deployment.
@@ -260,4 +266,29 @@ public class FlowableProperties {
     public void setCustomMybatisXMLMappers(List<String> customMybatisXMLMappers) {
         this.customMybatisXMLMappers = customMybatisXMLMappers;
     }
+
+	public String getActivityFontName() {
+		return activityFontName;
+	}
+
+	public void setActivityFontName(String activityFontName) {
+		this.activityFontName = activityFontName;
+	}
+
+	public String getLabelFontName() {
+		return labelFontName;
+	}
+
+	public void setLabelFontName(String labelFontName) {
+		this.labelFontName = labelFontName;
+	}
+
+	public String getAnnotationFontName() {
+		return annotationFontName;
+	}
+
+	public void setAnnotationFontName(String annotationFontName) {
+		this.annotationFontName = annotationFontName;
+	}
+    
 }
