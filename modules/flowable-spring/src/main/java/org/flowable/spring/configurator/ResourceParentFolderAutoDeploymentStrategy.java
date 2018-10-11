@@ -24,15 +24,20 @@ import java.util.zip.ZipInputStream;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.DeploymentBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 /**
- * Implementation of {@link AutoDeploymentStrategy} that performs a separate deployment for each set of {@link Resource}s that share the same parent folder. The namehint is used to prefix the names of
- * deployments. If the parent folder for a {@link Resource} cannot be determined, the resource's name is used.
+ * Implementation of {@link AutoDeploymentStrategy} that performs a separate deployment for each set of {@link Resource}s that share the same parent folder.
+ * The namehint is used to prefix the names of deployments. If the parent folder for a {@link Resource} cannot be determined, the resource's name is used.
  * 
  * @author Tiese Barrell
+ * @author Joram Barrez
  */
 public class ResourceParentFolderAutoDeploymentStrategy extends AbstractAutoDeploymentStrategy {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResourceParentFolderAutoDeploymentStrategy.class);
 
     /**
      * The deployment mode this strategy handles.
@@ -49,31 +54,33 @@ public class ResourceParentFolderAutoDeploymentStrategy extends AbstractAutoDepl
     @Override
     public void deployResources(final String deploymentNameHint, final Resource[] resources, final RepositoryService repositoryService) {
 
-        // Create a deployment for each distinct parent folder using the name
-        // hint
-        // as a prefix
+        // Create a deployment for each distinct parent folder using the namehint as a prefix
         final Map<String, Set<Resource>> resourcesMap = createMap(resources);
-
         for (final Entry<String, Set<Resource>> group : resourcesMap.entrySet()) {
 
-            final String deploymentName = determineDeploymentName(deploymentNameHint, group.getKey());
+            try {
+                final String deploymentName = determineDeploymentName(deploymentNameHint, group.getKey());
+                final DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentName);
 
-            final DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentName);
+                for (final Resource resource : group.getValue()) {
+                    final String resourceName = determineResourceName(resource);
 
-            for (final Resource resource : group.getValue()) {
-                final String resourceName = determineResourceName(resource);
-
-                try {
                     if (resourceName.endsWith(".bar") || resourceName.endsWith(".zip") || resourceName.endsWith(".jar")) {
                         deploymentBuilder.addZipInputStream(new ZipInputStream(resource.getInputStream()));
                     } else {
                         deploymentBuilder.addInputStream(resourceName, resource.getInputStream());
                     }
-                } catch (IOException e) {
-                    throw new FlowableException("couldn't auto deploy resource '" + resource + "': " + e.getMessage(), e);
+
                 }
+
+                deploymentBuilder.deploy();
+
+            } catch (Exception e) {
+                // Any exception should not stop the bootup of the engine
+                LOGGER.warn("Exception while autodeploying process definitions. "
+                    + "This exception can be ignored if the root cause indicates a unique constraint violation, "
+                    + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", e);
             }
-            deploymentBuilder.deploy();
         }
 
     }
