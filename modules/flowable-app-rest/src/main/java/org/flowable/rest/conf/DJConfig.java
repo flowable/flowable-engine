@@ -2,6 +2,7 @@ package org.flowable.rest.conf;
 
 import javax.annotation.PostConstruct;
 
+import com.dj.flowable.CustomEventListener;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.variable.service.impl.types.SerializableType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +30,8 @@ public class DJConfig {
 		//Add listener into eventDispatcher 
 		
 		//TODO: Comment for problems with IntelliJ
-//		springProcessEngineConfiguration.getEventDispatcher()
-//			.addEventListener(new CustomEventListener(defaulDjAdapterUrl));
+		springProcessEngineConfiguration.getEventDispatcher()
+			.addEventListener(new CustomEventListener(defaulDjAdapterUrl));
 		
 		//Add json DDBB serializator
 		springProcessEngineConfiguration.getVariableTypes().addType(new JsonVariableType(true), 

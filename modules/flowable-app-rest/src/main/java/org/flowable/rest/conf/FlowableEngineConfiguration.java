@@ -114,13 +114,13 @@ public class FlowableEngineConfiguration {
         processEngineConfiguration.setAsyncExecutorActivate(Boolean.valueOf(environment.getProperty("engine.process.asyncexecutor.activate", "true")));
         processEngineConfiguration.setHistory(environment.getProperty("engine.process.history.level", "full"));
         
-        //Added here for Intellij Problems
-        List<FlowableEventListener> listeners = processEngineConfiguration.getEventListeners();
-        if(listeners == null) {
-        	listeners = new ArrayList<>();
-        }
-        listeners.add(new CustomEventListener(defaulDjAdapterUrl));
-        processEngineConfiguration.setEventListeners(listeners);
+//        //Added here for Intellij Problems
+//        List<FlowableEventListener> listeners = processEngineConfiguration.getEventListeners();
+//        if(listeners == null) {
+//        	listeners = new ArrayList<>();
+//        }
+//        listeners.add(new CustomEventListener(defaulDjAdapterUrl));
+//        processEngineConfiguration.setEventListeners(listeners);
         
         
         String emailHost = environment.getProperty("email.host");
