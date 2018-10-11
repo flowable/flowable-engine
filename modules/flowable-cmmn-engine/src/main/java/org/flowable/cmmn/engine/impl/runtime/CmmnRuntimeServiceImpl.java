@@ -42,6 +42,7 @@ import org.flowable.cmmn.engine.impl.cmd.RemoveLocalVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.RemoveLocalVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.RemoveVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.RemoveVariablesCmd;
+import org.flowable.cmmn.engine.impl.cmd.SetCaseInstanceNameCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetLocalVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetLocalVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetVariableCmd;
@@ -189,6 +190,11 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     @Override
     public void removeLocalVariables(String planItemInstanceId, Collection<String> variableNames) {
         commandExecutor.execute(new RemoveLocalVariablesCmd(planItemInstanceId, variableNames));
+    }
+
+    @Override
+    public void setCaseInstanceName(String caseInstanceId, String caseName) {
+        commandExecutor.execute(new SetCaseInstanceNameCmd(caseInstanceId, caseName));
     }
 
     @Override

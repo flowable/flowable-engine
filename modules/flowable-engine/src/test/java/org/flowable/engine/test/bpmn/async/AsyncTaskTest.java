@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.bpmn.async;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.Date;
 import java.util.List;
 
@@ -115,12 +117,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         assertEquals(1, managementService.createJobQuery().count());
         Job job = managementService.createJobQuery().singleResult();
 
-        try {
-            managementService.executeJob(job.getId());
-            fail();
-        } catch (Exception e) {
-            // exception expected
-        }
+        assertThatThrownBy(() -> managementService.executeJob(job.getId()));
 
         // the service failed: the execution is still sitting in the service task:
         Execution execution = null;

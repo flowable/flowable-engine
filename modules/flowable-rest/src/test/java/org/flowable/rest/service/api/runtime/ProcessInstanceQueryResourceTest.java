@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.runtime;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.HashMap;
 
 import org.apache.http.HttpStatus;
@@ -28,8 +30,6 @@ import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to the process instance query resource.
@@ -183,7 +183,10 @@ public class ProcessInstanceQueryResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
         dataNode = rootNode.get("data");
         assertEquals(1, dataNode.size());
-        assertEquals(processInstance2.getId(), dataNode.get(0).get("id").asText());
+        JsonNode valueNode = dataNode.get(0);
+        assertEquals(processInstance2.getId(), valueNode.get("id").asText());
+        assertEquals("The One Task Process", valueNode.get("processDefinitionName").asText());
+        assertEquals("One task process description", valueNode.get("processDefinitionDescription").asText());
     }
 
 }

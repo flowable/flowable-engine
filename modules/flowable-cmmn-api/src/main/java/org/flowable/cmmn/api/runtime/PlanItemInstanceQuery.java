@@ -13,7 +13,9 @@
 package org.flowable.cmmn.api.runtime;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.flowable.common.engine.api.query.Query;
 
@@ -49,6 +51,7 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
     
     PlanItemInstanceQuery planItemDefinitionId(String planItemDefinitionId);
     PlanItemInstanceQuery planItemDefinitionType(String planItemDefinitionType);
+    PlanItemInstanceQuery planItemDefinitionTypes(List<String> planItemDefinitionType);
     
     /**
      * Only select plan item instances which have a local variable with the given value. The type of variable is determined based on the value. 

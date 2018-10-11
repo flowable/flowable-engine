@@ -25,7 +25,7 @@ public final class SchemaOperationsIdmEngineBuild implements Command<Void> {
 
     @Override
     public Void execute(CommandContext commandContext) {
-        IdmDbSchemaManager idmDbSchemaManager = (IdmDbSchemaManager) CommandContextUtil.getIdmEngineConfiguration(commandContext).getDbSchemaManager();
+        IdmDbSchemaManager idmDbSchemaManager = (IdmDbSchemaManager) CommandContextUtil.getIdmEngineConfiguration(commandContext).getSchemaManager();
         idmDbSchemaManager.performSchemaOperationsIdmEngineBuild();
         return null;
     }

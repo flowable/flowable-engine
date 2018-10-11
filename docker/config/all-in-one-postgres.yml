@@ -1,0 +1,25 @@
+version: '3.6'
+services:
+    flowable-all-in-one-app:
+        image: flowable/all-in-one
+        depends_on:
+            - flowable-db
+        environment:
+            - SERVER_PORT=9977
+            - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://flowable-db:5432/flowable
+            - SPRING_DATASOURCE_USERNAME=flowable
+            - SPRING_DATASOURCE_PASSWORD=flowable
+        ports:
+            - 8080:8080
+        entrypoint: ["/wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "/opt/tomcat/bin/catalina.sh", "run"]
+    flowable-db:
+        image: postgres:9.6-alpine
+        container_name: flowable-postgres
+        environment:
+            - POSTGRES_PASSWORD=flowable
+            - POSTGRES_USER=flowable
+            - POSTGRES_DB=flowable
+        ports:
+            - 5433:5432
+        command: postgres

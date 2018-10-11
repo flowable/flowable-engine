@@ -16,6 +16,7 @@ package org.flowable.cmmn.rest.service.api.runtime.caze;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.rest.service.api.RestActionRequest;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -37,6 +38,7 @@ import io.swagger.annotations.Authorization;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 @RestController
 @Api(tags = { "Case Instances" }, description = "Manage Case Instances", authorizations = { @Authorization(value = "basicAuth") })
@@ -49,7 +51,15 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
     })
     @GetMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}", produces = "application/json")
     public CaseInstanceResponse getCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request) {
-        return restResponseFactory.createCaseInstanceResponse(getCaseInstanceFromRequest(caseInstanceId));
+        CaseInstanceResponse caseInstanceResponse = restResponseFactory.createCaseInstanceResponse(getCaseInstanceFromRequest(caseInstanceId));
+        
+        CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().caseDefinitionId(caseInstanceResponse.getCaseDefinitionId()).singleResult();
+        if (caseDefinition != null) {
+            caseInstanceResponse.setCaseDefinitionName(caseDefinition.getName());
+            caseInstanceResponse.setCaseDefinitionDescription(caseDefinition.getDescription());
+        }
+        
+        return caseInstanceResponse;
     }
     
     @ApiOperation(value = "Execute an action on a case instance", tags = { "Plan Item Instances" }, notes = "")
@@ -103,4 +113,5 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
         runtimeService.terminateCaseInstance(caseInstance.getId());
         response.setStatus(HttpStatus.NO_CONTENT.value());
     }
+
 }

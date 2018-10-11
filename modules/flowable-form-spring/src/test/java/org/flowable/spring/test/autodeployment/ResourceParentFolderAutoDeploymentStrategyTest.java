@@ -189,17 +189,4 @@ public class ResourceParentFolderAutoDeploymentStrategyTest extends AbstractAuto
         verify(deploymentBuilderMock, times(1)).deploy();
     }
 
-    @Test
-    public void testDeployResourcesIOExceptionYieldsFlowableException() throws Exception {
-        IOException ioException = new IOException("Test");
-        when(resourceMock3.getInputStream()).thenThrow(ioException);
-
-        final Resource[] resources = new Resource[] { resourceMock3 };
-        assertThatThrownBy(() ->
-            classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock))
-            .isInstanceOf(FlowableException.class)
-            .hasMessage("couldn't auto deploy resource 'resourceMock3': Test")
-            .hasCause(ioException);
-    }
-
 }

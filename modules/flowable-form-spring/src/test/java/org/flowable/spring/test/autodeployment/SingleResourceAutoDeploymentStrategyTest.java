@@ -86,17 +86,4 @@ public class SingleResourceAutoDeploymentStrategyTest extends AbstractAutoDeploy
         verify(deploymentBuilderMock, never()).deploy();
     }
 
-    @Test
-    public void testDeployResourcesIOExceptionYieldsFlowableException() throws Exception {
-        IOException ioException = new IOException("IO message");
-        when(resourceMock3.getInputStream()).thenThrow(ioException);
-
-        final Resource[] resources = new Resource[] { resourceMock3 };
-        assertThatThrownBy(() ->
-            classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock))
-            .isInstanceOf(FlowableException.class)
-            .hasMessage("couldn't auto deploy resource 'resourceMock3': IO message")
-            .hasCause(ioException);
-    }
-
 }

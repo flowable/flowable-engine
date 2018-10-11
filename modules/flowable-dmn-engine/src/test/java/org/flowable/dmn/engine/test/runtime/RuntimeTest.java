@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.engine.test.AbstractFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
@@ -29,6 +31,8 @@ import org.junit.Test;
  * @author Yvo Swillens
  */
 public class RuntimeTest extends AbstractFlowableDmnTest {
+
+    public ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/multiple_conclusions.dmn")
@@ -339,5 +343,23 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
         Assert.assertEquals(true, result.getRuleExecutions().get(1).getConditionResults().get(0).getResult());
         Assert.assertEquals(true, result.getRuleExecutions().get(2).getConditionResults().get(0).getResult());
         Assert.assertEquals(true, result.getRuleExecutions().get(3).getConditionResults().get(0).getResult());
+    }
+
+
+    @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/json.dmn")
+    public void testJsonNumbers1() {
+        Map<String, Object> processVariablesInput = new HashMap<>();
+        ObjectNode inputNode = objectMapper.createObjectNode();
+        inputNode.put("value", 5L);
+
+        processVariablesInput.put("inputVariable1", inputNode);
+
+        Map<String, Object> result = ruleService.createExecuteDecisionBuilder()
+                .decisionKey("decision")
+                .variables(processVariablesInput)
+                .executeWithSingleResult();
+
+        Assert.assertEquals("result2", result.get("outputVariable1"));
     }
 }

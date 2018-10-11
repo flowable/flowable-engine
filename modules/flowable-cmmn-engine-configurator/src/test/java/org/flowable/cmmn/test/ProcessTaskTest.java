@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -198,6 +200,25 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         assertEquals(1, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
 
     }
+
+    @Test
+    @CmmnDeployment
+    public void testProcessIOParameterExpressions() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionId(cmmnRepositoryService.createCaseDefinitionQuery().singleResult().getId())
+            .variable("processDefinitionKey", "oneTask")
+            .start();
+
+        Task task = processEngine.getTaskService().createTaskQuery().singleResult();
+        assertNotNull(task);
+
+        // Completing task will trigger completion of process task plan item
+        assertEquals(2L, ((Number) processEngine.getRuntimeService().getVariable(task.getProcessInstanceId(), "numberVariable")).longValue());
+        processEngine.getTaskService().complete(task.getId(), Collections.singletonMap("processVariable", "Hello World"));
+
+        assertEquals("Hello World", cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVariable"));
+
+    }
     
     protected CaseInstance startCaseInstanceWithOneTaskProcess() {
         return startCaseInstanceWithOneTaskProcess(null);
@@ -353,6 +374,24 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         assertEquals(0, processEngine.getTaskService().createTaskQuery().count());
         assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+        "org/flowable/cmmn/test/ProcesTaskTest.testParentStageTerminatedBeforeProcessStarted.cmmn",
+        "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml"
+    })
+    public void testParentStageTerminatedBeforeProcessStarted() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testProcessTask").start();
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertEquals("A", task.getName());
+
+        UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertEquals("Complete stage", userEventListenerInstance.getName());
+        cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId());
+
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
     }
     
 }

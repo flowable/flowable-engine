@@ -856,10 +856,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // agenda factory
     protected FlowableEngineAgendaFactory agendaFactory;
 
-    protected SchemaManager identityLinkDbSchemaManager;
-    protected SchemaManager variableDbSchemaManager;
-    protected SchemaManager taskDbSchemaManager;
-    protected SchemaManager jobDbSchemaManager;
+    protected SchemaManager identityLinkSchemaManager;
+    protected SchemaManager variableSchemaManager;
+    protected SchemaManager taskSchemaManager;
+    protected SchemaManager jobSchemaManager;
 
     // Backwards compatibility //////////////////////////////////////////////////////////////
 
@@ -1045,44 +1045,44 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initSchemaManager() {
         super.initSchemaManager();
         
-        initProcessDbSchemaManager();
-        initIdentityLinkDbSchemaManager();
-        initVariableDbSchemaManager();
-        initTaskDbSchemaManager();
-        initJobDbSchemaManager();
+        initProcessSchemaManager();
+        initIdentityLinkSchemaManager();
+        initVariableSchemaManager();
+        initTaskSchemaManager();
+        initJobSchemaManager();
     }
     
     public void initNonRelationalDataSource() {
         // for subclassing
     }
 
-    protected void initProcessDbSchemaManager() {
+    protected void initProcessSchemaManager() {
         if (this.schemaManager == null) {
             this.schemaManager = new ProcessDbSchemaManager();
         }
     }
 
-    protected void initVariableDbSchemaManager() {
-        if (this.variableDbSchemaManager == null) {
-            this.variableDbSchemaManager = new VariableDbSchemaManager();
+    protected void initVariableSchemaManager() {
+        if (this.variableSchemaManager == null) {
+            this.variableSchemaManager = new VariableDbSchemaManager();
         }
     }
 
-    protected void initTaskDbSchemaManager() {
-        if (this.taskDbSchemaManager == null) {
-            this.taskDbSchemaManager = new TaskDbSchemaManager();
+    protected void initTaskSchemaManager() {
+        if (this.taskSchemaManager == null) {
+            this.taskSchemaManager = new TaskDbSchemaManager();
         }
     }
 
-    protected void initIdentityLinkDbSchemaManager() {
-        if (this.identityLinkDbSchemaManager == null) {
-            this.identityLinkDbSchemaManager = new IdentityLinkDbSchemaManager();
+    protected void initIdentityLinkSchemaManager() {
+        if (this.identityLinkSchemaManager == null) {
+            this.identityLinkSchemaManager = new IdentityLinkDbSchemaManager();
         }
     }
 
-    protected void initJobDbSchemaManager() {
-        if (this.jobDbSchemaManager == null) {
-            this.jobDbSchemaManager = new JobDbSchemaManager();
+    protected void initJobSchemaManager() {
+        if (this.jobSchemaManager == null) {
+            this.jobSchemaManager = new JobDbSchemaManager();
         }
     }
     
@@ -3941,39 +3941,39 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public SchemaManager getVariableDbSchemaManager() {
-        return variableDbSchemaManager;
+    public SchemaManager getVariableSchemaManager() {
+        return variableSchemaManager;
     }
 
-    public ProcessEngineConfigurationImpl setVariableDbSchemaManager(SchemaManager variableDbSchemaManager) {
-        this.variableDbSchemaManager = variableDbSchemaManager;
+    public ProcessEngineConfigurationImpl setVariableSchemaManager(SchemaManager variableSchemaManager) {
+        this.variableSchemaManager = variableSchemaManager;
         return this;
     }
 
-    public SchemaManager getTaskDbSchemaManager() {
-        return taskDbSchemaManager;
+    public SchemaManager getTaskSchemaManager() {
+        return taskSchemaManager;
     }
 
-    public ProcessEngineConfigurationImpl setTaskDbSchemaManager(SchemaManager taskDbSchemaManager) {
-        this.taskDbSchemaManager = taskDbSchemaManager;
+    public ProcessEngineConfigurationImpl setTaskSchemaManager(SchemaManager taskSchemaManager) {
+        this.taskSchemaManager = taskSchemaManager;
         return this;
     }
 
-    public SchemaManager getIdentityLinkDbSchemaManager() {
-        return identityLinkDbSchemaManager;
+    public SchemaManager getIdentityLinkSchemaManager() {
+        return identityLinkSchemaManager;
     }
 
-    public ProcessEngineConfigurationImpl setIdentityLinkDbSchemaManager(SchemaManager identityLinkDbSchemaManager) {
-        this.identityLinkDbSchemaManager = identityLinkDbSchemaManager;
+    public ProcessEngineConfigurationImpl setIdentityLinkSchemaManager(SchemaManager identityLinkSchemaManager) {
+        this.identityLinkSchemaManager = identityLinkSchemaManager;
         return this;
     }
 
-    public SchemaManager getJobDbSchemaManager() {
-        return jobDbSchemaManager;
+    public SchemaManager getJobSchemaManager() {
+        return jobSchemaManager;
     }
 
-    public ProcessEngineConfigurationImpl setJobDbSchemaManager(SchemaManager jobDbSchemaManager) {
-        this.jobDbSchemaManager = jobDbSchemaManager;
+    public ProcessEngineConfigurationImpl setJobSchemaManager(SchemaManager jobSchemaManager) {
+        this.jobSchemaManager = jobSchemaManager;
         return this;
     }
     

@@ -50,7 +50,7 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
 
     @Override
     protected List<EngineDeployer> getCustomDeployers() {
-        return Collections.<EngineDeployer>singletonList(new CmmnDeployer());
+        return Collections.singletonList(new CmmnDeployer());
     }
 
     @Override
@@ -87,7 +87,7 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
             
         }
 
-        cmmnEngineConfiguration.setExecuteServiceDbSchemaManagers(false);
+        cmmnEngineConfiguration.setExecuteServiceSchemaManagers(false);
 
         initCmmnEngine();
 

@@ -68,8 +68,8 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
     }
 
     @Override
-    public Map<String, Object> getVariables(String execId){
-       return processEngineRuntimeService.getVariables(execId);
+    public Map<String, Object> getVariables(String executionId){
+       return processEngineRuntimeService.getVariables(executionId);
     }
 
 }

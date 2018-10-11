@@ -153,7 +153,7 @@ public class AdhocSubProcessTest extends PluggableFlowableTestCase {
             assertEquals(3, historicTasks.size());
             // only check for existence and assume that the SQL processing has ordered the values correctly
             // see https://github.com/flowable/flowable-engine/issues/8
-            ArrayList tasks = new ArrayList(3);
+            List<String> tasks = new ArrayList<>(3);
             tasks.add(historicTasks.get(0).getTaskDefinitionKey());
             tasks.add(historicTasks.get(1).getTaskDefinitionKey());
             tasks.add(historicTasks.get(2).getTaskDefinitionKey());

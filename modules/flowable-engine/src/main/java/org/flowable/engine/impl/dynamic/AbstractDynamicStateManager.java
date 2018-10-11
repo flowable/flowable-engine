@@ -854,7 +854,6 @@ public abstract class AbstractDynamicStateManager {
     protected ExecutionEntity migrateExecutionEntity(ExecutionEntity parentExecutionEntity, ExecutionEntity childExecution, FlowElement newFlowElement, CommandContext commandContext) {
 
         TaskService taskService = CommandContextUtil.getTaskService(commandContext);
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
 
         childExecution.setParent(parentExecutionEntity);
         // manage the bidirectional parent-child relation

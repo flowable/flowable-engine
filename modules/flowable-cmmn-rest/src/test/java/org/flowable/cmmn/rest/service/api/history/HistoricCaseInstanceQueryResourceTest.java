@@ -176,7 +176,11 @@ public class HistoricCaseInstanceQueryResourceTest extends BaseSpringRestTestCas
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
         assertEquals(2, dataNode.size());
-        assertEquals(caseInstance.getId(), dataNode.get(0).get("id").asText());
+        JsonNode valueNode = dataNode.get(0);
+        assertEquals(caseInstance.getId(), valueNode.get("id").asText());
         assertEquals(caseInstance2.getId(), dataNode.get(1).get("id").asText());
+        
+        assertEquals("One Human Task Case", valueNode.get("caseDefinitionName").asText());
+        assertEquals("A human task case", valueNode.get("caseDefinitionDescription").asText());
     }
 }

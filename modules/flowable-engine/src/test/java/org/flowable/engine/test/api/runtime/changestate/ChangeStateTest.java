@@ -224,7 +224,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         Execution execution = runtimeService.createExecutionQuery().parentId(task.getExecutionId()).singleResult();
-        Job job = managementService.createTimerJobQuery().executionId(execution.getId()).singleResult();
+        managementService.createTimerJobQuery().executionId(execution.getId()).singleResult();
 
         assertNotNull(timerJob);
 
@@ -2875,7 +2875,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         Map<String, List<Task>> classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
         assertEquals(1, classifiedTasks.get("beforeCatchEvent").size());
-        List<Execution> messageCatchEvents = runtimeService.createExecutionQuery().messageEventSubscriptionName("intermediateCatchEvent").list();
         List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         Map<String, List<EventSubscription>> classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
         assertTrue(classifiedEventSubscriptions.isEmpty());

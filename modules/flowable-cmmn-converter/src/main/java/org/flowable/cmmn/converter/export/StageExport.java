@@ -60,6 +60,9 @@ public class StageExport extends AbstractPlanItemDefinitionExport<Stage> {
         if (StringUtils.isNotEmpty(stage.getAutoCompleteCondition())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_AUTO_COMPLETE_CONDITION, stage.getAutoCompleteCondition());
         }
+        if (stage.getDisplayOrder() != null) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_DISPLAY_ORDER, String.valueOf(stage.getDisplayOrder()));
+        }
     }
 
     @Override

@@ -161,9 +161,9 @@ public abstract class InternalFlowableFormExtension implements AfterEachCallback
 
                     @Override
                     public Object execute(CommandContext commandContext) {
-                        SchemaManager dbSchemaManager = CommandContextUtil.getFormEngineConfiguration(commandContext).getDbSchemaManager();
-                        dbSchemaManager.schemaDrop();
-                        dbSchemaManager.schemaCreate();
+                        SchemaManager schemaManager = CommandContextUtil.getFormEngineConfiguration(commandContext).getSchemaManager();
+                        schemaManager.schemaDrop();
+                        schemaManager.schemaCreate();
                         return null;
                     }
                 });

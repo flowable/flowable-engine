@@ -369,7 +369,7 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
             List<org.flowable.task.api.Task> list = taskService.createTaskQuery().processDefinitionNameLike("%\\%%").orderByTaskCreateTime().asc().list();
             // only check for existence and assume that the SQL processing has ordered the values correctly
             // see https://github.com/flowable/flowable-engine/issues/8
-            ArrayList tasks = new ArrayList(2);
+            List<String> tasks = new ArrayList<>(2);
             tasks.add(list.get(0).getId());
             tasks.add(list.get(1).getId());
             assertTrue(tasks.contains(task1.getId()));
@@ -380,7 +380,7 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
             assertEquals(2, list.size());
             // only check for existence and assume that the SQL processing has ordered the values correctly
             // see https://github.com/flowable/flowable-engine/issues/8
-            tasks = new ArrayList(2);
+            tasks = new ArrayList<>(2);
             tasks.add(list.get(0).getId());
             tasks.add(list.get(1).getId());
             assertTrue(tasks.contains(task1.getId()));

@@ -19,15 +19,18 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.engine.HistoryService;
+import org.flowable.engine.RepositoryService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.HistoricProcessInstanceQueryProperty;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
@@ -56,6 +59,9 @@ public class HistoricProcessInstanceBaseResource {
 
     @Autowired
     protected HistoryService historyService;
+    
+    @Autowired
+    protected RepositoryService repositoryService;
     
     @Autowired(required=false)
     protected BpmnRestApiInterceptor restApiInterceptor;
@@ -171,8 +177,34 @@ public class HistoricProcessInstanceBaseResource {
             restApiInterceptor.accessHistoryProcessInfoWithQuery(query);
         }
 
-        return paginateList(allRequestParams, queryRequest, query, "processInstanceId", allowedSortProperties,
-            restResponseFactory::createHistoricProcessInstanceResponseList);
+        DataResponse<HistoricProcessInstanceResponse> responseList = paginateList(allRequestParams, queryRequest, query, "processInstanceId", allowedSortProperties,
+                restResponseFactory::createHistoricProcessInstanceResponseList);
+        
+        Set<String> processDefinitionIds = new HashSet<String>();
+        List<HistoricProcessInstanceResponse> processInstanceList = responseList.getData();
+        for (HistoricProcessInstanceResponse processInstanceResponse : processInstanceList) {
+            if (!processDefinitionIds.contains(processInstanceResponse.getProcessDefinitionId())) {
+                processDefinitionIds.add(processInstanceResponse.getProcessDefinitionId());
+            }
+        }
+        
+        if (processDefinitionIds.size() > 0) {
+            List<ProcessDefinition> processDefinitionList = repositoryService.createProcessDefinitionQuery().processDefinitionIds(processDefinitionIds).list();
+            Map<String, ProcessDefinition> processDefinitionMap = new HashMap<String, ProcessDefinition>();
+            for (ProcessDefinition processDefinition : processDefinitionList) {
+                processDefinitionMap.put(processDefinition.getId(), processDefinition);
+            }
+            
+            for (HistoricProcessInstanceResponse processInstanceResponse : processInstanceList) {
+                if (processDefinitionMap.containsKey(processInstanceResponse.getProcessDefinitionId())) {
+                    ProcessDefinition processDefinition = processDefinitionMap.get(processInstanceResponse.getProcessDefinitionId());
+                    processInstanceResponse.setProcessDefinitionName(processDefinition.getName());
+                    processInstanceResponse.setProcessDefinitionDescription(processDefinition.getDescription());
+                }
+            }
+        }
+        
+        return responseList;
     }
     
     protected HistoricProcessInstance getHistoricProcessInstanceFromRequest(String processInstanceId) {

@@ -263,6 +263,11 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * Only select tasks with the given category.
      */
     T taskCategory(String category);
+    
+    /**
+     * Only select tasks with form key.
+     */
+    T taskWithFormKey();
 
     /**
      * Only select tasks with the given taskDefinitionKey. The task definition key is the id of the userTask: &lt;userTask id="xxx" .../&gt;

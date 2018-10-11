@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.bpmn.gateway;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -189,11 +191,7 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
 
                 "    <userTask id='theTask1' name='Input is one' /> " + "    <userTask id='theTask2' name='Default input' /> " + "  </process>" + "</definitions>";
 
-        try {
-            repositoryService.createDeployment().addString("myprocess.bpmn20.xml", defaultFlowWithCondition).deploy();
-            fail();
-        } catch (Exception e) {
-        }
+        assertThatThrownBy(() -> repositoryService.createDeployment().addString("myprocess.bpmn20.xml", defaultFlowWithCondition).deploy());
 
         String noOutgoingFlow = "<?xml version='1.0' encoding='UTF-8'?>"
                 + "<definitions id='definitions' xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:activiti='http://activiti.org/bpmn' targetNamespace='Examples'>"

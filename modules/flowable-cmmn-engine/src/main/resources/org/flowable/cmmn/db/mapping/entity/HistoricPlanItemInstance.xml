@@ -290,6 +290,9 @@
             <if test="planItemDefinitionType != null">
                 and RES.ITEM_DEFINITION_TYPE_ = #{planItemDefinitionType}
             </if>
+            <if test="planItemDefinitionTypes != null">
+                and RES.ITEM_DEFINITION_TYPE_ in <foreach item="type" index="index" collection="planItemDefinitionTypes" open="(" separator="," close=")">#{type}</foreach>
+            </if>
             <if test="createdBefore != null">
                 and RES.CREATED_TIME_ &lt;= #{createdBefore}
             </if>
@@ -372,7 +375,7 @@
                 and RES.TENANT_ID_ like #{tenantIdLike}
             </if>
             <if test="withoutTenantId">
-                and RES.TENANT_ID_ is null or RES.TENANT_ID_ = ''
+                and (RES.TENANT_ID_ is null or RES.TENANT_ID_ = '')
             </if>
 
         </where>

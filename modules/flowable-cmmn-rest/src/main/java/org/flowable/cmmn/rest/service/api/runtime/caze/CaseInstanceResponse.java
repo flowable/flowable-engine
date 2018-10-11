@@ -14,6 +14,7 @@
 package org.flowable.cmmn.rest.service.api.runtime.caze;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
@@ -31,9 +32,17 @@ public class CaseInstanceResponse {
     protected String name;
     protected String url;
     protected String businessKey;
+    protected Date startTime;
+    protected String startUserId;
+    protected String state;
     protected boolean ended;
     protected String caseDefinitionId;
     protected String caseDefinitionUrl;
+    protected String caseDefinitionName;
+    protected String caseDefinitionDescription;
+    protected String parentId;
+    protected String callbackId;
+    protected String callbackType;
     protected List<RestVariable> variables = new ArrayList<>();
     protected String tenantId;
     protected boolean completed;
@@ -73,6 +82,33 @@ public class CaseInstanceResponse {
     public void setBusinessKey(String businessKey) {
         this.businessKey = businessKey;
     }
+    
+    @ApiModelProperty(example = "2019-04-17T10:17:43.902+0000")
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    @ApiModelProperty(example = "aUserId")
+    public String getStartUserId() {
+        return startUserId;
+    }
+
+    public void setStartUserId(String startUserId) {
+        this.startUserId = startUserId;
+    }
+    
+    @ApiModelProperty(example = "active")
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
 
     public boolean isEnded() {
         return ended;
@@ -98,6 +134,51 @@ public class CaseInstanceResponse {
 
     public void setCaseDefinitionUrl(String caseDefinitionUrl) {
         this.caseDefinitionUrl = caseDefinitionUrl;
+    }
+    
+    @ApiModelProperty(example = "aCaseDefinitionName")
+    public String getCaseDefinitionName() {
+        return caseDefinitionName;
+    }
+
+    public void setCaseDefinitionName(String caseDefinitionName) {
+        this.caseDefinitionName = caseDefinitionName;
+    }
+
+    @ApiModelProperty(example = "A case definition description")
+    public String getCaseDefinitionDescription() {
+        return caseDefinitionDescription;
+    }
+
+    public void setCaseDefinitionDescription(String caseDefinitionDescription) {
+        this.caseDefinitionDescription = caseDefinitionDescription;
+    }
+    
+    @ApiModelProperty(example = "123")
+    public String getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
+
+    @ApiModelProperty(example = "123")
+    public String getCallbackId() {
+        return callbackId;
+    }
+
+    public void setCallbackId(String callbackId) {
+        this.callbackId = callbackId;
+    }
+
+    @ApiModelProperty(example = "cmmn-1.1-to-cmmn-1.1-child-case")
+    public String getCallbackType() {
+        return callbackType;
+    }
+
+    public void setCallbackType(String callbackType) {
+        this.callbackType = callbackType;
     }
 
     public List<RestVariable> getVariables() {

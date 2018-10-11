@@ -333,7 +333,9 @@
             "NO-AVAILABLE-USER-EVENT-LISTENERS":"No User Event Listeners available",
             "NO-COMPLETED-USER-EVENT-LISTENERS":"No User Event Listeners completed",
             "USER-EVENT-LISTENER-NO-NAME": "Nameless User Event Listener",
-            "USER-EVENT-LISTENER-COMPLETED": "Completed"
+            "USER-EVENT-LISTENER-COMPLETED": "Completed",
+            "ENABLED-PLAN-ITEM_INSTANCE-NO-NAME": "No name",
+            "START-PLAN-ITEM-INSTANCE": "Start"
         },
         "ACTION" : {
             "CREATE": "+ Start a case",
@@ -363,7 +365,8 @@
             "REACHED-MILESTONES": "Reached milestones",
             "AVAILABLE-USER-EVENT-LISTENERS": "Available User Event Listeners",
             "COMPLETED-USER-EVENT-LISTENERS": "Completed User Event Listeners",
-            "CONTENT" : "Content"
+            "CONTENT" : "Content",
+            "ENABLED-PLAN-ITEM-INSTANCES": "Enabled plan item instances"
         },
         "POPUP": {
             "CANCEL-TITLE": "Cancel the case?",

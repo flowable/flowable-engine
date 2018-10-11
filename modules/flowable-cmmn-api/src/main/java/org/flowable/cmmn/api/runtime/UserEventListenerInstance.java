@@ -29,7 +29,7 @@ public interface UserEventListenerInstance {
 
     String getPlanItemDefinitionId();
 
-    String getStageIntanceId();
+    String getStageInstanceId();
 
     String getState();
 }

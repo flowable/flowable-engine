@@ -59,11 +59,11 @@ public class MoveActivityIdContainer {
     }
 
     public List<String> getActivityIds() {
-        return Optional.ofNullable(activityIds).orElse(Collections.EMPTY_LIST);
+        return Optional.ofNullable(activityIds).orElse(Collections.emptyList());
     }
 
     public List<String> getMoveToActivityIds() {
-        return Optional.ofNullable(moveToActivityIds).orElse(Collections.EMPTY_LIST);
+        return Optional.ofNullable(moveToActivityIds).orElse(Collections.emptyList());
     }
 
     public boolean isMoveToParentProcess() {

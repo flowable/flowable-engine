@@ -127,7 +127,12 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected ProcessDiagramGenerator processDiagramGenerator;
 
     protected boolean isCreateDiagramOnDeploy = true;
-
+    
+    /**
+     *  include the sequence flow name in case there's no Label DI, 
+     */
+    protected boolean drawSequenceFlowNameWithNoLabelDI = false;
+    
     protected String defaultCamelContext = "camelContext";
 
     protected String activityFontName = "Arial";
@@ -546,7 +551,16 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
         this.isCreateDiagramOnDeploy = createDiagramOnDeploy;
         return this;
     }
-
+    
+    public boolean isDrawSequenceFlowNameWithNoLabelDI() {
+        return drawSequenceFlowNameWithNoLabelDI;
+    }
+    
+    public ProcessEngineConfiguration setDrawSequenceFlowNameWithNoLabelDI(boolean drawSequenceFlowNameWithNoLabelDI) {
+        this.drawSequenceFlowNameWithNoLabelDI = drawSequenceFlowNameWithNoLabelDI;
+        return this;
+    }
+    
     public String getActivityFontName() {
         return activityFontName;
     }

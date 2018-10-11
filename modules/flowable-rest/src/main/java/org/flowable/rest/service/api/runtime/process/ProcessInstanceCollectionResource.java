@@ -25,6 +25,8 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
 import org.flowable.engine.HistoryService;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
@@ -60,6 +62,9 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
 
     @Autowired
     protected HistoryService historyService;
+    
+    @Autowired
+    protected RepositoryService repositoryService;
 
     @ApiOperation(value = "List process instances", nickname ="listProcessInstances", tags = { "Process Instances" })
     @ApiImplicitParams({
@@ -292,6 +297,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
 
             response.setStatus(HttpStatus.CREATED.value());
 
+            ProcessInstanceResponse processInstanceResponse = null;
             if (request.getReturnVariables()) {
                 Map<String, Object> runtimeVariableMap = null;
                 List<HistoricVariableInstance> historicVariableList = null;
@@ -300,11 +306,20 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
                 } else {
                     runtimeVariableMap = runtimeService.getVariables(instance.getId());
                 }
-                return restResponseFactory.createProcessInstanceResponse(instance, true, runtimeVariableMap, historicVariableList);
+                processInstanceResponse = restResponseFactory.createProcessInstanceResponse(instance, true, runtimeVariableMap, historicVariableList);
 
             } else {
-                return restResponseFactory.createProcessInstanceResponse(instance);
+                processInstanceResponse = restResponseFactory.createProcessInstanceResponse(instance);
             }
+            
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processInstanceResponse.getProcessDefinitionId()).singleResult();
+            
+            if (processDefinition != null) {
+                processInstanceResponse.setProcessDefinitionName(processDefinition.getName());
+                processInstanceResponse.setProcessDefinitionDescription(processDefinition.getDescription());
+            }
+            
+            return processInstanceResponse;
 
         } catch (FlowableObjectNotFoundException aonfe) {
             throw new FlowableIllegalArgumentException(aonfe.getMessage(), aonfe);

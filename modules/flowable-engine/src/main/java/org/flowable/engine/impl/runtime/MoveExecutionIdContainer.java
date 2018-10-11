@@ -57,11 +57,11 @@ public class MoveExecutionIdContainer {
     }
 
     public List<String> getExecutionIds() {
-        return Optional.ofNullable(executionIds).orElse(Collections.EMPTY_LIST);
+        return Optional.ofNullable(executionIds).orElse(Collections.emptyList());
     }
 
     public List<String> getMoveToActivityIds() {
-        return Optional.ofNullable(moveToActivityIds).orElse(Collections.EMPTY_LIST);
+        return Optional.ofNullable(moveToActivityIds).orElse(Collections.emptyList());
     }
 
     public Optional<String> getNewAssigneeId() {

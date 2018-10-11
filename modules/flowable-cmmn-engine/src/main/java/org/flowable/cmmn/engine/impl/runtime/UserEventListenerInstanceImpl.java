@@ -65,7 +65,7 @@ public class UserEventListenerInstanceImpl implements UserEventListenerInstance 
     }
 
     @Override
-    public String getStageIntanceId() {
+    public String getStageInstanceId() {
         return innerPlanItemInstance.getStageInstanceId();
     }
 
@@ -83,7 +83,7 @@ public class UserEventListenerInstanceImpl implements UserEventListenerInstance 
                 ", caseDefinitionId='" + getCaseDefinitionId() + '\'' +
                 ", elementId='" + getElementId() + '\'' +
                 ", planItemDefinitionId='" + getPlanItemDefinitionId() + '\'' +
-                ", stageIntanceId='" + getStageIntanceId() + '\'' +
+                ", stageInstanceId='" + getStageInstanceId() + '\'' +
                 '}';
     }
 }

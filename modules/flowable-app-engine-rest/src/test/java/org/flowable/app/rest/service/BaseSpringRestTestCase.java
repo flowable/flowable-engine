@@ -284,9 +284,9 @@ public class BaseSpringRestTestCase extends TestCase {
             commandExecutor.execute(new Command<Object>() {
                 @Override
                 public Object execute(CommandContext commandContext) {
-                    SchemaManager dbSchemaManager = CommandContextUtil.getAppEngineConfiguration(commandContext).getDbSchemaManager();
-                    dbSchemaManager.schemaDrop();
-                    dbSchemaManager.schemaCreate();
+                    SchemaManager schemaManager = CommandContextUtil.getAppEngineConfiguration(commandContext).getSchemaManager();
+                    schemaManager.schemaDrop();
+                    schemaManager.schemaCreate();
                     return null;
                 }
             });

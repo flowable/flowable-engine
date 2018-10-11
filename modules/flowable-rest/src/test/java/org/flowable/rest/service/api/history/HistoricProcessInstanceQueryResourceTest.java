@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.history;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.HashMap;
 
 import org.apache.http.HttpStatus;
@@ -29,8 +31,6 @@ import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import static org.junit.Assert.*;
 
 /**
  * Test for REST-operation related to the historic process instance query resource.
@@ -172,7 +172,11 @@ public class HistoricProcessInstanceQueryResourceTest extends BaseSpringRestTest
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
         assertEquals(2, dataNode.size());
-        assertEquals(processInstance.getId(), dataNode.get(0).get("id").asText());
+        JsonNode valueNode = dataNode.get(0);
+        assertEquals(processInstance.getId(), valueNode.get("id").asText());
         assertEquals(processInstance2.getId(), dataNode.get(1).get("id").asText());
+        
+        assertEquals("The One Task Process", valueNode.get("processDefinitionName").asText());
+        assertEquals("One task process description", valueNode.get("processDefinitionDescription").asText());
     }
 }

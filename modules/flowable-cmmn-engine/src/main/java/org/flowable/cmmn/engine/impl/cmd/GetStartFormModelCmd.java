@@ -61,8 +61,8 @@ public class GetStartFormModelCmd implements Command<FormInfo>, Serializable {
 
         if (StringUtils.isNotEmpty(planModel.getFormKey())) {
             CmmnDeployment deployment = CommandContextUtil.getCmmnDeploymentEntityManager(commandContext).findById(caseDefinition.getDeploymentId());
-            formInfo = formService.getFormInstanceModelByKeyAndParentDeploymentIdAndScopeId(
-                planModel.getFormKey(), deployment.getParentDeploymentId(), caseInstanceId, ScopeTypes.CMMN, caseDefinition.getTenantId());
+            formInfo = formService.getFormInstanceModelByKeyAndParentDeploymentIdAndScopeId(planModel.getFormKey(), deployment.getParentDeploymentId(), 
+                            caseInstanceId, ScopeTypes.CMMN, null, caseDefinition.getTenantId());
         }
 
         // If form does not exists, we don't want to leak out this info to just anyone
