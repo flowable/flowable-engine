@@ -13,8 +13,11 @@
 
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
+import java.util.List;
+
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 
 public interface CaseDefinitionEntity extends Entity, CaseDefinition {
     
@@ -40,4 +43,5 @@ public interface CaseDefinitionEntity extends Entity, CaseDefinition {
     
     void setTenantId(String tenantId);
 
+    List<IdentityLinkEntity> getIdentityLinks();
 }

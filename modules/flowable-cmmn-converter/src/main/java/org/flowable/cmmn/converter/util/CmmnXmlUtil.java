@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.converter.util;
 
+import java.text.StringCharacterIterator;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -82,6 +84,47 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
             }
         }
         return extensionElement;
+    }
+    
+    public static String getAttributeValue(String attributeName, XMLStreamReader xtr) {
+        String attributeValue = xtr.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, attributeName);
+
+        return attributeValue;
+    }
+    
+    public static List<String> parseDelimitedList(String s) {
+        List<String> result = new ArrayList<>();
+        if (StringUtils.isNotEmpty(s)) {
+
+            StringCharacterIterator iterator = new StringCharacterIterator(s);
+            char c = iterator.first();
+
+            StringBuilder strb = new StringBuilder();
+            boolean insideExpression = false;
+
+            while (c != StringCharacterIterator.DONE) {
+                if (c == '{' || c == '$') {
+                    insideExpression = true;
+                } else if (c == '}') {
+                    insideExpression = false;
+                } else if (c == ',' && !insideExpression) {
+                    result.add(strb.toString().trim());
+                    strb.delete(0, strb.length());
+                }
+
+                if (c != ',' || (insideExpression)) {
+                    strb.append(c);
+                }
+
+                c = iterator.next();
+            }
+
+            if (strb.length() > 0) {
+                result.add(strb.toString().trim());
+            }
+
+        }
+        return result;
     }
 
     public static void writeDefaultAttribute(String attributeName, String value, XMLStreamWriter xtw) throws Exception {
@@ -217,6 +260,20 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
                 }
             }
         }
+    }
+    
+    public static String convertToDelimitedString(List<String> stringList) {
+        StringBuilder resultString = new StringBuilder();
+
+        if (stringList != null) {
+            for (String result : stringList) {
+                if (resultString.length() > 0) {
+                    resultString.append(",");
+                }
+                resultString.append(result);
+            }
+        }
+        return resultString.toString();
     }
 
     public static boolean isBlacklisted(ExtensionAttribute attribute, List<ExtensionAttribute>... blackLists) {

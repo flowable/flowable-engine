@@ -23,6 +23,7 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.form.api.FormDefinition;
+import org.flowable.identitylink.api.IdentityLink;
 
 public interface CmmnRepositoryService {
 
@@ -88,6 +89,60 @@ public interface CmmnRepositoryService {
     
     /** Query case definitions */
     CaseDefinitionQuery createCaseDefinitionQuery();
+    
+    /**
+     * Authorizes a candidate user for a case definition.
+     * 
+     * @param caseDefinitionId
+     *            id of the case definition, cannot be null.
+     * @param userId
+     *            id of the user involve, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when the case definition or user doesn't exist.
+     */
+    void addCandidateStarterUser(String caseDefinitionId, String userId);
+
+    /**
+     * Authorizes a candidate group for a case definition.
+     * 
+     * @param caseDefinitionId
+     *            id of the case definition, cannot be null.
+     * @param groupId
+     *            id of the group involve, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when the case definition or group doesn't exist.
+     */
+    void addCandidateStarterGroup(String caseDefinitionId, String groupId);
+
+    /**
+     * Removes the authorization of a candidate user for a case definition.
+     * 
+     * @param caseDefinitionId
+     *            id of the case definition, cannot be null.
+     * @param userId
+     *            id of the user involve, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when the case definition or user doesn't exist.
+     */
+    void deleteCandidateStarterUser(String caseDefinitionId, String userId);
+
+    /**
+     * Removes the authorization of a candidate group for a case definition.
+     * 
+     * @param caseDefinitionId
+     *            id of the case definition, cannot be null.
+     * @param groupId
+     *            id of the group involve, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when the case definition or group doesn't exist.
+     */
+    void deleteCandidateStarterGroup(String caseDefinitionId, String groupId);
+    
+    /**
+     * Retrieves the {@link IdentityLink}s associated with the given case definition. Such an {@link IdentityLink} informs how a certain identity (eg. group or user) is authorized for a certain
+     * case definition
+     */
+    List<IdentityLink> getIdentityLinksForCaseDefinition(String caseDefinitionId);
     
     /**
      * Sets the category of the case definition. Case definitions can be queried by category: see {@link CaseDefinitionQuery#caseDefinitionCategory(String)}.

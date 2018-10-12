@@ -8,7 +8,7 @@
     xmlns:flowable="http://flowable.org/cmmn"
     targetNamespace="http://flowable.org/cmmn">
 
-    <case id="myCase">
+    <case id="myCase" flowable:initiatorVariableName="test" flowable:candidateStarterUsers="test,test2" flowable:candidateStarterGroups="group,group2">
         <casePlanModel id="myPlanModel" name="My CasePlanModel" flowable:formKey="formKey">
 
             <planItem id="planItemTaskA" definitionRef="taskA" />

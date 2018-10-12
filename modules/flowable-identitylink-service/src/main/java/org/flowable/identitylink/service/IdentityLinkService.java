@@ -74,6 +74,8 @@ public interface IdentityLinkService {
     
     void deleteIdentityLinksByProcessDefinitionId(String processDefinitionId);
     
+    void deleteIdentityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType);
+    
     void deleteIdentityLinksByProcessInstanceId(String processInstanceId);
     
 }

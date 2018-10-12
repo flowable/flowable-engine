@@ -57,6 +57,13 @@ public class SimpleCmmnXmlConverterTest extends AbstractConverterTest {
         // Case
         Case caze = cmmnModel.getCases().get(0);
         assertEquals("myCase", caze.getId());
+        assertEquals("test", caze.getInitiatorVariableName());
+        assertEquals(2, caze.getCandidateStarterUsers().size());
+        assertTrue(caze.getCandidateStarterUsers().contains("test"));
+        assertTrue(caze.getCandidateStarterUsers().contains("test2"));
+        assertEquals(2, caze.getCandidateStarterGroups().size());
+        assertTrue(caze.getCandidateStarterGroups().contains("group"));
+        assertTrue(caze.getCandidateStarterGroups().contains("group2"));
 
         // Plan model
         Stage planModel = caze.getPlanModel();

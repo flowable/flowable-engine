@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
-  <case id="testRepeatingStage" name="Repeating stage" flowable:initiatorVariableName="initiator">
+  <case id="testRepeatingStage" name="Repeating stage" flowable:initiatorVariableName="initiator" flowable:candidateStarterUsers="kermit">
     <casePlanModel id="casePlanModel">
       <planItem id="planItem1" name="Task outside stage" definitionRef="sid-FE742B49-4D62-46A7-8DBA-C5F65A8337BE"></planItem>
       <planItem id="planItem5" definitionRef="sid-42474674-1589-4213-9C73-6025E61DAB67">

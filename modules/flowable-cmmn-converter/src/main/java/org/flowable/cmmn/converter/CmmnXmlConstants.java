@@ -76,6 +76,8 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_ID = "id";
     String ATTRIBUTE_NAME = "name";
     String ATTRIBUTE_INITIATOR_VARIABLE_NAME = "initiatorVariableName";
+    String ATTRIBUTE_CASE_CANDIDATE_USERS = "candidateStarterUsers";
+    String ATTRIBUTE_CASE_CANDIDATE_GROUPS = "candidateStarterGroups";
     String ATTRIBUTE_TEXT_FORMAT = "textFormat";
     String ATTRIBUTE_DEFINITION_REF = "definitionRef";
     String ATTRIBUTE_SOURCE_REF = "sourceRef";

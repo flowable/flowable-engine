@@ -20,9 +20,9 @@ import java.util.List;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.IdentityLinkEventHandler;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
-import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.event.impl.FlowableIdentityLinkEventBuilder;
 import org.flowable.identitylink.service.impl.persistence.entity.data.IdentityLinkDataManager;
 
@@ -304,6 +304,11 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
     @Override
     public void deleteIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType) {
         identityLinkDataManager.deleteIdentityLinksByScopeIdAndScopeType(scopeId, scopeType);
+    }
+    
+    @Override
+    public void deleteIdentityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType) {
+        identityLinkDataManager.deleteIdentityLinksByScopeDefinitionIdAndScopeType(scopeDefinitionId, scopeType);
     }
 
     public IdentityLinkDataManager getIdentityLinkDataManager() {

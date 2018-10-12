@@ -185,5 +185,13 @@ public class MybatisIdentityLinkDataManager extends AbstractDataManager<Identity
             bulkDelete("deleteIdentityLinksByScopeIdAndScopeType", identityLinksByScopeIdAndTypeMatcher, parameters);
         }
     }
+    
+    @Override
+    public void deleteIdentityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("scopeDefinitionId", scopeDefinitionId);
+        parameters.put("scopeType", scopeType);
+        getDbSqlSession().delete("deleteIdentityLinksByScopeDefinitionIdAndScopeType", parameters, IdentityLinkEntityImpl.class);
+    }
 
 }
