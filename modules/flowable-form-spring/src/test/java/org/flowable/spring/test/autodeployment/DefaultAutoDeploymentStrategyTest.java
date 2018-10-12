@@ -84,26 +84,4 @@ public class DefaultAutoDeploymentStrategyTest extends AbstractAutoDeploymentStr
         verify(deploymentBuilderMock, times(1)).deploy();
     }
 
-    @Test
-    public void testDeployResourcesIOExceptionYieldsFlowableException() throws Exception {
-        IOException ioException = new IOException("Test message");
-        when(resourceMock3.getInputStream()).thenThrow(ioException);
-
-        final Resource[] resources = new Resource[] { resourceMock3 };
-        assertThatThrownBy(() ->
-            classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock))
-            .isInstanceOf(FlowableException.class)
-            .hasMessage("couldn't auto deploy resource 'resourceMock3': Test message")
-            .hasCause(ioException);
-    }
-
-    @Test
-    public void testDetermineResourceNameWithExceptionFailsGracefully() throws Exception {
-        when(resourceMock3.getFile()).thenThrow(new IOException());
-        when(resourceMock3.getFilename()).thenReturn(resourceName3);
-
-        final Resource[] resources = new Resource[] { resourceMock3 };
-        classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
-    }
-
 }

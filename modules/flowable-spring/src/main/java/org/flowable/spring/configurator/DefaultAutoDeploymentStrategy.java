@@ -19,14 +19,20 @@ import java.util.zip.ZipInputStream;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.DeploymentBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 /**
- * Default implementation of {@link AutoDeploymentStrategy} that groups all {@link Resource}s into a single deployment. This implementation is equivalent to the previously used implementation.
+ * Default implementation of {@link AutoDeploymentStrategy} that groups all {@link Resource}s into a single deployment.
+ * This implementation is equivalent to the previously used implementation.
  * 
  * @author Tiese Barrell
+ * @author Joram Barrez
  */
 public class DefaultAutoDeploymentStrategy extends AbstractAutoDeploymentStrategy {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultAutoDeploymentStrategy.class);
 
     /**
      * The deployment mode this strategy handles.
@@ -41,24 +47,28 @@ public class DefaultAutoDeploymentStrategy extends AbstractAutoDeploymentStrateg
     @Override
     public void deployResources(final String deploymentNameHint, final Resource[] resources, final RepositoryService repositoryService) {
 
-        // Create a single deployment for all resources using the name hint as the literal name
-        final DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentNameHint);
+        try {
+            // Create a single deployment for all resources using the name hint as the literal name
+            final DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentNameHint);
 
-        for (final Resource resource : resources) {
-            final String resourceName = determineResourceName(resource);
-
-            try {
+            for (final Resource resource : resources) {
+                final String resourceName = determineResourceName(resource);
                 if (resourceName.endsWith(".bar") || resourceName.endsWith(".zip") || resourceName.endsWith(".jar")) {
                     deploymentBuilder.addZipInputStream(new ZipInputStream(resource.getInputStream()));
                 } else {
                     deploymentBuilder.addInputStream(resourceName, resource.getInputStream());
                 }
-            } catch (IOException e) {
-                throw new FlowableException("couldn't auto deploy resource '" + resource + "': " + e.getMessage(), e);
-            }
-        }
 
-        deploymentBuilder.deploy();
+            }
+
+            deploymentBuilder.deploy();
+
+        } catch (Exception e) {
+            // Any exception should not stop the bootup of the engine
+            LOGGER.warn("Exception while autodeploying process definitions. "
+                + "This exception can be ignored if the root cause indicates a unique constraint violation, "
+                + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", e);
+        }
 
     }
 

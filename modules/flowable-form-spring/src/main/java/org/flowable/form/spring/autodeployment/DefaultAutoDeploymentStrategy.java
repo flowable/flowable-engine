@@ -18,6 +18,8 @@ import java.io.IOException;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.form.api.FormDeploymentBuilder;
 import org.flowable.form.api.FormRepositoryService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 /**
@@ -26,6 +28,8 @@ import org.springframework.core.io.Resource;
  * @author Tiese Barrell
  */
 public class DefaultAutoDeploymentStrategy extends AbstractAutoDeploymentStrategy {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultAutoDeploymentStrategy.class);
 
     /**
      * The deployment mode this strategy handles.
@@ -40,21 +44,23 @@ public class DefaultAutoDeploymentStrategy extends AbstractAutoDeploymentStrateg
     @Override
     public void deployResources(final String deploymentNameHint, final Resource[] resources, final FormRepositoryService repositoryService) {
 
-        // Create a single deployment for all resources using the name hint as the literal name
-        final FormDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentNameHint);
+        try {
+            // Create a single deployment for all resources using the name hint as the literal name
+            final FormDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentNameHint);
 
-        for (final Resource resource : resources) {
-            final String resourceName = determineResourceName(resource);
-
-            try {
+            for (final Resource resource : resources) {
+                final String resourceName = determineResourceName(resource);
                 deploymentBuilder.addInputStream(resourceName, resource.getInputStream());
-
-            } catch (IOException e) {
-                throw new FlowableException("couldn't auto deploy resource '" + resource + "': " + e.getMessage(), e);
             }
-        }
 
-        deploymentBuilder.deploy();
+            deploymentBuilder.deploy();
+
+        } catch (Exception e) {
+            // Any exception should not stop the bootup of the engine
+            LOGGER.warn("Exception while autodeploying process definitions. "
+                + "This exception can be ignored if the root cause indicates a unique constraint violation, "
+                + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", e);
+        }
 
     }
 
