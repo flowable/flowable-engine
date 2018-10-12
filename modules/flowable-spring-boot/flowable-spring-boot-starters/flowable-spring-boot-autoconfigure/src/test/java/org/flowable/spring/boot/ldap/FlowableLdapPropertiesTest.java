@@ -47,6 +47,7 @@ public class FlowableLdapPropertiesTest {
         query.setAllUsers("(&(objectClass=inetOrgPerson))");
         query.setGroupsForUser("(&(objectClass=groupOfUniqueNames)(uniqueMember={0}))");
         query.setAllGroups("(&(objectClass=groupOfUniqueNames))");
+        query.setGroupById("(&(objectClass=groupOfUniqueNames)(uniqueId={0}))");
 
         FlowableLdapProperties.Attribute attribute = properties.getAttribute();
         attribute.setUserId("id");
@@ -72,6 +73,7 @@ public class FlowableLdapPropertiesTest {
                 "queryAllUsers",
                 "queryGroupsForUser",
                 "queryAllGroups",
+                "queryGroupByGroupId",
                 "userIdAttribute",
                 "userFirstNameAttribute",
                 "userLastNameAttribute",
@@ -91,13 +93,15 @@ public class FlowableLdapPropertiesTest {
                 "queryUserByFullNameLike",
                 "queryAllUsers",
                 "queryGroupsForUser",
-                "queryAllGroups")
+                "queryAllGroups",
+                "queryGroupByGroupId")
             .containsExactly(
                 query.getUserById(),
                 query.getUserByFullNameLike(),
                 query.getAllUsers(),
                 query.getGroupsForUser(),
-                query.getAllGroups()
+                query.getAllGroups(),
+                query.getGroupById()
             );
 
         assertThat(ldapConfiguration)
