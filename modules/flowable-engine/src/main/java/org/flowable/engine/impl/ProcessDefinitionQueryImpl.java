@@ -310,6 +310,15 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
         }
         return CommandContextUtil.getProcessEngineConfiguration().getCandidateManager().getGroupsForCandidateUser(authorizationUserId);
     }
+    
+    @Override
+    public ProcessDefinitionQueryImpl startableByUser(String userId) {
+        if (userId == null) {
+            throw new FlowableIllegalArgumentException("userId is null");
+        }
+        this.authorizationUserId = userId;
+        return this;
+    }
 
     // sorting ////////////////////////////////////////////
 
@@ -483,14 +492,5 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
 
     public String getEventSubscriptionType() {
         return eventSubscriptionType;
-    }
-
-    @Override
-    public ProcessDefinitionQueryImpl startableByUser(String userId) {
-        if (userId == null) {
-            throw new FlowableIllegalArgumentException("userId is null");
-        }
-        this.authorizationUserId = userId;
-        return this;
     }
 }

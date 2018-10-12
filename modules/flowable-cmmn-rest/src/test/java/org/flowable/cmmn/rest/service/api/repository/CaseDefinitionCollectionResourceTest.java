@@ -110,6 +110,10 @@ public class CaseDefinitionCollectionResourceTest extends BaseSpringRestTestCase
             assertResultsPresentInDataResponse(url, oneTaskCase.getId(), simpleCaseDef.getId(), repeatingStageCase.getId());
             url = baseUrl + "?latest=false";
             assertResultsPresentInDataResponse(baseUrl, firstOneTaskCase.getId(), oneTaskCase.getId(), simpleCaseDef.getId(), repeatingStageCase.getId());
+            
+            // Test startableByUser
+            url = baseUrl + "?startableByUser=kermit";
+            assertResultsPresentInDataResponse(url, repeatingStageCase.getId());
 
             // Test deploymentId
             url = baseUrl + "?deploymentId=" + secondDeployment.getId();

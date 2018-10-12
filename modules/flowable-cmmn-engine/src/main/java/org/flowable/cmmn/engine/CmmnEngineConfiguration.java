@@ -27,6 +27,7 @@ import javax.sql.DataSource;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
 import org.flowable.cmmn.api.CallbackTypes;
+import org.flowable.cmmn.api.CandidateManager;
 import org.flowable.cmmn.api.CmmnEngineConfigurationApi;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
@@ -87,6 +88,7 @@ import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskUpdatedH
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.VariableCreatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.VariableRemovedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.VariableUpdatedHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.idm.DefaultCandidateManager;
 import org.flowable.cmmn.engine.impl.interceptor.CmmnCommandInvoker;
 import org.flowable.cmmn.engine.impl.job.AsyncActivatePlanItemInstanceJobHandler;
 import org.flowable.cmmn.engine.impl.job.TriggerTimerEventJobHandler;
@@ -290,6 +292,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager;
 
     protected boolean disableIdmEngine;
+    
+    protected CandidateManager candidateManager;
 
     protected CaseInstanceHelper caseInstanceHelper;
     protected CmmnHistoryManager cmmnHistoryManager;
@@ -719,6 +723,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initCaseDefinitionCache();
         initDeploymentManager();
         initCaseInstanceHelper();
+        initCandidateManager();
         initHistoryManager();
         initCaseInstanceCallbacks();
         initFormFieldHandler();
@@ -1077,6 +1082,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void initCaseInstanceHelper() {
         if (caseInstanceHelper == null) {
             caseInstanceHelper = new CaseInstanceHelperImpl();
+        }
+    }
+    
+    public void initCandidateManager() {
+        if (candidateManager == null) {
+            candidateManager = new DefaultCandidateManager(this);
         }
     }
 
@@ -1849,6 +1860,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setCaseInstanceHelper(CaseInstanceHelper caseInstanceHelper) {
         this.caseInstanceHelper = caseInstanceHelper;
+        return this;
+    }
+    
+    public CandidateManager getCandidateManager() {
+        return candidateManager;
+    }
+
+    public CmmnEngineConfiguration setCandidateManager(CandidateManager candidateManager) {
+        this.candidateManager = candidateManager;
         return this;
     }
 
