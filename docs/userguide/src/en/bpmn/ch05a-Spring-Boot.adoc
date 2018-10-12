@@ -755,6 +755,7 @@ flowable.idm.ldap.query.all-users= # The query that is executed when searching f
 flowable.idm.ldap.query.groups-for-user= # The query that is executed when searching for the groups of a specific user.
 flowable.idm.ldap.query.user-by-full-name-like= # The query that is executed when searching for a user by full name.
 flowable.idm.ldap.query.user-by-id= # The query that is executed when searching for a user by userId.
+flowable.idm.ldap.query.group-by-id= # The query that is executed when searching for a specific group by groupId.
 flowable.idm.ldap.search-time-limit=0 # The timeout (in milliseconds) that is used when doing a search in LDAP. By default set to '0', which means 'wait forever'.
 flowable.idm.ldap.security-authentication=simple # The value that is used for the 'java.naming.security.authentication' property used to connect to the LDAP system.
 flowable.idm.ldap.server= # The server host on which the LDAP system can be reached. For example 'ldap://localhost'.
