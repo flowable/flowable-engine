@@ -57,6 +57,8 @@ public class LDAPGroupQueryImpl extends GroupQueryImpl {
     protected List<Group> executeQuery() {
         if (getUserId() != null) {
             return findGroupsByUser(getUserId());
+        } else if (getId() != null) {
+            return findGroupsById(getId());
         } else {
             return findAllGroups();
         }
@@ -81,6 +83,11 @@ public class LDAPGroupQueryImpl extends GroupQueryImpl {
         }
 
         return groups;
+    }
+
+    protected List<Group> findGroupsById(String id) {
+        String searchExpression = ldapConfigurator.getLdapQueryBuilder().buildQueryGroupsById(ldapConfigurator, id);
+        return executeGroupQuery(searchExpression);
     }
 
     protected List<Group> findAllGroups() {
