@@ -1,43 +1,38 @@
 package org.flowable.rest.conf;
 
-import javax.annotation.PostConstruct;
-
-import com.dj.flowable.CustomEventListener;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.variable.service.impl.types.SerializableType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import com.dj.flowable.CustomEventListener;
 import com.dj.flowable.JsonVariableType;
 
+
 @Component
+@DependsOn("flowableEngineConfiguration")
 public class DJConfig {
 	
-	@Autowired
-	ProcessEngineConfigurationImpl springProcessEngineConfiguration;
+    @Autowired
+	ProcessEngineConfigurationImpl processEngineConfiguration;
 
 	@Value("${url.dj.adapter:http://localhost:8080}")
 	private String defaulDjAdapterUrl;
 	
-	
-	
-	
-	@PostConstruct
-	void init() {
-		
-		//Add custom event listener
-		//Add listener into eventDispatcher 
-		
-		//TODO: Comment for problems with IntelliJ
-		springProcessEngineConfiguration.getEventDispatcher()
-			.addEventListener(new CustomEventListener(defaulDjAdapterUrl));
-		
-		//Add json DDBB serializator
-		springProcessEngineConfiguration.getVariableTypes().addType(new JsonVariableType(true), 
-				springProcessEngineConfiguration.getVariableTypes().getTypeIndex(SerializableType.TYPE_NAME));
-		
+	//runs when Spring context is loaded
+	@EventListener
+	public void onApplicationEvent(ContextRefreshedEvent event) {
+
+	    processEngineConfiguration.getEventDispatcher()
+            .addEventListener(new CustomEventListener(defaulDjAdapterUrl));
+    
+	    processEngineConfiguration.getVariableTypes().addType(new JsonVariableType(true), 
+	            processEngineConfiguration.getVariableTypes().getTypeIndex(SerializableType.TYPE_NAME));
 	}
 
 
-}
+ }
