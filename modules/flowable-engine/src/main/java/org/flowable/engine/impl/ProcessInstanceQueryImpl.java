@@ -703,6 +703,11 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     }
 
     @Override
+    public ProcessInstanceQuery orderByStartTime() {
+        return orderBy(ProcessInstanceQueryProperty.PROCESS_START_TIME);
+    }
+
+    @Override
     public ProcessInstanceQuery orderByTenantId() {
         this.orderProperty = ProcessInstanceQueryProperty.TENANT_ID;
         return this;

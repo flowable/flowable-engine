@@ -367,6 +367,11 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
     ProcessInstanceQuery orderByProcessDefinitionId();
 
     /**
+     * Order by start time (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    ProcessInstanceQuery orderByStartTime();
+
+    /**
      * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
      */
     ProcessInstanceQuery orderByTenantId();

@@ -48,6 +48,7 @@ public class BaseCaseInstanceResource {
         allowedSortProperties.put("caseDefinitionId", CaseInstanceQueryProperty.CASE_DEFINITION_ID);
         allowedSortProperties.put("caseDefinitionKey", CaseInstanceQueryProperty.CASE_DEFINITION_KEY);
         allowedSortProperties.put("id", CaseInstanceQueryProperty.CASE_INSTANCE_ID);
+        allowedSortProperties.put("startTime", CaseInstanceQueryProperty.CASE_START_TIME);
         allowedSortProperties.put("tenantId", CaseInstanceQueryProperty.TENANT_ID);
     }
 
