@@ -93,7 +93,7 @@ public class HistoricVariableInstanceBaseResource {
         }
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessHistoryVariableInfoWithQuery(query);
+            restApiInterceptor.accessHistoryVariableInfoWithQuery(query, queryRequest);
         }
 
         return paginateList(allRequestParams, query, "variableName", allowedSortProperties, restResponseFactory::createHistoricVariableInstanceResponseList);

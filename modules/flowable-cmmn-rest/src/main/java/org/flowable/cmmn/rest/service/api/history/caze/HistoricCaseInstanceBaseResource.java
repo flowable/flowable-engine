@@ -117,7 +117,7 @@ public class HistoricCaseInstanceBaseResource {
         }
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessHistoryCaseInfoWithQuery(query);
+            restApiInterceptor.accessHistoryCaseInfoWithQuery(query, queryRequest);
         }
 
         DataResponse<HistoricCaseInstanceResponse> responseList = paginateList(allRequestParams, queryRequest, query, "caseInstanceId", allowedSortProperties,

@@ -123,7 +123,7 @@ public class PlanItemInstanceBaseResource {
         }
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessPlanItemInstanceInfoWithQuery(query);
+            restApiInterceptor.accessPlanItemInstanceInfoWithQuery(query, queryRequest);
         }
 
         return paginateList(requestParams, queryRequest, query, "startTime", allowedSortProperties, restResponseFactory::createPlanItemInstanceResponseList);

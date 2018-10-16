@@ -190,7 +190,7 @@ public class ContentItemBaseResource {
         }
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessContentItemInfoWithQuery(contentItemQuery);
+            restApiInterceptor.accessContentItemInfoWithQuery(contentItemQuery, request);
         }
 
         return paginateList(requestParams, request, contentItemQuery, "created", properties, restResponseFactory::createContentItemResponseList);

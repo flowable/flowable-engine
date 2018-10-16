@@ -111,7 +111,7 @@ public class ExecutionBaseResource {
         }
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessExecutionInfoWithQuery(query);
+            restApiInterceptor.accessExecutionInfoWithQuery(query, queryRequest);
         }
 
         return paginateList(requestParams, queryRequest, query, "processInstanceId", allowedSortProperties, restResponseFactory::createExecutionResponseList);

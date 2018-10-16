@@ -19,6 +19,7 @@ import org.flowable.form.api.FormDeploymentQuery;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormInstance;
 import org.flowable.form.api.FormInstanceQuery;
+import org.flowable.form.rest.service.api.form.FormInstanceQueryRequest;
 import org.flowable.form.rest.service.api.form.FormRequest;
 
 public interface FormRestApiInterceptor {
@@ -27,7 +28,7 @@ public interface FormRestApiInterceptor {
 
     void accessFormInstanceById(FormInstance formInstance);
     
-    void accessFormInstanceInfoWithQuery(FormInstanceQuery formInstanceQuery);
+    void accessFormInstanceInfoWithQuery(FormInstanceQuery formInstanceQuery, FormInstanceQueryRequest request);
     
     void storeFormInstance(FormRequest formRequest);
     

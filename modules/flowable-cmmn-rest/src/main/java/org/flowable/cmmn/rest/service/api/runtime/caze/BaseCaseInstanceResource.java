@@ -108,7 +108,7 @@ public class BaseCaseInstanceResource {
         }
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessCaseInstanceInfoWithQuery(query);
+            restApiInterceptor.accessCaseInstanceInfoWithQuery(query, queryRequest);
         }
 
         DataResponse<CaseInstanceResponse> responseList = paginateList(requestParams, queryRequest, query, "id", allowedSortProperties, restResponseFactory::createCaseInstanceResponseList);

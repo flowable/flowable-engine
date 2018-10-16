@@ -97,7 +97,7 @@ public abstract class HistoricPlanItemInstanceBaseResource {
         Optional.ofNullable(queryRequest.getEndedAfter()).ifPresent(query::endedAfter);
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessHistoryPlanItemInfoWithQuery(query);
+            restApiInterceptor.accessHistoryPlanItemInfoWithQuery(query, queryRequest);
         }
 
         return paginateList(allRequestParams, queryRequest, query, "createdTime", allowedSortProperties,

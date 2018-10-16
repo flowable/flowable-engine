@@ -264,7 +264,7 @@ public class TaskBaseResource {
         }
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessTaskInfoWithQuery(taskQuery);
+            restApiInterceptor.accessTaskInfoWithQuery(taskQuery, request);
         }
 
         return paginateList(requestParams, request, taskQuery, "id", properties, restResponseFactory::createTaskResponseList);

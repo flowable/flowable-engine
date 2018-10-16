@@ -174,7 +174,7 @@ public class HistoricProcessInstanceBaseResource {
         }
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessHistoryProcessInfoWithQuery(query);
+            restApiInterceptor.accessHistoryProcessInfoWithQuery(query, queryRequest);
         }
 
         DataResponse<HistoricProcessInstanceResponse> responseList = paginateList(allRequestParams, queryRequest, query, "processInstanceId", allowedSortProperties,
