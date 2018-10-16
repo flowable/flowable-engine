@@ -172,7 +172,7 @@ public class BaseProcessInstanceResource {
         }
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessProcessInstanceInfoWithQuery(query);
+            restApiInterceptor.accessProcessInstanceInfoWithQuery(query, queryRequest);
         }
 
         DataResponse<ProcessInstanceResponse> responseList = paginateList(requestParams, queryRequest, query, "id", allowedSortProperties, restResponseFactory::createProcessInstanceResponseList);

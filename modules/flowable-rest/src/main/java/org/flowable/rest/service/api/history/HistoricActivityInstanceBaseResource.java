@@ -115,7 +115,7 @@ public class HistoricActivityInstanceBaseResource {
         }
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessHistoryActivityInfoWithQuery(query);
+            restApiInterceptor.accessHistoryActivityInfoWithQuery(query, queryRequest);
         }
 
         return paginateList(allRequestParams, queryRequest, query, "startTime", allowedSortProperties,

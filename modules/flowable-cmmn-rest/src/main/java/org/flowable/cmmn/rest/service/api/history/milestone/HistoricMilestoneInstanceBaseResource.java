@@ -61,7 +61,7 @@ public abstract class HistoricMilestoneInstanceBaseResource {
         Optional.ofNullable(queryRequest.getReachedAfter()).ifPresent(query::milestoneInstanceReachedAfter);
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessHistoryMilestoneInfoWithQuery(query);
+            restApiInterceptor.accessHistoryMilestoneInfoWithQuery(query, queryRequest);
         }
 
         return paginateList(allRequestParams, queryRequest, query, "timestamp", allowedSortProperties,
