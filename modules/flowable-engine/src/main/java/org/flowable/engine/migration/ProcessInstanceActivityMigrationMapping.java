@@ -41,20 +41,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public abstract class ProcessInstanceActivityMigrationMapping {
 
-    public enum MappingType {ONE_TO_ONE, ONE_TO_MANY, MANY_TO_ONE}
-
-    @JsonIgnore
-    protected final MappingType mappingType;
-
     protected String withNewAssignee;
-
-    public ProcessInstanceActivityMigrationMapping(MappingType mappingType) {
-        this.mappingType = mappingType;
-    }
-
-    public MappingType getMappingType() {
-        return mappingType;
-    }
 
     public abstract List<String> getFromActivityIds();
 
@@ -87,7 +74,6 @@ public abstract class ProcessInstanceActivityMigrationMapping {
 
         @JsonCreator
         public OneToOneMapping(@JsonProperty("fromActivityId") String fromActivityId, @JsonProperty("toActivityId") String toActivityId) {
-            super(MappingType.ONE_TO_ONE);
             this.fromActivityId = fromActivityId;
             this.toActivityId = toActivityId;
         }
@@ -157,7 +143,6 @@ public abstract class ProcessInstanceActivityMigrationMapping {
 
         @JsonCreator
         public OneToManyMapping(@JsonProperty("fromActivityId") String fromActivityId, @JsonProperty("toActivityIds") List<String> toActivityIds) {
-            super(MappingType.ONE_TO_MANY);
             this.fromActivityId = fromActivityId;
             this.toActivityIds = toActivityIds;
         }
@@ -234,7 +219,6 @@ public abstract class ProcessInstanceActivityMigrationMapping {
 
         @JsonCreator
         public ManyToOneMapping(@JsonProperty("fromActivityIds") List<String> fromActivityIds, @JsonProperty("toActivityId") String toActivityId) {
-            super(MappingType.MANY_TO_ONE);
             this.fromActivityIds = fromActivityIds;
             this.toActivityId = toActivityId;
         }

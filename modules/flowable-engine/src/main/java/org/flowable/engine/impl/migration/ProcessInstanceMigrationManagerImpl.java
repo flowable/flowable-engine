@@ -278,38 +278,35 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
             String fromActivityId;
             String toActivityId;
             String newAssignee = activityMapping.getWithNewAssignee();
-            switch (activityMapping.getMappingType()) {
-                case ONE_TO_ONE:
-                    fromActivityId = ((ProcessInstanceActivityMigrationMapping.OneToOneMapping) activityMapping).getFromActivityId();
-                    toActivityId = ((ProcessInstanceActivityMigrationMapping.OneToOneMapping) activityMapping).getToActivityId();
-                    if (executionActivityIdsToMapExplicitly.contains(fromActivityId)) {
-                        changeActivityStateBuilder.moveActivityIdTo(fromActivityId, toActivityId, newAssignee);
-                        executionActivityIdsToMapExplicitly.remove(fromActivityId);
+
+            if (activityMapping instanceof ProcessInstanceActivityMigrationMapping.OneToOneMapping) {
+                fromActivityId = ((ProcessInstanceActivityMigrationMapping.OneToOneMapping) activityMapping).getFromActivityId();
+                toActivityId = ((ProcessInstanceActivityMigrationMapping.OneToOneMapping) activityMapping).getToActivityId();
+                if (executionActivityIdsToMapExplicitly.contains(fromActivityId)) {
+                    changeActivityStateBuilder.moveActivityIdTo(fromActivityId, toActivityId, newAssignee);
+                    executionActivityIdsToMapExplicitly.remove(fromActivityId);
+                }
+            } else if (activityMapping instanceof ProcessInstanceActivityMigrationMapping.OneToManyMapping) {
+                fromActivityId = ((ProcessInstanceActivityMigrationMapping.OneToManyMapping) activityMapping).getFromActivityId();
+                List<String> toActivityIds = activityMapping.getToActivityIds();
+                if (executionActivityIdsToMapExplicitly.contains(fromActivityId)) {
+                    changeActivityStateBuilder.moveSingleActivityIdToActivityIds(fromActivityId, toActivityIds, newAssignee);
+                    executionActivityIdsToMapExplicitly.remove(fromActivityId);
+                }
+            } else if (activityMapping instanceof ProcessInstanceActivityMigrationMapping.ManyToOneMapping) {
+                List<String> fromActivityIds = activityMapping.getFromActivityIds();
+                toActivityId = ((ProcessInstanceActivityMigrationMapping.ManyToOneMapping) activityMapping).getToActivityId();
+                List<String> executionIds = new ArrayList<>();
+                for (String activityId : fromActivityIds) {
+                    if (executionActivityIdsToMapExplicitly.contains(activityId)) {
+                        List<ExecutionEntity> executionEntities = filteredExecutionsByActivityId.get(activityId);
+                        executionIds.addAll(executionEntities.stream().map(ExecutionEntity::getId).collect(Collectors.toList()));
+                        executionActivityIdsToMapExplicitly.remove(activityId);
                     }
-                    break;
-                case ONE_TO_MANY:
-                    fromActivityId = ((ProcessInstanceActivityMigrationMapping.OneToManyMapping) activityMapping).getFromActivityId();
-                    List<String> toActivityIds = activityMapping.getToActivityIds();
-                    if (executionActivityIdsToMapExplicitly.contains(fromActivityId)) {
-                        changeActivityStateBuilder.moveSingleActivityIdToActivityIds(fromActivityId, toActivityIds, newAssignee);
-                        executionActivityIdsToMapExplicitly.remove(fromActivityId);
-                    }
-                    break;
-                case MANY_TO_ONE:
-                    List<String> fromActivityIds = activityMapping.getFromActivityIds();
-                    toActivityId = ((ProcessInstanceActivityMigrationMapping.ManyToOneMapping) activityMapping).getToActivityId();
-                    List<String> executionIds = new ArrayList<>();
-                    for (String activityId : fromActivityIds) {
-                        if (executionActivityIdsToMapExplicitly.contains(activityId)) {
-                            List<ExecutionEntity> executionEntities = filteredExecutionsByActivityId.get(activityId);
-                            executionIds.addAll(executionEntities.stream().map(ExecutionEntity::getId).collect(Collectors.toList()));
-                            executionActivityIdsToMapExplicitly.remove(activityId);
-                        }
-                    }
-                    changeActivityStateBuilder.moveExecutionsToSingleActivityId(executionIds, toActivityId, newAssignee);
-                    break;
-                default:
-                    throw new FlowableException("Unknown Activity Mapping or not implemented yet!!!");
+                }
+                changeActivityStateBuilder.moveExecutionsToSingleActivityId(executionIds, toActivityId, newAssignee);
+            } else {
+                throw new FlowableException("Unknown Activity Mapping or not implemented yet!!!");
             }
         }
 
