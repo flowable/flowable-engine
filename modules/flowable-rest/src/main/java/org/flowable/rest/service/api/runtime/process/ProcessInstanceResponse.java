@@ -43,9 +43,9 @@ public class ProcessInstanceResponse {
     protected String processDefinitionName;
     protected String processDefinitionDescription;
     protected String activityId;
-    protected String startedBy;
+    protected String startUserId;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
-    protected Date started;
+    protected Date startTime;
     protected List<RestVariable> variables = new ArrayList<>();
     protected String callbackId;
     protected String callbackType;
@@ -152,21 +152,21 @@ public class ProcessInstanceResponse {
     }
     
     @ApiModelProperty(example = "johnDoe")
-    public String getStartedBy() {
-        return startedBy;
+    public String getStartUserId() {
+        return startUserId;
     }
 
-    public void setStartedBy(String startedBy) {
-        this.startedBy = startedBy;
+    public void setStartUserId(String startUserId) {
+        this.startUserId = startUserId;
     }
 
-    @ApiModelProperty(example = "2018-04-17T10:17:43.902+0000")
-    public Date getStarted() {
-        return started;
+    @ApiModelProperty(example = "2018-04-17T10:17:43.902+0000", dataType = "string")
+    public Date getStartTime() {
+        return startTime;
     }
 
-    public void setStarted(Date started) {
-        this.started = started;
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 
     public List<RestVariable> getVariables() {

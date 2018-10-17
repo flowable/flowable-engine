@@ -51,6 +51,7 @@ import org.assertj.core.api.Assertions;
 import org.eclipse.jetty.server.Server;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.db.SchemaManager;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -238,6 +239,7 @@ public class BaseSpringRestTestCase {
             throw e;
 
         } finally {
+            Authentication.setAuthenticatedUserId(null);
             TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), testName.getMethodName());
             dropUsers();
             assertAndEnsureCleanDb();

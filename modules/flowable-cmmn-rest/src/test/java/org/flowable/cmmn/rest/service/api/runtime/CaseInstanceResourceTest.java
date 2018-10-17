@@ -13,6 +13,8 @@
 
 package org.flowable.cmmn.rest.service.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.Serializable;
 
 import org.apache.http.HttpStatus;
@@ -25,6 +27,7 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.flowable.common.engine.impl.identity.Authentication;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -40,6 +43,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
      */
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstance() throws Exception {
+        Authentication.setAuthenticatedUserId("getCaseUser");
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
 
         String url = buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId());
@@ -52,6 +56,8 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertEquals(caseInstance.getId(), responseNode.get("id").textValue());
         assertEquals("myBusinessKey", responseNode.get("businessKey").textValue());
         assertEquals("", responseNode.get("tenantId").textValue());
+        assertThat(responseNode.get("startTime").textValue()).as("startTime").isNotNull();
+        assertThat(responseNode.get("startUserId").textValue()).as("startUserId").isEqualTo("getCaseUser");
 
         assertEquals(responseNode.get("url").asText(), url);
         assertEquals(responseNode.get("caseDefinitionUrl").asText(), buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId()));

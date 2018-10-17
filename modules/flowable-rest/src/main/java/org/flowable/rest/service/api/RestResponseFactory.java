@@ -553,8 +553,8 @@ public class RestResponseFactory {
     public ProcessInstanceResponse createProcessInstanceResponse(ProcessInstance processInstance, RestUrlBuilder urlBuilder) {
         ProcessInstanceResponse result = new ProcessInstanceResponse();
         result.setActivityId(processInstance.getActivityId());
-        result.setStartedBy(processInstance.getStartUserId());
-        result.setStarted(processInstance.getStartTime());
+        result.setStartUserId(processInstance.getStartUserId());
+        result.setStartTime(processInstance.getStartTime());
         result.setBusinessKey(processInstance.getBusinessKey());
         result.setId(processInstance.getId());
         result.setName(processInstance.getName());
@@ -593,8 +593,8 @@ public class RestResponseFactory {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         ProcessInstanceResponse result = new ProcessInstanceResponse();
         result.setActivityId(processInstance.getActivityId());
-        result.setStartedBy(processInstance.getStartUserId());
-        result.setStarted(processInstance.getStartTime());
+        result.setStartUserId(processInstance.getStartUserId());
+        result.setStartTime(processInstance.getStartTime());
         result.setBusinessKey(processInstance.getBusinessKey());
         result.setId(processInstance.getId());
         result.setName(processInstance.getName());

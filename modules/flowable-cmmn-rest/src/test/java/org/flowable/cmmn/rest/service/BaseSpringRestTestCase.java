@@ -59,6 +59,7 @@ import org.flowable.cmmn.rest.service.api.RestUrlBuilder;
 import org.flowable.cmmn.rest.util.TestServerUtil;
 import org.flowable.cmmn.rest.util.TestServerUtil.TestServer;
 import org.flowable.common.engine.impl.db.SchemaManager;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
@@ -209,6 +210,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
             throw e;
 
         } finally {
+            Authentication.setAuthenticatedUserId(null);
             CmmnTestHelper.annotationDeploymentTearDown(cmmnEngine, deploymentId, getClass(), getName());
             dropUsers();
             assertAndEnsureCleanDb();

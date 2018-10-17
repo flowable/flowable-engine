@@ -19,6 +19,7 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -44,7 +45,9 @@ public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
     @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
     public void testGetProcessInstance() throws Exception {
+        Authentication.setAuthenticatedUserId("testUser");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne", "myBusinessKey");
+        Authentication.setAuthenticatedUserId(null);
 
         String url = buildUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId());
         CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
@@ -54,6 +57,10 @@ public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
         assertNotNull(responseNode);
         assertEquals(processInstance.getId(), responseNode.get("id").textValue());
+        assertTrue("has startTime", responseNode.has("startTime"));
+        assertNotNull("startTime", responseNode.get("startTime").textValue());
+        assertEquals(processInstance.getStartUserId(), responseNode.get("startUserId").textValue());
+        assertEquals(processInstance.getProcessDefinitionName(), responseNode.get("processDefinitionName").textValue());
         assertEquals("myBusinessKey", responseNode.get("businessKey").textValue());
         assertFalse(responseNode.get("suspended").booleanValue());
         assertEquals("", responseNode.get("tenantId").textValue());
