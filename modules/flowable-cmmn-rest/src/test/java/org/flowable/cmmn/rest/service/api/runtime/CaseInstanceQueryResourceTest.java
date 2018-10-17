@@ -13,6 +13,8 @@
 
 package org.flowable.cmmn.rest.service.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 
 import org.apache.http.HttpStatus;
@@ -23,6 +25,7 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.flowable.common.engine.impl.identity.Authentication;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -129,6 +132,7 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
      */
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn", "org/flowable/cmmn/rest/service/api/repository/repeatingStage.cmmn" })
     public void testQueryCaseInstancesPagingAndSorting() throws Exception {
+        Authentication.setAuthenticatedUserId("queryCaseUser");
         CaseInstance caseInstance1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
         CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testRepeatingStage").start();
         
@@ -180,6 +184,8 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
         assertEquals(caseInstance1.getId(), valueNode.get("id").asText());
         assertEquals("One Human Task Case", valueNode.get("caseDefinitionName").asText());
         assertEquals("A human task case", valueNode.get("caseDefinitionDescription").asText());
+        assertThat(valueNode.get("startTime").textValue()).as("startTime").isNotNull();
+        assertThat(valueNode.get("startUserId").textValue()).as("startUserId").isEqualTo("queryCaseUser");
     }
 
 }
