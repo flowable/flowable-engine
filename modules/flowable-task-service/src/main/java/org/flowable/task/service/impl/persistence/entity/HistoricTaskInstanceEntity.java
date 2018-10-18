@@ -83,7 +83,15 @@ public interface HistoricTaskInstanceEntity extends Entity, HistoricTaskInstance
 
     void setScopeDefinitionId(String scopeDefinitionId);
 
-    void setStartTime(Date startTime);
+    void setCreateTime(Date createTime);
+
+    /**
+     * @deprecated use {@link #setCreateTime(Date)} instead
+     */
+    @Deprecated
+    default void setStartTime(Date startTime) {
+        setCreateTime(startTime);
+    }
 
     void setEndTime(Date endTime);
 
