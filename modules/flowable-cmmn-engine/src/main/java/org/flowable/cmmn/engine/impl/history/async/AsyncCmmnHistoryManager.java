@@ -338,7 +338,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_DESCRIPTION, task.getDescription());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_OWNER, task.getOwner());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ASSIGNEE, task.getAssignee());
-        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_START_TIME, cmmnEngineConfiguration.getClock().getCurrentTime());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CREATE_TIME, task.getCreateTime());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_TASK_DEFINITION_KEY, task.getTaskDefinitionKey());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_TASK_DEFINITION_ID, task.getTaskDefinitionId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_PRIORITY, task.getPriority());

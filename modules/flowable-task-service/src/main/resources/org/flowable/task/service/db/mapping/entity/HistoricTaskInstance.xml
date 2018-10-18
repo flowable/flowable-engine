@@ -65,7 +65,7 @@
         #{description ,jdbcType=VARCHAR},
         #{owner ,jdbcType=VARCHAR},
         #{assignee ,jdbcType=VARCHAR},
-        #{startTime, jdbcType=TIMESTAMP},
+        #{createTime, jdbcType=TIMESTAMP},
         #{claimTime, jdbcType=TIMESTAMP},
         #{endTime, jdbcType=TIMESTAMP},
         #{durationInMillis ,jdbcType=BIGINT},
@@ -126,7 +126,7 @@
            #{historicTask.description ,jdbcType=VARCHAR},
            #{historicTask.owner ,jdbcType=VARCHAR},
            #{historicTask.assignee ,jdbcType=VARCHAR},
-           #{historicTask.startTime, jdbcType=TIMESTAMP},
+           #{historicTask.createTime, jdbcType=TIMESTAMP},
            #{historicTask.claimTime, jdbcType=TIMESTAMP},
            #{historicTask.endTime, jdbcType=TIMESTAMP},
            #{historicTask.durationInMillis ,jdbcType=BIGINT},
@@ -188,7 +188,7 @@
              #{historicTask.description ,jdbcType=VARCHAR},
              #{historicTask.owner ,jdbcType=VARCHAR},
              #{historicTask.assignee ,jdbcType=VARCHAR},
-             #{historicTask.startTime, jdbcType=TIMESTAMP},
+             #{historicTask.createTime, jdbcType=TIMESTAMP},
              #{historicTask.claimTime, jdbcType=TIMESTAMP},
              #{historicTask.endTime, jdbcType=TIMESTAMP},
              #{historicTask.durationInMillis ,jdbcType=BIGINT},
@@ -312,7 +312,7 @@
     <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
     <result property="owner" column="OWNER_" jdbcType="VARCHAR" />
     <result property="assignee" column="ASSIGNEE_" jdbcType="VARCHAR" />
-    <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
+    <result property="createTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="claimTime" column="CLAIM_TIME_" jdbcType="TIMESTAMP" />
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
     <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
@@ -342,7 +342,7 @@
     <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
     <result property="owner" column="OWNER_" jdbcType="VARCHAR" />
     <result property="assignee" column="ASSIGNEE_" jdbcType="VARCHAR" />
-    <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
+    <result property="createTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="claimTime" column="CLAIM_TIME_" jdbcType="TIMESTAMP" />
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
     <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />

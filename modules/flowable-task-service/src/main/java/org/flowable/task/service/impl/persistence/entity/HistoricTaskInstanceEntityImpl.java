@@ -43,7 +43,7 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
     protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
-    protected Date startTime;
+    protected Date createTime;
     protected Date endTime;
     protected Long durationInMillis;
     protected String deleteReason;
@@ -86,7 +86,7 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
         this.description = task.getDescription();
         this.owner = task.getOwner();
         this.assignee = task.getAssignee();
-        this.startTime = CommandContextUtil.getTaskServiceConfiguration().getClock().getCurrentTime();
+        this.createTime = task.getCreateTime();
         this.taskDefinitionKey = task.getTaskDefinitionKey();
         this.formKey = task.getFormKey();
 
@@ -135,8 +135,8 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
         if (this.endTime == null) {
             this.deleteReason = deleteReason;
             this.endTime = CommandContextUtil.getTaskServiceConfiguration().getClock().getCurrentTime();
-            if (endTime != null && startTime != null) {
-                this.durationInMillis = endTime.getTime() - startTime.getTime();
+            if (endTime != null && createTime != null) {
+                this.durationInMillis = endTime.getTime() - createTime.getTime();
             }
         }
     }
@@ -210,7 +210,7 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
 
     @Override
     public Date getStartTime() {
-        return startTime;
+        return getCreateTime(); // For backwards compatible reason implemented with createTime and startTime
     }
 
     @Override
@@ -239,8 +239,8 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
     }
 
     @Override
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
     @Override
@@ -323,7 +323,7 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
 
     @Override
     public Date getCreateTime() {
-        return getStartTime(); // For backwards compatible reason implemented with createTime and startTime
+        return createTime;
     }
 
     @Override
@@ -408,7 +408,7 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
 
     @Override
     public Date getTime() {
-        return getStartTime();
+        return getCreateTime();
     }
 
     @Override
