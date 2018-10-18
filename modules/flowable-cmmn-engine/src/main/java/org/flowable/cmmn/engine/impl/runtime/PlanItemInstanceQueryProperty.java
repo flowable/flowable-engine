@@ -27,7 +27,7 @@ public class PlanItemInstanceQueryProperty implements QueryProperty {
 
     private static final Map<String, PlanItemInstanceQueryProperty> properties = new HashMap<>();
 
-    public static final PlanItemInstanceQueryProperty START_TIME = new PlanItemInstanceQueryProperty("RES.START_TIME_");
+    public static final PlanItemInstanceQueryProperty CREATE_TIME = new PlanItemInstanceQueryProperty("RES.CREATE_TIME_");
     public static final PlanItemInstanceQueryProperty NAME = new PlanItemInstanceQueryProperty("RES.NAME_");
 
     private String name;

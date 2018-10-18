@@ -24,12 +24,10 @@ import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.flowable.cmmn.api.runtime.MilestoneInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
-import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.content.api.ContentService;
 import org.flowable.form.api.FormInfo;
@@ -147,7 +145,7 @@ public class FlowableCaseInstanceService {
             .list());
 
         List<StageRepresentation> stageRepresentations = stages.stream()
-            .map(p -> new StageRepresentation(p.getName(), p.getState(), p.getCreatedTime(), p.getEndedTime()))
+            .map(p -> new StageRepresentation(p.getName(), p.getState(), p.getCreateTime(), p.getEndedTime()))
             .collect(Collectors.toList());
 
         return new ResultListDataRepresentation(stageRepresentations);
@@ -179,7 +177,7 @@ public class FlowableCaseInstanceService {
             .list());
 
         List<StageRepresentation> stageRepresentations = stages.stream()
-            .map(p -> new StageRepresentation(p.getName(), p.getState(), p.getCreatedTime(), p.getEndedTime()))
+            .map(p -> new StageRepresentation(p.getName(), p.getState(), p.getCreateTime(), p.getEndedTime()))
             .collect(Collectors.toList());
 
         return new ResultListDataRepresentation(stageRepresentations);
@@ -203,7 +201,7 @@ public class FlowableCaseInstanceService {
             .list());
 
         List<MilestoneRepresentation> milestoneRepresentations = milestones.stream()
-            .map(p -> new MilestoneRepresentation(p.getName(), p.getState(), p.getCreatedTime()))
+            .map(p -> new MilestoneRepresentation(p.getName(), p.getState(), p.getCreateTime()))
             .collect(Collectors.toList());
 
         return new ResultListDataRepresentation(milestoneRepresentations);
@@ -235,7 +233,7 @@ public class FlowableCaseInstanceService {
             .list());
 
         List<MilestoneRepresentation> milestoneRepresentations = milestones.stream()
-            .map(p -> new MilestoneRepresentation(p.getName(), p.getState(), p.getCreatedTime()))
+            .map(p -> new MilestoneRepresentation(p.getName(), p.getState(), p.getCreateTime()))
             .collect(Collectors.toList());
 
         return new ResultListDataRepresentation(milestoneRepresentations);
@@ -357,7 +355,7 @@ public class FlowableCaseInstanceService {
             planItemInstanceRepresentation.setPlanItemDefinitionType(planItemInstance.getPlanItemDefinitionType());
             planItemInstanceRepresentation.setName(planItemInstance.getName());
             planItemInstanceRepresentation.setState(planItemInstance.getState());
-            planItemInstanceRepresentation.setStartTime(planItemInstance.getStartTime());
+            planItemInstanceRepresentation.setCreateTime(planItemInstance.getCreateTime());
             representations.add(planItemInstanceRepresentation);
         }
 

@@ -35,7 +35,7 @@ public class HistoricPlanItemInstanceResponse {
     protected String planItemDefinitionId;
     protected String planItemDefinitionType;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
-    protected Date createdTime;
+    protected Date createTime;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date lastAvailableTime;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
@@ -155,12 +155,12 @@ public class HistoricPlanItemInstanceResponse {
     }
 
     @ApiModelProperty(example = "2013-04-17T10:17:43.902+0000")
-    public Date getCreatedTime() {
-        return createdTime;
+    public Date getCreateTime() {
+        return createTime;
     }
 
-    public void setCreatedTime(Date createdTime) {
-        this.createdTime = createdTime;
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
     @ApiModelProperty(example = "2013-04-17T10:17:43.902+0000")

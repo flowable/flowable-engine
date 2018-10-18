@@ -14,7 +14,6 @@ package org.flowable.ui.task.model.runtime;
 
 import java.util.Date;
 
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.ui.common.model.AbstractRepresentation;
 
 /**
@@ -32,7 +31,7 @@ public class PlanItemInstanceRepresentation extends AbstractRepresentation {
     protected String planItemDefinitionType;
     protected String name;
     protected String state;
-    protected Date startTime;
+    protected Date createTime;
 
     public String getId() {
         return id;
@@ -94,10 +93,10 @@ public class PlanItemInstanceRepresentation extends AbstractRepresentation {
     public void setState(String state) {
         this.state = state;
     }
-    public Date getStartTime() {
-        return startTime;
+    public Date getCreateTime() {
+        return createTime;
     }
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 }

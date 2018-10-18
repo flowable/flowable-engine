@@ -415,7 +415,7 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         assertEquals(expected.getElementId(), actual.get("elementId").textValue());
         assertEquals(expected.getPlanItemDefinitionId(), actual.get("planItemDefinitionId").textValue());
         assertEquals(expected.getPlanItemDefinitionType(), actual.get("planItemDefinitionType").textValue());
-        assertEquals(getISODateStringWithTZ(expected.getCreatedTime()), actual.get("createdTime").textValue());
+        assertEquals(getISODateStringWithTZ(expected.getCreateTime()), actual.get("createTime").textValue());
         assertEquals(getISODateStringWithTZ(expected.getLastAvailableTime()), actual.get("lastAvailableTime").textValue());
         assertEquals(getISODateStringWithTZ(expected.getLastEnabledTime()), actual.get("lastEnabledTime").textValue());
         assertEquals(getISODateStringWithTZ(expected.getLastDisabledTime()), actual.get("lastDisabledTime").textValue());

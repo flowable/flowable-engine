@@ -32,7 +32,9 @@ public interface DelegatePlanItemInstance extends PlanItemInstance, VariableScop
     void setElementId(String elementId);
     void setPlanItemDefinitionId(String planItemDefinitionId);
     void setPlanItemDefinitionType(String planItemDefinitionType);
+    @Deprecated
     void setStartTime(Date startTime);
+    void setCreateTime(Date createTime);
     void setStartUserId(String startUserId);
     void setReferenceId(String referenceId);
     void setReferenceType(String referenceType);

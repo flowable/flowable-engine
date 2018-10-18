@@ -6,7 +6,7 @@
 
     <insert id="insertPlanItemInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl">
         insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_,
-                                                         NAME_, STATE_, START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_)
+                                                         NAME_, STATE_, CREATE_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_)
         values (
             #{id ,jdbcType=VARCHAR},
             1,
@@ -19,7 +19,7 @@
             #{planItemDefinitionType, jdbcType=VARCHAR},
             #{name ,jdbcType=VARCHAR},
             #{state ,jdbcType=VARCHAR},
-            #{startTime ,jdbcType=TIMESTAMP},
+            #{createTime ,jdbcType=TIMESTAMP},
             #{startUserId ,jdbcType=VARCHAR},
             #{referenceId ,jdbcType=VARCHAR},
             #{referenceType ,jdbcType=VARCHAR},
@@ -33,7 +33,7 @@
 
   <insert id="bulkInsertPlanItemInstance" parameterType="java.util.List">
     insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_,
-                                                     NAME_, STATE_, START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_)
+                                                     NAME_, STATE_, CREATE_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_)
     values
       <foreach collection="list" item="planItemInstance" index="index" separator=",">
         (
@@ -48,7 +48,7 @@
             #{planItemInstance.planItemDefinitionType, jdbcType=VARCHAR},
             #{planItemInstance.name ,jdbcType=VARCHAR},
             #{planItemInstance.state ,jdbcType=VARCHAR},
-            #{planItemInstance.startTime ,jdbcType=TIMESTAMP},
+            #{planItemInstance.createTime ,jdbcType=TIMESTAMP},
             #{planItemInstance.startUserId ,jdbcType=VARCHAR},
             #{planItemInstance.referenceId, jdbcType=VARCHAR},
             #{planItemInstance.referenceType, jdbcType=VARCHAR},
@@ -65,7 +65,7 @@
         INSERT ALL
         <foreach collection="list" item="planItemInstance" index="index">
             into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_,
-                                                      NAME_, STATE_, START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_) VALUES
+                                                      NAME_, STATE_, CREATE_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_) VALUES
             (
                 #{planItemInstance.id ,jdbcType=VARCHAR},
                 1,
@@ -78,7 +78,7 @@
                 #{planItemInstance.planItemDefinitionType, jdbcType=VARCHAR},
                 #{planItemInstance.name ,jdbcType=VARCHAR},
                 #{planItemInstance.state ,jdbcType=VARCHAR},
-                #{planItemInstance.startTime ,jdbcType=TIMESTAMP},
+                #{planItemInstance.createTime ,jdbcType=TIMESTAMP},
                 #{planItemInstance.startUserId ,jdbcType=VARCHAR},
                 #{planItemInstance.referenceId, jdbcType=VARCHAR},
                 #{planItemInstance.referenceType, jdbcType=VARCHAR},
@@ -123,8 +123,8 @@
         <if test="originalPersistentState.state != state">
             STATE_ = #{state, jdbcType=VARCHAR},
         </if>
-        <if test="originalPersistentState.startTime != startTime">
-            START_TIME_ = #{startTime, jdbcType=TIMESTAMP},
+        <if test="originalPersistentState.createTime != createTime">
+            CREATE_TIME_ = #{createTime, jdbcType=TIMESTAMP},
         </if>
         <if test="originalPersistentState.startUserId != startUserId">
             START_USER_ID_ = #{startUserId, jdbcType=VARCHAR},
@@ -182,7 +182,7 @@
     <result property="planItemDefinitionType" column="ITEM_DEFINITION_TYPE_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="state" column="STATE_" jdbcType="VARCHAR" />
-    <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
+    <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
     <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
     <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR" />
     <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR" />
@@ -258,10 +258,10 @@
             and RES.STATE_ = #{state}
         </if>
         <if test="startedBefore != null">
-            and RES.START_TIME_ &lt;= #{startedBefore}
+            and RES.CREATE_TIME_ &lt;= #{startedBefore}
         </if>
         <if test="startedAfter != null">
-            and RES.START_TIME_ &gt;= #{startedAfter}
+            and RES.CREATE_TIME_ &gt;= #{startedAfter}
         </if>
         <if test="startUserId != null">
             and RES.START_USER_ID_ = #{startUserId}

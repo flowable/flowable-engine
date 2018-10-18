@@ -331,8 +331,8 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     }
     
     @Override
-    public PlanItemInstanceQuery orderByStartTime() {
-        this.orderProperty = PlanItemInstanceQueryProperty.START_TIME;
+    public PlanItemInstanceQuery orderByCreateTime() {
+        this.orderProperty = PlanItemInstanceQueryProperty.CREATE_TIME;
         return this;
     }
     

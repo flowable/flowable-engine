@@ -6,7 +6,7 @@
 
     <insert id="insertHistoricPlanItemInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityImpl">
         insert into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
-        ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, CREATED_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
+        ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
         LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_)
         values (
             #{id ,jdbcType=VARCHAR},
@@ -20,7 +20,7 @@
             #{elementId ,jdbcType=VARCHAR},
             #{planItemDefinitionId ,jdbcType=VARCHAR},
             #{planItemDefinitionType ,jdbcType=VARCHAR},
-            #{createdTime ,jdbcType=TIMESTAMP},
+            #{createTime ,jdbcType=TIMESTAMP},
             #{lastAvailableTime ,jdbcType=TIMESTAMP},
             #{lastEnabledTime ,jdbcType=TIMESTAMP},
             #{lastDisabledTime ,jdbcType=TIMESTAMP},
@@ -41,7 +41,7 @@
 
     <insert id="bulkInsertHistoricPlanItemInstance" parameterType="java.util.List">
         insert into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
-        ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, CREATED_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
+        ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
         LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_)
         values
         <foreach collection="list" item="historicPlanItemInstance" index="index" separator=",">
@@ -57,7 +57,7 @@
             #{historicPlanItemInstance.elementId ,jdbcType=VARCHAR},
             #{historicPlanItemInstance.planItemDefinitionId ,jdbcType=VARCHAR},
             #{historicPlanItemInstance.planItemDefinitionType ,jdbcType=VARCHAR},
-            #{historicPlanItemInstance.createdTime ,jdbcType=TIMESTAMP},
+            #{historicPlanItemInstance.createTime ,jdbcType=TIMESTAMP},
             #{historicPlanItemInstance.lastAvailableTime ,jdbcType=TIMESTAMP},
             #{historicPlanItemInstance.lastEnabledTime ,jdbcType=TIMESTAMP},
             #{historicPlanItemInstance.lastDisabledTime ,jdbcType=TIMESTAMP},
@@ -81,7 +81,7 @@
         INSERT ALL
         <foreach collection="list" item="historicPlanItemInstance" index="index">
             into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
-            ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, CREATED_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
+            ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
             LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_)
             VALUES (
                 #{historicPlanItemInstance.id ,jdbcType=VARCHAR},
@@ -95,7 +95,7 @@
                 #{historicPlanItemInstance.elementId ,jdbcType=VARCHAR},
                 #{historicPlanItemInstance.planItemDefinitionId ,jdbcType=VARCHAR},
                 #{historicPlanItemInstance.planItemDefinitionType ,jdbcType=VARCHAR},
-                #{historicPlanItemInstance.createdTime ,jdbcType=TIMESTAMP},
+                #{historicPlanItemInstance.createTime ,jdbcType=TIMESTAMP},
                 #{historicPlanItemInstance.lastAvailableTime ,jdbcType=TIMESTAMP},
                 #{historicPlanItemInstance.lastEnabledTime ,jdbcType=TIMESTAMP},
                 #{historicPlanItemInstance.lastDisabledTime ,jdbcType=TIMESTAMP},
@@ -148,8 +148,8 @@
             <if test="originalPersistentState.planItemDefinitionType != planItemDefinitionType">
                 ITEM_DEFINITION_TYPE_ = #{planItemDefinitionType, jdbcType=VARCHAR},
             </if>
-            <if test="originalPersistentState.createdTime != createdTime">
-                CREATED_TIME_ = #{createdTime, jdbcType=TIMESTAMP},
+            <if test="originalPersistentState.createTime != createTime">
+                CREATE_TIME_ = #{createTime, jdbcType=TIMESTAMP},
             </if>
             <if test="originalPersistentState.lastAvailableTime != lastAvailableTime">
                 LAST_AVAILABLE_TIME_ = #{lastAvailableTime, jdbcType=TIMESTAMP},
@@ -220,7 +220,7 @@
         <result property="elementId" column="ELEMENT_ID_" jdbcType="VARCHAR"/>
         <result property="planItemDefinitionId" column="ITEM_DEFINITION_ID_" jdbcType="VARCHAR"/>
         <result property="planItemDefinitionType" column="ITEM_DEFINITION_TYPE_" jdbcType="VARCHAR"/>
-        <result property="createdTime" column="CREATED_TIME_" jdbcType="TIMESTAMP"/>
+        <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP"/>
         <result property="lastAvailableTime" column="LAST_AVAILABLE_TIME_" jdbcType="TIMESTAMP"/>
         <result property="lastEnabledTime" column="LAST_ENABLED_TIME_" jdbcType="TIMESTAMP"/>
         <result property="lastDisabledTime" column="LAST_DISABLED_TIME_" jdbcType="TIMESTAMP"/>
@@ -294,10 +294,10 @@
                 and RES.ITEM_DEFINITION_TYPE_ in <foreach item="type" index="index" collection="planItemDefinitionTypes" open="(" separator="," close=")">#{type}</foreach>
             </if>
             <if test="createdBefore != null">
-                and RES.CREATED_TIME_ &lt;= #{createdBefore}
+                and RES.CREATE_TIME_ &lt;= #{createdBefore}
             </if>
             <if test="createdAfter != null">
-                and RES.CREATED_TIME_ &gt;= #{createdAfter}
+                and RES.CREATE_TIME_ &gt;= #{createdAfter}
             </if>
             <if test="lastAvailableBefore != null">
                 and RES.LAST_AVAILABLE_TIME_ &lt;= #{lastAvailableBefore}

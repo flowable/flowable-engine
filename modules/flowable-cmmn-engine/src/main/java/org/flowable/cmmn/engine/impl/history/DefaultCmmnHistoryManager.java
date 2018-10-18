@@ -226,7 +226,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             historicPlanItemInstanceEntity.setReferenceId(planItemInstanceEntity.getReferenceId());
             historicPlanItemInstanceEntity.setReferenceType(planItemInstanceEntity.getReferenceType());
             historicPlanItemInstanceEntity.setTenantId(planItemInstanceEntity.getTenantId());
-            historicPlanItemInstanceEntity.setCreatedTime(planItemInstanceEntity.getStartTime());
+            historicPlanItemInstanceEntity.setCreateTime(planItemInstanceEntity.getCreateTime());
             historicPlanItemInstanceEntityManager.insert(historicPlanItemInstanceEntity);
         }
     }

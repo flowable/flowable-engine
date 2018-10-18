@@ -29,7 +29,9 @@ public interface PlanItemInstance {
     String getElementId();
     String getPlanItemDefinitionId();
     String getPlanItemDefinitionType();
+    @Deprecated()
     Date getStartTime();
+    Date getCreateTime();
     String getStartUserId();
     String getReferenceId();
     String getReferenceType();

@@ -42,7 +42,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     protected String planItemDefinitionType;
     protected String name;
     protected String state;
-    protected Date startTime;
+    protected Date createTime;
     protected String startUserId;
     protected String referenceId;
     protected String referenceType;
@@ -72,7 +72,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         persistentState.put("planItemDefinitionType", planItemDefinitionType);
         persistentState.put("name", name);
         persistentState.put("state", state);
-        persistentState.put("startTime", startTime);
+        persistentState.put("createTime", createTime);
         persistentState.put("startUserId", startUserId);
         persistentState.put("referenceId", referenceId);
         persistentState.put("referenceType", referenceType);
@@ -166,12 +166,20 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         this.state = state;
     }
     @Override
+    public Date getCreateTime() {
+        return createTime;
+    }
+    @Override
     public Date getStartTime() {
-        return startTime;
+        return getCreateTime();
     }
     @Override
     public void setStartTime(Date startTime) {
-        this.startTime = startTime;
+        setCreateTime(startTime);
+    }
+    @Override
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
     @Override
     public String getStartUserId() {

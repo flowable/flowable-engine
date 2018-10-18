@@ -39,7 +39,7 @@ public interface HistoricPlanItemInstance {
 
     String getPlanItemDefinitionType();
 
-    Date getCreatedTime();
+    Date getCreateTime();
 
     Date getLastAvailableTime();
 

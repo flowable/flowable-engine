@@ -469,7 +469,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REFERENCE_ID, planItemInstanceEntity.getReferenceId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REFERENCE_TYPE, planItemInstanceEntity.getReferenceType());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_TENANT_ID, planItemInstanceEntity.getTenantId());
-        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CREATE_TIME, planItemInstanceEntity.getStartTime());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CREATE_TIME, planItemInstanceEntity.getCreateTime());
         
         if (planItemInstanceEntity.getCaseDefinitionId() != null) {
             addCaseDefinitionFields(data, CaseDefinitionUtil.getCaseDefinition(planItemInstanceEntity.getCaseDefinitionId()));

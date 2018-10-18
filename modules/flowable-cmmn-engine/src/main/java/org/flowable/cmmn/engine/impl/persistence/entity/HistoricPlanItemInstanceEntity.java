@@ -44,7 +44,7 @@ public interface HistoricPlanItemInstanceEntity extends Entity, HasRevision, His
 
     void setPlanItemDefinitionType(String planItemDefinitionType);
 
-    void setCreatedTime(Date createdTime);
+    void setCreateTime(Date createTime);
 
     void setLastAvailableTime(Date availableTime);
 

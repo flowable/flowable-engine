@@ -61,7 +61,7 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
     HistoricPlanItemInstanceQuery exitAfter(Date exitAfter);
     HistoricPlanItemInstanceQuery endedBefore(Date startedBefore);
     HistoricPlanItemInstanceQuery endedAfter(Date startedAfter);
-    HistoricPlanItemInstanceQuery orderByCreatedTime();
+    HistoricPlanItemInstanceQuery orderByCreateTime();
     HistoricPlanItemInstanceQuery orderByEndedTime();
     HistoricPlanItemInstanceQuery orderByName();
 }

@@ -63,7 +63,7 @@ public class PlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager
             Expression nameExpression = expressionManager.createExpression(planItem.getName());
             planItemInstanceEntity.setName(nameExpression.getValue(caseInstanceEntity).toString());
         }
-        planItemInstanceEntity.setStartTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
+        planItemInstanceEntity.setCreateTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
         planItemInstanceEntity.setElementId(planItem.getId());
         PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
         if (planItemDefinition != null) {
