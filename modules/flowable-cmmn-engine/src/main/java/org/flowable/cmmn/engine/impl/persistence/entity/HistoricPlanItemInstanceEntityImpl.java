@@ -32,7 +32,7 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     protected String elementId;
     protected String planItemDefinitionId;
     protected String planItemDefinitionType;
-    protected Date createdTime;
+    protected Date createTime;
     protected Date lastAvailableTime;
     protected Date lastEnabledTime;
     protected Date lastDisabledTime;
@@ -59,7 +59,7 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
         persistentState.put("elementId", elementId);
         persistentState.put("name", name);
         persistentState.put("state", state);
-        persistentState.put("createdTime", createdTime);
+        persistentState.put("createTime", createTime);
         persistentState.put("lastAvailableTime", lastAvailableTime);
         persistentState.put("lastEnabledTime", lastEnabledTime);
         persistentState.put("lastDisabledTime", lastDisabledTime);
@@ -171,13 +171,13 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     }
 
     @Override
-    public Date getCreatedTime() {
-        return createdTime;
+    public Date getCreateTime() {
+        return createTime;
     }
 
     @Override
-    public void setCreatedTime(Date createdTime) {
-        this.createdTime = createdTime;
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
     @Override

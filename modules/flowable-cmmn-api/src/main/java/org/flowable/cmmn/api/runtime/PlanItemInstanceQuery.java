@@ -317,7 +317,7 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
      */
     PlanItemInstanceQuery caseVariableNotExists(String name);
     
-    PlanItemInstanceQuery orderByStartTime();
+    PlanItemInstanceQuery orderByCreateTime();
     PlanItemInstanceQuery orderByName();
     
 }

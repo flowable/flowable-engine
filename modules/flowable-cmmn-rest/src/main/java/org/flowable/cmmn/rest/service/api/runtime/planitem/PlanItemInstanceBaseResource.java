@@ -43,7 +43,8 @@ public class PlanItemInstanceBaseResource {
 
     static {
         allowedSortProperties.put("name", PlanItemInstanceQueryProperty.NAME);
-        allowedSortProperties.put("startTime", PlanItemInstanceQueryProperty.START_TIME);
+        allowedSortProperties.put("createTime", PlanItemInstanceQueryProperty.CREATE_TIME);
+        allowedSortProperties.put("startTime", PlanItemInstanceQueryProperty.CREATE_TIME); // backwards compatibility
     }
 
     @Autowired
@@ -126,7 +127,7 @@ public class PlanItemInstanceBaseResource {
             restApiInterceptor.accessPlanItemInstanceInfoWithQuery(query, queryRequest);
         }
 
-        return paginateList(requestParams, queryRequest, query, "startTime", allowedSortProperties, restResponseFactory::createPlanItemInstanceResponseList);
+        return paginateList(requestParams, queryRequest, query, "createTime", allowedSortProperties, restResponseFactory::createPlanItemInstanceResponseList);
     }
 
     protected void addVariables(PlanItemInstanceQuery planItemInstanceQuery, List<QueryVariable> variables, boolean isCase) {

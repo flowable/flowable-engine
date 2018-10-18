@@ -124,7 +124,7 @@ public class HistoricCaseInstanceResource extends HistoricCaseInstanceBaseResour
             List<PlanItemInstance> stagePlanItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstanceId)
                 .planItemDefinitionType(PlanItemDefinitionType.STAGE)
-                .orderByStartTime().asc()
+                .orderByCreateTime().asc()
                 .list();
             
             for (PlanItemInstance planItemInstance : stagePlanItemInstances) {

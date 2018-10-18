@@ -318,8 +318,8 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
 
     @Override
-    public HistoricPlanItemInstanceQuery orderByCreatedTime() {
-        return orderBy(HistoricPlanItemInstanceQueryProperty.CREATED_TIME);
+    public HistoricPlanItemInstanceQuery orderByCreateTime() {
+        return orderBy(HistoricPlanItemInstanceQueryProperty.CREATE_TIME);
 
     }
 

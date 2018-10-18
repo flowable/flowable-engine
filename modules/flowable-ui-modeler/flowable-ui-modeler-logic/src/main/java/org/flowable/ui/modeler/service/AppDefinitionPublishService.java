@@ -150,7 +150,7 @@ public class AppDefinitionPublishService extends BaseAppDefinitionService {
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {
                 return;
             } else {
-                LOGGER.error("Invalid deploy result code: {}", response.getStatusLine());
+                LOGGER.error("Invalid deploy result code: {} for url", response.getStatusLine() + httpPost.getURI().toString());
                 throw new InternalServerErrorException("Invalid deploy result code: " + response.getStatusLine());
             }
             
