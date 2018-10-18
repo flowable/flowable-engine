@@ -44,6 +44,12 @@ import org.junit.jupiter.api.Test;
  */
 public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowableTestCase {
 
+    Condition<Execution> isInactiveExecution = new Condition<>(execution -> !((ExecutionEntity) execution).isActive(), "inactive execution");
+    Consumer<Task> hasLoopCounter = task -> {
+        Map<String, Object> variables = taskService.getVariables(task.getId());
+        assertThat(variables).extracting("loopCounter").isNotNull();
+    };
+
     @AfterEach
     protected void tearDown() {
         deleteDeployments();
@@ -330,12 +336,6 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         ProcessDefinition procParallelMultiInst = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/parallel-multi-instance-task.bpmn20.xml");
         ProcessDefinition procSimpleOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
 
-        Condition<Execution> isInactiveExecution = new Condition<>(execution -> !((ExecutionEntity) execution).isActive(), "inactive execution");
-        Consumer<Task> hasLoopCounter = task -> {
-            Map<String, Object> variables = taskService.getVariables(task.getId());
-            assertThat(variables).extracting("loopCounter").isNotNull();
-        };
-
         //Start the processInstance
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procParallelMultiInst.getId(), Collections.singletonMap("nrOfLoops", 3));
         completeTask(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult());
@@ -549,12 +549,6 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
     public void testMigrateParallelMultiInstanceActivityToSequentialMultiInstanceActivity() {
         ProcessDefinition procParallelMultiInst = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/parallel-multi-instance-task.bpmn20.xml");
         ProcessDefinition procSequentialMultiInst = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/sequential-multi-instance-task.bpmn20.xml");
-
-        Condition<Execution> isInactiveExecution = new Condition<>(execution -> !((ExecutionEntity) execution).isActive(), "inactive execution");
-        Consumer<Task> hasLoopCounter = task -> {
-            Map<String, Object> variables = taskService.getVariables(task.getId());
-            assertThat(variables).extracting("loopCounter").isNotNull();
-        };
 
         //Start the processInstance
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procParallelMultiInst.getId(), Collections.singletonMap("nrOfLoops", 3));
@@ -1027,18 +1021,21 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         assertProcessEnded(processInstance.getId());
     }
 
+    //TODO WIP - Test for exception
     @Test
     @Disabled("Not supported - Cannot migrate to an arbitrary activity inside an MI subProcess")
     public void testMigrateSimpleActivityToActivityInsideMultiInstanceSubProcess() {
 
     }
 
+    //TODO WIP - Test for exception
     @Test
     @Disabled("Not supported - Cannot migrate to an arbitrary activity inside an MI subProcess")
     public void testMigrateSimpleActivityToMultiInstanceSubProcessNestedInsideMultiInstanceSubProcess() {
 
     }
 
+    //TODO WIP - Test for exception
     @Test
     @Disabled("Not supported - Cannot migrate to an arbitrary activity inside an MI subProcess")
     public void testMigrateMultiInstanceSubProcessActivityToNestedMultiInstanceSubProcessActivity() {
@@ -1233,6 +1230,115 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
                 assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procParallelMultiInst.getId());
             }
         }
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testAutoMapMultiInstanceSubProcessWhileMigrateSiblingActivityInParallelGateway() {
+        //The original model is a  parallelGateway with a MI subProces in one path
+        //The model update replaces the simple activity in the other path with a subprocess, the MI subProcess is autoMapped and should not "change" only update the model reference
+        ProcessDefinition firstVersionModel = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/parallel-gateway-with-activity-and-mi-subprocess.bpmn20.xml");
+        ProcessDefinition secondVersionModel = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/parallel-gateway-with-subprocess-and-mi-subprocess.bpmn20.xml");
+
+        //Start the processInstance
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(firstVersionModel.getId());
+        runtimeService.setVariables(processInstance.getId(), Collections.singletonMap("nrOfLoops", 2));
+
+        //Progress inside the parallel gateway
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("taskBeforeFork");
+        completeTask(task);
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting("processDefinitionId").containsOnly(firstVersionModel.getId());
+        assertThat(executions).haveExactly(3, new Condition<>(execution -> execution.getActivityId().equals("miSubProcess"), "MI SubProcess"));
+        assertThat(executions).haveExactly(1, new Condition<>(execution -> execution.getActivityId().equals("miSubProcess") && ((ExecutionEntity) execution).isMultiInstanceRoot(), "One MI SubProcess root"));
+        assertThat(executions).haveExactly(2, new Condition<>(execution -> execution.getActivityId().equals("miSubProcessTask1"), "Two tasks in the MI subProcess"));
+        assertThat(executions).haveExactly(1, new Condition<>(execution -> execution.getActivityId().equals("parallelTask"), "One Task execution parallel to the MI SubProcess"));
+
+        Execution miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
+        Map<String, Object> miRootVars = runtimeService.getVariables(miRoot.getId());
+        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(2);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(0);
+        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(2);
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("parallelTask", "miSubProcessTask1", "miSubProcessTask1");
+
+        //Complete one task and one loop of the MI subProcess
+        tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("miSubProcessTask1")).forEach(this::completeTask);
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("miSubProcessTask2")).findFirst().ifPresent(this::completeTask);
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
+        miRootVars = runtimeService.getVariables(miRoot.getId());
+        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(1);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(1);
+        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(2);
+
+        assertThat(executions).haveExactly(2, new Condition<>(execution -> execution.getActivityId().equals("miSubProcess"), "MI SubProcess"));
+        assertThat(executions).haveExactly(1, new Condition<>(execution -> execution.getActivityId().equals("miSubProcess") && ((ExecutionEntity) execution).isMultiInstanceRoot(), "One MI SubProcess root"));
+        assertThat(executions).haveExactly(1, new Condition<>(execution -> execution.getActivityId().equals("miSubProcessTask2"), "a MI subProcess task"));
+        assertThat(executions).haveExactly(1, new Condition<>(execution -> execution.getActivityId().equals("parallelTask"), "One Task execution parallel to the MI SubProcess"));
+
+        //Prepare and action the migration
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(secondVersionModel.getId())
+            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "subProcessTask1"));
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
+
+        //Confirm the result, the MI subProcess should be "intact" with only its model reference changed, only the other path of the gateway should have changed
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting("processDefinitionId").containsOnly(secondVersionModel.getId());
+        assertThat(executions).haveExactly(2, new Condition<>(execution -> execution.getActivityId().equals("miSubProcess"), "MI SubProcess"));
+        assertThat(executions).haveExactly(1, new Condition<>(execution -> execution.getActivityId().equals("miSubProcess") && ((ExecutionEntity) execution).isMultiInstanceRoot(), "One MI SubProcess root"));
+        assertThat(executions).haveExactly(1, new Condition<>(execution -> execution.getActivityId().equals("miSubProcessTask2"), "a MI subProcess task"));
+        assertThat(executions).haveExactly(1, new Condition<>(execution -> execution.getActivityId().equals("subProcess"), "The new subProcess"));
+        assertThat(executions).haveExactly(1, new Condition<>(execution -> execution.getActivityId().equals("subProcessTask1"), "The migrated task"));
+
+        miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
+        miRootVars = runtimeService.getVariables(miRoot.getId());
+        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(1);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(1);
+        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(2);
+
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).hasSize(2);
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsOnly("miSubProcessTask2", "subProcessTask1");
+
+        //Complete the process
+        completeProcessInstanceTasks(processInstance.getId());
+
+        //        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+        //            //Check History
+        //            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+        //                .processInstanceId(processInstance.getId())
+        //                .activityType("userTask")
+        //                .list();
+        //            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).haveAtMost(1, new Condition<>((String s) -> s.equals("beforeMultiInstance"), "beforeMultiInstance completed task"));
+        //            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).haveAtMost(6, new Condition<>((String s) -> s.equals("nestedSubTask1"), "nestedSubTask1 completed task"));
+        //            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).haveAtMost(6, new Condition<>((String s) -> s.equals("subTask1"), "subTask1 completed task"));
+        //            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).haveAtMost(4, new Condition<>((String s) -> s.equals("subTask2"), "subTask2 completed task"));
+        //            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).haveAtMost(2, new Condition<>((String s) -> s.equals("afterMultiInstance"), "afterMultiInstance completed task"));
+        //            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelMultiInst.getId());
+        //
+        //            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        //                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+        //                    .processInstanceId(processInstance.getId())
+        //                    .list();
+        //                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).haveAtMost(1, new Condition<>((String s) -> s.equals("beforeMultiInstance"), "beforeMultiInstance completed task"));
+        //                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).haveAtMost(6, new Condition<>((String s) -> s.equals("nestedSubTask1"), "nestedSubTask1 completed task"));
+        //                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).haveAtMost(6, new Condition<>((String s) -> s.equals("subTask1"), "subTask1 completed task"));
+        //                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).haveAtMost(4, new Condition<>((String s) -> s.equals("subTask2"), "subTask2 completed task"));
+        //                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).haveAtMost(2, new Condition<>((String s) -> s.equals("afterMultiInstance"), "afterMultiInstance completed task"));
+        //                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procParallelMultiInst.getId());
+        //            }
+        //        }
 
         assertProcessEnded(processInstance.getId());
     }
