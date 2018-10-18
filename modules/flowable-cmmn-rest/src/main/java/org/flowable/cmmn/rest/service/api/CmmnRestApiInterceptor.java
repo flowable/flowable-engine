@@ -33,10 +33,12 @@ import org.flowable.cmmn.rest.service.api.history.milestone.HistoricMilestoneIns
 import org.flowable.cmmn.rest.service.api.history.planitem.HistoricPlanItemInstanceQueryRequest;
 import org.flowable.cmmn.rest.service.api.history.task.HistoricTaskInstanceQueryRequest;
 import org.flowable.cmmn.rest.service.api.history.variable.HistoricVariableInstanceQueryRequest;
+import org.flowable.cmmn.rest.service.api.runtime.caze.CaseInstanceCreateRequest;
 import org.flowable.cmmn.rest.service.api.runtime.caze.CaseInstanceQueryRequest;
 import org.flowable.cmmn.rest.service.api.runtime.planitem.PlanItemInstanceQueryRequest;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskActionRequest;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskQueryRequest;
+import org.flowable.cmmn.rest.service.api.runtime.task.TaskRequest;
 import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
@@ -54,7 +56,7 @@ public interface CmmnRestApiInterceptor {
     
     void accessTaskInfoWithQuery(TaskQuery taskQuery, TaskQueryRequest request);
     
-    void createTask(Task task);
+    void createTask(Task task, TaskRequest request);
     
     void deleteTask(Task task);
     
@@ -64,7 +66,7 @@ public interface CmmnRestApiInterceptor {
 
     void accessCaseInstanceInfoWithQuery(CaseInstanceQuery caseInstanceQuery, CaseInstanceQueryRequest request);
     
-    void createCaseInstance(CaseInstanceBuilder caseInstanceBuilder);
+    void createCaseInstance(CaseInstanceBuilder caseInstanceBuilder, CaseInstanceCreateRequest request);
     
     void deleteCaseInstance(CaseInstance caseInstance);
     
