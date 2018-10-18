@@ -290,7 +290,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
             }
             
             if (restApiInterceptor != null) {
-                restApiInterceptor.createProcessInstance(processInstanceBuilder);
+                restApiInterceptor.createProcessInstance(processInstanceBuilder, request);
             }
 
             instance = processInstanceBuilder.start();

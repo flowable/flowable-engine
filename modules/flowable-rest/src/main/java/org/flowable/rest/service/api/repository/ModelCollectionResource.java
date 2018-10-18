@@ -166,7 +166,7 @@ public class ModelCollectionResource extends BaseModelResource {
         model.setTenantId(modelRequest.getTenantId());
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.createModel(model);
+            restApiInterceptor.createModel(model, modelRequest);
         }
 
         repositoryService.saveModel(model);

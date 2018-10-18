@@ -198,7 +198,7 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             }
             
             if (restApiInterceptor != null) {
-                restApiInterceptor.createCaseInstance(caseInstanceBuilder);
+                restApiInterceptor.createCaseInstance(caseInstanceBuilder, request);
             }
 
             instance = caseInstanceBuilder.start();

@@ -48,14 +48,17 @@ import org.flowable.rest.service.api.history.HistoricTaskInstanceQueryRequest;
 import org.flowable.rest.service.api.history.HistoricVariableInstanceQueryRequest;
 import org.flowable.rest.service.api.identity.GroupRequest;
 import org.flowable.rest.service.api.identity.UserRequest;
+import org.flowable.rest.service.api.repository.ModelRequest;
 import org.flowable.rest.service.api.runtime.process.ExecutionActionRequest;
 import org.flowable.rest.service.api.runtime.process.ExecutionChangeActivityStateRequest;
 import org.flowable.rest.service.api.runtime.process.ExecutionQueryRequest;
 import org.flowable.rest.service.api.runtime.process.InjectActivityRequest;
+import org.flowable.rest.service.api.runtime.process.ProcessInstanceCreateRequest;
 import org.flowable.rest.service.api.runtime.process.ProcessInstanceQueryRequest;
 import org.flowable.rest.service.api.runtime.process.SignalEventReceivedRequest;
 import org.flowable.rest.service.api.runtime.task.TaskActionRequest;
 import org.flowable.rest.service.api.runtime.task.TaskQueryRequest;
+import org.flowable.rest.service.api.runtime.task.TaskRequest;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -69,7 +72,7 @@ public interface BpmnRestApiInterceptor {
     
     void accessTaskInfoWithQuery(TaskQuery taskQuery, TaskQueryRequest request);
     
-    void createTask(Task task);
+    void createTask(Task task, TaskRequest request);
     
     void deleteTask(Task task);
     
@@ -85,7 +88,7 @@ public interface BpmnRestApiInterceptor {
 
     void accessProcessInstanceInfoWithQuery(ProcessInstanceQuery processInstanceQuery, ProcessInstanceQueryRequest request);
     
-    void createProcessInstance(ProcessInstanceBuilder processInstanceBuilder);
+    void createProcessInstance(ProcessInstanceBuilder processInstanceBuilder, ProcessInstanceCreateRequest request);
     
     void deleteProcessInstance(ProcessInstance processInstance);
     
@@ -115,7 +118,7 @@ public interface BpmnRestApiInterceptor {
     
     void accessModelInfoWithQuery(ModelQuery modelQuery);
     
-    void createModel(Model model);
+    void createModel(Model model, ModelRequest request);
     
     void accessJobInfoById(Job job);
     
