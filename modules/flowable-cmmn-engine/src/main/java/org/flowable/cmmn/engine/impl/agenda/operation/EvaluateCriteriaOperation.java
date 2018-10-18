@@ -216,7 +216,10 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         for (Criterion entryCriterion : criteria) {
             Sentry sentry = entryCriterion.getSentry();
 
-            if (sentry.getOnParts().size() == 1 && sentry.getSentryIfPart() == null) { // No need to look into the satisfied onparts
+            // There can be zero or more on parts and zero or one if part.
+            // All defined parts need to be satisfied for the sentry to trigger.
+
+            if (sentry.getOnParts().size() == 1 && sentry.getSentryIfPart() == null) { // Only one one part and no if part: no need to fetch the previously satisfied onparts
                 if (planItemLifeCycleEvent != null) {
                     SentryOnPart sentryOnPart = sentry.getOnParts().get(0);
                     if (sentryOnPartMatchesCurrentLifeCycleEvent(sentryOnPart)) {
@@ -224,38 +227,40 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                     }
                 }
 
-            } else if (sentry.getOnParts().isEmpty() && sentry.getSentryIfPart() != null) {
+            } else if (sentry.getOnParts().isEmpty() && sentry.getSentryIfPart() != null) { // Only an if part: simply evaluate the if part
                 if (evaluateSentryIfPart(sentry, entityWithSentryPartInstances)) {
                     return CriteriaEvaluationResult.SENTRY_SATISFIED;
                 }
                 
             } else {
 
+                // Go through the previously satisfied sentry parts and see if the ifPart was already satisfied
+                // and collect the ids of all previously satisfied onParts
                 boolean sentryIfPartSatisfied = false;
-                Set<String> satisfiedSentryOnPartIds = new HashSet<>(1); // can maximum be one for a given sentry
+                Set<String> previouslySatisfiedSentryOnPartIds = new HashSet<>(1);
                 for (SentryPartInstanceEntity sentryPartInstanceEntity : entityWithSentryPartInstances.getSatisfiedSentryPartInstances()) {
                     if (sentryPartInstanceEntity.getOnPartId() != null) {
-                        satisfiedSentryOnPartIds.add(sentryPartInstanceEntity.getOnPartId());
+                        previouslySatisfiedSentryOnPartIds.add(sentryPartInstanceEntity.getOnPartId());
                     } else if (sentryPartInstanceEntity.getIfPartId() != null
                             && sentryPartInstanceEntity.getIfPartId().equals(sentry.getSentryIfPart().getId())) {
                         sentryIfPartSatisfied = true;
                     }
                 }
 
-                boolean criteriaSatisfied = false;
+                boolean criteriaSatisfied = false; // general flag indicating if any criteria has fire during this evaluataion
                 
-                // On parts
+                // Verify if the onParts which are not yet satisfied, become satisifed due to the new event
                 for (SentryOnPart sentryOnPart : sentry.getOnParts()) {
-                    if (!satisfiedSentryOnPartIds.contains(sentryOnPart.getId())) {
+                    if (!previouslySatisfiedSentryOnPartIds.contains(sentryOnPart.getId())) {
                         if (planItemLifeCycleEvent != null && sentryOnPartMatchesCurrentLifeCycleEvent(sentryOnPart)) {
                             createSentryPartInstanceEntity(entityWithSentryPartInstances, sentryOnPart, null);
-                            satisfiedSentryOnPartIds.add(sentryOnPart.getId());
+                            previouslySatisfiedSentryOnPartIds.add(sentryOnPart.getId());
                             criteriaSatisfied = true;
                         }
                     }
                 }
                 
-                // If parts
+                // Verify the ifPart in case it wasn't satisfied yet
                 if (sentry.getSentryIfPart() != null && !sentryIfPartSatisfied) {
                     if (evaluateSentryIfPart(sentry, entityWithSentryPartInstances)) {
                         createSentryPartInstanceEntity(entityWithSentryPartInstances, null, sentry.getSentryIfPart());
