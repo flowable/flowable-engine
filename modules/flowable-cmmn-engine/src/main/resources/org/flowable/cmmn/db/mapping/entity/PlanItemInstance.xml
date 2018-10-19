@@ -257,11 +257,11 @@
         <if test="state != null">
             and RES.STATE_ = #{state}
         </if>
-        <if test="startedBefore != null">
-            and RES.CREATE_TIME_ &lt;= #{startedBefore}
+        <if test="createdBefore != null">
+            and RES.CREATE_TIME_ &lt;= #{createdBefore}
         </if>
-        <if test="startedAfter != null">
-            and RES.CREATE_TIME_ &gt;= #{startedAfter}
+        <if test="createdAfter != null">
+            and RES.CREATE_TIME_ &gt;= #{createdAfter}
         </if>
         <if test="startUserId != null">
             and RES.START_USER_ID_ = #{startUserId}

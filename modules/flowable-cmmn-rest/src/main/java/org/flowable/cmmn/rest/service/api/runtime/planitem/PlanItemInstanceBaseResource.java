@@ -97,11 +97,11 @@ public class PlanItemInstanceBaseResource {
         if (queryRequest.getReferenceType() != null) {
             query.planItemInstanceReferenceType(queryRequest.getReferenceType());
         }
-        if (queryRequest.getStartedBefore() != null) {
-            query.planItemInstanceStartedBefore(queryRequest.getStartedBefore());
+        if (queryRequest.getCreatedBefore() != null) {
+            query.planItemInstanceCreatedBefore(queryRequest.getCreatedBefore());
         }
-        if (queryRequest.getStartedAfter() != null) {
-            query.planItemInstanceStartedAfter(queryRequest.getStartedAfter());
+        if (queryRequest.getCreatedAfter() != null) {
+            query.planItemInstanceCreatedAfter(queryRequest.getCreatedAfter());
         }
         if (queryRequest.getStartUserId() != null) {
             query.planItemInstanceStartUserId(queryRequest.getStartUserId());

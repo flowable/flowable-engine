@@ -117,12 +117,12 @@ public class PlanItemInstanceCollectionResource extends PlanItemInstanceBaseReso
             queryRequest.setReferenceType(allRequestParams.get("referenceType"));
         }
         
-        if (allRequestParams.containsKey("startedBefore")) {
-            queryRequest.setStartedBefore(RequestUtil.getDate(allRequestParams, "startedBefore"));
+        if (allRequestParams.containsKey("createdBefore")) {
+            queryRequest.setCreatedBefore(RequestUtil.getDate(allRequestParams, "createdBefore"));
         }
         
-        if (allRequestParams.containsKey("startedAfter")) {
-            queryRequest.setStartedAfter(RequestUtil.getDate(allRequestParams, "startedAfter"));
+        if (allRequestParams.containsKey("createdAfter")) {
+            queryRequest.setCreatedAfter(RequestUtil.getDate(allRequestParams, "createdAfter"));
         }
         
         if (allRequestParams.containsKey("startUserId")) {
