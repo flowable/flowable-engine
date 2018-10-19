@@ -39,8 +39,8 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     protected List<String> planItemDefinitionTypes;
     protected String name;
     protected String state;
-    protected Date startedBefore;
-    protected Date startedAfter;
+    protected Date createdBefore;
+    protected Date createdAfter;
     protected String startUserId;
     protected String referenceId;
     protected String referenceType;
@@ -194,20 +194,20 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     }
 
     @Override
-    public PlanItemInstanceQuery planItemInstanceStartedBefore(Date startedBefore) {
-        if (startedBefore == null) {
-            throw new FlowableIllegalArgumentException("StartedBefore is null");
+    public PlanItemInstanceQuery planItemInstanceCreatedBefore(Date createdBefore) {
+        if (createdBefore == null) {
+            throw new FlowableIllegalArgumentException("createdBefore is null");
         }
-        this.startedBefore = startedBefore;
+        this.createdBefore = createdBefore;
         return this;
     }
 
     @Override
-    public PlanItemInstanceQuery planItemInstanceStartedAfter(Date startedAfter) {
-        if (startedAfter == null) {
-            throw new FlowableIllegalArgumentException("StartedAfter is null");
+    public PlanItemInstanceQuery planItemInstanceCreatedAfter(Date createdAfter) {
+        if (createdAfter == null) {
+            throw new FlowableIllegalArgumentException("createdAfter is null");
         }
-        this.startedAfter = startedAfter;
+        this.createdAfter = createdAfter;
         return this;
     }
 
@@ -386,12 +386,12 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
         return state;
     }
 
-    public Date getStartedBefore() {
-        return startedBefore;
+    public Date getCreatedBefore() {
+        return createdBefore;
     }
 
-    public Date getStartedAfter() {
-        return startedAfter;
+    public Date getCreatedAfter() {
+        return createdAfter;
     }
 
     public String getStartUserId() {
