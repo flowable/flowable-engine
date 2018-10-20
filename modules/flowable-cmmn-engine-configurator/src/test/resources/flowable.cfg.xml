@@ -16,6 +16,8 @@
         
         <property name="asyncFailedJobWaitTime" value="1" />
         
+        <property name="enableEntityLinks" value="true" />
+        
         <property name="configurators">
             <list>
                 <bean class="org.flowable.cmmn.engine.configurator.CmmnEngineConfigurator">
@@ -36,6 +38,8 @@
         <property name="asyncExecutorActivate" value="false" />
     
         <property name="asyncFailedJobWaitTime" value="1" />
+        
+        <property name="enableEntityLinks" value="true" />
     </bean>
     
     <bean id="processAsyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">

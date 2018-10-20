@@ -243,6 +243,16 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * Only select tasks for the given scope definition identifier. 
      */
     T scopeDefinitionId(String scopeDefinitionId);
+    
+    /**
+     * Select all tasks for the given process id and its children.
+     */
+    T processInstanceIdWithChildren(String processInstanceId);
+    
+    /**
+     * Select all tasks for the given process id and its children.
+     */
+    T caseInstanceIdWithChildren(String caseInstanceId);
 
     /**
      * Only select tasks that are created on the given date.

@@ -83,6 +83,8 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
+    protected String processInstanceIdWithChildren;
+    protected String caseInstanceIdWithChildren;
     protected Date createTime;
     protected Date createTimeBefore;
     protected Date createTimeAfter;
@@ -732,6 +734,26 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
     
+    @Override
+    public TaskQuery processInstanceIdWithChildren(String processInstanceId) {
+        if (orActive) {
+            currentOrQueryObject.processInstanceIdWithChildren(processInstanceId);
+        } else {
+            this.processInstanceIdWithChildren = processInstanceId;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery caseInstanceIdWithChildren(String caseInstanceId) {
+        if (orActive) {
+            currentOrQueryObject.caseInstanceIdWithChildren(caseInstanceId);
+        } else {
+            this.caseInstanceIdWithChildren = caseInstanceId;
+        }
+        return this;
+    }
+
     @Override
     public TaskQuery planItemInstanceId(String planItemInstanceId) {
         if (orActive) {
@@ -1752,6 +1774,14 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public String getProcessInstanceBusinessKey() {
         return processInstanceBusinessKey;
+    }
+    
+    public String getProcessInstanceIdWithChildren() {
+        return processInstanceIdWithChildren;
+    }
+
+    public String getCaseInstanceIdWithChildren() {
+        return caseInstanceIdWithChildren;
     }
 
     public boolean getExcludeSubtasks() {

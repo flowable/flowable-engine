@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.AbstractHistoryManager;
@@ -31,6 +32,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.history.async.AsyncHistorySession;
@@ -556,6 +558,60 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
             Map<String, String> data = new HashMap<>();
             putIfNotNull(data, HistoryJsonConstants.ID, identityLink.getId());
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_IDENTITY_LINK_DELETED, data);
+        }
+    }
+    
+    @Override
+    public void recordEntityLinkCreated(EntityLinkEntity entityLink) {
+        String processDefinitionId = null;
+        if (ScopeTypes.BPMN.equals(entityLink.getScopeType()) && entityLink.getScopeId() != null) {
+            ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(entityLink.getScopeId());
+            if (execution != null) {
+                processDefinitionId = execution.getProcessDefinitionId();
+            }
+            
+        } else if (ScopeTypes.TASK.equals(entityLink.getScopeType()) && entityLink.getScopeId() != null) {
+            TaskEntity task = CommandContextUtil.getTaskService().getTask(entityLink.getScopeId());
+            if (task != null) {
+                processDefinitionId = task.getProcessDefinitionId();
+            }
+        }
+        
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processDefinitionId)) {
+            Map<String, String> data = new HashMap<>();
+            putIfNotNull(data, HistoryJsonConstants.ID, entityLink.getId());
+            putIfNotNull(data, HistoryJsonConstants.ENTITY_LINK_TYPE, entityLink.getLinkType());
+            putIfNotNull(data, HistoryJsonConstants.CREATE_TIME, entityLink.getCreateTime());
+            putIfNotNull(data, HistoryJsonConstants.SCOPE_ID, entityLink.getScopeId());
+            putIfNotNull(data, HistoryJsonConstants.SCOPE_TYPE, entityLink.getScopeType());
+            putIfNotNull(data, HistoryJsonConstants.SCOPE_DEFINITION_ID, entityLink.getScopeDefinitionId());
+            putIfNotNull(data, HistoryJsonConstants.REF_SCOPE_ID, entityLink.getReferenceScopeId());
+            putIfNotNull(data, HistoryJsonConstants.REF_SCOPE_TYPE, entityLink.getReferenceScopeType());
+            putIfNotNull(data, HistoryJsonConstants.REF_SCOPE_DEFINITION_ID, entityLink.getReferenceScopeDefinitionId());
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_ENTITY_LINK_CREATED, data);
+        }
+    }
+    
+    @Override
+    public void recordEntityLinkDeleted(EntityLinkEntity entityLink) {
+        String processDefinitionId = null;
+        if (ScopeTypes.BPMN.equals(entityLink.getScopeType()) && entityLink.getScopeId() != null) {
+            ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(entityLink.getScopeId());
+            if (execution != null) {
+                processDefinitionId = execution.getProcessDefinitionId();
+            }
+            
+        } else if (ScopeTypes.TASK.equals(entityLink.getScopeType()) && entityLink.getScopeId() != null) {
+            TaskEntity task = CommandContextUtil.getTaskService().getTask(entityLink.getScopeId());
+            if (task != null) {
+                processDefinitionId = task.getProcessDefinitionId();
+            }
+        }
+        
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processDefinitionId)) {
+            Map<String, String> data = new HashMap<>();
+            putIfNotNull(data, HistoryJsonConstants.ID, entityLink.getId());
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_ENTITY_LINK_DELETED, data);
         }
     }
 

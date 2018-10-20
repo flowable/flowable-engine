@@ -47,6 +47,9 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityMa
 import org.flowable.engine.impl.persistence.entity.PropertyEntityManager;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityManager;
 import org.flowable.engine.impl.persistence.entity.TableDataManager;
+import org.flowable.entitylink.api.EntityLinkService;
+import org.flowable.entitylink.api.history.HistoricEntityLinkService;
+import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
@@ -150,6 +153,40 @@ public class CommandContextUtil {
         }
         
         return historicIdentityLinkService;
+    }
+    
+    // ENTITY LINK SERVICE
+    public static EntityLinkServiceConfiguration getEntityLinkServiceConfiguration() {
+        return getEntityLinkServiceConfiguration(getCommandContext());
+    }
+    
+    public static EntityLinkServiceConfiguration getEntityLinkServiceConfiguration(CommandContext commandContext) {
+        return (EntityLinkServiceConfiguration) getProcessEngineConfiguration(commandContext).getServiceConfigurations()
+                        .get(EngineConfigurationConstants.KEY_ENTITY_LINK_SERVICE_CONFIG);
+    }
+    
+    public static EntityLinkService getEntityLinkService() {
+        return getEntityLinkService(getCommandContext());
+    }
+    
+    public static EntityLinkService getEntityLinkService(CommandContext commandContext) {
+        EntityLinkService entityLinkService = null;
+        EntityLinkServiceConfiguration entityLinkServiceConfiguration = getEntityLinkServiceConfiguration(commandContext);
+        if (entityLinkServiceConfiguration != null) {
+            entityLinkService = entityLinkServiceConfiguration.getEntityLinkService();
+        }
+        
+        return entityLinkService;
+    }
+    
+    public static HistoricEntityLinkService getHistoricEntityLinkService() {
+        HistoricEntityLinkService historicEntityLinkService = null;
+        EntityLinkServiceConfiguration entityLinkServiceConfiguration = getEntityLinkServiceConfiguration();
+        if (entityLinkServiceConfiguration != null) {
+            historicEntityLinkService = entityLinkServiceConfiguration.getHistoricEntityLinkService();
+        }
+        
+        return historicEntityLinkService;
     }
     
     // TASK SERVICE

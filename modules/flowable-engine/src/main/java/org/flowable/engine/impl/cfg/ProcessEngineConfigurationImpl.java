@@ -213,6 +213,8 @@ import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.history.async.json.transformer.ActivityEndHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ActivityFullHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ActivityStartHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.EntityLinkCreatedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.EntityLinkDeletedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.FormPropertiesSubmittedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.HistoricDetailVariableUpdateHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.IdentityLinkCreatedHistoryJsonTransformer;
@@ -317,6 +319,8 @@ import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.migration.ProcessInstanceMigrationManager;
 import org.flowable.engine.parse.BpmnParseHandler;
+import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
+import org.flowable.entitylink.service.impl.db.EntityLinkDbSchemaManager;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.identitylink.service.IdentityLinkEventHandler;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
@@ -484,8 +488,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     
     protected VariableServiceConfiguration variableServiceConfiguration;
     protected IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
+    protected EntityLinkServiceConfiguration entityLinkServiceConfiguration;
     protected TaskServiceConfiguration taskServiceConfiguration;
     protected JobServiceConfiguration jobServiceConfiguration;
+    
+    protected boolean enableEntityLinks;
 
     // DEPLOYERS //////////////////////////////////////////////////////////////////
 
@@ -857,6 +864,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected FlowableEngineAgendaFactory agendaFactory;
 
     protected SchemaManager identityLinkSchemaManager;
+    protected SchemaManager entityLinkSchemaManager;
     protected SchemaManager variableSchemaManager;
     protected SchemaManager taskSchemaManager;
     protected SchemaManager jobSchemaManager;
@@ -978,6 +986,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initFlowable5CompatibilityHandler();
         initVariableServiceConfiguration();
         initIdentityLinkServiceConfiguration();
+        initEntityLinkServiceConfiguration();
         initTaskServiceConfiguration();
         initJobServiceConfiguration();
         initAsyncExecutor();
@@ -1047,6 +1056,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         
         initProcessSchemaManager();
         initIdentityLinkSchemaManager();
+        initEntityLinkSchemaManager();
         initVariableSchemaManager();
         initTaskSchemaManager();
         initJobSchemaManager();
@@ -1077,6 +1087,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected void initIdentityLinkSchemaManager() {
         if (this.identityLinkSchemaManager == null) {
             this.identityLinkSchemaManager = new IdentityLinkDbSchemaManager();
+        }
+    }
+    
+    protected void initEntityLinkSchemaManager() {
+        if (this.entityLinkSchemaManager == null) {
+            this.entityLinkSchemaManager = new EntityLinkDbSchemaManager();
         }
     }
 
@@ -1371,6 +1387,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected IdentityLinkServiceConfiguration instantiateIdentityLinkServiceConfiguration() {
         return new IdentityLinkServiceConfiguration();
+    }
+    
+    public void initEntityLinkServiceConfiguration() {
+        this.entityLinkServiceConfiguration = instantiateEntityLinkServiceConfiguration();
+        this.entityLinkServiceConfiguration.setHistoryLevel(this.historyLevel);
+        this.entityLinkServiceConfiguration.setClock(this.clock);
+        this.entityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
+        this.entityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+
+        this.entityLinkServiceConfiguration.init();
+
+        addServiceConfiguration(EngineConfigurationConstants.KEY_ENTITY_LINK_SERVICE_CONFIG, this.entityLinkServiceConfiguration);
+    }
+
+    protected EntityLinkServiceConfiguration instantiateEntityLinkServiceConfiguration() {
+        return new EntityLinkServiceConfiguration();
     }
 
     public void initTaskServiceConfiguration() {
@@ -1902,6 +1934,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         
         historyJsonTransformers.add(new IdentityLinkCreatedHistoryJsonTransformer());
         historyJsonTransformers.add(new IdentityLinkDeletedHistoryJsonTransformer());
+        
+        historyJsonTransformers.add(new EntityLinkCreatedHistoryJsonTransformer());
+        historyJsonTransformers.add(new EntityLinkDeletedHistoryJsonTransformer());
         
         historyJsonTransformers.add(new VariableCreatedHistoryJsonTransformer());
         historyJsonTransformers.add(new VariableUpdatedHistoryJsonTransformer());
@@ -3967,6 +4002,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.identityLinkSchemaManager = identityLinkSchemaManager;
         return this;
     }
+    
+    public SchemaManager getEntityLinkSchemaManager() {
+        return entityLinkSchemaManager;
+    }
+
+    public ProcessEngineConfigurationImpl setEntityLinkSchemaManager(SchemaManager entityLinkSchemaManager) {
+        this.entityLinkSchemaManager = entityLinkSchemaManager;
+        return this;
+    }
 
     public SchemaManager getJobSchemaManager() {
         return jobSchemaManager;
@@ -3974,6 +4018,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setJobSchemaManager(SchemaManager jobSchemaManager) {
         this.jobSchemaManager = jobSchemaManager;
+        return this;
+    }
+    
+    public boolean isEnableEntityLinks() {
+        return enableEntityLinks;
+    }
+
+    public ProcessEngineConfigurationImpl setEnableEntityLinks(boolean enableEntityLinks) {
+        this.enableEntityLinks = enableEntityLinks;
         return this;
     }
     

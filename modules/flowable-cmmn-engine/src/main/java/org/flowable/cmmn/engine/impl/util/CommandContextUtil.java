@@ -45,6 +45,9 @@ import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentService;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
 import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.entitylink.api.EntityLinkService;
+import org.flowable.entitylink.api.history.HistoricEntityLinkService;
+import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
@@ -307,6 +310,8 @@ public class CommandContextUtil {
 
         return identityService;
     }
+    
+    // IDENTITY LINK SERVICE
 
     public static IdentityLinkServiceConfiguration getIdentityLinkServiceConfiguration() {
         return getIdentityLinkServiceConfiguration(getCommandContext());
@@ -332,6 +337,35 @@ public class CommandContextUtil {
     public static HistoricIdentityLinkService getHistoricIdentityLinkService(CommandContext commandContext) {
         return getIdentityLinkServiceConfiguration(commandContext).getHistoricIdentityLinkService();
     }
+    
+    // ENTITY LINK SERVICE
+
+    public static EntityLinkServiceConfiguration getEntityLinkServiceConfiguration() {
+        return getEntityLinkServiceConfiguration(getCommandContext());
+    }
+
+    public static EntityLinkServiceConfiguration getEntityLinkServiceConfiguration(CommandContext commandContext) {
+        return (EntityLinkServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
+                        .get(EngineConfigurationConstants.KEY_ENTITY_LINK_SERVICE_CONFIG);
+    }
+
+    public static EntityLinkService getEntityLinkService() {
+        return getEntityLinkService(getCommandContext());
+    }
+
+    public static EntityLinkService getEntityLinkService(CommandContext commandContext) {
+        return getEntityLinkServiceConfiguration(commandContext).getEntityLinkService();
+    }
+    
+    public static HistoricEntityLinkService getHistoricEntityLinkService() {
+        return getHistoricEntityLinkService(getCommandContext());
+    }
+
+    public static HistoricEntityLinkService getHistoricEntityLinkService(CommandContext commandContext) {
+        return getEntityLinkServiceConfiguration(commandContext).getHistoricEntityLinkService();
+    }
+    
+    // VARIABLE SERVICE
 
     public static VariableServiceConfiguration getVariableServiceConfiguration() {
         return getVariableServiceConfiguration(getCommandContext());
@@ -341,6 +375,8 @@ public class CommandContextUtil {
         return (VariableServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
                         .get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
     }
+    
+    // TASK SERVICE
 
     public static TaskService getTaskService() {
         return getTaskService(getCommandContext());

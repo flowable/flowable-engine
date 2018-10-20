@@ -655,7 +655,7 @@
       <if test="processInstanceBusinessKeyLike != null">
         and HPI.BUSINESS_KEY_ like #{processInstanceBusinessKeyLike}${wildcardEscapeClause}
       </if>
-       <if test="processInstanceBusinessKeyLikeIgnoreCase != null">
+      <if test="processInstanceBusinessKeyLikeIgnoreCase != null">
         and lower(HPI.BUSINESS_KEY_) like #{processInstanceBusinessKeyLikeIgnoreCase}${wildcardEscapeClause}
       </if>
       <if test="taskDefinitionKey != null">
@@ -678,6 +678,16 @@
       </if>
       <if test="scopeDefinitionId != null">
         and RES.SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
+      </if>
+      <if test="processInstanceIdWithChildren != null">
+        and exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and 
+            ELINK.SCOPE_ID_ = #{processInstanceIdWithChildren} AND ELINK.SCOPE_TYPE_ = 'bpmn' and 
+            ELINK.REF_SCOPE_ID_ = RES.ID_ and ELINK.REF_SCOPE_TYPE_ = 'task')
+      </if>
+      <if test="caseInstanceIdWithChildren != null">
+        and exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and 
+            ELINK.SCOPE_ID_ = #{caseInstanceIdWithChildren} AND ELINK.SCOPE_TYPE_ = 'cmmn' and 
+            ELINK.REF_SCOPE_ID_ = RES.ID_ and ELINK.REF_SCOPE_TYPE_ = 'task')
       </if>
       <if test="taskName != null">
         and RES.NAME_ = #{taskName}
@@ -1034,16 +1044,26 @@
             or RES.EXECUTION_ID_ = #{orQueryObject.executionId}
           </if>
           <if test="orQueryObject.scopeId != null">
-            and RES.SCOPE_ID_ = #{orQueryObject.scopeId}
+            or RES.SCOPE_ID_ = #{orQueryObject.scopeId}
           </if>
           <if test="orQueryObject.subScopeId != null">
-            and RES.SUB_SCOPE_ID_ = #{orQueryObject.subScopeId}
+            or RES.SUB_SCOPE_ID_ = #{orQueryObject.subScopeId}
           </if>
           <if test="orQueryObject.scopeType != null">
-            and RES.SCOPE_TYPE_ = #{orQueryObject.scopeType}
+            or RES.SCOPE_TYPE_ = #{orQueryObject.scopeType}
           </if>
           <if test="orQueryObject.scopeDefinitionId != null">
-            and RES.SCOPE_DEFINITION_ID_ = #{orQueryObject.scopeDefinitionId}
+            or RES.SCOPE_DEFINITION_ID_ = #{orQueryObject.scopeDefinitionId}
+          </if>
+          <if test="orQueryObject.processInstanceIdWithChildren != null">
+            or exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and 
+                ELINK.SCOPE_ID_ = #{orQueryObject.processInstanceIdWithChildren} AND ELINK.SCOPE_TYPE_ = 'bpmn' and 
+                ELINK.REF_SCOPE_ID_ = RES.ID_ and ELINK.REF_SCOPE_TYPE_ = 'task')
+          </if>
+          <if test="orQueryObject.caseInstanceIdWithChildren != null">
+            or exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and 
+                ELINK.SCOPE_ID_ = #{orQueryObject.caseInstanceIdWithChildren} AND ELINK.SCOPE_TYPE_ = 'cmmn' and 
+                ELINK.REF_SCOPE_ID_ = RES.ID_ and ELINK.REF_SCOPE_TYPE_ = 'task')
           </if>
           <if test="orQueryObject.taskName != null">
             or RES.NAME_ = #{orQueryObject.taskName}

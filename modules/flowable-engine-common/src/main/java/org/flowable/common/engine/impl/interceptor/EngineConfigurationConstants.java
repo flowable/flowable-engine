@@ -34,6 +34,8 @@ public interface EngineConfigurationConstants {
     
     String KEY_IDENTITY_LINK_SERVICE_CONFIG = "cfg.identityLinkService";
     
+    String KEY_ENTITY_LINK_SERVICE_CONFIG = "cfg.entityLinkService";
+    
     String KEY_JOB_SERVICE_CONFIG = "cfg.jobService";
     
     int PRIORITY_ENGINE_PROCESS = 50000;

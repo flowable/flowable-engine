@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.history;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -37,6 +38,10 @@ public interface CmmnHistoryManager {
     void recordIdentityLinkCreated(IdentityLinkEntity identityLink);
 
     void recordIdentityLinkDeleted(IdentityLinkEntity identityLink);
+    
+    void recordEntityLinkCreated(EntityLinkEntity entityLink);
+
+    void recordEntityLinkDeleted(EntityLinkEntity entityLink);
 
     void recordVariableCreate(VariableInstanceEntity variable);
 

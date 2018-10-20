@@ -28,6 +28,9 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.entitylink.api.history.HistoricEntityLinkService;
+import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
+import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntity;
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
@@ -134,6 +137,31 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     public void recordIdentityLinkDeleted(IdentityLinkEntity identityLink) {
         if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
             CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricIdentityLink(identityLink.getId());
+        }
+    }
+    
+    @Override
+    public void recordEntityLinkCreated(EntityLinkEntity entityLink) {
+        if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE && entityLink.getScopeId() != null) {
+            HistoricEntityLinkService historicEntityLinkService = CommandContextUtil.getHistoricEntityLinkService();
+            HistoricEntityLinkEntity historicEntityLinkEntity = (HistoricEntityLinkEntity) historicEntityLinkService.createHistoricEntityLink();
+            historicEntityLinkEntity.setId(entityLink.getId());
+            historicEntityLinkEntity.setLinkType(entityLink.getLinkType());
+            historicEntityLinkEntity.setCreateTime(entityLink.getCreateTime());
+            historicEntityLinkEntity.setScopeId(entityLink.getScopeId());
+            historicEntityLinkEntity.setScopeType(entityLink.getScopeType());
+            historicEntityLinkEntity.setScopeDefinitionId(entityLink.getScopeDefinitionId());
+            historicEntityLinkEntity.setReferenceScopeId(entityLink.getReferenceScopeId());
+            historicEntityLinkEntity.setReferenceScopeType(entityLink.getReferenceScopeType());
+            historicEntityLinkEntity.setReferenceScopeDefinitionId(entityLink.getReferenceScopeDefinitionId());
+            historicEntityLinkService.insertHistoricEntityLink(historicEntityLinkEntity, false);
+        }
+    }
+
+    @Override
+    public void recordEntityLinkDeleted(EntityLinkEntity entityLink) {
+        if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
+            CommandContextUtil.getHistoricEntityLinkService().deleteHistoricEntityLink(entityLink.getId());
         }
     }
 

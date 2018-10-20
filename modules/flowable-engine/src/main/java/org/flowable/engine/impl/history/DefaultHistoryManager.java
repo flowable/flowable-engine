@@ -19,6 +19,7 @@ import java.util.Objects;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.history.HistoricActivityInstance;
@@ -32,6 +33,9 @@ import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.TaskHelper;
+import org.flowable.entitylink.api.history.HistoricEntityLinkService;
+import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
+import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntity;
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
@@ -142,6 +146,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             getHistoricActivityInstanceEntityManager().deleteHistoricActivityInstancesByProcessInstanceId(processInstanceId);
             TaskHelper.deleteHistoricTaskInstancesByProcessInstanceId(processInstanceId);
             CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricIdentityLinksByProcessInstanceId(processInstanceId);
+            CommandContextUtil.getHistoricEntityLinkService().deleteHistoricEntityLinksByScopeIdAndScopeType(processInstanceId, ScopeTypes.BPMN);
             getCommentEntityManager().deleteCommentsByProcessInstanceId(processInstanceId);
 
             if (historicProcessInstance != null) {
@@ -437,6 +442,60 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processDefinitionId)) {
             CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricIdentityLink(identityLink.getId());
+        }
+    }
+    
+    // Entity link related history
+    @Override
+    public void recordEntityLinkCreated(EntityLinkEntity entityLink) {
+        String processDefinitionId = null;
+        if (ScopeTypes.BPMN.equals(entityLink.getScopeType()) && entityLink.getScopeId() != null) {
+            ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(entityLink.getScopeId());
+            if (execution != null) {
+                processDefinitionId = execution.getProcessDefinitionId();
+            }
+            
+        } else if (ScopeTypes.TASK.equals(entityLink.getScopeType()) && entityLink.getScopeId() != null) {
+            TaskEntity task = CommandContextUtil.getTaskService().getTask(entityLink.getScopeId());
+            if (task != null) {
+                processDefinitionId = task.getProcessDefinitionId();
+            }
+        }
+        
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processDefinitionId)) {
+            HistoricEntityLinkService historicEntityLinkService = CommandContextUtil.getHistoricEntityLinkService();
+            HistoricEntityLinkEntity historicEntityLinkEntity = (HistoricEntityLinkEntity) historicEntityLinkService.createHistoricEntityLink();
+            historicEntityLinkEntity.setId(entityLink.getId());
+            historicEntityLinkEntity.setLinkType(entityLink.getLinkType());
+            historicEntityLinkEntity.setCreateTime(entityLink.getCreateTime());
+            historicEntityLinkEntity.setScopeId(entityLink.getScopeId());
+            historicEntityLinkEntity.setScopeType(entityLink.getScopeType());
+            historicEntityLinkEntity.setScopeDefinitionId(entityLink.getScopeDefinitionId());
+            historicEntityLinkEntity.setReferenceScopeId(entityLink.getReferenceScopeId());
+            historicEntityLinkEntity.setReferenceScopeType(entityLink.getReferenceScopeType());
+            historicEntityLinkEntity.setReferenceScopeDefinitionId(entityLink.getReferenceScopeDefinitionId());
+            historicEntityLinkService.insertHistoricEntityLink(historicEntityLinkEntity, false);
+        }
+    }
+    
+    @Override
+    public void recordEntityLinkDeleted(EntityLinkEntity entityLink) {
+        String processDefinitionId = null;
+        if (ScopeTypes.BPMN.equals(entityLink.getScopeType()) && entityLink.getScopeId() != null) {
+            ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(entityLink.getScopeId());
+            if (execution != null) {
+                processDefinitionId = execution.getProcessDefinitionId();
+            }
+            
+        } else if (ScopeTypes.TASK.equals(entityLink.getScopeType()) && entityLink.getScopeId() != null) {
+            TaskEntity task = CommandContextUtil.getTaskService().getTask(entityLink.getScopeId());
+            if (task != null) {
+                processDefinitionId = task.getProcessDefinitionId();
+            }
+        }
+        
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processDefinitionId)) {
+            CommandContextUtil.getHistoricEntityLinkService().deleteHistoricEntityLink(entityLink.getId());
         }
     }
 

@@ -68,6 +68,8 @@ import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstanceEndHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstanceStartHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstanceUpdateNameHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.EntityLinkCreatedHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.EntityLinkDeletedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.HistoricCaseInstanceDeletedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.IdentityLinkCreatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.IdentityLinkDeletedHistoryJsonTransformer;
@@ -188,6 +190,8 @@ import org.flowable.common.engine.impl.scripting.BeansResolverFactory;
 import org.flowable.common.engine.impl.scripting.ResolverFactory;
 import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
+import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
+import org.flowable.entitylink.service.impl.db.EntityLinkDbSchemaManager;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.identitylink.service.IdentityLinkEventHandler;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
@@ -339,6 +343,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected DelegateExpressionFieldInjectionMode delegateExpressionFieldInjectionMode = DelegateExpressionFieldInjectionMode.MIXED;
 
     protected SchemaManager identityLinkSchemaManager;
+    protected SchemaManager entityLinkSchemaManager;
     protected SchemaManager variableSchemaManager;
     protected SchemaManager taskSchemaManager;
     protected SchemaManager jobSchemaManager;
@@ -356,6 +361,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     // Identitylink support
     protected IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
+    
+    // Entitylink support
+    protected EntityLinkServiceConfiguration entityLinkServiceConfiguration;
+    protected boolean enableEntityLinks;
 
     // Task support
     protected TaskServiceConfiguration taskServiceConfiguration;
@@ -729,6 +738,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initFormFieldHandler();
         initClock();
         initIdentityLinkServiceConfiguration();
+        initEntityLinkServiceConfiguration();
         initVariableServiceConfiguration();
         configuratorsAfterInit();
         initTaskServiceConfiguration();
@@ -755,6 +765,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
         if (executeServiceSchemaManagers) {
             initIdentityLinkSchemaManager();
+            initEntityLinkSchemaManager();
             initVariableSchemaManager();
             initTaskSchemaManager();
             initJobSchemaManager();
@@ -790,6 +801,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected void initIdentityLinkSchemaManager() {
         if (this.identityLinkSchemaManager == null) {
             this.identityLinkSchemaManager = new IdentityLinkDbSchemaManager();
+        }
+    }
+    
+    protected void initEntityLinkSchemaManager() {
+        if (this.entityLinkSchemaManager == null) {
+            this.entityLinkSchemaManager = new EntityLinkDbSchemaManager();
         }
     }
 
@@ -1275,6 +1292,22 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected IdentityLinkServiceConfiguration instantiateIdentityLinkServiceConfiguration() {
         return new IdentityLinkServiceConfiguration();
     }
+    
+    public void initEntityLinkServiceConfiguration() {
+        this.entityLinkServiceConfiguration = instantiateEntityLinkServiceConfiguration();
+        this.entityLinkServiceConfiguration.setHistoryLevel(this.historyLevel);
+        this.entityLinkServiceConfiguration.setClock(this.clock);
+        this.entityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
+        this.entityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+
+        this.entityLinkServiceConfiguration.init();
+
+        addServiceConfiguration(EngineConfigurationConstants.KEY_ENTITY_LINK_SERVICE_CONFIG, this.entityLinkServiceConfiguration);
+    }
+
+    protected EntityLinkServiceConfiguration instantiateEntityLinkServiceConfiguration() {
+        return new EntityLinkServiceConfiguration();
+    }
 
     public void initBusinessCalendarManager() {
         if (businessCalendarManager == null) {
@@ -1339,6 +1372,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         
         historyJsonTransformers.add(new IdentityLinkCreatedHistoryJsonTransformer());
         historyJsonTransformers.add(new IdentityLinkDeletedHistoryJsonTransformer());
+        
+        historyJsonTransformers.add(new EntityLinkCreatedHistoryJsonTransformer());
+        historyJsonTransformers.add(new EntityLinkDeletedHistoryJsonTransformer());
         
         historyJsonTransformers.add(new VariableCreatedHistoryJsonTransformer());
         historyJsonTransformers.add(new VariableUpdatedHistoryJsonTransformer());
@@ -2112,6 +2148,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.identityLinkSchemaManager = identityLinkSchemaManager;
         return this;
     }
+    
+    public SchemaManager getEntityLinkSchemaManager() {
+        return entityLinkSchemaManager;
+    }
+
+    public CmmnEngineConfiguration setEntityLinkSchemaManager(SchemaManager entityLinkSchemaManager) {
+        this.entityLinkSchemaManager = entityLinkSchemaManager;
+        return this;
+    }
 
     public SchemaManager getVariableSchemaManager() {
         return variableSchemaManager;
@@ -2173,6 +2218,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setIdentityLinkServiceConfiguration(IdentityLinkServiceConfiguration identityLinkServiceConfiguration) {
         this.identityLinkServiceConfiguration = identityLinkServiceConfiguration;
+        return this;
+    }
+    
+    public EntityLinkServiceConfiguration getEntityLinkServiceConfiguration() {
+        return entityLinkServiceConfiguration;
+    }
+
+    public CmmnEngineConfiguration setEntityLinkServiceConfiguration(EntityLinkServiceConfiguration entityLinkServiceConfiguration) {
+        this.entityLinkServiceConfiguration = entityLinkServiceConfiguration;
         return this;
     }
 
@@ -2924,6 +2978,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public boolean isEnableEntityLinks() {
+        return enableEntityLinks;
+    }
+
+    public CmmnEngineConfiguration setEnableEntityLinks(boolean enableEntityLinks) {
+        this.enableEntityLinks = enableEntityLinks;
+        return this;
+    }
+
     public Map<String, HistoryJobHandler> getHistoryJobHandlers() {
         return historyJobHandlers;
     }
@@ -2973,30 +3036,27 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return httpClientConfig;
     }
 
-    public void setHttpClientConfig(HttpClientConfig httpClientConfig) {
+    public CmmnEngineConfiguration setHttpClientConfig(HttpClientConfig httpClientConfig) {
         this.httpClientConfig.merge(httpClientConfig);
+        return this;
     }
 
     public FormFieldHandler getFormFieldHandler() {
         return formFieldHandler;
     }
 
-    public void setFormFieldHandler(FormFieldHandler formFieldHandler) {
+    public CmmnEngineConfiguration setFormFieldHandler(FormFieldHandler formFieldHandler) {
         this.formFieldHandler = formFieldHandler;
-    }
-
-    public void resetClock() {
-        if (this.clock != null) {
-            clock.reset();
-        }
+        return this;
     }
 
     public TaskPostProcessor getTaskPostProcessor() {
         return taskPostProcessor;
     }
 
-    public void setTaskPostProcessor(TaskPostProcessor processor) {
+    public CmmnEngineConfiguration setTaskPostProcessor(TaskPostProcessor processor) {
         this.taskPostProcessor = processor;
+        return this;
     }
 
     @Override
@@ -3008,5 +3068,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public CmmnEngineConfiguration setScriptingEngines(ScriptingEngines scriptingEngines) {
         this.scriptingEngines = scriptingEngines;
         return this;
+    }
+    
+    public void resetClock() {
+        if (this.clock != null) {
+            clock.reset();
+        }
     }
 }
