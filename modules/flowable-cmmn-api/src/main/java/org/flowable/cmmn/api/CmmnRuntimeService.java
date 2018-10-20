@@ -22,6 +22,7 @@ import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.entitylink.api.EntityLink;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 
@@ -155,6 +156,11 @@ public interface CmmnRuntimeService {
      * Retrieves the {@link IdentityLink}s associated with the given case instance. Such an identity link informs how a certain user is involved with a case instance.
      */
     List<IdentityLink> getIdentityLinksForCaseInstance(String instanceId);
+    
+    /**
+     * Retrieves the {@link EntityLink}s associated with the given case instance.
+     */
+    List<EntityLink> getEntityLinkChildrenForCaseInstance(String instanceId);
 
     /**
      * Gets a Form model instance of the start form of a specific case definition or case instance

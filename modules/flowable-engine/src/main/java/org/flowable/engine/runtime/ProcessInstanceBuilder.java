@@ -75,6 +75,12 @@ public interface ProcessInstanceBuilder {
      * The tenantId to lookup the process definition should still be provided if needed.
      */
     ProcessInstanceBuilder overrideProcessDefinitionTenantId(String tenantId);
+    
+    /**
+     * When starting a process instance from the CMMN engine process task, the process instance id needs to be known beforehand
+     * to store entity links and callback references before the process instance is started.
+     */
+    ProcessInstanceBuilder predefineProcessInstanceId(String processInstanceId);
 
     /**
      * Sets the process variables

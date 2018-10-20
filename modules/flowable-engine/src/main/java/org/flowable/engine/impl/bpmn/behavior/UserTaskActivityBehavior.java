@@ -24,6 +24,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
 import org.flowable.common.engine.impl.el.ExpressionManager;
@@ -36,6 +37,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.EntityLinkUtil;
 import org.flowable.engine.impl.util.IdentityLinkUtil;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
@@ -223,6 +225,11 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
         if (!skipUserTask) {
             handleAssignments(taskService, activeTaskAssignee, activeTaskOwner,
                     activeTaskCandidateUsers, activeTaskCandidateGroups, task, expressionManager, execution);
+            
+            if (processEngineConfiguration.isEnableEntityLinks()) {
+                EntityLinkUtil.copyExistingEntityLinks(execution.getProcessInstanceId(), task.getId(), ScopeTypes.TASK);
+                EntityLinkUtil.createNewEntityLink(execution.getProcessInstanceId(), task.getId(), ScopeTypes.TASK);
+            }
             
             processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_CREATE);
 

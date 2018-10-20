@@ -60,6 +60,8 @@ public interface HistoryJsonConstants {
     String TYPE_HISTORIC_DETAIL_VARIABLE_UPDATE = "historic-detail-variable-update";
     String TYPE_IDENTITY_LINK_CREATED = "identitylink-created";
     String TYPE_IDENTITY_LINK_DELETED = "identitylink-deleted";
+    String TYPE_ENTITY_LINK_CREATED = "entitylink-created";
+    String TYPE_ENTITY_LINK_DELETED = "entitylink-deleted";
     String TYPE_TASK_CREATED = "task-created";
     String TYPE_TASK_ASSIGNEE_CHANGED = "task-assignee-changed";
     String TYPE_TASK_OWNER_CHANGED = "task-owner-changed";
@@ -147,6 +149,8 @@ public interface HistoryJsonConstants {
     String OWNER = "owner";
     
     String IDENTITY_LINK_TYPE = "identityLinkType";
+    
+    String ENTITY_LINK_TYPE = "entityLinkType";
 
     String TASK_DEFINITION_KEY = "taskDefinitionKey";
     
@@ -185,6 +189,18 @@ public interface HistoryJsonConstants {
     String CALLBACK_ID = "callbackId";
     
     String CALLBACK_TYPE = "callbackType";
+    
+    String SCOPE_ID = "scopeId";
+    
+    String SCOPE_TYPE = "scopeType";
+    
+    String SCOPE_DEFINITION_ID = "scopeDefinitionId";
+    
+    String REF_SCOPE_ID = "referenceScopeId";
+    
+    String REF_SCOPE_TYPE = "referenceScopeType";
+    
+    String REF_SCOPE_DEFINITION_ID = "referenceScopeDefinitionId";
 
     String TIMESTAMP = "__timeStamp"; // Two underscores to avoid clashes with other fields
     

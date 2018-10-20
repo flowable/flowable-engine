@@ -45,6 +45,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
     protected String businessKey;
     protected String tenantId;
     protected String overrideDefinitionTenantId;
+    protected String predefinedProcessInstanceId;
     protected String processInstanceName;
     protected String callbackId;
     protected String callbackType;
@@ -71,6 +72,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
         
         this.processInstanceName = processInstanceBuilder.getProcessInstanceName();
         this.overrideDefinitionTenantId = processInstanceBuilder.getOverrideDefinitionTenantId();
+        this.predefinedProcessInstanceId = processInstanceBuilder.getPredefinedProcessInstanceId();
         this.transientVariables = processInstanceBuilder.getTransientVariables();
         this.callbackId = processInstanceBuilder.getCallbackId();
         this.callbackType = processInstanceBuilder.getCallbackType();
@@ -109,7 +111,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
 
         processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
         ProcessInstance processInstance = processInstanceHelper.createProcessInstance(processDefinition, businessKey, processInstanceName, 
-                        overrideDefinitionTenantId, variables, transientVariables, callbackId, callbackType, true);
+                        overrideDefinitionTenantId, predefinedProcessInstanceId, variables, transientVariables, callbackId, callbackType, true);
 
         return processInstance;
     }

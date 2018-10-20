@@ -17,6 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -24,7 +25,12 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.entitylink.api.EntityLink;
+import org.flowable.entitylink.api.EntityLinkType;
+import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -49,12 +55,26 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertEquals("Task 1", task.getName());
         assertEquals("JohnDoe", task.getAssignee());
+        String task1Id = task.getId();
+        
+        List<EntityLink> entityLinks = cmmnRuntimeService.getEntityLinkChildrenForCaseInstance(caseInstance.getId());
+        assertEquals(1, entityLinks.size());
+        EntityLink entityLink = entityLinks.get(0);
+        assertEquals(EntityLinkType.CHILD, entityLink.getLinkType());
+        assertNotNull(entityLink.getCreateTime());
+        assertEquals(caseInstance.getId(), entityLink.getScopeId());
+        assertEquals(ScopeTypes.CMMN, entityLink.getScopeType());
+        assertNull(entityLink.getScopeDefinitionId());
+        assertEquals(task.getId(), entityLink.getReferenceScopeId());
+        assertEquals(ScopeTypes.TASK, entityLink.getReferenceScopeType());
+        assertNull(entityLink.getReferenceScopeDefinitionId());
 
         cmmnTaskService.complete(task.getId());
 
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertEquals("Task 2", task.getName());
         assertNull(task.getAssignee());
+        String task2Id = task.getId();
 
         task = cmmnTaskService.createTaskQuery().taskCandidateGroup("test").caseInstanceId(caseInstance.getId()).singleResult();
         assertEquals("Task 2", task.getName());
@@ -66,10 +86,37 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
 
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
 
-        assertEquals("JohnDoe", cmmnHistoryService.createHistoricVariableInstanceQuery()
-                        .caseInstanceId(caseInstance.getId())
-                        .variableName("var1")
-                        .singleResult().getValue());
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            assertEquals("JohnDoe", cmmnHistoryService.createHistoricVariableInstanceQuery()
+                            .caseInstanceId(caseInstance.getId())
+                            .variableName("var1")
+                            .singleResult().getValue());
+            
+            List<HistoricEntityLink> historicEntityLinks = cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(caseInstance.getId());
+            assertEquals(2, historicEntityLinks.size());
+            boolean hasTask1 = false;
+            boolean hasTask2 = false;
+            for (HistoricEntityLink historicEntityLink : historicEntityLinks) {
+                assertEquals(EntityLinkType.CHILD, historicEntityLink.getLinkType());
+                assertNotNull(historicEntityLink.getCreateTime());
+                assertEquals(caseInstance.getId(), historicEntityLink.getScopeId());
+                assertEquals(ScopeTypes.CMMN, historicEntityLink.getScopeType());
+                assertNull(historicEntityLink.getScopeDefinitionId());
+                if (task1Id.equals(historicEntityLink.getReferenceScopeId())) {
+                    hasTask1 = true;
+                }
+                
+                if (task2Id.equals(historicEntityLink.getReferenceScopeId())) {
+                    hasTask2 = true;
+                }
+                
+                assertEquals(ScopeTypes.TASK, historicEntityLink.getReferenceScopeType());
+                assertNull(historicEntityLink.getReferenceScopeDefinitionId());
+            }
+            
+            assertTrue(hasTask1);
+            assertTrue(hasTask2);
+        }
 
         Authentication.setAuthenticatedUserId(null);
     }
@@ -210,8 +257,6 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertEquals("Task 1", task.getName());
         assertNull(task.getAssignee());
-
-
 
         assertEquals(0, cmmnRuntimeService.getIdentityLinksForCaseInstance(caseInstance.getId()).size());
 

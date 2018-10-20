@@ -91,6 +91,9 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
         // Identity links
         getIdentityLinkEntityManager().deleteIdentityLinksByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
         
+        // Entity links
+        getEntityLinkEntityManager().deleteEntityLinksByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
+        
         // Tasks
         TaskEntityManager taskEntityManager = getTaskEntityManager();
         List<TaskEntity> taskEntities = taskEntityManager.findTasksByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);

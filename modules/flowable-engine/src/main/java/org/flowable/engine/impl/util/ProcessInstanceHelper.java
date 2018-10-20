@@ -59,17 +59,17 @@ public class ProcessInstanceHelper {
     public ProcessInstance createProcessInstance(ProcessDefinition processDefinition, String businessKey, String processInstanceName, 
                     Map<String, Object> variables, Map<String, Object> transientVariables) {
         
-        return createProcessInstance(processDefinition, businessKey, processInstanceName, null, variables, transientVariables, null, null, false);
+        return createProcessInstance(processDefinition, businessKey, processInstanceName, null, null, variables, transientVariables, null, null, false);
     }
 
     public ProcessInstance createAndStartProcessInstance(ProcessDefinition processDefinition, String businessKey, String processInstanceName, 
                     Map<String, Object> variables, Map<String, Object> transientVariables) {
         
-        return createProcessInstance(processDefinition, businessKey, processInstanceName, null, variables, transientVariables, null, null, true);
+        return createProcessInstance(processDefinition, businessKey, processInstanceName, null, null, variables, transientVariables, null, null, true);
     }
 
     public ProcessInstance createProcessInstance(ProcessDefinition processDefinition, String businessKey, String processInstanceName, 
-                    String overrideDefinitionTenantId, Map<String, Object> variables, Map<String, Object> transientVariables, 
+                    String overrideDefinitionTenantId, String predefinedProcessInstanceId, Map<String, Object> variables, Map<String, Object> transientVariables, 
                     String callbackId, String callbackType, boolean startProcessInstance) {
 
         CommandContext commandContext = Context.getCommandContext();
@@ -96,7 +96,8 @@ public class ProcessInstanceHelper {
         }
 
         return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, businessKey, processInstanceName, overrideDefinitionTenantId, 
-                        initialFlowElement, process, variables, transientVariables, callbackId, callbackType, startProcessInstance);
+                        predefinedProcessInstanceId, initialFlowElement, process, variables, transientVariables, 
+                        callbackId, callbackType, startProcessInstance);
     }
 
     public ProcessInstance createAndStartProcessInstanceByMessage(ProcessDefinition processDefinition, String messageName, String businessKey, 
@@ -137,7 +138,7 @@ public class ProcessInstanceHelper {
             throw new FlowableException("No message start event found for process definition " + processDefinition.getId() + " and message name " + messageName);
         }
 
-        return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, businessKey, null, null, initialFlowElement, 
+        return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, businessKey, null, null, null, initialFlowElement, 
                         process, variables, transientVariables, callbackId, callbackType, true);
     }
     
@@ -145,12 +146,12 @@ public class ProcessInstanceHelper {
             String businessKey, String processInstanceName, FlowElement initialFlowElement, Process process, Map<String, Object> variables, 
             Map<String, Object> transientVariables, boolean startProcessInstance) {
         
-        return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, businessKey, processInstanceName, null, initialFlowElement, 
+        return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, businessKey, processInstanceName, null, null, initialFlowElement, 
                         process, variables, transientVariables, null, null, startProcessInstance);
     }
 
     public ProcessInstance createAndStartProcessInstanceWithInitialFlowElement(ProcessDefinition processDefinition, String businessKey, String processInstanceName, 
-                    String overrideDefinitionTenantId, FlowElement initialFlowElement, Process process, Map<String, Object> variables, 
+                    String overrideDefinitionTenantId, String predefinedProcessInstanceId, FlowElement initialFlowElement, Process process, Map<String, Object> variables, 
                     Map<String, Object> transientVariables, String callbackId, String callbackType, boolean startProcessInstance) {
 
         CommandContext commandContext = Context.getCommandContext();
@@ -169,8 +170,9 @@ public class ProcessInstanceHelper {
         }
 
         ExecutionEntity processInstance = CommandContextUtil.getExecutionEntityManager(commandContext)
-                .createProcessInstanceExecution(processDefinition, businessKey, tenantId, initiatorVariableName, initialFlowElement.getId());
-
+                .createProcessInstanceExecution(processDefinition, predefinedProcessInstanceId, businessKey, tenantId, 
+                                initiatorVariableName, initialFlowElement.getId());
+        
         processInstance.setName(processInstanceName);
         
         // Callbacks

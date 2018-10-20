@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityImpl">
+
+  <!-- INSERT ENTITY LINK -->
+  
+  <insert id="insertEntityLink" parameterType="org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityImpl">
+    insert into ${prefix}ACT_RU_ENTITYLINK (ID_, REV_, CREATE_TIME_, LINK_TYPE_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_)
+    values (#{id, jdbcType=VARCHAR},
+            1,
+            #{createTime, jdbcType=TIMESTAMP},
+            #{linkType, jdbcType=VARCHAR},
+            #{scopeId, jdbcType=VARCHAR},
+            #{scopeType, jdbcType=VARCHAR},
+            #{scopeDefinitionId, jdbcType=VARCHAR},
+            #{referenceScopeId, jdbcType=VARCHAR},
+            #{referenceScopeType, jdbcType=VARCHAR},
+            #{referenceScopeDefinitionId, jdbcType=VARCHAR})
+            
+  </insert>
+  
+  <insert id="bulkInsertEntityLink" parameterType="org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityImpl">
+    insert into ${prefix}ACT_RU_ENTITYLINK (ID_, REV_, CREATE_TIME_, LINK_TYPE_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_)
+    values 
+    <foreach collection="list" item="entityLink" index="index" separator=","> 
+      (#{entityLink.id, jdbcType=VARCHAR},
+        1,
+        #{entityLink.createTime, jdbcType=TIMESTAMP},
+        #{entityLink.linkType, jdbcType=VARCHAR},
+        #{entityLink.scopeId, jdbcType=VARCHAR},
+        #{entityLink.scopeType, jdbcType=VARCHAR},
+        #{entityLink.scopeDefinitionId, jdbcType=VARCHAR},
+        #{entityLink.referenceScopeId, jdbcType=VARCHAR},
+        #{entityLink.referenceScopeType, jdbcType=VARCHAR},
+        #{entityLink.referenceScopeDefinitionId, jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+  
+  <insert id="bulkInsertEntityLink" databaseId="oracle" parameterType="org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityImpl">
+    INSERT ALL
+      <foreach collection="list" item="entityLink" index="index">
+        into ${prefix}ACT_RU_ENTITYLINK (ID_, REV_, CREATE_TIME_, LINK_TYPE_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_) VALUES
+           (#{entityLink.id, jdbcType=VARCHAR},
+            1,
+            #{entityLink.createTime, jdbcType=TIMESTAMP},
+            #{entityLink.linkType, jdbcType=VARCHAR},
+            #{entityLink.scopeId, jdbcType=VARCHAR},
+            #{entityLink.scopeType, jdbcType=VARCHAR},
+            #{entityLink.scopeDefinitionId, jdbcType=VARCHAR},
+            #{entityLink.referenceScopeId, jdbcType=VARCHAR},
+            #{entityLink.referenceScopeType, jdbcType=VARCHAR},
+            #{entityLink.referenceScopeDefinitionId, jdbcType=VARCHAR})
+      </foreach>
+    SELECT * FROM dual
+  </insert>
+  
+  <!-- ENTITY LINK DELETE -->
+  
+  <delete id="deleteEntityLink" parameterType="string">
+    delete from ${prefix}ACT_RU_ENTITYLINK where ID_ = #{id}
+  </delete>
+  
+  <delete id="bulkDeleteEntityLink" parameterType="java.util.Collection">
+    delete from ${prefix}ACT_RU_ENTITYLINK where 
+    <foreach item="entityLink" collection="list" index="index" separator=" or ">
+        ID_ = #{entityLink.id, jdbcType=VARCHAR}
+    </foreach>
+  </delete>
+  
+  <delete id="deleteEntityLinksByScopeIdAndScopeType" parameterType="java.util.Map">
+    delete from ${prefix}ACT_RU_ENTITYLINK where SCOPE_ID_ = #{scopeId} and SCOPE_TYPE_ = #{scopeType}
+  </delete>
+  
+  <delete id="deleteEntityLinksByScopeDefinitionIdAndScopeType" parameterType="java.util.Map">
+    delete from ${prefix}ACT_RU_ENTITYLINK where SCOPE_DEFINITION_ID_ = #{scopeDefinitionId} and SCOPE_TYPE_ = #{scopeType}
+  </delete>
+  
+
+  <!-- ENTITY LINK RESULTMAP -->
+
+  <resultMap id="entityLinkResultMap" type="org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
+    <result property="linkType" column="LINK_TYPE_" jdbcType="VARCHAR" />
+    <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
+    <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
+    <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
+    <result property="referenceScopeId" column="REF_SCOPE_ID_" jdbcType="VARCHAR"/>
+    <result property="referenceScopeType" column="REF_SCOPE_TYPE_" jdbcType="VARCHAR"/>
+    <result property="referenceScopeDefinitionId" column="REF_SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
+  </resultMap>
+
+  <!-- ENTITY LINK SELECT -->
+
+  <select id="selectEntityLink" parameterType="string" resultMap="entityLinkResultMap">
+    select * from ${prefix}ACT_RU_ENTITYLINK where ID_ = #{id, jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectEntityLinksByScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="entityLinkResultMap">
+    select * from ${prefix}ACT_RU_ENTITYLINK where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType}
+  </select>
+  
+  <select id="selectEntityLinksByReferenceScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="entityLinkResultMap">
+    select * from ${prefix}ACT_RU_ENTITYLINK where REF_SCOPE_ID_ = #{parameter.referenceScopeId} and SCOPE_TYPE_ = #{parameter.referenceScopeType} and LINK_TYPE_ = #{parameter.linkType}
+  </select>
+  
+  <select id="selectEntityLinksByScopeDefinitionAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="entityLinkResultMap">
+    select * from ${prefix}ACT_RU_ENTITYLINK where SCOPE_DEFINITION_ID_ = #{parameter.scopeDefinitionId} and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType}
+  </select>
+  
+  <select id="selectEntityLinks" resultMap="entityLinkResultMap">
+    select * from ${prefix}ACT_RU_ENTITYLINK
+  </select>
+  
+</mapper>

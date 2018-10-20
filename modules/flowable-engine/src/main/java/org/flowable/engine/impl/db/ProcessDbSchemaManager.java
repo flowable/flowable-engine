@@ -88,6 +88,7 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         
         getCommonSchemaManager().schemaCreate();
         getIdentityLinkSchemaManager().schemaCreate();
+        getEntityLinkSchemaManager().schemaCreate();
         getTaskSchemaManager().schemaCreate();
         getVariableSchemaManager().schemaCreate();
         getJobSchemaManager().schemaCreate();
@@ -152,6 +153,12 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         }
         
         try {
+            getEntityLinkSchemaManager().schemaDrop();
+        } catch (Exception e) {
+            LOGGER.info("Error dropping entity link tables", e);
+        }
+        
+        try {
             getCommonSchemaManager().schemaDrop();
         } catch (Exception e) {
             LOGGER.info("Error dropping common tables", e);
@@ -196,6 +203,7 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         
         getCommonSchemaManager().schemaUpdate();
         getIdentityLinkSchemaManager().schemaUpdate();
+        getEntityLinkSchemaManager().schemaUpdate();
         getTaskSchemaManager().schemaUpdate();
         getVariableSchemaManager().schemaUpdate();
         getJobSchemaManager().schemaUpdate();
@@ -329,6 +337,10 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
     
     protected SchemaManager getIdentityLinkSchemaManager() {
         return CommandContextUtil.getProcessEngineConfiguration().getIdentityLinkSchemaManager();
+    }
+    
+    protected SchemaManager getEntityLinkSchemaManager() {
+        return CommandContextUtil.getProcessEngineConfiguration().getEntityLinkSchemaManager();
     }
     
     protected SchemaManager getVariableSchemaManager() {

@@ -33,6 +33,7 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.history.async.AsyncHistorySession;
@@ -239,6 +240,39 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
         return CaseDefinitionUtil.getCaseDefinition(caseDefinitionId);
     }
     
+    @Override
+    public void recordEntityLinkCreated(EntityLinkEntity entityLink) {
+        if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE && entityLink.getScopeId() != null) {
+            
+            Map<String, String> data = new HashMap<>();
+            addCommonEntityLinkFields(entityLink, data);
+            
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_ENTITY_LINK_CREATED, data, null);
+        }
+    }
+
+    @Override
+    public void recordEntityLinkDeleted(EntityLinkEntity entityLink) {
+        if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
+            
+            Map<String, String> data = new HashMap<>();
+            addCommonEntityLinkFields(entityLink, data);
+            
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_ENTITY_LINK_DELETED, data, null);
+        }
+    }
+    
+    protected void addCommonEntityLinkFields(EntityLinkEntity entityLink, Map<String, String> data) {
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, entityLink.getId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ENTITY_LINK_TYPE, entityLink.getLinkType());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CREATE_TIME, entityLink.getLinkType());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SCOPE_ID, entityLink.getScopeId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SCOPE_TYPE, entityLink.getScopeType());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SCOPE_DEFINITION_ID, entityLink.getScopeDefinitionId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REF_SCOPE_ID, entityLink.getReferenceScopeId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REF_SCOPE_TYPE, entityLink.getReferenceScopeType());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REF_SCOPE_DEFINITION_ID, entityLink.getReferenceScopeDefinitionId());
+    }
 
     @Override
     public void recordVariableCreate(VariableInstanceEntity variable) {

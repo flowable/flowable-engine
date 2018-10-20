@@ -39,6 +39,10 @@
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
+            <artifactId>flowable-entitylink-service-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
             <artifactId>flowable-variable-service-api</artifactId>
         </dependency>
         <dependency>

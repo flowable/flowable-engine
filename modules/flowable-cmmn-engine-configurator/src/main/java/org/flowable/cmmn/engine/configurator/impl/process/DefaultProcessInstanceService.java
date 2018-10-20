@@ -12,16 +12,13 @@
  */
 package org.flowable.cmmn.engine.configurator.impl.process;
 
+import java.util.Map;
+
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
-import org.flowable.cmmn.model.IOParameter;
-import org.flowable.engine.RuntimeService;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -30,24 +27,35 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
 
     private static final String DELETE_REASON = "deletedFromCmmnCase";
     
-    protected RuntimeService processEngineRuntimeService;
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
-    public DefaultProcessInstanceService(RuntimeService runtimeService) {
-        this.processEngineRuntimeService = runtimeService;
+    public DefaultProcessInstanceService(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        this.processEngineConfiguration = processEngineConfiguration;
     }
 
     @Override
-    public String startProcessInstanceByKey(String processDefinitionKey, String tenantId, Map<String, Object> inParametersMap) {
-        return startProcessInstanceByKey(processDefinitionKey, null, tenantId, inParametersMap);
+    public String generateNewProcessInstanceId() {
+        return processEngineConfiguration.getIdGenerator().getNextId();
     }
 
     @Override
-    public String startProcessInstanceByKey(String processDefinitionKey, String planItemInstanceId, String tenantId, Map<String, Object> inParametersMap) {
-        ProcessInstanceBuilder processInstanceBuilder = processEngineRuntimeService.createProcessInstanceBuilder();
+    public String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String
+                    tenantId, Map<String, Object> inParametersMap) {
+        
+        return startProcessInstanceByKey(processDefinitionKey, predefinedProcessInstanceId, null, tenantId, inParametersMap);
+    }
+
+    @Override
+    public String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, 
+                    String planItemInstanceId, String tenantId, Map<String, Object> inParametersMap) {
+        
+        ProcessInstanceBuilder processInstanceBuilder = processEngineConfiguration.getRuntimeService().createProcessInstanceBuilder();
         processInstanceBuilder.processDefinitionKey(processDefinitionKey);
         if (tenantId != null) {
             processInstanceBuilder.tenantId(tenantId);
         }
+        
+        processInstanceBuilder.predefineProcessInstanceId(predefinedProcessInstanceId);
 
         if (planItemInstanceId != null) {
             processInstanceBuilder.callbackId(planItemInstanceId);
@@ -64,12 +72,12 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
 
     @Override
     public void deleteProcessInstance(String processInstanceId) {
-        processEngineRuntimeService.deleteProcessInstance(processInstanceId, DELETE_REASON);
+        processEngineConfiguration.getRuntimeService().deleteProcessInstance(processInstanceId, DELETE_REASON);
     }
 
     @Override
     public Map<String, Object> getVariables(String executionId){
-       return processEngineRuntimeService.getVariables(executionId);
+       return processEngineConfiguration.getRuntimeService().getVariables(executionId);
     }
 
 }

@@ -130,7 +130,7 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
     }
 
     protected void initProcessInstanceService(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        cmmnEngineConfiguration.setProcessInstanceService(new DefaultProcessInstanceService(processEngineConfiguration.getRuntimeService()));
+        cmmnEngineConfiguration.setProcessInstanceService(new DefaultProcessInstanceService(processEngineConfiguration));
     }
 
     protected void initProcessInstanceStateChangedCallbacks(ProcessEngineConfigurationImpl processEngineConfiguration) {

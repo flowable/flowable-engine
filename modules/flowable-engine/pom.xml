@@ -44,6 +44,10 @@
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
+            <artifactId>flowable-entitylink-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
             <artifactId>flowable-task-service</artifactId>
         </dependency>
         <dependency>
