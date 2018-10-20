@@ -11,6 +11,7 @@
         <property name="jdbcPassword" value="@jdbc.password@" />
         <property name="databaseSchema" value="@jdbc.schema@" />
         <property name="databaseSchemaUpdate" value="drop-create" />
+        <property name="enableEntityLinks" value="true" />
     </bean>
 
     <bean id="testBean" class="org.flowable.cmmn.test.delegate.TestBean" />
