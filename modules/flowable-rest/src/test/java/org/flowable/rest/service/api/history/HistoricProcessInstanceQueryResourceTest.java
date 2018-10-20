@@ -13,6 +13,7 @@
 
 package org.flowable.rest.service.api.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
@@ -21,6 +22,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
@@ -50,6 +52,7 @@ public class HistoricProcessInstanceQueryResourceTest extends BaseSpringRestTest
         processVariables.put("intVar", 67890);
         processVariables.put("booleanVar", false);
 
+        Authentication.setAuthenticatedUserId("historyQueryAndSortUser");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", processVariables);
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
@@ -178,5 +181,7 @@ public class HistoricProcessInstanceQueryResourceTest extends BaseSpringRestTest
         
         assertEquals("The One Task Process", valueNode.get("processDefinitionName").asText());
         assertEquals("One task process description", valueNode.get("processDefinitionDescription").asText());
+        assertThat(valueNode.has("startTime")).as("has startTime").isTrue();
+        assertThat(valueNode.get("startUserId").textValue()).as("startUserId").isEqualTo(processInstance.getStartUserId());
     }
 }

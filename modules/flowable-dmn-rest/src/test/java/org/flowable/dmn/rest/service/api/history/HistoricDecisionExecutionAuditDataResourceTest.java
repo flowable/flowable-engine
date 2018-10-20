@@ -12,6 +12,7 @@
  */
 package org.flowable.dmn.rest.service.api.history;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,6 +58,10 @@ public class HistoricDecisionExecutionAuditDataResourceTest extends BaseSpringDm
     public void testGetDecisionTableResourceForUnexistingDecisionTable() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_HISTORIC_DECISION_EXECUTION_AUDITDATA, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
+        try (InputStream contentStream = response.getEntity().getContent()) {
+            JsonNode errorNode = objectMapper.readTree(contentStream);
+            assertEquals("Could not find a decision execution with id 'unexisting'", errorNode.get("exception").textValue());
+        }
         closeResponse(response);
     }
 }

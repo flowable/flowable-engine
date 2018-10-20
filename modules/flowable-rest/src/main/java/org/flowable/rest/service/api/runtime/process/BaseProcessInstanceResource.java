@@ -48,6 +48,7 @@ public class BaseProcessInstanceResource {
         allowedSortProperties.put("processDefinitionId", ProcessInstanceQueryProperty.PROCESS_DEFINITION_ID);
         allowedSortProperties.put("processDefinitionKey", ProcessInstanceQueryProperty.PROCESS_DEFINITION_KEY);
         allowedSortProperties.put("id", ProcessInstanceQueryProperty.PROCESS_INSTANCE_ID);
+        allowedSortProperties.put("startTime", ProcessInstanceQueryProperty.PROCESS_START_TIME);
         allowedSortProperties.put("tenantId", ProcessInstanceQueryProperty.TENANT_ID);
     }
 
@@ -172,7 +173,7 @@ public class BaseProcessInstanceResource {
         }
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessProcessInstanceInfoWithQuery(query);
+            restApiInterceptor.accessProcessInstanceInfoWithQuery(query, queryRequest);
         }
 
         DataResponse<ProcessInstanceResponse> responseList = paginateList(requestParams, queryRequest, query, "id", allowedSortProperties, restResponseFactory::createProcessInstanceResponseList);

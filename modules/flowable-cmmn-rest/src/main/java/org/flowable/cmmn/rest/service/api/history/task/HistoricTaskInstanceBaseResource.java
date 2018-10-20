@@ -221,7 +221,7 @@ public class HistoricTaskInstanceBaseResource {
         }
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessHistoryTaskInfoWithQuery(query);
+            restApiInterceptor.accessHistoryTaskInfoWithQuery(query, queryRequest);
         }
 
         return paginateList(allRequestParams, queryRequest, query, "taskInstanceId", allowedSortProperties,

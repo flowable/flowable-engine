@@ -101,7 +101,7 @@ public class BaseFormInstanceResource {
         }
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessFormInstanceInfoWithQuery(query);
+            restApiInterceptor.accessFormInstanceInfoWithQuery(query, queryRequest);
         }
 
         return paginateList(requestParams, queryRequest, query, "submittedDate", allowedSortProperties, restResponseFactory::createFormInstanceResponse);

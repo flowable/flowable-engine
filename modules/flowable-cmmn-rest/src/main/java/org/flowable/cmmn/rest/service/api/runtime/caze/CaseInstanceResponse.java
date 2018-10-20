@@ -18,6 +18,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
+import org.flowable.common.rest.util.DateToStringSerializer;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -32,6 +35,7 @@ public class CaseInstanceResponse {
     protected String name;
     protected String url;
     protected String businessKey;
+    @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date startTime;
     protected String startUserId;
     protected String state;

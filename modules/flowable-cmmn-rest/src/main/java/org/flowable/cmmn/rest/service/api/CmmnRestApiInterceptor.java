@@ -28,7 +28,17 @@ import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
+import org.flowable.cmmn.rest.service.api.history.caze.HistoricCaseInstanceQueryRequest;
+import org.flowable.cmmn.rest.service.api.history.milestone.HistoricMilestoneInstanceQueryRequest;
+import org.flowable.cmmn.rest.service.api.history.planitem.HistoricPlanItemInstanceQueryRequest;
+import org.flowable.cmmn.rest.service.api.history.task.HistoricTaskInstanceQueryRequest;
+import org.flowable.cmmn.rest.service.api.history.variable.HistoricVariableInstanceQueryRequest;
+import org.flowable.cmmn.rest.service.api.runtime.caze.CaseInstanceCreateRequest;
+import org.flowable.cmmn.rest.service.api.runtime.caze.CaseInstanceQueryRequest;
+import org.flowable.cmmn.rest.service.api.runtime.planitem.PlanItemInstanceQueryRequest;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskActionRequest;
+import org.flowable.cmmn.rest.service.api.runtime.task.TaskQueryRequest;
+import org.flowable.cmmn.rest.service.api.runtime.task.TaskRequest;
 import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
@@ -44,9 +54,9 @@ public interface CmmnRestApiInterceptor {
 
     void accessTaskInfoById(Task task);
     
-    void accessTaskInfoWithQuery(TaskQuery taskQuery);
+    void accessTaskInfoWithQuery(TaskQuery taskQuery, TaskQueryRequest request);
     
-    void createTask(Task task);
+    void createTask(Task task, TaskRequest request);
     
     void deleteTask(Task task);
     
@@ -54,9 +64,9 @@ public interface CmmnRestApiInterceptor {
     
     void accessCaseInstanceInfoById(CaseInstance caseInstance);
 
-    void accessCaseInstanceInfoWithQuery(CaseInstanceQuery caseInstanceQuery);
+    void accessCaseInstanceInfoWithQuery(CaseInstanceQuery caseInstanceQuery, CaseInstanceQueryRequest request);
     
-    void createCaseInstance(CaseInstanceBuilder caseInstanceBuilder);
+    void createCaseInstance(CaseInstanceBuilder caseInstanceBuilder, CaseInstanceCreateRequest request);
     
     void deleteCaseInstance(CaseInstance caseInstance);
     
@@ -64,7 +74,7 @@ public interface CmmnRestApiInterceptor {
     
     void accessPlanItemInstanceInfoById(PlanItemInstance planItemInstance);
 
-    void accessPlanItemInstanceInfoWithQuery(PlanItemInstanceQuery planItemInstanceQuery);
+    void accessPlanItemInstanceInfoWithQuery(PlanItemInstanceQuery planItemInstanceQuery, PlanItemInstanceQueryRequest request);
     
     void doPlanItemInstanceAction(PlanItemInstance planItemInstance, RestActionRequest actionRequest);
     
@@ -98,13 +108,13 @@ public interface CmmnRestApiInterceptor {
     
     void accessHistoryTaskInfoById(HistoricTaskInstance historicTaskInstance);
     
-    void accessHistoryTaskInfoWithQuery(HistoricTaskInstanceQuery historicTaskInstanceQuery);
+    void accessHistoryTaskInfoWithQuery(HistoricTaskInstanceQuery historicTaskInstanceQuery, HistoricTaskInstanceQueryRequest request);
     
     void deleteHistoricTask(HistoricTaskInstance historicTaskInstance);
     
     void accessHistoryCaseInfoById(HistoricCaseInstance historicCaseInstance);
     
-    void accessHistoryCaseInfoWithQuery(HistoricCaseInstanceQuery historicCaseInstanceQuery);
+    void accessHistoryCaseInfoWithQuery(HistoricCaseInstanceQuery historicCaseInstanceQuery, HistoricCaseInstanceQueryRequest request);
     
     void deleteHistoricCase(HistoricCaseInstance historicCaseInstance);
     
@@ -114,13 +124,13 @@ public interface CmmnRestApiInterceptor {
     
     void accessHistoryMilestoneInfoById(HistoricMilestoneInstance historicMilestoneInstance);
     
-    void accessHistoryMilestoneInfoWithQuery(HistoricMilestoneInstanceQuery historicMilestoneInstanceQuery);
+    void accessHistoryMilestoneInfoWithQuery(HistoricMilestoneInstanceQuery historicMilestoneInstanceQuery, HistoricMilestoneInstanceQueryRequest request);
     
     void accessHistoryPlanItemInfoById(HistoricPlanItemInstance historicPlanItemInstance);
     
-    void accessHistoryPlanItemInfoWithQuery(HistoricPlanItemInstanceQuery historicPlanItemInstanceQuery);
+    void accessHistoryPlanItemInfoWithQuery(HistoricPlanItemInstanceQuery historicPlanItemInstanceQuery, HistoricPlanItemInstanceQueryRequest request);
     
     void accessHistoryVariableInfoById(HistoricVariableInstance historicVariableInstance);
     
-    void accessHistoryVariableInfoWithQuery(HistoricVariableInstanceQuery historicVariableInstanceQuery);
+    void accessHistoryVariableInfoWithQuery(HistoricVariableInstanceQuery historicVariableInstanceQuery, HistoricVariableInstanceQueryRequest request);
 }

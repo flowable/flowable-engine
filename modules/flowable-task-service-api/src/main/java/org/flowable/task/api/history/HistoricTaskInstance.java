@@ -31,7 +31,12 @@ public interface HistoricTaskInstance extends TaskInfo, HistoricData {
      */
     String getDeleteReason();
 
-    /** Time when the task started. */
+    /**
+     * Time when the task created.
+     *
+     * @deprecated use {@link #getCreateTime()} instead
+     **/
+    @Deprecated
     Date getStartTime();
 
     /** Time when the task was deleted or completed. */

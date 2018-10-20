@@ -314,7 +314,7 @@ public class TaskCollectionResource extends TaskBaseResource {
         }
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.createTask(task);
+            restApiInterceptor.createTask(task, taskRequest);
         }
         
         taskService.saveTask(task);

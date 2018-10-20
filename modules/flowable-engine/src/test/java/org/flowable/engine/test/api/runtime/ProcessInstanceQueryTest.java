@@ -13,6 +13,8 @@
 package org.flowable.engine.test.api.runtime;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -25,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.assertj.core.api.Assertions;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -46,6 +49,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Tijs Rademakers
  * @author Frederik Heremans
  * @author Falko Menge
+ * @author Filip Hrisafov
  */
 public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
 
@@ -2030,5 +2034,30 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().startedBy(authenticatedUser).list();
 
         assertEquals(1, processInstances.size());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryOrderedByStartTime() throws Exception {
+        Instant now = Instant.now();
+
+        processEngineConfiguration.getClock().setCurrentTime(Date.from(now));
+        String nowInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", "now").getId();
+
+        processEngineConfiguration.getClock().setCurrentTime(Date.from(now.minus(1, ChronoUnit.HOURS)));
+        String nowMinus1InstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", "now").getId();
+
+        processEngineConfiguration.getClock().setCurrentTime(Date.from(now.plus(1, ChronoUnit.HOURS)));
+        String nowPlus1InstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", "now").getId();
+
+        Assertions.assertThat(runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("now").orderByStartTime().asc().list())
+            .extracting(ProcessInstance::getId)
+            .as("ascending order by startTime")
+            .containsExactly(nowMinus1InstanceId, nowInstanceId, nowPlus1InstanceId);
+
+        Assertions.assertThat(runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("now").orderByStartTime().desc().list())
+            .extracting(ProcessInstance::getId)
+            .as("descending order by startTime")
+            .containsExactly(nowPlus1InstanceId, nowInstanceId, nowMinus1InstanceId);
     }
 }
