@@ -13,7 +13,7 @@
     <artifactId>flowable-ui-edge</artifactId>
 
     <properties>
-        <spring.cloud.version>Finchley.M9</spring.cloud.version>
+        <spring.cloud.version>Finchley.SR1</spring.cloud.version>
     </properties>
 
     <dependencyManagement>
@@ -98,15 +98,4 @@
             </plugin>
         </plugins>
     </build>
-    <repositories>
-        <!-- Spring Milestone repo needed for Finchley M9. Once it goes to SR we can drop this -->
-        <repository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>https://repo.spring.io/libs-milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
 </project>
