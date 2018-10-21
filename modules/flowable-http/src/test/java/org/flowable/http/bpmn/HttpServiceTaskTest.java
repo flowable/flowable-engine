@@ -450,7 +450,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         assertEquals("text/plain", headerMap.get("Content-Type"));
         assertEquals("623b94fc-14b8-4ee6-aed7-b16b9321e29f", headerMap.get("X-Request-ID"));
         assertEquals("localhost:7000", headerMap.get("Host"));
-        assertEquals(null, headerMap.get("Test"));
+        assertEquals("", headerMap.get("Test"));
 
         // Request assertions
         Map<String, Object> request = new HashMap<>();
