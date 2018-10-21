@@ -68,7 +68,13 @@ public class GetTaskVariableInstancesCmd implements Command<Map<String, Variable
             }
 
         }
-
+        if (variables != null) {
+            for (Map.Entry<String, VariableInstance> entry : variables.entrySet()) {
+                if (entry.getValue() != null) {
+                    entry.getValue().getValue();
+                }
+            }
+        }
         return variables;
     }
 }

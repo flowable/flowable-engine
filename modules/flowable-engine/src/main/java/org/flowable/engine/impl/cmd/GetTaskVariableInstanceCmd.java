@@ -59,7 +59,9 @@ public class GetTaskVariableInstanceCmd implements Command<VariableInstance>, Se
         } else {
             variableEntity = task.getVariableInstance(variableName, false);
         }
-
+        if (variableEntity != null) {
+            variableEntity.getValue();
+        }
         return variableEntity;
     }
 }

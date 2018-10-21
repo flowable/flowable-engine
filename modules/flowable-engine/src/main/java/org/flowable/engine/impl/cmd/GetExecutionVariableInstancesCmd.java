@@ -79,6 +79,13 @@ public class GetExecutionVariableInstancesCmd implements Command<Map<String, Var
                 }
             }
         }
+        if (variables != null) {
+            for (Map.Entry<String, VariableInstance> entry : variables.entrySet()) {
+                if (entry.getValue() != null) {
+                    entry.getValue().getValue();
+                }
+            }
+        }
 
         return variables;
     }

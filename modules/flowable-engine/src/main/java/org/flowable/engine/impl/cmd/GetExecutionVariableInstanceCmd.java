@@ -65,7 +65,9 @@ public class GetExecutionVariableInstanceCmd implements Command<VariableInstance
                 variableEntity = execution.getVariableInstance(variableName, false);
             }
         }
-
+        if (variableEntity != null) {
+            variableEntity.getValue();
+        }
         return variableEntity;
     }
 }

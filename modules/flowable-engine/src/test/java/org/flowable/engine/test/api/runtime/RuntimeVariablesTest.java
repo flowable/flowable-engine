@@ -22,6 +22,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.jupiter.api.Test;
 
@@ -71,7 +72,7 @@ public class RuntimeVariablesTest extends PluggableFlowableTestCase {
     })
     public void testGetVariablesByExecutionIdsForSerializableType() {
         ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        org.flowable.task.api.Task task1 = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
+        Task task1 = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
 
         StringBuilder sb = new StringBuilder("a");
         for (int i = 0; i < 4001; i++) {
@@ -79,14 +80,28 @@ public class RuntimeVariablesTest extends PluggableFlowableTestCase {
         }
         String serializableTypeVar = sb.toString();
 
+        // Task variables
+        taskService.setVariableLocal(task1.getId(), "taskVar1", serializableTypeVar);
+
+        VariableInstance variableInstance = taskService.getVariableInstance(task1.getId(), "taskVar1");
+        assertEquals(serializableTypeVar, variableInstance.getValue());
+
+        Map<String, VariableInstance> variableInstances = taskService.getVariableInstances(task1.getId());
+        assertEquals(serializableTypeVar, variableInstances.get("taskVar1").getValue());
+
         // Execution variables
         taskService.setVariable(task1.getId(), "executionVar1", serializableTypeVar);
 
-        // only 1 process
-        Set<String> executionIds = new HashSet<>();
+        Set<String> executionIds = new HashSet<String>();
         executionIds.add(processInstance1.getId());
         List<VariableInstance> variables = runtimeService.getVariableInstancesByExecutionIds(executionIds);
         assertEquals(serializableTypeVar, variables.get(0).getValue());
+
+        variableInstance = runtimeService.getVariableInstance(processInstance1.getId(), "executionVar1");
+        assertEquals(serializableTypeVar, variableInstance.getValue());
+
+        variableInstances = runtimeService.getVariableInstances(processInstance1.getId());
+        assertEquals(serializableTypeVar, variableInstances.get("executionVar1").getValue());
     }
 
     private void checkVariable(String executionId, String name, String value, List<VariableInstance> variables) {
