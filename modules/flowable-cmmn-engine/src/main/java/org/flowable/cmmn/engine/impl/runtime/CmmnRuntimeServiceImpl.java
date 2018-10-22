@@ -52,6 +52,7 @@ import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceWithFormCmd;
 import org.flowable.cmmn.engine.impl.cmd.StartPlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TerminateCaseInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.TerminatePlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TriggerPlanItemInstanceCmd;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.entitylink.api.EntityLink;
@@ -122,6 +123,11 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     @Override
     public void terminateCaseInstance(String caseInstanceId) {
         commandExecutor.execute(new TerminateCaseInstanceCmd(caseInstanceId));
+    }
+
+    @Override
+    public void terminatePlanItemInstance(String planItemInstanceId) {
+        commandExecutor.execute(new TerminatePlanItemInstanceCmd(planItemInstanceId));
     }
 
     @Override
