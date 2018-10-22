@@ -16,6 +16,10 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.session.DefaultSessionCache;
+import org.eclipse.jetty.server.session.FileSessionDataStore;
+import org.eclipse.jetty.server.session.SessionCache;
+import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.flowable.cmmn.rest.WebConfigurer;
 import org.slf4j.Logger;
@@ -56,6 +60,12 @@ public class TestServerUtil {
         WebConfigurer configurer = new WebConfigurer();
         configurer.setContext(context);
         contextHandler.addEventListener(configurer);
+
+        // Create the SessionHandler (wrapper) to handle the sessions
+        SessionHandler sessionsHandler = new SessionHandler();
+        SessionCache sessionCache = new DefaultSessionCache(sessionsHandler);
+        sessionCache.setSessionDataStore(new FileSessionDataStore());
+        contextHandler.setSessionHandler(sessionsHandler);
 
         return contextHandler;
     }
