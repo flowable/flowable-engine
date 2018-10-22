@@ -35,6 +35,16 @@ public interface DelegatePlanItemInstance extends PlanItemInstance, VariableScop
     @Deprecated
     void setStartTime(Date startTime);
     void setCreateTime(Date createTime);
+    void setLastAvailableTime(Date availableTime);
+    void setLastEnabledTime(Date enabledTime);
+    void setLastDisabledTime(Date disabledTime);
+    void setLastStartedTime(Date startedTime);
+    void setLastSuspendedTime(Date suspendedTime);
+    void setCompletedTime(Date completedTime);
+    void setOccurredTime(Date occurredTime);
+    void setTerminatedTime(Date terminatedTime);
+    void setExitTime(Date exitTime);
+    void setEndedTime(Date endedTime);
     void setStartUserId(String startUserId);
     void setReferenceId(String referenceId);
     void setReferenceType(String referenceType);

@@ -65,6 +65,8 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected String startUserId;
     protected String referenceId;
     protected String referenceType;
+    protected boolean ended;
+    protected boolean notEnded;
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
@@ -234,14 +236,14 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
 
     @Override
-    public HistoricPlanItemInstanceQuery lastStartedBefore(Date lastStartedBefore) {
-        this.lastStartedBefore = lastStartedBefore;
+    public HistoricPlanItemInstanceQuery lastStartedBefore(Date startedBefore) {
+        this.lastStartedBefore = startedBefore;
         return this;
     }
 
     @Override
-    public HistoricPlanItemInstanceQuery lastStartedAfter(Date lastStartedAfter) {
-        this.lastStartedAfter = lastStartedAfter;
+    public HistoricPlanItemInstanceQuery lastStartedAfter(Date startedAfter) {
+        this.lastStartedAfter = startedAfter;
         return this;
     }
 
@@ -318,15 +320,25 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
 
     @Override
+    public HistoricPlanItemInstanceQuery ended() {
+        this.ended = true;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery notEnded() {
+        this.notEnded = true;
+        return this;
+    }
+
+    @Override
     public HistoricPlanItemInstanceQuery orderByCreateTime() {
         return orderBy(HistoricPlanItemInstanceQueryProperty.CREATE_TIME);
-
     }
 
     @Override
     public HistoricPlanItemInstanceQuery orderByEndedTime() {
         return orderBy(HistoricPlanItemInstanceQueryProperty.ENDED_TIME);
-
     }
 
     @Override
@@ -588,6 +600,14 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
 
     public void setEndedAfter(Date endedAfter) {
         this.endedAfter = endedAfter;
+    }
+
+    public boolean isEnded() {
+        return ended;
+    }
+
+    public boolean isNotEnded() {
+        return notEnded;
     }
 
     public String getStartUserId() {

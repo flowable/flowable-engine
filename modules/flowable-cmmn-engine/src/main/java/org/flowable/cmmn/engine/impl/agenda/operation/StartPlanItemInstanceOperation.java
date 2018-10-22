@@ -41,6 +41,7 @@ public class StartPlanItemInstanceOperation extends AbstractChangePlanItemInstan
     
     @Override
     protected void internalExecute() {
+        planItemInstanceEntity.setLastStartedTime(getCurrentTime(commandContext));
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceStarted(planItemInstanceEntity);
         executeActivityBehavior();
     }

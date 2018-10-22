@@ -44,6 +44,8 @@ public class TerminatePlanItemInstanceOperation extends AbstractDeletePlanItemIn
     
     @Override
     protected void internalExecute() {
+        planItemInstanceEntity.setEndedTime(getCurrentTime(commandContext));
+        planItemInstanceEntity.setTerminatedTime(planItemInstanceEntity.getEndedTime());
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceTerminated(planItemInstanceEntity);
     }
     

@@ -406,51 +406,56 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
 
     @Override
     public void recordPlanItemInstanceAvailable(PlanItemInstanceEntity planItemInstanceEntity) {
-        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_AVAILABLE, CmmnAsyncHistoryConstants.FIELD_LAST_AVAILABLE_TIME);
+        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, planItemInstanceEntity.getLastAvailableTime(),
+            CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_AVAILABLE, CmmnAsyncHistoryConstants.FIELD_LAST_AVAILABLE_TIME);
     }
 
     @Override
     public void recordPlanItemInstanceEnabled(PlanItemInstanceEntity planItemInstanceEntity) {
-        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_ENABLED, CmmnAsyncHistoryConstants.FIELD_LAST_ENABLED_TIME);
+        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, planItemInstanceEntity.getLastEnabledTime(),
+            CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_ENABLED, CmmnAsyncHistoryConstants.FIELD_LAST_ENABLED_TIME);
     }
 
     @Override
     public void recordPlanItemInstanceDisabled(PlanItemInstanceEntity planItemInstanceEntity) {
-        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_DISABLED, CmmnAsyncHistoryConstants.FIELD_LAST_DISABLED_TIME);
+        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, planItemInstanceEntity.getLastDisabledTime(),
+            CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_DISABLED, CmmnAsyncHistoryConstants.FIELD_LAST_DISABLED_TIME);
     }
 
     @Override
     public void recordPlanItemInstanceStarted(PlanItemInstanceEntity planItemInstanceEntity) {
-        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_STARTED, CmmnAsyncHistoryConstants.FIELD_LAST_STARTED_TIME);
+        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, planItemInstanceEntity.getLastStartedTime(),
+            CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_STARTED, CmmnAsyncHistoryConstants.FIELD_LAST_STARTED_TIME);
     }
 
     @Override
     public void recordPlanItemInstanceSuspended(PlanItemInstanceEntity planItemInstanceEntity) {
-        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_SUSPENDED, CmmnAsyncHistoryConstants.FIELD_LAST_SUSPENDED_TIME);      
+        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, planItemInstanceEntity.getLastSuspendedTime(),
+            CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_SUSPENDED, CmmnAsyncHistoryConstants.FIELD_LAST_SUSPENDED_TIME);
     }
 
     @Override
     public void recordPlanItemInstanceCompleted(PlanItemInstanceEntity planItemInstanceEntity) {
-        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_COMPLETED, 
-                CmmnAsyncHistoryConstants.FIELD_END_TIME, CmmnAsyncHistoryConstants.FIELD_COMPLETED_TIME);    
+        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, planItemInstanceEntity.getCompletedTime(),
+            CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_COMPLETED, CmmnAsyncHistoryConstants.FIELD_END_TIME, CmmnAsyncHistoryConstants.FIELD_COMPLETED_TIME);
     }
 
     @Override
     public void recordPlanItemInstanceOccurred(PlanItemInstanceEntity planItemInstanceEntity) {
-        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_OCCURRED, 
-                CmmnAsyncHistoryConstants.FIELD_END_TIME, CmmnAsyncHistoryConstants.FIELD_OCCURRED_TIME);      
+        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, planItemInstanceEntity.getOccurredTime(),
+            CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_OCCURRED, CmmnAsyncHistoryConstants.FIELD_END_TIME, CmmnAsyncHistoryConstants.FIELD_OCCURRED_TIME);
     }
 
     @Override
     public void recordPlanItemInstanceTerminated(PlanItemInstanceEntity planItemInstanceEntity) {
-        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_TERMINATED, 
-                CmmnAsyncHistoryConstants.FIELD_END_TIME, CmmnAsyncHistoryConstants.FIELD_TERMINATED_TIME);      
+        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, planItemInstanceEntity.getTerminatedTime(),
+            CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_TERMINATED, CmmnAsyncHistoryConstants.FIELD_END_TIME, CmmnAsyncHistoryConstants.FIELD_TERMINATED_TIME);
     }
 
     @Override
     public void recordPlanItemInstanceExit(PlanItemInstanceEntity planItemInstanceEntity) {
-        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_EXIT, 
-                CmmnAsyncHistoryConstants.FIELD_END_TIME, CmmnAsyncHistoryConstants.FIELD_EXIT_TIME);         
+        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, planItemInstanceEntity.getExitTime(),
+            CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_EXIT, CmmnAsyncHistoryConstants.FIELD_END_TIME, CmmnAsyncHistoryConstants.FIELD_EXIT_TIME);
     }
     
     protected void addCommonPlanItemInstanceFields(PlanItemInstanceEntity planItemInstanceEntity, Map<String, String> data) {
@@ -476,11 +481,10 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
         }
     }
     
-    protected void updatePlanItemInstanceTimeStamp(PlanItemInstanceEntity planItemInstanceEntity, String type, String...fields) {
+    protected void updatePlanItemInstanceTimeStamp(PlanItemInstanceEntity planItemInstanceEntity, Date time, String type, String...fields) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             Map<String, String> data = new HashMap<>();
             addCommonPlanItemInstanceFields(planItemInstanceEntity, data);
-            Date time = cmmnEngineConfiguration.getClock().getCurrentTime();
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_UPDATE_TIME, time);
             for (String field : fields) {
                 putIfNotNull(data, field, time);

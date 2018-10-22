@@ -44,6 +44,8 @@ public class OccurPlanItemInstanceOperation extends AbstractDeletePlanItemInstan
     
     @Override
     protected void internalExecute() {
+        planItemInstanceEntity.setEndedTime(getCurrentTime(commandContext));
+        planItemInstanceEntity.setOccurredTime(planItemInstanceEntity.getEndedTime());
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceOccurred(planItemInstanceEntity);
     }
     

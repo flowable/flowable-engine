@@ -32,6 +32,16 @@ public interface PlanItemInstance {
     @Deprecated()
     Date getStartTime();
     Date getCreateTime();
+    Date getLastAvailableTime();
+    Date getLastEnabledTime();
+    Date getLastDisabledTime();
+    Date getLastStartedTime();
+    Date getLastSuspendedTime();
+    Date getCompletedTime();
+    Date getOccurredTime();
+    Date getTerminatedTime();
+    Date getExitTime();
+    Date getEndedTime();
     String getStartUserId();
     String getReferenceId();
     String getReferenceType();
