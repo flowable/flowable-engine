@@ -17,7 +17,7 @@ public class DJConfig {
 	@Autowired
 	ProcessEngineConfigurationImpl springProcessEngineConfiguration;
 
-	@Value("${url.dj.adapter:http://localhost:8080}")
+	@Value("${url.dj.adapter:http://localhost:8080/djadapter}")
 	private String defaulDjAdapterUrl;
 	
 	
