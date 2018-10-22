@@ -13,6 +13,7 @@
 package org.flowable.cmmn.rest.service;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.DateFormat;
@@ -269,9 +270,8 @@ public abstract class BaseSpringRestTestCase extends TestCase {
             return response;
 
         } catch (IOException e) {
-            Assert.fail(e.getMessage());
+            throw new UncheckedIOException(e);
         }
-        return null;
     }
 
     public void closeResponse(CloseableHttpResponse response) {
