@@ -42,6 +42,8 @@ public interface ProcessInstanceActivityMigrationMappingOptions <T extends Proce
 
         T withLocalVariablesForAllActivities(Map<String, Object> variables);
 
+        T withLocalVariables(Map<String, Map<String, Object>> mappingVariables);
+
         Map<String, Map<String, Object>> getActivitiesLocalVariables();
     }
 

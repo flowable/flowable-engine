@@ -42,7 +42,7 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
     }
 
     @Override
-    public ProcessInstanceMigrationDocumentBuilder setProcessDefinitionToMigrateTo(String processDefinitionKey, int processDefinitionVersion) {
+    public ProcessInstanceMigrationDocumentBuilder setProcessDefinitionToMigrateTo(String processDefinitionKey, Integer processDefinitionVersion) {
         this.migrateToProcessDefinitionKey = processDefinitionKey;
         this.migrateToProcessDefinitionVersion = processDefinitionVersion;
         return this;

@@ -13,7 +13,6 @@
 
 package org.flowable.engine.impl.migration;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -23,20 +22,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.migration.ProcessInstanceActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
+import org.flowable.engine.migration.ProcessInstanceMigrationDocumentConverter;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author Dennis Federico
  */
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigrationDocument {
 
     protected String migrateToProcessDefinitionId;
@@ -49,16 +43,7 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
     protected Set<String> mappedFromActivities;
 
     public static ProcessInstanceMigrationDocument fromProcessInstanceMigrationDocumentJson(String processInstanceMigrationDocumentJson) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            return objectMapper.readValue(processInstanceMigrationDocumentJson, ProcessInstanceMigrationDocumentImpl.class);
-        } catch (IOException e) {
-            if (e.getCause() instanceof FlowableException) {
-                throw (FlowableException) e.getCause();
-            }
-            throw new FlowableIllegalArgumentException("Low level I/O problem with Json argument", e);
-        }
+        return ProcessInstanceMigrationDocumentConverter.convertFromJson(processInstanceMigrationDocumentJson);
     }
 
     public void setMigrateToProcessDefinitionId(String processDefinitionId) {
@@ -160,7 +145,6 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
     }
 
     @Override
-    @JsonIgnore
     public Map<String, Map<String, Object>> getActivitiesLocalVariables() {
         return activitiesLocalVariables;
     }
@@ -176,12 +160,8 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
 
     @Override
     public String asJsonString() {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        JsonNode jsonNode = ProcessInstanceMigrationDocumentConverter.convertToJson(this);
+        return jsonNode.toString();
     }
 
     @Override
