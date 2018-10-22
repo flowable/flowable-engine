@@ -312,7 +312,7 @@
                 and RES.LAST_ENABLED_TIME_ &gt;= #{lastEnabledAfter}
             </if>
             <if test="lastDisabledBefore != null">
-                and RES.LAST_DISABLED_TIME_ &lt;= #lastDisabledBefore}
+                and RES.LAST_DISABLED_TIME_ &lt;= #{lastDisabledBefore}
             </if>
             <if test="lastDisabledAfter != null">
                 and RES.LAST_DISABLED_TIME_ &gt;= #{lastDisabledAfter}
