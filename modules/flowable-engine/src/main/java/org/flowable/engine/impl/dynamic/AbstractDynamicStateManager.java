@@ -911,7 +911,7 @@ public abstract class AbstractDynamicStateManager {
             Iterator<BoundaryEvent> boundaryEventsIterator = boundaryEvents.iterator();
             Iterator<ExecutionEntity> boundaryEventExecutionsIterator = boundaryEventExecutions.iterator();
 
-            while (boundaryEventExecutionsIterator.hasNext() && boundaryEventExecutionsIterator.hasNext()) {
+            while (boundaryEventsIterator.hasNext() && boundaryEventExecutionsIterator.hasNext()) {
                 BoundaryEvent boundaryEvent = boundaryEventsIterator.next();
                 ExecutionEntity boundaryEventExecution = boundaryEventExecutionsIterator.next();
                 ActivityBehavior boundaryEventBehavior = ((ActivityBehavior) boundaryEvent.getBehavior());
