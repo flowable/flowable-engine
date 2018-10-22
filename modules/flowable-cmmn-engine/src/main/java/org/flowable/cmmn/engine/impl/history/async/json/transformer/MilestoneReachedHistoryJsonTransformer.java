@@ -23,6 +23,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.*;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * @author Joram Barrez
  */
@@ -34,8 +37,8 @@ public class MilestoneReachedHistoryJsonTransformer extends AbstractHistoryJsonT
     }
 
     @Override
-    public String getType() {
-        return CmmnAsyncHistoryConstants.TYPE_MILESTONE_REACHED;
+    public List<String> getTypes() {
+        return Collections.singletonList(CmmnAsyncHistoryConstants.TYPE_MILESTONE_REACHED);
     }
 
     @Override

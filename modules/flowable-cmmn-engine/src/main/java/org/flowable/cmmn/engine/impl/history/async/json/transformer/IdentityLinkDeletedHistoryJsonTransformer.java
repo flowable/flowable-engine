@@ -23,14 +23,17 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * @author Joram Barrez
  */
 public class IdentityLinkDeletedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
     @Override
-    public String getType() {
-        return CmmnAsyncHistoryConstants.TYPE_IDENTITY_LINK_DELETED;
+    public List<String> getTypes() {
+        return Collections.singletonList(CmmnAsyncHistoryConstants.TYPE_IDENTITY_LINK_DELETED);
     }
 
     @Override

@@ -38,11 +38,14 @@ public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
     }
 
     public void addHistoryJsonTransformer(HistoryJsonTransformer historyJsonTransformer) {
-        String type = historyJsonTransformer.getType();
-        if (!historyJsonTransformers.containsKey(type)) {
-            historyJsonTransformers.put(type, new ArrayList<>());
+        List<String> types = historyJsonTransformer.getTypes();
+
+        for (String type : types) {
+            if (!historyJsonTransformers.containsKey(type)) {
+                historyJsonTransformers.put(type, new ArrayList<>());
+            }
+            historyJsonTransformers.get(type).add(historyJsonTransformer);
         }
-        historyJsonTransformers.get(historyJsonTransformer.getType()).add(historyJsonTransformer);
     }
 
     @Override
@@ -74,7 +77,7 @@ public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
 
             } else {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Could not handle history job (id={}) for transformer {}. as it is not applicable. Unacquiring. {}", job.getId(), transformer.getType(), historicalJsonData);
+                    LOGGER.debug("Could not handle history job (id={}) for transformer {}. as it is not applicable. Unacquiring. {}", job.getId(), transformer.getTypes(), historicalJsonData);
                 }
                 throw new AsyncHistoryJobNotApplicableException();
 
