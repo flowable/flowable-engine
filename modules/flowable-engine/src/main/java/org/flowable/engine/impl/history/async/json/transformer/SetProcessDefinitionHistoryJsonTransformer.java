@@ -14,6 +14,9 @@ package org.flowable.engine.impl.history.async.json.transformer;
 
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
@@ -25,8 +28,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class SetProcessDefinitionHistoryJsonTransformer extends AbstractNeedsProcessInstanceHistoryJsonTransformer {
 
     @Override
-    public String getType() {
-        return HistoryJsonConstants.TYPE_SET_PROCESS_DEFINITION;
+    public List<String> getTypes() {
+        return Collections.singletonList(HistoryJsonConstants.TYPE_SET_PROCESS_DEFINITION);
     }
     
     @Override
