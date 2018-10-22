@@ -42,6 +42,9 @@ public class ExitPlanItemInstanceOperation extends AbstractDeletePlanItemInstanc
         if (isStage(planItemInstanceEntity)) {
             exitChildPlanItemInstances();
         }
+
+        planItemInstanceEntity.setEndedTime(getCurrentTime(commandContext));
+        planItemInstanceEntity.setExitTime(planItemInstanceEntity.getEndedTime());
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceExit(planItemInstanceEntity);
     }
 

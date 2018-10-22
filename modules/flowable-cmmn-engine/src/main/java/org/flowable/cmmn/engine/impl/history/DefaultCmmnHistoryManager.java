@@ -233,72 +233,81 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
 
     @Override
     public void recordPlanItemInstanceAvailable(PlanItemInstanceEntity planItemInstanceEntity) {
-        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, h -> h.setLastAvailableTime(cmmnEngineConfiguration.getClock().getCurrentTime()));
+        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, planItemInstanceEntity.getLastAvailableTime(),
+            h -> h.setLastAvailableTime(planItemInstanceEntity.getLastAvailableTime()));
     }
 
     @Override
     public void recordPlanItemInstanceEnabled(PlanItemInstanceEntity planItemInstanceEntity) {
-        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, h -> h.setLastEnabledTime(cmmnEngineConfiguration.getClock().getCurrentTime()));
+        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, planItemInstanceEntity.getLastEnabledTime(),
+            h -> h.setLastEnabledTime(planItemInstanceEntity.getLastEnabledTime()));
     }
 
     @Override
     public void recordPlanItemInstanceDisabled(PlanItemInstanceEntity planItemInstanceEntity) {
-        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, h -> h.setLastDisabledTime(cmmnEngineConfiguration.getClock().getCurrentTime()));
+        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, planItemInstanceEntity.getLastDisabledTime(),
+            h -> h.setLastDisabledTime(planItemInstanceEntity.getLastDisabledTime()));
     }
 
     @Override
     public void recordPlanItemInstanceStarted(PlanItemInstanceEntity planItemInstanceEntity) {
-        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, h -> h.setLastStartedTime(cmmnEngineConfiguration.getClock().getCurrentTime()));
+        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, planItemInstanceEntity.getLastStartedTime(),
+            h -> h.setLastStartedTime(planItemInstanceEntity.getLastStartedTime()));
     }
 
     @Override
     public void recordPlanItemInstanceSuspended(PlanItemInstanceEntity planItemInstanceEntity) {
-        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, h -> h.setLastSuspendedTime(cmmnEngineConfiguration.getClock().getCurrentTime()));
+        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, planItemInstanceEntity.getLastSuspendedTime(),
+            h -> h.setLastSuspendedTime(planItemInstanceEntity.getLastSuspendedTime()));
     }
 
     @Override
     public void recordPlanItemInstanceCompleted(PlanItemInstanceEntity planItemInstanceEntity) {
-        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, h -> {
-            Date currentTime = cmmnEngineConfiguration.getClock().getCurrentTime();
-            h.setEndedTime(currentTime);
-            h.setCompletedTime(currentTime);
+        Date completedTime = planItemInstanceEntity.getCompletedTime();
+        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, completedTime,
+            h -> {
+                h.setEndedTime(completedTime);
+                h.setCompletedTime(completedTime);
         });
     }
 
     @Override
     public void recordPlanItemInstanceTerminated(PlanItemInstanceEntity planItemInstanceEntity) {
-        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, h -> {
-            Date currentTime = cmmnEngineConfiguration.getClock().getCurrentTime();
-            h.setEndedTime(currentTime);
-            h.setTerminatedTime(currentTime);
+        Date terminatedTime = planItemInstanceEntity.getTerminatedTime();
+        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, terminatedTime,
+            h -> {
+                h.setEndedTime(terminatedTime);
+                h.setTerminatedTime(terminatedTime);
         });
     }
 
     @Override
     public void recordPlanItemInstanceOccurred(PlanItemInstanceEntity planItemInstanceEntity) {
-        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, h -> {
-            Date currentTime = cmmnEngineConfiguration.getClock().getCurrentTime();
-            h.setEndedTime(currentTime);
-            h.setOccurredTime(currentTime);
+        Date occurredTime = planItemInstanceEntity.getOccurredTime();
+        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, occurredTime,
+            h -> {
+                h.setEndedTime(occurredTime);
+                h.setOccurredTime(occurredTime);
         });
     }
 
     @Override
     public void recordPlanItemInstanceExit(PlanItemInstanceEntity planItemInstanceEntity) {
-        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, h -> {
-            Date currentTime = cmmnEngineConfiguration.getClock().getCurrentTime();
-            h.setEndedTime(currentTime);
-            h.setExitTime(currentTime);
+        Date exitTime = planItemInstanceEntity.getExitTime();
+        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, exitTime,
+            h -> {
+                h.setEndedTime(exitTime);
+                h.setExitTime(exitTime);
         });
     }
 
-    protected void recordHistoricPlanItemInstanceEntity(PlanItemInstanceEntity planItemInstanceEntity, Consumer<HistoricPlanItemInstanceEntity> changes) {
+    protected void recordHistoricPlanItemInstanceEntity(PlanItemInstanceEntity planItemInstanceEntity, Date lastUpdatedTime, Consumer<HistoricPlanItemInstanceEntity> changes) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager();
             HistoricPlanItemInstanceEntity historicPlanItemInstanceEntity = historicPlanItemInstanceEntityManager.findById(planItemInstanceEntity.getId());
             if (historicPlanItemInstanceEntity != null) {
                 historicPlanItemInstanceEntity.setState(planItemInstanceEntity.getState());
-                historicPlanItemInstanceEntity.setLastUpdatedTime(cmmnEngineConfiguration.getClock().getCurrentTime());
+                historicPlanItemInstanceEntity.setLastUpdatedTime(lastUpdatedTime);
                 changes.accept(historicPlanItemInstanceEntity);
             }
         }

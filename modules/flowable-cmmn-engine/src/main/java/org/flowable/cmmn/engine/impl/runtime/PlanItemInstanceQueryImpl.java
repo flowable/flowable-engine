@@ -41,6 +41,28 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     protected String state;
     protected Date createdBefore;
     protected Date createdAfter;
+    protected Date lastAvailableBefore;
+    protected Date lastAvailableAfter;
+    protected Date lastEnabledBefore;
+    protected Date lastEnabledAfter;
+    protected Date lastDisabledBefore;
+    protected Date lastDisabledAfter;
+    protected Date lastStartedBefore;
+    protected Date lastStartedAfter;
+    protected Date lastSuspendedBefore;
+    protected Date lastSuspendedAfter;
+    protected Date completedBefore;
+    protected Date completedAfter;
+    protected Date terminatedBefore;
+    protected Date terminatedAfter;
+    protected Date occurredBefore;
+    protected Date occurredAfter;
+    protected Date exitBefore;
+    protected Date exitAfter;
+    protected Date endedBefore;
+    protected Date endedAfter;
+    protected boolean ended;
+    protected boolean includeEnded;
     protected String startUserId;
     protected String referenceId;
     protected String referenceType;
@@ -212,6 +234,197 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     }
 
     @Override
+    public PlanItemInstanceQuery planItemInstanceLastAvailableBefore(Date availableBefore) {
+        if (availableBefore == null) {
+            throw new FlowableIllegalArgumentException("availableBefore is null");
+        }
+        this.lastAvailableBefore = availableBefore;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceLastAvailableAfter(Date availableAfter) {
+        if (availableAfter == null) {
+            throw new FlowableIllegalArgumentException("availableAfter is null");
+        }
+        this.lastAvailableAfter = availableAfter;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceLastEnabledBefore(Date enabledBefore) {
+        if (enabledBefore == null) {
+            throw new FlowableIllegalArgumentException("enabledBefore is null");
+        }
+        this.lastEnabledBefore = enabledBefore;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceLastEnabledAfter(Date enabledAfter) {
+        if (enabledAfter == null) {
+            throw new FlowableIllegalArgumentException("enabledAfter is null");
+        }
+        this.lastEnabledAfter = enabledAfter;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceLastDisabledBefore(Date disabledBefore) {
+        if (disabledBefore == null) {
+            throw new FlowableIllegalArgumentException("disabledBefore is null");
+        }
+        this.lastDisabledBefore = disabledBefore;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceLastDisabledAfter(Date disabledAfter) {
+        if (disabledAfter == null) {
+            throw new FlowableIllegalArgumentException("disabledAfter is null");
+        }
+        this.lastDisabledAfter = disabledAfter;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceLastStartedBefore(Date startedBefore) {
+        if (startedBefore == null) {
+            throw new FlowableIllegalArgumentException("activatedBefore is null");
+        }
+        this.lastStartedBefore = startedBefore;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceLastStartedAfter(Date startedAfter) {
+        if (startedAfter == null) {
+            throw new FlowableIllegalArgumentException("startedAfter is null");
+        }
+        this.lastStartedAfter = startedAfter;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceLastSuspendedBefore(Date suspendedBefore) {
+        if (suspendedBefore == null) {
+            throw new FlowableIllegalArgumentException("suspendedBefore is null");
+        }
+        this.lastSuspendedBefore = suspendedBefore;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceLastSuspendedAfter(Date suspendedAfter) {
+        if (suspendedAfter == null) {
+            throw new FlowableIllegalArgumentException("suspendedAfter is null");
+        }
+        this.lastSuspendedAfter = suspendedAfter;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceCompletedBefore(Date completedBefore) {
+        if (completedBefore == null) {
+            throw new FlowableIllegalArgumentException("completedBefore is null");
+        }
+        this.completedBefore = completedBefore;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceCompletedAfter(Date completedAfter) {
+        if (completedAfter == null) {
+            throw new FlowableIllegalArgumentException("completedAfter is null");
+        }
+        this.completedAfter = completedAfter;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceOccurredBefore(Date occurredBefore) {
+        if (occurredBefore == null) {
+            throw new FlowableIllegalArgumentException("occurredBefore is null");
+        }
+        this.occurredBefore = occurredBefore;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceOccurredAfter(Date occurredAfter) {
+        if (occurredAfter == null) {
+            throw new FlowableIllegalArgumentException("occurredAfter is null");
+        }
+        this.occurredAfter = occurredAfter;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceTerminatedBefore(Date terminatedBefore) {
+        if (terminatedBefore == null) {
+            throw new FlowableIllegalArgumentException("terminatedBefore is null");
+        }
+        this.terminatedBefore = terminatedBefore;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceTerminatedAfter(Date terminatedAfter) {
+        if (terminatedAfter == null) {
+            throw new FlowableIllegalArgumentException("terminatedAfter is null");
+        }
+        this.terminatedAfter = terminatedAfter;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceExitBefore(Date exitBefore) {
+        if (exitBefore == null) {
+            throw new FlowableIllegalArgumentException("exitBefore is null");
+        }
+        this.exitBefore = exitBefore;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceExitAfter(Date exitAfter) {
+        if (exitAfter == null) {
+            throw new FlowableIllegalArgumentException("exitAfter is null");
+        }
+        this.exitAfter = exitAfter;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceEndedBefore(Date endedBefore) {
+        if (endedBefore == null) {
+            throw new FlowableIllegalArgumentException("endedBefore is null");
+        }
+        this.endedBefore = endedBefore;
+        return this;
+    }
+    @Override
+    public PlanItemInstanceQuery planItemInstanceEndedAfter(Date endedAfter) {
+        if (endedAfter == null) {
+            throw new FlowableIllegalArgumentException("endedAfter is null");
+        }
+        this.endedAfter = endedAfter;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery ended() {
+        this.ended = true;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery includeEnded() {
+        this.includeEnded = true;
+        return this;
+    }
+
+    @Override
     public PlanItemInstanceQuery planItemInstanceStartUserId(String startUserId) {
         if (startUserId == null) {
             throw new FlowableIllegalArgumentException("Start user id is null");
@@ -335,7 +548,13 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
         this.orderProperty = PlanItemInstanceQueryProperty.CREATE_TIME;
         return this;
     }
-    
+
+    @Override
+    public PlanItemInstanceQuery orderByEndTime() {
+        this.orderProperty = PlanItemInstanceQueryProperty.END_TIME;
+        return this;
+    }
+
     @Override
     public PlanItemInstanceQuery orderByName() {
         this.orderProperty = PlanItemInstanceQueryProperty.NAME;
@@ -345,77 +564,241 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     public String getCaseDefinitionId() {
         return caseDefinitionId;
     }
-
+    public void setCaseDefinitionId(String caseDefinitionId) {
+        this.caseDefinitionId = caseDefinitionId;
+    }
     public String getCaseInstanceId() {
         return caseInstanceId;
     }
-
+    public void setCaseInstanceId(String caseInstanceId) {
+        this.caseInstanceId = caseInstanceId;
+    }
     public String getStageInstanceId() {
         return stageInstanceId;
     }
-    
+    public void setStageInstanceId(String stageInstanceId) {
+        this.stageInstanceId = stageInstanceId;
+    }
     public String getPlanItemInstanceId() {
         return planItemInstanceId;
     }
-
+    public void setPlanItemInstanceId(String planItemInstanceId) {
+        this.planItemInstanceId = planItemInstanceId;
+    }
     public String getElementId() {
         return elementId;
     }
-    
+    public void setElementId(String elementId) {
+        this.elementId = elementId;
+    }
     public String getPlanItemDefinitionId() {
         return planItemDefinitionId;
     }
-    
+    public void setPlanItemDefinitionId(String planItemDefinitionId) {
+        this.planItemDefinitionId = planItemDefinitionId;
+    }
     public String getPlanItemDefinitionType() {
         return planItemDefinitionType;
     }
-
+    public void setPlanItemDefinitionType(String planItemDefinitionType) {
+        this.planItemDefinitionType = planItemDefinitionType;
+    }
     public List<String> getPlanItemDefinitionTypes() {
         return planItemDefinitionTypes;
     }
-
     public void setPlanItemDefinitionTypes(List<String> planItemDefinitionTypes) {
         this.planItemDefinitionTypes = planItemDefinitionTypes;
     }
-
     public String getName() {
         return name;
     }
-
+    public void setName(String name) {
+        this.name = name;
+    }
     public String getState() {
         return state;
     }
-
+    public void setState(String state) {
+        this.state = state;
+    }
     public Date getCreatedBefore() {
         return createdBefore;
     }
-
+    public void setCreatedBefore(Date createdBefore) {
+        this.createdBefore = createdBefore;
+    }
     public Date getCreatedAfter() {
         return createdAfter;
     }
-
+    public void setCreatedAfter(Date createdAfter) {
+        this.createdAfter = createdAfter;
+    }
+    public Date getLastAvailableBefore() {
+        return lastAvailableBefore;
+    }
+    public void setLastAvailableBefore(Date lastAvailableBefore) {
+        this.lastAvailableBefore = lastAvailableBefore;
+    }
+    public Date getLastAvailableAfter() {
+        return lastAvailableAfter;
+    }
+    public void setLastAvailableAfter(Date lastAvailableAfter) {
+        this.lastAvailableAfter = lastAvailableAfter;
+    }
+    public Date getLastEnabledBefore() {
+        return lastEnabledBefore;
+    }
+    public void setLastEnabledBefore(Date lastEnabledBefore) {
+        this.lastEnabledBefore = lastEnabledBefore;
+    }
+    public Date getLastEnabledAfter() {
+        return lastEnabledAfter;
+    }
+    public void setLastEnabledAfter(Date lastEnabledAfter) {
+        this.lastEnabledAfter = lastEnabledAfter;
+    }
+    public Date getLastDisabledBefore() {
+        return lastDisabledBefore;
+    }
+    public void setLastDisabledBefore(Date lastDisabledBefore) {
+        this.lastDisabledBefore = lastDisabledBefore;
+    }
+    public Date getLastDisabledAfter() {
+        return lastDisabledAfter;
+    }
+    public void setLastDisabledAfter(Date lastDisabledAfter) {
+        this.lastDisabledAfter = lastDisabledAfter;
+    }
+    public Date getLastStartedBefore() {
+        return lastStartedBefore;
+    }
+    public void setLastStartedBefore(Date lastStartedBefore) {
+        this.lastStartedBefore = lastStartedBefore;
+    }
+    public Date getLastStartedAfter() {
+        return lastStartedAfter;
+    }
+    public void setLastStartedAfter(Date lastStartedAfter) {
+        this.lastStartedAfter = lastStartedAfter;
+    }
+    public Date getLastSuspendedBefore() {
+        return lastSuspendedBefore;
+    }
+    public void setLastSuspendedBefore(Date lastSuspendedBefore) {
+        this.lastSuspendedBefore = lastSuspendedBefore;
+    }
+    public Date getLastSuspendedAfter() {
+        return lastSuspendedAfter;
+    }
+    public void setLastSuspendedAfter(Date lastSuspendedAfter) {
+        this.lastSuspendedAfter = lastSuspendedAfter;
+    }
+    public Date getCompletedBefore() {
+        return completedBefore;
+    }
+    public void setCompletedBefore(Date completedBefore) {
+        this.completedBefore = completedBefore;
+    }
+    public Date getCompletedAfter() {
+        return completedAfter;
+    }
+    public void setCompletedAfter(Date completedAfter) {
+        this.completedAfter = completedAfter;
+    }
+    public Date getTerminatedBefore() {
+        return terminatedBefore;
+    }
+    public void setTerminatedBefore(Date terminatedBefore) {
+        this.terminatedBefore = terminatedBefore;
+    }
+    public Date getTerminatedAfter() {
+        return terminatedAfter;
+    }
+    public void setTerminatedAfter(Date terminatedAfter) {
+        this.terminatedAfter = terminatedAfter;
+    }
+    public Date getOccurredBefore() {
+        return occurredBefore;
+    }
+    public void setOccurredBefore(Date occurredBefore) {
+        this.occurredBefore = occurredBefore;
+    }
+    public Date getOccurredAfter() {
+        return occurredAfter;
+    }
+    public void setOccurredAfter(Date occurredAfter) {
+        this.occurredAfter = occurredAfter;
+    }
+    public Date getExitBefore() {
+        return exitBefore;
+    }
+    public void setExitBefore(Date exitBefore) {
+        this.exitBefore = exitBefore;
+    }
+    public Date getExitAfter() {
+        return exitAfter;
+    }
+    public void setExitAfter(Date exitAfter) {
+        this.exitAfter = exitAfter;
+    }
+    public Date getEndedBefore() {
+        return endedBefore;
+    }
+    public void setEndedBefore(Date endedBefore) {
+        this.endedBefore = endedBefore;
+    }
+    public Date getEndedAfter() {
+        return endedAfter;
+    }
+    public void setEndedAfter(Date endedAfter) {
+        this.endedAfter = endedAfter;
+    }
+    public boolean isEnded() {
+        return ended;
+    }
+    public void setEnded(boolean ended) {
+        this.ended = ended;
+    }
+    public boolean isIncludeEnded() {
+        return includeEnded;
+    }
+    public void setIncludeEnded(boolean includeEnded) {
+        this.includeEnded = includeEnded;
+    }
     public String getStartUserId() {
         return startUserId;
     }
-    
+    public void setStartUserId(String startUserId) {
+        this.startUserId = startUserId;
+    }
     public String getReferenceId() {
         return referenceId;
     }
-
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+    }
     public String getReferenceType() {
         return referenceType;
     }
-    
+    public void setReferenceType(String referenceType) {
+        this.referenceType = referenceType;
+    }
     public boolean isCompleteable() {
         return completeable;
     }
-
+    public void setCompleteable(boolean completeable) {
+        this.completeable = completeable;
+    }
     public String getTenantId() {
         return tenantId;
     }
-
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
     public boolean isWithoutTenantId() {
         return withoutTenantId;
     }
-
+    public void setWithoutTenantId(boolean withoutTenantId) {
+        this.withoutTenantId = withoutTenantId;
+    }
 }

@@ -47,8 +47,8 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
     HistoricPlanItemInstanceQuery lastEnabledAfter(Date enabledAfter);
     HistoricPlanItemInstanceQuery lastDisabledBefore(Date disabledBefore);
     HistoricPlanItemInstanceQuery lastDisabledAfter(Date disabledAfter);
-    HistoricPlanItemInstanceQuery lastStartedBefore(Date activatedBefore);
-    HistoricPlanItemInstanceQuery lastStartedAfter(Date activatedAfter);
+    HistoricPlanItemInstanceQuery lastStartedBefore(Date startedBefore);
+    HistoricPlanItemInstanceQuery lastStartedAfter(Date startedAfter);
     HistoricPlanItemInstanceQuery lastSuspendedBefore(Date suspendedBefore);
     HistoricPlanItemInstanceQuery lastSuspendedAfter(Date suspendedAfter);
     HistoricPlanItemInstanceQuery completedBefore(Date completedBefore);
@@ -59,8 +59,10 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
     HistoricPlanItemInstanceQuery terminatedAfter(Date terminatedAfter);
     HistoricPlanItemInstanceQuery exitBefore(Date exitBefore);
     HistoricPlanItemInstanceQuery exitAfter(Date exitAfter);
-    HistoricPlanItemInstanceQuery endedBefore(Date startedBefore);
-    HistoricPlanItemInstanceQuery endedAfter(Date startedAfter);
+    HistoricPlanItemInstanceQuery endedBefore(Date endedBefore);
+    HistoricPlanItemInstanceQuery endedAfter(Date endedAfter);
+    HistoricPlanItemInstanceQuery ended();
+    HistoricPlanItemInstanceQuery notEnded();
     HistoricPlanItemInstanceQuery orderByCreateTime();
     HistoricPlanItemInstanceQuery orderByEndedTime();
     HistoricPlanItemInstanceQuery orderByName();

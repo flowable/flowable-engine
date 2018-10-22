@@ -186,6 +186,16 @@
         P.NAME_ as PI_NAME_,
         P.STATE_ as PI_STATE_,
         P.CREATE_TIME_ as PI_CREATE_TIME_TIME_,
+        P.LAST_AVAILABLE_TIME_ as PI_LAST_AVAILABLE_TIME_,
+        P.LAST_ENABLED_TIME_ as PI_LAST_ENABLED_TIME_,
+        P.LAST_DISABLED_TIME_ as PI_LAST_DISABLED_TIME_,
+        P.LAST_STARTED_TIME_ as PI_LAST_STARTED_TIME_,
+        P.LAST_SUSPENDED_TIME_ as PI_LAST_SUSPENDED_TIME_,
+        P.COMPLETED_TIME_ as PI_COMPLETED_TIME_,
+        P.OCCURRED_TIME_ as PI_OCCURRED_TIME_ ,
+        P.TERMINATED_TIME_ as PI_TERMINATED_TIME_,
+        P.EXIT_TIME_ as PI_EXIT_TIME_,
+        P.ENDED_TIME_ as PI_ENDED_TIME_,
         P.START_USER_ID_ as PI_USER_ID_,
         P.REFERENCE_ID_ as PI_REFERENCE_ID_,
         P.REFERENCE_TYPE_ as PI_REFERENCE_TYPE_,
@@ -197,11 +207,12 @@
         from ${prefix}ACT_CMMN_RU_CASE_INST C
         inner join ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST P on C.ID_ = CASE_INST_ID_
         where
+        P.ENDED_TIME_ is null
         <if test="caseInstanceId != null">
-            C.ID_ = #{caseInstanceId, jdbcType=VARCHAR}
+            and C.ID_ = #{caseInstanceId, jdbcType=VARCHAR}
         </if>
          <if test="planItemInstanceId != null">
-            C.ID_ = (select CASE_INST_ID_ from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where ID_ = #{planItemInstanceId, jdbcType=VARCHAR})
+            and C.ID_ = (select CASE_INST_ID_ from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where ID_ = #{planItemInstanceId, jdbcType=VARCHAR})
         </if>
     </select>
 
