@@ -15,6 +15,9 @@ package org.flowable.cmmn.engine.impl.history.async.json.transformer;
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDateFromJson;
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -30,8 +33,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class EntityLinkCreatedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
     @Override
-    public String getType() {
-        return CmmnAsyncHistoryConstants.TYPE_ENTITY_LINK_CREATED;
+    public List<String> getTypes() {
+        return Collections.singletonList(CmmnAsyncHistoryConstants.TYPE_ENTITY_LINK_CREATED);
     }
 
     @Override

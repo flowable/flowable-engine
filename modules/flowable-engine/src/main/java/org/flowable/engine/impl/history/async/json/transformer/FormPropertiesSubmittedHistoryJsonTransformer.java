@@ -15,6 +15,9 @@ package org.flowable.engine.impl.history.async.json.transformer;
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDateFromJson;
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.history.HistoricActivityInstance;
@@ -30,8 +33,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class FormPropertiesSubmittedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
     @Override
-    public String getType() {
-        return HistoryJsonConstants.TYPE_FORM_PROPERTIES_SUBMITTED;
+    public List<String> getTypes() {
+        return Collections.singletonList(HistoryJsonConstants.TYPE_FORM_PROPERTIES_SUBMITTED);
     }
 
     @Override

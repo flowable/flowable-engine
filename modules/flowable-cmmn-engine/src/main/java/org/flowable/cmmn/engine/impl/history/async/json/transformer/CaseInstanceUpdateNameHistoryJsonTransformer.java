@@ -14,6 +14,9 @@ package org.flowable.cmmn.engine.impl.history.async.json.transformer;
 
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityManager;
@@ -29,8 +32,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class CaseInstanceUpdateNameHistoryJsonTransformer extends AbstractNeedsHistoricCaseInstanceJsonTransformer {
 
     @Override
-    public String getType() {
-        return CmmnAsyncHistoryConstants.TYPE_UPDATE_CASE_INSTANCE_NAME;
+    public List<String> getTypes() {
+        return Collections.singletonList(CmmnAsyncHistoryConstants.TYPE_UPDATE_CASE_INSTANCE_NAME);
     }
 
     @Override

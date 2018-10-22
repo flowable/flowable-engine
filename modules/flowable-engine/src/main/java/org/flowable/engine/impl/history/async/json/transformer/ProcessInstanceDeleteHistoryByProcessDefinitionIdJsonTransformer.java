@@ -14,6 +14,7 @@ package org.flowable.engine.impl.history.async.json.transformer;
 
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -26,8 +27,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class ProcessInstanceDeleteHistoryByProcessDefinitionIdJsonTransformer extends AbstractProcessInstanceDeleteHistoryTransformer {
 
     @Override
-    public String getType() {
-        return HistoryJsonConstants.TYPE_PROCESS_INSTANCE_DELETED_BY_PROCDEF_ID;
+    public List<String> getTypes() {
+        return Collections.singletonList(HistoryJsonConstants.TYPE_PROCESS_INSTANCE_DELETED_BY_PROCDEF_ID);
     }
 
     @Override

@@ -12,7 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.history.async.json.transformer;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
@@ -32,8 +34,8 @@ import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonU
 public class CaseInstanceEndHistoryJsonTransformer extends AbstractNeedsHistoricCaseInstanceJsonTransformer {
 
     @Override
-    public String getType() {
-        return CmmnAsyncHistoryConstants.TYPE_CASE_INSTANCE_END;
+    public List<String> getTypes() {
+        return Collections.singletonList(CmmnAsyncHistoryConstants.TYPE_CASE_INSTANCE_END);
     }
 
     @Override
