@@ -23,8 +23,15 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  */
 public class CompleteStagePlanItemInstanceCmd extends AbstractNeedsPlanItemInstanceCmd {
 
+    protected boolean force;
+
     public CompleteStagePlanItemInstanceCmd(String planItemInstanceId) {
         super(planItemInstanceId);
+    }
+
+    public CompleteStagePlanItemInstanceCmd(String planItemInstanceId, boolean force) {
+        super(planItemInstanceId);
+        this.force = force;
     }
     
     @Override
@@ -32,7 +39,7 @@ public class CompleteStagePlanItemInstanceCmd extends AbstractNeedsPlanItemInsta
         if (!PlanItemDefinitionType.STAGE.equals(planItemInstanceEntity.getPlanItemDefinitionType())) {
             throw new FlowableIllegalArgumentException("Can only complete plan item instances of type stage. Type is " + planItemInstanceEntity.getPlanItemDefinitionType());
         }
-        if (!planItemInstanceEntity.isCompleteable()) {
+        if (!force && !planItemInstanceEntity.isCompleteable()) { // if force is true, ignore the completeable flag
             throw new FlowableIllegalArgumentException("Can only complete a stage plan item instance that is marked as completeable (there might still be active plan item instance).");
         }
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);

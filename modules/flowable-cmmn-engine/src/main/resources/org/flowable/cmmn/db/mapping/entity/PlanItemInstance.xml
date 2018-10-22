@@ -406,7 +406,7 @@
         <!-- Note the inverse check on includeEnded here:
              by default, this will be applied (as it's the default value of the query object)
              and only by calling .includeEnded() all plan item instances will be returned as this if won't be true anymore.-->
-        <if test="!includeEnded">
+        <if test="!includeEnded &amp;&amp; !ended">
             and RES.ENDED_TIME_ is null
         </if>
         <if test="startUserId != null">

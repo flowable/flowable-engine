@@ -103,7 +103,12 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     public void completeStagePlanItemInstance(String planItemInstanceId) {
         commandExecutor.execute(new CompleteStagePlanItemInstanceCmd(planItemInstanceId));
     }
-    
+
+    @Override
+    public void completeStagePlanItemInstance(String planItemInstanceId, boolean force) {
+        commandExecutor.execute(new CompleteStagePlanItemInstanceCmd(planItemInstanceId, true));
+    }
+
     @Override
     public void startPlanItemInstance(String planItemInstanceId) {
         commandExecutor.execute(new StartPlanItemInstanceCmd(planItemInstanceId));
@@ -118,7 +123,7 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     public void terminateCaseInstance(String caseInstanceId) {
         commandExecutor.execute(new TerminateCaseInstanceCmd(caseInstanceId));
     }
-    
+
     @Override
     public void evaluateCriteria(String caseInstanceId) {
         commandExecutor.execute(new EvaluateCriteriaCmd(caseInstanceId));
