@@ -20,7 +20,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.server.Server;
-import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
@@ -40,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -216,9 +216,8 @@ public abstract class BaseSpringRestTestCase extends TestCase {
             return response;
 
         } catch (IOException e) {
-            Assert.fail(e.getMessage());
+            throw new UncheckedIOException(e);
         }
-        return null;
     }
 
     public void closeResponse(CloseableHttpResponse response) {
