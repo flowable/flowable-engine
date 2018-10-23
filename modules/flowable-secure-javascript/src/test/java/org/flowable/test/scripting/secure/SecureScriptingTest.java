@@ -12,6 +12,9 @@
  */
 package org.flowable.test.scripting.secure;
 
+
+import static org.assertj.core.api.Assertions.catchThrowable;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,39 +49,24 @@ public class SecureScriptingTest extends SecureScriptingBaseTest {
         enableSysoutsInScript();
         addWhiteListedClass("java.lang.Thread"); // For the thread.sleep
 
-        try {
-            runtimeService.startProcessInstanceByKey("secureScripting");
-            Assert.fail(); // Expecting exception
-        } catch (Throwable t) {
-            t.printStackTrace();
-            Assert.assertTrue(t.getMessage().contains("Maximum variableScope time of 3000 ms exceeded"));
-        }
+        Throwable t = catchThrowable(() -> runtimeService.startProcessInstanceByKey("secureScripting"));
+        Assert.assertTrue(t.getMessage().contains("Maximum variableScope time of 3000 ms exceeded"));
     }
 
     @Test
     public void testMaximumStackDepth() {
         deployProcessDefinition("test-secure-script-max-stack-depth.bpmn20.xml");
 
-        try {
-            runtimeService.startProcessInstanceByKey("secureScripting");
-            Assert.fail(); // Expecting exception
-        } catch (Throwable t) {
-            t.printStackTrace();
-            Assert.assertTrue(t.getMessage().contains("Exceeded maximum stack depth"));
-        }
+        Throwable t = catchThrowable(() -> runtimeService.startProcessInstanceByKey("secureScripting"));
+        Assert.assertTrue(t.getMessage().contains("Exceeded maximum stack depth"));
     }
 
     @Test
     public void testMaxMemoryUsage() {
         deployProcessDefinition("test-secure-script-max-memory-usage.bpmn20.xml");
 
-        try {
-            runtimeService.startProcessInstanceByKey("secureScripting");
-            Assert.fail(); // Expecting exception
-        } catch (Throwable t) {
-            t.printStackTrace();
-            Assert.assertTrue(t.getMessage().contains("Memory limit of 3145728 bytes reached"));
-        }
+        Throwable t = catchThrowable(() -> runtimeService.startProcessInstanceByKey("secureScripting"));
+        Assert.assertTrue(t.getMessage().contains("Memory limit of 3145728 bytes reached"));
     }
 
     @Test
