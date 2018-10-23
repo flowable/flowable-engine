@@ -44,12 +44,6 @@ import org.junit.jupiter.api.Test;
  */
 public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowableTestCase {
 
-    Condition<Execution> isInactiveExecution = new Condition<>(execution -> !((ExecutionEntity) execution).isActive(), "inactive execution");
-    Consumer<Task> hasLoopCounter = task -> {
-        Map<String, Object> variables = taskService.getVariables(task.getId());
-        assertThat(variables).extracting("loopCounter").isNotNull();
-    };
-
     @AfterEach
     protected void tearDown() {
         deleteDeployments();
@@ -336,6 +330,12 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         ProcessDefinition procParallelMultiInst = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/parallel-multi-instance-task.bpmn20.xml");
         ProcessDefinition procSimpleOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
 
+        Condition<Execution> isInactiveExecution = new Condition<>(execution -> !((ExecutionEntity) execution).isActive(), "inactive execution");
+        Consumer<Task> hasLoopCounter = task -> {
+            Map<String, Object> variables = taskService.getVariables(task.getId());
+            assertThat(variables).extracting("loopCounter").isNotNull();
+        };
+
         //Start the processInstance
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procParallelMultiInst.getId(), Collections.singletonMap("nrOfLoops", 3));
         completeTask(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult());
@@ -549,6 +549,12 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
     public void testMigrateParallelMultiInstanceActivityToSequentialMultiInstanceActivity() {
         ProcessDefinition procParallelMultiInst = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/parallel-multi-instance-task.bpmn20.xml");
         ProcessDefinition procSequentialMultiInst = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/sequential-multi-instance-task.bpmn20.xml");
+
+        Condition<Execution> isInactiveExecution = new Condition<>(execution -> !((ExecutionEntity) execution).isActive(), "inactive execution");
+        Consumer<Task> hasLoopCounter = task -> {
+            Map<String, Object> variables = taskService.getVariables(task.getId());
+            assertThat(variables).extracting("loopCounter").isNotNull();
+        };
 
         //Start the processInstance
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procParallelMultiInst.getId(), Collections.singletonMap("nrOfLoops", 3));
