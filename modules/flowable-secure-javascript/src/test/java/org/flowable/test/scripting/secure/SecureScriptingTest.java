@@ -116,7 +116,7 @@ public class SecureScriptingTest extends SecureScriptingBaseTest {
     }
 
     @Test
-    public void testExecutionListener2() {
+    public void testExecutionListener2() throws Exception {
         deployProcessDefinition("test-secure-script-execution-listener2.bpmn20.xml");
 
         removeWhiteListedClass("org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl");
@@ -131,8 +131,6 @@ public class SecureScriptingTest extends SecureScriptingBaseTest {
             addWhiteListedClass("org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl");
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("secureScripting");
             Assert.assertEquals("testValue", runtimeService.getVariable(processInstance.getId(), "test"));
-        } catch (Exception e) {
-            Assert.fail();
         } finally {
             removeWhiteListedClass("org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl");
         }
