@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
-import org.flowable.cmmn.api.history. HistoricPlanItemInstanceQuery;
+import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.AbstractQuery;
@@ -67,6 +67,8 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected String referenceType;
     protected boolean ended;
     protected boolean notEnded;
+    protected String entryCriterionId;
+    protected String exitCriterionId;
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
@@ -163,6 +165,24 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceReferenceType(String referenceType) {
         this.referenceType = referenceType;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery planItemInstanceEntryCriterionId(String entryCriterionId) {
+        if (entryCriterionId == null) {
+            throw new FlowableIllegalArgumentException("EntryCriterionId is null");
+        }
+        this.entryCriterionId = entryCriterionId;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery planItemInstanceExitCriterionId(String exitCriterionId) {
+        if (exitCriterionId == null) {
+            throw new FlowableIllegalArgumentException("ExitCriterionId is null");
+        }
+        this.exitCriterionId = exitCriterionId;
         return this;
     }
 
@@ -346,318 +366,6 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
         return orderBy(HistoricPlanItemInstanceQueryProperty.NAME);
     }
 
-    public String getPlanItemInstanceId() {
-        return planItemInstanceId;
-    }
-
-    public void setPlanItemInstanceId(String planItemInstanceId) {
-        this.planItemInstanceId = planItemInstanceId;
-    }
-
-    public String getPlanItemInstanceName() {
-        return planItemInstanceName;
-    }
-
-    public void setPlanItemInstanceName(String planItemInstanceName) {
-        this.planItemInstanceName = planItemInstanceName;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
-    }
-
-    public String getCaseDefinitionId() {
-        return caseDefinitionId;
-    }
-
-    public void setCaseDefinitionId(String caseDefinitionId) {
-        this.caseDefinitionId = caseDefinitionId;
-    }
-
-    public String getCaseInstanceId() {
-        return caseInstanceId;
-    }
-
-    public void setCaseInstanceId(String caseInstanceId) {
-        this.caseInstanceId = caseInstanceId;
-    }
-
-    public String getStageInstanceId() {
-        return stageInstanceId;
-    }
-
-    public void setStageInstanceId(String stageInstanceId) {
-        this.stageInstanceId = stageInstanceId;
-    }
-
-    public String getElementId() {
-        return elementId;
-    }
-
-    public void setElementId(String elementId) {
-        this.elementId = elementId;
-    }
-
-    public String getPlanItemDefinitionId() {
-        return planItemDefinitionId;
-    }
-
-    public void setPlanItemDefinitionId(String planItemDefinitionId) {
-        this.planItemDefinitionId = planItemDefinitionId;
-    }
-
-    public String getPlanItemDefinitionType() {
-        return planItemDefinitionType;
-    }
-
-    public void setPlanItemDefinitionType(String planItemDefinitionType) {
-        this.planItemDefinitionType = planItemDefinitionType;
-    }
-
-    public List<String> getPlanItemDefinitionTypes() {
-        return planItemDefinitionTypes;
-    }
-
-    public void setPlanItemDefinitionTypes(List<String> planItemDefinitionTypes) {
-        this.planItemDefinitionTypes = planItemDefinitionTypes;
-    }
-
-    public Date getCreatedBefore() {
-        return createdBefore;
-    }
-
-    public void setCreatedBefore(Date createdBefore) {
-        this.createdBefore = createdBefore;
-    }
-
-    public Date getCreatedAfter() {
-        return createdAfter;
-    }
-
-    public void setCreatedAfter(Date createdAfter) {
-        this.createdAfter = createdAfter;
-    }
-
-    public Date getLastAvailableBefore() {
-        return lastAvailableBefore;
-    }
-
-    public void setLastAvailableBefore(Date lastAvailableBefore) {
-        this.lastAvailableBefore = lastAvailableBefore;
-    }
-
-    public Date getLastAvailableAfter() {
-        return lastAvailableAfter;
-    }
-
-    public void setLastAvailableAfter(Date lastAvailableAfter) {
-        this.lastAvailableAfter = lastAvailableAfter;
-    }
-
-    public Date getLastEnabledBefore() {
-        return lastEnabledBefore;
-    }
-
-    public void setLastEnabledBefore(Date lastEnabledBefore) {
-        this.lastEnabledBefore = lastEnabledBefore;
-    }
-
-    public Date getLastEnabledAfter() {
-        return lastEnabledAfter;
-    }
-
-    public void setLastEnabledAfter(Date lastEnabledAfter) {
-        this.lastEnabledAfter = lastEnabledAfter;
-    }
-
-    public Date getLastDisabledBefore() {
-        return lastDisabledBefore;
-    }
-
-    public void setLastDisabledBefore(Date lastDisabledBefore) {
-        this.lastDisabledBefore = lastDisabledBefore;
-    }
-
-    public Date getLastDisabledAfter() {
-        return lastDisabledAfter;
-    }
-
-    public void setLastDisabledAfter(Date lastDisabledAfter) {
-        this.lastDisabledAfter = lastDisabledAfter;
-    }
-
-    public Date getLastStartedBefore() {
-        return lastStartedBefore;
-    }
-
-    public void setLastStartedBefore(Date lastStartedBefore) {
-        this.lastStartedBefore = lastStartedBefore;
-    }
-
-    public Date getLastStartedAfter() {
-        return lastStartedAfter;
-    }
-
-    public void setLastStartedAfter(Date lastStartedAfter) {
-        this.lastStartedAfter = lastStartedAfter;
-    }
-
-    public Date getLastSuspendedBefore() {
-        return lastSuspendedBefore;
-    }
-
-    public void setLastSuspendedBefore(Date lastSuspendedBefore) {
-        this.lastSuspendedBefore = lastSuspendedBefore;
-    }
-
-    public Date getLastSuspendedAfter() {
-        return lastSuspendedAfter;
-    }
-
-    public void setLastSuspendedAfter(Date lastSuspendedAfter) {
-        this.lastSuspendedAfter = lastSuspendedAfter;
-    }
-
-    public Date getCompletedBefore() {
-        return completedBefore;
-    }
-
-    public void setCompletedBefore(Date completedBefore) {
-        this.completedBefore = completedBefore;
-    }
-
-    public Date getCompletedAfter() {
-        return completedAfter;
-    }
-
-    public void setCompletedAfter(Date completedAfter) {
-        this.completedAfter = completedAfter;
-    }
-
-    public Date getTerminatedBefore() {
-        return terminatedBefore;
-    }
-
-    public void setTerminatedBefore(Date terminatedBefore) {
-        this.terminatedBefore = terminatedBefore;
-    }
-
-    public Date getTerminatedAfter() {
-        return terminatedAfter;
-    }
-
-    public void setTerminatedAfter(Date terminatedAfter) {
-        this.terminatedAfter = terminatedAfter;
-    }
-
-    public Date getOccurredBefore() {
-        return occurredBefore;
-    }
-
-    public void setOccurredBefore(Date occurredBefore) {
-        this.occurredBefore = occurredBefore;
-    }
-
-    public Date getOccurredAfter() {
-        return occurredAfter;
-    }
-
-    public void setOccurredAfter(Date occurredAfter) {
-        this.occurredAfter = occurredAfter;
-    }
-
-    public Date getExitBefore() {
-        return exitBefore;
-    }
-
-    public void setExitBefore(Date exitBefore) {
-        this.exitBefore = exitBefore;
-    }
-
-    public Date getExitAfter() {
-        return exitAfter;
-    }
-
-    public void setExitAfter(Date exitAfter) {
-        this.exitAfter = exitAfter;
-    }
-
-    public Date getEndedBefore() {
-        return endedBefore;
-    }
-
-    public void setEndedBefore(Date endedBefore) {
-        this.endedBefore = endedBefore;
-    }
-
-    public Date getEndedAfter() {
-        return endedAfter;
-    }
-
-    public void setEndedAfter(Date endedAfter) {
-        this.endedAfter = endedAfter;
-    }
-
-    public boolean isEnded() {
-        return ended;
-    }
-
-    public boolean isNotEnded() {
-        return notEnded;
-    }
-
-    public String getStartUserId() {
-        return startUserId;
-    }
-
-    public void setStartUserId(String startUserId) {
-        this.startUserId = startUserId;
-    }
-
-    public String getReferenceId() {
-        return referenceId;
-    }
-
-    public void setReferenceId(String referenceId) {
-        this.referenceId = referenceId;
-    }
-
-    public String getReferenceType() {
-        return referenceType;
-    }
-
-    public void setReferenceType(String referenceType) {
-        this.referenceType = referenceType;
-    }
-
-    public String getTenantId() {
-        return tenantId;
-    }
-
-    public void setTenantId(String tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    public String getTenantIdLike() {
-        return tenantIdLike;
-    }
-
-    public void setTenantIdLike(String tenantIdLike) {
-        this.tenantIdLike = tenantIdLike;
-    }
-
-    public boolean isWithoutTenantId() {
-        return withoutTenantId;
-    }
-
-    public void setWithoutTenantId(boolean withoutTenantId) {
-        this.withoutTenantId = withoutTenantId;
-    }
-
     @Override
     public long executeCount(CommandContext commandContext) {
         return CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext).countByCriteria(this);
@@ -668,4 +376,130 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
         return CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext).findByCriteria(this);
     }
 
+    public String getPlanItemInstanceId() {
+        return planItemInstanceId;
+    }
+    public String getPlanItemInstanceName() {
+        return planItemInstanceName;
+    }
+    public String getState() {
+        return state;
+    }
+    public String getCaseDefinitionId() {
+        return caseDefinitionId;
+    }
+    public String getCaseInstanceId() {
+        return caseInstanceId;
+    }
+    public String getStageInstanceId() {
+        return stageInstanceId;
+    }
+    public String getElementId() {
+        return elementId;
+    }
+    public String getPlanItemDefinitionId() {
+        return planItemDefinitionId;
+    }
+    public String getPlanItemDefinitionType() {
+        return planItemDefinitionType;
+    }
+    public List<String> getPlanItemDefinitionTypes() {
+        return planItemDefinitionTypes;
+    }
+    public Date getCreatedBefore() {
+        return createdBefore;
+    }
+    public Date getCreatedAfter() {
+        return createdAfter;
+    }
+    public Date getLastAvailableBefore() {
+        return lastAvailableBefore;
+    }
+    public Date getLastAvailableAfter() {
+        return lastAvailableAfter;
+    }
+    public Date getLastEnabledBefore() {
+        return lastEnabledBefore;
+    }
+    public Date getLastEnabledAfter() {
+        return lastEnabledAfter;
+    }
+    public Date getLastDisabledBefore() {
+        return lastDisabledBefore;
+    }
+    public Date getLastDisabledAfter() {
+        return lastDisabledAfter;
+    }
+    public Date getLastStartedBefore() {
+        return lastStartedBefore;
+    }
+    public Date getLastStartedAfter() {
+        return lastStartedAfter;
+    }
+    public Date getLastSuspendedBefore() {
+        return lastSuspendedBefore;
+    }
+    public Date getLastSuspendedAfter() {
+        return lastSuspendedAfter;
+    }
+    public Date getCompletedBefore() {
+        return completedBefore;
+    }
+    public Date getCompletedAfter() {
+        return completedAfter;
+    }
+    public Date getTerminatedBefore() {
+        return terminatedBefore;
+    }
+    public Date getTerminatedAfter() {
+        return terminatedAfter;
+    }
+    public Date getOccurredBefore() {
+        return occurredBefore;
+    }
+    public Date getOccurredAfter() {
+        return occurredAfter;
+    }
+    public Date getExitBefore() {
+        return exitBefore;
+    }
+    public Date getExitAfter() {
+        return exitAfter;
+    }
+    public Date getEndedBefore() {
+        return endedBefore;
+    }
+    public Date getEndedAfter() {
+        return endedAfter;
+    }
+    public String getStartUserId() {
+        return startUserId;
+    }
+    public String getReferenceId() {
+        return referenceId;
+    }
+    public String getReferenceType() {
+        return referenceType;
+    }
+    public boolean isEnded() {
+        return ended;
+    }
+    public boolean isNotEnded() {
+        return notEnded;
+    }
+    public String getEntryCriterionId() {
+        return entryCriterionId;
+    }
+    public String getExitCriterionId() {
+        return exitCriterionId;
+    }
+    public String getTenantId() {
+        return tenantId;
+    }
+    public String getTenantIdLike() {
+        return tenantIdLike;
+    }
+    public boolean isWithoutTenantId() {
+        return withoutTenantId;
+    }
 }

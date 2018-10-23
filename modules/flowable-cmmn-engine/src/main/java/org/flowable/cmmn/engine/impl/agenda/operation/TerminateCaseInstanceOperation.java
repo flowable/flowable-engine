@@ -23,10 +23,12 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOperation {
     
     protected boolean manualTermination;
+    protected String exitCriterionId;
 
-    public TerminateCaseInstanceOperation(CommandContext commandContext, String caseInstanceId, boolean manualTermination) {
+    public TerminateCaseInstanceOperation(CommandContext commandContext, String caseInstanceId, boolean manualTermination, String exitCriterionId) {
         super(commandContext, caseInstanceId);
         this.manualTermination = manualTermination;
+        this.exitCriterionId = exitCriterionId;
     }
 
     @Override
@@ -39,7 +41,7 @@ public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOp
         if (manualTermination) {
             CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity);
         } else {
-            CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(planItemInstanceEntity);
+            CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(planItemInstanceEntity, exitCriterionId);
         }
     }
     

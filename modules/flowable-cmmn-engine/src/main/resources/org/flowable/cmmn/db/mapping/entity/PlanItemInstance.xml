@@ -8,7 +8,7 @@
         insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_,
                                                          NAME_, STATE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
                                                          LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_,
-                                                         START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_)
+                                                         START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_)
         values (
             #{id ,jdbcType=VARCHAR},
             1,
@@ -36,6 +36,8 @@
             #{referenceId ,jdbcType=VARCHAR},
             #{referenceType ,jdbcType=VARCHAR},
             #{completeable ,jdbcType=BOOLEAN},
+            #{entryCriterionId, jdbcType=VARCHAR},
+            #{exitCriterionId, jdbcType=VARCHAR},
             #{countEnabled, jdbcType=BOOLEAN},
             #{variableCount, jdbcType=INTEGER},
             #{sentryPartInstanceCount, jdbcType=INTEGER},
@@ -47,7 +49,7 @@
     insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_,
                                                      NAME_, STATE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
                                                      LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_,
-                                                     ENDED_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_,
+                                                     ENDED_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_,
                                                      IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_)
     values
       <foreach collection="list" item="planItemInstance" index="index" separator=",">
@@ -78,6 +80,8 @@
             #{planItemInstance.referenceId, jdbcType=VARCHAR},
             #{planItemInstance.referenceType, jdbcType=VARCHAR},
             #{planItemInstance.completeable, jdbcType=BOOLEAN},
+            #{planItemInstance.entryCriterionId, jdbcType=VARCHAR},
+            #{planItemInstance.exitCriterionId, jdbcType=VARCHAR},
             #{planItemInstance.countEnabled, jdbcType=BOOLEAN},
             #{planItemInstance.variableCount, jdbcType=INTEGER},
             #{planItemInstance.sentryPartInstanceCount, jdbcType=INTEGER},
@@ -92,7 +96,8 @@
             into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_,
                                                       NAME_, STATE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
                                                       LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_,
-                                                      START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_) VALUES
+                                                      START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_,
+                                                      IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_) VALUES
             (
                 #{planItemInstance.id ,jdbcType=VARCHAR},
                 1,
@@ -120,6 +125,8 @@
                 #{planItemInstance.referenceId, jdbcType=VARCHAR},
                 #{planItemInstance.referenceType, jdbcType=VARCHAR},
                 #{planItemInstance.completeable, jdbcType=BOOLEAN},
+                #{planItemInstance.entryCriterionId, jdbcType=VARCHAR},
+                #{planItemInstance.exitCriterionId, jdbcType=VARCHAR},
                 #{planItemInstance.countEnabled, jdbcType=BOOLEAN},
                 #{planItemInstance.variableCount, jdbcType=INTEGER},
                 #{planItemInstance.sentryPartInstanceCount, jdbcType=INTEGER},
@@ -205,6 +212,12 @@
         <if test="originalPersistentState.completeable != completeable">
             IS_COMPLETEABLE_ = #{completeable, jdbcType=BOOLEAN},
         </if>
+        <if test="originalPersistentState.entryCriterionId != entryCriterionId">
+            ENTRY_CRITERION_ID_ = #{entryCriterionId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.exitCriterionId != exitCriterionId">
+            EXIT_CRITERION_ID_ = #{exitCriterionId, jdbcType=VARCHAR},
+        </if>
         <if test="originalPersistentState.countEnabled != countEnabled">
             IS_COUNT_ENABLED_ = #{countEnabled, jdbcType=BOOLEAN},
         </if>
@@ -264,6 +277,8 @@
     <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR" />
     <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR" />
     <result property="completeable" column="IS_COMPLETEABLE_" jdbcType="BOOLEAN" />
+    <result property="entryCriterionId" column="ENTRY_CRITERION_ID_" jdbcType="VARCHAR" />
+    <result property="exitCriterionId" column="EXIT_CRITERION_ID_" jdbcType="VARCHAR" />
     <result property="countEnabled" column="IS_COUNT_ENABLED_" jdbcType="BOOLEAN" />
     <result property="variableCount" column="VAR_COUNT_" jdbcType="INTEGER" />
     <result property="sentryPartInstanceCount" column="SENTRY_PART_INST_COUNT_" jdbcType="INTEGER" />
@@ -420,6 +435,12 @@
         </if>
         <if test="completeable">
             and RES.IS_COMPLETEABLE_ = #{completeable, jdbcType=BOOLEAN}
+        </if>
+        <if test="entryCriterionId != null">
+            and RES.ENTRY_CRITERION_ID_ = #{entryCriterionId, jdbcType=VARCHAR}
+        </if>
+        <if test="exitCriterionId != null">
+            and RES.EXIT_CRITERION_ID_ = #{exitCriterionId, jdbcType=VARCHAR}
         </if>
         <if test="tenantId != null">
             and RES.TENANT_ID_ = #{tenantId}

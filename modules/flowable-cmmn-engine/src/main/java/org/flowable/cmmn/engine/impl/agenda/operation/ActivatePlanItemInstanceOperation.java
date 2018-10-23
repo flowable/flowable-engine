@@ -27,25 +27,33 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  */
 public class ActivatePlanItemInstanceOperation extends AbstractPlanItemInstanceOperation {
 
-    public ActivatePlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+    protected String entryCriterionId;
+
+    public ActivatePlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId) {
         super(commandContext, planItemInstanceEntity);
+        this.entryCriterionId = entryCriterionId;
     }
 
     @Override
     public void run() {
         // When it's an asynchronous task, a new activate operation is planned asynchronously.
         if (isAsync() && !PlanItemInstanceState.ASYNC_ACTIVE.equals(planItemInstanceEntity.getState())) {
-            CommandContextUtil.getAgenda(commandContext).planActivateAsyncPlanItemInstanceOperation(planItemInstanceEntity);
+            CommandContextUtil.getAgenda(commandContext).planActivateAsyncPlanItemInstanceOperation(planItemInstanceEntity, entryCriterionId);
         } else {
             // Sentries are not needed to be kept around, as the plan item is being enabled
             deleteSentryPartInstances();
+
+            if (entryCriterionId != null) {
+                planItemInstanceEntity.setEntryCriterionId(entryCriterionId);
+            }
+
             // Evaluate manual activation rule. If one is defined and it evaluates to true, the plan item becomes enabled.
             // Otherwise, the plan item instance is started and becomes active
             boolean isManuallyActivated = evaluateManualActivationRule();
             if (isManuallyActivated) {
-                CommandContextUtil.getAgenda(commandContext).planEnablePlanItemInstanceOperation(planItemInstanceEntity);
+                CommandContextUtil.getAgenda(commandContext).planEnablePlanItemInstanceOperation(planItemInstanceEntity, entryCriterionId);
             } else {
-                CommandContextUtil.getAgenda(commandContext).planStartPlanItemInstanceOperation(planItemInstanceEntity);
+                CommandContextUtil.getAgenda(commandContext).planStartPlanItemInstanceOperation(planItemInstanceEntity, entryCriterionId);
             }
         }
     }
@@ -79,6 +87,7 @@ public class ActivatePlanItemInstanceOperation extends AbstractPlanItemInstanceO
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("[Activate PlanItem] ");
+
         if (planItem.getName() != null) {
             stringBuilder.append(planItem.getName());
             stringBuilder.append(" (");
@@ -87,6 +96,11 @@ public class ActivatePlanItemInstanceOperation extends AbstractPlanItemInstanceO
         } else {
             stringBuilder.append(planItem.getId());
         }
+
+        if (entryCriterionId != null) {
+            stringBuilder.append("via entry criterion ").append(entryCriterionId);
+        }
+
         return stringBuilder.toString();
     }
 }
