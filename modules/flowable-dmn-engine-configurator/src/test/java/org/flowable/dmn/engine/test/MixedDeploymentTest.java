@@ -91,6 +91,7 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
     public void testNoHitsDecisionTask() {
         try {
             runtimeService.startProcessInstanceByKey("oneDecisionTaskProcess", Collections.singletonMap("inputVariable1", (Object) 2));
+            fail("Expected Exception");
         } catch (Exception e) {
             assertTrue(e.getMessage().contains("did not hit any rules for the provided input"));
         }
