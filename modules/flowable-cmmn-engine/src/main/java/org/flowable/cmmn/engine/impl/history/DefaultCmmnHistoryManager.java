@@ -227,6 +227,8 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             historicPlanItemInstanceEntity.setReferenceType(planItemInstanceEntity.getReferenceType());
             historicPlanItemInstanceEntity.setTenantId(planItemInstanceEntity.getTenantId());
             historicPlanItemInstanceEntity.setCreateTime(planItemInstanceEntity.getCreateTime());
+            historicPlanItemInstanceEntity.setEntryCriterionId(planItemInstanceEntity.getEntryCriterionId());
+            historicPlanItemInstanceEntity.setExitCriterionId(planItemInstanceEntity.getExitCriterionId());
             historicPlanItemInstanceEntityManager.insert(historicPlanItemInstanceEntity);
         }
     }
@@ -306,9 +308,14 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager();
             HistoricPlanItemInstanceEntity historicPlanItemInstanceEntity = historicPlanItemInstanceEntityManager.findById(planItemInstanceEntity.getId());
             if (historicPlanItemInstanceEntity != null) {
+
                 historicPlanItemInstanceEntity.setState(planItemInstanceEntity.getState());
                 historicPlanItemInstanceEntity.setLastUpdatedTime(lastUpdatedTime);
                 changes.accept(historicPlanItemInstanceEntity);
+
+                // Can be updated on state change
+                historicPlanItemInstanceEntity.setEntryCriterionId(planItemInstanceEntity.getEntryCriterionId());
+                historicPlanItemInstanceEntity.setExitCriterionId(planItemInstanceEntity.getExitCriterionId());
             }
         }
     }

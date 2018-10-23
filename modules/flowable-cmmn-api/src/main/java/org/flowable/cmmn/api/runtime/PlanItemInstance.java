@@ -46,6 +46,8 @@ public interface PlanItemInstance {
     String getReferenceId();
     String getReferenceType();
     boolean isCompleteable();
+    String getEntryCriterionId();
+    String getExitCriterionId();
     String getTenantId();
     
 }

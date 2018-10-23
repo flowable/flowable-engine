@@ -33,7 +33,7 @@ public class EnablePlanItemInstanceCmd extends AbstractNeedsPlanItemInstanceCmd 
                 && !PlanItemInstanceState.DISABLED.equals(planItemInstanceEntity.getState())) {
             throw new FlowableIllegalArgumentException("Can only enable a plan item instance which is in state AVAILABLE or DISABLED");
         }
-        CommandContextUtil.getAgenda(commandContext).planEnablePlanItemInstanceOperation(planItemInstanceEntity);
+        CommandContextUtil.getAgenda(commandContext).planEnablePlanItemInstanceOperation(planItemInstanceEntity, null);
     }
     
 }

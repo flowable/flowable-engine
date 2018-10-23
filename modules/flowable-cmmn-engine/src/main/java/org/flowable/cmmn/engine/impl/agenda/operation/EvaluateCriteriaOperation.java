@@ -72,7 +72,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
         String satisfiedExitCriterion = evaluateExitCriteria(caseInstanceEntity, getPlanModel(caseInstanceEntity));
         if (satisfiedExitCriterion != null) {
-            CommandContextUtil.getAgenda(commandContext).planTerminateCaseInstanceOperation(caseInstanceEntity.getId(), false);
+            CommandContextUtil.getAgenda(commandContext).planTerminateCaseInstanceOperation(caseInstanceEntity.getId(), satisfiedExitCriterion);
 
         } else {
             boolean criteriaChangeOrActiveChildren = evaluatePlanItemsCriteria(caseInstanceEntity);
@@ -115,7 +115,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             if (PlanItemInstanceState.EVALUATE_ENTRY_CRITERIA_STATES.contains(state)) {
                 
                 String satisfiedEntryCriterion = evaluateEntryCriteria(planItemInstanceEntity, planItem);
-                if (planItem.getEntryCriteria() == null || planItem.getEntryCriteria().isEmpty() || satisfiedEntryCriterion != null) {
+                if (planItem.getEntryCriteria().isEmpty() || satisfiedEntryCriterion != null) {
                     boolean activatePlanItemInstance = true;
                     if (!planItem.getEntryCriteria().isEmpty() && hasRepetitionRule(planItemInstanceEntity)) {
                         boolean isRepeating = evaluateRepetitionRule(planItemInstanceEntity);
@@ -139,13 +139,16 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                             activatePlanItemInstance = false;
                         }
                     }
+
                     if (planItem.getPlanItemDefinition() instanceof EventListener) {
                         activatePlanItemInstance = false; // event listeners occur, they don't become active
                     }
+
                     if (activatePlanItemInstance) {
                         criteriaChanged = true;
-                        CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(planItemInstanceEntity);
+                        CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(planItemInstanceEntity, satisfiedEntryCriterion);
                     }
+
                 }
 
             }
@@ -155,7 +158,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 String satisfiedExitCriterion = evaluateExitCriteria(planItemInstanceEntity, planItem);
                 if (satisfiedExitCriterion != null) {
                     criteriaChanged = true;
-                    CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(planItemInstanceEntity);
+                    CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(planItemInstanceEntity, satisfiedExitCriterion);
 
                 } else if (planItem.getPlanItemDefinition() instanceof Stage) {
 

@@ -34,8 +34,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
     public void run() {
         super.run();
         
-        boolean isRepeating = isRepeatingOnDelete();
-        if (isRepeating) {
+        if (isRepeatingOnDelete()) {
 
             // Create new repeating instance
             PlanItemInstanceEntity newPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, true);
@@ -48,7 +47,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
             // Plan item creation "for Repetition"
             CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceForRepetitionOperation(newPlanItemInstanceEntity);
             // Plan item doesn't have entry criteria (checked in the if condition) and immediately goes to ACTIVE
-            CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(newPlanItemInstanceEntity);
+            CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(newPlanItemInstanceEntity, null);
         }
         
         deleteSentryPartInstances();
@@ -74,9 +73,13 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
     }
 
     protected void exitChildPlanItemInstances() {
+        exitChildPlanItemInstances(null);
+    }
+
+    protected void exitChildPlanItemInstances(String exitCriterionId) {
         for (PlanItemInstanceEntity child : planItemInstanceEntity.getChildPlanItemInstances()) {
             if (StateTransition.isPossible(child, PlanItemTransition.EXIT)) {
-                CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(child);
+                CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(child, exitCriterionId);
             }
         }
     }

@@ -12,10 +12,10 @@
  */
 package org.flowable.cmmn.api.history;
 
-import org.flowable.common.engine.api.query.Query;
-
 import java.util.Date;
 import java.util.List;
+
+import org.flowable.common.engine.api.query.Query;
 
 /**
  * @author Dennis Federico
@@ -36,6 +36,8 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
     HistoricPlanItemInstanceQuery planItemInstanceStartUserId(String startUserId);
     HistoricPlanItemInstanceQuery planItemInstanceReferenceId(String referenceId);
     HistoricPlanItemInstanceQuery planItemInstanceReferenceType(String referenceType);
+    HistoricPlanItemInstanceQuery planItemInstanceEntryCriterionId(String entryCriterionId);
+    HistoricPlanItemInstanceQuery planItemInstanceExitCriterionId(String exitCriterionId);
     HistoricPlanItemInstanceQuery planItemInstanceTenantId(String tenantId);
     HistoricPlanItemInstanceQuery planItemInstanceWithoutTenantId();
     HistoricPlanItemInstanceQuery planItemInstanceTenantIdLike(String tenantIdLike);

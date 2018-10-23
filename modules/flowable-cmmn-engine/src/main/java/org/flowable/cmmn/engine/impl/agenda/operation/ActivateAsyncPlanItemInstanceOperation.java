@@ -16,6 +16,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.job.AsyncActivatePlanItemInstanceJobHandler;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.Task;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -28,8 +29,11 @@ import org.flowable.job.service.impl.persistence.entity.JobEntity;
  */
 public class ActivateAsyncPlanItemInstanceOperation extends AbstractChangePlanItemInstanceStateOperation {
 
-    public ActivateAsyncPlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+    protected String entryCriterionId;
+
+    public ActivateAsyncPlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId) {
         super(commandContext, planItemInstanceEntity);
+        this.entryCriterionId = entryCriterionId;
     }
 
     @Override
@@ -52,14 +56,37 @@ public class ActivateAsyncPlanItemInstanceOperation extends AbstractChangePlanIt
     protected void createAsyncJob(Task task) {
         JobService jobService = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService();
         JobEntity job = jobService.createJob();
+        job.setJobHandlerType(AsyncActivatePlanItemInstanceJobHandler.TYPE);
         job.setScopeId(planItemInstanceEntity.getCaseInstanceId());
         job.setSubScopeId(planItemInstanceEntity.getId());
         job.setScopeDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
         job.setScopeType(ScopeTypes.CMMN);
+        job.setJobHandlerConfiguration(entryCriterionId);
         job.setTenantId(planItemInstanceEntity.getTenantId());
-        job.setJobHandlerType(AsyncActivatePlanItemInstanceJobHandler.TYPE);
         jobService.createAsyncJob(job, task.isExclusive());
         jobService.scheduleAsyncJob(job);
+    }
+
+    @Override
+    public String toString() {
+        PlanItem planItem = planItemInstanceEntity.getPlanItem();
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("[Async activate PlanItem] ");
+
+        if (planItem.getName() != null) {
+            stringBuilder.append(planItem.getName());
+            stringBuilder.append(" (");
+            stringBuilder.append(planItem.getId());
+            stringBuilder.append(")");
+        } else {
+            stringBuilder.append(planItem.getId());
+        }
+
+        if (entryCriterionId != null) {
+            stringBuilder.append("via entry criterion ").append(entryCriterionId);
+        }
+
+        return stringBuilder.toString();
     }
 
 }
