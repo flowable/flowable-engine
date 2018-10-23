@@ -213,7 +213,7 @@ public class AbstractGetFormInstanceModelCmd implements Command<FormInstanceInfo
                         if (variableValue instanceof LocalDate) {
                             field.setValue(((LocalDate) variableValue).toString("d-M-yyyy"));
                         } else if (variableValue instanceof Date) {
-                            field.setValue((DATE_FORMAT.format((Date) variableValue)));
+                            field.setValue(DATE_FORMAT.format((Date) variableValue));
                         } else {
                             field.setValue(variableValue);
                         }

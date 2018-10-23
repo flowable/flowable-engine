@@ -112,7 +112,7 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
                     strb.delete(0, strb.length());
                 }
 
-                if (c != ',' || (insideExpression)) {
+                if (c != ',' || insideExpression) {
                     strb.append(c);
                 }
 

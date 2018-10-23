@@ -67,7 +67,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
 
         // Compensation check
         if ((currentFlowElement instanceof Activity)
-                && (((Activity) currentFlowElement)).isForCompensation()) {
+                && ((Activity) currentFlowElement).isForCompensation()) {
 
             /*
              * If the current flow element is part of a compensation, we don't always want to follow the regular rules of leaving an activity. More specifically, if there are no outgoing sequenceflow,

@@ -114,7 +114,7 @@ public class AsyncHistoryJsonUtil {
     
     public static Boolean getBooleanFromJson(ObjectNode objectNode, String fieldName) {
         String s = getStringFromJson(objectNode, fieldName);
-        if ((StringUtils.isNotEmpty(s))) {
+        if (StringUtils.isNotEmpty(s)) {
             return Boolean.valueOf(s);
         }
         return null;

@@ -34,7 +34,7 @@ public abstract class AbstractTestCase {
      * Asserts if the provided text is part of some text.
      */
     public void assertTextPresent(String expected, String actual) {
-        if ((actual == null) || (!actual.contains(expected))) {
+        if ((actual == null) || !actual.contains(expected)) {
             throw new AssertionError("expected presence of [" + expected + "], but was [" + actual + "]");
         }
     }

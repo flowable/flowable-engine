@@ -165,7 +165,7 @@ public class FormDeploymentCollectionResource {
         try {
             FormDeploymentBuilder deploymentBuilder = formRepositoryService.createDeployment();
             String fileName = file.getOriginalFilename();
-            if (StringUtils.isEmpty(fileName) || !(fileName.endsWith(".form"))) {
+            if (StringUtils.isEmpty(fileName) || !fileName.endsWith(".form")) {
                 fileName = file.getName();
             }
 

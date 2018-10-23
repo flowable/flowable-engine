@@ -35,7 +35,7 @@ public class SpringFormConfigurationHelper {
 
         try (GenericXmlApplicationContext applicationContext = new GenericXmlApplicationContext(new UrlResource(resource))) {
             Map<String, FormEngine> beansOfType = applicationContext.getBeansOfType(FormEngine.class);
-            if ((beansOfType == null) || (beansOfType.isEmpty())) {
+            if ((beansOfType == null) || beansOfType.isEmpty()) {
                 throw new FlowableException("no " + FormEngine.class.getName() + " defined in the application context " + resource.toString());
             }
 
