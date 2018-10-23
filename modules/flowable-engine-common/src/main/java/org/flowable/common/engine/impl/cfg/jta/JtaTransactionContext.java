@@ -53,9 +53,9 @@ public class JtaTransactionContext implements TransactionContext {
                 transaction.setRollbackOnly();
             }
         } catch (IllegalStateException e) {
-            throw new FlowableException("Unexpected IllegalStateException while marking transaction rollback only");
+            throw new FlowableException("Unexpected IllegalStateException while marking transaction rollback only", e);
         } catch (SystemException e) {
-            throw new FlowableException("SystemException while marking transaction rollback only");
+            throw new FlowableException("SystemException while marking transaction rollback only", e);
         }
     }
 

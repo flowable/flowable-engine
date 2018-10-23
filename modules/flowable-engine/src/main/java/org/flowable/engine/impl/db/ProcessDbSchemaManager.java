@@ -299,7 +299,7 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
                                              // really a number
             return cleanString;
         } catch (NumberFormatException nfe) {
-            throw new FlowableException("Illegal format for version: " + versionString);
+            throw new FlowableException("Illegal format for version: " + versionString, nfe);
         }
     }
 

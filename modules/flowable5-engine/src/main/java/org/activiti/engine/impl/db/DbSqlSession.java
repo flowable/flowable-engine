@@ -1035,7 +1035,7 @@ public class DbSqlSession implements Session {
             Double.parseDouble(cleanString); // try to parse it, to see if it is really a number
             return cleanString;
         } catch (NumberFormatException nfe) {
-            throw new ActivitiException("Illegal format for version: " + versionString);
+            throw new ActivitiException("Illegal format for version: " + versionString, nfe);
         }
     }
 

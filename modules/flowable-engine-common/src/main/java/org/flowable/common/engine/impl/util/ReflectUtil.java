@@ -195,7 +195,7 @@ public abstract class ReflectUtil {
         try {
             field = clazz.getDeclaredField(fieldName);
         } catch (SecurityException e) {
-            throw new FlowableException("not allowed to access field " + field + " on class " + clazz.getCanonicalName());
+            throw new FlowableException("not allowed to access field " + field + " on class " + clazz.getCanonicalName(), e);
         } catch (NoSuchFieldException e) {
             // for some reason getDeclaredFields doesn't search superclasses
             // (which getFields() does ... but that gives only public fields)
@@ -237,7 +237,7 @@ public abstract class ReflectUtil {
             }
             return null;
         } catch (SecurityException e) {
-            throw new FlowableException("Not allowed to access method " + setterName + " on class " + clazz.getCanonicalName());
+            throw new FlowableException("Not allowed to access method " + setterName + " on class " + clazz.getCanonicalName(), e);
         }
     }
     

@@ -92,7 +92,7 @@ public class CachingAndArtifactsManager {
                 try {
                     infoNode = (ObjectNode) objectMapper.readTree(infoBytes);
                 } catch (Exception e) {
-                    throw new FlowableException("Error deserializing json info for process definition " + processDefinition.getId());
+                    throw new FlowableException("Error deserializing json info for process definition " + processDefinition.getId(), e);
                 }
             }
         }
