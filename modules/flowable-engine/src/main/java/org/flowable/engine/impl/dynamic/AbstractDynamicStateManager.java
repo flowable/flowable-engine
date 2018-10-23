@@ -959,25 +959,21 @@ public abstract class AbstractDynamicStateManager {
     }
 
     protected boolean isExecutionInsideMultiInstance(ExecutionEntity execution) {
-        return getFlowElementMultiInstanceParent(execution.getCurrentFlowElement()).isPresent();
+        return getFlowElementMultiInstanceParentId(execution.getCurrentFlowElement()).isPresent();
     }
 
-    protected boolean isFlowElementInsideMultiInstance(FlowElement flowElement) {
-        return getFlowElementMultiInstanceParent(flowElement).isPresent();
-    }
-
-    protected Optional<FlowElement> getFlowElementMultiInstanceParent(FlowElement flowElement) {
+    protected Optional<String> getFlowElementMultiInstanceParentId(FlowElement flowElement) {
         FlowElementsContainer parentContainer = flowElement.getParentContainer();
         while (parentContainer instanceof Activity) {
-            if (isMultiInstanceFlowElement((Activity) parentContainer)) {
-                return Optional.of(((Activity) parentContainer));
+            if (isFlowElementMultiInstance((Activity) parentContainer)) {
+                return Optional.of(((Activity) parentContainer).getId());
             }
             parentContainer = ((Activity) parentContainer).getParentContainer();
         }
         return Optional.empty();
     }
 
-    protected boolean isMultiInstanceFlowElement(FlowElement flowElement) {
+    protected boolean isFlowElementMultiInstance(FlowElement flowElement) {
         if (flowElement instanceof Activity) {
             return ((Activity) flowElement).getLoopCharacteristics() != null;
         }
