@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.engine.migration.ProcessInstanceActivityMigrationMapping;
+import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocumentBuilder;
 
@@ -32,7 +32,7 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
     protected String migrateToProcessDefinitionKey;
     protected Integer migrateToProcessDefinitionVersion;
     protected String migrateToProcessDefinitionTenantId;
-    protected List<ProcessInstanceActivityMigrationMapping> activityMigrationMappings = new ArrayList<>();
+    protected List<ActivityMigrationMapping> activityMigrationMappings = new ArrayList<>();
     protected Map<String, Object> processInstanceVariables = new HashMap<>();
 
     @Override
@@ -55,13 +55,13 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
     }
 
     @Override
-    public ProcessInstanceMigrationDocumentBuilder addActivityMigrationMappings(List<ProcessInstanceActivityMigrationMapping> activityMigrationMappings) {
+    public ProcessInstanceMigrationDocumentBuilder addActivityMigrationMappings(List<ActivityMigrationMapping> activityMigrationMappings) {
         this.activityMigrationMappings.addAll(activityMigrationMappings);
         return this;
     }
 
     @Override
-    public ProcessInstanceMigrationDocumentBuilder addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping activityMigrationMapping) {
+    public ProcessInstanceMigrationDocumentBuilder addActivityMigrationMapping(ActivityMigrationMapping activityMigrationMapping) {
         this.activityMigrationMappings.add(activityMigrationMapping);
         return this;
     }

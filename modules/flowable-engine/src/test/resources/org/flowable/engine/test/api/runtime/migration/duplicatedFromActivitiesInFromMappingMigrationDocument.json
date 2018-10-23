@@ -1,9 +1,9 @@
 {
-  "migrateToProcessDefinitionId": "someProcessId",
-  "migrateToProcessDefinitionKey": "MyProcessKey",
-  "migrateToProcessDefinitionVersion": 9,
-  "migrateToProcessDefinitionTenantId": "admin",
-  "activityMigrationMappings": [
+  "toProcessDefinitionId": "someProcessId",
+  "toProcessDefinitionKey": "MyProcessKey",
+  "toProcessDefinitionVersion": 9,
+  "toProcessDefinitionTenantId": "admin",
+  "activityMappings": [
     {
       "fromActivityId": "originalActivity1",
       "toActivityId": "newActivity1",
@@ -18,8 +18,7 @@
       "toActivityIds": [
         "newActivity2.1",
         "newActivity2.2"
-      ],
-      "newAssignee": "the frog"
+      ]
     },
     {
       "fromActivityIds": [

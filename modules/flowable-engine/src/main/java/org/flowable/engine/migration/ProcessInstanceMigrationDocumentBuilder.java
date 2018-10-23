@@ -27,9 +27,9 @@ public interface ProcessInstanceMigrationDocumentBuilder {
 
     ProcessInstanceMigrationDocumentBuilder setTenantId(String processDefinitionTenantId);
 
-    ProcessInstanceMigrationDocumentBuilder addActivityMigrationMappings(List<ProcessInstanceActivityMigrationMapping> activityMigrationMappings);
+    ProcessInstanceMigrationDocumentBuilder addActivityMigrationMappings(List<ActivityMigrationMapping> activityMigrationMappings);
 
-    ProcessInstanceMigrationDocumentBuilder addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping activityMigrationMapping);
+    ProcessInstanceMigrationDocumentBuilder addActivityMigrationMapping(ActivityMigrationMapping activityMigrationMapping);
 
     ProcessInstanceMigrationDocumentBuilder addProcessInstanceVariable(String variableName, Object variableValue);
 

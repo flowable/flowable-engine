@@ -29,7 +29,7 @@ public interface ProcessInstanceMigrationDocument {
 
     String getMigrateToProcessDefinitionTenantId();
 
-    List<ProcessInstanceActivityMigrationMapping> getActivityMigrationMappings();
+    List<ActivityMigrationMapping> getActivityMigrationMappings();
 
     Map<String, Map<String, Object>> getActivitiesLocalVariables();
 

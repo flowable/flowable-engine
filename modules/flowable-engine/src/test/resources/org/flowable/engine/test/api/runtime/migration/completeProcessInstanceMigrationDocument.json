@@ -1,14 +1,14 @@
 {
-  "migrateToProcessDefinitionId": "someProcessId",
-  "migrateToProcessDefinitionKey": "MyProcessKey",
-  "migrateToProcessDefinitionVersion": 9,
-  "migrateToProcessDefinitionTenantId": "admin",
-  "activityMigrationMappings": [
+  "toProcessDefinitionId": "someProcessId",
+  "toProcessDefinitionKey": "MyProcessKey",
+  "toProcessDefinitionVersion": 9,
+  "toProcessDefinitionTenantId": "admin",
+  "activityMappings": [
     {
       "fromActivityId": "originalActivity1",
       "toActivityId": "newActivity1",
-      "withNewAssignee": "kermit",
-      "withLocalVariables": {
+      "newAssignee": "kermit",
+      "localVariables": {
         "varForNewActivity1": "varValue"
       }
     },
@@ -18,8 +18,7 @@
         "newActivity2.1",
         "newActivity2.2"
       ],
-      "withNewAssignee": "the frog",
-      "withLocalVariables": {
+      "localVariables": {
         "newActivity2.1": {
           "var2ForNewActivity2.x": 1234.567,
           "var1ForNewActivity2.x": "varValue"
@@ -36,7 +35,7 @@
         "originalActivity4"
       ],
       "toActivityId": "newActivity3",
-      "withLocalVariables": {
+      "localVariables": {
         "varForNewActivity3": 9876
       }
     }

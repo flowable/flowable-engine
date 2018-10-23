@@ -25,7 +25,7 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.migration.ProcessInstanceActivityMigrationMapping;
+import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -65,7 +65,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithExcGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "exclusiveGw"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "exclusiveGw"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -126,7 +126,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithExcGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "exclusiveGw"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "exclusiveGw"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -185,7 +185,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithExcGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "exclusiveGw").withLocalVariable("input", Integer.valueOf(1)))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "exclusiveGw").withLocalVariable("input", Integer.valueOf(1)))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -244,7 +244,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithExcGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "exclusiveGw"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "exclusiveGw"))
             .withProcessInstanceVariable("input", 1)
             .migrate(processInstance.getId());
 
@@ -304,7 +304,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithExcGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "theTask2"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "theTask2"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -364,7 +364,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefOneTask.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("theTask2", "userTask1Id"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("theTask2", "userTask1Id"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -424,7 +424,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithExcGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "exclusiveGw"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "exclusiveGw"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -490,7 +490,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithExcGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "exclusiveGw").withLocalVariables(Collections.singletonMap("input", Integer.valueOf(1))))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "exclusiveGw").withLocalVariables(Collections.singletonMap("input", Integer.valueOf(1))))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -556,7 +556,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithExcGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "theTask2"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "theTask2"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -623,7 +623,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         //Migrate each of the parallel task to a task in the parallel gateway
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procParallelGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "parallelFork"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "parallelFork"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -688,8 +688,8 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         //Migrate each of the parallel task to a task in the parallel gateway
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procParallelGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "oddFlowTask1"))
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "evenFlowTask4"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "oddFlowTask1"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "evenFlowTask4"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -751,7 +751,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         //Migrate each of the parallel task to a task in the parallel gateway
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procParallelGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("oddFlowTask3", "evenFlowTask2")))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("oddFlowTask3", "evenFlowTask2")))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -812,7 +812,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         //Migrate each of the parallel task to a task in the parallel gateway
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procParallelGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("task1", "task3")))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("task1", "task3")))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -850,7 +850,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         //Migrate each of the parallel task to a task in the parallel gateway
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procParallelGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "parallelFork"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "parallelFork"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -922,8 +922,8 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         //Migrate each of the parallel task to a task in the parallel gateway
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procParallelGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "oddFlowTask1"))
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "evenFlowTask4"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "oddFlowTask1"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "evenFlowTask4"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -992,7 +992,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         //Migrate each of the parallel task to a task in the parallel gateway
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procParallelGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("oddFlowTask3", "evenFlowTask2")))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("oddFlowTask3", "evenFlowTask2")))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1060,7 +1060,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
 
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procInclusiveGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("gwFork")))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("gwFork")))
             .migrate(processInstance.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1131,7 +1131,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         try {
             runtimeService.createProcessInstanceMigrationBuilder()
                 .migrateToProcessDefinition(procInclusiveGtw.getId())
-                .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("gwFork")).withLocalVariableForAllActivities("myConditionVar", 10))
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("gwFork")).withLocalVariableForAllActivities("myConditionVar", 10))
                 .migrate(processInstance.getId());
             fail("No outgoing sequence for the inclusive gateway could've been selected");
         } catch (FlowableException e) {
@@ -1159,7 +1159,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
 
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procInclusiveGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("gwFork")))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("gwFork")))
             .migrate(processInstance.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1229,7 +1229,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
 
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procInclusiveGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("gwFork")).withLocalVariableForAllActivities("myConditionVar", 11))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("gwFork")).withLocalVariableForAllActivities("myConditionVar", 11))
             .migrate(processInstance.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1299,7 +1299,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
 
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procInclusiveGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("gwFork")))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("gwFork")))
             .withProcessInstanceVariable("myConditionVar", 11)
             .migrate(processInstance.getId());
 
@@ -1370,7 +1370,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
 
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procInclusiveGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("taskLess")))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("taskLess")))
             .migrate(processInstance.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1442,7 +1442,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
 
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procInclusiveGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("taskMore", "taskLess")))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("taskMore", "taskLess")))
             .migrate(processInstance.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1531,8 +1531,8 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         //Migrate each of the parallel task to a task in the parallel gateway
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procInclusiveGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "taskMore"))
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "taskLess"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "taskMore"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "taskLess"))
             .migrate(processInstance.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1617,7 +1617,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
 
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefOneTask.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor(Arrays.asList("taskMore", "taskLess"), "userTask1Id"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor(Arrays.asList("taskMore", "taskLess"), "userTask1Id"))
             .migrate(processInstance.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1678,7 +1678,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
 
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procInclusiveGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("gwFork")))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("gwFork")))
             .migrate(processInstance.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1755,7 +1755,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
 
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procInclusiveGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("taskLess")))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("taskLess")))
             .migrate(processInstance.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1835,7 +1835,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
 
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procInclusiveGtw.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("taskMore", "taskLess")))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("taskMore", "taskLess")))
             .migrate(processInstance.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1926,7 +1926,7 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
 
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefOneTask.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor(Arrays.asList("taskMore", "taskLess"), "userTask1Id"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor(Arrays.asList("taskMore", "taskLess"), "userTask1Id"))
             .migrate(processInstance.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();

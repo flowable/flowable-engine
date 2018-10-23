@@ -22,7 +22,7 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.migration.ProcessInstanceActivityMigrationMapping;
+import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.Execution;
@@ -77,7 +77,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -144,7 +144,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -209,7 +209,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -274,7 +274,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -341,7 +341,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -408,7 +408,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -481,7 +481,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -552,7 +552,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -623,7 +623,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -694,7 +694,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -779,7 +779,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -865,7 +865,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -942,7 +942,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1019,7 +1019,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1097,7 +1097,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1174,7 +1174,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1254,7 +1254,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1334,7 +1334,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1418,8 +1418,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "beforeSubProcessTask"))
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "nestedSignalEventSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "beforeSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedSignalEventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1491,8 +1491,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "subProcessTask"))
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "nestedSignalEventSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "subProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedSignalEventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1564,8 +1564,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "beforeSubProcessTask"))
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "nestedMessageEventSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "beforeSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedMessageEventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1637,8 +1637,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "subProcessTask"))
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "nestedMessageEventSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "subProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedMessageEventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1710,8 +1710,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "beforeSubProcessTask"))
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "nestedTimerEventSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "beforeSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedTimerEventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1783,8 +1783,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "subProcessTask"))
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "nestedTimerEventSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "subProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedTimerEventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1856,8 +1856,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "beforeSubProcessTask"))
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "nestedSignalEventSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "beforeSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedSignalEventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -1929,8 +1929,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "subProcessTask"))
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "nestedSignalEventSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "subProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedSignalEventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -2020,8 +2020,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "beforeSubProcessTask"))
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "nestedMessageEventSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "beforeSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedMessageEventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -2094,8 +2094,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "subProcessTask"))
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "nestedMessageEventSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "subProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedMessageEventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -2187,8 +2187,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "beforeSubProcessTask"))
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "nestedTimerEventSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "beforeSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedTimerEventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -2262,8 +2262,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate to the other processDefinition
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "subProcessTask"))
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("parallelTask", "nestedTimerEventSubProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "subProcessTask"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedTimerEventSubProcessTask"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -2695,7 +2695,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefOneTask.getId())
             //This is still a "valid" migration of the Event SubProcess Start execution, doing it along with the task activity execution that requires migration, but is not a "direct" migration of the task
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor(Arrays.asList("processTask", "eventSubProcessStart"), "userTask1Id"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor(Arrays.asList("processTask", "eventSubProcessStart"), "userTask1Id"))
             .migrate(processInstance.getId());
 
         //Confirm
@@ -2761,7 +2761,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends PluggableFlowab
         //Migrate only the user task
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefOneTask.getId())
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("processTask", "userTask1Id"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "userTask1Id"))
             //.deleteActivityExcution("eventSubProcessStart")
             .migrate(processInstance.getId());
 

@@ -27,7 +27,7 @@ import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationBuilderImpl;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationDocumentImpl;
 import org.flowable.engine.impl.test.AbstractTestCase;
-import org.flowable.engine.migration.ProcessInstanceActivityMigrationMapping;
+import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.junit.jupiter.api.Test;
 
@@ -44,17 +44,16 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         Integer definitionVer = 9;
         String definitionTenantId = "admin";
 
-        ProcessInstanceActivityMigrationMapping oneToOneMapping = ProcessInstanceActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1")
+        ActivityMigrationMapping oneToOneMapping = ActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1")
             .withLocalVariable("varForNewActivity1", "varValue")
             .withNewAssignee("kermit");
 
-        ProcessInstanceActivityMigrationMapping manyToOneMapping = ProcessInstanceActivityMigrationMapping.createMappingFor(Arrays.asList("originalActivity3", "originalActivity4"), "newActivity3")
+        ActivityMigrationMapping manyToOneMapping = ActivityMigrationMapping.createMappingFor(Arrays.asList("originalActivity3", "originalActivity4"), "newActivity3")
             .withLocalVariable("varForNewActivity3", 9876);
 
-        ProcessInstanceActivityMigrationMapping oneToManyMapping = ProcessInstanceActivityMigrationMapping.createMappingFor("originalActivity2", Arrays.asList("newActivity2.1", "newActivity2.2"))
+        ActivityMigrationMapping oneToManyMapping = ActivityMigrationMapping.createMappingFor("originalActivity2", Arrays.asList("newActivity2.1", "newActivity2.2"))
             .withLocalVariableForAllActivities("var1ForNewActivity2.x", "varValue")
-            .withLocalVariableForAllActivities("var2ForNewActivity2.x", 1234.567)
-            .withNewAssignee("the frog");
+            .withLocalVariableForAllActivities("var2ForNewActivity2.x", 1234.567);
 
         HashMap<String, Map<String, Object>> activityLocalVariables = new HashMap<String, Map<String, Object>>() {
 
@@ -176,15 +175,14 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
                 put("processVar2", 456.789);
             }
         };
-        ProcessInstanceActivityMigrationMapping.OneToOneMapping oneToOneMapping = ProcessInstanceActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1")
+        ActivityMigrationMapping.OneToOneMapping oneToOneMapping = ActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1")
             .withLocalVariable("varForNewActivity1", "varValue")
             .withNewAssignee("kermit");
-        ProcessInstanceActivityMigrationMapping.ManyToOneMapping manyToOneMapping = ProcessInstanceActivityMigrationMapping.createMappingFor(Arrays.asList("originalActivity3", "originalActivity4"), "newActivity3")
+        ActivityMigrationMapping.ManyToOneMapping manyToOneMapping = ActivityMigrationMapping.createMappingFor(Arrays.asList("originalActivity3", "originalActivity4"), "newActivity3")
             .withLocalVariable("varForNewActivity3", 9876);
-        ProcessInstanceActivityMigrationMapping.OneToManyMapping oneToManyMapping = ProcessInstanceActivityMigrationMapping.createMappingFor("originalActivity2", Arrays.asList("newActivity2.1", "newActivity2.2"))
+        ActivityMigrationMapping.OneToManyMapping oneToManyMapping = ActivityMigrationMapping.createMappingFor("originalActivity2", Arrays.asList("newActivity2.1", "newActivity2.2"))
             .withLocalVariablesForActivity("newActivity2.1", varsForNewActivity2_1)
-            .withLocalVariablesForActivity("newActivity2.2", varsForNewActivity2_2)
-            .withNewAssignee("the frog");
+            .withLocalVariablesForActivity("newActivity2.2", varsForNewActivity2_2);
 
         ProcessInstanceMigrationDocument document = new ProcessInstanceMigrationBuilderImpl(null)
             .migrateToProcessDefinition(definitionId)
@@ -214,17 +212,17 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
     public void testSerializeDuplicatedFromActivity() {
 
         String definitionId = "someProcessId";
-        List<ProcessInstanceActivityMigrationMapping> activityMappings = new ArrayList<>();
-        activityMappings.add(ProcessInstanceActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1"));
-        activityMappings.add(ProcessInstanceActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity2"));
+        List<ActivityMigrationMapping> activityMappings = new ArrayList<>();
+        activityMappings.add(ActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1"));
+        activityMappings.add(ActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity2"));
 
         try {
             ProcessInstanceMigrationDocument document = new ProcessInstanceMigrationBuilderImpl(null)
                 .migrateToProcessDefinition(definitionId)
-                .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1").withLocalVariable("varForNewActivity1", "varValue"))
-                .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity2"))
-                .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("originalActivity2", Arrays.asList("newActivity1", "newActivity2")))
-                .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor(Arrays.asList("originalActivity2", "originalActivity3"), "newActivity3"))
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1").withLocalVariable("varForNewActivity1", "varValue"))
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity2"))
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("originalActivity2", Arrays.asList("newActivity1", "newActivity2")))
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor(Arrays.asList("originalActivity2", "originalActivity3"), "newActivity3"))
                 .withProcessInstanceVariable("processVar1", "varValue1")
                 .getProcessInstanceMigrationDocument();
             fail("Should not allow duplicated values in 'from' activity");
@@ -252,15 +250,15 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         String definitionKey = "MyProcessKey";
         Integer definitionVer = 5;
         String definitionTenantId = "admin";
-        ProcessInstanceActivityMigrationMapping.OneToOneMapping oneToOne1 = ProcessInstanceActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1");
-        ProcessInstanceActivityMigrationMapping.OneToOneMapping oneToOne2 = ProcessInstanceActivityMigrationMapping.createMappingFor("originalActivity2", "newActivity2");
+        ActivityMigrationMapping.OneToOneMapping oneToOne1 = ActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1");
+        ActivityMigrationMapping.OneToOneMapping oneToOne2 = ActivityMigrationMapping.createMappingFor("originalActivity2", "newActivity2");
 
         //Build a process migration document
         ProcessInstanceMigrationDocument document = new ProcessInstanceMigrationBuilderImpl(null)
             .migrateToProcessDefinition(definitionKey, definitionVer)
             .withMigrateToProcessDefinitionTenantId(definitionTenantId)
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1"))
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("originalActivity2", "newActivity2"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1"))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("originalActivity2", "newActivity2"))
             .getProcessInstanceMigrationDocument();
 
         //Serialize the document as Json
@@ -282,9 +280,9 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         Integer definitionVer = 5;
         String definitionTenantId = "admin";
 
-        ProcessInstanceActivityMigrationMapping.OneToOneMapping oneToOne1 = ProcessInstanceActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1")
+        ActivityMigrationMapping.OneToOneMapping oneToOne1 = ActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1")
             .withLocalVariables(Collections.singletonMap("variableString", "variableValue"));
-        ProcessInstanceActivityMigrationMapping.OneToOneMapping oneToOne2 = ProcessInstanceActivityMigrationMapping.createMappingFor("originalActivity2", "newActivity2")
+        ActivityMigrationMapping.OneToOneMapping oneToOne2 = ActivityMigrationMapping.createMappingFor("originalActivity2", "newActivity2")
             .withLocalVariable("variableDouble", 12345.6789);
 
         HashMap processInstanceVars = new HashMap<String, Object>() {
@@ -299,8 +297,8 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         ProcessInstanceMigrationDocument document = new ProcessInstanceMigrationBuilderImpl(null)
             .migrateToProcessDefinition(definitionKey, definitionVer)
             .withMigrateToProcessDefinitionTenantId(definitionTenantId)
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1").withLocalVariables(Collections.singletonMap("variableString", "variableValue")))
-            .addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping.createMappingFor("originalActivity2", "newActivity2").withLocalVariable("variableDouble", 12345.6789))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1").withLocalVariables(Collections.singletonMap("variableString", "variableValue")))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("originalActivity2", "newActivity2").withLocalVariable("variableDouble", 12345.6789))
             .withProcessInstanceVariable("instanceVar1", "stringValue")
             .withProcessInstanceVariable("instanceVar2", 12345.6789)
             .getProcessInstanceMigrationDocument();

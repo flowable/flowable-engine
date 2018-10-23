@@ -17,13 +17,13 @@ import java.util.Map;
 /**
  * @author Dennis
  */
-public interface ProcessInstanceActivityMigrationMappingOptions <T extends ProcessInstanceActivityMigrationMapping> {
+public interface ActivityMigrationMappingOptions<T extends ActivityMigrationMapping> {
 
-    T withNewAssignee(String newAssigneeId);
+    interface SingleToActivityOptions <T extends ActivityMigrationMapping> extends ActivityMigrationMappingOptions<T> {
 
-    String getWithNewAssignee();
+        T withNewAssignee(String newAssigneeId);
 
-    interface SingleToActivityOptions <T extends ProcessInstanceActivityMigrationMapping> extends ProcessInstanceActivityMigrationMappingOptions <T> {
+        String getWithNewAssignee();
 
         T withLocalVariable(String variableName, Object variableValue);
 
@@ -32,7 +32,7 @@ public interface ProcessInstanceActivityMigrationMappingOptions <T extends Proce
         Map<String,Object> getActivityLocalVariables();
     }
 
-    interface MultipleToActivityOptions<T extends ProcessInstanceActivityMigrationMapping> extends ProcessInstanceActivityMigrationMappingOptions <T> {
+    interface MultipleToActivityOptions<T extends ActivityMigrationMapping> extends ActivityMigrationMappingOptions<T> {
 
         T withLocalVariableForActivity(String toActivity, String variableName, Object variableValue);
 

@@ -13,12 +13,10 @@
 
 package org.flowable.engine.impl.migration;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.RuntimeService;
-import org.flowable.engine.migration.ProcessInstanceActivityMigrationMapping;
+import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 
@@ -69,7 +67,7 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
     }
 
     @Override
-    public ProcessInstanceMigrationBuilder addActivityMigrationMapping(ProcessInstanceActivityMigrationMapping mapping) {
+    public ProcessInstanceMigrationBuilder addActivityMigrationMapping(ActivityMigrationMapping mapping) {
         this.migrationDocumentBuilder.addActivityMigrationMapping(mapping);
         return this;
     }

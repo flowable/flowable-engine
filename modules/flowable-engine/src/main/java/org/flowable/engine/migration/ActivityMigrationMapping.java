@@ -21,34 +21,29 @@ import java.util.Map;
 /**
  * @author Dennis
  */
-public abstract class ProcessInstanceActivityMigrationMapping {
-
-    protected String withNewAssignee;
+public abstract class ActivityMigrationMapping {
 
     public abstract List<String> getFromActivityIds();
 
     public abstract List<String> getToActivityIds();
 
-    public String getWithNewAssignee() {
-        return withNewAssignee;
-    }
-
-    public static ProcessInstanceActivityMigrationMapping.OneToOneMapping createMappingFor(String fromActivityId, String toActivityId) {
+    public static ActivityMigrationMapping.OneToOneMapping createMappingFor(String fromActivityId, String toActivityId) {
         return new OneToOneMapping(fromActivityId, toActivityId);
     }
 
-    public static ProcessInstanceActivityMigrationMapping.OneToManyMapping createMappingFor(String fromActivityId, List<String> toActivityIds) {
+    public static ActivityMigrationMapping.OneToManyMapping createMappingFor(String fromActivityId, List<String> toActivityIds) {
         return new OneToManyMapping(fromActivityId, toActivityIds);
     }
 
-    public static ProcessInstanceActivityMigrationMapping.ManyToOneMapping createMappingFor(List<String> fromActivityIds, String toActivityId) {
+    public static ActivityMigrationMapping.ManyToOneMapping createMappingFor(List<String> fromActivityIds, String toActivityId) {
         return new ManyToOneMapping(fromActivityIds, toActivityId);
     }
 
-    public static class OneToOneMapping extends ProcessInstanceActivityMigrationMapping implements ProcessInstanceActivityMigrationMappingOptions.SingleToActivityOptions<OneToOneMapping> {
+    public static class OneToOneMapping extends ActivityMigrationMapping implements ActivityMigrationMappingOptions.SingleToActivityOptions<OneToOneMapping> {
 
         public String fromActivityId;
         public String toActivityId;
+        protected String withNewAssignee;
         protected Map<String, Object> withLocalVariables = new LinkedHashMap<>();
 
         public OneToOneMapping(String fromActivityId, String toActivityId) {
@@ -85,6 +80,11 @@ public abstract class ProcessInstanceActivityMigrationMapping {
         }
 
         @Override
+        public String getWithNewAssignee() {
+            return withNewAssignee;
+        }
+
+        @Override
         public OneToOneMapping withLocalVariable(String variableName, Object variableValue) {
             withLocalVariables.put(variableName, variableValue);
             return this;
@@ -107,7 +107,7 @@ public abstract class ProcessInstanceActivityMigrationMapping {
         }
     }
 
-    public static class OneToManyMapping extends ProcessInstanceActivityMigrationMapping implements ProcessInstanceActivityMigrationMappingOptions.MultipleToActivityOptions<OneToManyMapping> {
+    public static class OneToManyMapping extends ActivityMigrationMapping implements ActivityMigrationMappingOptions.MultipleToActivityOptions<OneToManyMapping> {
 
         public String fromActivityId;
         public List<String> toActivityIds;
@@ -132,12 +132,6 @@ public abstract class ProcessInstanceActivityMigrationMapping {
 
         public String getFromActivityId() {
             return fromActivityId;
-        }
-
-        @Override
-        public OneToManyMapping withNewAssignee(String newAssigneeId) {
-            this.withNewAssignee = newAssigneeId;
-            return this;
         }
 
         @Override
@@ -183,10 +177,11 @@ public abstract class ProcessInstanceActivityMigrationMapping {
         }
     }
 
-    public static class ManyToOneMapping extends ProcessInstanceActivityMigrationMapping implements ProcessInstanceActivityMigrationMappingOptions.SingleToActivityOptions<ManyToOneMapping> {
+    public static class ManyToOneMapping extends ActivityMigrationMapping implements ActivityMigrationMappingOptions.SingleToActivityOptions<ManyToOneMapping> {
 
         public List<String> fromActivityIds;
         public String toActivityId;
+        protected String withNewAssignee;
         protected Map<String, Object> withLocalVariables = new LinkedHashMap<>();
 
         public ManyToOneMapping(List<String> fromActivityIds, String toActivityId) {
@@ -214,6 +209,11 @@ public abstract class ProcessInstanceActivityMigrationMapping {
         public ManyToOneMapping withNewAssignee(String newAssigneeId) {
             this.withNewAssignee = newAssigneeId;
             return this;
+        }
+
+        @Override
+        public String getWithNewAssignee() {
+            return withNewAssignee;
         }
 
         @Override

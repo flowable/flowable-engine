@@ -22,7 +22,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.engine.migration.ProcessInstanceActivityMigrationMapping;
+import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocumentConverter;
 
@@ -37,7 +37,7 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
     protected String migrateToProcessDefinitionKey;
     protected Integer migrateToProcessDefinitionVersion;
     protected String migrateToProcessDefinitionTenantId;
-    protected List<ProcessInstanceActivityMigrationMapping> activityMigrationMappings;
+    protected List<ActivityMigrationMapping> activityMigrationMappings;
     protected Map<String, Map<String, Object>> activitiesLocalVariables;
     protected Map<String, Object> processInstanceVariables;
     protected Set<String> mappedFromActivities;
@@ -81,7 +81,7 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
         return migrateToProcessDefinitionTenantId;
     }
 
-    public void setActivityMigrationMappings(List<ProcessInstanceActivityMigrationMapping> activityMigrationMappings) {
+    public void setActivityMigrationMappings(List<ActivityMigrationMapping> activityMigrationMappings) {
         List<String> duplicates = findDuplicatedFromActivityIds(activityMigrationMappings);
         if (duplicates.isEmpty()) {
             this.activityMigrationMappings = activityMigrationMappings;
@@ -92,7 +92,7 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
         }
     }
 
-    protected static List<String> findDuplicatedFromActivityIds(List<ProcessInstanceActivityMigrationMapping> activityMigrationMappings) {
+    protected static List<String> findDuplicatedFromActivityIds(List<ActivityMigrationMapping> activityMigrationMappings) {
         //Frequency Map
         Map<String, Long> frequencyMap = activityMigrationMappings.stream()
             .flatMap(mapping -> mapping.getFromActivityIds().stream())
@@ -108,20 +108,20 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
         return duplicatedActivityIds;
     }
 
-    protected static Map<String, Map<String, Object>> buildActivitiesLocalVariablesMap(List<ProcessInstanceActivityMigrationMapping> activityMigrationMappings) {
+    protected static Map<String, Map<String, Object>> buildActivitiesLocalVariablesMap(List<ActivityMigrationMapping> activityMigrationMappings) {
 
         Map<String, Map<String, Object>> variablesMap = new HashMap<>();
         activityMigrationMappings.forEach(mapping -> {
             mapping.getToActivityIds().forEach(activityId -> {
                 Map<String, Object> mappedLocalVariables = null;
-                if (mapping instanceof ProcessInstanceActivityMigrationMapping.OneToOneMapping) {
-                    mappedLocalVariables = ((ProcessInstanceActivityMigrationMapping.OneToOneMapping) mapping).getActivityLocalVariables();
+                if (mapping instanceof ActivityMigrationMapping.OneToOneMapping) {
+                    mappedLocalVariables = ((ActivityMigrationMapping.OneToOneMapping) mapping).getActivityLocalVariables();
                 }
-                if (mapping instanceof ProcessInstanceActivityMigrationMapping.ManyToOneMapping) {
-                    mappedLocalVariables = ((ProcessInstanceActivityMigrationMapping.ManyToOneMapping) mapping).getActivityLocalVariables();
+                if (mapping instanceof ActivityMigrationMapping.ManyToOneMapping) {
+                    mappedLocalVariables = ((ActivityMigrationMapping.ManyToOneMapping) mapping).getActivityLocalVariables();
                 }
-                if (mapping instanceof ProcessInstanceActivityMigrationMapping.OneToManyMapping) {
-                    mappedLocalVariables = ((ProcessInstanceActivityMigrationMapping.OneToManyMapping) mapping).getActivitiesLocalVariables().get(activityId);
+                if (mapping instanceof ActivityMigrationMapping.OneToManyMapping) {
+                    mappedLocalVariables = ((ActivityMigrationMapping.OneToManyMapping) mapping).getActivitiesLocalVariables().get(activityId);
                 }
                 if (mappedLocalVariables != null && !mappedLocalVariables.isEmpty()) {
                     Map<String, Object> activityLocalVariables = variablesMap.computeIfAbsent(activityId, key -> new HashMap<>());
@@ -132,7 +132,7 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
         return variablesMap;
     }
 
-    protected static Set<String> extractMappedFromActivities(List<ProcessInstanceActivityMigrationMapping> activityMigrationMappings) {
+    protected static Set<String> extractMappedFromActivities(List<ActivityMigrationMapping> activityMigrationMappings) {
         Set<String> fromActivities = activityMigrationMappings.stream()
             .flatMap(mapping -> mapping.getFromActivityIds().stream())
             .collect(Collectors.toSet());
@@ -140,7 +140,7 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
     }
 
     @Override
-    public List<ProcessInstanceActivityMigrationMapping> getActivityMigrationMappings() {
+    public List<ActivityMigrationMapping> getActivityMigrationMappings() {
         return activityMigrationMappings;
     }
 
