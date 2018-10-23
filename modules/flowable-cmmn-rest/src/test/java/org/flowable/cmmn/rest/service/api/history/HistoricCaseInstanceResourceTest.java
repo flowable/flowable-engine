@@ -105,47 +105,6 @@ public class HistoricCaseInstanceResourceTest extends BaseSpringRestTestCase {
     }
     
     @CmmnDeployment
-    public void testStageOverviewWithOnlyRuntimeData() throws Exception {
-        HistoryLevel historyLevel = cmmnEngineConfiguration.getHistoryLevel();
-        cmmnEngineConfiguration.setHistoryLevel(HistoryLevel.NONE);
-        try {
-            CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testStageOverview").start();
-    
-            cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(5, ChronoUnit.DAYS)));
-    
-            ArrayNode stageOverviewResponse = getStageOverviewResponse(caseInstance);
-            assertEquals(4, stageOverviewResponse.size());
-            assertStage(stageOverviewResponse.get(0), "Stage one", false, true);
-            assertStage(stageOverviewResponse.get(1), "Stage two", false, false);
-            assertStage(stageOverviewResponse.get(2), "Stage three", false, false);
-            assertStage(stageOverviewResponse.get(3), "Stage four", false,  false);
-    
-            // We're doing a wrong time ordering, to test that the display order has precedence over the end time
-            cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(7, ChronoUnit.DAYS)));
-            taskService.complete(taskService.createTaskQuery().singleResult().getId());
-    
-            stageOverviewResponse = getStageOverviewResponse(caseInstance);
-            assertEquals(4, stageOverviewResponse.size());
-            assertStage(stageOverviewResponse.get(0), "Stage one", false, false);
-            assertStage(stageOverviewResponse.get(1), "Stage two", false, true);
-            assertStage(stageOverviewResponse.get(2), "Stage three", false, false);
-            assertStage(stageOverviewResponse.get(3), "Stage four", false,  false);
-    
-            cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(3, ChronoUnit.DAYS)));
-            taskService.complete(taskService.createTaskQuery().singleResult().getId());
-    
-            stageOverviewResponse = getStageOverviewResponse(caseInstance);
-            assertEquals(4, stageOverviewResponse.size());
-            assertStage(stageOverviewResponse.get(0), "Stage one", false, false);
-            assertStage(stageOverviewResponse.get(1), "Stage two", false, false);
-            assertStage(stageOverviewResponse.get(2), "Stage three", false, true);
-            assertStage(stageOverviewResponse.get(3), "Stage four", false,  false);
-        } finally {
-            cmmnEngineConfiguration.setHistoryLevel(historyLevel);
-        }
-    }
-
-    @CmmnDeployment
     public void testStageOverviewWithoutDisplayOrder() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testStageOverview").start();
 
@@ -193,7 +152,7 @@ public class HistoricCaseInstanceResourceTest extends BaseSpringRestTestCase {
 
     protected void assertStage(JsonNode jsonNode, String name, boolean isEnded, boolean isCurrent) {
         assertEquals(name, jsonNode.get("name").asText());
-        assertEquals("ended boolean is wrong", isEnded, jsonNode.get("ended").asBoolean());
+        assertEquals("'ended' boolean is wrong", isEnded, jsonNode.get("ended").asBoolean());
         assertEquals("current boolean is wrong", isCurrent, jsonNode.get("current").asBoolean());
     }
 
