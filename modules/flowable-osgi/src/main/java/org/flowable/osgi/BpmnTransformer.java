@@ -12,6 +12,7 @@
  */
 package org.flowable.osgi;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.flowable.osgi.Constants.BUNDLE_FLOWABLE_HEADER;
 import static org.osgi.framework.Constants.BUNDLE_MANIFESTVERSION;
 import static org.osgi.framework.Constants.BUNDLE_SYMBOLICNAME;
@@ -75,7 +76,7 @@ public class BpmnTransformer {
                 Element e = (Element) l.item(i);
                 String text = e.getTextContent();
                 Properties props = new Properties();
-                props.load(new ByteArrayInputStream(text.trim().getBytes()));
+                props.load(new ByteArrayInputStream(text.trim().getBytes(UTF_8)));
                 Enumeration en = props.propertyNames();
                 while (en.hasMoreElements()) {
                     String k = (String) en.nextElement();

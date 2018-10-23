@@ -13,6 +13,8 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,12 +50,12 @@ public class CommentEntityImpl extends AbstractBpmnEngineNoRevisionEntity implem
 
     @Override
     public byte[] getFullMessageBytes() {
-        return (fullMessage != null ? fullMessage.getBytes() : null);
+        return (fullMessage != null ? fullMessage.getBytes(UTF_8) : null);
     }
 
     @Override
     public void setFullMessageBytes(byte[] fullMessageBytes) {
-        fullMessage = (fullMessageBytes != null ? new String(fullMessageBytes) : null);
+        fullMessage = (fullMessageBytes != null ? new String(fullMessageBytes, UTF_8) : null);
     }
 
     public static String MESSAGE_PARTS_MARKER = "_|_";

@@ -15,6 +15,10 @@
  */ 
 package org.flowable.common.engine.impl.de.odysseus.el.tree.impl;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.EnumSet;
 
@@ -138,7 +142,7 @@ public class Builder implements TreeBuilder {
 			System.err.println("usage: java " + Builder.class.getName() + " <expression string>");
 			System.exit(1);
 		}
-		PrintWriter out = new PrintWriter(System.out);
+		PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out, UTF_8)));
 		Tree tree = null;
 		try {
 			tree = new Builder(Feature.METHOD_INVOCATIONS).build(args[0]);

@@ -12,6 +12,7 @@
  */
 package org.flowable.osgi;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.flowable.osgi.Constants.BUNDLE_FLOWABLE_HEADER;
 
 import java.io.BufferedReader;
@@ -367,7 +368,7 @@ public class Extender implements BundleTrackerCustomizer, ServiceTrackerCustomiz
         @Override
         public ScriptEngine resolveScriptEngine(String name) {
             try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(configFile.openStream()));
+                BufferedReader in = new BufferedReader(new InputStreamReader(configFile.openStream(), UTF_8));
                 String className = in.readLine();
                 in.close();
                 Class cls = bundle.loadClass(className);

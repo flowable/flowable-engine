@@ -12,6 +12,8 @@
  */
 package org.flowable.form.engine.impl.parser;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -76,7 +78,7 @@ public class FormDefinitionParse {
             if (encoding != null) {
                 in = new InputStreamReader(streamSource.getInputStream(), encoding);
             } else {
-                in = new InputStreamReader(streamSource.getInputStream());
+                in = new InputStreamReader(streamSource.getInputStream(), UTF_8);
             }
 
             String formJson = IOUtils.toString(in);

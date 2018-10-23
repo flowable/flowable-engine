@@ -13,6 +13,8 @@
 
 package org.flowable.idm.engine.impl.persistence.entity;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -109,11 +111,11 @@ public class IdentityInfoEntityManagerImpl extends AbstractEntityManager<Identit
     }
 
     protected byte[] encryptPassword(String accountPassword, String userPassword) {
-        return accountPassword.getBytes();
+        return accountPassword.getBytes(UTF_8);
     }
 
     protected String decryptPassword(byte[] storedPassword, String userPassword) {
-        return new String(storedPassword);
+        return new String(storedPassword, UTF_8);
     }
 
     @Override

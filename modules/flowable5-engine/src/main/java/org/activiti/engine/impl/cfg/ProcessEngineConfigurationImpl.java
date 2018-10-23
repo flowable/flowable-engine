@@ -13,6 +13,8 @@
 
 package org.activiti.engine.impl.cfg;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -847,7 +849,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
                 // update the jdbc parameters to the configured ones...
                 Environment environment = new Environment("default", transactionFactory, dataSource);
-                Reader reader = new InputStreamReader(inputStream);
+                Reader reader = new InputStreamReader(inputStream, UTF_8);
                 Properties properties = new Properties();
                 properties.put("prefix", databaseTablePrefix);
 

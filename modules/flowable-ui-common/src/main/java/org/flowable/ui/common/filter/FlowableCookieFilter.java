@@ -12,6 +12,8 @@
  */
 package org.flowable.ui.common.filter;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -296,7 +298,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
 
         String cookieAsPlainText = null;
         try {
-            cookieAsPlainText = new String(Base64.getDecoder().decode(cookieValue.getBytes()));
+            cookieAsPlainText = new String(Base64.getDecoder().decode(cookieValue.getBytes(UTF_8)), UTF_8);
         } catch (IllegalArgumentException e) {
             throw new InvalidCookieException("Cookie token was not Base64 encoded; value was '" + cookieValue + "'");
         }

@@ -12,6 +12,8 @@
  */
 package org.flowable.ui.common.service.idm;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
@@ -133,7 +135,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
     protected JsonNode callRemoteIdmService(String url, String username, String password) {
         HttpGet httpGet = new HttpGet(url);
         httpGet.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(
-                Base64.getEncoder().encode((username + ":" + password).getBytes(Charset.forName("UTF-8")))));
+                Base64.getEncoder().encode((username + ":" + password).getBytes(Charset.forName("UTF-8"))), UTF_8));
 
         HttpClientBuilder clientBuilder = HttpClientBuilder.create();
         SSLConnectionSocketFactory sslsf = null;

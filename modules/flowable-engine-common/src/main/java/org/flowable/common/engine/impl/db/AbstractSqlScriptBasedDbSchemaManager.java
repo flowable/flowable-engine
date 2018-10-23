@@ -12,6 +12,8 @@
  */
 package org.flowable.common.engine.impl.db;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -246,7 +248,7 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
             Connection connection = dbSqlSession.getSqlSession().getConnection();
             Exception exception = null;
             byte[] bytes = IoUtil.readInputStream(inputStream, resourceName);
-            String ddlStatements = new String(bytes);
+            String ddlStatements = new String(bytes, UTF_8);
 
             // Special DDL handling for certain databases
             try {

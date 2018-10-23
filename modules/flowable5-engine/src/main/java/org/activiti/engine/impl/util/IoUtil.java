@@ -12,6 +12,8 @@
  */
 package org.activiti.engine.impl.util;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -58,7 +60,7 @@ public class IoUtil {
         } finally {
             IoUtil.closeSilently(inputStream);
         }
-        return new String(buffer);
+        return new String(buffer, UTF_8);
     }
 
     public static File getFile(String filePath) {
@@ -74,7 +76,7 @@ public class IoUtil {
         BufferedOutputStream outputStream = null;
         try {
             outputStream = new BufferedOutputStream(new FileOutputStream(getFile(filePath)));
-            outputStream.write(content.getBytes());
+            outputStream.write(content.getBytes(UTF_8));
             outputStream.flush();
         } catch (Exception e) {
             throw new ActivitiException("Couldn't write file " + filePath, e);
