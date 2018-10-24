@@ -13,13 +13,61 @@
 
 package org.flowable.image.impl;
 
-import org.flowable.bpmn.model.*;
-import org.flowable.bpmn.model.Process;
-import org.flowable.image.ProcessDiagramGenerator;
-
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.flowable.bpmn.model.Activity;
+import org.flowable.bpmn.model.AdhocSubProcess;
+import org.flowable.bpmn.model.Artifact;
+import org.flowable.bpmn.model.Association;
+import org.flowable.bpmn.model.AssociationDirection;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.BusinessRuleTask;
+import org.flowable.bpmn.model.CallActivity;
+import org.flowable.bpmn.model.CompensateEventDefinition;
+import org.flowable.bpmn.model.EndEvent;
+import org.flowable.bpmn.model.ErrorEventDefinition;
+import org.flowable.bpmn.model.Event;
+import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.EventGateway;
+import org.flowable.bpmn.model.EventSubProcess;
+import org.flowable.bpmn.model.ExclusiveGateway;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FlowElementsContainer;
+import org.flowable.bpmn.model.FlowNode;
+import org.flowable.bpmn.model.Gateway;
+import org.flowable.bpmn.model.GraphicInfo;
+import org.flowable.bpmn.model.HttpServiceTask;
+import org.flowable.bpmn.model.InclusiveGateway;
+import org.flowable.bpmn.model.IntermediateCatchEvent;
+import org.flowable.bpmn.model.Lane;
+import org.flowable.bpmn.model.ManualTask;
+import org.flowable.bpmn.model.MessageEventDefinition;
+import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
+import org.flowable.bpmn.model.ParallelGateway;
+import org.flowable.bpmn.model.Pool;
+import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.ReceiveTask;
+import org.flowable.bpmn.model.ScriptTask;
+import org.flowable.bpmn.model.SendTask;
+import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.bpmn.model.ServiceTask;
+import org.flowable.bpmn.model.SignalEventDefinition;
+import org.flowable.bpmn.model.StartEvent;
+import org.flowable.bpmn.model.SubProcess;
+import org.flowable.bpmn.model.Task;
+import org.flowable.bpmn.model.TextAnnotation;
+import org.flowable.bpmn.model.ThrowEvent;
+import org.flowable.bpmn.model.TimerEventDefinition;
+import org.flowable.bpmn.model.UserTask;
+import org.flowable.image.ProcessDiagramGenerator;
 
 /**
  * Class to generate an image based the diagram interchange information in a BPMN 2.0 process.
