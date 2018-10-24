@@ -3,7 +3,7 @@
              xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
              targetNamespace="Examples">
 
-    <process id="changeStateForEventSubProcess">
+    <process id="interruptingTimerEventSubProcess">
 
         <startEvent id="theStart"/>
         <sequenceFlow sourceRef="theStart" targetRef="processTask"/>

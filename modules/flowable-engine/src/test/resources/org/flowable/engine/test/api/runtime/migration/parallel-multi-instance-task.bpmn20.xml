@@ -3,24 +3,22 @@
              xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
              targetNamespace="Examples">
 
-    <process id="sequentialMultiInstance">
+    <process id="parallelMultiInstanceTask">
 
         <startEvent id="theStart"/>
         <sequenceFlow id="flow1" sourceRef="theStart" targetRef="beforeMultiInstance"/>
-
         <userTask id="beforeMultiInstance"/>
+        <sequenceFlow sourceRef="beforeMultiInstance" targetRef="parallelTasks"/>
 
-        <sequenceFlow id="flow2" sourceRef="beforeMultiInstance" targetRef="seqTasks"/>
-
-        <userTask id="seqTasks" name="Sequential Task">
-            <multiInstanceLoopCharacteristics isSequential="true">
+        <userTask id="parallelTasks" name="Parallel Task">
+            <multiInstanceLoopCharacteristics isSequential="false">
                 <loopCardinality>${nrOfLoops}</loopCardinality>
             </multiInstanceLoopCharacteristics>
         </userTask>
 
-        <sequenceFlow id="flow3" sourceRef="seqTasks" targetRef="nextTask"/>
-        <userTask id="nextTask" name="next task"/>
-        <sequenceFlow id="flow4" sourceRef="nextTask" targetRef="theEnd"/>
+        <sequenceFlow id="flow2" sourceRef="parallelTasks" targetRef="afterMultiInstance"/>
+        <userTask id="afterMultiInstance" name="next task"/>
+        <sequenceFlow id="flow3" sourceRef="afterMultiInstance" targetRef="theEnd"/>
         <endEvent id="theEnd"/>
 
     </process>
