@@ -146,7 +146,11 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             getHistoricActivityInstanceEntityManager().deleteHistoricActivityInstancesByProcessInstanceId(processInstanceId);
             TaskHelper.deleteHistoricTaskInstancesByProcessInstanceId(processInstanceId);
             CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricIdentityLinksByProcessInstanceId(processInstanceId);
-            CommandContextUtil.getHistoricEntityLinkService().deleteHistoricEntityLinksByScopeIdAndScopeType(processInstanceId, ScopeTypes.BPMN);
+            
+            if (processEngineConfiguration.isEnableEntityLinks()) {
+                CommandContextUtil.getHistoricEntityLinkService().deleteHistoricEntityLinksByScopeIdAndScopeType(processInstanceId, ScopeTypes.BPMN);
+            }
+            
             getCommentEntityManager().deleteCommentsByProcessInstanceId(processInstanceId);
 
             if (historicProcessInstance != null) {

@@ -40,7 +40,6 @@ public class EntityLinkEntityImpl extends AbstractEntityLinkServiceNoRevisionEnt
     @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
-        persistentState.put("id", this.id);
         persistentState.put("linkType", this.linkType);
         persistentState.put("scopeId", this.scopeId);
         persistentState.put("scopeType", this.scopeType);
@@ -48,7 +47,6 @@ public class EntityLinkEntityImpl extends AbstractEntityLinkServiceNoRevisionEnt
         persistentState.put("referenceScopeId", this.referenceScopeId);
         persistentState.put("referenceScopeType", this.referenceScopeType);
         persistentState.put("referenceScopeDefinitionId", this.referenceScopeDefinitionId);
-        persistentState.put("createTime", this.createTime);
 
         return persistentState;
     }

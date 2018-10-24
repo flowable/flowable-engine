@@ -1294,15 +1294,17 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
     
     public void initEntityLinkServiceConfiguration() {
-        this.entityLinkServiceConfiguration = instantiateEntityLinkServiceConfiguration();
-        this.entityLinkServiceConfiguration.setHistoryLevel(this.historyLevel);
-        this.entityLinkServiceConfiguration.setClock(this.clock);
-        this.entityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
-        this.entityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
-
-        this.entityLinkServiceConfiguration.init();
-
-        addServiceConfiguration(EngineConfigurationConstants.KEY_ENTITY_LINK_SERVICE_CONFIG, this.entityLinkServiceConfiguration);
+        if (this.enableEntityLinks) {
+            this.entityLinkServiceConfiguration = instantiateEntityLinkServiceConfiguration();
+            this.entityLinkServiceConfiguration.setHistoryLevel(this.historyLevel);
+            this.entityLinkServiceConfiguration.setClock(this.clock);
+            this.entityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
+            this.entityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+    
+            this.entityLinkServiceConfiguration.init();
+    
+            addServiceConfiguration(EngineConfigurationConstants.KEY_ENTITY_LINK_SERVICE_CONFIG, this.entityLinkServiceConfiguration);
+        }
     }
 
     protected EntityLinkServiceConfiguration instantiateEntityLinkServiceConfiguration() {
