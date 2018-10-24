@@ -17,6 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
@@ -206,13 +207,16 @@ public class StartAuthorizationTest extends FlowableCmmnTestCase {
             assertTrue(containsUserOrGroup(null, "group3", links));
 
             // do not mention user, all cases should be selected
-            List<CaseDefinition> caseDefinitions = cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionName().asc().list();
-
+            List<CaseDefinition> caseDefinitions = cmmnRepositoryService.createCaseDefinitionQuery().list();
             assertEquals(3, caseDefinitions.size());
+            List<String> caseDefinitionIds = new ArrayList<>();
+            for (CaseDefinition caseDefinition : caseDefinitions) {
+                caseDefinitionIds.add(caseDefinition.getKey());
+            }
 
-            assertEquals("case1", caseDefinitions.get(0).getKey());
-            assertEquals("case2", caseDefinitions.get(1).getKey());
-            assertEquals("case3", caseDefinitions.get(2).getKey());
+            assertTrue(caseDefinitionIds.contains("case1"));
+            assertTrue(caseDefinitionIds.contains("case2"));
+            assertTrue(caseDefinitionIds.contains("case3"));
 
             // check user1, case2 has two authorized starters, of which one is "user1"
             caseDefinitions = cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionName().asc().startableByUser("user1").list();
