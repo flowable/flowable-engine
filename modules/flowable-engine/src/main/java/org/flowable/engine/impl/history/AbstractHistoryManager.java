@@ -265,7 +265,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
             activityId = execution.getCurrentFlowElement().getId();
         } else if (execution.getCurrentFlowElement() instanceof SequenceFlow
                         && execution.getCurrentFlowableListener() == null) { // while executing sequence flow listeners, we don't want historic activities
-            activityId = ((SequenceFlow) (execution.getCurrentFlowElement())).getSourceFlowElement().getId();
+            activityId = ((SequenceFlow) execution.getCurrentFlowElement()).getSourceFlowElement().getId();
         }
         return activityId;
     }

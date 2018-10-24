@@ -112,7 +112,7 @@ public class UserEntityManagerImpl extends AbstractEntityManager<UserEntity> imp
             user = findById(userId);
         }
 
-        return (user != null) && (password != null) && (passwordEncoder.isMatches(password, user.getPassword(), salt));
+        return (user != null) && (password != null) && passwordEncoder.isMatches(password, user.getPassword(), salt);
     }
 
     @Override

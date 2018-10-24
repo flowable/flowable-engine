@@ -112,7 +112,7 @@ public class BaseDynamicSubProcessInjectUtil {
             int counter = 0;
             boolean maxLengthReached = false;
             while (!maxLengthReached && process.getFlowElement(newFlowElementId, true) != null) {
-                newFlowElementId = prefix + (counter++) + "-" + originalFlowElementId;
+                newFlowElementId = prefix + counter++ + "-" + originalFlowElementId;
                 if (newFlowElementId.length() > 255) {
                     maxLengthReached = true;
                 }

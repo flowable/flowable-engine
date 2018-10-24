@@ -298,7 +298,7 @@ public abstract class ReflectUtil {
             return false;
         }
         for (int i = 0; i < parameterTypes.length; i++) {
-            if ((args[i] != null) && (!parameterTypes[i].isAssignableFrom(args[i].getClass()))) {
+            if ((args[i] != null) && !parameterTypes[i].isAssignableFrom(args[i].getClass())) {
                 return false;
             }
         }
