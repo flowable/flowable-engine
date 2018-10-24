@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CallActivity;
@@ -36,6 +37,7 @@ public class MoveExecutionEntityContainer {
     protected BpmnModel subProcessModel;
     protected BpmnModel processModel;
     protected ExecutionEntity superExecution;
+    protected String newAssigneeId;
     protected Map<String, ExecutionEntity> continueParentExecutionMap = new HashMap<>();
     protected Map<String, FlowElementMoveEntry> moveToFlowElementMap = new HashMap<>();
 
@@ -118,6 +120,14 @@ public class MoveExecutionEntityContainer {
 
     public ExecutionEntity getSuperExecution() {
         return superExecution;
+    }
+
+    public void setNewAssigneeId(String newAssigneeId) {
+        this.newAssigneeId = newAssigneeId;
+    }
+
+    public Optional<String> getNewAssigneeId() {
+        return Optional.ofNullable(newAssigneeId);
     }
 
     public void setSuperExecution(ExecutionEntity superExecution) {

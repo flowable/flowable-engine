@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.flowable.bpmn.model.StartEvent;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.repository.ProcessDefinition;
 
@@ -33,6 +34,7 @@ public class ProcessInstanceChangeState {
     protected Map<String, List<ExecutionEntity>> processInstanceActiveEmbeddedExecutions;
     protected List<MoveExecutionEntityContainer> moveExecutionEntityContainers;
     protected HashMap<String, ExecutionEntity> createdEmbeddedSubProcess = new HashMap<>();
+    protected HashMap<StartEvent, ExecutionEntity> pendingEventSubProcessesStartEvents = new HashMap<>();
 
     public ProcessInstanceChangeState() {
     }
@@ -105,6 +107,14 @@ public class ProcessInstanceChangeState {
     public ProcessInstanceChangeState setProcessInstanceActiveEmbeddedExecutions(Map<String, List<ExecutionEntity>> processInstanceActiveEmbeddedExecutions) {
         this.processInstanceActiveEmbeddedExecutions = processInstanceActiveEmbeddedExecutions;
         return this;
+    }
+
+    public HashMap<StartEvent, ExecutionEntity> getPendingEventSubProcessesStartEvents() {
+        return pendingEventSubProcessesStartEvents;
+    }
+
+    public void addPendingEventSubProcessStartEvent(StartEvent startEvent, ExecutionEntity eventSubProcessParent) {
+        this.pendingEventSubProcessesStartEvents.put(startEvent, eventSubProcessParent);
     }
 
 }
