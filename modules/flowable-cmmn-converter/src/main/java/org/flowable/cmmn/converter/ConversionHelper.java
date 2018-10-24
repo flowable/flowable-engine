@@ -109,7 +109,7 @@ public class ConversionHelper {
         if (hasEntryCriteria != null) {
 
             if (StringUtils.isEmpty(entryCriterion.getId())) {
-                // And id is expected by the evaluation algorithm, so setting an internal one if there isn't one
+                // An id is expected by the evaluation algorithm, so setting an internal one if there isn't one
                 entryCriterion.setId("entryCriterion_" + (hasEntryCriteria.getEntryCriteria().size() + 1));
             }
 
@@ -142,7 +142,7 @@ public class ConversionHelper {
         }
 
         if (StringUtils.isEmpty(exitCriterion.getId())) {
-            // And id is expected by the evaluation algorithm, so setting an internal one if there isn't one
+            // An id is expected by the evaluation algorithm, so setting an internal one if there isn't one
             exitCriterion.setId("exitCriterion_" + (hasExitCriteria.getExitCriteria().size() + 1));
         }
 

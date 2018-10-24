@@ -471,11 +471,13 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_PLAN_DEFINITION_ID, planItemInstanceEntity.getPlanItemDefinitionId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_PLAN_DEFINITION_TYPE, planItemInstanceEntity.getPlanItemDefinitionType());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_START_USER_ID, planItemInstanceEntity.getStartUserId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CREATE_TIME, planItemInstanceEntity.getCreateTime());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REFERENCE_ID, planItemInstanceEntity.getReferenceId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REFERENCE_TYPE, planItemInstanceEntity.getReferenceType());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ENTRY_CRITERION_ID, planItemInstanceEntity.getEntryCriterionId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_EXIT_CRITERION_ID, planItemInstanceEntity.getExitCriterionId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_TENANT_ID, planItemInstanceEntity.getTenantId());
-        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CREATE_TIME, planItemInstanceEntity.getCreateTime());
-        
+
         if (planItemInstanceEntity.getCaseDefinitionId() != null) {
             addCaseDefinitionFields(data, CaseDefinitionUtil.getCaseDefinition(planItemInstanceEntity.getCaseDefinitionId()));
         }
