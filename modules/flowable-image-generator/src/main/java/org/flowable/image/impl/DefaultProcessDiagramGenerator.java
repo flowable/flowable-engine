@@ -68,6 +68,7 @@ import org.flowable.bpmn.model.ThrowEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.image.ProcessDiagramGenerator;
+import org.flowable.bpmn.model.Transaction;
 
 /**
  * Class to generate an image based the diagram interchange information in a BPMN 2.0 process.
@@ -356,6 +357,19 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                     processDiagramCanvas.drawCollapsedSubProcess(flowNode.getName(), graphicInfo, false, scaleFactor);
                 } else {
                     processDiagramCanvas.drawExpandedSubProcess(flowNode.getName(), graphicInfo, false, scaleFactor);
+                }
+            }
+        });
+        // transaction
+        activityDrawInstructions.put(Transaction.class, new ActivityDrawInstruction() {
+
+            @Override
+            public void draw(DefaultProcessDiagramCanvas processDiagramCanvas, BpmnModel bpmnModel, FlowNode flowNode) {
+                GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(flowNode.getId());
+                if (graphicInfo.getExpanded() != null && !graphicInfo.getExpanded()) {
+                    processDiagramCanvas.drawCollapsedSubProcess(flowNode.getName(), graphicInfo, false, scaleFactor);
+                } else {
+                   processDiagramCanvas.drawExpandedSubProcess(flowNode.getName(), graphicInfo, false, scaleFactor);
                 }
             }
         });
