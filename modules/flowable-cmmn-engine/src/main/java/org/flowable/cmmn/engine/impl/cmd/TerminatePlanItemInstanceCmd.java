@@ -12,28 +12,22 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
-import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
  */
-public class EnablePlanItemInstanceCmd extends AbstractNeedsPlanItemInstanceCmd {
+public class TerminatePlanItemInstanceCmd extends AbstractNeedsPlanItemInstanceCmd {
 
-    public EnablePlanItemInstanceCmd(String planItemInstanceId) {
+    public TerminatePlanItemInstanceCmd(String planItemInstanceId) {
         super(planItemInstanceId);
     }
     
     @Override
     protected void internalExecute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        if (!PlanItemInstanceState.AVAILABLE.equals(planItemInstanceEntity.getState())
-                && !PlanItemInstanceState.DISABLED.equals(planItemInstanceEntity.getState())) {
-            throw new FlowableIllegalArgumentException("Can only enable a plan item instance which is in state AVAILABLE or DISABLED");
-        }
-        CommandContextUtil.getAgenda(commandContext).planEnablePlanItemInstanceOperation(planItemInstanceEntity, null);
+        CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity);
     }
     
 }

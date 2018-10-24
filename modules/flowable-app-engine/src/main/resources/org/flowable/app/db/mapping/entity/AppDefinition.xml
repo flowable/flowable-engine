@@ -132,7 +132,7 @@
   <select id="selectLatestAppDefinitionByKeyAndTenantId" parameterType="map" resultMap="appDefinitionResultMap">
     select *
     from ${prefix}ACT_APP_APPDEF 
-    where KEY_ = #{caseDefinitionKey} and
+    where KEY_ = #{appDefinitionKey} and
           TENANT_ID_ = #{tenantId} and
           VERSION_ = (select max(VERSION_) from ${prefix}ACT_APP_APPDEF where KEY_ = #{appDefinitionKey} and TENANT_ID_ = #{tenantId})
   </select>

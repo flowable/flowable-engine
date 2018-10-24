@@ -45,9 +45,9 @@ import org.junit.Test;
  */
 public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
 
-    private static Consumer<HistoricPlanItemInstance> assertCreatedTimeHistoricPlanItemInstance = h -> {
-        assertNotNull(h.getCreatedTime());
-        assertTrue(h.getCreatedTime().getTime() >= 0L);
+    private static Consumer<HistoricPlanItemInstance> assertCreateTimeHistoricPlanItemInstance = h -> {
+        assertNotNull(h.getCreateTime());
+        assertTrue(h.getCreateTime().getTime() >= 0L);
 //        if (!PlanItemInstanceState.WAITING_FOR_REPETITION.equalsIgnoreCase(h.getState())) {
 //            assertNotNull(h.getLastAvailableTime());
 //        }
@@ -55,7 +55,7 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
 
     private static Consumer<HistoricPlanItemInstance> assertStartedTimeHistoricPlanItemInstance = h -> {
         assertNotNull(h.getLastStartedTime());
-        assertTrue(h.getLastStartedTime().getTime() >= h.getCreatedTime().getTime());
+        assertTrue(h.getLastStartedTime().getTime() >= h.getCreateTime().getTime());
     };
 
     private static Consumer<HistoricPlanItemInstance> assertEndedTimeHistoricPlanItemInstance = h -> {
@@ -97,7 +97,7 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
         assertTrue(historicPlanItems.stream().anyMatch(h -> "task".equalsIgnoreCase(h.getPlanItemDefinitionType()) && "planItemTaskA".equalsIgnoreCase(h.getElementId())));
 
         //Check Start timeStamp within the second of its original creation
-        historicPlanItems.forEach(assertCreatedTimeHistoricPlanItemInstance);
+        historicPlanItems.forEach(assertCreateTimeHistoricPlanItemInstance);
         checkHistoryCreateTimestamp(currentPlanItems, historicPlanItems, 1000L);
 
         //Check activation timestamp... for those "live" instances not in "Waiting" state (i.e. AVAILABLE)
@@ -105,7 +105,7 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
         assertFalse(nonWaitingPlanInstanceIds.isEmpty());
         List<HistoricPlanItemInstance> filteredHistoricPlanItemInstances = historicPlanItems.stream().filter(h -> nonWaitingPlanInstanceIds.contains(h.getId())).collect(Collectors.toList());
         assertFalse(filteredHistoricPlanItemInstances.isEmpty());
-        filteredHistoricPlanItemInstances.forEach(assertCreatedTimeHistoricPlanItemInstance
+        filteredHistoricPlanItemInstances.forEach(assertCreateTimeHistoricPlanItemInstance
                 .andThen(assertStartedTimeHistoricPlanItemInstance)
                 .andThen(assertStartedTimeHistoricPlanItemInstance)
                 .andThen(assertStartedStateHistoricPlanItemInstance));
@@ -146,7 +146,7 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
         List<String> livePlanItemInstanceIds = currentPlanItems.stream().map(PlanItemInstance::getId).collect(Collectors.toList());
         assertFalse(livePlanItemInstanceIds.isEmpty());
         filteredHistoricPlanItemInstances = historicPlanItems.stream().filter(h -> !livePlanItemInstanceIds.contains(h.getId())).collect(Collectors.toList());
-        filteredHistoricPlanItemInstances.forEach(assertCreatedTimeHistoricPlanItemInstance
+        filteredHistoricPlanItemInstances.forEach(assertCreateTimeHistoricPlanItemInstance
                 .andThen(assertStartedTimeHistoricPlanItemInstance)
                 .andThen(assertEndedTimeHistoricPlanItemInstance)
                 .andThen(assertEndStateHistoricPlanItemInstance));
@@ -168,7 +168,7 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
         historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).list();
         assertNotNull(historicPlanItems);
         assertEquals(4, historicPlanItems.size());
-        historicPlanItems.forEach(assertCreatedTimeHistoricPlanItemInstance
+        historicPlanItems.forEach(assertCreateTimeHistoricPlanItemInstance
                 .andThen(assertStartedTimeHistoricPlanItemInstance)
                 .andThen(assertEndedTimeHistoricPlanItemInstance)
                 .andThen(assertEndStateHistoricPlanItemInstance)
@@ -230,8 +230,8 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
             assertNull(h.getLastDisabledTime());
             assertNull(h.getLastEnabledTime());
             assertNull(h.getLastSuspendedTime());
-            assertNotNull(h.getCreatedTime());
-            assertTrue(h.getCreatedTime().getTime() <= h.getLastAvailableTime().getTime());
+            assertNotNull(h.getCreateTime());
+            assertTrue(h.getCreateTime().getTime() <= h.getLastAvailableTime().getTime());
             assertTrue(h.getLastAvailableTime().getTime() <= h.getCompletedTime().getTime());
             assertTrue(h.getCompletedTime().getTime() <= h.getEndedTime().getTime());
         });
@@ -262,7 +262,7 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
         checkHistoryCreateTimestamp(currentPlanItems, historicPlanItems, 1000L);
         assertEquals(1, historicPlanItems.stream().filter(h -> PlanItemDefinitionType.STAGE.equalsIgnoreCase(h.getPlanItemDefinitionType()))
                 .filter(h -> PlanItemInstanceState.AVAILABLE.equalsIgnoreCase(h.getState()))
-                .filter(h -> h.getLastAvailableTime() != null && h.getCreatedTime().getTime() <= h.getLastAvailableTime().getTime())
+                .filter(h -> h.getLastAvailableTime() != null && h.getCreateTime().getTime() <= h.getLastAvailableTime().getTime())
                 .count());
 
         //QUERY FOR STAGES
@@ -273,7 +273,7 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
         assertEquals(1, historicPlanItems.size());
         historicPlanItems.forEach(h -> {
             assertNotNull(h.getLastAvailableTime());
-            assertTrue(h.getCreatedTime().getTime() <= h.getLastAvailableTime().getTime());
+            assertTrue(h.getCreateTime().getTime() <= h.getLastAvailableTime().getTime());
         });
 
         //QUERY FOR USER_EVENT_LISTENERS
@@ -284,7 +284,7 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
         assertEquals(2, historicPlanItems.size());
         historicPlanItems.forEach(h -> {
             assertNotNull(h.getLastAvailableTime());
-            assertTrue(h.getCreatedTime().getTime() <= h.getLastAvailableTime().getTime());
+            assertTrue(h.getCreateTime().getTime() <= h.getLastAvailableTime().getTime());
         });
 
         //Fulfill stages entryCriteria - keep date marks for query criteria
@@ -316,7 +316,7 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
         assertEquals(1, historicPlanItems.size());
         historicPlanItems.forEach(h -> {
             assertNotNull(h.getLastStartedTime());
-            assertTrue(h.getCreatedTime().getTime() <= h.getLastAvailableTime().getTime());
+            assertTrue(h.getCreateTime().getTime() <= h.getLastAvailableTime().getTime());
             assertTrue(h.getLastAvailableTime().getTime() <= h.getLastStartedTime().getTime());
         });
 
@@ -331,7 +331,7 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
             assertEquals(PlanItemInstanceState.ACTIVE, h.getState());
             assertNotNull(h.getLastAvailableTime());
             assertNotNull(h.getLastStartedTime());
-            assertTrue(h.getCreatedTime().getTime() <= h.getLastAvailableTime().getTime());
+            assertTrue(h.getCreateTime().getTime() <= h.getLastAvailableTime().getTime());
             assertTrue(h.getLastAvailableTime().getTime() <= h.getLastStartedTime().getTime());
         });
 
@@ -350,7 +350,7 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
             assertNotNull(h.getLastAvailableTime());
             assertNotNull(h.getOccurredTime());
             assertNotNull(h.getEndedTime());
-            assertTrue(h.getCreatedTime().getTime() <= h.getLastAvailableTime().getTime());
+            assertTrue(h.getCreateTime().getTime() <= h.getLastAvailableTime().getTime());
             assertTrue(h.getLastAvailableTime().getTime() <= h.getOccurredTime().getTime());
             assertTrue(h.getOccurredTime().getTime() <= h.getEndedTime().getTime());
         });
@@ -372,7 +372,7 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
         assertNotNull(historicPlanItem.getLastAvailableTime());
         assertNotNull(historicPlanItem.getCompletedTime());
         assertNotNull(historicPlanItem.getEndedTime());
-        assertTrue(historicPlanItem.getCreatedTime().getTime() <= historicPlanItem.getLastAvailableTime().getTime());
+        assertTrue(historicPlanItem.getCreateTime().getTime() <= historicPlanItem.getLastAvailableTime().getTime());
         assertTrue(historicPlanItem.getLastAvailableTime().getTime() <= historicPlanItem.getCompletedTime().getTime());
         assertTrue(historicPlanItem.getCompletedTime().getTime() <= historicPlanItem.getEndedTime().getTime());
 
@@ -406,7 +406,7 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
             assertNotNull(h.getLastAvailableTime());
             assertNotNull(h.getExitTime());
             assertNotNull(h.getEndedTime());
-            assertTrue(h.getCreatedTime().getTime() <= h.getLastAvailableTime().getTime());
+            assertTrue(h.getCreateTime().getTime() <= h.getLastAvailableTime().getTime());
             assertTrue(h.getLastAvailableTime().getTime() <= h.getExitTime().getTime());
             assertTrue(h.getExitTime().getTime() <= h.getEndedTime().getTime());
         });
@@ -462,19 +462,19 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
             return Integer.compare(order1, order2);
         });
 
-        long previousStartTime = 0L;
+        long previousCreateTime = 0L;
         long previousActivateTime = 0L;
         long previousEndTime = 0L;
         for (HistoricPlanItemInstance h : history) {
-            assertCreatedTimeHistoricPlanItemInstance
+            assertCreateTimeHistoricPlanItemInstance
                     .andThen(assertStartedTimeHistoricPlanItemInstance)
                     .andThen(assertEndedTimeHistoricPlanItemInstance)
                     .andThen(assertEndStateHistoricPlanItemInstance)
                     .accept(h);
-            assertTrue(previousStartTime <= h.getCreatedTime().getTime());
+            assertTrue(previousCreateTime <= h.getCreateTime().getTime());
             assertTrue(previousActivateTime <= h.getLastStartedTime().getTime());
             assertTrue(previousEndTime <= h.getEndedTime().getTime());
-            previousStartTime = h.getCreatedTime().getTime();
+            previousCreateTime = h.getCreateTime().getTime();
             previousActivateTime = h.getLastStartedTime().getTime();
             previousEndTime = h.getEndedTime().getTime();
         }
@@ -494,10 +494,10 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
             Optional<Long> createTimestamp = historicPlanItemInstances.stream()
                     .filter(h -> h.getId().equals(p.getId()))
                     .findFirst()
-                    .map(HistoricPlanItemInstance::getCreatedTime)
+                    .map(HistoricPlanItemInstance::getCreateTime)
                     .map(Date::getTime);
             assertTrue(createTimestamp.isPresent());
-            long delta = createTimestamp.orElse(Long.MAX_VALUE) - p.getStartTime().getTime();
+            long delta = createTimestamp.orElse(Long.MAX_VALUE) - p.getCreateTime().getTime();
             assertTrue(delta <= threshold);
         });
     }

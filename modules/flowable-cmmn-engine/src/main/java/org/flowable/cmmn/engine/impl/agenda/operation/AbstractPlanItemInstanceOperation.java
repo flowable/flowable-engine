@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import java.util.Date;
+
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityManager;
@@ -57,6 +59,10 @@ public abstract class AbstractPlanItemInstanceOperation extends CmmnOperation {
                 && planItem.getEntryCriteria().isEmpty()
                 && planItem.getItemControl() != null
                 && planItem.getItemControl().getRepetitionRule() != null;
+    }
+
+    protected Date getCurrentTime(CommandContext commandContext) {
+        return CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime();
     }
     
 }

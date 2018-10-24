@@ -35,7 +35,7 @@ public class PlanItemInstanceResponse {
     protected String state;
     protected boolean stage;
     protected String elementId;
-    protected Date startTime;
+    protected Date createTime;
     protected String startUserId;
     protected String referenceId;
     protected String referenceType;
@@ -148,12 +148,12 @@ public class PlanItemInstanceResponse {
         this.elementId = elementId;
     }
 
-    public Date getStartTime() {
-        return startTime;
+    public Date getCreateTime() {
+        return createTime;
     }
 
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
     public String getStartUserId() {

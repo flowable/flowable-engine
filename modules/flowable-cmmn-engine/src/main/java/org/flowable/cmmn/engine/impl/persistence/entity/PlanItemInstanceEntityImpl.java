@@ -42,11 +42,23 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     protected String planItemDefinitionType;
     protected String name;
     protected String state;
-    protected Date startTime;
+    protected Date createTime;
+    protected Date lastAvailableTime;
+    protected Date lastEnabledTime;
+    protected Date lastDisabledTime;
+    protected Date lastStartedTime;
+    protected Date lastSuspendedTime;
+    protected Date completedTime;
+    protected Date occurredTime;
+    protected Date terminatedTime;
+    protected Date exitTime;
+    protected Date endedTime;
     protected String startUserId;
     protected String referenceId;
     protected String referenceType;
     protected boolean completeable;
+    protected String entryCriterionId;
+    protected String exitCriterionId;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     
     // Counts
@@ -72,11 +84,23 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         persistentState.put("planItemDefinitionType", planItemDefinitionType);
         persistentState.put("name", name);
         persistentState.put("state", state);
-        persistentState.put("startTime", startTime);
+        persistentState.put("createTime", createTime);
+        persistentState.put("lastAvailableTime", lastAvailableTime);
+        persistentState.put("lastEnabledTime", lastEnabledTime);
+        persistentState.put("lastDisabledTime", lastDisabledTime);
+        persistentState.put("lastStartedTime", lastStartedTime);
+        persistentState.put("lastSuspendedTime", lastSuspendedTime);
+        persistentState.put("completedTime", completedTime);
+        persistentState.put("occurredTime", occurredTime);
+        persistentState.put("terminatedTime", terminatedTime);
+        persistentState.put("exitTime", exitTime);
+        persistentState.put("endedTime", endedTime);
         persistentState.put("startUserId", startUserId);
         persistentState.put("referenceId", referenceId);
         persistentState.put("referenceType", referenceType);
         persistentState.put("completeable", completeable);
+        persistentState.put("entryCriterionId", entryCriterionId);
+        persistentState.put("exitCriterionId", exitCriterionId);
         persistentState.put("countEnabled", countEnabled);
         persistentState.put("variableCount", variableCount);
         persistentState.put("sentryPartInstanceCount", sentryPartInstanceCount);
@@ -166,12 +190,109 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         this.state = state;
     }
     @Override
+    public Date getCreateTime() {
+        return createTime;
+    }
+    @Override
     public Date getStartTime() {
-        return startTime;
+        return getCreateTime();
     }
     @Override
     public void setStartTime(Date startTime) {
-        this.startTime = startTime;
+        setCreateTime(startTime);
+    }
+    @Override
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+    @Override
+    public Date getLastAvailableTime() {
+        return lastAvailableTime;
+    }
+    @Override
+    public void setLastAvailableTime(Date lastAvailableTime) {
+        this.lastAvailableTime = lastAvailableTime;
+    }
+    @Override
+    public Date getLastEnabledTime() {
+        return lastEnabledTime;
+    }
+    @Override
+    public void setLastEnabledTime(Date lastEnabledTime) {
+        this.lastEnabledTime = lastEnabledTime;
+    }
+    @Override
+    public Date getLastDisabledTime() {
+        return lastDisabledTime;
+    }
+    @Override
+    public void setLastDisabledTime(Date lastDisabledTime) {
+        this.lastDisabledTime = lastDisabledTime;
+    }
+    @Override
+    public Date getLastStartedTime() {
+        return lastStartedTime;
+    }
+    @Override
+    public void setLastStartedTime(Date lastStartedTime) {
+        this.lastStartedTime = lastStartedTime;
+    }
+    @Override
+    public Date getLastSuspendedTime() {
+        return lastSuspendedTime;
+    }
+    @Override
+    public void setLastSuspendedTime(Date lastSuspendedTime) {
+        this.lastSuspendedTime = lastSuspendedTime;
+    }
+    @Override
+    public Date getCompletedTime() {
+        return completedTime;
+    }
+    @Override
+    public void setCompletedTime(Date completedTime) {
+        this.completedTime = completedTime;
+    }
+    @Override
+    public Date getOccurredTime() {
+        return occurredTime;
+    }
+    @Override
+    public void setOccurredTime(Date occurredTime) {
+        this.occurredTime = occurredTime;
+    }
+    @Override
+    public Date getTerminatedTime() {
+        return terminatedTime;
+    }
+    @Override
+    public void setTerminatedTime(Date terminatedTime) {
+        this.terminatedTime = terminatedTime;
+    }
+    @Override
+    public Date getExitTime() {
+        return exitTime;
+    }
+    @Override
+    public void setExitTime(Date exitTime) {
+        this.exitTime = exitTime;
+    }
+    @Override
+    public Date getEndedTime() {
+        return endedTime;
+    }
+    @Override
+    public void setEndedTime(Date endedTime) {
+        this.endedTime = endedTime;
+    }
+    public void setPlanItem(PlanItem planItem) {
+        this.planItem = planItem;
+    }
+    public PlanItemInstanceEntity getStagePlanItemInstance() {
+        return stagePlanItemInstance;
+    }
+    public void setStagePlanItemInstance(PlanItemInstanceEntity stagePlanItemInstance) {
+        this.stagePlanItemInstance = stagePlanItemInstance;
     }
     @Override
     public String getStartUserId() {
@@ -204,6 +325,22 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     @Override
     public void setCompleteable(boolean completeable) {
         this.completeable = completeable;
+    }
+    @Override
+    public String getEntryCriterionId() {
+        return entryCriterionId;
+    }
+    @Override
+    public void setEntryCriterionId(String entryCriterionId) {
+        this.entryCriterionId = entryCriterionId;
+    }
+    @Override
+    public String getExitCriterionId() {
+        return exitCriterionId;
+    }
+    @Override
+    public void setExitCriterionId(String exitCriterionId) {
+        this.exitCriterionId = exitCriterionId;
     }
     @Override
     public String getTenantId() {

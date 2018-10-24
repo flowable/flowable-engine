@@ -94,12 +94,6 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
         assertThat(integer, instanceOf(Integer.class));
         assertEquals(5, integer);
 
-        //On the other hand the variable with scope local to the planItem instance cannot be found since the instance is not in scope
-        //only through the historyService
-        Map<String, Object> localVariables = cmmnRuntimeService.getLocalVariables(scriptTaskPlanInstanceId);
-        assertNotNull(localVariables);
-        assertTrue(localVariables.isEmpty());
-
         //The planItemInstance scope variable is available on the history service
         List<HistoricVariableInstance> historicVariables = cmmnHistoryService.createHistoricVariableInstanceQuery()
                 .caseInstanceId(caseInstance.getId())

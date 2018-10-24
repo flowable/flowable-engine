@@ -75,7 +75,7 @@ public class StageActivityBehavior extends CoreCmmnTriggerableActivityBehavior i
                     if (PlanItemTransition.TERMINATE.equals(transition)) {
                         CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(childPlanItemInstance);
                     } else if (PlanItemTransition.EXIT.equals(transition)) {
-                        CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(childPlanItemInstance);
+                        CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(childPlanItemInstance, null);
                     }
                 }
             }

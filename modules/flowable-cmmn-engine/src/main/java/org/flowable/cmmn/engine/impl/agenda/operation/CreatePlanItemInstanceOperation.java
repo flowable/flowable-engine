@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItemTransition;
@@ -35,10 +36,14 @@ public class CreatePlanItemInstanceOperation extends AbstractChangePlanItemInsta
             //Or if its the first instance of the repetition, this call sets the counter to 1
             setRepetitionCounter(planItemInstanceEntity, getRepetitionCounter(planItemInstanceEntity) + 1);
         }
-        CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceCreated(planItemInstanceEntity);
-        //Extending classes might override getNewState
+
+        CmmnHistoryManager cmmnHistoryManager = CommandContextUtil.getCmmnHistoryManager(commandContext);
+        cmmnHistoryManager.recordPlanItemInstanceCreated(planItemInstanceEntity);
+
+        //Extending classes might override getNewState, so need to check the available state again
         if (getNewState().equals(PlanItemInstanceState.AVAILABLE)) {
-            CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceAvailable(planItemInstanceEntity);
+            planItemInstanceEntity.setLastAvailableTime(getCurrentTime(commandContext));
+            cmmnHistoryManager.recordPlanItemInstanceAvailable(planItemInstanceEntity);
         }
     }
 

@@ -39,6 +39,7 @@ public class DisablePlanItemInstanceOperation extends AbstractChangePlanItemInst
     
     @Override
     protected void internalExecute() {
+        planItemInstanceEntity.setLastDisabledTime(getCurrentTime(commandContext));
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceDisabled(planItemInstanceEntity);
     }
     

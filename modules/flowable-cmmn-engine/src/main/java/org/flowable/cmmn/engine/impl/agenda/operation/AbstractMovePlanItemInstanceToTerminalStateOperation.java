@@ -24,9 +24,9 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 /**
  * @author Joram Barrez
  */
-public abstract class AbstractDeletePlanItemInstanceOperation extends AbstractChangePlanItemInstanceStateOperation {
+public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation extends AbstractChangePlanItemInstanceStateOperation {
 
-    public AbstractDeletePlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+    public AbstractMovePlanItemInstanceToTerminalStateOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
     }
 
@@ -34,8 +34,7 @@ public abstract class AbstractDeletePlanItemInstanceOperation extends AbstractCh
     public void run() {
         super.run();
         
-        boolean isRepeating = isRepeatingOnDelete();
-        if (isRepeating) {
+        if (isRepeatingOnDelete()) {
 
             // Create new repeating instance
             PlanItemInstanceEntity newPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, true);
@@ -48,11 +47,10 @@ public abstract class AbstractDeletePlanItemInstanceOperation extends AbstractCh
             // Plan item creation "for Repetition"
             CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceForRepetitionOperation(newPlanItemInstanceEntity);
             // Plan item doesn't have entry criteria (checked in the if condition) and immediately goes to ACTIVE
-            CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(newPlanItemInstanceEntity);
+            CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(newPlanItemInstanceEntity, null);
         }
         
         deleteSentryPartInstances();
-        CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).delete(planItemInstanceEntity);
     }
 
     /**
@@ -75,9 +73,13 @@ public abstract class AbstractDeletePlanItemInstanceOperation extends AbstractCh
     }
 
     protected void exitChildPlanItemInstances() {
+        exitChildPlanItemInstances(null);
+    }
+
+    protected void exitChildPlanItemInstances(String exitCriterionId) {
         for (PlanItemInstanceEntity child : planItemInstanceEntity.getChildPlanItemInstances()) {
             if (StateTransition.isPossible(child, PlanItemTransition.EXIT)) {
-                CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(child);
+                CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(child, exitCriterionId);
             }
         }
     }

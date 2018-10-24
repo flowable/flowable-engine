@@ -13,13 +13,21 @@
 package org.flowable.cmmn.api.runtime;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 import org.flowable.common.engine.api.query.Query;
 
 /**
+ * Allows to query for {@link PlanItemInstance}s.
+ *
+ * By default, as with other Flowable runtime API's, only runtime (not ended) plan item instances are returned.
+ * However, {@link PlanItemInstance} entities are only removed once a case instance has ended.
+ * This means that {@link PlanItemInstance} entities can still be queries when the case instance hasn't finished yet.
+ * To return the 'ended' (i.e. completed/terminated/exit/occurred) instances, use the {@link #ended()}
+ * or {@link #includeEnded()} methods.
+ *
+ *
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
@@ -27,7 +35,9 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
 
     PlanItemInstanceQuery caseDefinitionId(String caseDefinitionId);
     PlanItemInstanceQuery caseInstanceId(String caseInstanceId);
+
     PlanItemInstanceQuery stageInstanceId(String stageInstanceId);
+
     PlanItemInstanceQuery planItemInstanceId(String planItemInstanceId);
     PlanItemInstanceQuery planItemInstanceElementId(String elementId);
     PlanItemInstanceQuery planItemInstanceName(String name);
@@ -40,18 +50,51 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
     PlanItemInstanceQuery planItemInstanceStateAvailable();
     PlanItemInstanceQuery planItemInstanceStateCompleted();
     PlanItemInstanceQuery planItemInstanceStateTerminated();
-    PlanItemInstanceQuery planItemInstanceStartedBefore(Date startedBefore);
-    PlanItemInstanceQuery planItemInstanceStartedAfter(Date startedAfer);
+    PlanItemInstanceQuery planItemInstanceCreatedBefore(Date createdBefore);
+    PlanItemInstanceQuery planItemInstanceCreatedAfter(Date createdAfter);
+    PlanItemInstanceQuery planItemInstanceLastAvailableBefore(Date availableBefore);
+    PlanItemInstanceQuery planItemInstanceLastAvailableAfter(Date availableAfter);
+    PlanItemInstanceQuery planItemInstanceLastEnabledBefore(Date enabledBefore);
+    PlanItemInstanceQuery planItemInstanceLastEnabledAfter(Date enabledAfter);
+    PlanItemInstanceQuery planItemInstanceLastDisabledBefore(Date disabledBefore);
+    PlanItemInstanceQuery planItemInstanceLastDisabledAfter(Date disabledAfter);
+    PlanItemInstanceQuery planItemInstanceLastStartedBefore(Date startedBefore);
+    PlanItemInstanceQuery planItemInstanceLastStartedAfter(Date startedAfter);
+    PlanItemInstanceQuery planItemInstanceLastSuspendedBefore(Date suspendedBefore);
+    PlanItemInstanceQuery planItemInstanceLastSuspendedAfter(Date suspendedAfter);
+    PlanItemInstanceQuery planItemInstanceCompletedBefore(Date completedBefore);
+    PlanItemInstanceQuery planItemInstanceCompletedAfter(Date completedAfter);
+    PlanItemInstanceQuery planItemInstanceOccurredBefore(Date occurredBefore);
+    PlanItemInstanceQuery planItemInstanceOccurredAfter(Date occurredAfter);
+    PlanItemInstanceQuery planItemInstanceTerminatedBefore(Date terminatedBefore);
+    PlanItemInstanceQuery planItemInstanceTerminatedAfter(Date terminatedAfter);
+    PlanItemInstanceQuery planItemInstanceExitBefore(Date exitBefore);
+    PlanItemInstanceQuery planItemInstanceExitAfter(Date exitAfter);
+    PlanItemInstanceQuery planItemInstanceEndedBefore(Date endedBefore);
+    PlanItemInstanceQuery planItemInstanceEndedAfter(Date endedAfter);
     PlanItemInstanceQuery planItemInstanceStartUserId(String startUserId);
     PlanItemInstanceQuery planItemInstanceReferenceId(String referenceId);
     PlanItemInstanceQuery planItemInstanceReferenceType(String referenceType);
-    PlanItemInstanceQuery planItemCompleteable();
+    PlanItemInstanceQuery planItemInstanceEntryCriterionId(String entryCriterionId);
+    PlanItemInstanceQuery planItemInstanceExitCriterionId(String exitCriterionId);
+    PlanItemInstanceQuery planItemInstanceCompleteable();
     PlanItemInstanceQuery planItemInstanceTenantId(String tenantId);
     PlanItemInstanceQuery planItemInstanceWithoutTenantId();
     
     PlanItemInstanceQuery planItemDefinitionId(String planItemDefinitionId);
     PlanItemInstanceQuery planItemDefinitionType(String planItemDefinitionType);
     PlanItemInstanceQuery planItemDefinitionTypes(List<String> planItemDefinitionType);
+
+    /**
+     * @return The query will only return ended (completed/terminated/occurred/exited) plan item instances.
+     *         No runtime instances will be returned.
+     */
+    PlanItemInstanceQuery ended();
+
+    /**
+     * @return The query will include both runtime and ended (completed/terminated/occurred/exited) plan item instances.
+     */
+    PlanItemInstanceQuery includeEnded();
     
     /**
      * Only select plan item instances which have a local variable with the given value. The type of variable is determined based on the value. 
@@ -317,7 +360,8 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
      */
     PlanItemInstanceQuery caseVariableNotExists(String name);
     
-    PlanItemInstanceQuery orderByStartTime();
+    PlanItemInstanceQuery orderByCreateTime();
+    PlanItemInstanceQuery orderByEndTime();
     PlanItemInstanceQuery orderByName();
     
 }

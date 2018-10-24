@@ -42,11 +42,15 @@ public interface CmmnRuntimeService {
     void disablePlanItemInstance(String planItemInstanceId);
 
     void completeStagePlanItemInstance(String planItemInstanceId);
+
+    void completeStagePlanItemInstance(String planItemInstanceId, boolean force);
     
     void completeCaseInstance(String caseInstanceId);
     
     void terminateCaseInstance(String caseInstanceId);
-    
+
+    void terminatePlanItemInstance(String planItemInstanceId);
+
     void evaluateCriteria(String caseInstanceId);
 
     void completeUserEventListenerInstance(String userEventListenerInstanceId);

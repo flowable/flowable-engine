@@ -35,7 +35,7 @@ public class AsyncActivatePlanItemInstanceJobHandler implements JobHandler {
     @Override
     public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
         if (variableScope instanceof PlanItemInstanceEntity) {
-            CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation((PlanItemInstanceEntity) variableScope);
+            CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation((PlanItemInstanceEntity) variableScope, configuration); // configuration == entryCriterionId
         } else {
             throw new FlowableException("Invalid usage of " + TYPE + " job handler, variable scope is of type " + variableScope.getClass());
         }

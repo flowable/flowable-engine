@@ -14,7 +14,7 @@
       </sentry>
       <sentry id="sentry2">
         <planItemOnPart id="sentryOnPart2" sourceRef="planItem4">
-          <standardEvent>complete</standardEvent>
+          <standardEvent>occur</standardEvent>
         </planItemOnPart>
       </sentry>
       <stage id="sid-450D06F0-C12D-46D4-9C4B-9738D6BCAE9F" name="Stage one">

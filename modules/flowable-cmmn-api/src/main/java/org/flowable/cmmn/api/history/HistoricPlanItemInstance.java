@@ -16,6 +16,7 @@ import java.util.Date;
 
 /**
  * @author Dennis Federico
+ * @author Joram Barrez
  */
 public interface HistoricPlanItemInstance {
 
@@ -39,7 +40,7 @@ public interface HistoricPlanItemInstance {
 
     String getPlanItemDefinitionType();
 
-    Date getCreatedTime();
+    Date getCreateTime();
 
     Date getLastAvailableTime();
 
@@ -68,6 +69,10 @@ public interface HistoricPlanItemInstance {
     String getReferenceId();
 
     String getReferenceType();
+
+    String getEntryCriterionId();
+
+    String getExitCriterionId();
 
     String getTenantId();
 

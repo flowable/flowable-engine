@@ -419,4 +419,38 @@
         
     </changeSet>
 
+    <changeSet id="7" author="flowable">
+
+        <!-- rename CREATE_TIME to CREATE_TIME to avoid confusion with the start event of CMMN -->
+        <renameColumn tableName="ACT_CMMN_RU_PLAN_ITEM_INST" oldColumnName="START_TIME_" newColumnName="CREATE_TIME_" />
+        <renameColumn tableName="ACT_CMMN_HI_PLAN_ITEM_INST" oldColumnName="CREATED_TIME_" newColumnName="CREATE_TIME_" />
+
+        <addColumn tableName="ACT_CMMN_RU_PLAN_ITEM_INST">
+
+            <column name="LAST_AVAILABLE_TIME_" type="datetime(3)" />
+            <column name="LAST_ENABLED_TIME_" type="datetime(3)" />
+            <column name="LAST_DISABLED_TIME_" type="datetime(3)" />
+            <column name="LAST_STARTED_TIME_" type="datetime(3)" />
+            <column name="LAST_SUSPENDED_TIME_" type="datetime(3)" />
+            <column name="COMPLETED_TIME_" type="datetime(3)" />
+            <column name="OCCURRED_TIME_" type="datetime(3)" />
+            <column name="TERMINATED_TIME_" type="datetime(3)" />
+            <column name="EXIT_TIME_" type="datetime(3)" />
+            <column name="ENDED_TIME_" type="datetime(3)" />
+
+            <column name="ENTRY_CRITERION_ID_" type="varchar(255)" />
+            <column name="EXIT_CRITERION_ID_" type="varchar(255)" />
+
+        </addColumn>
+
+        <addColumn tableName="ACT_CMMN_HI_PLAN_ITEM_INST">
+
+            <column name="ENTRY_CRITERION_ID_" type="varchar(255)" />
+            <column name="EXIT_CRITERION_ID_" type="varchar(255)" />
+
+        </addColumn>
+
+
+    </changeSet>
+
 </databaseChangeLog>
