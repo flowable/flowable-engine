@@ -15,18 +15,12 @@ package org.flowable.engine.test.api.runtime.migration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-<<<<<<< HEAD
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-=======
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
->>>>>>> c2c6fb0989... Process instance migration v2 (#1343)
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.util.IoUtil;
@@ -49,9 +43,6 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         String definitionKey = "MyProcessKey";
         Integer definitionVer = 9;
         String definitionTenantId = "admin";
-<<<<<<< HEAD
-        HashMap activityMappings = new HashMap<String, String>() {
-=======
 
         ActivityMigrationMapping oneToOneMapping = ActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1")
             .withLocalVariable("varForNewActivity1", "varValue")
@@ -65,7 +56,6 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
             .withLocalVariableForAllActivities("var2ForNewActivity2.x", 1234.567);
 
         HashMap<String, Map<String, Object>> activityLocalVariables = new HashMap<String, Map<String, Object>>() {
->>>>>>> c2c6fb0989... Process instance migration v2 (#1343)
 
             {
                 put("newActivity1", new HashMap<String, Object>() {
@@ -121,10 +111,6 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
     public void testSerializeDeSerializeCompleteProcessInstanceMigrationDocumentForDefinitionId() {
 
         String definitionId = "someProcessId";
-<<<<<<< HEAD
-        List<String> instancesIds = Arrays.asList("123", "234", "567");
-        HashMap activityMappings = new HashMap<String, String>() {
-=======
 
         HashMap<String, Object> newActivity2xVars = new HashMap<String, Object>() {
 
@@ -135,7 +121,6 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         };
 
         HashMap<String, Map<String, Object>> activityLocalVariables = new HashMap<String, Map<String, Object>>() {
->>>>>>> c2c6fb0989... Process instance migration v2 (#1343)
 
             {
                 put("newActivity1", new HashMap<String, Object>() {
@@ -265,9 +250,6 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         String definitionKey = "MyProcessKey";
         Integer definitionVer = 5;
         String definitionTenantId = "admin";
-<<<<<<< HEAD
-        HashMap activityMappings = new HashMap<String, String>() {
-=======
         ActivityMigrationMapping.OneToOneMapping oneToOne1 = ActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1");
         ActivityMigrationMapping.OneToOneMapping oneToOne2 = ActivityMigrationMapping.createMappingFor("originalActivity2", "newActivity2");
 
@@ -304,7 +286,6 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
             .withLocalVariable("variableDouble", 12345.6789);
 
         HashMap processInstanceVars = new HashMap<String, Object>() {
->>>>>>> c2c6fb0989... Process instance migration v2 (#1343)
 
             {
                 put("instanceVar1", "stringValue");

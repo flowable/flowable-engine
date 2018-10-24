@@ -60,11 +60,6 @@ import org.osgi.framework.Constants;
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerMethod.class)
 public class BlueprintBasicTest {
-<<<<<<< HEAD
-    
-    private static final String FLOWABLE_VERSION = "6.4.0";
-=======
->>>>>>> 357152e339... flowable-osgi: Use depends-maven-plugin to let BlueprintBasicTest use dependency versions defined in pom.xml
 
     @Inject
     protected BundleContext ctx;
