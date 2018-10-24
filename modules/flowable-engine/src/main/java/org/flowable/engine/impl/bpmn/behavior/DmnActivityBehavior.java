@@ -45,8 +45,10 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
 
     protected static final String EXPRESSION_DECISION_TABLE_REFERENCE_KEY = "decisionTableReferenceKey";
     protected static final String EXPRESSION_DECISION_TABLE_THROW_ERROR_FLAG = "decisionTaskThrowErrorOnNoHits";
+    protected static final String EXPRESSION_DECISION_TABLE_RESPONCE_HANDLER = "decisionTaskReponseHandler";
 
     protected Task task;
+    protected DmnResponseHandler handler;
 
     public DmnActivityBehavior(Task task) {
         this.task = task;
@@ -135,6 +137,39 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
                 }
             }
         }
+        
+		// Call custom decision table response handler if present
+		FieldExtension handlerFieldExtension = DelegateHelper.getFlowElementField(execution,
+				EXPRESSION_DECISION_TABLE_RESPONCE_HANDLER);
+		boolean handlerFound = false;
+		if (handlerFieldExtension != null) {
+			String handlerName = handlerFieldExtension.getStringValue();
+			if (!StringUtils.isBlank(handlerName)) {
+				try {
+					Class<?> handlerClass = Class.forName(handlerName);
+					handler = (DmnResponseHandler) handlerClass.newInstance();
+					handler.handleResponse(execution, decisionExecutionAuditContainer.getDecisionResult(),
+							finaldecisionTableKeyValue);
+					handlerFound = true;
+				} catch (ClassNotFoundException e) {
+					throw new FlowableException(
+							"DMN response handler with reference " + handlerName + " is not found.");
+				} catch (InstantiationException e) {
+					throw new FlowableException(
+							"DMN response handler with reference " + handlerName + " could not be instatiated.");
+				} catch (IllegalAccessException e) {
+					throw new FlowableException(
+							"DMN response handler with reference " + handlerName + " is not accessible.");
+				} catch (ClassCastException e) {
+					throw new FlowableException("DMN response handler with reference " + handlerName
+							+ " is not an instance of DmnResponseHandler.");
+				}
+			}
+		}
+		if (!handlerFound && handler != null) {
+			handler.handleResponse(execution, decisionExecutionAuditContainer.getDecisionResult(),
+					finaldecisionTableKeyValue);
+		}
 
         setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue, execution, processEngineConfiguration.getObjectMapper());
 
