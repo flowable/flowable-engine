@@ -29,6 +29,7 @@ import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
@@ -282,6 +283,8 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
             assertNull(historicPlanItemInstance.getLastSuspendedTime());
             assertNull(historicPlanItemInstance.getExitTime());
             assertNull(historicPlanItemInstance.getTerminatedTime());
+            assertNull(historicPlanItemInstance.getEntryCriterionId());
+            assertNull(historicPlanItemInstance.getExitCriterionId());
             
             if (historicPlanItemInstance.getElementId().equals("planItemTaskA")) {
                 assertNotNull(historicPlanItemInstance.getLastEnabledTime());
@@ -358,6 +361,33 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         assertTrue(historicPlanItemInstance.getLastUpdatedTime().before(completedHistoricPlanItemInstance.getLastUpdatedTime()));
         
         cmmnEngineConfiguration.getClock().reset();
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testCriterionStoredOnPlanItemInstance() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCriterions").start();
+
+        // Executing the tasks triggers the entry criterion
+        Task taskB = cmmnTaskService.createTaskQuery().taskName("B").singleResult();
+        cmmnTaskService.complete(taskB.getId());
+
+        assertEquals(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("C").singleResult().getEntryCriterionId(), "entryA2");
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+
+        HistoricPlanItemInstance planItemInstanceC = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceName("C").singleResult();
+        assertEquals(planItemInstanceC.getEntryCriterionId(), "entryA2");
+        assertNull(planItemInstanceC.getExitCriterionId());
+
+        // Completing  will set the exit criterion
+        UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId());
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        planItemInstanceC = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceName("C").singleResult();
+        assertEquals(planItemInstanceC.getEntryCriterionId(), "entryA2");
+        assertEquals(planItemInstanceC.getExitCriterionId(), "stop");
     }
 
 }

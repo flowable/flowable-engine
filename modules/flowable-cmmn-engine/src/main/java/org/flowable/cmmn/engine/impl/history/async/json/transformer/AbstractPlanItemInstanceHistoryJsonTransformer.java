@@ -38,10 +38,12 @@ public abstract class AbstractPlanItemInstanceHistoryJsonTransformer extends Abs
         historicPlanItemInstanceEntity.setPlanItemDefinitionId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_PLAN_DEFINITION_ID));
         historicPlanItemInstanceEntity.setPlanItemDefinitionType(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_PLAN_DEFINITION_TYPE));
         historicPlanItemInstanceEntity.setStartUserId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_START_USER_ID));
+        historicPlanItemInstanceEntity.setCreateTime(getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_CREATE_TIME));
         historicPlanItemInstanceEntity.setReferenceId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_REFERENCE_ID));
         historicPlanItemInstanceEntity.setReferenceType(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_REFERENCE_TYPE));
+        historicPlanItemInstanceEntity.setEntryCriterionId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_ENTRY_CRITERION_ID));
+        historicPlanItemInstanceEntity.setExitCriterionId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_EXIT_CRITERION_ID));
         historicPlanItemInstanceEntity.setTenantId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_TENANT_ID));
-        historicPlanItemInstanceEntity.setCreateTime(getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_CREATE_TIME));
         historicPlanItemInstanceEntity.setLastUpdatedTime(getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_LAST_UPDATE_TIME));
     }
     
