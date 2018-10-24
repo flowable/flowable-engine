@@ -17,6 +17,7 @@ import java.util.Map;
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.persistence.entity.BpmnEngineEntityConstants;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 
@@ -35,7 +36,11 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
 
     @Override
     public String generateNewProcessInstanceId() {
-        return processEngineConfiguration.getIdGenerator().getNextId();
+        if (processEngineConfiguration.isUsePrefixId()) {
+            return BpmnEngineEntityConstants.BPMN_ENGINE_ID_PREFIX + processEngineConfiguration.getIdGenerator().getNextId();
+        } else {
+            return processEngineConfiguration.getIdGenerator().getNextId();
+        }
     }
 
     @Override

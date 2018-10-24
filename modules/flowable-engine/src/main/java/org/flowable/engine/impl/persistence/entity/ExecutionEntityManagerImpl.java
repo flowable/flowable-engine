@@ -788,7 +788,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
     }
     
     protected void deleteEntityLinks(ExecutionEntity executionEntity, CommandContext commandContext, boolean eventDispatcherEnabled) {
-        if (executionEntity.isProcessInstanceType()) {
+        if (processEngineConfiguration.isEnableEntityLinks() && executionEntity.isProcessInstanceType()) {
             EntityLinkService entityLinkService = CommandContextUtil.getEntityLinkService(commandContext);
             boolean deleteEntityLinks = true;
             if (eventDispatcherEnabled) {

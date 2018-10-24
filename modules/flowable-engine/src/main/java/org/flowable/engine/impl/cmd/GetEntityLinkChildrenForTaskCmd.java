@@ -15,19 +15,18 @@ package org.flowable.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.List;
 
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.identitylink.api.IdentityLinkType;
-import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.entitylink.api.EntityLink;
+import org.flowable.entitylink.api.EntityLinkType;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
- * @author Joram Barrez
- * @author Falko Menge
+ * @author Tijs Rademakers
  */
-public class GetEntityLinkChildrenForTaskCmd implements Command<List<IdentityLink>>, Serializable {
+public class GetEntityLinkChildrenForTaskCmd implements Command<List<EntityLink>>, Serializable {
 
     private static final long serialVersionUID = 1L;
     protected String taskId;
@@ -36,37 +35,10 @@ public class GetEntityLinkChildrenForTaskCmd implements Command<List<IdentityLin
         this.taskId = taskId;
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public List<IdentityLink> execute(CommandContext commandContext) {
+    public List<EntityLink> execute(CommandContext commandContext) {
         TaskEntity task = CommandContextUtil.getTaskService().getTask(taskId);
-
-        List<IdentityLink> identityLinks = (List) task.getIdentityLinks();
-
-        // assignee is not part of identity links in the db.
-        // so if there is one, we add it here.
-        // @Tom: we discussed this long on skype and you agreed ;-)
-        // an assignee *is* an identityLink, and so must it be reflected in the API
-        //
-        // Note: we cant move this code to the TaskEntity (which would be cleaner),
-        // since the task.delete cascaded to all associated identityLinks
-        // and of course this leads to exception while trying to delete a non-existing identityLink
-        if (task.getAssignee() != null) {
-            IdentityLinkEntity identityLink = CommandContextUtil.getIdentityLinkService().createIdentityLink();
-            identityLink.setUserId(task.getAssignee());
-            identityLink.setType(IdentityLinkType.ASSIGNEE);
-            identityLink.setTaskId(task.getId());
-            identityLinks.add(identityLink);
-        }
-        if (task.getOwner() != null) {
-            IdentityLinkEntity identityLink = CommandContextUtil.getIdentityLinkService().createIdentityLink();
-            identityLink.setUserId(task.getOwner());
-            identityLink.setTaskId(task.getId());
-            identityLink.setType(IdentityLinkType.OWNER);
-            identityLinks.add(identityLink);
-        }
-
-        return identityLinks;
+        return CommandContextUtil.getEntityLinkService().findEntityLinksByScopeIdAndType(task.getId(), ScopeTypes.TASK, EntityLinkType.CHILD);
     }
 
 }
