@@ -9,7 +9,7 @@
     <parent>
       <groupId>org.flowable</groupId>
       <artifactId>flowable-ui-admin</artifactId>
-      <version>6.4.0-7</version>
+      <version>6.4.0-8</version>
     </parent>
 
     <properties>
@@ -17,7 +17,7 @@
   		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
   		<!-- Libraries versions -->
-  		<flowable.version>6.4.0-7</flowable.version>
+  		<flowable.version>6.4.0-8</flowable.version>
   		<jetty.version>9.1.3.v20140225</jetty.version>
 
   		<!-- Web container version -->
