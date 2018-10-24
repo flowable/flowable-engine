@@ -644,22 +644,22 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
                 .list();
             assertThat(subProcesses).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "oddFlowTask1", "oddFlowTask3", "evenFlowTask2", "evenFlowTask4", "taskAfter");
             assertThat(subProcesses).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
-        }
 
-        List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-            .processInstanceId(processInstance.getId())
-            .activityType("parallelGateway")
-            .list();
-        //Two flows to join in
-        assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("parallelFork", "parallelJoin", "parallelJoin");
-        assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
-
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(processInstance.getId())
+                .activityType("parallelGateway")
                 .list();
-            assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("userTask1Id", "oddFlowTask1", "oddFlowTask3", "evenFlowTask2", "evenFlowTask4", "taskAfter");
-            assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+            //Two flows to join in
+            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("parallelFork", "parallelJoin", "parallelJoin");
+            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("userTask1Id", "oddFlowTask1", "oddFlowTask3", "evenFlowTask2", "evenFlowTask4", "taskAfter");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+            }
         }
 
         assertProcessEnded(processInstance.getId());
@@ -711,22 +711,22 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
             //Direct Migration
             assertThat(subProcesses).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("oddFlowTask1", "oddFlowTask3", "evenFlowTask4", "taskAfter");
             assertThat(subProcesses).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
-        }
 
-        List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-            .processInstanceId(processInstance.getId())
-            .activityType("parallelGateway")
-            .list();
-        //Two flows to join in, fork was not executed
-        assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("parallelJoin", "parallelJoin");
-        assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
-
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(processInstance.getId())
+                .activityType("parallelGateway")
                 .list();
-            assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("oddFlowTask1", "oddFlowTask3", "evenFlowTask4", "taskAfter");
-            assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+            //Two flows to join in, fork was not executed
+            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("parallelJoin", "parallelJoin");
+            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("oddFlowTask1", "oddFlowTask3", "evenFlowTask4", "taskAfter");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+            }
         }
 
         assertProcessEnded(processInstance.getId());
@@ -772,22 +772,22 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
                 .list();
             assertThat(subProcesses).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "oddFlowTask3", "evenFlowTask2", "evenFlowTask4", "taskAfter");
             assertThat(subProcesses).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
-        }
 
-        List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-            .processInstanceId(processInstance.getId())
-            .activityType("parallelGateway")
-            .list();
-        //Two flows to join in, fork was not executed
-        assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("parallelJoin", "parallelJoin");
-        assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
-
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(processInstance.getId())
+                .activityType("parallelGateway")
                 .list();
-            assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("userTask1Id", "oddFlowTask3", "evenFlowTask2", "evenFlowTask4", "taskAfter");
-            assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+            //Two flows to join in, fork was not executed
+            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("parallelJoin", "parallelJoin");
+            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("userTask1Id", "oddFlowTask3", "evenFlowTask2", "evenFlowTask4", "taskAfter");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+            }
         }
 
         assertProcessEnded(processInstance.getId());
@@ -871,29 +871,29 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
                 .list();
             assertThat(subProcesses).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "oddFlowTask1", "oddFlowTask3", "evenFlowTask2", "evenFlowTask4", "taskAfter");
             assertThat(subProcesses).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
-        }
 
-        List<HistoricActivityInstance> subProcExecution = historyService.createHistoricActivityInstanceQuery()
-            .processInstanceId(processInstance.getId())
-            .activityType("subProcess")
-            .list();
-        assertThat(subProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("subProcess");
-        assertThat(subProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
-
-        List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-            .processInstanceId(processInstance.getId())
-            .activityType("parallelGateway")
-            .list();
-        //Two flows to join in
-        assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("parallelFork", "parallelJoin", "parallelJoin");
-        assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
-
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+            List<HistoricActivityInstance> subProcExecution = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(processInstance.getId())
+                .activityType("subProcess")
                 .list();
-            assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("userTask1Id", "oddFlowTask1", "oddFlowTask3", "evenFlowTask2", "evenFlowTask4", "taskAfter");
-            assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+            assertThat(subProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("subProcess");
+            assertThat(subProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+    
+            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("parallelGateway")
+                .list();
+            //Two flows to join in
+            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("parallelFork", "parallelJoin", "parallelJoin");
+            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+    
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("userTask1Id", "oddFlowTask1", "oddFlowTask3", "evenFlowTask2", "evenFlowTask4", "taskAfter");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+            }
         }
 
         assertProcessEnded(processInstance.getId());
@@ -945,29 +945,29 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
             //Direct Migration
             assertThat(subProcesses).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("oddFlowTask1", "oddFlowTask3", "evenFlowTask4", "taskAfter");
             assertThat(subProcesses).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
-        }
 
-        List<HistoricActivityInstance> subProcExecution = historyService.createHistoricActivityInstanceQuery()
-            .processInstanceId(processInstance.getId())
-            .activityType("subProcess")
-            .list();
-        assertThat(subProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("subProcess");
-        assertThat(subProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
-
-        List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-            .processInstanceId(processInstance.getId())
-            .activityType("parallelGateway")
-            .list();
-        //Two flows to join in, fork was not executed
-        assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("parallelJoin", "parallelJoin");
-        assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
-
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+            List<HistoricActivityInstance> subProcExecution = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(processInstance.getId())
+                .activityType("subProcess")
                 .list();
-            assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("oddFlowTask1", "oddFlowTask3", "evenFlowTask4", "taskAfter");
-            assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+            assertThat(subProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("subProcess");
+            assertThat(subProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+    
+            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("parallelGateway")
+                .list();
+            //Two flows to join in, fork was not executed
+            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("parallelJoin", "parallelJoin");
+            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+    
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("oddFlowTask1", "oddFlowTask3", "evenFlowTask4", "taskAfter");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+            }
         }
 
         assertProcessEnded(processInstance.getId());
@@ -1013,29 +1013,29 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
                 .list();
             assertThat(subProcesses).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "oddFlowTask3", "evenFlowTask2", "evenFlowTask4", "taskAfter");
             assertThat(subProcesses).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
-        }
 
-        List<HistoricActivityInstance> subProcExecution = historyService.createHistoricActivityInstanceQuery()
-            .processInstanceId(processInstance.getId())
-            .activityType("subProcess")
-            .list();
-        assertThat(subProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("subProcess");
-        assertThat(subProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
-
-        List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-            .processInstanceId(processInstance.getId())
-            .activityType("parallelGateway")
-            .list();
-        //Two flows to join in, fork was not executed
-        assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("parallelJoin", "parallelJoin");
-        assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
-
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+            List<HistoricActivityInstance> subProcExecution = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(processInstance.getId())
+                .activityType("subProcess")
                 .list();
-            assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("userTask1Id", "oddFlowTask3", "evenFlowTask2", "evenFlowTask4", "taskAfter");
-            assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+            assertThat(subProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("subProcess");
+            assertThat(subProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+    
+            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("parallelGateway")
+                .list();
+            //Two flows to join in, fork was not executed
+            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("parallelJoin", "parallelJoin");
+            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+    
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("userTask1Id", "oddFlowTask3", "evenFlowTask2", "evenFlowTask4", "taskAfter");
+                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+            }
         }
 
         assertProcessEnded(processInstance.getId());
