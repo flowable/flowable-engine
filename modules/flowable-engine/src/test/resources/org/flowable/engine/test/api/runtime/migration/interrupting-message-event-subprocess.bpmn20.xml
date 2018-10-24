@@ -5,7 +5,7 @@
 
     <message id="myMessage" name="someMessage"/>
 
-    <process id="changeStateForEventSubProcess">
+    <process id="interruptingMessageEventSubProcess">
 
         <startEvent id="theStart"/>
         <sequenceFlow sourceRef="theStart" targetRef="processTask"/>

@@ -6,7 +6,9 @@
     <process id="parallelMultiInstance">
 
         <startEvent id="theStart"/>
-        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="parallelTasks"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="beforeMultiInstance"/>
+        <userTask id="beforeMultiInstance"/>
+        <sequenceFlow sourceRef="beforeMultiInstance" targetRef="parallelTasks"/>
 
         <userTask id="parallelTasks" name="Parallel Task">
             <multiInstanceLoopCharacteristics isSequential="false">

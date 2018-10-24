@@ -49,43 +49,71 @@ public class ChangeActivityStateBuilderImpl implements ChangeActivityStateBuilde
 
     @Override
     public ChangeActivityStateBuilder moveExecutionToActivityId(String executionId, String activityId) {
-        moveExecutionIdList.add(new MoveExecutionIdContainer(executionId, activityId));
+        return moveExecutionToActivityId(executionId, activityId, null);
+    }
+
+    public ChangeActivityStateBuilder moveExecutionToActivityId(String executionId, String activityId, String newAssigneeId) {
+        moveExecutionIdList.add(new MoveExecutionIdContainer(executionId, activityId, newAssigneeId));
         return this;
     }
 
     @Override
     public ChangeActivityStateBuilder moveExecutionsToSingleActivityId(List<String> executionIds, String activityId) {
-        moveExecutionIdList.add(new MoveExecutionIdContainer(executionIds, activityId));
+        return moveExecutionsToSingleActivityId(executionIds, activityId, null);
+    }
+
+    public ChangeActivityStateBuilder moveExecutionsToSingleActivityId(List<String> executionIds, String activityId, String newAssigneeId) {
+        moveExecutionIdList.add(new MoveExecutionIdContainer(executionIds, activityId, newAssigneeId));
         return this;
     }
 
     @Override
     public ChangeActivityStateBuilder moveSingleExecutionToActivityIds(String executionId, List<String> activityIds) {
-        moveExecutionIdList.add(new MoveExecutionIdContainer(executionId, activityIds));
+        return moveSingleExecutionToActivityIds(executionId, activityIds, null);
+    }
+
+    public ChangeActivityStateBuilder moveSingleExecutionToActivityIds(String executionId, List<String> activityIds, String newAssigneeId) {
+        moveExecutionIdList.add(new MoveExecutionIdContainer(executionId, activityIds, newAssigneeId));
         return this;
     }
 
     @Override
     public ChangeActivityStateBuilder moveActivityIdTo(String currentActivityId, String newActivityId) {
-        moveActivityIdList.add(new MoveActivityIdContainer(currentActivityId, newActivityId));
+        return moveActivityIdTo(currentActivityId, newActivityId, null);
+    }
+
+    public ChangeActivityStateBuilder moveActivityIdTo(String currentActivityId, String newActivityId, String newAssigneeId) {
+        moveActivityIdList.add(new MoveActivityIdContainer(currentActivityId, newActivityId, newAssigneeId));
         return this;
     }
 
     @Override
     public ChangeActivityStateBuilder moveActivityIdsToSingleActivityId(List<String> activityIds, String activityId) {
-        moveActivityIdList.add(new MoveActivityIdContainer(activityIds, activityId));
+        return moveActivityIdsToSingleActivityId(activityIds, activityId, null);
+    }
+
+    public ChangeActivityStateBuilder moveActivityIdsToSingleActivityId(List<String> activityIds, String activityId, String newAssigneeId) {
+        moveActivityIdList.add(new MoveActivityIdContainer(activityIds, activityId, newAssigneeId));
         return this;
     }
 
     @Override
     public ChangeActivityStateBuilder moveSingleActivityIdToActivityIds(String currentActivityId, List<String> newActivityIds) {
-        moveActivityIdList.add(new MoveActivityIdContainer(currentActivityId, newActivityIds));
+        return moveSingleActivityIdToActivityIds(currentActivityId, newActivityIds, null);
+    }
+
+    public ChangeActivityStateBuilder moveSingleActivityIdToActivityIds(String currentActivityId, List<String> newActivityIds, String newAssigneeId) {
+        moveActivityIdList.add(new MoveActivityIdContainer(currentActivityId, newActivityIds, newAssigneeId));
         return this;
     }
 
     @Override
     public ChangeActivityStateBuilder moveActivityIdToParentActivityId(String currentActivityId, String newActivityId) {
-        MoveActivityIdContainer moveActivityIdContainer = new MoveActivityIdContainer(currentActivityId, newActivityId);
+        return moveActivityIdToParentActivityId(currentActivityId, newActivityId, null);
+    }
+
+    public ChangeActivityStateBuilder moveActivityIdToParentActivityId(String currentActivityId, String newActivityId, String newAssigneeId) {
+        MoveActivityIdContainer moveActivityIdContainer = new MoveActivityIdContainer(currentActivityId, newActivityId, newAssigneeId);
         moveActivityIdContainer.setMoveToParentProcess(true);
         moveActivityIdList.add(moveActivityIdContainer);
         return this;
@@ -93,7 +121,11 @@ public class ChangeActivityStateBuilderImpl implements ChangeActivityStateBuilde
 
     @Override
     public ChangeActivityStateBuilder moveActivityIdToSubProcessInstanceActivityId(String currentActivityId, String newActivityId, String callActivityId) {
-        MoveActivityIdContainer moveActivityIdContainer = new MoveActivityIdContainer(currentActivityId, newActivityId);
+        return moveActivityIdToSubProcessInstanceActivityId(currentActivityId, newActivityId, callActivityId, null);
+    }
+
+    public ChangeActivityStateBuilder moveActivityIdToSubProcessInstanceActivityId(String currentActivityId, String newActivityId, String callActivityId, String newAssigneeId) {
+        MoveActivityIdContainer moveActivityIdContainer = new MoveActivityIdContainer(currentActivityId, newActivityId, newAssigneeId);
         moveActivityIdContainer.setMoveToSubProcessInstance(true);
         moveActivityIdContainer.setCallActivityId(callActivityId);
         moveActivityIdList.add(moveActivityIdContainer);
