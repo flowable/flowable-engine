@@ -1,5 +1,6 @@
 package org.flowable.job.service.impl.asyncexecutor;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
@@ -28,7 +29,7 @@ public class DefaultDebuggerExecutionExceptionHandler implements AsyncRunnableEx
                         if (exception != null) {
                             LOGGER.info("Debugger exception ", exception);
                             suspendedJobEntity.setExceptionMessage(exception.getMessage());
-                            suspendedJobEntity.setExceptionStacktrace(exception.getStackTrace().toString());
+                            suspendedJobEntity.setExceptionStacktrace(ExceptionUtils.getStackTrace(exception));
                         }
                         return null;
                     }
