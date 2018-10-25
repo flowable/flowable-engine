@@ -125,9 +125,9 @@ public abstract class AbstractFlowableTestCase extends AbstractContentTestCase {
             commandExecutor.execute(config, new Command<Object>() {
                 @Override
                 public Object execute(CommandContext commandContext) {
-                    SchemaManager dbSchemaManager = CommandContextUtil.getContentEngineConfiguration(commandContext).getDbSchemaManager();
-                    dbSchemaManager.schemaDrop();
-                    dbSchemaManager.schemaCreate();
+                    SchemaManager schemaManager = CommandContextUtil.getContentEngineConfiguration(commandContext).getSchemaManager();
+                    schemaManager.schemaDrop();
+                    schemaManager.schemaCreate();
                     return null;
                 }
             });

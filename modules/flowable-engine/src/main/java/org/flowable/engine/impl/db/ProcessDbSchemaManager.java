@@ -86,11 +86,12 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
     @Override
     public void schemaCreate() {
         
-        getCommonDbSchemaManager().schemaCreate();
-        getIdentityLinkDbSchemaManager().schemaCreate();
-        getTaskDbSchemaManager().schemaCreate();
-        getVariableDbSchemaManager().schemaCreate();
-        getJobDbSchemaManager().schemaCreate();
+        getCommonSchemaManager().schemaCreate();
+        getIdentityLinkSchemaManager().schemaCreate();
+        getEntityLinkSchemaManager().schemaCreate();
+        getTaskSchemaManager().schemaCreate();
+        getVariableSchemaManager().schemaCreate();
+        getJobSchemaManager().schemaCreate();
         
         if (isEngineTablePresent()) {
             String dbVersion = getDbVersion();
@@ -128,31 +129,37 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         }
         
         try {
-            getJobDbSchemaManager().schemaDrop();
+            getJobSchemaManager().schemaDrop();
         } catch (Exception e) {
             LOGGER.info("Error dropping job tables", e);
         }
      
         try {
-            getVariableDbSchemaManager().schemaDrop();
+            getVariableSchemaManager().schemaDrop();
         } catch (Exception e) {
             LOGGER.info("Error dropping variable tables", e);
         }
         
         try {
-            getTaskDbSchemaManager().schemaDrop();
+            getTaskSchemaManager().schemaDrop();
         } catch (Exception e) {
             LOGGER.info("Error dropping task tables", e);
         }
         
         try {
-            getIdentityLinkDbSchemaManager().schemaDrop();
+            getIdentityLinkSchemaManager().schemaDrop();
         } catch (Exception e) {
             LOGGER.info("Error dropping identity link tables", e);
         }
         
         try {
-            getCommonDbSchemaManager().schemaDrop();
+            getEntityLinkSchemaManager().schemaDrop();
+        } catch (Exception e) {
+            LOGGER.info("Error dropping entity link tables", e);
+        }
+        
+        try {
+            getCommonSchemaManager().schemaDrop();
         } catch (Exception e) {
             LOGGER.info("Error dropping common tables", e);
         }
@@ -194,11 +201,12 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
             }
         }
         
-        getCommonDbSchemaManager().schemaUpdate();
-        getIdentityLinkDbSchemaManager().schemaUpdate();
-        getTaskDbSchemaManager().schemaUpdate();
-        getVariableDbSchemaManager().schemaUpdate();
-        getJobDbSchemaManager().schemaUpdate();
+        getCommonSchemaManager().schemaUpdate();
+        getIdentityLinkSchemaManager().schemaUpdate();
+        getEntityLinkSchemaManager().schemaUpdate();
+        getTaskSchemaManager().schemaUpdate();
+        getVariableSchemaManager().schemaUpdate();
+        getJobSchemaManager().schemaUpdate();
 
         if (isUpgradeNeeded) {
             dbVersionProperty.setValue(ProcessEngine.VERSION);
@@ -304,12 +312,12 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
             }
 
             // Message returned from MySQL and Oracle
-            if (((exceptionMessage.indexOf("Table") != -1 || exceptionMessage.indexOf("table") != -1)) && (exceptionMessage.indexOf("doesn't exist") != -1)) {
+            if ((exceptionMessage.indexOf("Table") != -1 || exceptionMessage.indexOf("table") != -1) && (exceptionMessage.indexOf("doesn't exist") != -1)) {
                 return true;
             }
 
             // Message returned from Postgres
-            if (((exceptionMessage.indexOf("relation") != -1 || exceptionMessage.indexOf("table") != -1)) && (exceptionMessage.indexOf("does not exist") != -1)) {
+            if ((exceptionMessage.indexOf("relation") != -1 || exceptionMessage.indexOf("table") != -1) && (exceptionMessage.indexOf("does not exist") != -1)) {
                 return true;
             }
         }
@@ -323,24 +331,28 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         }
     }
     
-    protected SchemaManager getCommonDbSchemaManager() {
-        return CommandContextUtil.getProcessEngineConfiguration().getCommonDbSchemaManager();
+    protected SchemaManager getCommonSchemaManager() {
+        return CommandContextUtil.getProcessEngineConfiguration().getCommonSchemaManager();
     }
     
-    protected SchemaManager getIdentityLinkDbSchemaManager() {
-        return CommandContextUtil.getProcessEngineConfiguration().getIdentityLinkDbSchemaManager();
+    protected SchemaManager getIdentityLinkSchemaManager() {
+        return CommandContextUtil.getProcessEngineConfiguration().getIdentityLinkSchemaManager();
     }
     
-    protected SchemaManager getVariableDbSchemaManager() {
-        return CommandContextUtil.getProcessEngineConfiguration().getVariableDbSchemaManager();
+    protected SchemaManager getEntityLinkSchemaManager() {
+        return CommandContextUtil.getProcessEngineConfiguration().getEntityLinkSchemaManager();
     }
     
-    protected SchemaManager getTaskDbSchemaManager() {
-        return CommandContextUtil.getProcessEngineConfiguration().getTaskDbSchemaManager();
+    protected SchemaManager getVariableSchemaManager() {
+        return CommandContextUtil.getProcessEngineConfiguration().getVariableSchemaManager();
     }
     
-    protected SchemaManager getJobDbSchemaManager() {
-        return CommandContextUtil.getProcessEngineConfiguration().getJobDbSchemaManager();
+    protected SchemaManager getTaskSchemaManager() {
+        return CommandContextUtil.getProcessEngineConfiguration().getTaskSchemaManager();
+    }
+    
+    protected SchemaManager getJobSchemaManager() {
+        return CommandContextUtil.getProcessEngineConfiguration().getJobSchemaManager();
     }
     
     @Override

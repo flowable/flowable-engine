@@ -26,28 +26,44 @@ public class MoveActivityIdContainer {
     protected boolean moveToParentProcess;
     protected boolean moveToSubProcessInstance;
     protected String callActivityId;
+    protected String newAssigneeId;
 
     public MoveActivityIdContainer(String singleActivityId, String moveToActivityId) {
+        this(singleActivityId, moveToActivityId, null);
+    }
+
+    public MoveActivityIdContainer(String singleActivityId, String moveToActivityId, String newAssigneeId) {
         this.activityIds = Collections.singletonList(singleActivityId);
         this.moveToActivityIds = Collections.singletonList(moveToActivityId);
+        this.newAssigneeId = newAssigneeId;
     }
 
     public MoveActivityIdContainer(List<String> activityIds, String moveToActivityId) {
+        this(activityIds, moveToActivityId, null);
+    }
+
+    public MoveActivityIdContainer(List<String> activityIds, String moveToActivityId, String newAssigneeId) {
         this.activityIds = activityIds;
         this.moveToActivityIds = Collections.singletonList(moveToActivityId);
+        this.newAssigneeId = newAssigneeId;
     }
 
     public MoveActivityIdContainer(String singleActivityId, List<String> moveToActivityIds) {
+        this(singleActivityId, moveToActivityIds, null);
+    }
+
+    public MoveActivityIdContainer(String singleActivityId, List<String> moveToActivityIds, String newAssigneeId) {
         this.activityIds = Collections.singletonList(singleActivityId);
         this.moveToActivityIds = moveToActivityIds;
+        this.newAssigneeId = newAssigneeId;
     }
 
     public List<String> getActivityIds() {
-        return Optional.ofNullable(activityIds).orElse(Collections.EMPTY_LIST);
+        return Optional.ofNullable(activityIds).orElse(Collections.emptyList());
     }
 
     public List<String> getMoveToActivityIds() {
-        return Optional.ofNullable(moveToActivityIds).orElse(Collections.EMPTY_LIST);
+        return Optional.ofNullable(moveToActivityIds).orElse(Collections.emptyList());
     }
 
     public boolean isMoveToParentProcess() {
@@ -72,5 +88,9 @@ public class MoveActivityIdContainer {
 
     public void setCallActivityId(String callActivityId) {
         this.callActivityId = callActivityId;
+    }
+
+    public Optional<String> getNewAssigneeId() {
+        return Optional.ofNullable(newAssigneeId);
     }
 }

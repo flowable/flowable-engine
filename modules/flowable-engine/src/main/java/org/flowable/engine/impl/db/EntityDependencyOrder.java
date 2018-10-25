@@ -39,6 +39,8 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityIm
 import org.flowable.engine.impl.persistence.entity.PropertyEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntityImpl;
+import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityImpl;
+import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityImpl;
@@ -152,6 +154,8 @@ public class EntityDependencyOrder {
          * FK to Execution
          */
         DELETE_ORDER.add(SignalEventSubscriptionEntityImpl.class);
+        
+        DELETE_ORDER.add(EntityLinkEntityImpl.class);
 
         /*
          * FK to process definition FK to Execution FK to Task
@@ -178,6 +182,8 @@ public class EntityDependencyOrder {
         DELETE_ORDER.add(ProcessDefinitionEntityImpl.class);
 
         // History entities have no FK's
+        
+        DELETE_ORDER.add(HistoricEntityLinkEntityImpl.class);
 
         DELETE_ORDER.add(HistoricIdentityLinkEntityImpl.class);
 

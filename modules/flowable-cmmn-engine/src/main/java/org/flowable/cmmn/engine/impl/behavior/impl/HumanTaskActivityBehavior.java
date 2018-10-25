@@ -24,6 +24,7 @@ import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.EntityLinkUtil;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.api.FlowableException;
@@ -83,6 +84,11 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             handleCandidateGroups(commandContext, planItemInstanceEntity, expressionManager, taskEntity);
 
             CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskCreated(taskEntity);
+            
+            if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isEnableEntityLinks()) {
+                EntityLinkUtil.copyExistingEntityLinks(planItemInstanceEntity.getCaseInstanceId(), taskEntity.getId(), ScopeTypes.TASK);
+                EntityLinkUtil.createNewEntityLink(planItemInstanceEntity.getCaseInstanceId(), taskEntity.getId(), ScopeTypes.TASK);
+            }
 
         } else {
             // if not blocking, treat as a manual task. No need to create a task entry.

@@ -12,8 +12,12 @@
  */
 package org.flowable.cmmn.converter;
 
+import java.util.List;
+
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.converter.util.CmmnXmlUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnElement;
 
@@ -37,6 +41,18 @@ public class CaseXmlConverter extends BaseCmmnXmlConverter {
         Case caze = new Case();
         caze.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
         caze.setInitiatorVariableName(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_INITIATOR_VARIABLE_NAME));
+        
+        String candidateUsersString = CmmnXmlUtil.getAttributeValue(CmmnXmlConstants.ATTRIBUTE_CASE_CANDIDATE_USERS, xtr);
+        if (StringUtils.isNotEmpty(candidateUsersString)) {
+            List<String> candidateUsers = CmmnXmlUtil.parseDelimitedList(candidateUsersString);
+            caze.setCandidateStarterUsers(candidateUsers);
+        }
+
+        String candidateGroupsString = CmmnXmlUtil.getAttributeValue(CmmnXmlConstants.ATTRIBUTE_CASE_CANDIDATE_GROUPS, xtr);
+        if (StringUtils.isNotEmpty(candidateGroupsString)) {
+            List<String> candidateGroups = CmmnXmlUtil.parseDelimitedList(candidateGroupsString);
+            caze.setCandidateStarterGroups(candidateGroups);
+        }
         
         conversionHelper.getCmmnModel().addCase(caze);
         conversionHelper.setCurrentCase(caze);

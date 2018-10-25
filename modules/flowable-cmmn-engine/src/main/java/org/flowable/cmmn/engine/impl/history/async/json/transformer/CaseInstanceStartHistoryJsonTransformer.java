@@ -24,14 +24,17 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDateFromJson;
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * @author Joram Barrez
  */
 public class CaseInstanceStartHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
     @Override
-    public String getType() {
-        return CmmnAsyncHistoryConstants.TYPE_CASE_INSTANCE_START;
+    public List<String> getTypes() {
+        return Collections.singletonList(CmmnAsyncHistoryConstants.TYPE_CASE_INSTANCE_START);
     }
 
     @Override

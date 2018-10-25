@@ -122,9 +122,9 @@ public abstract class InternalFlowableIdmExtension implements AfterEachCallback,
 
                     @Override
                     public Object execute(CommandContext commandContext) {
-                        SchemaManager dbSchemaManager = CommandContextUtil.getIdmEngineConfiguration(commandContext).getDbSchemaManager();
-                        dbSchemaManager.schemaDrop();
-                        dbSchemaManager.schemaCreate();
+                        SchemaManager schemaManager = CommandContextUtil.getIdmEngineConfiguration(commandContext).getSchemaManager();
+                        schemaManager.schemaDrop();
+                        schemaManager.schemaCreate();
                         return null;
                     }
                 });

@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.flowable</groupId>
         <artifactId>flowable-ui-task</artifactId>
-        <version>6.4.0-SNAPSHOT</version>
+        <version>6.4.1-SNAPSHOT</version>
     </parent>
     <artifactId>flowable-ui-task-app</artifactId>
     <packaging>war</packaging>
@@ -423,6 +423,16 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>docker-deps</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+            </dependencies>
         </profile>
         <!-- docker image build and push -->
         <profile>

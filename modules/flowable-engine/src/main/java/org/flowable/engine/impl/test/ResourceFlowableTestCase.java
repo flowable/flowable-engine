@@ -16,8 +16,6 @@ package org.flowable.engine.impl.test;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Tom Baeyens
@@ -25,8 +23,6 @@ import org.slf4j.LoggerFactory;
  */
 @Tag("resource")
 public abstract class ResourceFlowableTestCase extends AbstractFlowableTestCase {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ResourceFlowableTestCase.class);
 
     @RegisterExtension
     protected final ResourceFlowableExtension extension;

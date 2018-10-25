@@ -35,7 +35,7 @@ public class SpringAppConfigurationHelper {
 
         try (GenericXmlApplicationContext applicationContext = new GenericXmlApplicationContext(new UrlResource(resource))) {
             Map<String, AppEngine> beansOfType = applicationContext.getBeansOfType(AppEngine.class);
-            if ((beansOfType == null) || (beansOfType.isEmpty())) {
+            if ((beansOfType == null) || beansOfType.isEmpty()) {
                 throw new FlowableException("no " + AppEngine.class.getName() + " defined in the application context " + resource.toString());
             }
 

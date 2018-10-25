@@ -15,6 +15,7 @@ package org.flowable.engine.test.bpmn.callactivity;
 
 import static org.junit.Assert.assertNotEquals;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -36,10 +38,14 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.entitylink.api.EntityLink;
+import org.flowable.entitylink.api.EntityLinkType;
+import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -51,7 +57,8 @@ import org.junit.jupiter.api.Test;
 public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
 
     @Test
-    @Deployment(resources = { "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml", "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml", 
+                    "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
     public void testCallSimpleSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
 
@@ -59,6 +66,9 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         TaskQuery taskQuery = taskService.createTaskQuery();
         Task taskBeforeSubProcess = taskQuery.singleResult();
         assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
+        
+        Task childTask = taskService.createTaskQuery().processInstanceIdWithChildren(processInstance.getId()).singleResult();
+        assertEquals(taskBeforeSubProcess.getId(), childTask.getId());
 
         // Completing the task continues the process which leads to calling the subprocess
         taskService.complete(taskBeforeSubProcess.getId());
@@ -78,11 +88,94 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
             }
             
         });
+        
+        List<EntityLink> entityLinks = runtimeService.getEntityLinkChildrenForProcessInstance(processInstance.getId());
+        assertEquals(3, entityLinks.size());
+        EntityLink entityLinkSubProcess = null;
+        EntityLink entityLinkTask = null;
+        EntityLink entityLinkSubTask = null;
+        for (EntityLink entityLink : entityLinks) {
+            if (ScopeTypes.TASK.equals(entityLink.getReferenceScopeType())) {
+                if (taskBeforeSubProcess.getId().equals(entityLink.getReferenceScopeId())) {
+                    entityLinkTask = entityLink;
+                } else {
+                    entityLinkSubTask = entityLink;
+                }
+                
+            } else if (ScopeTypes.BPMN.equals(entityLink.getReferenceScopeType())) {
+                entityLinkSubProcess = entityLink;
+            }
+        }
+        assertNotNull(entityLinkSubProcess);
+        assertNotNull(entityLinkTask);
+        assertNotNull(entityLinkSubTask);
+        
+        assertEquals(processInstance.getId(), entityLinkSubProcess.getScopeId());
+        assertEquals(ScopeTypes.BPMN, entityLinkSubProcess.getScopeType());
+        assertNull(entityLinkSubProcess.getScopeDefinitionId());
+        assertEquals(execution.getProcessInstanceId(), entityLinkSubProcess.getReferenceScopeId());
+        assertEquals(ScopeTypes.BPMN, entityLinkSubProcess.getReferenceScopeType());
+        assertNull(entityLinkSubProcess.getReferenceScopeDefinitionId());
+        assertEquals(EntityLinkType.CHILD, entityLinkSubProcess.getLinkType());
+        assertNotNull(entityLinkSubProcess.getCreateTime());
+        
+        assertEquals(processInstance.getId(), entityLinkTask.getScopeId());
+        assertEquals(ScopeTypes.BPMN, entityLinkTask.getScopeType());
+        assertNull(entityLinkTask.getScopeDefinitionId());
+        assertEquals(taskBeforeSubProcess.getId(), entityLinkTask.getReferenceScopeId());
+        assertEquals(ScopeTypes.TASK, entityLinkTask.getReferenceScopeType());
+        assertNull(entityLinkTask.getReferenceScopeDefinitionId());
+        assertEquals(EntityLinkType.CHILD, entityLinkTask.getLinkType());
+        assertNotNull(entityLinkTask.getCreateTime());
+        
+        assertEquals(processInstance.getId(), entityLinkSubTask.getScopeId());
+        assertEquals(ScopeTypes.BPMN, entityLinkSubTask.getScopeType());
+        assertNull(entityLinkSubTask.getScopeDefinitionId());
+        assertEquals(taskInSubProcess.getId(), entityLinkSubTask.getReferenceScopeId());
+        assertEquals(ScopeTypes.TASK, entityLinkSubTask.getReferenceScopeType());
+        assertNull(entityLinkSubTask.getReferenceScopeDefinitionId());
+        assertEquals(EntityLinkType.CHILD, entityLinkSubTask.getLinkType());
+        assertNotNull(entityLinkSubTask.getCreateTime());
+        
+        entityLinks = runtimeService.getEntityLinkChildrenForProcessInstance(execution.getProcessInstanceId());
+        assertEquals(1, entityLinks.size());
+        EntityLink entityLink = entityLinks.get(0);
+        
+        assertEquals(execution.getProcessInstanceId(), entityLink.getScopeId());
+        assertEquals(ScopeTypes.BPMN, entityLink.getScopeType());
+        assertNull(entityLink.getScopeDefinitionId());
+        assertEquals(taskInSubProcess.getId(), entityLink.getReferenceScopeId());
+        assertEquals(ScopeTypes.TASK, entityLink.getReferenceScopeType());
+        assertNull(entityLink.getReferenceScopeDefinitionId());
+        assertEquals(EntityLinkType.CHILD, entityLink.getLinkType());
+        assertNotNull(entityLink.getCreateTime());
+        
+        childTask = taskService.createTaskQuery().processInstanceIdWithChildren(processInstance.getId()).singleResult();
+        assertEquals(taskInSubProcess.getId(), childTask.getId());
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            List<HistoricTaskInstance> childHistoricTasks = historyService.createHistoricTaskInstanceQuery()
+                            .processInstanceIdWithChildren(processInstance.getId())
+                            .list();
+            assertEquals(2, childHistoricTasks.size());
+            List<String> taskIds = new ArrayList<>();
+            for (HistoricTaskInstance task : childHistoricTasks) {
+                taskIds.add(task.getId());
+            }
+            assertTrue(taskIds.contains(taskBeforeSubProcess.getId()));
+            assertTrue(taskIds.contains(taskInSubProcess.getId()));
+        }
+        
+        childTask = taskService.createTaskQuery().processInstanceIdWithChildren(execution.getProcessInstanceId()).singleResult();
+        assertEquals(taskInSubProcess.getId(), childTask.getId());
 
         // Completing the task in the subprocess, finishes the subprocess
         taskService.complete(taskInSubProcess.getId());
         Task taskAfterSubProcess = taskQuery.singleResult();
         assertEquals("Task after subprocess", taskAfterSubProcess.getName());
+        
+        childTask = taskService.createTaskQuery().processInstanceIdWithChildren(processInstance.getId()).singleResult();
+        assertEquals(taskAfterSubProcess.getId(), childTask.getId());
 
         // Completing this task end the process instance
         taskService.complete(taskAfterSubProcess.getId());
@@ -105,6 +198,98 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
                 expectedActivities.remove(act.getActivityId());
             }
             assertTrue("Not all expected activities were found in the history", expectedActivities.isEmpty());
+            
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                List<HistoricEntityLink> historicEntityLinks = historyService.getHistoricEntityLinkChildrenForProcessInstance(processInstance.getId());
+                assertEquals(4, historicEntityLinks.size());
+                HistoricEntityLink historicEntityLinkSubProcess = null;
+                HistoricEntityLink historicEntityLinkTask = null;
+                HistoricEntityLink historicEntityLinkSubTask = null;
+                HistoricEntityLink historicEntityLinkAfterTask = null;
+                for (HistoricEntityLink historicEntityLink : historicEntityLinks) {
+                    if (ScopeTypes.TASK.equals(historicEntityLink.getReferenceScopeType())) {
+                        if (taskBeforeSubProcess.getId().equals(historicEntityLink.getReferenceScopeId())) {
+                            historicEntityLinkTask = historicEntityLink;
+                        } else if (taskAfterSubProcess.getId().equals(historicEntityLink.getReferenceScopeId())) {
+                            historicEntityLinkAfterTask = historicEntityLink;
+                        } else {
+                            historicEntityLinkSubTask = historicEntityLink;
+                        }
+                        
+                    } else if (ScopeTypes.BPMN.equals(historicEntityLink.getReferenceScopeType())) {
+                        historicEntityLinkSubProcess = historicEntityLink;
+                    }
+                }
+                assertNotNull(historicEntityLinkSubProcess);
+                assertNotNull(historicEntityLinkTask);
+                assertNotNull(historicEntityLinkSubTask);
+                
+                assertEquals(processInstance.getId(), historicEntityLinkSubProcess.getScopeId());
+                assertEquals(ScopeTypes.BPMN, historicEntityLinkSubProcess.getScopeType());
+                assertNull(historicEntityLinkSubProcess.getScopeDefinitionId());
+                assertEquals(execution.getProcessInstanceId(), historicEntityLinkSubProcess.getReferenceScopeId());
+                assertEquals(ScopeTypes.BPMN, historicEntityLinkSubProcess.getReferenceScopeType());
+                assertNull(historicEntityLinkSubProcess.getReferenceScopeDefinitionId());
+                assertEquals(EntityLinkType.CHILD, historicEntityLinkSubProcess.getLinkType());
+                assertNotNull(historicEntityLinkSubProcess.getCreateTime());
+                
+                assertEquals(processInstance.getId(), historicEntityLinkTask.getScopeId());
+                assertEquals(ScopeTypes.BPMN, historicEntityLinkTask.getScopeType());
+                assertNull(historicEntityLinkTask.getScopeDefinitionId());
+                assertEquals(taskBeforeSubProcess.getId(), historicEntityLinkTask.getReferenceScopeId());
+                assertEquals(ScopeTypes.TASK, historicEntityLinkTask.getReferenceScopeType());
+                assertNull(historicEntityLinkTask.getReferenceScopeDefinitionId());
+                assertEquals(EntityLinkType.CHILD, historicEntityLinkTask.getLinkType());
+                assertNotNull(historicEntityLinkTask.getCreateTime());
+                
+                assertEquals(processInstance.getId(), historicEntityLinkSubTask.getScopeId());
+                assertEquals(ScopeTypes.BPMN, historicEntityLinkSubTask.getScopeType());
+                assertNull(historicEntityLinkSubTask.getScopeDefinitionId());
+                assertEquals(taskInSubProcess.getId(), historicEntityLinkSubTask.getReferenceScopeId());
+                assertEquals(ScopeTypes.TASK, historicEntityLinkSubTask.getReferenceScopeType());
+                assertNull(historicEntityLinkSubTask.getReferenceScopeDefinitionId());
+                assertEquals(EntityLinkType.CHILD, historicEntityLinkSubTask.getLinkType());
+                assertNotNull(historicEntityLinkSubTask.getCreateTime());
+                
+                assertEquals(processInstance.getId(), historicEntityLinkAfterTask.getScopeId());
+                assertEquals(ScopeTypes.BPMN, historicEntityLinkAfterTask.getScopeType());
+                assertNull(historicEntityLinkAfterTask.getScopeDefinitionId());
+                assertEquals(taskAfterSubProcess.getId(), historicEntityLinkAfterTask.getReferenceScopeId());
+                assertEquals(ScopeTypes.TASK, historicEntityLinkAfterTask.getReferenceScopeType());
+                assertNull(historicEntityLinkAfterTask.getReferenceScopeDefinitionId());
+                assertEquals(EntityLinkType.CHILD, historicEntityLinkAfterTask.getLinkType());
+                assertNotNull(historicEntityLinkAfterTask.getCreateTime());
+                
+                historicEntityLinks = historyService.getHistoricEntityLinkChildrenForProcessInstance(execution.getProcessInstanceId());
+                assertEquals(1, historicEntityLinks.size());
+                HistoricEntityLink historicEntityLink = historicEntityLinks.get(0);
+                
+                assertEquals(execution.getProcessInstanceId(), historicEntityLink.getScopeId());
+                assertEquals(ScopeTypes.BPMN, historicEntityLink.getScopeType());
+                assertNull(historicEntityLink.getScopeDefinitionId());
+                assertEquals(taskInSubProcess.getId(), historicEntityLink.getReferenceScopeId());
+                assertEquals(ScopeTypes.TASK, historicEntityLink.getReferenceScopeType());
+                assertNull(historicEntityLink.getReferenceScopeDefinitionId());
+                assertEquals(EntityLinkType.CHILD, historicEntityLink.getLinkType());
+                assertNotNull(historicEntityLink.getCreateTime());
+                
+                List<HistoricTaskInstance> childHistoricTasks = historyService.createHistoricTaskInstanceQuery()
+                                .processInstanceIdWithChildren(processInstance.getId())
+                                .list();
+                assertEquals(3, childHistoricTasks.size());
+                List<String> taskIds = new ArrayList<>();
+                for (HistoricTaskInstance task : childHistoricTasks) {
+                    taskIds.add(task.getId());
+                }
+                assertTrue(taskIds.contains(taskBeforeSubProcess.getId()));
+                assertTrue(taskIds.contains(taskInSubProcess.getId()));
+                assertTrue(taskIds.contains(taskAfterSubProcess.getId()));
+                
+                HistoricTaskInstance childHistoricTask = historyService.createHistoricTaskInstanceQuery()
+                                .processInstanceIdWithChildren(execution.getProcessInstanceId())
+                                .singleResult();
+                assertEquals(taskInSubProcess.getId(), childHistoricTask.getId());
+            }
         }
     }
 
@@ -115,17 +300,13 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
 
-        // one task in the subprocess should be active after starting the
-        // process
-        // instance
+        // one task in the subprocess should be active after starting the process instance
         TaskQuery taskQuery = taskService.createTaskQuery();
         Task taskBeforeSubProcess = taskQuery.singleResult();
         assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
 
         // Completing the task continues the process which leads to calling the
-        // subprocess. The sub process we want to call is passed in as a
-        // variable
-        // into this task
+        // subprocess. The sub process we want to call is passed in as a variable into this task
         taskService.setVariable(taskBeforeSubProcess.getId(), "simpleSubProcessExpression", "simpleSubProcess");
         taskService.complete(taskBeforeSubProcess.getId());
         Task taskInSubProcess = taskQuery.singleResult();
@@ -150,14 +331,12 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
     public void testSubProcessEndsSuperProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessEndsSuperProcess");
 
-        // one task in the subprocess should be active after starting the
-        // process instance
+        // one task in the subprocess should be active after starting the process instance
         TaskQuery taskQuery = taskService.createTaskQuery();
         Task taskBeforeSubProcess = taskQuery.singleResult();
         assertEquals("Task in subprocess", taskBeforeSubProcess.getName());
 
-        // Completing this task ends the subprocess which leads to the end of
-        // the whole process instance
+        // Completing this task ends the subprocess which leads to the end of the whole process instance
         taskService.complete(taskBeforeSubProcess.getId());
         assertProcessEnded(processInstance.getId());
         assertEquals(0, runtimeService.createExecutionQuery().list().size());
@@ -183,8 +362,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         taskService.complete(taskA.getId());
         assertEquals(1, taskQuery.list().size());
 
-        // Completing the second task should end the subprocess and end the
-        // whole process instance
+        // Completing the second task should end the subprocess and end the whole process instance
         taskService.complete(taskB.getId());
         assertEquals(0, runtimeService.createExecutionQuery().count());
     }
@@ -326,12 +504,10 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertEquals(10l, runtimeService.getVariable(taskInSecondSubProcess.getProcessInstanceId(), "y"));
         assertEquals(10l, taskService.getVariable(taskInSecondSubProcess.getId(), "y"));
 
-        // Completing this task ends the subprocess which leads to a task in the
-        // super process
+        // Completing this task ends the subprocess which leads to a task in the super process
         taskService.complete(taskInSecondSubProcess.getId());
 
-        // one task in the subprocess should be active after starting the
-        // process instance
+        // one task in the subprocess should be active after starting the process instance
         Task taskAfterSecondSubProcess = taskQuery.singleResult();
         assertEquals("Task in super process", taskAfterSecondSubProcess.getName());
         assertEquals(15l, runtimeService.getVariable(taskAfterSecondSubProcess.getProcessInstanceId(), "z"));

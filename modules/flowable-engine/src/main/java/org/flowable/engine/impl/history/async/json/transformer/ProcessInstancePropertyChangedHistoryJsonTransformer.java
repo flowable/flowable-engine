@@ -14,6 +14,9 @@ package org.flowable.engine.impl.history.async.json.transformer;
 
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
@@ -29,8 +32,8 @@ public class ProcessInstancePropertyChangedHistoryJsonTransformer extends Abstra
     public static final String PROPERTY_BUSINESS_KEY = "businessKey";
 
     @Override
-    public String getType() {
-        return HistoryJsonConstants.TYPE_PROCESS_INSTANCE_PROPERTY_CHANGED;
+    public List<String> getTypes() {
+        return Collections.singletonList(HistoryJsonConstants.TYPE_PROCESS_INSTANCE_PROPERTY_CHANGED);
     }
 
     @Override

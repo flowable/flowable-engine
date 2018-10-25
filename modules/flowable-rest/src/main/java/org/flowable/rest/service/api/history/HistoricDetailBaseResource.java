@@ -79,7 +79,7 @@ public class HistoricDetailBaseResource {
         }
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessHistoryDetailInfoWithQuery(query);
+            restApiInterceptor.accessHistoryDetailInfoWithQuery(query, queryRequest);
         }
 
         return paginateList(allRequestParams, queryRequest, query, "processInstanceId", allowedSortProperties,

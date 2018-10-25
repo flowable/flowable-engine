@@ -213,6 +213,8 @@ import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.history.async.json.transformer.ActivityEndHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ActivityFullHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ActivityStartHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.EntityLinkCreatedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.EntityLinkDeletedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.FormPropertiesSubmittedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.HistoricDetailVariableUpdateHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.IdentityLinkCreatedHistoryJsonTransformer;
@@ -317,6 +319,8 @@ import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.migration.ProcessInstanceMigrationManager;
 import org.flowable.engine.parse.BpmnParseHandler;
+import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
+import org.flowable.entitylink.service.impl.db.EntityLinkDbSchemaManager;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.identitylink.service.IdentityLinkEventHandler;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
@@ -484,8 +488,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     
     protected VariableServiceConfiguration variableServiceConfiguration;
     protected IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
+    protected EntityLinkServiceConfiguration entityLinkServiceConfiguration;
     protected TaskServiceConfiguration taskServiceConfiguration;
     protected JobServiceConfiguration jobServiceConfiguration;
+    
+    protected boolean enableEntityLinks;
 
     // DEPLOYERS //////////////////////////////////////////////////////////////////
 
@@ -856,10 +863,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // agenda factory
     protected FlowableEngineAgendaFactory agendaFactory;
 
-    protected SchemaManager identityLinkDbSchemaManager;
-    protected SchemaManager variableDbSchemaManager;
-    protected SchemaManager taskDbSchemaManager;
-    protected SchemaManager jobDbSchemaManager;
+    protected SchemaManager identityLinkSchemaManager;
+    protected SchemaManager entityLinkSchemaManager;
+    protected SchemaManager variableSchemaManager;
+    protected SchemaManager taskSchemaManager;
+    protected SchemaManager jobSchemaManager;
 
     // Backwards compatibility //////////////////////////////////////////////////////////////
 
@@ -978,6 +986,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initFlowable5CompatibilityHandler();
         initVariableServiceConfiguration();
         initIdentityLinkServiceConfiguration();
+        initEntityLinkServiceConfiguration();
         initTaskServiceConfiguration();
         initJobServiceConfiguration();
         initAsyncExecutor();
@@ -1045,44 +1054,51 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initSchemaManager() {
         super.initSchemaManager();
         
-        initProcessDbSchemaManager();
-        initIdentityLinkDbSchemaManager();
-        initVariableDbSchemaManager();
-        initTaskDbSchemaManager();
-        initJobDbSchemaManager();
+        initProcessSchemaManager();
+        initIdentityLinkSchemaManager();
+        initEntityLinkSchemaManager();
+        initVariableSchemaManager();
+        initTaskSchemaManager();
+        initJobSchemaManager();
     }
     
     public void initNonRelationalDataSource() {
         // for subclassing
     }
 
-    protected void initProcessDbSchemaManager() {
+    protected void initProcessSchemaManager() {
         if (this.schemaManager == null) {
             this.schemaManager = new ProcessDbSchemaManager();
         }
     }
 
-    protected void initVariableDbSchemaManager() {
-        if (this.variableDbSchemaManager == null) {
-            this.variableDbSchemaManager = new VariableDbSchemaManager();
+    protected void initVariableSchemaManager() {
+        if (this.variableSchemaManager == null) {
+            this.variableSchemaManager = new VariableDbSchemaManager();
         }
     }
 
-    protected void initTaskDbSchemaManager() {
-        if (this.taskDbSchemaManager == null) {
-            this.taskDbSchemaManager = new TaskDbSchemaManager();
+    protected void initTaskSchemaManager() {
+        if (this.taskSchemaManager == null) {
+            this.taskSchemaManager = new TaskDbSchemaManager();
         }
     }
 
-    protected void initIdentityLinkDbSchemaManager() {
-        if (this.identityLinkDbSchemaManager == null) {
-            this.identityLinkDbSchemaManager = new IdentityLinkDbSchemaManager();
+    protected void initIdentityLinkSchemaManager() {
+        if (this.identityLinkSchemaManager == null) {
+            this.identityLinkSchemaManager = new IdentityLinkDbSchemaManager();
+        }
+    }
+    
+    protected void initEntityLinkSchemaManager() {
+        if (this.entityLinkSchemaManager == null) {
+            this.entityLinkSchemaManager = new EntityLinkDbSchemaManager();
         }
     }
 
-    protected void initJobDbSchemaManager() {
-        if (this.jobDbSchemaManager == null) {
-            this.jobDbSchemaManager = new JobDbSchemaManager();
+    protected void initJobSchemaManager() {
+        if (this.jobSchemaManager == null) {
+            this.jobSchemaManager = new JobDbSchemaManager();
         }
     }
     
@@ -1371,6 +1387,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected IdentityLinkServiceConfiguration instantiateIdentityLinkServiceConfiguration() {
         return new IdentityLinkServiceConfiguration();
+    }
+    
+    public void initEntityLinkServiceConfiguration() {
+        if (this.enableEntityLinks) {
+            this.entityLinkServiceConfiguration = instantiateEntityLinkServiceConfiguration();
+            this.entityLinkServiceConfiguration.setHistoryLevel(this.historyLevel);
+            this.entityLinkServiceConfiguration.setClock(this.clock);
+            this.entityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
+            this.entityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+    
+            this.entityLinkServiceConfiguration.init();
+    
+            addServiceConfiguration(EngineConfigurationConstants.KEY_ENTITY_LINK_SERVICE_CONFIG, this.entityLinkServiceConfiguration);
+        }
+    }
+
+    protected EntityLinkServiceConfiguration instantiateEntityLinkServiceConfiguration() {
+        return new EntityLinkServiceConfiguration();
     }
 
     public void initTaskServiceConfiguration() {
@@ -1902,6 +1936,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         
         historyJsonTransformers.add(new IdentityLinkCreatedHistoryJsonTransformer());
         historyJsonTransformers.add(new IdentityLinkDeletedHistoryJsonTransformer());
+        
+        historyJsonTransformers.add(new EntityLinkCreatedHistoryJsonTransformer());
+        historyJsonTransformers.add(new EntityLinkDeletedHistoryJsonTransformer());
         
         historyJsonTransformers.add(new VariableCreatedHistoryJsonTransformer());
         historyJsonTransformers.add(new VariableUpdatedHistoryJsonTransformer());
@@ -3941,39 +3978,57 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public SchemaManager getVariableDbSchemaManager() {
-        return variableDbSchemaManager;
+    public SchemaManager getVariableSchemaManager() {
+        return variableSchemaManager;
     }
 
-    public ProcessEngineConfigurationImpl setVariableDbSchemaManager(SchemaManager variableDbSchemaManager) {
-        this.variableDbSchemaManager = variableDbSchemaManager;
+    public ProcessEngineConfigurationImpl setVariableSchemaManager(SchemaManager variableSchemaManager) {
+        this.variableSchemaManager = variableSchemaManager;
         return this;
     }
 
-    public SchemaManager getTaskDbSchemaManager() {
-        return taskDbSchemaManager;
+    public SchemaManager getTaskSchemaManager() {
+        return taskSchemaManager;
     }
 
-    public ProcessEngineConfigurationImpl setTaskDbSchemaManager(SchemaManager taskDbSchemaManager) {
-        this.taskDbSchemaManager = taskDbSchemaManager;
+    public ProcessEngineConfigurationImpl setTaskSchemaManager(SchemaManager taskSchemaManager) {
+        this.taskSchemaManager = taskSchemaManager;
         return this;
     }
 
-    public SchemaManager getIdentityLinkDbSchemaManager() {
-        return identityLinkDbSchemaManager;
+    public SchemaManager getIdentityLinkSchemaManager() {
+        return identityLinkSchemaManager;
     }
 
-    public ProcessEngineConfigurationImpl setIdentityLinkDbSchemaManager(SchemaManager identityLinkDbSchemaManager) {
-        this.identityLinkDbSchemaManager = identityLinkDbSchemaManager;
+    public ProcessEngineConfigurationImpl setIdentityLinkSchemaManager(SchemaManager identityLinkSchemaManager) {
+        this.identityLinkSchemaManager = identityLinkSchemaManager;
+        return this;
+    }
+    
+    public SchemaManager getEntityLinkSchemaManager() {
+        return entityLinkSchemaManager;
+    }
+
+    public ProcessEngineConfigurationImpl setEntityLinkSchemaManager(SchemaManager entityLinkSchemaManager) {
+        this.entityLinkSchemaManager = entityLinkSchemaManager;
         return this;
     }
 
-    public SchemaManager getJobDbSchemaManager() {
-        return jobDbSchemaManager;
+    public SchemaManager getJobSchemaManager() {
+        return jobSchemaManager;
     }
 
-    public ProcessEngineConfigurationImpl setJobDbSchemaManager(SchemaManager jobDbSchemaManager) {
-        this.jobDbSchemaManager = jobDbSchemaManager;
+    public ProcessEngineConfigurationImpl setJobSchemaManager(SchemaManager jobSchemaManager) {
+        this.jobSchemaManager = jobSchemaManager;
+        return this;
+    }
+    
+    public boolean isEnableEntityLinks() {
+        return enableEntityLinks;
+    }
+
+    public ProcessEngineConfigurationImpl setEnableEntityLinks(boolean enableEntityLinks) {
+        this.enableEntityLinks = enableEntityLinks;
         return this;
     }
     

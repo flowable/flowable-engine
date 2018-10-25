@@ -40,10 +40,12 @@ public class ProcessInstanceResponse {
     protected boolean ended;
     protected String processDefinitionId;
     protected String processDefinitionUrl;
+    protected String processDefinitionName;
+    protected String processDefinitionDescription;
     protected String activityId;
-    protected String startedBy;
+    protected String startUserId;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
-    protected Date started;
+    protected Date startTime;
     protected List<RestVariable> variables = new ArrayList<>();
     protected String callbackId;
     protected String callbackType;
@@ -121,6 +123,24 @@ public class ProcessInstanceResponse {
     public void setProcessDefinitionUrl(String processDefinitionUrl) {
         this.processDefinitionUrl = processDefinitionUrl;
     }
+    
+    @ApiModelProperty(example = "A process definition name")
+    public String getProcessDefinitionName() {
+        return processDefinitionName;
+    }
+
+    public void setProcessDefinitionName(String processDefinitionName) {
+        this.processDefinitionName = processDefinitionName;
+    }
+
+    @ApiModelProperty(example = "A process definition description")
+    public String getProcessDefinitionDescription() {
+        return processDefinitionDescription;
+    }
+
+    public void setProcessDefinitionDescription(String processDefinitionDescription) {
+        this.processDefinitionDescription = processDefinitionDescription;
+    }
 
     @ApiModelProperty(example = "processTask")
     public String getActivityId() {
@@ -132,21 +152,21 @@ public class ProcessInstanceResponse {
     }
     
     @ApiModelProperty(example = "johnDoe")
-    public String getStartedBy() {
-        return startedBy;
+    public String getStartUserId() {
+        return startUserId;
     }
 
-    public void setStartedBy(String startedBy) {
-        this.startedBy = startedBy;
+    public void setStartUserId(String startUserId) {
+        this.startUserId = startUserId;
     }
 
-    @ApiModelProperty(example = "2018-04-17T10:17:43.902+0000")
-    public Date getStarted() {
-        return started;
+    @ApiModelProperty(example = "2018-04-17T10:17:43.902+0000", dataType = "string")
+    public Date getStartTime() {
+        return startTime;
     }
 
-    public void setStarted(Date started) {
-        this.started = started;
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 
     public List<RestVariable> getVariables() {

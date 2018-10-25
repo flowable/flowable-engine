@@ -16,10 +16,14 @@ package org.flowable.cmmn.rest.service.api.runtime.caze;
 import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryProperty;
@@ -44,6 +48,7 @@ public class BaseCaseInstanceResource {
         allowedSortProperties.put("caseDefinitionId", CaseInstanceQueryProperty.CASE_DEFINITION_ID);
         allowedSortProperties.put("caseDefinitionKey", CaseInstanceQueryProperty.CASE_DEFINITION_KEY);
         allowedSortProperties.put("id", CaseInstanceQueryProperty.CASE_INSTANCE_ID);
+        allowedSortProperties.put("startTime", CaseInstanceQueryProperty.CASE_START_TIME);
         allowedSortProperties.put("tenantId", CaseInstanceQueryProperty.TENANT_ID);
     }
 
@@ -52,6 +57,9 @@ public class BaseCaseInstanceResource {
 
     @Autowired
     protected CmmnRuntimeService runtimeService;
+    
+    @Autowired
+    protected CmmnRepositoryService repositoryService;
     
     @Autowired(required=false)
     protected CmmnRestApiInterceptor restApiInterceptor;
@@ -74,14 +82,14 @@ public class BaseCaseInstanceResource {
             query.caseInstanceBusinessKey(queryRequest.getCaseBusinessKey());
         }
         if (queryRequest.getInvolvedUser() != null) {
-            //query.involvedUser(queryRequest.getInvolvedUser());
+            query.involvedUser(queryRequest.getInvolvedUser());
         }
         if (queryRequest.getCaseInstanceParentId() != null) {
             query.caseInstanceParentId(queryRequest.getCaseInstanceParentId());
         }
         if (queryRequest.getIncludeCaseVariables() != null) {
             if (queryRequest.getIncludeCaseVariables()) {
-                //query.includeCaseVariables();
+                query.includeCaseVariables();
             }
         }
         if (queryRequest.getVariables() != null) {
@@ -101,10 +109,36 @@ public class BaseCaseInstanceResource {
         }
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessCaseInstanceInfoWithQuery(query);
+            restApiInterceptor.accessCaseInstanceInfoWithQuery(query, queryRequest);
         }
 
-        return paginateList(requestParams, queryRequest, query, "id", allowedSortProperties, restResponseFactory::createCaseInstanceResponseList);
+        DataResponse<CaseInstanceResponse> responseList = paginateList(requestParams, queryRequest, query, "id", allowedSortProperties, restResponseFactory::createCaseInstanceResponseList);
+        
+        Set<String> caseDefinitionIds = new HashSet<String>();
+        List<CaseInstanceResponse> caseInstanceList = responseList.getData();
+        for (CaseInstanceResponse caseInstanceResponse : caseInstanceList) {
+            if (!caseDefinitionIds.contains(caseInstanceResponse.getCaseDefinitionId())) {
+                caseDefinitionIds.add(caseInstanceResponse.getCaseDefinitionId());
+            }
+        }
+        
+        if (caseDefinitionIds.size() > 0) {
+            List<CaseDefinition> caseDefinitionList = repositoryService.createCaseDefinitionQuery().caseDefinitionIds(caseDefinitionIds).list();
+            Map<String, CaseDefinition> caseDefinitionMap = new HashMap<String, CaseDefinition>();
+            for (CaseDefinition caseDefinition : caseDefinitionList) {
+                caseDefinitionMap.put(caseDefinition.getId(), caseDefinition);
+            }
+            
+            for (CaseInstanceResponse caseInstanceResponse : caseInstanceList) {
+                if (caseDefinitionMap.containsKey(caseInstanceResponse.getCaseDefinitionId())) {
+                    CaseDefinition caseDefinition = caseDefinitionMap.get(caseInstanceResponse.getCaseDefinitionId());
+                    caseInstanceResponse.setCaseDefinitionName(caseDefinition.getName());
+                    caseInstanceResponse.setCaseDefinitionDescription(caseDefinition.getDescription());
+                }
+            }
+        }
+        
+        return responseList;
     }
     
     protected CaseInstance getCaseInstanceFromRequest(String caseInstanceId) {

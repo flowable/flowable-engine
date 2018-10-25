@@ -37,8 +37,8 @@ angular.module('flowableApp')
         }]);
 
 angular.module('flowableApp')
-    .controller('CaseDetailController', ['$rootScope', '$scope', '$translate', '$http', '$timeout', '$location', '$route', '$modal', '$routeParams', '$popover', 'appResourceRoot', 'TaskService', 'CaseService', 'CommentService', 'RelatedContentService', 'MilestoneService', 'StageService', 'UserEventListenerService',
-        function ($rootScope, $scope, $translate, $http, $timeout, $location, $route, $modal, $routeParams, $popover, appResourceRoot, TaskService, CaseService, CommentService, RelatedContentService, MilestoneService, StageService, UserEventListenerService) {
+    .controller('CaseDetailController', ['$rootScope', '$scope', '$translate', '$http', '$timeout', '$location', '$route', '$modal', '$routeParams', '$popover', 'appResourceRoot', 'TaskService', 'CaseService', 'CommentService', 'RelatedContentService', 'MilestoneService', 'StageService', 'UserEventListenerService', 'PlanItemInstanceService',
+        function ($rootScope, $scope, $translate, $http, $timeout, $location, $route, $modal, $routeParams, $popover, appResourceRoot, TaskService, CaseService, CommentService, RelatedContentService, MilestoneService, StageService, UserEventListenerService, PlanItemInstanceService) {
 
             $rootScope.root.showStartForm = false;
 
@@ -70,12 +70,13 @@ angular.module('flowableApp')
                     $scope.loadCaseInstanceStages();
                     $scope.loadUserEventListeners();
                     $scope.loadCaseInstanceMilestones();
+                    $scope.loadEnabledPlanItemInstances();
                 }).error(function (response, status, headers, config) {
                     console.log('Something went wrong: ' + response);
                 });
             };
 
-            $rootScope.loadCaseTasks = function () {
+            $scope.loadCaseTasks = function () {
 
                 // Runtime tasks
                 TaskService.getCaseInstanceTasks($scope.model.caseInstance.id, false).then(function (response) {
@@ -99,7 +100,7 @@ angular.module('flowableApp')
                 });
             };
 
-            $rootScope.loadCaseInstanceStages = function () {
+            $scope.loadCaseInstanceStages = function () {
 
                 $scope.model.caseHasStages = false;
 
@@ -122,7 +123,7 @@ angular.module('flowableApp')
                 });
             };
 
-            $rootScope.loadCaseInstanceMilestones = function () {
+            $scope.loadCaseInstanceMilestones = function () {
 
                 $scope.model.caseHasMilestones = false;
 
@@ -145,7 +146,7 @@ angular.module('flowableApp')
                 });
             };
 
-            $rootScope.loadUserEventListeners = function () {
+            $scope.loadUserEventListeners = function () {
 
                 $scope.model.hasUserEventListeners = false;
 
@@ -166,6 +167,21 @@ angular.module('flowableApp')
                         $scope.model.caseCompletedUserEventListeners = [];
                     }
                 });
+            };
+
+            $scope.loadEnabledPlanItemInstances = function() {
+
+                $scope.model.hasEnabledPlanItemInstance = false;
+
+                PlanItemInstanceService.getCaseInstanceEnabledPlanItemInstances($scope.model.caseInstance.id).then(function (response) {
+                    if (response.data && response.data.length > 0) {
+                        $scope.model.caseEnabledPlanItemInstances = response.data;
+                        $scope.model.hasEnabledPlanItemInstance = true;
+                    } else {
+                        $scope.model.caseEnabledPlanItemInstances = [];
+                    }
+                });
+
             };
 
             $scope.toggleCreateContent = function () {
@@ -257,6 +273,11 @@ angular.module('flowableApp')
 
             $scope.triggerUserEventListener = function (userEventListener) {
                 UserEventListenerService.triggerCaseInstanceUserEventListener($scope.model.caseInstance.id, userEventListener.id);
+            };
+
+            $scope.startPlanItemInstance = function (planItemInstance) {
+                PlanItemInstanceService.startPlanItemInstance(planItemInstance.caseInstanceId, planItemInstance.id);
+                $route.reload();
             };
 
             $scope.openStartForm = function () {

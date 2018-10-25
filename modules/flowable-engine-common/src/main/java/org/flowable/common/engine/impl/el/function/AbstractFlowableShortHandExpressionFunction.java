@@ -16,7 +16,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.flowable.common.engine.api.FlowableException;
 
@@ -26,7 +25,6 @@ import org.flowable.common.engine.api.FlowableException;
 public abstract class AbstractFlowableShortHandExpressionFunction implements FlowableShortHandExpressionFunction {
 
     protected String variableScopeName;
-    protected List<String> functionNameOptions;
     protected String functionName;
     protected String prefix;
     protected String localName;
@@ -36,11 +34,9 @@ public abstract class AbstractFlowableShortHandExpressionFunction implements Flo
     protected String replacePattern;
     
     /**
-     * @param functionPrefixOptions The list of function prefixes, e.g. variables, vars, var
+     * @param variableScopeName The name of the scoped variable that would be added to the generated function
      * @param functionNameOptions The list of function names, e.g. equals, eq
-     * @param finalFunctionPrefix The prefix to which all the others will be enhanced to
-     * @param finalFunctionName The function name to  which all the others will be enhanced to
-     * @param multiParameterFunction Indicates if the function has multiple (more than one) parameter
+     * @param functionName The function name to which all the others will be enhanced to
      */
     public AbstractFlowableShortHandExpressionFunction(String variableScopeName, List<String> functionNameOptions, String functionName) {
         
@@ -92,7 +88,7 @@ public abstract class AbstractFlowableShortHandExpressionFunction implements Flo
     protected String buildOrWordGroup(List<String> options) {
         StringBuilder strb = new StringBuilder();
         strb.append("(");
-        strb.append(options.stream().collect(Collectors.joining("|")));
+        strb.append(String.join("|", options));
         strb.append(")");
         return strb.toString();
     }

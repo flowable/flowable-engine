@@ -13,6 +13,7 @@
 package org.flowable.app.rest.service;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.DateFormat;
@@ -33,7 +34,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -238,12 +238,9 @@ public class BaseSpringRestTestCase extends TestCase {
             httpResponses.add(response);
             return response;
 
-        } catch (ClientProtocolException e) {
-            Assert.fail(e.getMessage());
         } catch (IOException e) {
-            Assert.fail(e.getMessage());
+            throw new UncheckedIOException(e);
         }
-        return null;
     }
 
     public void closeResponse(CloseableHttpResponse response) {
@@ -251,7 +248,7 @@ public class BaseSpringRestTestCase extends TestCase {
             try {
                 response.close();
             } catch (IOException e) {
-                fail("Could not close http connection");
+                throw new AssertionError("Could not close http connection", e);
             }
         }
     }
@@ -284,9 +281,9 @@ public class BaseSpringRestTestCase extends TestCase {
             commandExecutor.execute(new Command<Object>() {
                 @Override
                 public Object execute(CommandContext commandContext) {
-                    SchemaManager dbSchemaManager = CommandContextUtil.getAppEngineConfiguration(commandContext).getDbSchemaManager();
-                    dbSchemaManager.schemaDrop();
-                    dbSchemaManager.schemaCreate();
+                    SchemaManager schemaManager = CommandContextUtil.getAppEngineConfiguration(commandContext).getSchemaManager();
+                    schemaManager.schemaDrop();
+                    schemaManager.schemaCreate();
                     return null;
                 }
             });

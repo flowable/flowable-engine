@@ -12,6 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.history.async.json.transformer;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -27,8 +30,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class TaskCreatedHistoryJsonTransformer extends AbstractTaskHistoryJsonTransformer {
 
     @Override
-    public String getType() {
-        return CmmnAsyncHistoryConstants.TYPE_TASK_CREATED;
+    public List<String> getTypes() {
+        return Collections.singletonList(CmmnAsyncHistoryConstants.TYPE_TASK_CREATED);
     }
     
     @Override

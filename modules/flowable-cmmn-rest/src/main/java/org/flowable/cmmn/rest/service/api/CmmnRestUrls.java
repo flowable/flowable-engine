@@ -79,6 +79,7 @@ public final class CmmnRestUrls {
     public static final String SEGMENT_IMAGE = "image";
     public static final String SEGMENT_DECISION_TABLES = "decision-tables";
     public static final String SEGMENT_FORM_DEFINITIONS = "form-definitions";
+    public static final String SEGMENT_STAGE_OVERVIEW = "stage-overview";
 
     /**
      * URL template for the deployment collection: <i>cmmn-repository/deployments</i>
@@ -325,6 +326,11 @@ public final class CmmnRestUrls {
      * URL template for a single historic case instance: <i>cmmn-history/historic-case-instances/{0:caseInstanceId}</i>
      */
     public static final String[] URL_HISTORIC_CASE_INSTANCE = { SEGMENT_HISTORY_RESOURCES, SEGMENT_HISTORIC_CASE_INSTANCE_RESOURCE, "{0}" };
+
+    /**
+     * URL template for a single historic case instance stage overview: <i>cmmn-history/historic-case-instances/{0:caseInstanceId}/stage-overview</i>
+     */
+    public static final String[] URL_HISTORIC_CASE_INSTANCE_STAGE_OVERVIEW = { SEGMENT_HISTORY_RESOURCES, SEGMENT_HISTORIC_CASE_INSTANCE_RESOURCE, "{0}", SEGMENT_STAGE_OVERVIEW};
 
     /**
      * URL template for historic process instance query: <i>cmmn-history/historic-case-instances</i>

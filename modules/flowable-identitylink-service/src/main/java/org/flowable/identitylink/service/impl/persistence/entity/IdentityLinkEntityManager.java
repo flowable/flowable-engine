@@ -77,5 +77,7 @@ public interface IdentityLinkEntityManager extends EntityManager<IdentityLinkEnt
     void deleteIdentityLinksByProcessInstanceId(String processInstanceId);
 
     void deleteIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType);
+    
+    void deleteIdentityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType);
 
 }

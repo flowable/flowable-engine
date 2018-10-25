@@ -13,6 +13,13 @@
 
 package org.flowable.cmmn.rest.service.api;
 
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.entity.ContentType;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
@@ -62,13 +69,6 @@ import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.api.history.HistoricVariableInstance;
-
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 /**
  * Default implementation of a {@link CmmnRestResponseFactory}.
@@ -219,6 +219,7 @@ public class CmmnRestResponseFactory {
         response.setName(caseDefinition.getName());
         response.setDescription(caseDefinition.getDescription());
         response.setGraphicalNotationDefined(caseDefinition.hasGraphicalNotation());
+        response.setStartFormDefined(caseDefinition.hasStartFormKey());
         response.setTenantId(caseDefinition.getTenantId());
 
         // Links to other resources
@@ -436,9 +437,15 @@ public class CmmnRestResponseFactory {
         result.setBusinessKey(caseInstance.getBusinessKey());
         result.setId(caseInstance.getId());
         result.setName(caseInstance.getName());
+        result.setStartTime(caseInstance.getStartTime());
+        result.setStartUserId(caseInstance.getStartUserId());
+        result.setState(caseInstance.getState());
         result.setCaseDefinitionId(caseInstance.getCaseDefinitionId());
         result.setCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId()));
         result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId()));
+        result.setParentId(caseInstance.getParentId());
+        result.setCallbackId(caseInstance.getCallbackId());
+        result.setCallbackType(caseInstance.getCallbackType());
         result.setTenantId(caseInstance.getTenantId());
 
         return result;
@@ -450,9 +457,16 @@ public class CmmnRestResponseFactory {
         CaseInstanceResponse result = new CaseInstanceResponse();
         result.setBusinessKey(caseInstance.getBusinessKey());
         result.setId(caseInstance.getId());
+        result.setName(caseInstance.getName());
+        result.setStartTime(caseInstance.getStartTime());
+        result.setStartUserId(caseInstance.getStartUserId());
+        result.setState(caseInstance.getState());
         result.setCaseDefinitionId(caseInstance.getCaseDefinitionId());
         result.setCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId()));
         result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId()));
+        result.setParentId(caseInstance.getParentId());
+        result.setCallbackId(caseInstance.getCallbackId());
+        result.setCallbackType(caseInstance.getCallbackType());
         result.setTenantId(caseInstance.getTenantId());
         result.setCompleted(false);
 
@@ -494,7 +508,7 @@ public class CmmnRestResponseFactory {
         result.setElementId(planItemInstance.getElementId());
         result.setReferenceId(planItemInstance.getReferenceId());
         result.setReferenceType(planItemInstance.getReferenceType());
-        result.setStartTime(planItemInstance.getStartTime());
+        result.setCreateTime(planItemInstance.getCreateTime());
         result.setStartUserId(planItemInstance.getStartUserId());
         result.setStage(planItemInstance.isStage());
         result.setCompleteable(planItemInstance.isCompleteable());
@@ -519,6 +533,7 @@ public class CmmnRestResponseFactory {
     public HistoricCaseInstanceResponse createHistoricCaseInstanceResponse(HistoricCaseInstance caseInstance, RestUrlBuilder urlBuilder) {
         HistoricCaseInstanceResponse result = new HistoricCaseInstanceResponse();
         result.setBusinessKey(caseInstance.getBusinessKey());
+        result.setName(caseInstance.getName());
         result.setEndTime(caseInstance.getEndTime());
         result.setId(caseInstance.getId());
         result.setCaseDefinitionId(caseInstance.getCaseDefinitionId());
@@ -693,7 +708,7 @@ public class CmmnRestResponseFactory {
         result.setElementId(historicPlanItemInstance.getElementId());
         result.setPlanItemDefinitionId(historicPlanItemInstance.getPlanItemDefinitionId());
         result.setPlanItemDefinitionType(historicPlanItemInstance.getPlanItemDefinitionType());
-        result.setCreatedTime(historicPlanItemInstance.getCreatedTime());
+        result.setCreateTime(historicPlanItemInstance.getCreateTime());
         result.setLastAvailableTime(historicPlanItemInstance.getLastAvailableTime());
         result.setLastEnabledTime(historicPlanItemInstance.getLastEnabledTime());
         result.setLastDisabledTime(historicPlanItemInstance.getLastDisabledTime());

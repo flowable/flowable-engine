@@ -76,30 +76,29 @@ public class ProcessTaskJsonConverter extends BaseCmmnJsonConverter implements P
         JsonNode processTaskInParametersNode = CmmnJsonConverterUtil.getProperty(CmmnStencilConstants.PROPERTY_PROCESS_IN_PARAMETERS, elementNode);
         if (processTaskInParametersNode != null && processTaskInParametersNode.has("inParameters") && !processTaskInParametersNode.get("inParameters").isNull()) {
             JsonNode inParametersNode =  processTaskInParametersNode.get("inParameters");
-            List<IOParameter> inParameters = new ArrayList<>();
-            readIOParameter(inParametersNode, inParameters);
-            task.setInParameters(inParameters);
+            task.setInParameters(readIOParameters(inParametersNode));
         }
 
 
         JsonNode processTaskOutParametersNode = CmmnJsonConverterUtil.getProperty(CmmnStencilConstants.PROPERTY_PROCESS_OUT_PARAMETERS, elementNode);
         if (processTaskOutParametersNode != null && processTaskOutParametersNode.has("outParameters") && !processTaskOutParametersNode.get("outParameters").isNull()) {
             JsonNode outParametersNode =  processTaskOutParametersNode.get("outParameters");
-            List<IOParameter> outParameters = new ArrayList<>();
-            readIOParameter(outParametersNode, outParameters);
-            task.setOutParameters(outParameters);
+            task.setOutParameters(readIOParameters(outParametersNode));
         }
         return task;
     }
 
-    private void readIOParameter(JsonNode outParametersNode, List<IOParameter> ioParameters) {
-        for (JsonNode in : outParametersNode){
+    private List<IOParameter> readIOParameters(JsonNode parametersNode) {
+        List<IOParameter> ioParameters = new ArrayList<>();
+        for (JsonNode paramNode : parametersNode){
             IOParameter ioParameter = new IOParameter();
-            ioParameter.setSource(in.get("source").asText());
-            ioParameter.setSourceExpression(in.get("sourceExpression").asText());
-            ioParameter.setTarget(in.get("target").asText());
+            ioParameter.setSource(paramNode.get("source").asText());
+            ioParameter.setSourceExpression(paramNode.get("sourceExpression").asText());
+            ioParameter.setTarget(paramNode.get("target").asText());
+            ioParameter.setTargetExpression(paramNode.get("targetExpression").asText());
             ioParameters.add(ioParameter);
         }
+        return ioParameters;
     }
 
     @Override

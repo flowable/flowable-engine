@@ -16,6 +16,9 @@ import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonU
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getIntegerFromJson;
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
@@ -30,8 +33,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class TaskCreatedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
     @Override
-    public String getType() {
-        return HistoryJsonConstants.TYPE_TASK_CREATED;
+    public List<String> getTypes() {
+        return Collections.singletonList(HistoryJsonConstants.TYPE_TASK_CREATED);
     }
     
     @Override
@@ -70,7 +73,12 @@ public class TaskCreatedHistoryJsonTransformer extends AbstractHistoryJsonTransf
             historicTaskInstance.setDescription(getStringFromJson(historicalData, HistoryJsonConstants.DESCRIPTION));
             historicTaskInstance.setOwner(getStringFromJson(historicalData, HistoryJsonConstants.OWNER));
             historicTaskInstance.setAssignee(getStringFromJson(historicalData, HistoryJsonConstants.ASSIGNEE));
-            historicTaskInstance.setStartTime(getDateFromJson(historicalData, HistoryJsonConstants.START_TIME));
+            if (historicalData.has(HistoryJsonConstants.CREATE_TIME)) {
+                historicTaskInstance.setCreateTime(getDateFromJson(historicalData, HistoryJsonConstants.CREATE_TIME));
+            } else {
+                // For backwards compatibility. New async data uses the CREATE_TIME. This should be removed eventually
+                historicTaskInstance.setCreateTime(getDateFromJson(historicalData, HistoryJsonConstants.START_TIME));
+            }
             historicTaskInstance.setTaskDefinitionKey(getStringFromJson(historicalData, HistoryJsonConstants.TASK_DEFINITION_KEY));
             historicTaskInstance.setTaskDefinitionId(getStringFromJson(historicalData, HistoryJsonConstants.TASK_DEFINITION_ID));
             historicTaskInstance.setPriority(getIntegerFromJson(historicalData, HistoryJsonConstants.PRIORITY));

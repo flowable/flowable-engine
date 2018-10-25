@@ -13,7 +13,9 @@
 package org.flowable.cmmn.engine.impl.history.async.json.transformer;
 
 import java.util.Base64;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
@@ -37,8 +39,8 @@ import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonU
 public class VariableUpdatedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
     @Override
-    public String getType() {
-        return CmmnAsyncHistoryConstants.TYPE_VARIABLE_UPDATED;
+    public List<String> getTypes() {
+        return Collections.singletonList(CmmnAsyncHistoryConstants.TYPE_VARIABLE_UPDATED);
     }
 
     @Override

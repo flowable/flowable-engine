@@ -13,7 +13,13 @@
 
 package org.flowable.cmmn.rest.service.api.runtime;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpStatus;
@@ -34,6 +40,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * Test for all REST-operations related to a single Case instance resource.
  * 
  * @author Tijs Rademakers
+ * @author Filip Hrisafov
  */
 public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
 
@@ -76,6 +83,40 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
 
         url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?caseDefinitionId=anotherId";
         assertResultsPresentInDataResponse(url);
+    }
+
+    /**
+     * Test getting a list of sorted case instance
+     */
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testGetCaseInstancesSorted() throws Exception {
+        Instant initialTime = Instant.now();
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(initialTime));
+        String nowInstanceId = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("now").start().getId();
+
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(initialTime.plus(1, ChronoUnit.HOURS)));
+        String nowPlus1InstanceId = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("nowPlus1").start().getId();
+
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(initialTime.minus(1, ChronoUnit.HOURS)));
+        String nowMinus1InstanceId = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("nowMinus1").start().getId();
+
+        List<String> sortedIds = new ArrayList<>();
+        sortedIds.add(nowInstanceId);
+        sortedIds.add(nowPlus1InstanceId);
+        sortedIds.add(nowMinus1InstanceId);
+        Collections.sort(sortedIds);
+
+        // Test without any parameters
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION);
+        assertResultsExactlyPresentInDataResponse(url, sortedIds.toArray(new String[0]));
+
+        // Sort by start time
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?sort=startTime";
+        assertResultsExactlyPresentInDataResponse(url, nowMinus1InstanceId, nowInstanceId, nowPlus1InstanceId);
+
+        // Sort by start time desc
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?sort=startTime&order=desc";
+        assertResultsExactlyPresentInDataResponse(url, nowPlus1InstanceId, nowInstanceId, nowMinus1InstanceId);
     }
 
     /**

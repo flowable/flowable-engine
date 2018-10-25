@@ -13,10 +13,13 @@
 
 package org.flowable.engine.test.api.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +36,8 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.api.runtime.ProcessInstanceQueryTest;
+import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
@@ -931,6 +936,50 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionCategory("invalid").count());
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().or().processDefinitionCategory(processDefinitionCategory).processDefinitionId("invalid").endOr().list().size());
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().or().processDefinitionCategory(processDefinitionCategory).processDefinitionId("invalid").endOr().count());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testHistoricIdentityLinksForProcessInstance() {
+        Date processInstanceStartTime = new Date();
+        processEngineConfiguration.getClock().setCurrentTime(processInstanceStartTime);
+        identityService.setAuthenticatedUserId("johndoe");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
+
+        List<HistoricIdentityLink> historicIdentityLinks = historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getProcessInstanceId());
+
+        assertThat(historicIdentityLinks).hasSize(1);
+
+        HistoricIdentityLink historicIdentityLink = historicIdentityLinks.get(0);
+        assertThat(historicIdentityLink.getType()).isEqualTo(IdentityLinkType.STARTER);
+        assertThat(historicIdentityLink.getUserId()).isEqualTo("johndoe");
+        assertThat(historicIdentityLink.getCreateTime()).isEqualTo(processInstanceStartTime);
+
+        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
+        assertEquals("johndoe", historicProcessInstance.getStartUserId());
+        assertEquals("theStart", historicProcessInstance.getStartActivityId());
+
+        Date taskCompleteTime = new Date();
+        processEngineConfiguration.getClock().setCurrentTime(taskCompleteTime);
+
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).hasSize(1);
+        taskService.complete(tasks.get(0).getId());
+
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
+
+        historicIdentityLinks = historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getProcessInstanceId());
+
+        assertThat(historicIdentityLinks).hasSize(2);
+
+        historicIdentityLinks.sort(Comparator.comparing(HistoricIdentityLink::getCreateTime));
+
+        historicIdentityLink = historicIdentityLinks.get(1);
+        assertThat(historicIdentityLink.getType()).isEqualTo(IdentityLinkType.PARTICIPANT);
+        assertThat(historicIdentityLink.getUserId()).isEqualTo("johndoe");
+        assertThat(historicIdentityLink.getCreateTime()).isEqualTo(taskCompleteTime);
     }
 
 }

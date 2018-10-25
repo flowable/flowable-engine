@@ -281,7 +281,7 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
         // v4 has no timer
 
         // Deploy v1
-        String deployment1 = repositoryService.createDeployment()
+        repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/engine/test/bpmn/event/timer/StartTimerEventTest.testTimersRecreatedOnDeploymentDelete_v1.bpmn20.xml")
                 .deploy().getId();
 
@@ -357,7 +357,7 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
         String testTenant = "Activiti-tenant";
 
         // Deploy v1
-        String deployment1 = repositoryService.createDeployment()
+        repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/engine/test/bpmn/event/timer/StartTimerEventTest.testTimersRecreatedOnDeploymentDelete_v1.bpmn20.xml")
                 .tenantId(testTenant)
                 .deploy().getId();

@@ -18,5 +18,7 @@ package org.flowable.common.engine.api.scope;
 public interface ScopeTypes {
 
     String APP = "app";
+    String BPMN = "bpmn";
     String CMMN = "cmmn";
+    String TASK = "task";
 }

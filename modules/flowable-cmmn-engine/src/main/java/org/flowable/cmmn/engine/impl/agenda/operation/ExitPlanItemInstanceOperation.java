@@ -21,10 +21,13 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 /**
  * @author Joram Barrez
  */
-public class ExitPlanItemInstanceOperation extends AbstractDeletePlanItemInstanceOperation {
+public class ExitPlanItemInstanceOperation extends AbstractMovePlanItemInstanceToTerminalStateOperation {
+
+    protected String exitCriterionId;
     
-    public ExitPlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+    public ExitPlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, String exitCriterionId) {
         super(commandContext, planItemInstanceEntity);
+        this.exitCriterionId = exitCriterionId;
     }
     
     @Override
@@ -40,8 +43,12 @@ public class ExitPlanItemInstanceOperation extends AbstractDeletePlanItemInstanc
     @Override
     protected void internalExecute() {
         if (isStage(planItemInstanceEntity)) {
-            exitChildPlanItemInstances();
+            exitChildPlanItemInstances(exitCriterionId);
         }
+
+        planItemInstanceEntity.setExitCriterionId(exitCriterionId);
+        planItemInstanceEntity.setEndedTime(getCurrentTime(commandContext));
+        planItemInstanceEntity.setExitTime(planItemInstanceEntity.getEndedTime());
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceExit(planItemInstanceEntity);
     }
 

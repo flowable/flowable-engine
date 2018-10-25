@@ -21,7 +21,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 /**
  * @author Joram Barrez
  */
-public class TerminatePlanItemInstanceOperation extends AbstractDeletePlanItemInstanceOperation {
+public class TerminatePlanItemInstanceOperation extends AbstractMovePlanItemInstanceToTerminalStateOperation {
 
     public TerminatePlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
@@ -44,6 +44,8 @@ public class TerminatePlanItemInstanceOperation extends AbstractDeletePlanItemIn
     
     @Override
     protected void internalExecute() {
+        planItemInstanceEntity.setEndedTime(getCurrentTime(commandContext));
+        planItemInstanceEntity.setTerminatedTime(planItemInstanceEntity.getEndedTime());
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceTerminated(planItemInstanceEntity);
     }
     

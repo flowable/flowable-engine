@@ -761,6 +761,23 @@
       "popular" : true
     }]
   }, {
+      "name" : "displayorderpackage",
+      "properties" : [ {
+        "id" : "displayorder",
+        "type" : "String",
+        "title" : "Display order",
+        "value" : "",
+        "description" : "A number value indicating the order compared to other stages when getting or showing a stage overview.",
+        "popular" : true
+      }, {
+        "id" : "completionneutralrulecondition",
+        "type" : "String",
+        "title" : "Completion neutral Rule",
+        "value" : "",
+        "description" : "An expression that is resolved to determine if the plan item is completion neutral.",
+        "popular" : true
+      }]
+    }, {
     "name": "scriptformatpackage",
     "properties" : [ {
         "id": "scriptformat",
@@ -841,7 +858,8 @@
       "requiredrulepackage",
       "repetitionrulepackage",
       "manualactivationrulepackage",
-      "completionneutralrulepackage"
+      "completionneutralrulepackage",
+      "displayorderpackage"
     ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "StageActivity", "all", "association_start", "association_end" ]

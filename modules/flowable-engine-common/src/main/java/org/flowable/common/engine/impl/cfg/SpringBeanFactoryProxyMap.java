@@ -33,7 +33,7 @@ public class SpringBeanFactoryProxyMap implements Map<Object, Object> {
 
     @Override
     public Object get(Object key) {
-        if ((key == null) || (!String.class.isAssignableFrom(key.getClass()))) {
+        if ((key == null) || !String.class.isAssignableFrom(key.getClass())) {
             return null;
         }
         return beanFactory.getBean((String) key);
@@ -41,7 +41,7 @@ public class SpringBeanFactoryProxyMap implements Map<Object, Object> {
 
     @Override
     public boolean containsKey(Object key) {
-        if ((key == null) || (!String.class.isAssignableFrom(key.getClass()))) {
+        if ((key == null) || !String.class.isAssignableFrom(key.getClass())) {
             return false;
         }
         return beanFactory.containsBean((String) key);

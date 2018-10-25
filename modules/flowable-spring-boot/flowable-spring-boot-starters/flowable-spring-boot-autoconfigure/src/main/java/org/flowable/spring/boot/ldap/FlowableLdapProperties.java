@@ -289,6 +289,17 @@ public class FlowableLdapProperties {
          */
         private String allGroups;
 
+        /**
+         * The query that is executed when searching for a group by groupId.
+         *
+         * <p>
+         *     For example: (&amp;(objectClass=organizationalRole)(cn={0}))
+         * </p>
+         *
+         * The group id will be injected as {0}
+         */
+        private String groupById;
+
         public String getUserById() {
             return userById;
         }
@@ -329,12 +340,21 @@ public class FlowableLdapProperties {
             this.allGroups = allGroups;
         }
 
+        public String getGroupById() {
+            return groupById;
+        }
+
+        public void setGroupById(String groupById) {
+            this.groupById = groupById;
+        }
+
         public void customize(LDAPConfiguration configuration) {
             configuration.setQueryUserByUserId(getUserById());
             configuration.setQueryUserByFullNameLike(getUserByFullNameLike());
             configuration.setQueryAllUsers(getAllUsers());
             configuration.setQueryGroupsForUser(getGroupsForUser());
             configuration.setQueryAllGroups(getAllGroups());
+            configuration.setQueryGroupByGroupId(getGroupById());
         }
     }
 

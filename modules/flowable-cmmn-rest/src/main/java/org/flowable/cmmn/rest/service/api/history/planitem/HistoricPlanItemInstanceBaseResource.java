@@ -37,7 +37,8 @@ public abstract class HistoricPlanItemInstanceBaseResource {
     private static Map<String, QueryProperty> allowedSortProperties = new HashMap<>();
 
     static {
-        allowedSortProperties.put("createdTime", HistoricPlanItemInstanceQueryProperty.CREATED_TIME);
+        allowedSortProperties.put("createTime", HistoricPlanItemInstanceQueryProperty.CREATE_TIME);
+        allowedSortProperties.put("createdTime", HistoricPlanItemInstanceQueryProperty.CREATE_TIME); // backwards compatibility
         allowedSortProperties.put("endedTime", HistoricPlanItemInstanceQueryProperty.ENDED_TIME);
         allowedSortProperties.put("name", HistoricPlanItemInstanceQueryProperty.NAME);
     }
@@ -97,10 +98,10 @@ public abstract class HistoricPlanItemInstanceBaseResource {
         Optional.ofNullable(queryRequest.getEndedAfter()).ifPresent(query::endedAfter);
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessHistoryPlanItemInfoWithQuery(query);
+            restApiInterceptor.accessHistoryPlanItemInfoWithQuery(query, queryRequest);
         }
 
-        return paginateList(allRequestParams, queryRequest, query, "createdTime", allowedSortProperties,
+        return paginateList(allRequestParams, queryRequest, query, "createTime", allowedSortProperties,
             restResponseFactory::createHistoricPlanItemInstanceResponseList);
     }
 

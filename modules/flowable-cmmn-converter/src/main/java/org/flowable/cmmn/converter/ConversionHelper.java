@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CmmnDiEdge;
@@ -103,11 +104,18 @@ public class ConversionHelper {
             CmmnElement cmmnElement = iterator.previous();
             if (cmmnElement instanceof HasEntryCriteria) {
                 hasEntryCriteria = (HasEntryCriteria) cmmnElement;
-                entryCriterion.setAttachedToRefId(cmmnElement.getId());
             }
         }
         if (hasEntryCriteria != null) {
+
+            if (StringUtils.isEmpty(entryCriterion.getId())) {
+                // An id is expected by the evaluation algorithm, so setting an internal one if there isn't one
+                entryCriterion.setId("entryCriterion_" + (hasEntryCriteria.getEntryCriteria().size() + 1));
+            }
+
+            entryCriterion.setAttachedToRefId(hasEntryCriteria.getId());
             hasEntryCriteria.getEntryCriteria().add(entryCriterion);
+
         } else {
             throw new FlowableException("Cannot add an entry criteria " + entryCriterion.getId() + " no matching plan item found to attach it to");
         }
@@ -126,15 +134,20 @@ public class ConversionHelper {
             CmmnElement cmmnElement = iterator.previous();
             if (cmmnElement instanceof HasExitCriteria) {
                 hasExitCriteria = (HasExitCriteria) cmmnElement;
-                exitCriterion.setAttachedToRefId(cmmnElement.getId());
             }
         }
 
-        if (hasExitCriteria != null) {
-            hasExitCriteria.getExitCriteria().add(exitCriterion);
-        } else {
-            getCurrentCase().getPlanModel().getExitCriteria().add(exitCriterion);
+        if (hasExitCriteria == null) {
+            hasExitCriteria = getCurrentCase().getPlanModel();
         }
+
+        if (StringUtils.isEmpty(exitCriterion.getId())) {
+            // An id is expected by the evaluation algorithm, so setting an internal one if there isn't one
+            exitCriterion.setId("exitCriterion_" + (hasExitCriteria.getExitCriteria().size() + 1));
+        }
+
+        exitCriterion.setAttachedToRefId(hasExitCriteria.getId());
+        hasExitCriteria.getExitCriteria().add(exitCriterion);
     }
 
     public void addSentry(Sentry sentry) {

@@ -24,7 +24,6 @@ import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.flowable.cmmn.api.runtime.MilestoneInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
@@ -42,6 +41,7 @@ import org.flowable.ui.common.service.exception.NotFoundException;
 import org.flowable.ui.task.model.runtime.CaseInstanceRepresentation;
 import org.flowable.ui.task.model.runtime.CreateCaseInstanceRepresentation;
 import org.flowable.ui.task.model.runtime.MilestoneRepresentation;
+import org.flowable.ui.task.model.runtime.PlanItemInstanceRepresentation;
 import org.flowable.ui.task.model.runtime.StageRepresentation;
 import org.flowable.ui.task.model.runtime.UserEventListenerRepresentation;
 import org.flowable.ui.task.service.api.UserCache;
@@ -54,6 +54,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 @Service
 @Transactional
@@ -144,7 +145,7 @@ public class FlowableCaseInstanceService {
             .list());
 
         List<StageRepresentation> stageRepresentations = stages.stream()
-            .map(p -> new StageRepresentation(p.getName(), p.getState(), p.getCreatedTime(), p.getEndedTime()))
+            .map(p -> new StageRepresentation(p.getName(), p.getState(), p.getCreateTime(), p.getEndedTime()))
             .collect(Collectors.toList());
 
         return new ResultListDataRepresentation(stageRepresentations);
@@ -176,7 +177,7 @@ public class FlowableCaseInstanceService {
             .list());
 
         List<StageRepresentation> stageRepresentations = stages.stream()
-            .map(p -> new StageRepresentation(p.getName(), p.getState(), p.getCreatedTime(), p.getEndedTime()))
+            .map(p -> new StageRepresentation(p.getName(), p.getState(), p.getCreateTime(), p.getEndedTime()))
             .collect(Collectors.toList());
 
         return new ResultListDataRepresentation(stageRepresentations);
@@ -200,7 +201,7 @@ public class FlowableCaseInstanceService {
             .list());
 
         List<MilestoneRepresentation> milestoneRepresentations = milestones.stream()
-            .map(p -> new MilestoneRepresentation(p.getName(), p.getState(), p.getCreatedTime()))
+            .map(p -> new MilestoneRepresentation(p.getName(), p.getState(), p.getCreateTime()))
             .collect(Collectors.toList());
 
         return new ResultListDataRepresentation(milestoneRepresentations);
@@ -232,7 +233,7 @@ public class FlowableCaseInstanceService {
             .list());
 
         List<MilestoneRepresentation> milestoneRepresentations = milestones.stream()
-            .map(p -> new MilestoneRepresentation(p.getName(), p.getState(), p.getCreatedTime()))
+            .map(p -> new MilestoneRepresentation(p.getName(), p.getState(), p.getCreateTime()))
             .collect(Collectors.toList());
 
         return new ResultListDataRepresentation(milestoneRepresentations);
@@ -333,6 +334,46 @@ public class FlowableCaseInstanceService {
 
         cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId());
 
+    }
+
+    public ResultListDataRepresentation getCaseInstanceEnabledPlanItemInstances(String caseInstanceId) {
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .planItemInstanceState(PlanItemInstanceState.ENABLED)
+            .list();
+
+        List<PlanItemInstanceRepresentation> representations = new ArrayList<>(planItemInstances.size());
+        for (PlanItemInstance planItemInstance : planItemInstances) {
+            PlanItemInstanceRepresentation planItemInstanceRepresentation = new PlanItemInstanceRepresentation();
+            planItemInstanceRepresentation.setId(planItemInstance.getId());
+            planItemInstanceRepresentation.setCaseDefinitionId(planItemInstance.getCaseDefinitionId());
+            planItemInstanceRepresentation.setCaseInstanceId(planItemInstance.getCaseInstanceId());
+            planItemInstanceRepresentation.setStageInstanceId(planItemInstance.getStageInstanceId());
+            planItemInstanceRepresentation.setStage(planItemInstance.isStage());
+            planItemInstanceRepresentation.setElementId(planItemInstance.getElementId());
+            planItemInstanceRepresentation.setPlanItemDefinitionId(planItemInstance.getPlanItemDefinitionId());
+            planItemInstanceRepresentation.setPlanItemDefinitionType(planItemInstance.getPlanItemDefinitionType());
+            planItemInstanceRepresentation.setName(planItemInstance.getName());
+            planItemInstanceRepresentation.setState(planItemInstance.getState());
+            planItemInstanceRepresentation.setCreateTime(planItemInstance.getCreateTime());
+            representations.add(planItemInstanceRepresentation);
+        }
+
+        return new ResultListDataRepresentation(representations);
+    }
+
+    public void startEnabledPlanItemInstance(String caseInstanceId, String planItemInstanceId) {
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .planItemInstanceId(planItemInstanceId)
+            .planItemInstanceState(PlanItemInstanceState.ENABLED)
+            .singleResult();
+
+        if (planItemInstance == null) {
+            throw new NotFoundException("No enabled planitem instance found with id " + planItemInstanceId);
+        }
+
+        cmmnRuntimeService.startPlanItemInstance(planItemInstanceId);
     }
 
     public void deleteCaseInstance(String caseInstanceId) {

@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -52,7 +53,16 @@ public class HistoricProcessInstanceResource extends HistoricProcessInstanceBase
             @ApiResponse(code = 404, message = "Indicates that the historic process instances could not be found.") })
     @GetMapping(value = "/history/historic-process-instances/{processInstanceId}", produces = "application/json")
     public HistoricProcessInstanceResponse getProcessInstance(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
-        return restResponseFactory.createHistoricProcessInstanceResponse(getHistoricProcessInstanceFromRequest(processInstanceId));
+        HistoricProcessInstanceResponse processInstanceResponse = restResponseFactory.createHistoricProcessInstanceResponse(getHistoricProcessInstanceFromRequest(processInstanceId));
+        
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processInstanceResponse.getProcessDefinitionId()).singleResult();
+        
+        if (processDefinition != null) {
+            processInstanceResponse.setProcessDefinitionName(processDefinition.getName());
+            processInstanceResponse.setProcessDefinitionDescription(processDefinition.getDescription());
+        }
+        
+        return processInstanceResponse;
     }
 
     @ApiOperation(value = " Delete a historic process instance", tags = { "History Process" }, nickname = "deleteHistoricProcessInstance")

@@ -24,7 +24,7 @@ public class SchemaOperationsDmnEngineBuild implements Command<Void> {
 
     @Override
     public Void execute(CommandContext commandContext) {
-        ((DmnDbSchemaManager) CommandContextUtil.getDmnEngineConfiguration(commandContext).getDbSchemaManager()).initSchema();
+        ((DmnDbSchemaManager) CommandContextUtil.getDmnEngineConfiguration(commandContext).getSchemaManager()).initSchema();
         return null;
     }
 

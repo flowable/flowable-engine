@@ -27,6 +27,7 @@ import org.flowable.engine.history.NativeHistoricDetailQuery;
 import org.flowable.engine.history.NativeHistoricProcessInstanceQuery;
 import org.flowable.engine.history.ProcessInstanceHistoryLog;
 import org.flowable.engine.history.ProcessInstanceHistoryLogQuery;
+import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -116,6 +117,11 @@ public interface HistoryService {
      * certain process instance, even if the instance is completed as opposed to {@link IdentityLink}s which only exist for active instances.
      */
     List<HistoricIdentityLink> getHistoricIdentityLinksForProcessInstance(String processInstanceId);
+    
+    /**
+     * Retrieves the {@link HistoricEntityLink}s associated with the given process instance.
+     */
+    List<HistoricEntityLink> getHistoricEntityLinkChildrenForProcessInstance(String processInstanceId);
 
     /**
      * Allows to retrieve the {@link ProcessInstanceHistoryLog} for one process instance.

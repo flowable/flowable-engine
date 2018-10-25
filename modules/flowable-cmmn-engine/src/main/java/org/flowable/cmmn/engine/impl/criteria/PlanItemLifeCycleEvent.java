@@ -15,6 +15,8 @@ package org.flowable.cmmn.engine.impl.criteria;
 import org.flowable.cmmn.model.PlanItem;
 
 /**
+ * Internal class used during criteria evaluation.
+ *
  * @author Joram Barrez
  */
 public class PlanItemLifeCycleEvent {

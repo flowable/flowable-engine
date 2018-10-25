@@ -20,6 +20,7 @@ import java.util.Date;
 
 /**
  * @author Dennis Federico
+ * @author Joram Barrez
  */
 public interface HistoricPlanItemInstanceEntity extends Entity, HasRevision, HistoricPlanItemInstance {
 
@@ -44,7 +45,7 @@ public interface HistoricPlanItemInstanceEntity extends Entity, HasRevision, His
 
     void setPlanItemDefinitionType(String planItemDefinitionType);
 
-    void setCreatedTime(Date createdTime);
+    void setCreateTime(Date createTime);
 
     void setLastAvailableTime(Date availableTime);
 
@@ -73,6 +74,10 @@ public interface HistoricPlanItemInstanceEntity extends Entity, HasRevision, His
     void setReferenceId(String referenceId);
 
     void setReferenceType(String referenceType);
+
+    void setEntryCriterionId(String entryCriterionId);
+
+    void setExitCriterionId(String exitCriterionId);
 
     void setTenantId(String tenantId);
 

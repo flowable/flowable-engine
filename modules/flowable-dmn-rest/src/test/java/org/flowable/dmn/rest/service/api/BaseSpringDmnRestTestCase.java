@@ -204,7 +204,7 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
             try {
                 response.close();
             } catch (IOException e) {
-                fail("Could not close http connection");
+                throw new AssertionError("Could not close http connection", e);
             }
         }
     }

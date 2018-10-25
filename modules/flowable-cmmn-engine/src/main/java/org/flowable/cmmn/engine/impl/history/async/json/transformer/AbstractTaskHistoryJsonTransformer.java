@@ -46,7 +46,12 @@ public abstract class AbstractTaskHistoryJsonTransformer extends AbstractHistory
         historicTaskInstanceEntity.setDescription(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_DESCRIPTION));
         historicTaskInstanceEntity.setOwner(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_OWNER));
         historicTaskInstanceEntity.setAssignee(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_ASSIGNEE));
-        historicTaskInstanceEntity.setStartTime(getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_START_TIME));
+        if (historicalData.has(CmmnAsyncHistoryConstants.FIELD_CREATE_TIME)) {
+            historicTaskInstanceEntity.setCreateTime(getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_CREATE_TIME));
+        } else {
+            // For backwards compatibility. New async data uses the FIELD_CREATE_TIME. This should be removed eventually
+            historicTaskInstanceEntity.setCreateTime(getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_START_TIME));
+        }
         historicTaskInstanceEntity.setFormKey(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_FORM_KEY));
         historicTaskInstanceEntity.setPriority(getIntegerFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_PRIORITY));
         historicTaskInstanceEntity.setDueDate(getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_DUE_DATE));

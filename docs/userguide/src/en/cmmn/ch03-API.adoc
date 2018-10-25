@@ -49,12 +49,12 @@ The *CmmnHistoryService* exposes all historical data gathered by the Flowable CM
 
 The *CmmnManagementService* gives access to low-level information about the database tables, allows to query for the different types of jobs and to execute them.
 
-For more detailed information on the service operations and the engine API, see link:$$flowable/index.html$$[the javadocs].
+For more detailed information on the service operations and the engine API, see link:$$http://www.flowable.org/docs/javadocs/index.html$$[the javadocs].
 
 
 === Exception strategy
 
-The base exception in Flowable is the +org.flowable.engine.common.api.FlowableException+, an unchecked exception. This exception can be thrown at all times by the API, but 'expected' exceptions that happen in specific methods are documented in the link:$$http://www.flowable.org/docs/javadocs/index.html$$[ the javadocs]. For example, an extract from ++CmmnTaskService++:
+The base exception in Flowable is the +org.flowable.engine.common.api.FlowableException+, an unchecked exception. This exception can be thrown at all times by the API, but 'expected' exceptions that happen in specific methods are documented in link:$$http://www.flowable.org/docs/javadocs/index.html$$[ the javadocs]. For example, an extract from ++CmmnTaskService++:
 
 [source,java,linenums]
 ----
@@ -308,7 +308,6 @@ class MyTest {
 }
 ----
 
-[TIP]
 -----
 With JUnit 5 you can also inject the id of the deployment (with +org.flowable.cmmn.engine.test.CmmnDeploymentId+_) into your test and lifecycle methods.
 -----
@@ -346,6 +345,7 @@ class MyTest {
     assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
   }
 }
+----
 
 In the JUnit 4 style, the _org.flowable.cmmn.engine.test.FlowableCmmnTestCase_ is available as parent class. It uses a configuration file _flowable.cmmn.cfg.xml_ by default or uses a standard CmmnEngine using an H2 in-memory database if such file is missing.
 Behind the scenes, a CmmnTestRunner is used to initialise the CMMN engine. Note in the example below how the _@CmmnDeployment_ annotation is used to automatically deploy the case definition (it will look for a .cmmn file in the same folder as the test class and expects the file to be named <Test class name>.<test method name>.cmmn.

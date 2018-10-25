@@ -195,9 +195,9 @@ public abstract class DmnTestHelper {
             commandExecutor.execute(config, new Command<Object>() {
                 @Override
                 public Object execute(CommandContext commandContext) {
-                    SchemaManager dbSchemaManager = CommandContextUtil.getDmnEngineConfiguration().getDbSchemaManager();
-                    dbSchemaManager.schemaDrop();
-                    dbSchemaManager.schemaCreate();
+                    SchemaManager schemaManager = CommandContextUtil.getDmnEngineConfiguration().getSchemaManager();
+                    schemaManager.schemaDrop();
+                    schemaManager.schemaCreate();
                     return null;
                 }
             });

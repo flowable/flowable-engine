@@ -83,10 +83,13 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
+    protected String processInstanceIdWithChildren;
+    protected String caseInstanceIdWithChildren;
     protected Date createTime;
     protected Date createTimeBefore;
     protected Date createTimeAfter;
     protected String category;
+    protected boolean withFormKey;
     protected String taskDefinitionId;
     protected String key;
     protected String keyLike;
@@ -732,6 +735,26 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
     
     @Override
+    public TaskQuery processInstanceIdWithChildren(String processInstanceId) {
+        if (orActive) {
+            currentOrQueryObject.processInstanceIdWithChildren(processInstanceId);
+        } else {
+            this.processInstanceIdWithChildren = processInstanceId;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery caseInstanceIdWithChildren(String caseInstanceId) {
+        if (orActive) {
+            currentOrQueryObject.caseInstanceIdWithChildren(caseInstanceId);
+        } else {
+            this.caseInstanceIdWithChildren = caseInstanceId;
+        }
+        return this;
+    }
+
+    @Override
     public TaskQuery planItemInstanceId(String planItemInstanceId) {
         if (orActive) {
             currentOrQueryObject.subScopeId(planItemInstanceId);
@@ -819,6 +842,16 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             currentOrQueryObject.category = category;
         } else {
             this.category = category;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery taskWithFormKey() {
+        if (orActive) {
+            currentOrQueryObject.withFormKey = true;
+        } else {
+            this.withFormKey = true;
         }
         return this;
     }
@@ -1742,6 +1775,14 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public String getProcessInstanceBusinessKey() {
         return processInstanceBusinessKey;
     }
+    
+    public String getProcessInstanceIdWithChildren() {
+        return processInstanceIdWithChildren;
+    }
+
+    public String getCaseInstanceIdWithChildren() {
+        return caseInstanceIdWithChildren;
+    }
 
     public boolean getExcludeSubtasks() {
         return excludeSubtasks;
@@ -1805,6 +1846,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public String getCategory() {
         return category;
+    }
+
+    public boolean isWithFormKey() {
+        return withFormKey;
     }
 
     public String getProcessDefinitionKeyLike() {

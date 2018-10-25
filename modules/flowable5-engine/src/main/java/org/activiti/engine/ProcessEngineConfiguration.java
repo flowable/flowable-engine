@@ -210,6 +210,11 @@ public abstract class ProcessEngineConfiguration {
     protected boolean tablePrefixIsSchema;
 
     protected boolean isCreateDiagramOnDeploy = true;
+    
+    /**
+     *  include the sequence flow name in case there's no Label DI, 
+     */
+    protected boolean drawSequenceFlowNameWithNoLabelDI = false;
 
     protected String xmlEncoding = "UTF-8";
 
@@ -593,7 +598,16 @@ public abstract class ProcessEngineConfiguration {
         this.classLoader = classLoader;
         return this;
     }
-
+    
+    public boolean isDrawSequenceFlowNameWithNoLabelDI() {
+        return drawSequenceFlowNameWithNoLabelDI;
+    }
+    
+    public ProcessEngineConfiguration setDrawSequenceFlowNameWithNoLabelDI(boolean drawSequenceFlowNameWithNoLabelDI) {
+        this.drawSequenceFlowNameWithNoLabelDI = drawSequenceFlowNameWithNoLabelDI;
+        return this;
+    }
+    
     public boolean isUseClassForNameClassLoading() {
         return useClassForNameClassLoading;
     }

@@ -42,7 +42,6 @@ public class IdentityLinkEntityImpl extends AbstractIdentityLinkServiceNoRevisio
     @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
-        persistentState.put("id", this.id);
         persistentState.put("type", this.type);
 
         if (this.userId != null) {

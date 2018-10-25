@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.api.mgmt;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -107,10 +109,7 @@ public class TimerJobQueryTest extends PluggableFlowableTestCase {
         // Executing the async job throws an exception -> job retry + creation of timer
         Job asyncJob = managementService.createJobQuery().singleResult();
         assertNotNull(asyncJob);
-        try {
-            managementService.executeJob(asyncJob.getId());
-            fail();
-        } catch (Exception e) { }
+        assertThatThrownBy(() -> managementService.executeJob(asyncJob.getId()));
         
         assertEquals(0, managementService.createJobQuery().count());
         assertEquals(3, managementService.createTimerJobQuery().timers().count());

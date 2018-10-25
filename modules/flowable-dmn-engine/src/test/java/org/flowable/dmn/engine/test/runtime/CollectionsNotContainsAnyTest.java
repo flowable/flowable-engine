@@ -62,7 +62,10 @@ public class CollectionsNotContainsAnyTest {
         Assert.assertTrue(result.getRuleExecutions().get(2).isValid());
         Assert.assertTrue(result.getRuleExecutions().get(5).isValid());
         Assert.assertTrue(result.getRuleExecutions().get(6).isValid());
+        Assert.assertTrue(result.getRuleExecutions().get(7).isValid());
+        Assert.assertTrue(result.getRuleExecutions().get(8).isValid());
         Assert.assertTrue(result.getRuleExecutions().get(9).isValid());
+        Assert.assertTrue(result.getRuleExecutions().get(10).isValid());
     }
 
     @Test
@@ -91,8 +94,5 @@ public class CollectionsNotContainsAnyTest {
         Assert.assertFalse(result.isFailed());
         Assert.assertFalse(result.getRuleExecutions().get(3).isValid());
         Assert.assertFalse(result.getRuleExecutions().get(4).isValid());
-        Assert.assertFalse(result.getRuleExecutions().get(7).isValid());
-        Assert.assertFalse(result.getRuleExecutions().get(8).isValid());
-        Assert.assertFalse(result.getRuleExecutions().get(10).isValid());
     }
 }

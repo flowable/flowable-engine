@@ -16,15 +16,19 @@ package org.flowable.rest.service.api.runtime.process;
 import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
+import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.impl.ProcessInstanceQueryProperty;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.rest.service.api.BpmnRestApiInterceptor;
@@ -44,6 +48,7 @@ public class BaseProcessInstanceResource {
         allowedSortProperties.put("processDefinitionId", ProcessInstanceQueryProperty.PROCESS_DEFINITION_ID);
         allowedSortProperties.put("processDefinitionKey", ProcessInstanceQueryProperty.PROCESS_DEFINITION_KEY);
         allowedSortProperties.put("id", ProcessInstanceQueryProperty.PROCESS_INSTANCE_ID);
+        allowedSortProperties.put("startTime", ProcessInstanceQueryProperty.PROCESS_START_TIME);
         allowedSortProperties.put("tenantId", ProcessInstanceQueryProperty.TENANT_ID);
     }
 
@@ -52,6 +57,9 @@ public class BaseProcessInstanceResource {
 
     @Autowired
     protected RuntimeService runtimeService;
+    
+    @Autowired
+    protected RepositoryService repositoryService;
     
     @Autowired(required=false)
     protected BpmnRestApiInterceptor restApiInterceptor;
@@ -165,10 +173,36 @@ public class BaseProcessInstanceResource {
         }
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessProcessInstanceInfoWithQuery(query);
+            restApiInterceptor.accessProcessInstanceInfoWithQuery(query, queryRequest);
         }
 
-        return paginateList(requestParams, queryRequest, query, "id", allowedSortProperties, restResponseFactory::createProcessInstanceResponseList);
+        DataResponse<ProcessInstanceResponse> responseList = paginateList(requestParams, queryRequest, query, "id", allowedSortProperties, restResponseFactory::createProcessInstanceResponseList);
+        
+        Set<String> processDefinitionIds = new HashSet<String>();
+        List<ProcessInstanceResponse> processInstanceList = responseList.getData();
+        for (ProcessInstanceResponse processInstanceResponse : processInstanceList) {
+            if (!processDefinitionIds.contains(processInstanceResponse.getProcessDefinitionId())) {
+                processDefinitionIds.add(processInstanceResponse.getProcessDefinitionId());
+            }
+        }
+        
+        if (processDefinitionIds.size() > 0) {
+            List<ProcessDefinition> processDefinitionList = repositoryService.createProcessDefinitionQuery().processDefinitionIds(processDefinitionIds).list();
+            Map<String, ProcessDefinition> processDefinitionMap = new HashMap<String, ProcessDefinition>();
+            for (ProcessDefinition processDefinition : processDefinitionList) {
+                processDefinitionMap.put(processDefinition.getId(), processDefinition);
+            }
+            
+            for (ProcessInstanceResponse processInstanceResponse : processInstanceList) {
+                if (processDefinitionMap.containsKey(processInstanceResponse.getProcessDefinitionId())) {
+                    ProcessDefinition processDefinition = processDefinitionMap.get(processInstanceResponse.getProcessDefinitionId());
+                    processInstanceResponse.setProcessDefinitionName(processDefinition.getName());
+                    processInstanceResponse.setProcessDefinitionDescription(processDefinition.getDescription());
+                }
+            }
+        }
+        
+        return responseList;
     }
 
     protected void addVariables(ProcessInstanceQuery processInstanceQuery, List<QueryVariable> variables) {

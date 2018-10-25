@@ -35,9 +35,10 @@ public class PlanItemInstanceQueryRequest extends PaginateRequest {
     private String stageInstanceId;
     private String planItemDefinitionId;
     private String planItemDefinitionType;
+    private List<String> planItemDefinitionTypes;
     private String state;
-    private Date startedBefore;
-    private Date startedAfter;
+    private Date createdBefore;
+    private Date createdAfter;
     private String startUserId;
     private String referenceId;
     private String referenceType;
@@ -128,6 +129,14 @@ public class PlanItemInstanceQueryRequest extends PaginateRequest {
         this.planItemDefinitionType = planItemDefinitionType;
     }
 
+    public List<String> getPlanItemDefinitionTypes() {
+        return planItemDefinitionTypes;
+    }
+
+    public void setPlanItemDefinitionTypes(List<String> planItemDefinitionTypes) {
+        this.planItemDefinitionTypes = planItemDefinitionTypes;
+    }
+
     public String getState() {
         return state;
     }
@@ -136,20 +145,20 @@ public class PlanItemInstanceQueryRequest extends PaginateRequest {
         this.state = state;
     }
 
-    public Date getStartedBefore() {
-        return startedBefore;
+    public Date getCreatedBefore() {
+        return createdBefore;
     }
 
-    public void setStartedBefore(Date startedBefore) {
-        this.startedBefore = startedBefore;
+    public void setCreatedBefore(Date createdBefore) {
+        this.createdBefore = createdBefore;
     }
 
-    public Date getStartedAfter() {
-        return startedAfter;
+    public Date getCreatedAfter() {
+        return createdAfter;
     }
 
-    public void setStartedAfter(Date startedAfter) {
-        this.startedAfter = startedAfter;
+    public void setCreatedAfter(Date createdAfter) {
+        this.createdAfter = createdAfter;
     }
 
     public String getStartUserId() {

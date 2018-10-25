@@ -12,7 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.history.async.json.transformer;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -30,8 +32,8 @@ import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonU
 public class TaskEndedHistoryJsonTransformer extends AbstractTaskHistoryJsonTransformer {
     
     @Override
-    public String getType() {
-        return CmmnAsyncHistoryConstants.TYPE_TASK_REMOVED;
+    public List<String> getTypes() {
+        return Collections.singletonList(CmmnAsyncHistoryConstants.TYPE_TASK_REMOVED);
     }
     
     @Override

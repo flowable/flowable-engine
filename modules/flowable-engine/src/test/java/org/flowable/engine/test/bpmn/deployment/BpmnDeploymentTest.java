@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.bpmn.deployment;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.io.InputStream;
 import java.util.List;
 
@@ -184,15 +186,11 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
 
     @Test
     public void testDeployTwoProcessesWithDuplicateIdAtTheSameTime() {
-        try {
-            String bpmnResourceName = "org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml";
-            String bpmnResourceName2 = "org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService2.bpmn20.xml";
-            repositoryService.createDeployment().enableDuplicateFiltering().addClasspathResource(bpmnResourceName).addClasspathResource(bpmnResourceName2).name("duplicateAtTheSameTime").deploy();
-            fail();
-        } catch (Exception e) {
-            // Verify that nothing is deployed
-            assertEquals(0, repositoryService.createDeploymentQuery().count());
-        }
+        String bpmnResourceName = "org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml";
+        String bpmnResourceName2 = "org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService2.bpmn20.xml";
+        assertThatThrownBy(() -> repositoryService.createDeployment().enableDuplicateFiltering().addClasspathResource(bpmnResourceName).addClasspathResource(bpmnResourceName2).name("duplicateAtTheSameTime").deploy());
+        // Verify that nothing is deployed
+        assertEquals(0, repositoryService.createDeploymentQuery().count());
     }
 
     @Test

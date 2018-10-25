@@ -13,12 +13,27 @@
 
 package org.flowable.cmmn.rest.service.api.history.caze;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
+import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
+import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,6 +50,7 @@ import io.swagger.annotations.Authorization;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 @RestController
 @Api(tags = { "History Case" }, description = "Manage History Case Instances", authorizations = { @Authorization(value = "basicAuth") })
@@ -44,15 +60,29 @@ public class HistoricCaseInstanceResource extends HistoricCaseInstanceBaseResour
     protected CmmnRestResponseFactory restResponseFactory;
 
     @Autowired
-    protected CmmnHistoryService historyService;
+    protected CmmnRepositoryService cmmnRepositoryService;
+
+    @Autowired
+    protected CmmnHistoryService cmmnhistoryService;
+    
+    @Autowired
+    protected CmmnRuntimeService cmmnRuntimeService;
 
     @ApiOperation(value = "Get a historic case instance", tags = { "History Case" }, nickname = "getHistoricCaseInstance")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates that the historic process instances could be found."),
             @ApiResponse(code = 404, message = "Indicates that the historic process instances could not be found.") })
     @GetMapping(value = "/cmmn-history/historic-case-instances/{caseInstanceId}", produces = "application/json")
-    public HistoricCaseInstanceResponse getCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request) {
-        return restResponseFactory.createHistoricCaseInstanceResponse(getHistoricCaseInstanceFromRequest(caseInstanceId));
+    public HistoricCaseInstanceResponse getCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId) {
+        HistoricCaseInstanceResponse caseInstanceResponse = restResponseFactory.createHistoricCaseInstanceResponse(getHistoricCaseInstanceFromRequest(caseInstanceId));
+        
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseInstanceResponse.getCaseDefinitionId()).singleResult();
+        if (caseDefinition != null) {
+            caseInstanceResponse.setCaseDefinitionName(caseDefinition.getName());
+            caseInstanceResponse.setCaseDefinitionDescription(caseDefinition.getDescription());
+        }
+        
+        return caseInstanceResponse;
     }
 
     @ApiOperation(value = " Delete a historic case instance", tags = { "History Case" }, nickname = "deleteHistoricCaseInstance")
@@ -66,7 +96,65 @@ public class HistoricCaseInstanceResource extends HistoricCaseInstanceBaseResour
             restApiInterceptor.deleteHistoricCase(caseInstance);
         }
         
-        historyService.deleteHistoricCaseInstance(caseInstance.getId());
+        cmmnhistoryService.deleteHistoricCaseInstance(caseInstance.getId());
         response.setStatus(HttpStatus.NO_CONTENT.value());
     }
+
+    @GetMapping(value = "/cmmn-history/historic-case-instances/{caseInstanceId}/stage-overview", produces = "application/json")
+    public List<StageResponse> getStageOverview(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId) {
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
+
+        if (caseInstance == null) {
+            throw new FlowableObjectNotFoundException("No case instance found for id " + caseInstanceId);
+        }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessStageOverview(caseInstance);
+        }
+
+        List<PlanItemInstance> stagePlanItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .planItemDefinitionType(PlanItemDefinitionType.STAGE)
+            .includeEnded()
+            .orderByEndTime().asc()
+            .list();
+
+        CmmnModel cmmnModel = cmmnRepositoryService.getCmmnModel(caseInstance.getCaseDefinitionId());
+        List<Stage> stages = cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionsOfType(Stage.class, true);
+
+        // If one stage has a display order, they are ordered by that.
+        // Otherwise, the order as it comes back from the query is used.
+        stages.sort(Comparator.comparing(Stage::getDisplayOrder, Comparator.nullsFirst(Comparator.naturalOrder()))
+            .thenComparing(stage -> getPlanItemInstanceEndTime(stagePlanItemInstances, stage), Comparator.nullsLast(Comparator.naturalOrder()))
+        );
+        List<StageResponse> stageResponses = new ArrayList<>(stages.size());
+        for (Stage stage : stages) {
+            StageResponse stageResponse = new StageResponse(stage.getId(), stage.getName());
+            Optional<PlanItemInstance> planItemInstance = getPlanItemInstance(stagePlanItemInstances, stage);
+
+            // If not ended or current, it's implicitly a future one
+            if (planItemInstance.isPresent()) {
+                stageResponse.setEnded(planItemInstance.get().getEndedTime() != null);
+                stageResponse.setCurrent(PlanItemInstanceState.ACTIVE.equals(planItemInstance.get().getState()));
+            }
+
+            stageResponses.add(stageResponse);
+        }
+
+        return stageResponses;
+    }
+
+    protected Date getPlanItemInstanceEndTime(List<PlanItemInstance> stagePlanItemInstances, Stage stage) {
+        return getPlanItemInstance(stagePlanItemInstances, stage)
+            .map(PlanItemInstance::getEndedTime)
+            .orElse(null);
+    }
+
+    protected Optional<PlanItemInstance> getPlanItemInstance(List<PlanItemInstance> stagePlanItemInstances, Stage stage) {
+        return stagePlanItemInstances.stream()
+            .filter(s -> s.getPlanItemDefinitionId().equals(stage.getId()))
+            .findFirst();
+    }
+
 }

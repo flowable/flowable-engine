@@ -25,9 +25,12 @@ public interface CmmnAsyncHistoryConstants {
     
     String TYPE_CASE_INSTANCE_END = "cmmn-case-instance-end";
     String TYPE_CASE_INSTANCE_START = "cmmn-case-instance-start";
+    String TYPE_UPDATE_CASE_INSTANCE_NAME = "cmmn-update-case-instance-name";
     String TYPE_HISTORIC_CASE_INSTANCE_DELETED = "cmmn-historic-case-instance-deleted";
     String TYPE_IDENTITY_LINK_CREATED = "cmmn-identity-link-created";
     String TYPE_IDENTITY_LINK_DELETED = "cmmn-identity-link-deleted";
+    String TYPE_ENTITY_LINK_CREATED = "cmmn-entity-link-created";
+    String TYPE_ENTITY_LINK_DELETED = "cmmn-entity-link-deleted";
     String TYPE_MILESTONE_REACHED = "cmmn-milestone-reached";
     String TYPE_PLAN_ITEM_INSTANCE_AVAILABLE = "cmmn-plan-item-instance-available";
     String TYPE_PLAN_ITEM_INSTANCE_COMPLETED = "cmmn-plan-item-instance-completed";
@@ -48,6 +51,9 @@ public interface CmmnAsyncHistoryConstants {
     
     List<String> ORDERED_TYPES = Arrays.asList(
             TYPE_CASE_INSTANCE_START,
+            TYPE_UPDATE_CASE_INSTANCE_NAME,
+            TYPE_ENTITY_LINK_CREATED,
+            TYPE_ENTITY_LINK_DELETED,
             TYPE_IDENTITY_LINK_CREATED,
             TYPE_IDENTITY_LINK_DELETED,
             TYPE_MILESTONE_REACHED,
@@ -97,6 +103,7 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_ID = "id";
     String FIELD_IS_STAGE = "isStage";
     String FIELD_IDENTITY_LINK_TYPE = "identityLinkType";
+    String FIELD_ENTITY_LINK_TYPE = "entityLinkType";
     String FIELD_LAST_AVAILABLE_TIME = "lastAvailableTime";
     String FIELD_LAST_DISABLED_TIME = "lastDisabledTime";
     String FIELD_LAST_ENABLED_TIME = "lastEnabledTime";
@@ -114,11 +121,16 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_PRIORITY = "priority";
     String FIELD_REFERENCE_ID = "referenceId";
     String FIELD_REFERENCE_TYPE = "referenceType";
+    String FIELD_ENTRY_CRITERION_ID = "entryCriterionId";
+    String FIELD_EXIT_CRITERION_ID = "exitCriterionId";
     String FIELD_REVISION = "revision";
     String FIELD_SCOPE_ID = "scopeId";
     String FIELD_SCOPE_DEFINITION_ID = "scopeDefinitionId";
     String FIELD_SCOPE_TYPE = "scopeType";
     String FIELD_SUB_SCOPE_ID = "subScopeId";
+    String FIELD_REF_SCOPE_ID = "refScopeId";
+    String FIELD_REF_SCOPE_DEFINITION_ID = "refScopeDefinitionId";
+    String FIELD_REF_SCOPE_TYPE = "refScopeType";
     String FIELD_STAGE_INSTANCE_ID = "stageInstanceId";
     String FIELD_START_TIME = "startTime";
     String FIELD_START_USER_ID = "startUserId";

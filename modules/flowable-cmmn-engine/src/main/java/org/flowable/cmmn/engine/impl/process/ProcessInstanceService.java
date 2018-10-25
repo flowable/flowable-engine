@@ -19,12 +19,16 @@ import java.util.Map;
  */
 public interface ProcessInstanceService {
     
-    String startProcessInstanceByKey(String processDefinitionKey, String tenantId, Map<String, Object> inParametersMap);
+    String generateNewProcessInstanceId();
+    
+    String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String tenantId, 
+                    Map<String, Object> inParametersMap);
 
-    String startProcessInstanceByKey(String processDefinitionKey, String planItemInstanceId, String tenantId, Map<String, Object> inParametersMap);
+    String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String planItemInstanceId, 
+                    String tenantId, Map<String, Object> inParametersMap);
 
     void deleteProcessInstance(String processInstanceId);
 
-    Map<String, Object> getVariables(String execId);
+    Map<String, Object> getVariables(String executionId);
 
 }

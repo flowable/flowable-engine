@@ -64,6 +64,8 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
+    protected String processInstanceIdWithChildren;
+    protected String caseInstanceIdWithChildren;
     protected String taskId;
     protected String taskName;
     protected String taskNameLike;
@@ -109,6 +111,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected Date completedAfterDate;
     protected Date completedBeforeDate;
     protected String category;
+    protected boolean withFormKey;
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
@@ -270,6 +273,26 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         } else {
             this.scopeDefinitionId(caseDefinitionId);
             this.scopeType(ScopeTypes.CMMN);
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricTaskInstanceQueryImpl processInstanceIdWithChildren(String processInstanceId) {
+        if (inOrStatement) {
+            currentOrQueryObject.processInstanceIdWithChildren(processInstanceId);
+        } else {
+            this.processInstanceIdWithChildren = processInstanceId;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQueryImpl caseInstanceIdWithChildren(String caseInstanceId) {
+        if (inOrStatement) {
+            currentOrQueryObject.caseInstanceIdWithChildren(caseInstanceId);
+        } else {
+            this.caseInstanceIdWithChildren = caseInstanceId;
         }
         return this;
     }
@@ -1220,6 +1243,16 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     }
 
     @Override
+    public HistoricTaskInstanceQuery taskWithFormKey() {
+        if (inOrStatement) {
+            currentOrQueryObject.withFormKey = true;
+        } else {
+            this.withFormKey = true;
+        }
+        return this;
+    }
+
+    @Override
     public HistoricTaskInstanceQuery taskCandidateUser(String candidateUser) {
         if (candidateUser == null) {
             throw new FlowableIllegalArgumentException("Candidate user is null");
@@ -1679,6 +1712,14 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return taskDefinitionKeyLike;
     }
 
+    public String getProcessInstanceIdWithChildren() {
+        return processInstanceIdWithChildren;
+    }
+
+    public String getCaseInstanceIdWithChildren() {
+        return caseInstanceIdWithChildren;
+    }
+
     public Integer getTaskPriority() {
         return taskPriority;
     }
@@ -1737,6 +1778,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public String getCategory() {
         return category;
+    }
+
+    public boolean isWithFormKey() {
+        return withFormKey;
     }
 
     public String getTenantId() {

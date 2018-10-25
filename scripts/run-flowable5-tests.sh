@@ -1,7 +1,7 @@
 #!/bin/sh
 echo "Building dependencies"
 cd ..
-mvn clean install -DskipTests
+mvn clean install -DskipTests -Pcheck
 
 STATUS=$?
 if [ $STATUS -ne 0 ]

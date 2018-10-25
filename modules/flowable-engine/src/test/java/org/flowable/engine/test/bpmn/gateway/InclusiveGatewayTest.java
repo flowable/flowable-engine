@@ -798,8 +798,6 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         assertFalse(classifiedTasks.containsKey("taskInclusive3"));
 
         //Finish the rest of the tasks
-        List<Task> collect = Stream.concat(classifiedTasks.get("taskInclusive1").stream(), classifiedTasks.get("taskInclusive1").stream()).collect(Collectors.toList());
-
         Stream.concat(classifiedTasks.get("taskInclusive1").stream(), classifiedTasks.get("taskInclusive2").stream())
             .forEach(this::completeTask);
 

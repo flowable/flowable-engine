@@ -30,13 +30,13 @@ public interface CmmnEngineAgenda extends Agenda {
 
     void planCreatePlanItemInstanceForRepetitionOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
-    void planActivatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+    void planActivatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId);
     
-    void planStartPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+    void planStartPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId);
     
-    void planEnablePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+    void planEnablePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId);
 
-    void planActivateAsyncPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+    void planActivateAsyncPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId);
 
     void planDisablePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
@@ -44,7 +44,7 @@ public interface CmmnEngineAgenda extends Agenda {
 
     void planOccurPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
-    void planExitPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+    void planExitPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitCriterionId);
 
     void planTerminatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
@@ -52,7 +52,9 @@ public interface CmmnEngineAgenda extends Agenda {
 
     void planCompleteCaseInstanceOperation(CaseInstanceEntity caseInstanceEntity);
 
-    void planTerminateCaseInstanceOperation(String caseInstanceEntityId, boolean manualTermination);
+    void planManualTerminateCaseInstanceOperation(String caseInstanceEntityId);
+
+    void planTerminateCaseInstanceOperation(String caseInstanceEntityId, String exitCriterionId);
 
     void planEvaluateCriteriaOperation(String caseInstanceEntityId);
     

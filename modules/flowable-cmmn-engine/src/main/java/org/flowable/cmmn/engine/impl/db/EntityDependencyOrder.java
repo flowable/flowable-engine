@@ -27,6 +27,8 @@ import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityI
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityImpl;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityImpl;
+import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
@@ -43,12 +45,14 @@ public class EntityDependencyOrder {
 
     static {
 
+        DELETE_ORDER.add(HistoricEntityLinkEntityImpl.class);
         DELETE_ORDER.add(HistoricIdentityLinkEntityImpl.class);
         DELETE_ORDER.add(HistoricMilestoneInstanceEntityImpl.class);
         DELETE_ORDER.add(HistoricCaseInstanceEntityImpl.class);
         DELETE_ORDER.add(VariableInstanceEntityImpl.class);
         DELETE_ORDER.add(VariableByteArrayEntityImpl.class);
         DELETE_ORDER.add(HistoricVariableInstanceEntityImpl.class);
+        DELETE_ORDER.add(EntityLinkEntityImpl.class);
         DELETE_ORDER.add(IdentityLinkEntityImpl.class);
         DELETE_ORDER.add(MilestoneInstanceEntityImpl.class);
         DELETE_ORDER.add(SentryPartInstanceEntityImpl.class);

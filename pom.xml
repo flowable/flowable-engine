@@ -14,24 +14,24 @@
 	</parent>
 
 	<packaging>pom</packaging>
-	<version>6.4.0-SNAPSHOT</version>
+	<version>6.4.1-SNAPSHOT</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jdk.version>1.8</jdk.version>
-		<spring.framework.version>5.0.9.RELEASE</spring.framework.version>
-		<spring.security.version>5.0.8.RELEASE</spring.security.version>
+		<spring.framework.version>5.0.10.RELEASE</spring.framework.version>
+		<spring.security.version>5.0.9.RELEASE</spring.security.version>
 		<jackson.version>2.9.7</jackson.version>
 		<mule.version>3.8.0</mule.version>
         <camel.version>2.22.0</camel.version>
 		<cxf.version>3.2.6</cxf.version>
 		<slf4j.version>1.7.25</slf4j.version>
-		<spring.boot.version>2.0.5.RELEASE</spring.boot.version>
+		<spring.boot.version>2.0.6.RELEASE</spring.boot.version>
 
 		<junit.version>4.12</junit.version>
-		<junit.jupiter.version>5.2.0</junit.jupiter.version>
-		<junit.vintage.version>5.2.0</junit.vintage.version>
-		<junit.platform.version>1.2.0</junit.platform.version>
-		<mockito.version>2.20.1</mockito.version>
+		<junit.jupiter.version>5.3.1</junit.jupiter.version>
+		<junit.vintage.version>5.3.1</junit.vintage.version>
+		<junit.platform.version>1.3.1</junit.platform.version>
+		<mockito.version>2.22.0</mockito.version>
 
         <checkstyle.config.location>checkstyle/flowable-checkstyle.xml</checkstyle.config.location>
         <checkstyle.suppressions.location>/checkstyle/flowable-suppressions.xml</checkstyle.suppressions.location>
@@ -144,17 +144,17 @@
 			<dependency>
 				<groupId>javax.xml.bind</groupId>
 				<artifactId>jaxb-api</artifactId>
-				<version>2.3.0</version>
+				<version>2.3.1</version>
 			</dependency>
 			<dependency>
 				<groupId>com.sun.xml.bind</groupId>
 				<artifactId>jaxb-impl</artifactId>
-				<version>2.3.0</version>
+				<version>2.3.1</version>
 			</dependency>
 			<dependency>
 				<groupId>com.sun.xml.bind</groupId>
 				<artifactId>jaxb-xjc</artifactId>
-				<version>2.3.0</version>
+				<version>2.3.1</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.servlet</groupId>
@@ -536,6 +536,16 @@
             </dependency>
             <dependency>
                 <groupId>org.flowable</groupId>
+                <artifactId>flowable-entitylink-service-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-entitylink-service</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
                 <artifactId>flowable-task-service-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -685,8 +695,8 @@
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
-				<artifactId>groovy-all</artifactId>
-				<version>2.4.15</version>
+				<artifactId>groovy-jsr223</artifactId>
+				<version>2.5.3</version>
 			</dependency>
 			<dependency>
 				<groupId>org.drools</groupId>
@@ -887,7 +897,7 @@
 			<dependency>
 				<groupId>xerces</groupId>
 				<artifactId>xercesImpl</artifactId>
-				<version>2.11.0</version>
+				<version>2.12.0</version>
 			</dependency>
 			<dependency>
 				<groupId>joda-time</groupId>
@@ -977,6 +987,8 @@
 		<module>modules/flowable-bpmn-converter</module>
 		<module>modules/flowable-engine-common-api</module>
 		<module>modules/flowable-engine-common</module>
+		<module>modules/flowable-entitylink-service-api</module>
+		<module>modules/flowable-entitylink-service</module>
 		<module>modules/flowable-idm-api</module>
 		<module>modules/flowable-idm-engine</module>
 		<module>modules/flowable-idm-engine-configurator</module>
@@ -1009,18 +1021,17 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.7.0</version>
+				<version>3.8.0</version>
 				<configuration>
 					<source>${jdk.version}</source>
 					<target>${jdk.version}</target>
 					<showDeprecation>true</showDeprecation>
 					<showWarnings>true</showWarnings>
-					<optimize>true</optimize>
 				</configuration>
 			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.22.0</version>
+				<version>2.22.1</version>
 				<configuration>
 					<failIfNoTests>false</failIfNoTests>
 					<trimStackTrace>false</trimStackTrace>

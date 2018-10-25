@@ -18,6 +18,8 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.flowable.entitylink.api.EntityLink;
+import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -184,6 +186,16 @@ public interface HistoryManager {
      * Record the deletion of a {@link IdentityLink}, if audit history is enabled
      */
     void recordIdentityLinkDeleted(IdentityLinkEntity identityLink);
+    
+    /**
+     * Record the creation of a new {@link EntityLink}, if audit history is enabled.
+     */
+    void recordEntityLinkCreated(EntityLinkEntity entityLink);
+    
+    /**
+     * Record the deletion of a {@link EntityLink}, if audit history is enabled
+     */
+    void recordEntityLinkDeleted(EntityLinkEntity entityLink);
 
     void updateProcessBusinessKeyInHistory(ExecutionEntity processInstance);
     

@@ -48,15 +48,15 @@ public class BaseHistoricDecisionExecutionResource {
      */
     protected DmnHistoricDecisionExecution getHistoricDecisionExecutionFromRequest(String decisionExecutionId) {
         DmnHistoricDecisionExecutionQuery historicDecisionExecutionQuery = dmnHistoryService.createHistoricDecisionExecutionQuery().id(decisionExecutionId);
-        
-        if (restApiInterceptor != null) {
-            restApiInterceptor.accessDecisionHistoryInfoWithQuery(historicDecisionExecutionQuery);
-        }
-        
+
         DmnHistoricDecisionExecution decisionExecution = historicDecisionExecutionQuery.singleResult();
 
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDecisionHistoryInfoById(decisionExecution);
+        }
+
         if (decisionExecution == null) {
-            throw new FlowableObjectNotFoundException("Could not find a decision execution with id '" + decisionExecution);
+            throw new FlowableObjectNotFoundException("Could not find a decision execution with id '" + decisionExecutionId + "'");
         }
         return decisionExecution;
     }

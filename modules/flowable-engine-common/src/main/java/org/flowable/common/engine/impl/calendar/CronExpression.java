@@ -331,7 +331,7 @@ public class CronExpression implements Serializable, Cloneable {
 
         Date timeAfter = getTimeAfter(testDateCal.getTime());
 
-        return ((timeAfter != null) && (timeAfter.equals(originalDate)));
+        return ((timeAfter != null) && timeAfter.equals(originalDate));
     }
 
     /**
@@ -546,7 +546,7 @@ public class CronExpression implements Serializable, Cloneable {
             return i;
         }
         char c = s.charAt(i);
-        if ((c >= 'A') && (c <= 'Z') && (!s.equals("L")) && (!s.equals("LW")) && (!s.matches("^L-[0-9]*[W]?"))) {
+        if ((c >= 'A') && (c <= 'Z') && !s.equals("L") && !s.equals("LW") && !s.matches("^L-[0-9]*[W]?")) {
             String sub = s.substring(i, i + 3);
             int sval = -1;
             int eval = -1;
@@ -1624,7 +1624,7 @@ public class CronExpression implements Serializable, Cloneable {
         case 1:
             return 31;
         case 2:
-            return (isLeapYear(year)) ? 29 : 28;
+            return isLeapYear(year) ? 29 : 28;
         case 3:
             return 31;
         case 4:

@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
-import org.flowable.cmmn.api.history. HistoricPlanItemInstanceQuery;
+import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.AbstractQuery;
@@ -39,6 +39,7 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected String elementId;
     protected String planItemDefinitionId;
     protected String planItemDefinitionType;
+    protected List<String> planItemDefinitionTypes;
     protected Date createdBefore;
     protected Date createdAfter;
     protected Date lastAvailableBefore;
@@ -64,6 +65,10 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected String startUserId;
     protected String referenceId;
     protected String referenceType;
+    protected boolean ended;
+    protected boolean notEnded;
+    protected String entryCriterionId;
+    protected String exitCriterionId;
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
@@ -126,7 +131,22 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
 
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceDefinitionType(String planItemDefinitionType) {
+        if (planItemDefinitionType == null) {
+            throw new FlowableIllegalArgumentException("Plan item definition type is null");
+        }
         this.planItemDefinitionType = planItemDefinitionType;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery planItemInstanceDefinitionTypes(List<String> planItemDefinitionTypes) {
+        if (planItemDefinitionTypes == null) {
+            throw new FlowableIllegalArgumentException("Plan item definition types is null");
+        }
+        if (planItemDefinitionTypes.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Plan item definition types is empty");
+        }
+        this.planItemDefinitionTypes = planItemDefinitionTypes;
         return this;
     }
 
@@ -145,6 +165,24 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceReferenceType(String referenceType) {
         this.referenceType = referenceType;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery planItemInstanceEntryCriterionId(String entryCriterionId) {
+        if (entryCriterionId == null) {
+            throw new FlowableIllegalArgumentException("EntryCriterionId is null");
+        }
+        this.entryCriterionId = entryCriterionId;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery planItemInstanceExitCriterionId(String exitCriterionId) {
+        if (exitCriterionId == null) {
+            throw new FlowableIllegalArgumentException("ExitCriterionId is null");
+        }
+        this.exitCriterionId = exitCriterionId;
         return this;
     }
 
@@ -218,14 +256,14 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
 
     @Override
-    public HistoricPlanItemInstanceQuery lastStartedBefore(Date lastStartedBefore) {
-        this.lastStartedBefore = lastStartedBefore;
+    public HistoricPlanItemInstanceQuery lastStartedBefore(Date startedBefore) {
+        this.lastStartedBefore = startedBefore;
         return this;
     }
 
     @Override
-    public HistoricPlanItemInstanceQuery lastStartedAfter(Date lastStartedAfter) {
-        this.lastStartedAfter = lastStartedAfter;
+    public HistoricPlanItemInstanceQuery lastStartedAfter(Date startedAfter) {
+        this.lastStartedAfter = startedAfter;
         return this;
     }
 
@@ -302,15 +340,25 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
 
     @Override
-    public HistoricPlanItemInstanceQuery orderByCreatedTime() {
-        return orderBy(HistoricPlanItemInstanceQueryProperty.CREATED_TIME);
+    public HistoricPlanItemInstanceQuery ended() {
+        this.ended = true;
+        return this;
+    }
 
+    @Override
+    public HistoricPlanItemInstanceQuery notEnded() {
+        this.notEnded = true;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery orderByCreateTime() {
+        return orderBy(HistoricPlanItemInstanceQueryProperty.CREATE_TIME);
     }
 
     @Override
     public HistoricPlanItemInstanceQuery orderByEndedTime() {
         return orderBy(HistoricPlanItemInstanceQueryProperty.ENDED_TIME);
-
     }
 
     @Override
@@ -328,4 +376,130 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
         return CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext).findByCriteria(this);
     }
 
+    public String getPlanItemInstanceId() {
+        return planItemInstanceId;
+    }
+    public String getPlanItemInstanceName() {
+        return planItemInstanceName;
+    }
+    public String getState() {
+        return state;
+    }
+    public String getCaseDefinitionId() {
+        return caseDefinitionId;
+    }
+    public String getCaseInstanceId() {
+        return caseInstanceId;
+    }
+    public String getStageInstanceId() {
+        return stageInstanceId;
+    }
+    public String getElementId() {
+        return elementId;
+    }
+    public String getPlanItemDefinitionId() {
+        return planItemDefinitionId;
+    }
+    public String getPlanItemDefinitionType() {
+        return planItemDefinitionType;
+    }
+    public List<String> getPlanItemDefinitionTypes() {
+        return planItemDefinitionTypes;
+    }
+    public Date getCreatedBefore() {
+        return createdBefore;
+    }
+    public Date getCreatedAfter() {
+        return createdAfter;
+    }
+    public Date getLastAvailableBefore() {
+        return lastAvailableBefore;
+    }
+    public Date getLastAvailableAfter() {
+        return lastAvailableAfter;
+    }
+    public Date getLastEnabledBefore() {
+        return lastEnabledBefore;
+    }
+    public Date getLastEnabledAfter() {
+        return lastEnabledAfter;
+    }
+    public Date getLastDisabledBefore() {
+        return lastDisabledBefore;
+    }
+    public Date getLastDisabledAfter() {
+        return lastDisabledAfter;
+    }
+    public Date getLastStartedBefore() {
+        return lastStartedBefore;
+    }
+    public Date getLastStartedAfter() {
+        return lastStartedAfter;
+    }
+    public Date getLastSuspendedBefore() {
+        return lastSuspendedBefore;
+    }
+    public Date getLastSuspendedAfter() {
+        return lastSuspendedAfter;
+    }
+    public Date getCompletedBefore() {
+        return completedBefore;
+    }
+    public Date getCompletedAfter() {
+        return completedAfter;
+    }
+    public Date getTerminatedBefore() {
+        return terminatedBefore;
+    }
+    public Date getTerminatedAfter() {
+        return terminatedAfter;
+    }
+    public Date getOccurredBefore() {
+        return occurredBefore;
+    }
+    public Date getOccurredAfter() {
+        return occurredAfter;
+    }
+    public Date getExitBefore() {
+        return exitBefore;
+    }
+    public Date getExitAfter() {
+        return exitAfter;
+    }
+    public Date getEndedBefore() {
+        return endedBefore;
+    }
+    public Date getEndedAfter() {
+        return endedAfter;
+    }
+    public String getStartUserId() {
+        return startUserId;
+    }
+    public String getReferenceId() {
+        return referenceId;
+    }
+    public String getReferenceType() {
+        return referenceType;
+    }
+    public boolean isEnded() {
+        return ended;
+    }
+    public boolean isNotEnded() {
+        return notEnded;
+    }
+    public String getEntryCriterionId() {
+        return entryCriterionId;
+    }
+    public String getExitCriterionId() {
+        return exitCriterionId;
+    }
+    public String getTenantId() {
+        return tenantId;
+    }
+    public String getTenantIdLike() {
+        return tenantIdLike;
+    }
+    public boolean isWithoutTenantId() {
+        return withoutTenantId;
+    }
 }

@@ -36,7 +36,7 @@ public class SpringContentConfigurationHelper {
 
         ApplicationContext applicationContext = new GenericXmlApplicationContext(new UrlResource(resource));
         Map<String, ContentEngine> beansOfType = applicationContext.getBeansOfType(ContentEngine.class);
-        if ((beansOfType == null) || (beansOfType.isEmpty())) {
+        if ((beansOfType == null) || beansOfType.isEmpty()) {
             throw new FlowableException("no " + ContentEngine.class.getName() + " defined in the application context " + resource.toString());
         }
 

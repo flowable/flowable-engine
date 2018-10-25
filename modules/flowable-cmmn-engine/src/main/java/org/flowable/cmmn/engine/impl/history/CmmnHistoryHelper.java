@@ -40,6 +40,10 @@ public class CmmnHistoryHelper {
                 .forEach(p -> historicPlanItemInstanceEntityManager.delete(p.getId()));
 
         CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricIdentityLinksByScopeIdAndScopeType(historicCaseInstance.getId(), ScopeTypes.CMMN);
+        
+        if (cmmnEngineConfiguration.isEnableEntityLinks()) {
+            CommandContextUtil.getHistoricEntityLinkService().deleteHistoricEntityLinksByScopeIdAndScopeType(historicCaseInstance.getId(), ScopeTypes.CMMN);
+        }
 
         historicCaseInstanceEntityManager.delete(historicCaseInstance);
 

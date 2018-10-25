@@ -45,6 +45,7 @@ import org.flowable.engine.impl.cmd.GetActiveAdhocSubProcessesCmd;
 import org.flowable.engine.impl.cmd.GetDataObjectCmd;
 import org.flowable.engine.impl.cmd.GetDataObjectsCmd;
 import org.flowable.engine.impl.cmd.GetEnabledActivitiesForAdhocSubProcessCmd;
+import org.flowable.engine.impl.cmd.GetEntityLinkChildrenForProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.GetExecutionVariableCmd;
 import org.flowable.engine.impl.cmd.GetExecutionVariableInstanceCmd;
 import org.flowable.engine.impl.cmd.GetExecutionVariableInstancesCmd;
@@ -86,6 +87,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Event;
+import org.flowable.entitylink.api.EntityLink;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
@@ -473,6 +475,11 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     public List<IdentityLink> getIdentityLinksForProcessInstance(String processInstanceId) {
         return commandExecutor.execute(new GetIdentityLinksForProcessInstanceCmd(processInstanceId));
     }
+    
+    @Override
+    public List<EntityLink> getEntityLinkChildrenForProcessInstance(String processInstanceId) {
+        return commandExecutor.execute(new GetEntityLinkChildrenForProcessInstanceCmd(processInstanceId));
+    }
 
     @Override
     public ProcessInstanceQuery createProcessInstanceQuery() {
@@ -694,7 +701,7 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
 
     @Override
     public ProcessInstanceMigrationValidationResult validateMigrationForProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
-        return commandExecutor.execute(ProcessInstanceMigrationValidationCmd.forProcessDefinition(processInstanceId, processInstanceMigrationDocument));
+        return commandExecutor.execute(ProcessInstanceMigrationValidationCmd.forProcessInstance(processInstanceId, processInstanceMigrationDocument));
     }
 
     @Override

@@ -135,6 +135,9 @@ public class CaseDefinitionCollectionResource {
         if (allRequestParams.containsKey("deploymentId")) {
             caseDefinitionQuery.deploymentId(allRequestParams.get("deploymentId"));
         }
+        if (allRequestParams.containsKey("startableByUser")) {
+            caseDefinitionQuery.startableByUser(allRequestParams.get("startableByUser"));
+        }
         if (allRequestParams.containsKey("tenantId")) {
             caseDefinitionQuery.caseDefinitionTenantId(allRequestParams.get("tenantId"));
         }

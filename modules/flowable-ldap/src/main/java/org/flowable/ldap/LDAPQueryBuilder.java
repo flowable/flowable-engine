@@ -92,6 +92,16 @@ public class LDAPQueryBuilder {
         return searchExpression;
     }
 
+    public String buildQueryGroupsById(LDAPConfiguration ldapConfigurator, String groupId) {
+        String searchExpression;
+        if (ldapConfigurator.getQueryGroupByGroupId() != null) {
+            searchExpression = MessageFormat.format(ldapConfigurator.getQueryGroupByGroupId(), groupId);
+        } else {
+            searchExpression = groupId;
+        }
+        return searchExpression;
+    }
+
     protected SearchControls createSearchControls(LDAPConfiguration ldapConfigurator) {
         SearchControls searchControls = new SearchControls();
         searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);

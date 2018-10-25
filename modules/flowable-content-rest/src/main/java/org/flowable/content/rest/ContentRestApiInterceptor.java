@@ -14,12 +14,13 @@ package org.flowable.content.rest;
 
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.api.ContentItemQuery;
+import org.flowable.content.rest.service.api.content.ContentItemQueryRequest;
 
 public interface ContentRestApiInterceptor {
     
     void accessContentItemInfoById(ContentItem contentItem);
     
-    void accessContentItemInfoWithQuery(ContentItemQuery contentItemQuery);
+    void accessContentItemInfoWithQuery(ContentItemQuery contentItemQuery, ContentItemQueryRequest request);
     
     void createNewContentItem(ContentItem contentItem);
     

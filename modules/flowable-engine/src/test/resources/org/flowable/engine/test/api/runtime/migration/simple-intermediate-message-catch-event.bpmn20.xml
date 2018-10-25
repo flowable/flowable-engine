@@ -5,7 +5,7 @@
 
     <message id="myNewMessage" name="someNewMessage"/>
 
-    <process id="changeStateForSimpleIntermediateEvent">
+    <process id="simpleIntermediateEvent">
 
         <startEvent id="theStart"/>
 

@@ -61,6 +61,17 @@ public class CmmnEngineImpl implements CmmnEngine {
             commandExecutor.execute(cmmnEngineConfiguration.getSchemaCommandConfig(), cmmnEngineConfiguration.getSchemaManagementCmd());
         }
 
+        if (asyncExecutor != null && asyncExecutor.isAutoActivate()) {
+            asyncExecutor.start();
+        }
+
+        // When running together with the bpmn engine, the asyncHistoryExecutor is shared by default.
+        // However, calling multiple times .start() won't do anything (the method returns if already running),
+        // so no need to check this case specically here.
+        if (asyncHistoryExecutor != null && asyncHistoryExecutor.isAutoActivate()) {
+            asyncHistoryExecutor.start();
+        }
+
         LOGGER.info("CmmnEngine {} created", name);
         
         CmmnEngines.registerCmmnEngine(this);

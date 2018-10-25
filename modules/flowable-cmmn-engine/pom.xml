@@ -11,7 +11,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>6.4.0-SNAPSHOT</version>
+        <version>6.4.1-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -42,6 +42,10 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-idm-engine-configurator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-entitylink-service</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
@@ -145,7 +149,7 @@
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
+            <artifactId>groovy-jsr223</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

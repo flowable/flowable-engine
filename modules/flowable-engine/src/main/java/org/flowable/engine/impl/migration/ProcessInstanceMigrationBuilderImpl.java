@@ -16,6 +16,7 @@ package org.flowable.engine.impl.migration;
 import java.util.Map;
 
 import org.flowable.engine.RuntimeService;
+import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 
@@ -66,14 +67,20 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
     }
 
     @Override
-    public ProcessInstanceMigrationBuilder addActivityMigrationMapping(String fromActivityId, String toActivityId) {
-        this.migrationDocumentBuilder.addActivityMigrationMapping(fromActivityId, toActivityId);
+    public ProcessInstanceMigrationBuilder addActivityMigrationMapping(ActivityMigrationMapping mapping) {
+        this.migrationDocumentBuilder.addActivityMigrationMapping(mapping);
         return this;
     }
 
     @Override
-    public ProcessInstanceMigrationBuilder addActivityMigrationMappings(Map<String, String> activityMigrationMappings) {
-        this.migrationDocumentBuilder.addActivityMigrationMappings(activityMigrationMappings);
+    public ProcessInstanceMigrationBuilder withProcessInstanceVariable(String variableName, Object variableValue) {
+        this.migrationDocumentBuilder.processInstanceVariables.put(variableName, variableValue);
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationBuilder withProcessInstanceVariables(Map<String, Object> variables) {
+        this.migrationDocumentBuilder.processInstanceVariables.putAll(variables);
         return this;
     }
 
@@ -89,15 +96,32 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
     }
 
     @Override
-    public void migrateProcessInstancesOf(String processDefinitionId) {
+    public ProcessInstanceMigrationValidationResult validateMigration(String processInstanceId) {
+        ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
+        return runtimeService.validateMigrationForProcessInstance(processInstanceId, document);
+    }
+
+    @Override
+    public void migrateProcessInstances(String processDefinitionId) {
         ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
         runtimeService.migrateProcessInstancesOfProcessDefinition(processDefinitionId, document);
     }
 
     @Override
-    public void migrateProcessInstancesOf(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId) {
+    public ProcessInstanceMigrationValidationResult validateMigrationOfProcessInstances(String processDefinitionId) {
+        ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
+        return runtimeService.validateMigrationForProcessInstancesOfProcessDefinition(processDefinitionId, document);
+    }
+
+    @Override
+    public void migrateProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId) {
         ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
         runtimeService.migrateProcessInstancesOfProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, document);
     }
 
+    @Override
+    public ProcessInstanceMigrationValidationResult validateMigrationOfProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId) {
+        ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
+        return runtimeService.validateMigrationForProcessInstancesOfProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, document);
+    }
 }

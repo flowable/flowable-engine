@@ -28,7 +28,9 @@ import org.flowable.engine.history.ProcessInstanceHistoryLogQuery;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.DeleteHistoricProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.DeleteHistoricTaskInstanceCmd;
+import org.flowable.engine.impl.cmd.GetHistoricEntityLinkChildrenForProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.GetHistoricIdentityLinksForTaskCmd;
+import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.service.history.NativeHistoricTaskInstanceQuery;
@@ -118,6 +120,11 @@ public class HistoryServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     @Override
     public List<HistoricIdentityLink> getHistoricIdentityLinksForTask(String taskId) {
         return commandExecutor.execute(new GetHistoricIdentityLinksForTaskCmd(taskId, null));
+    }
+    
+    @Override
+    public List<HistoricEntityLink> getHistoricEntityLinkChildrenForProcessInstance(String processInstanceId) {
+        return commandExecutor.execute(new GetHistoricEntityLinkChildrenForProcessInstanceCmd(processInstanceId));
     }
 
     @Override

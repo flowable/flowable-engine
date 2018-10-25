@@ -364,7 +364,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
             Comment comment = taskService.addComment(taskId, null, "This is a regular comment");
             Comment customComment1 = taskService.addComment(taskId, null, customType1, "This is a custom comment of type Type1");
-            Comment customComment2 = taskService.addComment(taskId, null, customType1, "This is another Type1 comment");
+            taskService.addComment(taskId, null, customType1, "This is another Type1 comment");
             Comment customComment3 = taskService.addComment(taskId, null, customType2, "This is another custom comment. Type2 this time!");
 
             assertEquals(CommentEntity.TYPE_COMMENT, comment.getType());

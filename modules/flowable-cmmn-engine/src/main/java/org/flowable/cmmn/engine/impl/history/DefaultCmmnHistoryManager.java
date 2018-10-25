@@ -28,6 +28,9 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.entitylink.api.history.HistoricEntityLinkService;
+import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
+import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntity;
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
@@ -73,6 +76,17 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             if (historicCaseInstanceEntity != null) {
                 historicCaseInstanceEntity.setEndTime(cmmnEngineConfiguration.getClock().getCurrentTime());
                 historicCaseInstanceEntity.setState(state);
+            }
+        }
+    }
+    
+    @Override
+    public void recordUpdateCaseInstanceName(CaseInstanceEntity caseInstanceEntity, String name) {
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
+            HistoricCaseInstanceEntity historicCaseInstanceEntity = historicCaseInstanceEntityManager.findById(caseInstanceEntity.getId());
+            if (historicCaseInstanceEntity != null) {
+                historicCaseInstanceEntity.setName(name);
             }
         }
     }
@@ -123,6 +137,31 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     public void recordIdentityLinkDeleted(IdentityLinkEntity identityLink) {
         if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
             CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricIdentityLink(identityLink.getId());
+        }
+    }
+    
+    @Override
+    public void recordEntityLinkCreated(EntityLinkEntity entityLink) {
+        if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE && entityLink.getScopeId() != null) {
+            HistoricEntityLinkService historicEntityLinkService = CommandContextUtil.getHistoricEntityLinkService();
+            HistoricEntityLinkEntity historicEntityLinkEntity = (HistoricEntityLinkEntity) historicEntityLinkService.createHistoricEntityLink();
+            historicEntityLinkEntity.setId(entityLink.getId());
+            historicEntityLinkEntity.setLinkType(entityLink.getLinkType());
+            historicEntityLinkEntity.setCreateTime(entityLink.getCreateTime());
+            historicEntityLinkEntity.setScopeId(entityLink.getScopeId());
+            historicEntityLinkEntity.setScopeType(entityLink.getScopeType());
+            historicEntityLinkEntity.setScopeDefinitionId(entityLink.getScopeDefinitionId());
+            historicEntityLinkEntity.setReferenceScopeId(entityLink.getReferenceScopeId());
+            historicEntityLinkEntity.setReferenceScopeType(entityLink.getReferenceScopeType());
+            historicEntityLinkEntity.setReferenceScopeDefinitionId(entityLink.getReferenceScopeDefinitionId());
+            historicEntityLinkService.insertHistoricEntityLink(historicEntityLinkEntity, false);
+        }
+    }
+
+    @Override
+    public void recordEntityLinkDeleted(EntityLinkEntity entityLink) {
+        if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
+            CommandContextUtil.getHistoricEntityLinkService().deleteHistoricEntityLink(entityLink.getId());
         }
     }
 
@@ -187,80 +226,96 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             historicPlanItemInstanceEntity.setReferenceId(planItemInstanceEntity.getReferenceId());
             historicPlanItemInstanceEntity.setReferenceType(planItemInstanceEntity.getReferenceType());
             historicPlanItemInstanceEntity.setTenantId(planItemInstanceEntity.getTenantId());
-            historicPlanItemInstanceEntity.setCreatedTime(planItemInstanceEntity.getStartTime());
+            historicPlanItemInstanceEntity.setCreateTime(planItemInstanceEntity.getCreateTime());
+            historicPlanItemInstanceEntity.setEntryCriterionId(planItemInstanceEntity.getEntryCriterionId());
+            historicPlanItemInstanceEntity.setExitCriterionId(planItemInstanceEntity.getExitCriterionId());
             historicPlanItemInstanceEntityManager.insert(historicPlanItemInstanceEntity);
         }
     }
 
     @Override
     public void recordPlanItemInstanceAvailable(PlanItemInstanceEntity planItemInstanceEntity) {
-        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, h -> h.setLastAvailableTime(cmmnEngineConfiguration.getClock().getCurrentTime()));
+        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, planItemInstanceEntity.getLastAvailableTime(),
+            h -> h.setLastAvailableTime(planItemInstanceEntity.getLastAvailableTime()));
     }
 
     @Override
     public void recordPlanItemInstanceEnabled(PlanItemInstanceEntity planItemInstanceEntity) {
-        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, h -> h.setLastEnabledTime(cmmnEngineConfiguration.getClock().getCurrentTime()));
+        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, planItemInstanceEntity.getLastEnabledTime(),
+            h -> h.setLastEnabledTime(planItemInstanceEntity.getLastEnabledTime()));
     }
 
     @Override
     public void recordPlanItemInstanceDisabled(PlanItemInstanceEntity planItemInstanceEntity) {
-        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, h -> h.setLastDisabledTime(cmmnEngineConfiguration.getClock().getCurrentTime()));
+        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, planItemInstanceEntity.getLastDisabledTime(),
+            h -> h.setLastDisabledTime(planItemInstanceEntity.getLastDisabledTime()));
     }
 
     @Override
     public void recordPlanItemInstanceStarted(PlanItemInstanceEntity planItemInstanceEntity) {
-        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, h -> h.setLastStartedTime(cmmnEngineConfiguration.getClock().getCurrentTime()));
+        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, planItemInstanceEntity.getLastStartedTime(),
+            h -> h.setLastStartedTime(planItemInstanceEntity.getLastStartedTime()));
     }
 
     @Override
     public void recordPlanItemInstanceSuspended(PlanItemInstanceEntity planItemInstanceEntity) {
-        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, h -> h.setLastSuspendedTime(cmmnEngineConfiguration.getClock().getCurrentTime()));
+        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, planItemInstanceEntity.getLastSuspendedTime(),
+            h -> h.setLastSuspendedTime(planItemInstanceEntity.getLastSuspendedTime()));
     }
 
     @Override
     public void recordPlanItemInstanceCompleted(PlanItemInstanceEntity planItemInstanceEntity) {
-        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, h -> {
-            Date currentTime = cmmnEngineConfiguration.getClock().getCurrentTime();
-            h.setEndedTime(currentTime);
-            h.setCompletedTime(currentTime);
+        Date completedTime = planItemInstanceEntity.getCompletedTime();
+        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, completedTime,
+            h -> {
+                h.setEndedTime(completedTime);
+                h.setCompletedTime(completedTime);
         });
     }
 
     @Override
     public void recordPlanItemInstanceTerminated(PlanItemInstanceEntity planItemInstanceEntity) {
-        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, h -> {
-            Date currentTime = cmmnEngineConfiguration.getClock().getCurrentTime();
-            h.setEndedTime(currentTime);
-            h.setTerminatedTime(currentTime);
+        Date terminatedTime = planItemInstanceEntity.getTerminatedTime();
+        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, terminatedTime,
+            h -> {
+                h.setEndedTime(terminatedTime);
+                h.setTerminatedTime(terminatedTime);
         });
     }
 
     @Override
     public void recordPlanItemInstanceOccurred(PlanItemInstanceEntity planItemInstanceEntity) {
-        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, h -> {
-            Date currentTime = cmmnEngineConfiguration.getClock().getCurrentTime();
-            h.setEndedTime(currentTime);
-            h.setOccurredTime(currentTime);
+        Date occurredTime = planItemInstanceEntity.getOccurredTime();
+        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, occurredTime,
+            h -> {
+                h.setEndedTime(occurredTime);
+                h.setOccurredTime(occurredTime);
         });
     }
 
     @Override
     public void recordPlanItemInstanceExit(PlanItemInstanceEntity planItemInstanceEntity) {
-        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, h -> {
-            Date currentTime = cmmnEngineConfiguration.getClock().getCurrentTime();
-            h.setEndedTime(currentTime);
-            h.setExitTime(currentTime);
+        Date exitTime = planItemInstanceEntity.getExitTime();
+        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, exitTime,
+            h -> {
+                h.setEndedTime(exitTime);
+                h.setExitTime(exitTime);
         });
     }
 
-    protected void recordHistoricPlanItemInstanceEntity(PlanItemInstanceEntity planItemInstanceEntity, Consumer<HistoricPlanItemInstanceEntity> changes) {
+    protected void recordHistoricPlanItemInstanceEntity(PlanItemInstanceEntity planItemInstanceEntity, Date lastUpdatedTime, Consumer<HistoricPlanItemInstanceEntity> changes) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager();
             HistoricPlanItemInstanceEntity historicPlanItemInstanceEntity = historicPlanItemInstanceEntityManager.findById(planItemInstanceEntity.getId());
             if (historicPlanItemInstanceEntity != null) {
+
                 historicPlanItemInstanceEntity.setState(planItemInstanceEntity.getState());
-                historicPlanItemInstanceEntity.setLastUpdatedTime(cmmnEngineConfiguration.getClock().getCurrentTime());
+                historicPlanItemInstanceEntity.setLastUpdatedTime(lastUpdatedTime);
                 changes.accept(historicPlanItemInstanceEntity);
+
+                // Can be updated on state change
+                historicPlanItemInstanceEntity.setEntryCriterionId(planItemInstanceEntity.getEntryCriterionId());
+                historicPlanItemInstanceEntity.setExitCriterionId(planItemInstanceEntity.getExitCriterionId());
             }
         }
     }

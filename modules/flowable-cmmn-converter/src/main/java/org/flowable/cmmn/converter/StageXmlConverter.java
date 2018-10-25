@@ -14,6 +14,7 @@ package org.flowable.cmmn.converter;
 
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.Stage;
 
@@ -37,9 +38,15 @@ public class StageXmlConverter extends PlanItemDefinitiomXmlConverter {
         Stage stage = new Stage();
         
         stage.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
+
         stage.setAutoComplete(Boolean.valueOf(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IS_AUTO_COMPLETE)));
         stage.setAutoCompleteCondition(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_AUTO_COMPLETE_CONDITION));
-        
+
+        String displayOrderString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_DISPLAY_ORDER);
+        if (StringUtils.isNotEmpty(displayOrderString)) {
+            stage.setDisplayOrder(Integer.valueOf(displayOrderString));
+        }
+
         stage.setCase(conversionHelper.getCurrentCase());
         stage.setParent(conversionHelper.getCurrentStage());
         

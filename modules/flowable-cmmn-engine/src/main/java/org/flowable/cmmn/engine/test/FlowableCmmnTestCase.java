@@ -115,6 +115,10 @@ public abstract class FlowableCmmnTestCase {
         cmmnEngineConfiguration.getClock().setCurrentTime(date);
         return date;
     }
+
+    protected void setClockTo(long epochTime) {
+        setClockTo(new Date(epochTime));
+    }
     
     protected void setClockTo(Date date) {
         cmmnEngineConfiguration.getClock().setCurrentTime(date);

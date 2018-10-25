@@ -32,7 +32,7 @@ public class StartPlanItemInstanceCmd extends AbstractNeedsPlanItemInstanceCmd {
         if (!PlanItemInstanceState.ENABLED.equals(planItemInstanceEntity.getState())) {
             throw new FlowableIllegalArgumentException("Can only enable a plan item instance which is in state ENABLED");
         }
-        CommandContextUtil.getAgenda(commandContext).planStartPlanItemInstanceOperation(planItemInstanceEntity);
+        CommandContextUtil.getAgenda(commandContext).planStartPlanItemInstanceOperation(planItemInstanceEntity, null);
     }
     
 }

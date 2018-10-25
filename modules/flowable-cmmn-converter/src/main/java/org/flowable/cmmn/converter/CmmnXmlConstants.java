@@ -76,6 +76,8 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_ID = "id";
     String ATTRIBUTE_NAME = "name";
     String ATTRIBUTE_INITIATOR_VARIABLE_NAME = "initiatorVariableName";
+    String ATTRIBUTE_CASE_CANDIDATE_USERS = "candidateStarterUsers";
+    String ATTRIBUTE_CASE_CANDIDATE_GROUPS = "candidateStarterGroups";
     String ATTRIBUTE_TEXT_FORMAT = "textFormat";
     String ATTRIBUTE_DEFINITION_REF = "definitionRef";
     String ATTRIBUTE_SOURCE_REF = "sourceRef";
@@ -87,6 +89,8 @@ public interface CmmnXmlConstants {
 
     String ATTRIBUTE_IS_AUTO_COMPLETE = "autoComplete";
     String ATTRIBUTE_AUTO_COMPLETE_CONDITION = "autoCompleteCondition";
+
+    String ATTRIBUTE_DISPLAY_ORDER = "displayOrder";
 
     String ATTRIBUTE_CASE_REF = "caseRef";
     String ATTRIBUTE_PROCESS_REF = "processRef";
@@ -104,6 +108,7 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_IOPARAMETER_SOURCE = "source";
     String ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION = "sourceExpression";
     String ATTRIBUTE_IOPARAMETER_TARGET = "target";
+    String ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION = "targetExpression";
 
     String ELEMENT_TIMER_EXPRESSION = "timerExpression";
     String ELEMENT_PLAN_ITEM_START_TRIGGER = "planItemStartTrigger";

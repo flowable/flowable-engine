@@ -27,7 +27,7 @@ public class TerminateCaseInstanceCmd extends AbstractNeedsCaseInstanceCmd {
     
     @Override
     protected void internalExecute(CommandContext commandContext, CaseInstanceEntity caseInstanceEntity) {
-        CommandContextUtil.getAgenda(commandContext).planTerminateCaseInstanceOperation(caseInstanceEntity.getId(), true);
+        CommandContextUtil.getAgenda(commandContext).planManualTerminateCaseInstanceOperation(caseInstanceEntity.getId());
     }
 
 }

@@ -188,6 +188,10 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         conf.setEnableSafeBpmnXml(processProperties.isEnableSafeXml());
 
         conf.setHistoryLevel(flowableProperties.getHistoryLevel());
+        
+        conf.setActivityFontName(flowableProperties.getActivityFontName());
+        conf.setAnnotationFontName(flowableProperties.getAnnotationFontName());
+        conf.setLabelFontName(flowableProperties.getLabelFontName());
 
         IdGenerator idGenerator = getIfAvailable(processIdGenerator, globalIdGenerator);
         if (idGenerator == null) {

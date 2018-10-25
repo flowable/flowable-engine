@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
@@ -197,20 +198,29 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             }
             
             if (restApiInterceptor != null) {
-                restApiInterceptor.createCaseInstance(caseInstanceBuilder);
+                restApiInterceptor.createCaseInstance(caseInstanceBuilder, request);
             }
 
             instance = caseInstanceBuilder.start();
 
             response.setStatus(HttpStatus.CREATED.value());
 
+            CaseInstanceResponse caseInstanceResponse = null;
             if (request.getReturnVariables()) {
                 Map<String, Object> runtimeVariableMap = runtimeService.getVariables(instance.getId());
-                return restResponseFactory.createCaseInstanceResponse(instance, true, runtimeVariableMap);
+                caseInstanceResponse = restResponseFactory.createCaseInstanceResponse(instance, true, runtimeVariableMap);
 
             } else {
-                return restResponseFactory.createCaseInstanceResponse(instance);
+                caseInstanceResponse = restResponseFactory.createCaseInstanceResponse(instance);
             }
+            
+            CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().caseDefinitionId(caseInstanceResponse.getCaseDefinitionId()).singleResult();
+            if (caseDefinition != null) {
+                caseInstanceResponse.setCaseDefinitionName(caseDefinition.getName());
+                caseInstanceResponse.setCaseDefinitionDescription(caseDefinition.getDescription());
+            }
+            
+            return caseInstanceResponse;
 
         } catch (FlowableObjectNotFoundException aonfe) {
             throw new FlowableIllegalArgumentException(aonfe.getMessage(), aonfe);

@@ -26,6 +26,9 @@ public class CollectionUtil {
 
     /**
      * all values of value must be in collection
+     *
+     * @return {@code true} if all elements of value are within the collection,
+     * {@code false} if at least one element of value is not within the collection
      */
     public static boolean allOf(Object collection, Object value) {
 
@@ -61,7 +64,10 @@ public class CollectionUtil {
     }
 
     /**
-     * all values of value must not be in collection
+     * none of the values of value must be in collection
+     *
+     * @return {@code true} if all elements of value are not within the collection,
+     * {@code false} if at least one element of value is within the collection
      */
     public static boolean noneOf(Object collection, Object value) {
 
@@ -79,12 +85,12 @@ public class CollectionUtil {
         // elements to check
         if (DMNParseUtil.isParseableCollection(value)) {
             Collection valueCollection = DMNParseUtil.parseCollection(value, targetCollection);
-            return valueCollection == null || !targetCollection.containsAll(valueCollection);
+            return !CollectionUtils.containsAny(targetCollection, valueCollection);
         } else if (DMNParseUtil.isJavaCollection(value)) {
-            return !targetCollection.containsAll((Collection) value);
+            return !CollectionUtils.containsAny(targetCollection, (Collection) value);
         } else if (DMNParseUtil.isArrayNode(value)) {
             Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) value);
-            return valueCollection == null || !targetCollection.containsAll(valueCollection);
+            return !CollectionUtils.containsAny(targetCollection, valueCollection);
         } else {
             Object formattedValue = DMNParseUtil.getFormattedValue(value, targetCollection);
             return !targetCollection.contains(formattedValue);
@@ -98,6 +104,9 @@ public class CollectionUtil {
 
     /**
      * one of the values of value must be in collection
+     *
+     * @return {@code true} if at least one element of value is within the collection,
+     * {@code false} if all elements of value are not within the collection
      */
     public static boolean anyOf(Object collection, Object value) {
 
@@ -134,6 +143,9 @@ public class CollectionUtil {
 
     /**
      * one of the values of value must not be in collection
+     *
+     * @return {@code true} if a least one element of value is not within the collection,
+     * {@code false} if all elements of value are within the collection
      */
     public static boolean notAllOf(Object collection, Object value) {
 
@@ -151,12 +163,12 @@ public class CollectionUtil {
         // elements to check
         if (DMNParseUtil.isParseableCollection(value)) {
             Collection valueCollection = DMNParseUtil.parseCollection(value, targetCollection);
-            return valueCollection == null || !CollectionUtils.containsAny(targetCollection, valueCollection);
+            return valueCollection == null || !targetCollection.containsAll(valueCollection);
         } else if (DMNParseUtil.isJavaCollection(value)) {
-            return !CollectionUtils.containsAny(targetCollection, (Collection) value);
+            return !targetCollection.containsAll((Collection) value);
         } else if (DMNParseUtil.isArrayNode(value)) {
             Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) value);
-            return valueCollection == null || !CollectionUtils.containsAny(targetCollection, valueCollection);
+            return valueCollection == null || !targetCollection.containsAll(valueCollection);
         } else {
             Object formattedValue = DMNParseUtil.getFormattedValue(value, targetCollection);
             return !targetCollection.contains(formattedValue);

@@ -44,6 +44,8 @@ public class TaskResponse {
     protected Date dueDate;
     protected int priority;
     protected boolean suspended;
+    @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
+    protected Date claimTime;
     protected String taskDefinitionKey;
     protected String tenantId;
     protected String category;
@@ -70,6 +72,7 @@ public class TaskResponse {
         setDueDate(task.getDueDate());
         setPriority(task.getPriority());
         setSuspended(task.isSuspended());
+        setClaimTime(task.getClaimTime());
         setTaskDefinitionKey(task.getTaskDefinitionKey());
         setParentTaskId(task.getParentTaskId());
         setCategory(task.getCategory());
@@ -185,6 +188,15 @@ public class TaskResponse {
 
     public void setSuspended(boolean suspended) {
         this.suspended = suspended;
+    }
+
+    @ApiModelProperty(example = "2018-04-17T10:17:43.902+0000", dataType = "string")
+    public Date getClaimTime() {
+        return claimTime;
+    }
+
+    public void setClaimTime(Date claimTime) {
+        this.claimTime = claimTime;
     }
 
     @ApiModelProperty(example = "theTask")

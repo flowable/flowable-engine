@@ -321,6 +321,18 @@ public interface TaskService {
      *             when the task or form definition doesn't exist.
      */
     FormInfo getTaskFormModel(String taskId);
+    
+    /**
+     * Gets a Form model instance of the task form of a specific task without any variable handling
+     * 
+     * @param taskId
+     *            id of the task, cannot be null.
+     * @param ignoreVariables
+     *            should the variables be ignored when fetching the form model?
+     * @throws FlowableObjectNotFoundException
+     *             when the task or form definition doesn't exist.
+     */
+    FormInfo getTaskFormModel(String taskId, boolean ignoreVariables);
 
     /**
      * Changes the assignee of the given task to the given userId. No check is done whether the user is known by the identity component.

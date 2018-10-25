@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
+import org.flowable.cmmn.engine.impl.listener.PlanItemLifeCycleListenerUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CountingPlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.EntityWithSentryPartInstances;
@@ -53,8 +54,6 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
     protected PlanItemLifeCycleEvent planItemLifeCycleEvent;
 
-    private enum CriteriaEvaluationResult {SENTRY_SATISFIED, SENTRY_SATISFIED_BUT_IGNORED, PART_TRIGGERED, NONE}
-    
     // only the last evaluation planned on the agenda operation will have this true
     protected boolean evaluateCaseInstanceCompleted;
 
@@ -71,9 +70,9 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
     public void run() {
         super.run();
 
-        CriteriaEvaluationResult planModelExitCriteriaEvaluationResult = evaluateExitCriteria(caseInstanceEntity, getPlanModel(caseInstanceEntity));
-        if (CriteriaEvaluationResult.SENTRY_SATISFIED.equals(planModelExitCriteriaEvaluationResult)) {
-            CommandContextUtil.getAgenda(commandContext).planTerminateCaseInstanceOperation(caseInstanceEntity.getId(), false);
+        String satisfiedExitCriterion = evaluateExitCriteria(caseInstanceEntity, getPlanModel(caseInstanceEntity));
+        if (satisfiedExitCriterion != null) {
+            CommandContextUtil.getAgenda(commandContext).planTerminateCaseInstanceOperation(caseInstanceEntity.getId(), satisfiedExitCriterion);
 
         } else {
             boolean criteriaChangeOrActiveChildren = evaluatePlanItemsCriteria(caseInstanceEntity);
@@ -111,19 +110,24 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         for (PlanItemInstanceEntity planItemInstanceEntity : planItemInstances) {
 
             PlanItem planItem = planItemInstanceEntity.getPlanItem();
-            CriteriaEvaluationResult evaluationResult = null;
             String state = planItemInstanceEntity.getState();
+
             if (PlanItemInstanceState.EVALUATE_ENTRY_CRITERIA_STATES.contains(state)) {
                 
-                evaluationResult = evaluateEntryCriteria(planItemInstanceEntity, planItem);
-                if (evaluationResult.equals(CriteriaEvaluationResult.SENTRY_SATISFIED)) {
+                String satisfiedEntryCriterion = evaluateEntryCriteria(planItemInstanceEntity, planItem);
+                if (planItem.getEntryCriteria().isEmpty() || satisfiedEntryCriterion != null) {
                     boolean activatePlanItemInstance = true;
                     if (!planItem.getEntryCriteria().isEmpty() && hasRepetitionRule(planItemInstanceEntity)) {
                         boolean isRepeating = evaluateRepetitionRule(planItemInstanceEntity);
                         if (isRepeating) {
 
                             PlanItemInstanceEntity childPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false);
-                            childPlanItemInstanceEntity.setState(PlanItemInstanceState.WAITING_FOR_REPETITION);
+
+                            String oldState = childPlanItemInstanceEntity.getState();
+                            String newState = PlanItemInstanceState.WAITING_FOR_REPETITION;
+                            childPlanItemInstanceEntity.setState(newState);
+                            PlanItemLifeCycleListenerUtil.callLifeCycleListeners(commandContext, planItemInstanceEntity, oldState, newState);
+
                             if (newChildPlanItemInstances == null) {
                                 newChildPlanItemInstances = new ArrayList<>(1);
                             }
@@ -135,23 +139,26 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                             activatePlanItemInstance = false;
                         }
                     }
+
                     if (planItem.getPlanItemDefinition() instanceof EventListener) {
                         activatePlanItemInstance = false; // event listeners occur, they don't become active
                     }
+
                     if (activatePlanItemInstance) {
                         criteriaChanged = true;
-                        CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(planItemInstanceEntity);
+                        CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(planItemInstanceEntity, satisfiedEntryCriterion);
                     }
+
                 }
 
             }
             
             if (!PlanItemInstanceState.END_STATES.contains(state)) {
                 
-                evaluationResult = evaluateExitCriteria(planItemInstanceEntity, planItem);
-                if (evaluationResult.equals(CriteriaEvaluationResult.SENTRY_SATISFIED)) {
+                String satisfiedExitCriterion = evaluateExitCriteria(planItemInstanceEntity, planItem);
+                if (satisfiedExitCriterion != null) {
                     criteriaChanged = true;
-                    CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(planItemInstanceEntity);
+                    CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(planItemInstanceEntity, satisfiedExitCriterion);
 
                 } else if (planItem.getPlanItemDefinition() instanceof Stage) {
 
@@ -189,86 +196,88 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         return criteriaChanged || activeChildren > 0;
     }
 
-    protected CriteriaEvaluationResult evaluateEntryCriteria(PlanItemInstanceEntity planItemInstanceEntity, PlanItem planItem) {
+    protected String evaluateEntryCriteria(PlanItemInstanceEntity planItemInstanceEntity, PlanItem planItem) {
         List<Criterion> criteria = planItem.getEntryCriteria();
         if (criteria != null && !criteria.isEmpty()) {
             return evaluateCriteria(planItemInstanceEntity, criteria);
         }
-        return CriteriaEvaluationResult.SENTRY_SATISFIED;
+        return null;
     }
 
-    protected CriteriaEvaluationResult evaluateExitCriteria(EntityWithSentryPartInstances entityWithSentryPartInstances, HasExitCriteria hasExitCriteria) {
+    protected String evaluateExitCriteria(EntityWithSentryPartInstances entityWithSentryPartInstances, HasExitCriteria hasExitCriteria) {
         List<Criterion> criteria = hasExitCriteria.getExitCriteria();
         if (criteria != null && !criteria.isEmpty()) {
             return evaluateCriteria(entityWithSentryPartInstances, criteria);
         }
-        return CriteriaEvaluationResult.NONE;
+        return null;
     }
 
-    protected CriteriaEvaluationResult evaluateCriteria(EntityWithSentryPartInstances entityWithSentryPartInstances, List<Criterion> criteria) {
-        boolean partTriggered = false;
-        for (Criterion entryCriterion : criteria) {
-            Sentry sentry = entryCriterion.getSentry();
+    /**
+     * @return Returns the id of the criterion that is satisfied.
+     *         If none is satisfied, null is returned.
+     */
+    protected String evaluateCriteria(EntityWithSentryPartInstances entityWithSentryPartInstances, List<Criterion> criteria) {
+        for (Criterion criterion : criteria) {
+            Sentry sentry = criterion.getSentry();
 
-            if (sentry.getOnParts().size() == 1 && sentry.getSentryIfPart() == null) { // No need to look into the satisfied onparts
+            // There can be zero or more on parts and zero or one if part.
+            // All defined parts need to be satisfied for the sentry to trigger.
+
+            if (sentry.getOnParts().size() == 1 && sentry.getSentryIfPart() == null) { // Only one one part and no if part: no need to fetch the previously satisfied onparts
                 if (planItemLifeCycleEvent != null) {
                     SentryOnPart sentryOnPart = sentry.getOnParts().get(0);
                     if (sentryOnPartMatchesCurrentLifeCycleEvent(sentryOnPart)) {
-                        return CriteriaEvaluationResult.SENTRY_SATISFIED;
+                        return criterion.getId();
                     }
                 }
 
-            } else if (sentry.getOnParts().isEmpty() && sentry.getSentryIfPart() != null) {
+            } else if (sentry.getOnParts().isEmpty() && sentry.getSentryIfPart() != null) { // Only an if part: simply evaluate the if part
                 if (evaluateSentryIfPart(sentry, entityWithSentryPartInstances)) {
-                    return CriteriaEvaluationResult.SENTRY_SATISFIED;
+                    return criterion.getId();
                 }
                 
             } else {
 
+                // Go through the previously satisfied sentry parts and see if the ifPart was already satisfied
+                // and collect the ids of all previously satisfied onParts
+
                 boolean sentryIfPartSatisfied = false;
-                Set<String> satisfiedSentryOnPartIds = new HashSet<>(1); // can maximum be one for a given sentry
+                Set<String> previouslySatisfiedSentryOnPartIds = new HashSet<>(1);
                 for (SentryPartInstanceEntity sentryPartInstanceEntity : entityWithSentryPartInstances.getSatisfiedSentryPartInstances()) {
                     if (sentryPartInstanceEntity.getOnPartId() != null) {
-                        satisfiedSentryOnPartIds.add(sentryPartInstanceEntity.getOnPartId());
+                        previouslySatisfiedSentryOnPartIds.add(sentryPartInstanceEntity.getOnPartId());
                     } else if (sentryPartInstanceEntity.getIfPartId() != null
                             && sentryPartInstanceEntity.getIfPartId().equals(sentry.getSentryIfPart().getId())) {
                         sentryIfPartSatisfied = true;
                     }
                 }
 
-                boolean criteriaSatisfied = false;
-                
-                // On parts
+                // Verify if the onParts which are not yet satisfied, become satisifed due to the new event
                 for (SentryOnPart sentryOnPart : sentry.getOnParts()) {
-                    if (!satisfiedSentryOnPartIds.contains(sentryOnPart.getId())) {
+                    if (!previouslySatisfiedSentryOnPartIds.contains(sentryOnPart.getId())) {
                         if (planItemLifeCycleEvent != null && sentryOnPartMatchesCurrentLifeCycleEvent(sentryOnPart)) {
                             createSentryPartInstanceEntity(entityWithSentryPartInstances, sentryOnPart, null);
-                            satisfiedSentryOnPartIds.add(sentryOnPart.getId());
-                            criteriaSatisfied = true;
+                            previouslySatisfiedSentryOnPartIds.add(sentryOnPart.getId());
                         }
                     }
                 }
                 
-                // If parts
+                // Verify the ifPart in case it wasn't satisfied yet
                 if (sentry.getSentryIfPart() != null && !sentryIfPartSatisfied) {
                     if (evaluateSentryIfPart(sentry, entityWithSentryPartInstances)) {
                         createSentryPartInstanceEntity(entityWithSentryPartInstances, null, sentry.getSentryIfPart());
-                        sentryIfPartSatisfied = true;
-                        criteriaSatisfied = true;
                     }
                 }
 
                 if (entityWithSentryPartInstances.getSatisfiedSentryPartInstances().size() == (sentry.getOnParts().size() + (sentry.getSentryIfPart() != null ? 1 : 0))) {
-                    return CriteriaEvaluationResult.SENTRY_SATISFIED;
-                } else if (criteriaSatisfied) {
-                    partTriggered = true;
+                    return criterion.getId();
                 }
 
             }
 
         }
-        
-        return partTriggered ? CriteriaEvaluationResult.PART_TRIGGERED : CriteriaEvaluationResult.NONE;
+
+        return null;
     }
 
     public boolean sentryOnPartMatchesCurrentLifeCycleEvent(SentryOnPart sentryOnPart) {

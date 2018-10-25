@@ -43,7 +43,8 @@ public class PlanItemInstanceBaseResource {
 
     static {
         allowedSortProperties.put("name", PlanItemInstanceQueryProperty.NAME);
-        allowedSortProperties.put("startTime", PlanItemInstanceQueryProperty.START_TIME);
+        allowedSortProperties.put("createTime", PlanItemInstanceQueryProperty.CREATE_TIME);
+        allowedSortProperties.put("startTime", PlanItemInstanceQueryProperty.CREATE_TIME); // backwards compatibility
     }
 
     @Autowired
@@ -78,6 +79,9 @@ public class PlanItemInstanceBaseResource {
         if (queryRequest.getPlanItemDefinitionType() != null) {
             query.planItemDefinitionType(queryRequest.getPlanItemDefinitionType());
         }
+        if (queryRequest.getPlanItemDefinitionTypes() != null) {
+            query.planItemDefinitionTypes(queryRequest.getPlanItemDefinitionTypes());
+        }
         if (queryRequest.getName() != null) {
             query.planItemInstanceName(queryRequest.getName());
         }
@@ -93,11 +97,11 @@ public class PlanItemInstanceBaseResource {
         if (queryRequest.getReferenceType() != null) {
             query.planItemInstanceReferenceType(queryRequest.getReferenceType());
         }
-        if (queryRequest.getStartedBefore() != null) {
-            query.planItemInstanceStartedBefore(queryRequest.getStartedBefore());
+        if (queryRequest.getCreatedBefore() != null) {
+            query.planItemInstanceCreatedBefore(queryRequest.getCreatedBefore());
         }
-        if (queryRequest.getStartedAfter() != null) {
-            query.planItemInstanceStartedAfter(queryRequest.getStartedAfter());
+        if (queryRequest.getCreatedAfter() != null) {
+            query.planItemInstanceCreatedAfter(queryRequest.getCreatedAfter());
         }
         if (queryRequest.getStartUserId() != null) {
             query.planItemInstanceStartUserId(queryRequest.getStartUserId());
@@ -120,10 +124,10 @@ public class PlanItemInstanceBaseResource {
         }
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessPlanItemInstanceInfoWithQuery(query);
+            restApiInterceptor.accessPlanItemInstanceInfoWithQuery(query, queryRequest);
         }
 
-        return paginateList(requestParams, queryRequest, query, "startTime", allowedSortProperties, restResponseFactory::createPlanItemInstanceResponseList);
+        return paginateList(requestParams, queryRequest, query, "createTime", allowedSortProperties, restResponseFactory::createPlanItemInstanceResponseList);
     }
 
     protected void addVariables(PlanItemInstanceQuery planItemInstanceQuery, List<QueryVariable> variables, boolean isCase) {

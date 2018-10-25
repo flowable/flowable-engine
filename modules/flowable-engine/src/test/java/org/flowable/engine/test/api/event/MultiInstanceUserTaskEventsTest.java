@@ -291,7 +291,6 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(2, tasks.size());
         org.flowable.task.api.Task task0 = tasks.get(0);
-        org.flowable.task.api.Task task1 = tasks.get(1);
 
         taskService.complete(task0.getId());
 

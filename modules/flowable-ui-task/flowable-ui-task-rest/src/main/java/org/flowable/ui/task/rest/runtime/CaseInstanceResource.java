@@ -88,6 +88,18 @@ public class CaseInstanceResource {
         caseInstanceService.triggerUserEventListener(caseInstanceId, userEventListenerId);
     }
 
+    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/enabled-planitem-instances", method = RequestMethod.GET)
+    @ResponseStatus(value = HttpStatus.OK)
+    public ResultListDataRepresentation getCaseInstanceEnabledPlanItemInstances(@PathVariable String caseInstanceId) {
+        return caseInstanceService.getCaseInstanceEnabledPlanItemInstances(caseInstanceId);
+    }
+
+    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/enabled-planitem-instances/{planItemInstanceId}", method = RequestMethod.POST)
+    @ResponseStatus(value = HttpStatus.OK)
+    public void startEnabledPlanItemInstance(@PathVariable String caseInstanceId, @PathVariable String planItemInstanceId) {
+        caseInstanceService.startEnabledPlanItemInstance(caseInstanceId, planItemInstanceId);
+    }
+
     @RequestMapping(value = "/rest/case-instances/{caseInstanceId}", method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteCaseInstance(@PathVariable String caseInstanceId) {

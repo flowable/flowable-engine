@@ -25,8 +25,6 @@ import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEnt
  */
 public interface ProcessDefinitionEntity extends ProcessDefinition, Entity, HasRevision {
 
-    List<IdentityLinkEntity> getIdentityLinks();
-
     void setKey(String key);
 
     void setName(String name);
@@ -73,5 +71,7 @@ public interface ProcessDefinitionEntity extends ProcessDefinition, Entity, HasR
     String getEngineVersion();
 
     void setEngineVersion(String engineVersion);
+    
+    List<IdentityLinkEntity> getIdentityLinks();
     
 }

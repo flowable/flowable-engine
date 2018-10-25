@@ -42,6 +42,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
     protected String keyLike;
     protected String resourceName;
     protected String resourceNameLike;
+    protected String authorizationUserId;
     protected Integer version;
     protected Integer versionGt;
     protected Integer versionGte;
@@ -251,6 +252,22 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
     @Override
     public CaseDefinitionQuery caseDefinitionWithoutTenantId() {
         this.withoutTenantId = true;
+        return this;
+    }
+    
+    public List<String> getAuthorizationGroups() {
+        if (authorizationUserId == null) {
+            return null;
+        }
+        return CommandContextUtil.getCmmnEngineConfiguration().getCandidateManager().getGroupsForCandidateUser(authorizationUserId);
+    }
+    
+    @Override
+    public CaseDefinitionQuery startableByUser(String userId) {
+        if (userId == null) {
+            throw new FlowableIllegalArgumentException("userId is null");
+        }
+        this.authorizationUserId = userId;
         return this;
     }
 

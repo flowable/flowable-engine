@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.api.tenant;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -370,27 +372,18 @@ public class TenancyTest extends PluggableFlowableTestCase {
         assertEquals(2 * nrOfProcessInstancesNoTenant, taskService.createTaskQuery().taskWithoutTenantId().list().size());
 
         // Remove the tenant id and verify results
-        try {
-            repositoryService.changeDeploymentTenantId(deploymentId, "");
-            fail(); // should clash: there is already a process definition with
-                    // the same key
-        } catch (Exception e) {
-
-        }
+        // should clash: there is already a process definition with the same key
+        assertThatThrownBy(() -> repositoryService.changeDeploymentTenantId(deploymentId, ""));
     }
 
     @Test
     public void testChangeDeploymentIdWithClash() {
         String processDefinitionIdWithTenant = deployTestProcessWithTestTenant("tenantA");
-        String processDefinitionIdNoTenant = deployOneTaskTestProcess();
+        deployOneTaskTestProcess();
 
         // Changing the one with tenant now back to one without should clash,
         // cause there already exists one
-        try {
-            repositoryService.changeDeploymentTenantId(processDefinitionIdWithTenant, "");
-            fail();
-        } catch (Exception e) {
-        }
+        assertThatThrownBy(() -> repositoryService.changeDeploymentTenantId(processDefinitionIdWithTenant, ""));
 
         // Deploying another version should just up the version
         String processDefinitionIdNoTenant2 = deployOneTaskTestProcess();
@@ -524,13 +517,8 @@ public class TenancyTest extends PluggableFlowableTestCase {
         assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").processDefinitionWithoutTenantId().list().size());
 
         // Now, start process instances by process definition key (no tenant)
-        try {
-            runtimeService.startProcessInstanceByKey("oneTaskProcess");
-            fail(); // shouldn't happen, there is no process definition with that
-                    // key that has no tenant, it has to give an exception as
-                    // such!
-        } catch (Exception e) {
-        }
+        // there is no process definition with that key that has no tenant, it has to give an exception
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("oneTaskProcess"));
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", tentanA);
         assertEquals(procDefIdA, processInstance.getProcessDefinitionId());
@@ -887,12 +875,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
 
             // following line if executed will give activiti object not found
             // exception as the process1 is linked to a tenant id.
-            try {
-                processInstance = runtimeService.startProcessInstanceByKey("process1");
-                Assert.fail();
-            } catch (Exception e) {
-
-            }
+            assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("process1"));
 
             // Cleanup
             deleteDeployments();

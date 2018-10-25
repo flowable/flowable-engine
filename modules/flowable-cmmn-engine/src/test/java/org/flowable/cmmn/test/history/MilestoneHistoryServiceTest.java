@@ -85,6 +85,8 @@ public class MilestoneHistoryServiceTest extends FlowableCmmnTestCase {
         //Milestone query is in sync with HistoricMilestone
         assertCaseInstanceNotEnded(caseInstance);
         assertEquals(3, cmmnRuntimeService.createMilestoneInstanceQuery().count());
+        assertEquals(1L, cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceName("1").milestoneInstanceWithoutTenantId().count());
+        assertEquals(1, cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceName("1").milestoneInstanceWithoutTenantId().list().size());
         assertEquals(3, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
 
         //Finish Case by triggering the last event
@@ -95,6 +97,8 @@ public class MilestoneHistoryServiceTest extends FlowableCmmnTestCase {
         assertCaseInstanceEnded(caseInstance);
         assertEquals(0, cmmnRuntimeService.createMilestoneInstanceQuery().count());
         assertEquals(3, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+        assertEquals(1L, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceName("1").milestoneInstanceWithoutTenantId().count());
+        assertEquals(1, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceName("1").milestoneInstanceWithoutTenantId().list().size());
 
         //There are two named milestones
         HistoricMilestoneInstance abcMilestone = cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceName("abcMilestone").singleResult();

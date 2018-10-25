@@ -18,6 +18,7 @@ import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricVariableInstanceQuery;
+import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
@@ -56,4 +57,9 @@ public interface CmmnHistoryService {
      * certain case instance, even if the instance is completed as opposed to {@link IdentityLink}s which only exist for active instances.
      */
     List<HistoricIdentityLink> getHistoricIdentityLinksForCaseInstance(String caseInstanceId);
+    
+    /**
+     * Retrieves the {@link HistoricEntityLink}s associated with the given case instance.
+     */
+    List<HistoricEntityLink> getHistoricEntityLinkChildrenForCaseInstance(String caseInstanceId);
 }

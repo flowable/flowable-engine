@@ -199,9 +199,9 @@ public abstract class InternalFlowableExtension implements AfterEachCallback, Be
 
                     @Override
                     public Object execute(CommandContext commandContext) {
-                        SchemaManager dbSchemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager();
-                        dbSchemaManager.schemaDrop();
-                        dbSchemaManager.schemaCreate();
+                        SchemaManager schemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getSchemaManager();
+                        schemaManager.schemaDrop();
+                        schemaManager.schemaCreate();
                         return null;
                     }
                 });

@@ -39,6 +39,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Event;
+import org.flowable.entitylink.api.EntityLink;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
@@ -521,6 +522,11 @@ public interface RuntimeService {
      * Retrieves the {@link IdentityLink}s associated with the given process instance. Such an {@link IdentityLink} informs how a certain user is involved with a process instance.
      */
     List<IdentityLink> getIdentityLinksForProcessInstance(String instanceId);
+    
+    /**
+     * Retrieves the {@link EntityLink}s associated with the given process instance.
+     */
+    List<EntityLink> getEntityLinkChildrenForProcessInstance(String instanceId);
 
     // Variables
     // ////////////////////////////////////////////////////////////////////

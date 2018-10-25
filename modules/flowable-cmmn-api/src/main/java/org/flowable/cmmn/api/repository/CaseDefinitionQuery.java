@@ -59,6 +59,8 @@ public interface CaseDefinitionQuery extends Query<CaseDefinitionQuery, CaseDefi
     CaseDefinitionQuery caseDefinitionResourceName(String resourceName);
 
     CaseDefinitionQuery caseDefinitionResourceNameLike(String resourceNameLike);
+    
+    CaseDefinitionQuery startableByUser(String userId);
 
     CaseDefinitionQuery caseDefinitionTenantId(String tenantId);
 

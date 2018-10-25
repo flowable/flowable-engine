@@ -12,6 +12,8 @@
  */
 package org.flowable.job.service.impl.history.async.transformer;
 
+import java.util.List;
+
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
@@ -22,7 +24,7 @@ public interface HistoryJsonTransformer {
     String FIELD_NAME_TYPE = "type";
     String FIELD_NAME_DATA = "data";
 
-    String getType();
+    List<String> getTypes();
 
     boolean isApplicable(ObjectNode historicalData, CommandContext commandContext);
 

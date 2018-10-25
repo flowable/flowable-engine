@@ -18,6 +18,8 @@ import java.util.List;
  * @author Joram Barrez
  */
 public interface HasEntryCriteria {
+
+    String getId();
     
     void addEntryCriterion(Criterion entryCriterion);
     

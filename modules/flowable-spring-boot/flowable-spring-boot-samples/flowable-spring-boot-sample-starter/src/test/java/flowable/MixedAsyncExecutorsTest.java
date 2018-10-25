@@ -87,8 +87,8 @@ public class MixedAsyncExecutorsTest {
         // Timer fires after 1 day, so setting it to 1 day + 1 second
         setClockTo(new Date(startTime.getTime() + (24 * 60 * 60 * 1000 + 1)));
 
-        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnRule.getCmmnEngine(), 7000L, 200L, true);
-        JobTestHelper.waitForJobExecutorToProcessAllJobs(processRule, 7000L, 200L);
+        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnRule.getCmmnEngine(), 10000L, 200L, true);
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processRule, 10000L, 200L);
 
         // User task should be active after the timer has triggered
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(2);
