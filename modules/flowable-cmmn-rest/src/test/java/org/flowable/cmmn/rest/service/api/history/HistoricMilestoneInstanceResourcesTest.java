@@ -290,7 +290,7 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
             String url = URI.create(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_MILESTONE_INSTANCE, expected.getId())).toURL().toString();
             assertEquals(url, actual.get("url").textValue());
         } catch (MalformedURLException e) {
-            fail("Cannot create url");
+            throw new AssertionError("Cannot create url", e);
         }
 
         try {

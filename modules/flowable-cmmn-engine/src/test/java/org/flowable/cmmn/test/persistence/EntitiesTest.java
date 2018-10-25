@@ -68,9 +68,8 @@ public class EntitiesTest {
             assertNotNull(c);
             return c;
         } catch (Exception e) {
-            fail("Entity interface class for " + mappedResource + " not found");
+            throw new AssertionError("Entity interface class for " + mappedResource + " not found", e);
         }
-        return null;
     }
     
     protected Class getAndAssertEntityImplClass(String mappedResource) {
@@ -79,9 +78,8 @@ public class EntitiesTest {
             assertNotNull(c);
             return c;
         } catch (Exception e) {
-            fail("Entity interface class for " + mappedResource + " not found");
+            throw new AssertionError("Entity interface class for " + mappedResource + " not found", e);
         }
-        return null;
     }
     
     private Set<String> getMappedResources() {

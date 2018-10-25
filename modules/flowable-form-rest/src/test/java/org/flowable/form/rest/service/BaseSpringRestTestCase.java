@@ -225,7 +225,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
             try {
                 response.close();
             } catch (IOException e) {
-                fail("Could not close http connection");
+                throw new AssertionError("Could not close http connection", e);
             }
         }
     }

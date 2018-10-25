@@ -203,7 +203,7 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
             try {
                 response.close();
             } catch (IOException e) {
-                fail("Could not close http connection");
+                throw new AssertionError("Could not close http connection", e);
             }
         }
     }
