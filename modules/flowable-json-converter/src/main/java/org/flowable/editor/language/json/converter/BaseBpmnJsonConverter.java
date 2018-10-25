@@ -419,6 +419,11 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
             } else {
                 propertyItemNode.putNull(PROPERTY_FORM_VARIABLE);
             }
+            if (StringUtils.isNotEmpty(property.getDefaultExpression())) {
+                propertyItemNode.put(PROPERTY_FORM_DEFAULT, property.getDefaultExpression());
+            } else {
+                propertyItemNode.putNull(PROPERTY_FORM_DEFAULT);
+            }
             if (StringUtils.isNotEmpty(property.getDatePattern())) {
                 propertyItemNode.put(PROPERTY_FORM_DATE_PATTERN, property.getDatePattern());
             }
@@ -524,7 +529,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                         formProperty.setType(getValueAsString(PROPERTY_FORM_TYPE, formNode));
                         formProperty.setExpression(getValueAsString(PROPERTY_FORM_EXPRESSION, formNode));
                         formProperty.setVariable(getValueAsString(PROPERTY_FORM_VARIABLE, formNode));
-
+                        formProperty.setDefaultExpression(getValueAsString(PROPERTY_FORM_DEFAULT, formNode));
                         if ("date".equalsIgnoreCase(formProperty.getType())) {
                             formProperty.setDatePattern(getValueAsString(PROPERTY_FORM_DATE_PATTERN, formNode));
 
