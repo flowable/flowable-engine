@@ -81,6 +81,9 @@ public class HistoricTaskInstanceBaseResource {
         if (queryRequest.getCaseInstanceId() != null) {
             query.caseInstanceId(queryRequest.getCaseInstanceId());
         }
+        if (queryRequest.getCaseInstanceIdWithChildren() != null) {
+            query.caseInstanceIdWithChildren(queryRequest.getCaseInstanceIdWithChildren());
+        }
         if (queryRequest.getCaseDefinitionId() != null) {
             query.caseDefinitionId(queryRequest.getCaseDefinitionId());
         }

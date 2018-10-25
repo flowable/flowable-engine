@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.runtime;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -37,8 +39,6 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to the Task collection resource.
@@ -252,6 +252,13 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             // Process instance filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?processInstanceId=" + processInstance.getId();
             assertResultsPresentInDataResponse(url, processTask.getId());
+            
+            // Process instance with children filtering
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?processInstanceIdWithChildren=" + processInstance.getId();
+            assertResultsPresentInDataResponse(url, processTask.getId());
+            
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?processInstanceIdWithChildren=nonexisting";
+            assertResultsPresentInDataResponse(url);
 
             // Execution filtering
             Execution taskExecution = runtimeService.createExecutionQuery().activityId("processTask").singleResult();

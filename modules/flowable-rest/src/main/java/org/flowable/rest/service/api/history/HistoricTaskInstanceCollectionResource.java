@@ -43,6 +43,7 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
     @ApiImplicitParams({
             @ApiImplicitParam(name = "taskId", dataType = "string", value = "An id of the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "The process instance id of the historic task instance.", paramType = "query"),
+            @ApiImplicitParam(name = "processInstanceIdWithChildren", dataType = "string", value = "Selects the historic task instances for the process instance and its children.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionKey", dataType = "string", value = "The process definition key of the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionKeyLike", dataType = "string", value = "The process definition key of the historic task instance, which matches the given value.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "The process definition id of the historic task instance.", paramType = "query"),
@@ -102,6 +103,10 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
 
         if (allRequestParams.get("processInstanceId") != null) {
             queryRequest.setProcessInstanceId(allRequestParams.get("processInstanceId"));
+        }
+        
+        if (allRequestParams.get("processInstanceIdWithChildren") != null) {
+            queryRequest.setProcessInstanceIdWithChildren(allRequestParams.get("processInstanceIdWithChildren"));
         }
 
         if (allRequestParams.get("processBusinessKey") != null) {

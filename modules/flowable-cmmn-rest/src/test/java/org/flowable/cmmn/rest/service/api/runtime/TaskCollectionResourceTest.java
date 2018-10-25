@@ -241,6 +241,14 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             // Case instance filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseInstanceId=" + caseInstance.getId();
             assertResultsPresentInDataResponse(url, caseTask.getId());
+            
+            // Case instance with children filtering
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseInstanceIdWithChildren=" + caseInstance.getId();
+            assertResultsPresentInDataResponse(url, caseTask.getId());
+            
+            // Case instance with children filtering
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseInstanceIdWithChildren=notexisting";
+            assertResultsPresentInDataResponse(url);
 
             // CreatedOn filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?createdOn=" + getISODateString(adhocTaskCreate.getTime());
