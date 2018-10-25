@@ -78,6 +78,7 @@ public class EngineConfiguration {
         cmmnEngineConfiguration.setDatabaseSchemaUpdate(CmmnEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
         cmmnEngineConfiguration.setTransactionManager(annotationDrivenTransactionManager());
         cmmnEngineConfiguration.setHistoryLevel(HistoryLevel.FULL);
+        cmmnEngineConfiguration.setEnableEntityLinks(true);
         return cmmnEngineConfiguration;
     }
 

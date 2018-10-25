@@ -174,10 +174,19 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
             requestNode.put("involvedUser", "misspiggy");
             assertResultsPresentInPostDataResponse(url, requestNode, adhocTask.getId());
 
-            // Process instance filtering
+            // Case instance filtering
             requestNode.removeAll();
             requestNode.put("caseInstanceId", caseInstance.getId());
             assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
+            
+            // Case instance with children filtering
+            requestNode.removeAll();
+            requestNode.put("caseInstanceIdWithChildren", caseInstance.getId());
+            assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
+            
+            requestNode.removeAll();
+            requestNode.put("caseInstanceIdWithChildren", "noexisting");
+            assertResultsPresentInPostDataResponse(url, requestNode);
 
             // CreatedOn filtering
             requestNode.removeAll();
