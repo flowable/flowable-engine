@@ -154,6 +154,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
 
             propertiesNode.put(PROPERTY_ASYNCHRONOUS, activity.isAsynchronous());
             propertiesNode.put(PROPERTY_EXCLUSIVE, !activity.isNotExclusive());
+            propertiesNode.put(PROPERTY_FOR_COMPENSATION,activity.isForCompensation());
 
             if (activity.getLoopCharacteristics() != null) {
                 MultiInstanceLoopCharacteristics loopDef = activity.getLoopCharacteristics();
@@ -309,7 +310,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                 Activity activity = (Activity) baseElement;
                 activity.setAsynchronous(getPropertyValueAsBoolean(PROPERTY_ASYNCHRONOUS, elementNode));
                 activity.setNotExclusive(!getPropertyValueAsBoolean(PROPERTY_EXCLUSIVE, elementNode));
-
+                activity.setForCompensation(getPropertyValueAsBoolean(PROPERTY_FOR_COMPENSATION, elementNode));
                 String multiInstanceType = getPropertyValueAsString(PROPERTY_MULTIINSTANCE_TYPE, elementNode);
                 String multiInstanceCardinality = getPropertyValueAsString(PROPERTY_MULTIINSTANCE_CARDINALITY, elementNode);
                 String multiInstanceCollection = getPropertyValueAsString(PROPERTY_MULTIINSTANCE_COLLECTION, elementNode);
