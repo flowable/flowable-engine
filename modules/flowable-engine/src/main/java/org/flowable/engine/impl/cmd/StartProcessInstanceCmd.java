@@ -80,6 +80,15 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
 
     @Override
     public ProcessInstance execute(CommandContext commandContext) {
+
+        processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
+        ProcessInstance processInstance = processInstanceHelper.createProcessInstance(getProcessDefinition(commandContext), businessKey, processInstanceName,
+                        overrideDefinitionTenantId, predefinedProcessInstanceId, variables, transientVariables, callbackId, callbackType, true);
+
+        return processInstance;
+    }
+
+    protected ProcessDefinition getProcessDefinition(CommandContext commandContext) {
         DeploymentManager deploymentCache = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDeploymentManager();
 
         // Find the process definition
@@ -108,12 +117,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
         } else {
             throw new FlowableIllegalArgumentException("processDefinitionKey and processDefinitionId are null");
         }
-
-        processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
-        ProcessInstance processInstance = processInstanceHelper.createProcessInstance(processDefinition, businessKey, processInstanceName, 
-                        overrideDefinitionTenantId, predefinedProcessInstanceId, variables, transientVariables, callbackId, callbackType, true);
-
-        return processInstance;
+        return processDefinition;
     }
 
     protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {
