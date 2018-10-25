@@ -10,7 +10,7 @@
 		<dependency>
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-engine</artifactId>
-			<version>6.4.0-8</version>
+			<version>6.4.0-9</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
