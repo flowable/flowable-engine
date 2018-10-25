@@ -112,4 +112,14 @@ public interface ProcessInstanceBuilder {
      **/
     ProcessInstance start();
 
+    /**
+     * Start the process instance asynchronously
+     *
+     * @throws FlowableIllegalArgumentException
+     *             if processDefinitionKey and processDefinitionId are null
+     * @throws FlowableObjectNotFoundException
+     *             when no process definition is deployed with the given processDefinitionKey or processDefinitionId
+     **/
+    ProcessInstance startAsync();
+
 }

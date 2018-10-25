@@ -153,6 +153,11 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
         return runtimeService.startProcessInstance(this);
     }
 
+    @Override
+    public ProcessInstance startAsync() {
+        return runtimeService.startProcessInstanceAsync(this);
+    }
+
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
