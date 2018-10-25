@@ -192,7 +192,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         // ProcessStartExecutionListeners are executed from the asynchronous job
         assertNull(varSetInExecutionListener);
 
-        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 1000, 100);
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 2000, 200);
 
         // Process start executionListener will have executionListener class
         // that sets 2 variables
