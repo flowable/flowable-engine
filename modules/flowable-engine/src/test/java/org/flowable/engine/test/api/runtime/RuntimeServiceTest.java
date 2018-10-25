@@ -221,7 +221,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertEquals( "Process is started, but its execution waits on the job",
             0, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
 
-        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 1000, 100);
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 2000, 200);
         assertEquals("The task is created from the job execution",
             1, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
     }
@@ -241,7 +241,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertEquals( "Process is started, but its execution waits on the job",
             0, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
 
-        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 1000, 100);
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 2000, 200);
         assertEquals("The task is created from the job execution",
             1, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
     }
