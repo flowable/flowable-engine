@@ -33,7 +33,7 @@ class NoneStartEventActivityBehaviorTest extends PluggableFlowableTestCase {
         assertThat(job).isNotNull();
         assertThat(runtimeService.createExecutionQuery().processInstanceId(pi.getId()).onlyChildExecutions().singleResult().getActivityId()).isEqualTo("theStart");
 
-        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 1000, 200);
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 2000, 200);
         assertProcessEnded(pi.getProcessInstanceId());
     }
 
