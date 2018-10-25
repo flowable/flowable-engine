@@ -178,6 +178,15 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
             requestNode.removeAll();
             requestNode.put("processInstanceId", processInstance.getId());
             assertResultsPresentInPostDataResponse(url, requestNode, processTask.getId());
+            
+            // Process instance with children filtering
+            requestNode.removeAll();
+            requestNode.put("processInstanceIdWithChildren", processInstance.getId());
+            assertResultsPresentInPostDataResponse(url, requestNode, processTask.getId());
+            
+            requestNode.removeAll();
+            requestNode.put("processInstanceIdWithChildren", "nonexisting");
+            assertResultsPresentInPostDataResponse(url, requestNode);
 
             // Execution filtering
             requestNode.removeAll();

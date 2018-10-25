@@ -87,6 +87,7 @@ public class EngineConfiguration {
         processEngineConfiguration.setTransactionManager(annotationDrivenTransactionManager());
         processEngineConfiguration.setAsyncExecutorActivate(false);
         processEngineConfiguration.setHistoryLevel(HistoryLevel.FULL);
+        processEngineConfiguration.setEnableEntityLinks(true);
         return processEngineConfiguration;
     }
 

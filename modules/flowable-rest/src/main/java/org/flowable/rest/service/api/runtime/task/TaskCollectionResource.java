@@ -69,6 +69,7 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiImplicitParam(name = "taskDefinitionKey", dataType = "string", value = "Only return tasks with the given task definition id.", paramType = "query"),
             @ApiImplicitParam(name = "taskDefinitionKeyLike", dataType = "string", value = "Only return tasks with a given task definition id like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "Only return tasks which are part of the process instance with the given id.", paramType = "query"),
+            @ApiImplicitParam(name = "processInstanceIdWithChildren", dataType = "string", value = "Only return tasks which are part of the process instance and its children with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceBusinessKey", dataType = "string", value = "Only return tasks which are part of the process instance with the given business key.", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceBusinessKeyLike", dataType = "string", value = "Only return tasks which are part of the process instance which has a business key like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "Only return tasks which are part of a process instance which has a process definition with the given id.", paramType = "query"),
@@ -200,6 +201,10 @@ public class TaskCollectionResource extends TaskBaseResource {
 
         if (requestParams.containsKey("processInstanceId")) {
             request.setProcessInstanceId(requestParams.get("processInstanceId"));
+        }
+        
+        if (requestParams.containsKey("processInstanceIdWithChildren")) {
+            request.setProcessInstanceIdWithChildren(requestParams.get("processInstanceIdWithChildren"));
         }
 
         if (requestParams.containsKey("processInstanceBusinessKey")) {
