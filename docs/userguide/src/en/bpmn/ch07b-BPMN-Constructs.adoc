@@ -5106,6 +5106,17 @@ Defining the 'inheritBusinessKey' attribute with a value of +true+ will set the 
 </callActivity>
 ----
 
+The callActivity element provides fallback option in the case when process definition was not found by key in the current tenant. When attribute fallbackToDefaultTenant is set to true.
+callActivity searches for process definition by key in definitions without tenant.
+
+[source,xml,linenums]
+----
+<callActivity id="callSubProcess" calledElement="checkCreditProcess" flowable:inheritVariables="true">
+    <extensionElements>
+        <flowable:fallbackToDefaultTenant value="true" />
+    </extensionElements>
+</callActivity>
+----
 
 ===== Reference the process from the same deployment
 
