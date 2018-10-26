@@ -14,6 +14,7 @@
 package org.flowable.engine.test.bpmn.callactivity;
 
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,11 +25,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -624,6 +628,79 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         
         taskService.complete(taskAfterSubProcess.getId());
         assertEquals(0, runtimeService.createExecutionQuery().count());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcessWithFallback.bpmn20.xml"},
+        tenantId = "flowable"
+    )
+    public void testCallSubProcessWithFallbackToDefaultTenant() {
+        assertCallActivityToFallback();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcessWithFallbackWrongNonBoolean.bpmn20.xml",
+        "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"},
+        tenantId = "flowable"
+    )
+    public void testCallSubProcessWithFallbackToDefaultTenantWithWrongExpressionOnSameTenant() {
+        assertProcessExecuted();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcessWithFallbackFalse.bpmn20.xml",
+        "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"},
+        tenantId = "flowable"
+    )
+    public void testCallSubProcessWithFallbackToDefaultTenantFalseInSameTenant() {
+        assertProcessExecuted();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcessWithFallbackFalse.bpmn20.xml"},
+        tenantId = "flowable"
+    )
+    public void testCallSubProcessWithFallbackToDefaultTenantFalse() {
+        assertThrows(
+            FlowableObjectNotFoundException.class,
+            () -> assertCallActivityToFallback()
+        );
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcessWithFallbackWrongNonBoolean.bpmn20.xml"},
+        tenantId = "flowable"
+    )
+    public void testCallSubProcessWithFallbackToDefaultTenantNonBooleanValue() {
+        assertThrows(
+            FlowableException.class,
+            () -> assertCallActivityToFallback(),
+            "Unable to recognize fallbackToDefaultTenant value 1"
+        );
+    }
+
+    protected void assertCallActivityToFallback() {
+        org.flowable.engine.repository.Deployment deployment = this.repositoryService.createDeployment().
+            addClasspathResource("org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml").
+            tenantId(ProcessEngineConfiguration.NO_TENANT_ID).
+            deploy();
+
+        try {
+            assertProcessExecuted();
+        } finally {
+            repositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    protected void assertProcessExecuted() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKeyAndTenantId("callSimpleSubProcess", "flowable");
+
+        Task taskInSubProcess = taskService.createTaskQuery().singleResult();
+        assertEquals("Task in subprocess", taskInSubProcess.getName());
+
+        // Completing the task in the subprocess, finishes the processes
+        taskService.complete(taskInSubProcess.getId());
+        assertProcessEnded(processInstance.getId());
     }
 
 }

@@ -5,6 +5,7 @@
         <activiti:in source="test" target="test"></activiti:in>
         <activiti:in sourceExpression="${test}" target="test"></activiti:in>
         <activiti:out source="test" target="test"></activiti:out>
+        <activiti:fallbackToDefaultTenant value="true"/>
       </extensionElements>
     </callActivity>
     <sequenceFlow id="sid-7D914C2B-2A0F-4CC8-A23D-DFC6317BF72E" sourceRef="sid-4D8B3541-C9E5-45BB-8BB1-F6C94B9A4C11" targetRef="callactivity"></sequenceFlow>

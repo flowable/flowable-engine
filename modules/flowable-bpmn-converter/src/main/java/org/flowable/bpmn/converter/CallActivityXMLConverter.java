@@ -39,6 +39,8 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
         childParserMap.put(inParameterParser.getElementName(), inParameterParser);
         OutParameterParser outParameterParser = new OutParameterParser();
         childParserMap.put(outParameterParser.getElementName(), outParameterParser);
+        FallbackToDefaultTenant fallbackToDefaultTenant = new FallbackToDefaultTenant();
+        childParserMap.put(fallbackToDefaultTenant.getElementName(), fallbackToDefaultTenant);
     }
 
     @Override
@@ -107,6 +109,23 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
                 callActivity.getInParameters(), didWriteExtensionStartElement, xtw);
         didWriteExtensionStartElement = writeIOParameters(ELEMENT_CALL_ACTIVITY_OUT_PARAMETERS,
                 callActivity.getOutParameters(), didWriteExtensionStartElement, xtw);
+
+        didWriteExtensionStartElement = writeFallbackToDefaultTenant(didWriteExtensionStartElement, xtw, callActivity);
+
+        return didWriteExtensionStartElement;
+    }
+
+    private boolean writeFallbackToDefaultTenant(boolean didWriteExtensionStartElement, XMLStreamWriter xtw, CallActivity callActivity) throws Exception {
+        if (!didWriteExtensionStartElement) {
+            xtw.writeStartElement(ELEMENT_EXTENSIONS);
+            didWriteExtensionStartElement = true;
+        }
+
+        if (callActivity.isFallbackToDefaultTenant()) {
+            xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_CALL_ACTIVITY_FALLBACK_TO_DEFAULT_TENANT, FLOWABLE_EXTENSIONS_NAMESPACE);
+            writeDefaultAttribute(ELEMENT_VALUE, "true", xtw);
+            xtw.writeEndElement();
+        }
         return didWriteExtensionStartElement;
     }
 
@@ -199,4 +218,21 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
             }
         }
     }
+
+    public class FallbackToDefaultTenant extends BaseChildElementParser {
+
+        @Override
+        public String getElementName() {
+            return ELEMENT_CALL_ACTIVITY_FALLBACK_TO_DEFAULT_TENANT;
+        }
+
+        @Override
+        public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
+            ((CallActivity) parentElement).
+                setFallbackToDefaultTenant(
+                    Boolean.valueOf(xtr.getAttributeValue(null, ELEMENT_VALUE))
+                );
+        }
+    }
+
 }

@@ -90,7 +90,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         if (finaldecisionTableKeyValue == null || finaldecisionTableKeyValue.length() == 0) {
             throw new FlowableIllegalArgumentException("decisionTableReferenceKey expression resolves to an empty value: " + decisionTableKeyValue);
         }
-
+        // todo: Can we apply default tenant?
         ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(execution.getProcessDefinitionId());
         Deployment deployment = CommandContextUtil.getDeploymentEntityManager().findById(processDefinition.getDeploymentId());
 

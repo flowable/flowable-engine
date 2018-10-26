@@ -222,6 +222,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_CALL_ACTIVITY_COMPLETE_ASYNC = "completeAsync";
     public static final String ELEMENT_CALL_ACTIVITY_IN_PARAMETERS = "in";
     public static final String ELEMENT_CALL_ACTIVITY_OUT_PARAMETERS = "out";
+    public static final String ELEMENT_CALL_ACTIVITY_FALLBACK_TO_DEFAULT_TENANT = "fallbackToDefaultTenant";
     public static final String ATTRIBUTE_IOPARAMETER_SOURCE = "source";
     public static final String ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION = "sourceExpression";
     public static final String ATTRIBUTE_IOPARAMETER_TARGET = "target";
