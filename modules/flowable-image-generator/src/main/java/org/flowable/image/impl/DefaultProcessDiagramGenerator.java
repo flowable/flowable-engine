@@ -356,7 +356,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                 if (graphicInfo.getExpanded() != null && !graphicInfo.getExpanded()) {
                     processDiagramCanvas.drawCollapsedSubProcess(flowNode.getName(), graphicInfo, false, scaleFactor);
                 } else {
-                    processDiagramCanvas.drawExpandedSubProcess(flowNode.getName(), graphicInfo, false, scaleFactor,SubProcess.class);
+                    processDiagramCanvas.drawExpandedSubProcess(flowNode.getName(), graphicInfo, false, scaleFactor);
                 }
             }
         });
@@ -369,7 +369,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                 if (graphicInfo.getExpanded() != null && !graphicInfo.getExpanded()) {
                     processDiagramCanvas.drawCollapsedSubProcess(flowNode.getName(), graphicInfo, false, scaleFactor);
                 } else {
-                   processDiagramCanvas.drawExpandedSubProcess(flowNode.getName(), graphicInfo, false, scaleFactor,Transaction.class);
+                   processDiagramCanvas.drawExpandedTransaction(flowNode.getName(), graphicInfo,  scaleFactor);
                 }
             }
         });
@@ -383,7 +383,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                 if (graphicInfo.getExpanded() != null && !graphicInfo.getExpanded()) {
                     processDiagramCanvas.drawCollapsedSubProcess(flowNode.getName(), graphicInfo, true, scaleFactor);
                 } else {
-                    processDiagramCanvas.drawExpandedSubProcess(flowNode.getName(), graphicInfo, true, scaleFactor,EventSubProcess.class);
+                    processDiagramCanvas.drawExpandedSubProcess(flowNode.getName(), graphicInfo, true, scaleFactor);
                 }
             }
         });
@@ -397,7 +397,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                 if (graphicInfo.getExpanded() != null && !graphicInfo.getExpanded()) {
                     processDiagramCanvas.drawCollapsedSubProcess(flowNode.getName(), graphicInfo, false, scaleFactor);
                 } else {
-                    processDiagramCanvas.drawExpandedSubProcess(flowNode.getName(), graphicInfo, false, scaleFactor,AdhocSubProcess.class);
+                    processDiagramCanvas.drawExpandedSubProcess(flowNode.getName(), graphicInfo, false, scaleFactor);
                 }
             }
         });

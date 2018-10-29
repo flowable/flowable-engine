@@ -878,33 +878,16 @@ public class DefaultProcessDiagramCanvas {
         drawTask(HTTP_TASK_IMAGE, name, graphicInfo, scaleFactor);
     }
 
-    public void drawExpandedSubProcess(String name, GraphicInfo graphicInfo, boolean isTriggeredByEvent, double scaleFactor,Class<?> type) {
+    public void drawExpandedSubProcess(String name, GraphicInfo graphicInfo, boolean isTriggeredByEvent, double scaleFactor) {
         RoundRectangle2D rect = new RoundRectangle2D.Double(graphicInfo.getX(), graphicInfo.getY(),
                 graphicInfo.getWidth(), graphicInfo.getHeight(), 8, 8);
 
         // Use different stroke (dashed)
-        if (type.equals(EventSubProcess.class)) {
+        if (isTriggeredByEvent) {
             Stroke originalStroke = g.getStroke();
             g.setStroke(EVENT_SUBPROCESS_STROKE);
             g.draw(rect);
             g.setStroke(originalStroke);
-        }else if (type.equals(Transaction.class)){
-            RoundRectangle2D outerRect = new RoundRectangle2D.Double(graphicInfo.getX()-3,
-                    graphicInfo.getY()-3,
-                    graphicInfo.getWidth()+6,
-                    graphicInfo.getHeight()+6,
-                    8,
-                    8);
-            Paint originalPaint = g.getPaint();
-            g.setPaint(SUBPROCESS_BOX_COLOR);
-            g.fill(outerRect);
-            g.setPaint(SUBPROCESS_BORDER_COLOR);
-            g.draw(outerRect);
-            g.setPaint(SUBPROCESS_BOX_COLOR);
-            g.fill(rect);
-            g.setPaint(SUBPROCESS_BORDER_COLOR);
-            g.draw(rect);
-            g.setPaint(originalPaint);
         }else{
             Paint originalPaint = g.getPaint();
             g.setPaint(SUBPROCESS_BOX_COLOR);
@@ -913,6 +896,31 @@ public class DefaultProcessDiagramCanvas {
             g.draw(rect);
             g.setPaint(originalPaint);
         }
+        if (scaleFactor == 1.0 && name != null && !name.isEmpty()) {
+            String text = fitTextToWidth(name, (int) graphicInfo.getWidth());
+            g.drawString(text, (int) graphicInfo.getX() + 10, (int) graphicInfo.getY() + 15);
+        }
+    }
+    public void drawExpandedTransaction(String name, GraphicInfo graphicInfo, double scaleFactor) {
+        RoundRectangle2D rect = new RoundRectangle2D.Double(graphicInfo.getX(), graphicInfo.getY(),
+                graphicInfo.getWidth(), graphicInfo.getHeight(), 8, 8);
+        RoundRectangle2D outerRect = new RoundRectangle2D.Double(graphicInfo.getX()-3,
+                graphicInfo.getY()-3,
+                graphicInfo.getWidth()+6,
+                graphicInfo.getHeight()+6,
+                8,
+                8);
+        Paint originalPaint = g.getPaint();
+        g.setPaint(SUBPROCESS_BOX_COLOR);
+        g.fill(outerRect);
+        g.setPaint(SUBPROCESS_BORDER_COLOR);
+        g.draw(outerRect);
+        g.setPaint(SUBPROCESS_BOX_COLOR);
+        g.fill(rect);
+        g.setPaint(SUBPROCESS_BORDER_COLOR);
+        g.draw(rect);
+        g.setPaint(originalPaint);
+
         if (scaleFactor == 1.0 && name != null && !name.isEmpty()) {
             String text = fitTextToWidth(name, (int) graphicInfo.getWidth());
             g.drawString(text, (int) graphicInfo.getX() + 10, (int) graphicInfo.getY() + 15);
