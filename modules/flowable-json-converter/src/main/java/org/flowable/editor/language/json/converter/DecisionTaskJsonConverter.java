@@ -74,6 +74,12 @@ public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter implements 
         decisionTableThrowErrorOnNoHitsField.setStringValue(decisionTableThrowErrorOnNoHitsNode ? "true" : "false");
         serviceTask.getFieldExtensions().add(decisionTableThrowErrorOnNoHitsField);
 
+        boolean fallbackToDefaultTenant = getPropertyValueAsBoolean(PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT, elementNode);
+        FieldExtension fallbackToDefaultTenantField = new FieldExtension();
+        fallbackToDefaultTenantField.setFieldName(PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT_KEY);
+        fallbackToDefaultTenantField.setStringValue(fallbackToDefaultTenant ? "true" : "false");
+        serviceTask.getFieldExtensions().add(fallbackToDefaultTenantField);
+
         return serviceTask;
     }
 

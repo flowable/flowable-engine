@@ -46,6 +46,7 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
         executeDecisionInfo.setScopeType(decisionBuilder.getScopeType());
         executeDecisionInfo.setVariables(decisionBuilder.getVariables());
         executeDecisionInfo.setTenantId(decisionBuilder.getTenantId());
+        executeDecisionInfo.setFallbackToDefaultTenant(decisionBuilder.isFallbackToDefaultTenant());
     }
 
     public AbstractExecuteDecisionCmd(String decisionKey, Map<String, Object> variables) {
@@ -75,9 +76,21 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
                     decisionTable = deploymentManager.findDeployedLatestDecisionByKeyAndTenantId(getDecisionKey(), getTenantId());
                     
                 } catch (FlowableObjectNotFoundException ex) {
-                    throw new FlowableObjectNotFoundException("No decision found for key: " + getDecisionKey() +
+                   if (executeDecisionInfo.isFallbackToDefaultTenant()) {
+                       try {
+                           decisionTable = deploymentManager.findDeployedLatestDecisionByKey(
+                               getDecisionKey()
+                           );
+                       } catch (FlowableObjectNotFoundException exWithoutTenant) {
+                           throw new FlowableObjectNotFoundException("No decision found for key: " + getDecisionKey() +
+                               ". There was also no fall back decision table found without tenant.");
+
+                       }
+                    } else {
+                        throw new FlowableObjectNotFoundException("No decision found for key: " + getDecisionKey() +
                             ", parent deployment id " + getParentDeploymentId() + " and tenant id: " + getTenantId() +
                             ". There was also no fall back decision table found without parent deployment id.");
+                    }
                 }
             }
             
@@ -101,14 +114,28 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
                     
                 } catch (FlowableObjectNotFoundException ex) {
                     throw new FlowableObjectNotFoundException("No decision found for key: " + getDecisionKey() +
-                            " and parent deployment id " + getParentDeploymentId() +
-                            ". There was also no fall back decision table found without parent deployment id.");
+                            ". There was also no fall back decision table found without tenant.");
                 }
             }
             
         } else if (StringUtils.isNotEmpty(getDecisionKey()) && StringUtils.isNotEmpty(getTenantId())) {
-            decisionTable = deploymentManager.findDeployedLatestDecisionByKeyAndTenantId(getDecisionKey(), getTenantId());
-            
+            try {
+                decisionTable = deploymentManager.findDeployedLatestDecisionByKeyAndTenantId(getDecisionKey(), getTenantId());
+            } catch (FlowableObjectNotFoundException ex) {
+                if (executeDecisionInfo.isFallbackToDefaultTenant()) {
+                    try {
+                        decisionTable = deploymentManager.findDeployedLatestDecisionByKey(
+                            getDecisionKey()
+                        );
+                    } catch (FlowableObjectNotFoundException exFallback) {
+                        throw new FlowableObjectNotFoundException("No decision found for key: " + getDecisionKey() +
+                            ". There was also no fall back decision table found without tenant.");
+                    }
+                } else {
+                    throw new FlowableObjectNotFoundException("No decision found for key: " + getDecisionKey() +
+                        " and tenant " + getTenantId());
+                }
+            }
         } else if (StringUtils.isNotEmpty(getDecisionKey())) {
             decisionTable = deploymentManager.findDeployedLatestDecisionByKey(getDecisionKey());
             

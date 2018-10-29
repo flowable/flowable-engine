@@ -20,6 +20,7 @@ import static org.junit.Assert.fail;
 import java.util.Collections;
 import java.util.List;
 
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.DmnEngines;
@@ -27,12 +28,17 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author Yvo Swillens
  */
 public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTest {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     @Deployment(resources = { "org/flowable/dmn/engine/test/deployment/oneDecisionTaskProcess.bpmn20.xml",
@@ -95,4 +101,100 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
             assertTrue(e.getMessage().contains("did not hit any rules for the provided input"));
         }
     }
+
+    @Test
+    @Deployment(resources = { "org/flowable/dmn/engine/test/deployment/oneDecisionTaskProcessFallBackToDefaultTenant.bpmn20.xml" },
+        tenantId = "flowable"
+    )
+    public void testDecisionTaskExecutionInAnotherDeploymentAndTenant() {
+        deployDecisionAndAssertProcessExecuted();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/dmn/engine/test/deployment/oneDecisionTaskProcess.bpmn20.xml" }
+    )
+    public void testDecisionTaskExecutionInAnotherDeploymentAndTenantDefaultBehavior() {
+        this.expectedException.expect(FlowableObjectNotFoundException.class);
+        this.expectedException.expectMessage("no processes deployed with key 'oneDecisionTaskProcess' for tenant identifier 'flowable'");
+
+        deployDecisionAndAssertProcessExecuted();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/dmn/engine/test/deployment/oneDecisionTaskProcessFallBackToDefaultTenantFalse.bpmn20.xml" },
+        tenantId = "flowable"
+    )
+    public void testDecisionTaskExecutionInAnotherDeploymentAndTenantFalse() {
+        this.expectedException.expect(FlowableObjectNotFoundException.class);
+        this.expectedException.expectMessage("No decision found for key: decision1 and tenant flowable");
+
+        deployDecisionAndAssertProcessExecuted();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/dmn/engine/test/deployment/oneDecisionTaskProcessFallBackToDefaultTenantFalse.bpmn20.xml" },
+        tenantId = "flowable"
+    )
+    public void testDecisionTaskExecutionInAnotherDeploymentAndTenantFallbackFalseWithoutDeployment() {
+        this.expectedException.expect(FlowableObjectNotFoundException.class);
+        this.expectedException.expectMessage("No decision found for key: decision1 and tenant flowable");
+
+        org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().
+            addClasspathResource("org/flowable/dmn/engine/test/deployment/simple.dmn").
+            tenantId("anotherTenant").
+            deploy();
+        try {
+            assertDmnProcessExecuted();
+        } finally {
+            this.repositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/dmn/engine/test/deployment/oneDecisionTaskProcessFallBackToDefaultTenant.bpmn20.xml" },
+        tenantId = "flowable"
+    )
+    public void testDecisionTaskExecutionInAnotherDeploymentAndTenantFallbackTrueWithoutDeployment() {
+        this.expectedException.expect(FlowableObjectNotFoundException.class);
+        this.expectedException.expectMessage("No decision found for key: decision1. There was also no fall back decision table found without tenant.");
+
+        org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().
+            addClasspathResource("org/flowable/dmn/engine/test/deployment/simple.dmn").
+            tenantId("anotherTenant").
+            deploy();
+        try {
+            assertDmnProcessExecuted();
+        } finally {
+            this.repositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+
+    protected void deployDecisionAndAssertProcessExecuted() {
+        org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().
+            addClasspathResource("org/flowable/dmn/engine/test/deployment/simple.dmn").
+            tenantId("").
+            deploy();
+        try {
+            assertDmnProcessExecuted();
+        } finally {
+            this.repositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    protected void assertDmnProcessExecuted() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKeyAndTenantId(
+            "oneDecisionTaskProcess",
+            Collections.singletonMap("inputVariable1", (Object) 1),
+            "flowable");
+        List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery()
+            .processInstanceId(processInstance.getId()).orderByVariableName().asc().list();
+
+        assertEquals("inputVariable1", variables.get(0).getVariableName());
+        assertEquals(1, variables.get(0).getValue());
+        assertEquals("outputVariable1", variables.get(1).getVariableName());
+        assertEquals("result1", variables.get(1).getValue());
+    }
+
+
 }
