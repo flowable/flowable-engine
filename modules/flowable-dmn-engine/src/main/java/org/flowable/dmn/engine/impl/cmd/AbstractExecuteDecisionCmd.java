@@ -133,8 +133,7 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
                             ". There was also no fall back decision table found without tenant.");
                     }
                 } else {
-                    throw new FlowableObjectNotFoundException("No decision found for key: " + getDecisionKey() +
-                        " and tenant " + getTenantId());
+                    throw ex;
                 }
             }
         } else if (StringUtils.isNotEmpty(getDecisionKey())) {
