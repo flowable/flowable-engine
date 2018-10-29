@@ -49,7 +49,9 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import org.flowable.bpmn.model.AssociationDirection;
+import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.GraphicInfo;
+import org.flowable.bpmn.model.Transaction;
 import org.flowable.image.exception.FlowableImageException;
 import org.flowable.image.util.ReflectUtil;
 import org.slf4j.Logger;
@@ -886,7 +888,7 @@ public class DefaultProcessDiagramCanvas {
             g.setStroke(EVENT_SUBPROCESS_STROKE);
             g.draw(rect);
             g.setStroke(originalStroke);
-        } else {
+        }else{
             Paint originalPaint = g.getPaint();
             g.setPaint(SUBPROCESS_BOX_COLOR);
             g.fill(rect);
@@ -894,6 +896,30 @@ public class DefaultProcessDiagramCanvas {
             g.draw(rect);
             g.setPaint(originalPaint);
         }
+        if (scaleFactor == 1.0 && name != null && !name.isEmpty()) {
+            String text = fitTextToWidth(name, (int) graphicInfo.getWidth());
+            g.drawString(text, (int) graphicInfo.getX() + 10, (int) graphicInfo.getY() + 15);
+        }
+    }
+    public void drawExpandedTransaction(String name, GraphicInfo graphicInfo, double scaleFactor) {
+        RoundRectangle2D rect = new RoundRectangle2D.Double(graphicInfo.getX(), graphicInfo.getY(),
+                graphicInfo.getWidth(), graphicInfo.getHeight(), 8, 8);
+        RoundRectangle2D outerRect = new RoundRectangle2D.Double(graphicInfo.getX()-3,
+                graphicInfo.getY()-3,
+                graphicInfo.getWidth()+6,
+                graphicInfo.getHeight()+6,
+                8,
+                8);
+        Paint originalPaint = g.getPaint();
+        g.setPaint(SUBPROCESS_BOX_COLOR);
+        g.fill(outerRect);
+        g.setPaint(SUBPROCESS_BORDER_COLOR);
+        g.draw(outerRect);
+        g.setPaint(SUBPROCESS_BOX_COLOR);
+        g.fill(rect);
+        g.setPaint(SUBPROCESS_BORDER_COLOR);
+        g.draw(rect);
+        g.setPaint(originalPaint);
 
         if (scaleFactor == 1.0 && name != null && !name.isEmpty()) {
             String text = fitTextToWidth(name, (int) graphicInfo.getWidth());
