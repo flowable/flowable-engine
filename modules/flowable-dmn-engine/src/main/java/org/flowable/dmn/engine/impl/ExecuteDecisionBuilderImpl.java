@@ -34,6 +34,7 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
     protected String scopeType;
     protected String tenantId;
     protected Map<String, Object> variables;
+    private boolean fallbackToDefaultTenant;
 
     public ExecuteDecisionBuilderImpl(DmnRuleServiceImpl ruleService) {
         this.ruleService = ruleService;
@@ -78,6 +79,12 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
     @Override
     public ExecuteDecisionBuilder tenantId(String tenantId) {
         this.tenantId = tenantId;
+        return this;
+    }
+
+    @Override
+    public ExecuteDecisionBuilder fallbackToDefaultTenant() {
+        this.fallbackToDefaultTenant = true;
         return this;
     }
 
@@ -144,6 +151,10 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
 
     public String getTenantId() {
         return tenantId;
+    }
+
+    public boolean isFallbackToDefaultTenant() {
+        return this.fallbackToDefaultTenant;
     }
 
     public Map<String, Object> getVariables() {
