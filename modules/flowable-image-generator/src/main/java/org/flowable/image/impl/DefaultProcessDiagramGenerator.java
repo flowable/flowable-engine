@@ -369,7 +369,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                 if (graphicInfo.getExpanded() != null && !graphicInfo.getExpanded()) {
                     processDiagramCanvas.drawCollapsedSubProcess(flowNode.getName(), graphicInfo, false, scaleFactor);
                 } else {
-                   processDiagramCanvas.drawExpandedSubProcess(flowNode.getName(), graphicInfo, false, scaleFactor);
+                   processDiagramCanvas.drawExpandedTransaction(flowNode.getName(), graphicInfo,  scaleFactor);
                 }
             }
         });
