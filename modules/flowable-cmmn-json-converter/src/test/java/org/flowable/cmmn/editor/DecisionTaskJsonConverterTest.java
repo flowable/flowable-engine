@@ -58,9 +58,17 @@ public class DecisionTaskJsonConverterTest extends AbstractConverterTest {
         assertEquals("sid-F4BCA0C7-8737-4279-B50F-59272C7C65A2", decisionTask.getId());
         assertEquals("dmnTask", decisionTask.getName());
 
-        FieldExtension fieldExtension = new FieldExtension();
-        fieldExtension.setFieldName("decisionTaskThrowErrorOnNoHits");
-        fieldExtension.setStringValue("false");
-        assertThat(((DecisionTask) planItemDefinition).getFieldExtensions(), Is.is(Collections.singletonList(fieldExtension)));
+        assertThatFieldExtension(((DecisionTask) planItemDefinition), "decisionTaskThrowErrorOnNoHits", "false");
+        assertThatFieldExtension(((DecisionTask) planItemDefinition), "fallbackToDefaultTenant", "true");
     }
+
+    protected void assertThatFieldExtension(DecisionTask decisionTask, String fieldName, Object fieldValue) {
+        assertTrue(decisionTask.getFieldExtensions().stream().
+            filter(field -> field.getFieldName().equals(fieldName)).
+            findFirst().
+            orElseThrow(AssertionError::new).
+            getStringValue().equals(fieldValue)
+        );
+    }
+
 }

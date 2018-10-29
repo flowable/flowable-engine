@@ -17,6 +17,7 @@ import static org.junit.Assert.assertNotNull;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnRule;
 import org.flowable.common.engine.api.FlowableException;
@@ -241,6 +242,48 @@ public class DecisionTaskTest {
                 .start();
 
         assertResultVariable(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment(
+        resources = {"org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTaskFallBackToDefaultTenant.cmmn"
+        },
+        tenantId = "flowable"
+    )
+    public void testDecisionServiceTaskWithFallback() {
+        deployDmnTableAssertCaseStarted();
+    }
+
+    protected void deployDmnTableAssertCaseStarted() {
+        org.flowable.cmmn.api.repository.CmmnDeployment cmmnDeployment = cmmnRule.getCmmnRepositoryService().createDeployment().
+            addClasspathResource("org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTask.dmn").
+            tenantId(CmmnEngineConfiguration.NO_TENANT_ID).
+            deploy();
+
+        try {
+            CaseInstance caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .variable("testVar", "test2")
+                .tenantId("flowable")
+                .start();
+
+            assertResultVariable(caseInstance);
+        } finally {
+            cmmnRule.getCmmnRepositoryService().deleteDeployment(cmmnDeployment.getId(), true);
+        }
+    }
+
+    @Test
+    @CmmnDeployment(
+        resources = {"org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTaskFallBackToDefaultTenantFalse.cmmn"
+        },
+        tenantId = "flowable"
+    )
+    public void testDecisionServiceTaskWithFallbackFalse() {
+        this.expectedException.expect(FlowableObjectNotFoundException.class);
+        this.expectedException.expectMessage("and tenant id: flowable. There was also no fall back decision table found without parent deployment id.");
+
+        deployDmnTableAssertCaseStarted();
     }
 
     protected void assertResultVariable(CaseInstance caseInstance) {

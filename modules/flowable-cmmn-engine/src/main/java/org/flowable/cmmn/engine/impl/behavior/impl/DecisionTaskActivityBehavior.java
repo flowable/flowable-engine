@@ -33,6 +33,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.ExecuteDecisionBuilder;
 
 import liquibase.util.StringUtils;
 
@@ -42,6 +43,7 @@ import liquibase.util.StringUtils;
 public class DecisionTaskActivityBehavior extends TaskActivityBehavior implements PlanItemActivityBehavior {
 
     protected static final String EXPRESSION_DECISION_TABLE_THROW_ERROR_FLAG = "decisionTaskThrowErrorOnNoHits";
+    protected static final String STRING_DECISION_TABLE_FALLBACK_TO_DEFAULT_TENANT = "fallbackToDefaultTenant";
 
     protected DecisionTask decisionTask;
     protected Expression decisionRefExpression;
@@ -76,15 +78,18 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
             }
         }
 
-        DecisionExecutionAuditContainer decisionExecutionAuditContainer = dmnRuleService.createExecuteDecisionBuilder().
-                parentDeploymentId(CaseDefinitionUtil.getDefinitionDeploymentId(planItemInstanceEntity.getCaseDefinitionId())).
-                decisionKey(externalRef).
-                instanceId(planItemInstanceEntity.getCaseInstanceId()).
-                executionId(planItemInstanceEntity.getId()).
-                activityId(decisionTask.getId()).
-                scopeType(ScopeTypes.CMMN).
-                variables(planItemInstanceEntity.getVariables()).
-                tenantId(planItemInstanceEntity.getTenantId()).
+        DecisionExecutionAuditContainer decisionExecutionAuditContainer =
+            applyFallbackToDefaultTenant(
+                dmnRuleService.createExecuteDecisionBuilder().
+                    parentDeploymentId(CaseDefinitionUtil.getDefinitionDeploymentId(planItemInstanceEntity.getCaseDefinitionId())).
+                    decisionKey(externalRef).
+                    instanceId(planItemInstanceEntity.getCaseInstanceId()).
+                    executionId(planItemInstanceEntity.getId()).
+                    activityId(decisionTask.getId()).
+                    scopeType(ScopeTypes.CMMN).
+                    variables(planItemInstanceEntity.getVariables()).
+                    tenantId(planItemInstanceEntity.getTenantId())
+            ).
                 executeWithAuditTrail();
 
         if (decisionExecutionAuditContainer == null) {
@@ -115,6 +120,14 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
                         CommandContextUtil.getCmmnEngineConfiguration(commandContext).getObjectMapper());
 
         CommandContextUtil.getAgenda().planCompletePlanItemInstanceOperation(planItemInstanceEntity);
+    }
+
+    protected ExecuteDecisionBuilder applyFallbackToDefaultTenant(ExecuteDecisionBuilder executeDecisionBuilder) {
+        boolean fallBackToDefaultTenant = Boolean.parseBoolean(getFieldString(STRING_DECISION_TABLE_FALLBACK_TO_DEFAULT_TENANT));
+        if (fallBackToDefaultTenant) {
+            return executeDecisionBuilder.fallbackToDefaultTenant();
+        }
+        return executeDecisionBuilder;
     }
 
 
