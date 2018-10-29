@@ -115,7 +115,7 @@ public class FlowableProducer extends DefaultProducer {
             try {
                 Thread.sleep(timeResolution);
             } catch (InterruptedException e) {
-                throw new FlowableException("error occurred while waiting for activity=" + activity + " for processInstanceId=" + processInstanceId);
+                throw new FlowableException("error occurred while waiting for activity=" + activity + " for processInstanceId=" + processInstanceId, e);
             }
             firstTime = false;
 

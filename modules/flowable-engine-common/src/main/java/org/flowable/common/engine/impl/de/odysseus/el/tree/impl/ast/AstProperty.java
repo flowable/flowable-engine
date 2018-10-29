@@ -170,7 +170,7 @@ public abstract class AstProperty extends AstNode {
 		try {
 			method = clazz.getMethod(name, paramTypes);
 		} catch (NoSuchMethodException e) {
-			throw new MethodNotFoundException(LocalMessages.get("error.property.method.notfound", name, clazz));
+			throw new MethodNotFoundException(LocalMessages.get("error.property.method.notfound", name, clazz), e);
 		}
 		method = findAccessibleMethod(method);
 		if (method == null) {
@@ -212,7 +212,7 @@ public abstract class AstProperty extends AstNode {
 		try {
 			return method.invoke(base, paramValues);
 		} catch (IllegalAccessException e) {
-			throw new ELException(LocalMessages.get("error.property.method.access", name, base.getClass()));
+			throw new ELException(LocalMessages.get("error.property.method.access", name, base.getClass()), e);
 		} catch (IllegalArgumentException e) {
 			throw new ELException(LocalMessages.get("error.property.method.invocation", name, base.getClass()), e);
 		} catch (InvocationTargetException e) {
