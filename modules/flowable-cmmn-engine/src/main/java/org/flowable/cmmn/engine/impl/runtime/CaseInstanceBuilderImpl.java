@@ -145,6 +145,11 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     }
     
     @Override
+    public CaseInstance startAsync() {
+        return cmmnRuntimeService.startCaseInstanceAsync(this);
+    }
+
+    @Override
     public CaseInstance startWithForm() {
         return cmmnRuntimeService.startCaseInstanceWithForm(this);
     }
