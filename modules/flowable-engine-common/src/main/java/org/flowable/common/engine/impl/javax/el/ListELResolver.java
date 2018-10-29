@@ -304,7 +304,7 @@ public class ListELResolver extends ELResolver {
 			try {
 				index = Integer.valueOf((String) property);
 			} catch (NumberFormatException e) {
-				throw new IllegalArgumentException("Cannot parse list index: " + property);
+				throw new IllegalArgumentException("Cannot parse list index: " + property, e);
 			}
 		} else if (property instanceof Character) {
 			index = ((Character) property).charValue();

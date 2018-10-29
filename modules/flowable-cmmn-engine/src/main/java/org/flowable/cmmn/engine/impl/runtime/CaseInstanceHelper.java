@@ -23,7 +23,9 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 public interface CaseInstanceHelper {
     
     CaseInstanceEntity startCaseInstance(CaseInstanceBuilder caseInstanceBuilder);
-    
+
+    CaseInstanceEntity startCaseInstanceAsync(CaseInstanceBuilder caseInstanceBuilder);
+
     void callCaseInstanceStateChangeCallbacks(CommandContext commandContext, CaseInstance caseInstance, String oldState, String newState);
     
 }

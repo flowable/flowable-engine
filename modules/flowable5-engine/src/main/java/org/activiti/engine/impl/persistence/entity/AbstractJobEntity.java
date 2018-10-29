@@ -86,7 +86,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         try {
             return new String(bytes, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            throw new ActivitiException("UTF-8 is not a supported encoding");
+            throw new ActivitiException("UTF-8 is not a supported encoding", e);
         }
     }
 
@@ -103,7 +103,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         try {
             return new String(bytes, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            throw new ActivitiException("UTF-8 is not a supported encoding");
+            throw new ActivitiException("UTF-8 is not a supported encoding", e);
         }
     }
 
@@ -118,7 +118,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         try {
             return str.getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
-            throw new ActivitiException("UTF-8 is not a supported encoding");
+            throw new ActivitiException("UTF-8 is not a supported encoding", e);
         }
     }
 
