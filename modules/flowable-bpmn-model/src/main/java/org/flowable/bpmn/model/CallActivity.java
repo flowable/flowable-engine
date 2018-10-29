@@ -114,7 +114,7 @@ public class CallActivity extends Activity {
         this.completeAsync = completeAsync;
     }
 
-    public Boolean isFallbackToDefaultTenant() {
+    public boolean isFallbackToDefaultTenant() {
         return fallbackToDefaultTenant;
     }
 

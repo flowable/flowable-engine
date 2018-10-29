@@ -250,10 +250,10 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
 
         if (isSameDeployment) {
             String deploymentId = ProcessDefinitionUtil.getProcessDefinition(execution.getProcessDefinitionId()).getDeploymentId();
-            if (execution.getTenantId() == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
+            if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
                 processDefinition = processDefinitionEntityManager.findProcessDefinitionByDeploymentAndKey(deploymentId, processDefinitionKey);
             } else {
-                processDefinition = processDefinitionEntityManager.findProcessDefinitionByDeploymentAndKeyAndTenantId(deploymentId, processDefinitionKey, execution.getTenantId());
+                processDefinition = processDefinitionEntityManager.findProcessDefinitionByDeploymentAndKeyAndTenantId(deploymentId, processDefinitionKey, tenantId);
             }
 
             if (processDefinition != null) {
