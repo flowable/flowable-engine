@@ -114,7 +114,8 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
                     
                 } catch (FlowableObjectNotFoundException ex) {
                     throw new FlowableObjectNotFoundException("No decision found for key: " + getDecisionKey() +
-                            ". There was also no fall back decision table found without tenant.");
+                            " and parent deployment id " + getParentDeploymentId() +
+                            ". There was also no fall back decision table found without parent deployment id.");
                 }
             }
             
