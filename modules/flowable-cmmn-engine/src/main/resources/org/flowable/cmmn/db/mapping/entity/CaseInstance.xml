@@ -207,15 +207,15 @@
         P.SENTRY_PART_INST_COUNT_ as PI_SENTRY_PART_INST_COUNT_,
         P.TENANT_ID_ as PI_TENANT_ID_
         from ${prefix}ACT_CMMN_RU_CASE_INST C
-        inner join ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST P on C.ID_ = CASE_INST_ID_
-        where
-        P.ENDED_TIME_ is null
-        <if test="caseInstanceId != null">
-            and C.ID_ = #{caseInstanceId, jdbcType=VARCHAR}
-        </if>
-         <if test="planItemInstanceId != null">
-            and C.ID_ = (select CASE_INST_ID_ from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where ID_ = #{planItemInstanceId, jdbcType=VARCHAR})
-        </if>
+        left join ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST P on C.ID_ = CASE_INST_ID_ and P.ENDED_TIME_ is null
+        <where>
+            <if test="caseInstanceId != null">
+                C.ID_ = #{caseInstanceId, jdbcType=VARCHAR}
+            </if>
+             <if test="planItemInstanceId != null">
+                and C.ID_ = (select CASE_INST_ID_ from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where ID_ = #{planItemInstanceId, jdbcType=VARCHAR})
+            </if>
+        </where>
     </select>
 
     <select id="selectCaseInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl" resultMap="caseInstanceResultMap">

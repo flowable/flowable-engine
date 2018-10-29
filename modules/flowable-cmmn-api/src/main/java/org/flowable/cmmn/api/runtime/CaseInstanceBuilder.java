@@ -64,7 +64,9 @@ public interface CaseInstanceBuilder {
     CaseInstanceBuilder parentId(String parentCaseInstanceId);
 
     CaseInstance start();
-    
+
+    CaseInstance startAsync();
+
     CaseInstance startWithForm();
 
     String getCaseDefinitionId();
