@@ -36,6 +36,7 @@
         "outgoing" : [ { "resourceId" : "sid-3E39A302-9778-49BA-AEBE-5609C72C7C65" } ],
         "properties" : { "callactivitycalledelement" : "processId",
             "callactivitycalledelementtype": "id",
+            "callactivityfallbacktodefaulttenant": "true",
             "callactivityinheritvariables" : true,
             "callactivitysamedeployment" : true,
             "callactivityinheritbusinesskey" : true,

@@ -761,6 +761,14 @@
 
   </attribute>
 
+  <attribute name="fallbackToDefaultTenant" type="boolean">
+    <annotation>
+      <documentation>
+		To be used on the callActivity element to search for process definition in the default tenant in the case when no definition was found in the current tenant
+      </documentation>
+    </annotation>
+  </attribute>
+
   <attribute name="businessKey" type="tns:tExpression">
     <annotation>
       <documentation>
