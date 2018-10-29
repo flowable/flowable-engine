@@ -64,6 +64,7 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
         callActivity.setSameDeployment(Boolean.valueOf(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_SAME_DEPLOYMENT, xtr)));
         callActivity.setUseLocalScopeForOutParameters(Boolean.valueOf(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_USE_LOCALSCOPE_FOR_OUTPARAMETERS, xtr)));
         callActivity.setCompleteAsync(Boolean.valueOf(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_COMPLETE_ASYNC, xtr)));
+        callActivity.setFallbackToDefaultTenant(Boolean.valueOf(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_FALLBACK_TO_DEFAULT_TENANT, xtr)));
         parseChildElements(getXMLElementName(), callActivity, childParserMap, model, xtr);
         return callActivity;
     }
@@ -97,6 +98,9 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
         }
         if (callActivity.isCompleteAsync()) {
             writeQualifiedAttribute(ATTRIBUTE_CALL_ACTIVITY_COMPLETE_ASYNC, "true", xtw);
+        }
+        if (callActivity.isFallbackToDefaultTenant()) {
+            writeQualifiedAttribute(ATTRIBUTE_CALL_ACTIVITY_FALLBACK_TO_DEFAULT_TENANT, "true", xtw);
         }
     }
 

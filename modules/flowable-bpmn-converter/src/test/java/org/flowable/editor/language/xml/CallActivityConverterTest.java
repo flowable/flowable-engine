@@ -54,6 +54,8 @@ public class CallActivityConverterTest extends AbstractConverterTest {
 
         assertEquals("processId", callActivity.getCalledElement());
 
+        assertTrue(callActivity.isFallbackToDefaultTenant());
+
         List<IOParameter> parameters = callActivity.getInParameters();
         assertEquals(2, parameters.size());
         IOParameter parameter = parameters.get(0);

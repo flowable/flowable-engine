@@ -26,6 +26,7 @@ import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
@@ -63,18 +64,22 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     protected String calledElement;
     protected String calledElementType;
     protected Expression calledElementExpression;
+    protected boolean fallbackToDefaultTenant;
     protected List<MapExceptionEntry> mapExceptions;
 
-    public CallActivityBehavior(String processDefinitionKey, String calledElementType, List<MapExceptionEntry> mapExceptions) {
+    public CallActivityBehavior(String processDefinitionKey, String calledElementType,
+        boolean fallbackToDefaultTenant, List<MapExceptionEntry> mapExceptions) {
         this.calledElement = processDefinitionKey;
         this.calledElementType = calledElementType;
         this.mapExceptions = mapExceptions;
+        this.fallbackToDefaultTenant = fallbackToDefaultTenant;
     }
 
-    public CallActivityBehavior(Expression processDefinitionExpression, String calledElementType, List<MapExceptionEntry> mapExceptions) {
+    public CallActivityBehavior(Expression processDefinitionExpression, String calledElementType, List<MapExceptionEntry> mapExceptions, boolean fallbackToDefaultTenant) {
         this.calledElementExpression = processDefinitionExpression;
         this.calledElementType = calledElementType;
         this.mapExceptions = mapExceptions;
+        this.fallbackToDefaultTenant = fallbackToDefaultTenant;
     }
 
     @Override
@@ -237,7 +242,39 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     }
 
     protected ProcessDefinition getProcessDefinitionByKey(DelegateExecution execution, boolean isSameDeployment) {
-        return findProcessDefinitionByKey(getCalledElementValue(execution), execution.getProcessDefinitionId(), execution.getTenantId(), isSameDeployment);
+        String processDefinitionKey = getCalledElementValue(execution);
+        String tenantId = execution.getTenantId();
+
+        ProcessDefinitionEntityManager processDefinitionEntityManager = Context.getProcessEngineConfiguration().getProcessDefinitionEntityManager();
+        ProcessDefinitionEntity processDefinition;
+
+        if (isSameDeployment) {
+            String deploymentId = ProcessDefinitionUtil.getProcessDefinition(execution.getProcessDefinitionId()).getDeploymentId();
+            if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
+                processDefinition = processDefinitionEntityManager.findProcessDefinitionByDeploymentAndKey(deploymentId, processDefinitionKey);
+            } else {
+                processDefinition = processDefinitionEntityManager.findProcessDefinitionByDeploymentAndKeyAndTenantId(deploymentId, processDefinitionKey, tenantId);
+            }
+
+            if (processDefinition != null) {
+                return processDefinition;
+            }
+        }
+
+        if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
+            processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKey(processDefinitionKey);
+        } else {
+            processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
+            if (processDefinition == null && this.fallbackToDefaultTenant) {
+                processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKey(processDefinitionKey);
+            }
+        }
+
+        if (processDefinition == null) {
+            throw new FlowableObjectNotFoundException("Process definition " + processDefinitionKey + " was not found in sameDeployment["+ isSameDeployment +
+                "] tenantId["+ tenantId+ "] falbackToDefaultTenant["+ this.fallbackToDefaultTenant + "]");
+        }
+        return processDefinition;
     }
 
     protected String getCalledElementValue(DelegateExecution execution) {
@@ -248,30 +285,6 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
             calledElementValue = calledElement;
         }
         return calledElementValue;
-    }
-
-    // Allow subclass to determine which version of a process to start.
-    protected ProcessDefinition findProcessDefinitionByKey(String processDefinitionKey, String processDefinitionId, String tenantId, boolean sameDeployment) {
-        if (sameDeployment) {
-            String deploymentId = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId).getDeploymentId();
-            ProcessDefinitionEntityManager processDefinitionEntityManager = Context.getProcessEngineConfiguration().getProcessDefinitionEntityManager();
-            ProcessDefinitionEntity processDefinitionByDeploymentAndKey = null;
-            if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-                processDefinitionByDeploymentAndKey = processDefinitionEntityManager.findProcessDefinitionByDeploymentAndKey(deploymentId, processDefinitionKey);
-            } else {
-                processDefinitionByDeploymentAndKey = processDefinitionEntityManager.findProcessDefinitionByDeploymentAndKeyAndTenantId(deploymentId, processDefinitionKey, tenantId);
-            }
-            
-            if (processDefinitionByDeploymentAndKey != null) {
-                return processDefinitionByDeploymentAndKey;
-            }
-        }
-
-        if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-            return CommandContextUtil.getProcessEngineConfiguration().getDeploymentManager().findDeployedLatestProcessDefinitionByKey(processDefinitionKey);
-        } else {
-            return CommandContextUtil.getProcessEngineConfiguration().getDeploymentManager().findDeployedLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
-        }
     }
 
     protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {
