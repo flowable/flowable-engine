@@ -10,11 +10,8 @@
     
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="callSubProcess" />
 
-    <callActivity id="callSubProcess" calledElement="simpleSubProcess">
-      <extensionElements>
-        <flowable:fallbackToDefaultTenant value="true"/>
-      </extensionElements>
-    </callActivity>
+    <callActivity id="callSubProcess" calledElement="simpleSubProcess"
+                  flowable:fallbackToDefaultTenant="true"/>
 
     <sequenceFlow id="flow4" sourceRef="callSubProcess" targetRef="theEnd" />
      

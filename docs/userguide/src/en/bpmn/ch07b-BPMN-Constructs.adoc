@@ -5129,10 +5129,8 @@ callActivity searches for process definition by key in definitions without tenan
 
 [source,xml,linenums]
 ----
-<callActivity id="callSubProcess" calledElement="checkCreditProcess" flowable:inheritVariables="true">
-    <extensionElements>
-        <flowable:fallbackToDefaultTenant value="true" />
-    </extensionElements>
+<callActivity id="callSubProcess" calledElement="checkCreditProcess" flowable:fallbackToDefaultTenant="true" >
+...
 </callActivity>
 ----
 
