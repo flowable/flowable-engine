@@ -201,7 +201,7 @@ public class DecisionTaskTest {
             resources = {"org/flowable/cmmn/test/runtime/DecisionTaskTest.testExpressionReferenceKey.cmmn"}
     )
     public void testNonStringReferenceKey() {
-        this.expectedException.expect(FlowableObjectNotFoundException.class);
+        this.expectedException.expect(FlowableException.class);
         this.expectedException.expectMessage("No decision found for key: 1 and parent deployment id");
 
         cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
@@ -216,7 +216,7 @@ public class DecisionTaskTest {
             resources = {"org/flowable/cmmn/test/runtime/DecisionTaskTest.testExpressionReferenceKey.cmmn"}
     )
     public void testNonExistingReferenceKey() {
-        this.expectedException.expect(FlowableObjectNotFoundException.class);
+        this.expectedException.expect(FlowableException.class);
         this.expectedException.expectMessage("No decision found for key: NonExistingReferenceKey and parent deployment id");
 
         cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
@@ -280,7 +280,7 @@ public class DecisionTaskTest {
         tenantId = "flowable"
     )
     public void testDecisionServiceTaskWithFallbackFalse() {
-        this.expectedException.expect(FlowableObjectNotFoundException.class);
+        this.expectedException.expect(FlowableException.class);
         this.expectedException.expectMessage("and tenant id: flowable. There was also no fall back decision table found without parent deployment id.");
 
         deployDmnTableAssertCaseStarted();
