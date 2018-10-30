@@ -78,19 +78,22 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
             }
         }
 
-        DecisionExecutionAuditContainer decisionExecutionAuditContainer =
-            applyFallbackToDefaultTenant(
-                dmnRuleService.createExecuteDecisionBuilder().
-                    parentDeploymentId(CaseDefinitionUtil.getDefinitionDeploymentId(planItemInstanceEntity.getCaseDefinitionId())).
-                    decisionKey(externalRef).
-                    instanceId(planItemInstanceEntity.getCaseInstanceId()).
-                    executionId(planItemInstanceEntity.getId()).
-                    activityId(decisionTask.getId()).
-                    scopeType(ScopeTypes.CMMN).
-                    variables(planItemInstanceEntity.getVariables()).
-                    tenantId(planItemInstanceEntity.getTenantId())
-            ).
-                executeWithAuditTrail();
+        ExecuteDecisionBuilder executeDecisionBuilder = dmnRuleService.createExecuteDecisionBuilder().
+            parentDeploymentId(CaseDefinitionUtil.getDefinitionDeploymentId(planItemInstanceEntity.getCaseDefinitionId())).
+            decisionKey(externalRef).
+            instanceId(planItemInstanceEntity.getCaseInstanceId()).
+            executionId(planItemInstanceEntity.getId()).
+            activityId(decisionTask.getId()).
+            scopeType(ScopeTypes.CMMN).
+            variables(planItemInstanceEntity.getVariables()).
+            tenantId(planItemInstanceEntity.getTenantId());
+
+        boolean fallBackToDefaultTenant = Boolean.parseBoolean(getFieldString(STRING_DECISION_TABLE_FALLBACK_TO_DEFAULT_TENANT));
+        if (fallBackToDefaultTenant) {
+            executeDecisionBuilder.fallbackToDefaultTenant();
+        }
+
+        DecisionExecutionAuditContainer decisionExecutionAuditContainer = executeDecisionBuilder.executeWithAuditTrail();
 
         if (decisionExecutionAuditContainer == null) {
             throw new FlowableException("DMN decision table with key " + externalRef + " was not executed.");
@@ -121,15 +124,6 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
 
         CommandContextUtil.getAgenda().planCompletePlanItemInstanceOperation(planItemInstanceEntity);
     }
-
-    protected ExecuteDecisionBuilder applyFallbackToDefaultTenant(ExecuteDecisionBuilder executeDecisionBuilder) {
-        boolean fallBackToDefaultTenant = Boolean.parseBoolean(getFieldString(STRING_DECISION_TABLE_FALLBACK_TO_DEFAULT_TENANT));
-        if (fallBackToDefaultTenant) {
-            return executeDecisionBuilder.fallbackToDefaultTenant();
-        }
-        return executeDecisionBuilder;
-    }
-
 
     protected void setVariables(List<Map<String, Object>> executionResult,
                                 String decisionKey,
