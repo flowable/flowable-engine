@@ -14,10 +14,12 @@ package org.flowable.dmn.engine.impl.cmd;
 
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
+import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.engine.impl.ExecuteDecisionBuilderImpl;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.Decision;
@@ -54,20 +56,18 @@ public class ExecuteDecisionWithAuditTrailCmd extends AbstractExecuteDecisionCmd
             throw new FlowableIllegalArgumentException("decisionKey is null");
         }
 
+        Decision decision;
         try {
-            Decision decision = resolveDecision(
-                resolveDecisionTable()
-            );
-            return CommandContextUtil.getDmnEngineConfiguration().getRuleEngineExecutor().execute(decision, executeDecisionInfo);
-        } catch (Exception e) {
+            DmnDecisionTable decisionTable = resolveDecisionTable();
+            decision = resolveDecision(decisionTable);
+        } catch (FlowableException e) {
             DecisionExecutionAuditContainer container = new DecisionExecutionAuditContainer();
             container.setFailed();
-            container.setExceptionMessage(
-                e.getMessage()
-            );
+            container.setExceptionMessage(e.getMessage());
             return container;
         }
 
+        return CommandContextUtil.getDmnEngineConfiguration().getRuleEngineExecutor().execute(decision, executeDecisionInfo);
     }
 
 }
