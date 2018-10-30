@@ -20,8 +20,11 @@ import static org.junit.Assert.fail;
 import java.util.Collections;
 import java.util.List;
 
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.DmnRepositoryService;
+import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.DmnEngines;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -100,6 +103,7 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
     @Test
     @Deployment(resources = { "org/flowable/dmn/engine/test/deployment/oneDecisionTaskNoHitsErrorProcess.bpmn20.xml"})
     public void testDecisionNotFound() {
+        deleteAllDmnDeployments();
         try {
             runtimeService.startProcessInstanceByKey("oneDecisionTaskProcess", Collections.singletonMap("inputVariable1", (Object) 2));
             fail("Expected Exception");
@@ -107,4 +111,14 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
             assertTrue(e.getMessage().contains("Decision table for key [decision1] was not found"));
         }
     }
+
+    protected void deleteAllDmnDeployments() {
+        DmnEngineConfiguration dmnEngineConfiguration = (DmnEngineConfiguration) flowableRule.getProcessEngine().getProcessEngineConfiguration().getEngineConfigurations()
+            .get(EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
+        dmnEngineConfiguration.getDmnRepositoryService().createDeploymentQuery().list().stream()
+        .forEach(
+            deployment -> dmnEngineConfiguration.getDmnRepositoryService().deleteDeployment(deployment.getId())
+        );
+    }
+
 }
