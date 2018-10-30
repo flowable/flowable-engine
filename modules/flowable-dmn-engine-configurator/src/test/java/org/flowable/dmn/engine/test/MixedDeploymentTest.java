@@ -20,6 +20,7 @@ import static org.junit.Assert.fail;
 import java.util.Collections;
 import java.util.List;
 
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.DmnEngines;
@@ -94,6 +95,18 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
             fail("Expected Exception");
         } catch (Exception e) {
             assertTrue(e.getMessage().contains("did not hit any rules for the provided input"));
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/dmn/engine/test/deployment/oneDecisionTaskNoHitsErrorProcess.bpmn20.xml"
+            })
+    public void testWithoutDecisionTableReference() {
+        try {
+            runtimeService.startProcessInstanceByKey("oneDecisionTaskProcess", Collections.singletonMap("inputVariable1", (Object) 2));
+            fail("Expected Exception");
+        } catch (FlowableObjectNotFoundException e) {
+            assertTrue(e.getMessage().contains("no decisions deployed with key 'decision1'"));
         }
     }
 }

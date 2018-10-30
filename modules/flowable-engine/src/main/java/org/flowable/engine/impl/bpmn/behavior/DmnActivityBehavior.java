@@ -105,7 +105,18 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
                 .variables(execution.getVariables())
                 .tenantId(execution.getTenantId())
                 .executeWithAuditTrail();
-        
+
+        if (CommandContextUtil.getCommandContext().getException() != null) {
+            // the exception is thrown when commandContext is closed. When commandContext is reused (default case for Bpmn -> Dmn call) exception is not thrown
+            // and null is returned.
+            Throwable throwable = CommandContextUtil.getCommandContext().getException();
+            if (throwable instanceof RuntimeException) {
+                throw (RuntimeException) throwable;
+            } else {
+                throw new RuntimeException(throwable);
+            }
+        }
+
         if (decisionExecutionAuditContainer.isFailed()) {
             throw new FlowableException("DMN decision table with key " + finaldecisionTableKeyValue + " execution failed. Cause: " + decisionExecutionAuditContainer.getExceptionMessage());
         }
