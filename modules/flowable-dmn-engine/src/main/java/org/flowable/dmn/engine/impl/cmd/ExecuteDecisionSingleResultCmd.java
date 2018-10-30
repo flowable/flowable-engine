@@ -52,15 +52,10 @@ public class ExecuteDecisionSingleResultCmd extends AbstractExecuteDecisionCmd i
 
     @Override
     public Map<String, Object> execute(CommandContext commandContext) {
-        if (getDecisionKey() == null) {
-            throw new FlowableIllegalArgumentException("decisionKey is null");
-        }
-        
-        DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
-        DmnDecisionTable decisionTable = resolveDecisionTable(dmnEngineConfiguration.getDeploymentManager());
-        Decision decision = resolveDecision(dmnEngineConfiguration.getDeploymentManager(), decisionTable);
 
-        DecisionExecutionAuditContainer executionResult = dmnEngineConfiguration.getRuleEngineExecutor().execute(decision, executeDecisionInfo);
+        DecisionExecutionAuditContainer executionResult = execute(
+          decision ->  CommandContextUtil.getDmnEngineConfiguration().getRuleEngineExecutor().execute(decision, executeDecisionInfo)
+        );
 
         Map<String, Object> decisionResult = null;
         if (executionResult != null && executionResult.getDecisionResult() != null && !executionResult.getDecisionResult().isEmpty()) {
