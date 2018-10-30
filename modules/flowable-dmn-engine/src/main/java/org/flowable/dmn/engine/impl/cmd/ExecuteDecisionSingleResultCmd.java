@@ -19,7 +19,6 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.ExecuteDecisionBuilderImpl;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
@@ -52,10 +51,14 @@ public class ExecuteDecisionSingleResultCmd extends AbstractExecuteDecisionCmd i
 
     @Override
     public Map<String, Object> execute(CommandContext commandContext) {
+        if (getDecisionKey() == null) {
+            throw new FlowableIllegalArgumentException("decisionKey is null");
+        }
 
-        DecisionExecutionAuditContainer executionResult = execute(
-          decision ->  CommandContextUtil.getDmnEngineConfiguration().getRuleEngineExecutor().execute(decision, executeDecisionInfo)
-        );
+        DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
+        Decision decision = resolveDecision(resolveDecisionTable());
+
+        DecisionExecutionAuditContainer executionResult = dmnEngineConfiguration.getRuleEngineExecutor().execute(decision, executeDecisionInfo);
 
         Map<String, Object> decisionResult = null;
         if (executionResult != null && executionResult.getDecisionResult() != null && !executionResult.getDecisionResult().isEmpty()) {

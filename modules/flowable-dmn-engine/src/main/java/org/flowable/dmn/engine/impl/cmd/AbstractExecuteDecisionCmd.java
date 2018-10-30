@@ -57,28 +57,6 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
     }
 
 
-    protected DecisionExecutionAuditContainer execute(Function<Decision, DecisionExecutionAuditContainer> executeFunction) {
-        if (getDecisionKey() == null) {
-            throw new FlowableIllegalArgumentException("decisionKey is null");
-        }
-
-        try {
-            Decision decision = resolveDecision(
-                resolveDecisionTable()
-            );
-            return executeFunction.apply(
-                decision
-            );
-        } catch (Exception e) {
-            DecisionExecutionAuditContainer container = new DecisionExecutionAuditContainer();
-            container.setFailed();
-            container.setExceptionMessage(
-                e.getMessage()
-            );
-            return container;
-        }
-    }
-
     protected DmnDecisionTable resolveDecisionTable() {
         DmnDecisionTable decisionTable = null;
         DecisionTableEntityManager decisionTableManager = CommandContextUtil.getDmnEngineConfiguration().getDecisionTableEntityManager();
@@ -87,12 +65,10 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
             List<DmnDeployment> dmnDeployments = CommandContextUtil.getDeploymentEntityManager().findDeploymentsByQueryCriteria(
                 new DmnDeploymentQueryImpl().parentDeploymentId(getParentDeploymentId()));
 
-            if (dmnDeployments == null || dmnDeployments.size() == 0) {
-                throw new FlowableObjectNotFoundException("no deployment found");
+            if (dmnDeployments != null && dmnDeployments.size() != 0) {
+                decisionTable = decisionTableManager.findDecisionTableByDeploymentAndKeyAndTenantId(
+                    dmnDeployments.get(0).getId(), getDecisionKey(), getTenantId());
             }
-
-            decisionTable = decisionTableManager.findDecisionTableByDeploymentAndKeyAndTenantId(
-                dmnDeployments.get(0).getId(), getDecisionKey(), getTenantId());
 
             if (decisionTable == null) {
                 // Fall back
@@ -109,11 +85,9 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
             List<DmnDeployment> dmnDeployments = CommandContextUtil.getDeploymentEntityManager().findDeploymentsByQueryCriteria(
                 new DmnDeploymentQueryImpl().parentDeploymentId(getParentDeploymentId()));
 
-            if (dmnDeployments == null || dmnDeployments.size() == 0) {
-                throw new FlowableObjectNotFoundException("no deployment found");
+            if (dmnDeployments != null && dmnDeployments.size() != 0) {
+                decisionTable = decisionTableManager.findDecisionTableByDeploymentAndKey(dmnDeployments.get(0).getId(), getDecisionKey());
             }
-
-            decisionTable = decisionTableManager.findDecisionTableByDeploymentAndKey(dmnDeployments.get(0).getId(), getDecisionKey());
 
             if (decisionTable == null) {
                 // Fall back

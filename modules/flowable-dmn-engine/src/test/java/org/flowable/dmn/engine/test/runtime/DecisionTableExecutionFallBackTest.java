@@ -76,7 +76,7 @@ public class DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest 
     public void decisionKeyTenantId_wrongTenantId_throwsException() {
         // Arrange
         expectedException.expect(FlowableObjectNotFoundException.class);
-        expectedException.expectMessage("no decisions deployed with key 'decision1' for tenant identifier 'WRONG_TENANT_ID'");
+        expectedException.expectMessage("Decision table for key [decision1] and tenantId [WRONG_TENANT_ID] was not found");
 
         // Act
         executeDecision("WRONG_TENANT_ID", null);
