@@ -98,19 +98,18 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
 
         DmnRuleService ruleService = CommandContextUtil.getDmnRuleService();
 
-        DecisionExecutionAuditContainer decisionExecutionAuditContainer =
-            applyFallbackToDefaultTenant(
-                execution,
-                ruleService.createExecuteDecisionBuilder()
-                    .decisionKey(finaldecisionTableKeyValue)
-                    .parentDeploymentId(deployment.getParentDeploymentId())
-                    .instanceId(execution.getProcessInstanceId())
-                    .executionId(execution.getId())
-                    .activityId(task.getId())
-                    .variables(execution.getVariables())
-                    .tenantId(execution.getTenantId())
-            )
-                .executeWithAuditTrail();
+        ExecuteDecisionBuilder executeDecisionBuilder = ruleService.createExecuteDecisionBuilder()
+            .decisionKey(finaldecisionTableKeyValue)
+            .parentDeploymentId(deployment.getParentDeploymentId())
+            .instanceId(execution.getProcessInstanceId())
+            .executionId(execution.getId())
+            .activityId(task.getId())
+            .variables(execution.getVariables())
+            .tenantId(execution.getTenantId());
+
+        applyFallbackToDefaultTenant(execution, executeDecisionBuilder);
+
+        DecisionExecutionAuditContainer decisionExecutionAuditContainer = executeDecisionBuilder.executeWithAuditTrail();
 
         if (decisionExecutionAuditContainer.isFailed()) {
             throw new FlowableException("DMN decision table with key " + finaldecisionTableKeyValue + " execution failed. Cause: " + decisionExecutionAuditContainer.getExceptionMessage());
