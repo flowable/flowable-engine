@@ -34,7 +34,7 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
     protected String scopeType;
     protected String tenantId;
     protected Map<String, Object> variables;
-    private boolean fallbackToDefaultTenant;
+    protected boolean fallbackToDefaultTenant;
 
     public ExecuteDecisionBuilderImpl(DmnRuleServiceImpl ruleService) {
         this.ruleService = ruleService;
