@@ -104,6 +104,17 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
     }
 
     @Test
+    @Deployment(resources = { "org/flowable/dmn/engine/test/deployment/oneDecisionTaskNoHitsErrorProcess.bpmn20.xml"})
+    public void testDecisionNotFound() {
+        try {
+            runtimeService.startProcessInstanceByKey("oneDecisionTaskProcess", Collections.singletonMap("inputVariable1", (Object) 2));
+            fail("Expected Exception");
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("Decision table for key [decision1] was not found"));
+        }
+    }
+
+    @Test
     @Deployment(resources = { "org/flowable/dmn/engine/test/deployment/oneDecisionTaskProcessFallBackToDefaultTenant.bpmn20.xml" },
         tenantId = "flowable"
     )
