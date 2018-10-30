@@ -76,8 +76,11 @@ public class FlowableTaskApplicationSecurityTest {
             "scheduledtasks",
             "httptrace",
             "flowable",
-            "mappings"
-
+            "mappings",
+            "caches",
+            "caches-cache",
+            "health-component",
+            "health-component-instance"
         )
     );
 

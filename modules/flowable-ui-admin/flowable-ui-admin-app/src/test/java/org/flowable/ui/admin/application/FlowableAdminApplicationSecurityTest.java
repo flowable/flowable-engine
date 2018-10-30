@@ -75,8 +75,11 @@ public class FlowableAdminApplicationSecurityTest {
             "metrics-requiredMetricName",
             "scheduledtasks",
             "httptrace",
-            "mappings"
-
+            "mappings",
+            "caches",
+            "caches-cache",
+            "health-component",
+            "health-component-instance"
         )
     );
 
