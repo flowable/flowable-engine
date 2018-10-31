@@ -120,6 +120,7 @@ public interface CmmnStencilConstants {
     String PROPERTY_PROCESS_REFERENCE = "processtaskprocessreference";
     String PROPERTY_PROCESS_IN_PARAMETERS = "processtaskinparameters";
     String PROPERTY_PROCESS_OUT_PARAMETERS = "processtaskoutparameters";
+    String PROPERTY_FALLBACK_TO_DEFAULT_TENANT = "fallbacktodefaulttenant";
 
     String PROPERTY_IN_PARAMETERS = "inParameters";
     String PROPERTY_OUT_PARAMETERS = "outParameters";

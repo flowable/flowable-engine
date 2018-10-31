@@ -1,0 +1,105 @@
+{
+  "modelId": "53254ad6-dcee-11e8-8a1f-b46bfcd9c998",
+  "bounds": {
+    "lowerRight": {
+      "x": 1200,
+      "y": 1050
+    },
+    "upperLeft": {
+      "x": 0,
+      "y": 0
+    }
+  },
+  "properties": {
+    "case_id": "processTaskModelId",
+    "name": "processTaskModelName",
+    "documentation": "",
+    "case_initiatorvariablename": "",
+    "case_author": "",
+    "case_version": "",
+    "case_namespace": "http://www.flowable.org/casedef",
+    "process_id": "processTask"
+  },
+  "childShapes": [
+    {
+      "resourceId": "casePlanModel",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": "",
+        "formkeydefinition": "",
+        "formreference": "",
+        "autocompleteenabled": "",
+        "autocompletecondition": ""
+      },
+      "stencil": {
+        "id": "CasePlanModel"
+      },
+      "childShapes": [
+        {
+          "resourceId": "sid-5E1BEB30-72F7-463C-A1CB-77F000CA7E0F",
+          "properties": {
+            "overrideid": "",
+            "name": "processTaskName",
+            "documentation": "",
+            "isblocking": true,
+            "isblockingexpression": "",
+            "processtaskprocessreference": {
+              "id": "203606a0-d907-11e8-9ef0-b46bfcd9c998",
+              "name": "simpleProcess"
+            },
+            "fallbacktodefaulttenant": true,
+            "processtaskinparameters": "",
+            "processtaskoutparameters": "",
+            "isasync": "",
+            "isexclusive": "",
+            "requiredenabled": "",
+            "requiredrulecondition": "",
+            "repetitionenabled": "",
+            "repetitionrulecondition": "",
+            "repetitioncountervariablename": "",
+            "manualactivationenabled": "",
+            "manualactivationrulecondition": "",
+            "completionneutralenabled": "",
+            "completionneutralrulecondition": ""
+          },
+          "stencil": {
+            "id": "ProcessTask"
+          },
+          "childShapes": [],
+          "outgoing": [],
+          "bounds": {
+            "lowerRight": {
+              "x": 361,
+              "y": 233
+            },
+            "upperLeft": {
+              "x": 261,
+              "y": 153
+            }
+          },
+          "dockers": []
+        }
+      ],
+      "outgoing": [],
+      "bounds": {
+        "lowerRight": {
+          "x": 758,
+          "y": 754
+        },
+        "upperLeft": {
+          "x": 40,
+          "y": 40
+        }
+      },
+      "dockers": []
+    }
+  ],
+  "stencil": {
+    "id": "CMMNDiagram"
+  },
+  "stencilset": {
+    "namespace": "http://b3mn.org/stencilset/cmmn1.1#",
+    "url": "../editor/stencilsets/cmmn1.1/cmmn1.1.json"
+  }
+}
