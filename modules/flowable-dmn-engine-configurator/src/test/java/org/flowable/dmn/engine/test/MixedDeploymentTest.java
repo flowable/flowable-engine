@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
-import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.DmnRepositoryService;
@@ -48,39 +47,47 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
     @Deployment(resources = { "org/flowable/dmn/engine/test/deployment/oneDecisionTaskProcess.bpmn20.xml",
             "org/flowable/dmn/engine/test/deployment/simple.dmn" })
     public void deploySingleProcessAndDecisionTable() {
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-                .latestVersion()
-                .processDefinitionKey("oneDecisionTaskProcess")
-                .singleResult();
-
-        assertNotNull(processDefinition);
-        assertEquals("oneDecisionTaskProcess", processDefinition.getKey());
-
-        DmnRepositoryService dmnRepositoryService = DmnEngines.getDefaultDmnEngine().getDmnRepositoryService();
-        DmnDecisionTable decisionTable = dmnRepositoryService.createDecisionTableQuery()
-                .latestVersion()
-                .decisionTableKey("decision1")
-                .singleResult();
-        assertNotNull(decisionTable);
-        assertEquals("decision1", decisionTable.getKey());
-
-        List<DmnDecisionTable> decisionTableList = repositoryService.getDecisionTablesForProcessDefinition(processDefinition.getId());
-        assertEquals(1l, decisionTableList.size());
-        assertEquals("decision1", decisionTableList.get(0).getKey());
+        try {
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                    .latestVersion()
+                    .processDefinitionKey("oneDecisionTaskProcess")
+                    .singleResult();
+    
+            assertNotNull(processDefinition);
+            assertEquals("oneDecisionTaskProcess", processDefinition.getKey());
+    
+            DmnRepositoryService dmnRepositoryService = DmnEngines.getDefaultDmnEngine().getDmnRepositoryService();
+            DmnDecisionTable decisionTable = dmnRepositoryService.createDecisionTableQuery()
+                    .latestVersion()
+                    .decisionTableKey("decision1")
+                    .singleResult();
+            assertNotNull(decisionTable);
+            assertEquals("decision1", decisionTable.getKey());
+    
+            List<DmnDecisionTable> decisionTableList = repositoryService.getDecisionTablesForProcessDefinition(processDefinition.getId());
+            assertEquals(1l, decisionTableList.size());
+            assertEquals("decision1", decisionTableList.get(0).getKey());
+        } finally {
+            deleteAllDmnDeployments();
+        }
     }
     
     @Test
     @Deployment(resources = { "org/flowable/dmn/engine/test/deployment/oneDecisionTaskProcess.bpmn20.xml",
             "org/flowable/dmn/engine/test/deployment/simple.dmn" })
     public void testDecisionTaskExecution() {
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneDecisionTaskProcess", Collections.singletonMap("inputVariable1", (Object) 1));
-        List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery()
-                        .processInstanceId(processInstance.getId()).orderByVariableName().asc().list();
-        
-        assertEquals("inputVariable1", variables.get(0).getVariableName());
-        assertEquals(1, variables.get(0).getValue());
-        assertEquals("outputVariable1", variables.get(1).getVariableName());
-        assertEquals("result1", variables.get(1).getValue());
+        try {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneDecisionTaskProcess", Collections.singletonMap("inputVariable1", (Object) 1));
+            List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery()
+                            .processInstanceId(processInstance.getId()).orderByVariableName().asc().list();
+            
+            assertEquals("inputVariable1", variables.get(0).getVariableName());
+            assertEquals(1, variables.get(0).getValue());
+            assertEquals("outputVariable1", variables.get(1).getVariableName());
+            assertEquals("result1", variables.get(1).getValue());
+        } finally {
+            deleteAllDmnDeployments();
+        }
     }
     
     @Test
@@ -92,6 +99,8 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
             fail("Expected DMN failure due to missing variable");
         } catch (Exception e) {
             assertTrue(e.getMessage().contains("Unknown property used in expression: #{inputVariable1"));
+        } finally {
+            deleteAllDmnDeployments();
         }
     }
     
@@ -104,18 +113,21 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
             fail("Expected Exception");
         } catch (Exception e) {
             assertTrue(e.getMessage().contains("did not hit any rules for the provided input"));
+        } finally {
+            deleteAllDmnDeployments();
         }
     }
 
     @Test
     @Deployment(resources = { "org/flowable/dmn/engine/test/deployment/oneDecisionTaskNoHitsErrorProcess.bpmn20.xml"})
     public void testDecisionNotFound() {
-        deleteAllDmnDeployments();
         try {
             runtimeService.startProcessInstanceByKey("oneDecisionTaskProcess", Collections.singletonMap("inputVariable1", (Object) 2));
             fail("Expected Exception");
         } catch (Exception e) {
             assertTrue(e.getMessage().contains("Decision table for key [decision1] was not found"));
+        } finally {
+            deleteAllDmnDeployments();
         }
     }
 
@@ -124,7 +136,6 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
         tenantId = "flowable"
     )
     public void testDecisionTaskExecutionInAnotherDeploymentAndTenant() {
-        deleteAllDmnDeployments();
         deployDecisionAndAssertProcessExecuted();
     }
 
@@ -146,7 +157,6 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
         this.expectedException.expect(FlowableException.class);
         this.expectedException.expectMessage("Decision table for key [decision1] and tenantId [flowable] was not found");
 
-        deleteAllDmnDeployments();
         deployDecisionAndAssertProcessExecuted();
     }
 
@@ -167,6 +177,7 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
             assertDmnProcessExecuted();
         } finally {
             this.repositoryService.deleteDeployment(deployment.getId(), true);
+            deleteAllDmnDeployments();
         }
     }
 
@@ -178,7 +189,6 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
         this.expectedException.expect(FlowableException.class);
         this.expectedException.expectMessage("No decision found for key: decision1. There was also no fall back decision table found without tenant.");
 
-        deleteAllDmnDeployments();
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().
             addClasspathResource("org/flowable/dmn/engine/test/deployment/simple.dmn").
             tenantId("anotherTenant").
@@ -187,6 +197,7 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
             assertDmnProcessExecuted();
         } finally {
             this.repositoryService.deleteDeployment(deployment.getId(), true);
+            deleteAllDmnDeployments();
         }
     }
 
@@ -200,6 +211,7 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
             assertDmnProcessExecuted();
         } finally {
             this.repositoryService.deleteDeployment(deployment.getId(), true);
+            deleteAllDmnDeployments();
         }
     }
 

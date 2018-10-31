@@ -21,7 +21,6 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnRule;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -246,8 +245,7 @@ public class DecisionTaskTest {
 
     @Test
     @CmmnDeployment(
-        resources = {"org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTaskFallBackToDefaultTenant.cmmn"
-        },
+        resources = {"org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTaskFallBackToDefaultTenant.cmmn"},
         tenantId = "flowable"
     )
     public void testDecisionServiceTaskWithFallback() {
