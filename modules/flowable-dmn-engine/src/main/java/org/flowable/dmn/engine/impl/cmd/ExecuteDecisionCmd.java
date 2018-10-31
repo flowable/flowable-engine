@@ -57,8 +57,7 @@ public class ExecuteDecisionCmd extends AbstractExecuteDecisionCmd implements Co
         }
 
         DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
-        DmnDecisionTable decisionTable = resolveDecisionTable(dmnEngineConfiguration.getDeploymentManager());
-        Decision decision = resolveDecision(dmnEngineConfiguration.getDeploymentManager(), decisionTable);
+        Decision decision = resolveDecision(resolveDecisionTable());
 
         DecisionExecutionAuditContainer executionResult = dmnEngineConfiguration.getRuleEngineExecutor().execute(decision, executeDecisionInfo);
 

@@ -76,7 +76,7 @@ public class DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest 
     public void decisionKeyTenantId_wrongTenantId_throwsException() {
         // Arrange
         expectedException.expect(FlowableObjectNotFoundException.class);
-        expectedException.expectMessage("no decisions deployed with key 'decision1' for tenant identifier 'WRONG_TENANT_ID'");
+        expectedException.expectMessage("Decision table for key [decision1] and tenantId [WRONG_TENANT_ID] was not found");
 
         // Act
         executeDecision("WRONG_TENANT_ID", null);
@@ -124,6 +124,35 @@ public class DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest 
         try {
             // Act
             Map<String, Object> result = executeDecision(null, "WRONG_PARENT_DEPLOYMENT_ID");
+
+            // Assert
+            Assert.assertEquals("result2", result.get("outputVariable1"));
+        } finally {
+            dmnEngine.getDmnRepositoryService().deleteDeployment(localDeployment.getId());
+        }
+    }
+
+    @Test
+    public void fallBackDecisionKeyDeploymentId_fallbackToDefaultTenant() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+        DmnDeployment localDeployment = dmnEngine.getDmnRepositoryService().createDeployment().
+                addClasspathResource("org/flowable/dmn/engine/test/runtime/StandaloneRuntimeTest.ruleUsageExample.dmn").
+                tenantId(null).
+                parentDeploymentId(TEST_PARENT_DEPLOYMENT_ID).
+                deploy();
+        try {
+            // Act
+            Map<String, Object> inputVariables = new HashMap<>();
+            inputVariables.put("inputVariable1", 2);
+            inputVariables.put("inputVariable2", "test2");
+
+            Map<String, Object> result = flowableDmnRule.getDmnEngine().getDmnRuleService().createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .tenantId("flowable")
+                .parentDeploymentId(localDeployment.getId())
+                .variables(inputVariables)
+                .fallbackToDefaultTenant()
+                .executeWithSingleResult();
 
             // Assert
             Assert.assertEquals("result2", result.get("outputVariable1"));

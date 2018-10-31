@@ -370,6 +370,16 @@
       "popular" : true
     } ]
   }, {
+    "name" : "decisiontaskfallbacktodefaulttenantpackage",
+    "properties" : [ {
+      "id" : "decisiontaskfallbacktodefaulttenant",
+      "type" : "Boolean",
+      "title" : "Fallback to default tenant",
+      "value" : "false",
+      "description" : "Find decision definition without tenant when previous attemps to find it with tenant failed.",
+      "popular" : true
+    } ]
+  }, {
       "name": "httptaskrequestmethodpackage",
       "properties": [
         {
@@ -949,6 +959,7 @@
         "documentationpackage",
         "decisiontaskdecisiontablereferencepackage",
         "decisiontaskthrowerroronnohitspackage",
+        "decisiontaskfallbacktodefaulttenantpackage",
         "asyncpackage",
         "requiredrulepackage",
         "repetitionrulepackage",
