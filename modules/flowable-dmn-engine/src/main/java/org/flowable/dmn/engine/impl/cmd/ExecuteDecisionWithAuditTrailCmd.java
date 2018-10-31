@@ -52,14 +52,15 @@ public class ExecuteDecisionWithAuditTrailCmd extends AbstractExecuteDecisionCmd
 
     @Override
     public DecisionExecutionAuditContainer execute(CommandContext commandContext) {
-        if (getDecisionKey() == null) {
+        if (executeDecisionInfo.getDecisionKey() == null) {
             throw new FlowableIllegalArgumentException("decisionKey is null");
         }
 
-        Decision decision;
+        Decision decision = null;
         try {
             DmnDecisionTable decisionTable = resolveDecisionTable();
             decision = resolveDecision(decisionTable);
+            
         } catch (FlowableException e) {
             DecisionExecutionAuditContainer container = new DecisionExecutionAuditContainer();
             container.setFailed();

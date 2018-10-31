@@ -52,12 +52,13 @@ public class ExecuteDecisionCmd extends AbstractExecuteDecisionCmd implements Co
 
     @Override
     public List<Map<String, Object>> execute(CommandContext commandContext) {
-        if (getDecisionKey() == null) {
+        if (executeDecisionInfo.getDecisionKey() == null) {
             throw new FlowableIllegalArgumentException("decisionKey is null");
         }
 
         DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
-        Decision decision = resolveDecision(resolveDecisionTable());
+        DmnDecisionTable decisionTable = resolveDecisionTable();
+        Decision decision = resolveDecision(decisionTable);
 
         DecisionExecutionAuditContainer executionResult = dmnEngineConfiguration.getRuleEngineExecutor().execute(decision, executeDecisionInfo);
 
