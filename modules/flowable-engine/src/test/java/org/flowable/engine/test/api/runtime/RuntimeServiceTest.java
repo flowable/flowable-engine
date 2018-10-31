@@ -1329,4 +1329,48 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
             hasMessage("No process definition found for key 'oneTaskProcess'. Fallback to default tenant was also applied.");
     }
 
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testStartAsyncWithFallbackToDefaultTenant() {
+        ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
+
+        ProcessInstance processInstance = processInstanceBuilder.processDefinitionKey("oneTaskProcess").
+            tenantId("flowable").
+            fallbackToDefaultTenant().
+            startAsync();
+
+        assertThat(processInstance, is(notNullValue()));
+    }
+
+    @Test
+    public void testStartAsyncWithFallbackToDefaultTenant_definitionNotFound() {
+        ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
+
+        assertThatThrownBy(
+            () -> processInstanceBuilder.processDefinitionKey("nonExistingDefinition").
+                tenantId("flowable").
+                fallbackToDefaultTenant().
+                startAsync()
+        ).
+            isExactlyInstanceOf(FlowableObjectNotFoundException.class).
+            hasMessage("No process definition found for key 'nonExistingDefinition'. Fallback to default tenant was also applied.");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" },
+        tenantId = "nonDefaultTenant"
+    )
+    public void testStartAsyncWithFallbackToDefaultTenant_definitionNotFoundInNonDefaultTenant() {
+        ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
+
+        assertThatThrownBy(
+            () -> processInstanceBuilder.processDefinitionKey("oneTaskProcess").
+                tenantId("flowable").
+                fallbackToDefaultTenant().
+                startAsync()
+        ).
+            isExactlyInstanceOf(FlowableObjectNotFoundException.class).
+            hasMessage("No process definition found for key 'oneTaskProcess'. Fallback to default tenant was also applied.");
+    }
+
 }
