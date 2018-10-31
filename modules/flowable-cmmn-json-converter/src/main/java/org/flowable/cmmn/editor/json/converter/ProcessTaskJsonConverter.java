@@ -12,19 +12,20 @@
  */
 package org.flowable.cmmn.editor.json.converter;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
-import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
-import org.flowable.cmmn.model.BaseElement;
-import org.flowable.cmmn.model.CaseTask;
-import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.cmmn.model.IOParameter;
-import org.flowable.cmmn.model.ProcessTask;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
+import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
+import org.flowable.cmmn.model.BaseElement;
+import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.IOParameter;
+import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.ProcessTask;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
@@ -44,7 +45,7 @@ public class ProcessTaskJsonConverter extends BaseCmmnJsonConverter implements P
     }
 
     public static void fillCmmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
-        convertersToJsonMap.put(CaseTask.class, ProcessTaskJsonConverter.class);
+        convertersToJsonMap.put(ProcessTask.class, ProcessTaskJsonConverter.class);
     }
     
     @Override
@@ -55,7 +56,11 @@ public class ProcessTaskJsonConverter extends BaseCmmnJsonConverter implements P
     @Override
     protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor,
             BaseElement baseElement, CmmnModel cmmnModel) {
-        // todo
+        // todo implement rest of the properties
+        ProcessTask processTask = (ProcessTask) ((PlanItem) baseElement).getPlanItemDefinition();
+
+        propertiesNode.put(PROPERTY_FALLBACK_TO_DEFAULT_TENANT, processTask.isFallbackToDefaultTenant());
+
     }
 
     @Override
@@ -85,6 +90,12 @@ public class ProcessTaskJsonConverter extends BaseCmmnJsonConverter implements P
             JsonNode outParametersNode =  processTaskOutParametersNode.get("outParameters");
             task.setOutParameters(readIOParameters(outParametersNode));
         }
+
+        JsonNode fallbackToDefaultTenant = CmmnJsonConverterUtil.getProperty(CmmnStencilConstants.PROPERTY_FALLBACK_TO_DEFAULT_TENANT, elementNode);
+        if (fallbackToDefaultTenant != null) {
+            task.setFallbackToDefaultTenant(fallbackToDefaultTenant.booleanValue());
+        }
+
         return task;
     }
 

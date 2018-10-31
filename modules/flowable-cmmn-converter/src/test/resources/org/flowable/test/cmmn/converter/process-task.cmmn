@@ -25,7 +25,7 @@
             </sentry>
 
             <task id="theTask" name="The Task" isBlocking="true" />
-            <processTask id="theProcess" isBlocking="true">
+            <processTask id="theProcess" isBlocking="true" flowable:fallbackToDefaultTenant="true">
                 <extensionElements>
                   <flowable:in source="num2" target="num"></flowable:in>
                   <flowable:out source="num" target="num3"></flowable:out>

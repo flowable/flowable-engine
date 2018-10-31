@@ -12,9 +12,11 @@
  */
 package org.flowable.cmmn.test;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.Collections;
@@ -31,6 +33,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -514,5 +517,55 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
     }
-    
+
+    @Test
+    @CmmnDeployment(
+        resources = {"org/flowable/cmmn/test/ProcessTaskTest.testOneTaskProcessFallbackToDefaultTenant.cmmn"},
+        tenantId = "flowable"
+    )
+    public void testOneTaskProcessFallbackToDefaultTenant() {
+        Deployment deployment = this.processEngineRepositoryService.createDeployment().
+            addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml").
+            deploy();
+        try {
+            CaseInstance caseInstance = startCaseInstanceWithOneTaskProcess("flowable");
+            List<Task> processTasks = processEngine.getTaskService().createTaskQuery().list();
+            assertEquals(1, processTasks.size());
+
+            // Non-blocking process task, plan item should have been completed
+            List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .list();
+            assertEquals(1, planItemInstances.size());
+            assertEquals("Task Two", planItemInstances.get(0).getName());
+
+            assertEquals(1, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
+
+            processEngine.getTaskService().complete(processTasks.get(0).getId());
+            assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    @Test
+    @CmmnDeployment(
+        resources = {"org/flowable/cmmn/test/ProcessTaskTest.testOneTaskProcessFallbackToDefaultTenantFalse.cmmn"},
+        tenantId = "flowable"
+    )
+    public void testOneTaskProcessFallbackToDefaultTenantFalse() {
+        Deployment deployment = this.processEngineRepositoryService.createDeployment().
+            addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml").
+            deploy();
+        try {
+            startCaseInstanceWithOneTaskProcess("flowable");
+            fail();
+        } catch (FlowableObjectNotFoundException e) {
+            assertThat(e.getMessage(), is("Process definition with key 'oneTask' and tenantId 'flowable' was not found"));
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
 }
