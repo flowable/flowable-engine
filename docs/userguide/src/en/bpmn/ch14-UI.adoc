@@ -845,6 +845,12 @@ This are the Admin UI App specific properties
 |security.encryption.credentials-secret-spec
 |-
 |The string that needs to be used to create a SecretKeySpec using it's bytes.
+
+|flowable.admin.app.security.preemptive-basic-authentication
+|
+|false
+|Perform a preemptive basic authentication when issuing requests to the flowable REST API.
+**NB:** This is an experimental property and might be removed without notice.
 |===============
 
 In addition to these properties, the Flowable admin application has a few more properties. The full
