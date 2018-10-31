@@ -370,6 +370,16 @@
       "popular" : true
     } ]
   }, {
+    "name" : "decisiontaskfallbacktodefaulttenantpackage",
+    "properties" : [ {
+      "id" : "decisiontaskfallbacktodefaulttenant",
+      "type" : "Boolean",
+      "title" : "Fallback to default tenant",
+      "value" : "false",
+      "description" : "Find decision definition without tenant when previous attemps to find it with tenant failed.",
+      "popular" : true
+    } ]
+  }, {
       "name": "httptaskrequestmethodpackage",
       "properties": [
         {
@@ -591,6 +601,16 @@
       "title" : "Process reference",
       "value" : "",
       "description" : "Set the process reference",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "fallbacktodefaulttenantpackage",
+    "properties" : [ {
+      "id" : "fallbacktodefaulttenant",
+      "type" : "Boolean",
+      "title" : "Fallback to default tenant",
+      "value" : "false",
+      "description" : "Use default tenant as a fallback when definition is not found by key in the specified tenant",
       "popular" : true
     } ]
   }, {
@@ -949,6 +969,7 @@
         "documentationpackage",
         "decisiontaskdecisiontablereferencepackage",
         "decisiontaskthrowerroronnohitspackage",
+        "decisiontaskfallbacktodefaulttenantpackage",
         "asyncpackage",
         "requiredrulepackage",
         "repetitionrulepackage",
@@ -1084,6 +1105,7 @@
       "documentationpackage",
       "blockingpackage",
       "processtaskprocessreferencepackage",
+      "fallbacktodefaulttenantpackage",
       "processtaskinparameterspackage",
       "processtaskoutparameterspackage",
       "asyncpackage",

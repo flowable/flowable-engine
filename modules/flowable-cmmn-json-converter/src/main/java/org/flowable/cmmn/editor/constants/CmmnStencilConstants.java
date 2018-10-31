@@ -114,12 +114,15 @@ public interface CmmnStencilConstants {
     String PROPERTY_DECISIONTABLE_REFERENCE_KEY = "decisionTableReferenceKey";
     String PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS = "decisiontaskthrowerroronnohits";
     String PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY = "decisionTaskThrowErrorOnNoHits";
+    String PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT = "decisiontaskfallbacktodefaulttenant";
+    String PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT_KEY = "fallbackToDefaultTenant";
 
     String PROPERTY_CASE_REFERENCE = "casetaskcasereference";
 
     String PROPERTY_PROCESS_REFERENCE = "processtaskprocessreference";
     String PROPERTY_PROCESS_IN_PARAMETERS = "processtaskinparameters";
     String PROPERTY_PROCESS_OUT_PARAMETERS = "processtaskoutparameters";
+    String PROPERTY_FALLBACK_TO_DEFAULT_TENANT = "fallbacktodefaulttenant";
 
     String PROPERTY_IN_PARAMETERS = "inParameters";
     String PROPERTY_OUT_PARAMETERS = "outParameters";

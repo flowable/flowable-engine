@@ -103,6 +103,11 @@ public interface ProcessInstanceBuilder {
     ProcessInstanceBuilder transientVariable(String variableName, Object value);
 
     /**
+     * Use default tenant as a fallback in the case when process definition was not found by key and tenant id
+     */
+    ProcessInstanceBuilder fallbackToDefaultTenant();
+
+    /**
      * Start the process instance
      * 
      * @throws FlowableIllegalArgumentException

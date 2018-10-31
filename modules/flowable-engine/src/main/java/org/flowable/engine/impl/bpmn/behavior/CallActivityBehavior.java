@@ -272,7 +272,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
 
         if (processDefinition == null) {
             throw new FlowableObjectNotFoundException("Process definition " + processDefinitionKey + " was not found in sameDeployment["+ isSameDeployment +
-                "] tenantId["+ tenantId+ "] falbackToDefaultTenant["+ this.fallbackToDefaultTenant + "]");
+                "] tenantId["+ tenantId+ "] fallbackToDefaultTenant["+ this.fallbackToDefaultTenant + "]");
         }
         return processDefinition;
     }
