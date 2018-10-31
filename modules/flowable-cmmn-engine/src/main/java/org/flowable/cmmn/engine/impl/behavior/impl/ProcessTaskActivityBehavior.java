@@ -47,6 +47,7 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
     protected String processRef;
     List<IOParameter> inParameters;
     List<IOParameter> outParameters;
+    protected boolean fallbackToDefaultTenant;
 
     public ProcessTaskActivityBehavior(Process process, Expression processRefExpression, ProcessTask processTask) {
         super(processTask.isBlocking(), processTask.getBlockingExpression());
@@ -55,6 +56,7 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
         this.processRef = processTask.getProcessRef();
         this.inParameters = processTask.getInParameters();
         this.outParameters = processTask.getOutParameters();
+        this.fallbackToDefaultTenant = processTask.isFallbackToDefaultTenant();
     }
 
     @Override
@@ -115,9 +117,11 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
         
         boolean blocking = evaluateIsBlocking(planItemInstanceEntity);
         if (blocking) {
-            processInstanceService.startProcessInstanceByKey(externalRef, processInstanceId, planItemInstanceEntity.getId(), planItemInstanceEntity.getTenantId(), inParametersMap);
+            processInstanceService.startProcessInstanceByKey(externalRef, processInstanceId, planItemInstanceEntity.getId(),
+                planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, inParametersMap);
         } else {
-            processInstanceService.startProcessInstanceByKey(externalRef, processInstanceId, planItemInstanceEntity.getTenantId(), inParametersMap);
+            processInstanceService.startProcessInstanceByKey(externalRef, processInstanceId,
+                planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, inParametersMap);
         }
 
         if (!blocking) {
