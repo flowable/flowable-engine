@@ -20,12 +20,12 @@ import java.util.Map;
 public interface ProcessInstanceService {
     
     String generateNewProcessInstanceId();
-    
-    String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String tenantId, 
+
+    String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String tenantId, boolean fallbackToDefaultTenant,
                     Map<String, Object> inParametersMap);
 
-    String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String planItemInstanceId, 
-                    String tenantId, Map<String, Object> inParametersMap);
+    String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String planItemInstanceId,
+                    String tenantId, boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap);
 
     void deleteProcessInstance(String processInstanceId);
 

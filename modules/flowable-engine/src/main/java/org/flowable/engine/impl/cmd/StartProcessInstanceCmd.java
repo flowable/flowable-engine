@@ -121,7 +121,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
                             "'. Fallback to default tenant was also applied.", ProcessDefinition.class);
                     }
                 } else {
-                    throw new FlowableObjectNotFoundException("Process definition withe key '" + processDefinitionKey +
+                    throw new FlowableObjectNotFoundException("Process definition with key '" + processDefinitionKey +
                         "' and tenantId '"+ tenantId +"' was not found", ProcessDefinition.class);
                 }
             }
