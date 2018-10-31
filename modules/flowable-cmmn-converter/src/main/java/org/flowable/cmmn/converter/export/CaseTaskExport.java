@@ -36,5 +36,8 @@ public class CaseTaskExport extends AbstractPlanItemDefinitionExport<CaseTask> {
         if (StringUtils.isNotEmpty(caseTask.getCaseRef())) {
             xtw.writeAttribute(ATTRIBUTE_CASE_REF, caseTask.getCaseRef());
         }
+        if (caseTask.isFallbackToDefaultTenant()) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT, "true");
+        }
     }
 }

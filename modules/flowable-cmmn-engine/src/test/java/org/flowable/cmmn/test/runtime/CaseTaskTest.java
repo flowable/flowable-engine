@@ -373,5 +373,31 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
         
     }
-    
+
+    @Test
+    @CmmnDeployment
+    public void testFallbackToDefaultTenant() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("myCase").
+            tenantId("flowable").
+            fallbackToDefaultTenant().
+            start();
+
+        assertBlockingCaseTaskFlow(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testFallbackToDefaultTenantFalse() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("myCase").
+            tenantId("flowable").
+            fallbackToDefaultTenant().
+            start();
+
+        this.expectedException.expect(FlowableObjectNotFoundException.class);
+        this.expectedException.expectMessage("no case definition deployed with key 'oneTaskCase' for tenant identifier 'flowable'");
+        assertBlockingCaseTaskFlow(caseInstance);
+    }
+
 }
