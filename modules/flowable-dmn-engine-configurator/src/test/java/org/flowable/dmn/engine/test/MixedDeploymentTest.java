@@ -144,7 +144,7 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
     )
     public void testDecisionTaskExecutionInAnotherDeploymentAndTenantDefaultBehavior() {
         this.expectedException.expect(FlowableObjectNotFoundException.class);
-        this.expectedException.expectMessage("no processes deployed with key 'oneDecisionTaskProcess' for tenant identifier 'flowable'");
+        this.expectedException.expectMessage("Process definition with key 'oneDecisionTaskProcess' and tenantId 'flowable' was not found");
 
         deployDecisionAndAssertProcessExecuted();
     }
