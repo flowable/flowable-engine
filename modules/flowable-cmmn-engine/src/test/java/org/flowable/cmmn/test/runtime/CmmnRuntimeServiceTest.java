@@ -132,4 +132,52 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
             startAsync();
     }
 
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
+    public void createCaseInstanceWithFallBack() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            tenantId("flowable").
+            fallbackToDefaultTenant().
+            start();
+
+        assertThat(caseInstance, is(notNullValue()));
+    }
+
+    @Test
+    public void createCaseInstanceWithFallBack_DefinitionNotFound() {
+        this.expectedException.expect(FlowableObjectNotFoundException.class);
+        this.expectedException.expectMessage("Case definition was not found by key 'oneTaskCase'. Fallback to default tenant was also used.");
+
+        cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            tenantId("flowable").
+            fallbackToDefaultTenant().
+            start();
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
+    public void createCaseInstanceAsyncWithFallBack() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            tenantId("flowable").
+            fallbackToDefaultTenant().
+            startAsync();
+
+        assertThat(caseInstance, is(notNullValue()));
+    }
+
+    @Test
+    public void createCaseInstanceAsyncWithFallBack_DefinitionNotFound() {
+        this.expectedException.expect(FlowableObjectNotFoundException.class);
+        this.expectedException.expectMessage("Case definition was not found by key 'oneTaskCase'. Fallback to default tenant was also used.");
+
+        cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            tenantId("flowable").
+            fallbackToDefaultTenant().
+            startAsync();
+    }
+
 }

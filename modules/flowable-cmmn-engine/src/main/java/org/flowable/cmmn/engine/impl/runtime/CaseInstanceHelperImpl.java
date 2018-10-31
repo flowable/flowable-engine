@@ -89,9 +89,18 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
                     throw new FlowableObjectNotFoundException("No case definition found for key " + caseDefinitionKey, CaseDefinition.class);
                 }
             } else if (!CmmnEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-                caseDefinition = deploymentManager.findDeployedLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, caseInstanceBuilder.getTenantId());
-                if (caseDefinition == null) {
-                    throw new FlowableObjectNotFoundException("No case definition found for key " + caseDefinitionKey, CaseDefinition.class);
+                try {
+                    caseDefinition = deploymentManager.findDeployedLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, caseInstanceBuilder.getTenantId());
+                } catch (FlowableObjectNotFoundException e) {
+                    if (caseInstanceBuilder.isFallbackToDefaultTenant()) {
+                        try {
+                            caseDefinition = deploymentManager.findDeployedLatestCaseDefinitionByKey(caseDefinitionKey);
+                        } catch(FlowableObjectNotFoundException e1) {
+                            throw new FlowableObjectNotFoundException("Case definition was not found by key '"+caseDefinitionKey+"'. Fallback to default tenant was also used.");
+                        }
+                    } else {
+                        throw e;
+                    }
                 }
             }
         } else {

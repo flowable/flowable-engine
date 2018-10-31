@@ -63,6 +63,13 @@ public interface CaseInstanceBuilder {
      */
     CaseInstanceBuilder parentId(String parentCaseInstanceId);
 
+    /**
+     * If case definition is not found by key in the specified tenant use default tenant search as a fall back
+     *
+     * @return modified case instance builder
+     */
+    CaseInstanceBuilder fallbackToDefaultTenant();
+
     CaseInstance start();
 
     CaseInstance startAsync();
@@ -90,5 +97,7 @@ public interface CaseInstanceBuilder {
     String getCallbackId();
 
     String getParentId();
+
+    boolean isFallbackToDefaultTenant();
 
 }
