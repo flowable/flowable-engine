@@ -1,0 +1,448 @@
+{
+  "modelId": "870fe834-dd87-11e8-9b7c-ea4fff2a26d6",
+  "bounds": {
+    "lowerRight": {
+      "x": 1200,
+      "y": 1050
+    },
+    "upperLeft": {
+      "x": 0,
+      "y": 0
+    }
+  },
+  "properties": {
+    "process_id": "process_pool1",
+    "name": "process_pool1",
+    "documentation": "",
+    "process_author": "",
+    "process_version": "",
+    "process_namespace": "http://www.activiti.org/test",
+    "process_historylevel": "",
+    "isexecutable": true,
+    "dataproperties": "{\"items\":[{\"dataproperty_id\":\"c\",\"dataproperty_name\":\"c\",\"dataproperty_type\":\"string\",\"dataproperty_value\":\"c\"}]}",
+    "executionlisteners": "{\"executionListeners\":[{\"event\":\"start\",\"implementation\":\"c\",\"className\":\"c\",\"expression\":\"c\",\"delegateExpression\":\"\",\"$$hashKey\":\"uiGrid-002V\",\"fields\":[]}]}",
+    "eventlisteners": "{\"eventListeners\":[]}",
+    "signaldefinitions": [
+      {
+        "id": "shareniu_signal",
+        "name": "shareniu_signal",
+        "scope": "global",
+        "$$hashKey": "uiGrid-000B"
+      }
+    ],
+    "messagedefinitions": "[]",
+    "process_potentialstarteruser": "",
+    "process_potentialstartergroup": "",
+    "iseagerexecutionfetch": "false",
+    "messages": []
+  },
+  "childShapes": [
+    {
+      "resourceId": "pool1",
+      "properties": {
+        "overrideid": "pool1",
+        "name": "Pool",
+        "documentation": "",
+        "process_id": "process_pool1",
+        "isexecutable": "true"
+      },
+      "stencil": {
+        "id": "Pool"
+      },
+      "childShapes": [
+        {
+          "resourceId": "lane1",
+          "properties": {
+            "overrideid": "lane1",
+            "name": "",
+            "documentation": "",
+            "showcaption": true
+          },
+          "stencil": {
+            "id": "Lane"
+          },
+          "childShapes": [
+            {
+              "resourceId": "startevent1",
+              "properties": {
+                "overrideid": "startevent1",
+                "name": "Start",
+                "documentation": "",
+                "executionlisteners": {
+                  "executionListeners": []
+                },
+                "initiator": "",
+                "formkeydefinition": "",
+                "formreference": "",
+                "formproperties": "",
+                "interrupting": true
+              },
+              "stencil": {
+                "id": "StartNoneEvent"
+              },
+              "childShapes": [],
+              "outgoing": [
+                {
+                  "resourceId": "flow1"
+                }
+              ],
+              "bounds": {
+                "lowerRight": {
+                  "x": 210,
+                  "y": 80
+                },
+                "upperLeft": {
+                  "x": 180,
+                  "y": 50
+                }
+              },
+              "dockers": []
+            }
+          ],
+          "outgoing": [],
+          "bounds": {
+            "lowerRight": {
+              "x": 500,
+              "y": 150
+            },
+            "upperLeft": {
+              "x": 30,
+              "y": 0
+            }
+          },
+          "dockers": []
+        },
+        {
+          "resourceId": "lane2",
+          "properties": {
+            "overrideid": "lane2",
+            "name": "New lane",
+            "documentation": "",
+            "showcaption": true
+          },
+          "stencil": {
+            "id": "Lane"
+          },
+          "childShapes": [
+            {
+              "resourceId": "usertask1",
+              "properties": {
+                "overrideid": "usertask1",
+                "name": "shareniu-a",
+                "documentation": "",
+                "asynchronousdefinition": false,
+                "exclusivedefinition": true,
+                "executionlisteners": {
+                  "executionListeners": []
+                },
+                "multiinstance_type": "None",
+                "multiinstance_cardinality": "",
+                "multiinstance_collection": "",
+                "multiinstance_variable": "",
+                "multiinstance_condition": "",
+                "isforcompensation": "false",
+                "usertaskassignment": "",
+                "formkeydefinition": "",
+                "formreference": "",
+                "duedatedefinition": "",
+                "prioritydefinition": "",
+                "formproperties": "",
+                "tasklisteners": {
+                  "taskListeners": []
+                },
+                "skipexpression": "",
+                "categorydefinition": ""
+              },
+              "stencil": {
+                "id": "UserTask"
+              },
+              "childShapes": [],
+              "outgoing": [
+                {
+                  "resourceId": "flow2"
+                }
+              ],
+              "bounds": {
+                "lowerRight": {
+                  "x": 255,
+                  "y": 105
+                },
+                "upperLeft": {
+                  "x": 150,
+                  "y": 50
+                }
+              },
+              "dockers": []
+            }
+          ],
+          "outgoing": [],
+          "bounds": {
+            "lowerRight": {
+              "x": 500,
+              "y": 300
+            },
+            "upperLeft": {
+              "x": 30,
+              "y": 150
+            }
+          },
+          "dockers": []
+        },
+        {
+          "resourceId": "lane3",
+          "properties": {
+            "overrideid": "lane3",
+            "name": "New lane",
+            "documentation": "",
+            "showcaption": true
+          },
+          "stencil": {
+            "id": "Lane"
+          },
+          "childShapes": [
+            {
+              "resourceId": "usertask2",
+              "properties": {
+                "overrideid": "usertask2",
+                "name": "shareniu-b",
+                "documentation": "",
+                "asynchronousdefinition": false,
+                "exclusivedefinition": true,
+                "executionlisteners": {
+                  "executionListeners": []
+                },
+                "multiinstance_type": "None",
+                "multiinstance_cardinality": "",
+                "multiinstance_collection": "",
+                "multiinstance_variable": "",
+                "multiinstance_condition": "",
+                "isforcompensation": "false",
+                "usertaskassignment": "",
+                "formkeydefinition": "",
+                "formreference": "",
+                "duedatedefinition": "",
+                "prioritydefinition": "",
+                "formproperties": "",
+                "tasklisteners": {
+                  "taskListeners": []
+                },
+                "skipexpression": "",
+                "categorydefinition": ""
+              },
+              "stencil": {
+                "id": "UserTask"
+              },
+              "childShapes": [],
+              "outgoing": [
+                {
+                  "resourceId": "flow3"
+                }
+              ],
+              "bounds": {
+                "lowerRight": {
+                  "x": 255,
+                  "y": 95
+                },
+                "upperLeft": {
+                  "x": 150,
+                  "y": 40
+                }
+              },
+              "dockers": []
+            },
+            {
+              "resourceId": "endevent1",
+              "properties": {
+                "overrideid": "endevent1",
+                "name": "End",
+                "documentation": "",
+                "executionlisteners": {
+                  "executionListeners": []
+                }
+              },
+              "stencil": {
+                "id": "EndNoneEvent"
+              },
+              "childShapes": [],
+              "outgoing": [],
+              "bounds": {
+                "lowerRight": {
+                  "x": 328,
+                  "y": 78
+                },
+                "upperLeft": {
+                  "x": 300,
+                  "y": 50
+                }
+              },
+              "dockers": []
+            }
+          ],
+          "outgoing": [],
+          "bounds": {
+            "lowerRight": {
+              "x": 500,
+              "y": 450
+            },
+            "upperLeft": {
+              "x": 30,
+              "y": 300
+            }
+          },
+          "dockers": []
+        }
+      ],
+      "outgoing": [],
+      "bounds": {
+        "lowerRight": {
+          "x": 830,
+          "y": 790
+        },
+        "upperLeft": {
+          "x": 330,
+          "y": 340
+        }
+      },
+      "dockers": []
+    },
+    {
+      "resourceId": "flow1",
+      "properties": {
+        "overrideid": "flow1",
+        "name": "",
+        "documentation": "",
+        "conditionsequenceflow": "",
+        "executionlisteners": "",
+        "defaultflow": "false",
+        "skipexpression": ""
+      },
+      "stencil": {
+        "id": "SequenceFlow"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "usertask1"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 561.2234264833916,
+          "y": 539.8409071401513
+        },
+        "upperLeft": {
+          "x": 555.7199328916084,
+          "y": 420.59854598484867
+        }
+      },
+      "dockers": [
+        {
+          "x": 15,
+          "y": 15
+        },
+        {
+          "x": 52.5,
+          "y": 27.5
+        }
+      ],
+      "target": {
+        "resourceId": "usertask1"
+      }
+    },
+    {
+      "resourceId": "flow2",
+      "properties": {
+        "overrideid": "flow2",
+        "name": "",
+        "documentation": "",
+        "conditionsequenceflow": "",
+        "executionlisteners": "",
+        "defaultflow": "false",
+        "skipexpression": ""
+      },
+      "stencil": {
+        "id": "SequenceFlow"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "usertask2"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 562.5,
+          "y": 679.15625
+        },
+        "upperLeft": {
+          "x": 562.5,
+          "y": 595.84375
+        }
+      },
+      "dockers": [
+        {
+          "x": 52.5,
+          "y": 27.5
+        },
+        {
+          "x": 52.5,
+          "y": 27.5
+        }
+      ],
+      "target": {
+        "resourceId": "usertask2"
+      }
+    },
+    {
+      "resourceId": "flow3",
+      "properties": {
+        "overrideid": "flow3",
+        "name": "",
+        "documentation": "",
+        "conditionsequenceflow": "",
+        "executionlisteners": "",
+        "defaultflow": "false",
+        "skipexpression": ""
+      },
+      "stencil": {
+        "id": "SequenceFlow"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "endevent1"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 659.0629923064856,
+          "y": 705.8280003190376
+        },
+        "upperLeft": {
+          "x": 615.7651326935144,
+          "y": 704.4688746809624
+        }
+      },
+      "dockers": [
+        {
+          "x": 52.5,
+          "y": 27.5
+        },
+        {
+          "x": 14,
+          "y": 14
+        }
+      ],
+      "target": {
+        "resourceId": "endevent1"
+      }
+    }
+  ],
+  "stencil": {
+    "id": "BPMNDiagram"
+  },
+  "stencilset": {
+    "namespace": "http://b3mn.org/stencilset/bpmn2.0#",
+    "url": "../editor/stencilsets/bpmn2.0/bpmn2.0.json"
+  }
+}
