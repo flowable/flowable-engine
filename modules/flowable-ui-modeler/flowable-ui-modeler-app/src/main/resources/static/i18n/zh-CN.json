@@ -960,7 +960,7 @@
     "EVENT_TYPE.MEMBERSHIP.CREATED.TOOLTIP": "创建了新的membership",
     "EVENT_TYPE.MEMBERSHIP.DELETED.TOOLTIP": "单个membership已被删除",
     "EVENT_TYPE.MEMBERSHIPS.DELETED.TOOLTIP": "相关组中的所有成员已被删除。由于可能的原因，个别事件不会被派遣。",
-    "EVENT_TYPE.TASK.ASSIGNED.TOOLTIP": "一个任务已经被分配人了。这将抛出一个 ENTITY_UPDATED 事件",
+    "EVENT_TYPE.TASK.ASSIGNED.TOOLTIP": "一个任务已经被分配人了。这将抛出一个实体更新事件",
     "EVENT_TYPE.TASK.COMPLETED.TOOLTIP": "一个任务已经被完成。在删除任务实体之前调度",
     "EVENT_TYPE.UNCAUGHT.BPMNERROR.TOOLTIP": "当BPMN错误被抛出，但未在流程中捕获时",
     "EVENT_TYPE.VARIABLE.CREATED.TOOLTIP": "已经创建了一个新的变量",
