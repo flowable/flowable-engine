@@ -113,9 +113,9 @@
             "RELATED-CONTENT-ADDED-LOADING": "\"{{name}}\"已添加到任务中。一旦从外部源检索到这些内容, 就可以使用。"
         },
         "ACTION": {
-            "COMPLETE-TASK-WITH-FORM": "完整表单", 
-            "COMPLETE": "完整", 
-            "CLAIM": "Claim", 
+            "COMPLETE-TASK-WITH-FORM": "完成表单",
+            "COMPLETE": "完成",
+            "CLAIM": "认领",
             "ASSIGN": "分配", 
             "REASSIGN": "重新分配", 
             "CREATE": "+ 创建任务", 
