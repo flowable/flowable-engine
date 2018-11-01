@@ -307,6 +307,41 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
     }
 
     @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/risk_rating_spec_example_DMN12.dmn")
+    public void riskRatingDMN12() {
+        Map<String, Object> processVariablesInput = new HashMap<>();
+        processVariablesInput.put("age", 17);
+        processVariablesInput.put("riskcategory", "HIGH");
+        processVariablesInput.put("debtreview", true);
+
+        List<Map<String, Object>> result = ruleService.createExecuteDecisionBuilder()
+            .decisionKey("RiskRatingDecisionTable")
+            .variables(processVariablesInput)
+            .execute();
+
+        Map<String, Object> ruleResult1 = result.get(0);
+        Map<String, Object> ruleResult2 = result.get(1);
+        Map<String, Object> ruleResult3 = result.get(2);
+        Map<String, Object> ruleResult4 = result.get(3);
+
+        Assert.assertEquals("DECLINE", ruleResult1.get("routing"));
+        Assert.assertEquals("Applicant too young", ruleResult1.get("reason"));
+        Assert.assertEquals("NONE", ruleResult1.get("reviewlevel"));
+
+        Assert.assertEquals("REFER", ruleResult2.get("routing"));
+        Assert.assertEquals("Applicant under debt review", ruleResult2.get("reason"));
+        Assert.assertEquals("LEVEL 2", ruleResult2.get("reviewlevel"));
+
+        Assert.assertEquals("REFER", ruleResult3.get("routing"));
+        Assert.assertEquals("High risk application", ruleResult3.get("reason"));
+        Assert.assertEquals("LEVEL 1", ruleResult3.get("reviewlevel"));
+
+        Assert.assertEquals("ACCEPT", ruleResult4.get("routing"));
+        Assert.assertEquals("Acceptable", ruleResult4.get("reason"));
+        Assert.assertEquals("NONE", ruleResult4.get("reviewlevel"));
+    }
+
+    @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/numbers_1.dmn")
     public void testNumbers1() {
         Map<String, Object> processVariablesInput = new HashMap<>();
