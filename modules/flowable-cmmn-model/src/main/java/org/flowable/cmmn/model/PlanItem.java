@@ -14,6 +14,8 @@ package org.flowable.cmmn.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Joram Barrez
@@ -28,6 +30,21 @@ public class PlanItem extends CaseElement implements HasEntryCriteria, HasExitCr
     protected List<Criterion> exitCriteria = new ArrayList<>();
     protected List<Association> incomingAssociations = new ArrayList<>();
     protected List<Association> outgoingAssociations = new ArrayList<>();
+
+    /**
+     * A list of {@link PlanItem}s to which this plan item is dependent on through its entry criteria.
+     */
+    protected List<PlanItem> entryDependencies = new ArrayList<>();
+
+    /**
+     * A list of {@link PlanItem}s to which this plan item is dependent on through its exit criteria.
+     */
+    protected List<PlanItem> exitDependencies = new ArrayList<>();
+    
+    /**
+     * A list of {@link PlanItem}s that are dependent on this plan item (through either an entry or exit criterion).
+     */
+    protected List<PlanItem> dependentPlanItems = new ArrayList<>();
     
     protected Object behavior;
 
@@ -133,6 +150,30 @@ public class PlanItem extends CaseElement implements HasEntryCriteria, HasExitCr
 
     public void setBehavior(Object behavior) {
         this.behavior = behavior;
+    }
+
+    public List<PlanItem> getEntryDependencies() {
+        return entryDependencies;
+    }
+
+    public void setEntryDependencies(List<PlanItem> entryDependencies) {
+        this.entryDependencies = entryDependencies;
+    }
+
+    public List<PlanItem> getExitDependencies() {
+        return exitDependencies;
+    }
+
+    public void setExitDependencies(List<PlanItem> exitDependencies) {
+        this.exitDependencies = exitDependencies;
+    }
+
+    public List<PlanItem> getDependentPlanItems() {
+        return dependentPlanItems;
+    }
+
+    public void setDependentPlanItems(List<PlanItem> dependentPlanItems) {
+        this.dependentPlanItems = dependentPlanItems;
     }
     
     @Override

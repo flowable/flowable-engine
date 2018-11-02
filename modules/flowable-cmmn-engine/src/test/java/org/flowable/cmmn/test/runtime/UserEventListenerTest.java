@@ -39,6 +39,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * @author Dennis Federico
+ * @author Joram Barrez
  */
 public class UserEventListenerTest extends FlowableCmmnTestCase {
 
@@ -287,19 +288,10 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
         //Complete the Task
         cmmnRuntimeService.triggerPlanItemInstance(task.getId());
 
-        //Listener should still be available and Stage active
+        //Listener should be deleted as it's an orphan
         planItems = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .list().stream().collect(Collectors.groupingBy(PlanItemInstance::getPlanItemDefinitionType));
-        assertEquals(2, planItems.size());
-        assertEquals(1, planItems.getOrDefault(PlanItemDefinitionType.USER_EVENT_LISTENER, Collections.emptyList()).size());
-        PlanItemInstance listener = planItems.get(PlanItemDefinitionType.USER_EVENT_LISTENER).get(0);
-        assertEquals(PlanItemInstanceState.AVAILABLE, listener.getState());
-        assertEquals(1, planItems.getOrDefault(PlanItemDefinitionType.STAGE, Collections.emptyList()).size());
-        stage = planItems.get(PlanItemDefinitionType.STAGE).get(0);
-        assertEquals(PlanItemInstanceState.ACTIVE, stage.getState());
-
-        //Trigger the listener should end the case
-        cmmnRuntimeService.triggerPlanItemInstance(listener.getId());
+        assertEquals(0, planItems.size());
 
         //Stage and case instance should have ended...
         assertCaseInstanceEnded(caseInstance);
@@ -339,17 +331,10 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
         //Complete the Task
         cmmnRuntimeService.triggerPlanItemInstance(task.getId());
 
-        //Listener should still be available but Stage close/terminated
+        //Listener should be terminated as it's orphaned
         planItems = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .list().stream().collect(Collectors.groupingBy(PlanItemInstance::getPlanItemDefinitionType));
-        assertEquals(1, planItems.size());
-        assertEquals(1, planItems.getOrDefault(PlanItemDefinitionType.USER_EVENT_LISTENER, Collections.emptyList()).size());
-        listener = planItems.get(PlanItemDefinitionType.USER_EVENT_LISTENER).get(0);
-
-        //Trigger the listener should end the case
-        cmmnRuntimeService.triggerPlanItemInstance(listener.getId());
-
-        //Stage and case instance should have ended...
+        assertEquals(0, planItems.size());
         assertCaseInstanceEnded(caseInstance);
     }
 
@@ -436,5 +421,26 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
         //TODO suspended state query (need to suspend the parent stage)
 
     }
+
+    @Test
+    @CmmnDeployment
+    public void testUserEventInstanceDeletedWhenNotReferencedByExitSentry() {
+
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testUserEvent").start();
+        assertNotNull(cmmnRuntimeService.createUserEventListenerInstanceQuery().singleResult());
+
+        // Completing task A and B completes Stage A.
+        // This should also remove the user event listener, as nothing is referencing it anymore
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery().list();
+        assertEquals(2, tasks.size());
+        tasks.forEach(t -> cmmnTaskService.complete(t.getId()));
+
+        assertNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage A").singleResult());
+        assertNotNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage A").includeEnded().singleResult());
+        assertNull(cmmnRuntimeService.createUserEventListenerInstanceQuery().singleResult());
+
+    }
+
 }
 

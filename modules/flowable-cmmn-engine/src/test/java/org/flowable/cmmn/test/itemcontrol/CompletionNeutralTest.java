@@ -153,8 +153,7 @@ public class CompletionNeutralTest extends FlowableCmmnTestCase {
         taskB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskB").singleResult();
         assertNull(taskB);
         listener = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).singleResult();
-        assertNotNull(listener);
-        assertEquals(PlanItemInstanceState.AVAILABLE, listener.getState());
+        assertNull(listener);
 
         //End the case
         cmmnRuntimeService.triggerPlanItemInstance(taskA.getId());
@@ -281,8 +280,10 @@ public class CompletionNeutralTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(userEventOne.getId());
         stageOne = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("stageOne").singleResult();
         assertNull(stageOne);
+
+        // The listeners should all be removed
         listeners = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).list();
-        assertEquals(2, listeners.size());
+        assertEquals(0, listeners.size());
         assertCaseInstanceNotEnded(caseInstance);
 
         //The only thing keeping the case from ending is TaskA even with a deep nested required task, because its not AVAILABLE yet
