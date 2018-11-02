@@ -40,6 +40,17 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
     }
 
     @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/multiple_conclusions_DMN12.dmn")
+    public void deploySingleDecisionDMN12() {
+        DmnDecisionTable decision = repositoryService.createDecisionTableQuery()
+            .latestVersion()
+            .decisionTableKey("decision")
+            .singleResult();
+        assertNotNull(decision);
+        assertEquals("decision", decision.getKey());
+    }
+
+    @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/multiple_conclusions.dmn")
     public void deploySingleDecisionAndValidateCache() {
         DmnDecisionTable decision = repositoryService.createDecisionTableQuery()

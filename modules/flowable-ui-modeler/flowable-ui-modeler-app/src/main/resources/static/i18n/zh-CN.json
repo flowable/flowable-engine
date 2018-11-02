@@ -541,92 +541,92 @@
 
     "FORM-BUILDER": {
         "PALLETTE": {
-            "TEXT": "Text",
-            "MULTILINE-TEXT": "Multiline text",
-            "PASSWORD": "Password",
-            "NUMBER": "Number",
-            "CHECKBOX": "Checkbox",
-            "DATE": "Date",
-            "DROPDOWN": "Dropdown",
-            "RADIO": "Radio buttons",
-            "PEOPLE": "People",
-            "GROUP-OF-PEOPLE": "Group of people",
-            "UPLOAD": "Upload",
-            "EXPRESSION": "Expression",
-            "DECIMAL": "Decimal",
-	    	"HYPERLINK": "Hyperlink",
-	    	"SPACER": "Spacer",
-			"HORIZONTAL-LINE": "Horizontal line",
-			"HEADLINE": "Headline",
-			"HEADLINE-WITH-LINE":"Headline"
+            "TEXT": "文本",
+            "MULTILINE-TEXT": "多行文本",
+            "PASSWORD": "密码",
+            "NUMBER": "数字",
+            "CHECKBOX": "多选",
+            "DATE": "日期",
+            "DROPDOWN": "下拉",
+            "RADIO": "单选按钮",
+            "PEOPLE": "选择人",
+            "GROUP-OF-PEOPLE": "选择组",
+            "UPLOAD": "上传文件",
+            "EXPRESSION": "表达式",
+            "DECIMAL": "小数",
+	    	"HYPERLINK": "超链接",
+	    	"SPACER": "垫片",
+			"HORIZONTAL-LINE": "横线",
+			"HEADLINE": "标题",
+			"HEADLINE-WITH-LINE":"标题和线"
         },
         "TABS": {
-            "GENERAL": "General",
-            "OPTIONS": "Options",
-            "UPLOAD-OPTIONS": "Upload options",
-	    "ADVANCED-OPTIONS":"Advanced" 
+            "GENERAL": "一般",
+            "OPTIONS": "选项",
+            "UPLOAD-OPTIONS": "上传选项",
+	    "ADVANCED-OPTIONS":"高级"
         },
-        "VERSION": "Version {{version}}",
-        "LAST-UPDATED": "Last updated by {{lastUpdatedBy}}, {{lastUpdated | dateformat}}",
+        "VERSION": "版本 {{version}}",
+        "LAST-UPDATED": "最后更新的 {{lastUpdatedBy}}, {{lastUpdated | dateformat}}",
         "TITLE": {
-            "DESIGN": "Design",
-            "OUTCOME": "Outcomes"
+            "DESIGN": "设计",
+            "OUTCOME": "结果"
         },
         "POPUP": {
-            "EDIT-TITLE": "Edit field '{{name}}'",
-            "EXPRESSION-TITLE": "Edit expression"
+            "EDIT-TITLE": "编辑字段 '{{name}}'",
+            "EXPRESSION-TITLE": "编辑表达式"
         },
         "MESSAGE": {
-            "EMPTY-EXPRESSION": "(No expression value)",
-            "EXPRESSION-HELP": "You can also display values previously submitted in any form, as part of the text, by referencing them using a notation as follows ${myFieldId}.",
-            "OPTIONS-EXPRESSION-HELP": "You can use an expression to dynamically populate options for example by referencing a variable like this ${optionsVariable}. The expression needs to result in either a java object (java.util.List with Option objects) or its json representation."
+            "EMPTY-EXPRESSION": "(没有表达值)",
+            "EXPRESSION-HELP": "您还可以使用如下的符号来引用先前以任何形式提交的值，作为文本的一部分 ${myFieldId}.",
+            "OPTIONS-EXPRESSION-HELP": "可以使用表达式来动态填充选项，例如通过引用这样的变量 ${optionsVariable}. 这个表达式需要产生一个java对象(java.util)。带有选项对象的列表)或其json表示。"
         },
         "LABEL" : {
-            "FUNCTIONAL-GROUP": "Select group..",
-            "PERSON": "Select person.."
+            "FUNCTIONAL-GROUP": "选择组..",
+            "PERSON": "选择人.."
         },
         "COMPONENT": {
-            "LABEL": "Label:",
-            "OVERRIDEID": "Override id?",
+            "LABEL": "标签:",
+            "OVERRIDEID": "覆盖id?",
             "ID": "Id:",
-            "PLACEHOLDER": "Placeholder:",
-            "OPTIONS": "Options",
-            "RADIO-BUTTON-DEFAULT": "Option 1",
-            "DROPDOWN-DEFAULT-EMPTY-SELECTION": "Please choose one...",
-            "DROPDOWN-EMPTY-VALUE-HELP": "This is the 'empty value' option. Selecting this at runtime is the taken to mean 'no value' or 'empty'.  This is allowed for optional fields, but not allowed for required fields.",
-            "OPTIONS-EXPRESSION": "Options expression:",
-            "OPTIONS-EXPRESSION-ENABLED": "Enable options expression",
-            "REQUIRED": "Required",
-	          "READONLY": "Read-only",
-            "EXPRESSION": "Expression",
-            "ADD-OPTION": "+ Add a new option",
-            "UPLOAD-ALLOW-MULTIPLE": "Allow uploading multiple files",
-            "SIZE": "Size",
-	          "MAX-LENGTH":"Maximum length:",
-            "MIN-LENGTH":"Minimum length:",
-            "PASSWORD-UNMASK-OPTION": "password masking/unmasking option",
-	          "HYPERLINK-URL": "Hyperlink URL",
-	          "REGEX-PATTERN":"Regex standard",
+            "PLACEHOLDER": "默认值:",
+            "OPTIONS": "选项",
+            "RADIO-BUTTON-DEFAULT": "选项 1",
+            "DROPDOWN-DEFAULT-EMPTY-SELECTION": "请选择一个...",
+            "DROPDOWN-EMPTY-VALUE-HELP": " 这是‘空值’选项。在运行时选择它意味着‘没有值’或’空’。这允许用于可选字段，但不允许用于必需字段。",
+            "OPTIONS-EXPRESSION": "选择表达:",
+            "OPTIONS-EXPRESSION-ENABLED": "启用选项表达",
+            "REQUIRED": "必填",
+	          "READONLY": "只读",
+            "EXPRESSION": "表达式",
+            "ADD-OPTION": "+ 添加一个新选项",
+            "UPLOAD-ALLOW-MULTIPLE": "允许上传多个文件",
+            "SIZE": "大小",
+	          "MAX-LENGTH":"最大长度:",
+            "MIN-LENGTH":"最小长度:",
+            "PASSWORD-UNMASK-OPTION": "密码屏蔽/揭露选项",
+	          "HYPERLINK-URL": "超链接地址",
+	          "REGEX-PATTERN":"正则表达式的标准",
             "MASK":{
-              "TITLE":"Input mask",
+              "TITLE":"输入掩码",
               "EXAMPLES":{
-                "TITLE":"Examples:",
-                "NUMBER":"Any number",
-                "LETTER":"Any letter",
-                "NUMBERORLETTER":"Any letter or number",
-                "OPTIONAL":"Make mask optional (not valid)",
-                "PHONE":"Phone"
+                "TITLE":"例子:",
+                "NUMBER":"任何数字",
+                "LETTER":"任何字母",
+                "NUMBERORLETTER":"任何字母或数字",
+                "OPTIONAL":"使蒙版可选(无效)",
+                "PHONE":"电话"
                }
            }
         },
         "OUTCOMES": {
-            "DESCRIPTION": "You can define multiple outcomes for this task. When completing a task, the users selects one of the available outcomes, which can be used in eg. a condition further on in the process.",
-            "NO-OUTCOMES-OPTION": "Don't use custom outcomes, only show a 'Complete' button.",
-            "OUTCOMES-OPTION": "Use custom outcomes for this form.",
-            "POSSIBLE-OUTCOMES": "Possible outcomes",
-            "NEW-OUTCOME-PLACEHOLDER": "Enter new outcome",
-            "ADD": "Add outcome",
-            "REMOVE": "Remove"
+            "DESCRIPTION": "您可以为这个任务定义多个结果。在完成一个任务时，用户选择一个可用的结果，可以在eg中使用。在这个过程中进一步的条件。",
+            "NO-OUTCOMES-OPTION": "不要使用自定义结果，只显示'完成'按钮。",
+            "OUTCOMES-OPTION": "使用此表单的定制结果。",
+            "POSSIBLE-OUTCOMES": "可能的出线",
+            "NEW-OUTCOME-PLACEHOLDER": "输入新的出线",
+            "ADD": "添加出线",
+            "REMOVE": "移除"
         }
     },
 
@@ -960,7 +960,7 @@
     "EVENT_TYPE.MEMBERSHIP.CREATED.TOOLTIP": "创建了新的membership",
     "EVENT_TYPE.MEMBERSHIP.DELETED.TOOLTIP": "单个membership已被删除",
     "EVENT_TYPE.MEMBERSHIPS.DELETED.TOOLTIP": "相关组中的所有成员已被删除。由于可能的原因，个别事件不会被派遣。",
-    "EVENT_TYPE.TASK.ASSIGNED.TOOLTIP": "一个任务已经被分配人了。这将抛出一个 ENTITY_UPDATED 事件",
+    "EVENT_TYPE.TASK.ASSIGNED.TOOLTIP": "一个任务已经被分配人了。这将抛出一个实体更新事件",
     "EVENT_TYPE.TASK.COMPLETED.TOOLTIP": "一个任务已经被完成。在删除任务实体之前调度",
     "EVENT_TYPE.UNCAUGHT.BPMNERROR.TOOLTIP": "当BPMN错误被抛出，但未在流程中捕获时",
     "EVENT_TYPE.VARIABLE.CREATED.TOOLTIP": "已经创建了一个新的变量",
