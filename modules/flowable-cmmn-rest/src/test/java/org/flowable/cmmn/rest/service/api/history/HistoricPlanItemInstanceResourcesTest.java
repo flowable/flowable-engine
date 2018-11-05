@@ -145,7 +145,12 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
                 JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
                 closeResponse(response);
                 assertHistoricPlanItemValues(p, responseNode);
-                assertEquals(PlanItemInstanceState.COMPLETED, responseNode.get("state").asText());
+
+                if ("usereventlistener".equals(responseNode.get("planItemDefinitionType").asText())) {
+                    assertEquals(PlanItemInstanceState.TERMINATED, responseNode.get("state").asText());
+                } else {
+                    assertEquals(PlanItemInstanceState.COMPLETED, responseNode.get("state").asText());
+                }
             } catch (IOException e) {
                 fail(e.getMessage());
             }
@@ -256,7 +261,7 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         assertNotNull(responseNode);
-        assertEquals(4, responseNode.get("data").size());
+        assertEquals(3, responseNode.get("data").size());
 
         List<HistoricPlanItemInstance> listOfCompleted = historyService.createHistoricPlanItemInstanceQuery().planItemInstanceState(PlanItemInstanceState.COMPLETED).list();
         assertHistoricPlanItemValues(listOfCompleted, responseNode.get("data"));
@@ -380,7 +385,7 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         assertNotNull(responseNode);
-        assertEquals(4, responseNode.get("data").size());
+        assertEquals(3, responseNode.get("data").size());
 
         List<HistoricPlanItemInstance> listOfCompleted = historyService.createHistoricPlanItemInstanceQuery().planItemInstanceState(PlanItemInstanceState.COMPLETED).list();
         assertHistoricPlanItemValues(listOfCompleted, responseNode.get("data"));
