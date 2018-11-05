@@ -68,6 +68,11 @@ public interface TimerJobEntityManager extends EntityManager<TimerJobEntity> {
     List<TimerJobEntity> findJobsByProcessInstanceId(String id);
 
     /**
+     * Returns all {@link TimerJobEntity} for the given scope and subscope.
+     */
+    List<TimerJobEntity> findJobsByScopeIdAndSubScopeId(String scopeId, String subScopeId);
+
+    /**
      * Executes a {@link JobQueryImpl} and returns the matching {@link TimerJobEntity} instances.
      */
     List<Job> findJobsByQueryCriteria(TimerJobQueryImpl jobQuery);

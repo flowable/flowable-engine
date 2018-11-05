@@ -545,5 +545,25 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
         assertThat(userEventListenerInstances).extracting(UserEventListenerInstance::getName).containsExactly("A", "B");
     }
 
+    @Test
+    @CmmnDeployment
+    public void testTimerAndUserEventListenerForEntry() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTimerAndUserEventListenerForEntry").start();
+        assertEquals(4, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+        assertNotNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER).singleResult());
+        assertNull(cmmnTaskService.createTaskQuery().taskName("A").singleResult());
+        assertNotNull(cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).singleResult());
+
+        // Completing the user event listener should terminate the timer event listener
+        UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId());
+        assertEquals(2, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+        assertNotNull(cmmnTaskService.createTaskQuery().taskName("A").singleResult());
+
+        assertNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).singleResult());
+        assertNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER).singleResult());
+        assertNull(cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).singleResult());
+    }
+
 }
 

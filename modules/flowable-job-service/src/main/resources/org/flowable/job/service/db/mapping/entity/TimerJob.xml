@@ -356,6 +356,12 @@
         and P.TENANT_ID_ = #{parameter.tenantId}
     </select>
 
+    <select id="selectTimerJobsByScopeIdAndSubScopeId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+        select T.*
+        from ${prefix}ACT_RU_TIMER_JOB T
+        where T.SCOPE_ID_ = #{parameter.scopeId} and T.SUB_SCOPE_ID_ = #{parameter.subScopeId}
+    </select>
+
     <!-- JOB DELETE STATEMENTS -->
 
     <delete id="deleteTimerJob" parameterType="org.flowable.job.service.impl.persistence.entity.TimerJobEntityImpl">
