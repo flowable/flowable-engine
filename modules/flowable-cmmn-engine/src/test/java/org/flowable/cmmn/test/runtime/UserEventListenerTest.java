@@ -613,5 +613,23 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
         assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
     }
 
+    @Test
+    @CmmnDeployment
+    public void testUserEventListenerForEntryAndExit() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testUserEventListenerForEntryAndExit").start();
+        List<UserEventListenerInstance> userEventListenerInstances = cmmnRuntimeService.createUserEventListenerInstanceQuery()
+            .caseInstanceId(caseInstance.getId()).orderByName().asc().list();
+        assertThat(userEventListenerInstances).extracting(UserEventListenerInstance::getName).containsExactly("EventListenerA", "EventListenerB");
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).isEmpty();
+
+        // Completing event listener A will activate task A and task B. User event listener B becomes obsolete is gets removed.
+        cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstances.get(0).getId());
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("Task A", "Task B");
+        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).list()).isEmpty();
+    }
+
 }
 
