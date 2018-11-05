@@ -92,14 +92,17 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
             } else if (!CmmnEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
                 caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, tenantId);
 
-                if (caseDefinition == null && caseInstanceBuilder.isFallbackToDefaultTenant()) {
-                    caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKey(caseDefinitionKey);
-                    if (caseDefinition == null) {
+                if (caseDefinition == null) {
+                    if (caseInstanceBuilder.isFallbackToDefaultTenant()) {
+                        caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKey(caseDefinitionKey);
+                        if (caseDefinition == null) {
+                            throw new FlowableObjectNotFoundException(
+                                "Case definition was not found by key '" + caseDefinitionKey + "'. Fallback to default tenant was also used.");
+                        }
+                    } else {
                         throw new FlowableObjectNotFoundException(
-                            "Case definition was not found by key '" + caseDefinitionKey + "'. Fallback to default tenant was also used.");
+                            "Case definition was not found by key '" + caseDefinitionKey + "' and tenant '" + tenantId + "'");
                     }
-                } else {
-                    throw new FlowableObjectNotFoundException("Case definition was not found by key '" + caseDefinitionKey + "' and tenant '" + tenantId +"'");
                 }
             }
         } else {
