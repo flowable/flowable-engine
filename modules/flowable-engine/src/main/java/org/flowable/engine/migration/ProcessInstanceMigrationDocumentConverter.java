@@ -13,13 +13,13 @@
 package org.flowable.engine.migration;
 
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.ACTIVITY_MAPPINGS_JSON_SECTION;
-import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.CALL_ACTIVITY_PROCESS_DEFINITION_VERSION;
+import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.CALL_ACTIVITY_PROCESS_DEFINITION_VERSION_JSON_PROPERTY;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.FROM_ACTIVITY_IDS_JSON_PROPERTY;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.FROM_ACTIVITY_ID_JSON_PROPERTY;
+import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.IN_PARENT_PROCESS_OF_CALL_ACTIVITY_JSON_PROPERTY;
+import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.IN_SUB_PROCESS_OF_CALL_ACTIVITY_ID_JSON_PROPERTY;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.LOCAL_VARIABLES_JSON_SECTION;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.NEW_ASSIGNEE_JSON_PROPERTY;
-import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.OF_CALL_ACTIVITY_ID_JSON_PROPERTY;
-import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.OF_PARENT_PROCESS_JSON_VERSION;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.PROCESS_INSTANCE_VARIABLES_JSON_SECTION;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.TO_ACTIVITY_IDS_JSON_PROPERTY;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.TO_ACTIVITY_ID_JSON_PROPERTY;
@@ -198,11 +198,11 @@ public class ProcessInstanceMigrationDocumentConverter {
         protected ObjectNode convertAdditionalMappingInfoToJson(T mapping, ObjectMapper objectMapper) {
             ObjectNode mappingNode = objectMapper.createObjectNode();
             if (mapping.isToParentProcess()) {
-                mappingNode.put(OF_PARENT_PROCESS_JSON_VERSION, true);
+                mappingNode.put(IN_PARENT_PROCESS_OF_CALL_ACTIVITY_JSON_PROPERTY, mapping.getFromCallActivityId());
             }
             if (mapping.isToCallActivity()) {
-                mappingNode.put(OF_CALL_ACTIVITY_ID_JSON_PROPERTY, mapping.getToCallActivityId());
-                mappingNode.put(CALL_ACTIVITY_PROCESS_DEFINITION_VERSION, mapping.getCallActivityProcessDefinitionVersion());
+                mappingNode.put(IN_SUB_PROCESS_OF_CALL_ACTIVITY_ID_JSON_PROPERTY, mapping.getToCallActivityId());
+                mappingNode.put(CALL_ACTIVITY_PROCESS_DEFINITION_VERSION_JSON_PROPERTY, mapping.getCallActivityProcessDefinitionVersion());
             }
             return mappingNode;
         }
@@ -214,20 +214,22 @@ public class ProcessInstanceMigrationDocumentConverter {
         public abstract T convertFromJson(JsonNode jsonNode, ObjectMapper objectMapper);
 
         protected <M extends ActivityMigrationMappingOptions<T>> void convertAdditionalMappingInfoFromJson(M mapping, JsonNode jsonNode) {
-            Optional<JsonNode> inParentProcess = Optional.ofNullable(jsonNode.get(OF_PARENT_PROCESS_JSON_VERSION));
-            if (inParentProcess.isPresent() && inParentProcess.get().booleanValue()) {
-                mapping.inParentProcess();
-            } else {
-                Optional<JsonNode> ofCallActivityId = Optional.ofNullable(jsonNode.get(OF_CALL_ACTIVITY_ID_JSON_PROPERTY));
-                Optional<JsonNode> subProcDefVer = Optional.ofNullable(jsonNode.get(CALL_ACTIVITY_PROCESS_DEFINITION_VERSION));
-                if (ofCallActivityId.isPresent()) {
-                    if (subProcDefVer.isPresent()) {
-                        mapping.inCallActivity(ofCallActivityId.get().textValue(), subProcDefVer.get().intValue());
-                    } else {
-                        mapping.inCallActivity(ofCallActivityId.get().textValue());
-                    }
+            Optional<JsonNode> callActivityOfParentProcess = Optional.ofNullable(jsonNode.get(IN_PARENT_PROCESS_OF_CALL_ACTIVITY_JSON_PROPERTY));
+            if (callActivityOfParentProcess.isPresent()) {
+                callActivityOfParentProcess.map(JsonNode::textValue).ifPresent(mapping::inParentProcessOfCallActivityId);
+                return; //if its a move to parent, it cannot be also a move to subProcess
+            }
+
+            Optional<JsonNode> ofCallActivityId = Optional.ofNullable(jsonNode.get(IN_SUB_PROCESS_OF_CALL_ACTIVITY_ID_JSON_PROPERTY));
+            Optional<JsonNode> subProcDefVer = Optional.ofNullable(jsonNode.get(CALL_ACTIVITY_PROCESS_DEFINITION_VERSION_JSON_PROPERTY));
+            if (ofCallActivityId.isPresent()) {
+                if (subProcDefVer.isPresent()) {
+                    mapping.inSubProcessOfCallActivityId(ofCallActivityId.get().textValue(), subProcDefVer.get().intValue());
+                } else {
+                    mapping.inSubProcessOfCallActivityId(ofCallActivityId.get().textValue());
                 }
             }
+
         }
 
         protected <V> V getLocalVariablesFromJson(JsonNode jsonNode, ObjectMapper objectMapper) {

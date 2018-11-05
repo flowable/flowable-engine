@@ -7,7 +7,7 @@
     {
       "fromActivityId": "originalActivity1",
       "toActivityId": "newActivity1",
-      "ofCallActivityId": "callActivityId",
+      "inSubProcessOfCallActivityId": "callActivityId",
       "newAssignee": "kermit",
       "localVariables": {
         "varForNewActivity1": "varValue"
@@ -19,7 +19,7 @@
         "newActivity2.1",
         "newActivity2.2"
       ],
-      "ofCallActivityId": "someCallActivityId",
+      "inSubProcessOfCallActivityId": "someCallActivityId",
       "callActivityProcessDefinitionVersion": 2,
       "localVariables": {
         "newActivity2.1": {
@@ -38,7 +38,7 @@
         "originalActivity4"
       ],
       "toActivityId": "newActivity3",
-      "ofParentProcess": true,
+      "inParentProcessOfCallActivityId": "someCallActivityId",
       "localVariables": {
         "varForNewActivity3": 9876
       }

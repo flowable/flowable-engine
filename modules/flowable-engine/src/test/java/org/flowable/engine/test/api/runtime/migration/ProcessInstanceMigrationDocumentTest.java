@@ -328,25 +328,25 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         Integer definitionVer = 9;
         String definitionTenantId = "admin";
 
-        //last occurrence of inCallActivity prevails
+        //last occurrence of inSubProcessOfCallActivityId prevails
         ActivityMigrationMapping oneToOneMapping = ActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1")
-            .inCallActivity("wrongCallActivity", -4)
-            .inCallActivity("callActivityId")
+            .inSubProcessOfCallActivityId("wrongCallActivity", -4)
+            .inSubProcessOfCallActivityId("callActivityId")
             .withLocalVariable("varForNewActivity1", "varValue")
             .withNewAssignee("kermit");
 
-        //inParentProcess and inSubProcess are mutually exclusive, last occurrence prevails
+        //inParentProcessOfCallActivityId and inSubProcess are mutually exclusive, last occurrence prevails
         ActivityMigrationMapping oneToManyMapping = ActivityMigrationMapping.createMappingFor("originalActivity2", Arrays.asList("newActivity2.1", "newActivity2.2"))
             .withLocalVariableForAllActivities("var1ForNewActivity2.x", "varValue")
             .withLocalVariableForAllActivities("var2ForNewActivity2.x", 1234.567)
-            .inParentProcess()
-            .inCallActivity("someCallActivityId", 2);
+            .inParentProcessOfCallActivityId("someCallActivityId")
+            .inSubProcessOfCallActivityId("someCallActivityId", 2);
 
-        //inParentProcess and inSubProcess are mutually exclusive, last occurrence prevails
+        //inParentProcessOfCallActivityId and inSubProcess are mutually exclusive, last occurrence prevails
         ActivityMigrationMapping manyToOneMapping = ActivityMigrationMapping.createMappingFor(Arrays.asList("originalActivity3", "originalActivity4"), "newActivity3")
             .withLocalVariable("varForNewActivity3", 9876)
-            .inCallActivity("subProcKey", 2)
-            .inParentProcess();
+            .inSubProcessOfCallActivityId("subProcKey", 2)
+            .inParentProcessOfCallActivityId("someCallActivityId");
 
         HashMap<String, Map<String, Object>> activityLocalVariables = new HashMap<String, Map<String, Object>>() {
 
