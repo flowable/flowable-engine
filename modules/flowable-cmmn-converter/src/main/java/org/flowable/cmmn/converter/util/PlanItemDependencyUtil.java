@@ -54,4 +54,22 @@ public class PlanItemDependencyUtil {
         return planItems;
     }
 
+    public static boolean isEntryDependency(PlanItem planItem, PlanItem dependency) {
+        for (PlanItem entryDependency : planItem.getEntryDependencies()) {
+            if (entryDependency.getId().equals(dependency.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isExitDependency(PlanItem planItem, PlanItem dependency) {
+        for (PlanItem exitDependency : planItem.getExitDependencies()) {
+            if (exitDependency.getId().equals(dependency.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

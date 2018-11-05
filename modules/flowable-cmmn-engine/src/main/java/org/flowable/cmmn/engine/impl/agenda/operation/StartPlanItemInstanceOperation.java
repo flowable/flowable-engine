@@ -44,6 +44,10 @@ public class StartPlanItemInstanceOperation extends AbstractChangePlanItemInstan
     
     @Override
     protected void internalExecute() {
+
+        // Sentries are not needed to be kept around, as the plan item is being started
+        removeSentryRelatedData();
+
         planItemInstanceEntity.setEntryCriterionId(entryCriterionId);
         planItemInstanceEntity.setLastStartedTime(getCurrentTime(commandContext));
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceStarted(planItemInstanceEntity);
