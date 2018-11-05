@@ -565,5 +565,53 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
         assertNull(cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).singleResult());
     }
 
+    @Test
+    @CmmnDeployment
+    public void testUserEventNotUsedForExit() {
+
+        // This case definition has a stage with two tasks. An exit sentry with a user event exists for that stage.
+        // This tests checks that, if the stage completes normally, the user event listener is removed as it becomes an orphan
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testUserEventNotUsedForExit").start();
+        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("A", "B");
+        tasks.forEach(task -> cmmnTaskService.complete(task.getId()));
+
+        Task taskC = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(taskC.getName()).isEqualTo("C");
+
+        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testNestedUserEventListener() {
+
+        // This case definition has user event listener connected to a task on the same level and a deeply nested task.
+        // The deeply nested task hasn't been made available yet, but the event listener should not be deleted as it could still be made active later
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testNestedUserEventListener").start();
+        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("D");
+
+        // Complete the task on the same level should not trigger the deletion of the user event listener
+        cmmnTaskService.complete(tasks.get(0).getId());
+        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
+        // Setting the variable that guards the stage will make the nested task active
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "activateStage", true);
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("A", "B", "C");
+
+        // Completing task C should remove the user event listener
+        cmmnTaskService.complete(tasks.get(2).getId());
+        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+    }
+
 }
 

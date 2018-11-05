@@ -23,6 +23,7 @@ import java.util.Map;
 public class PlanFragment extends PlanItemDefinition {
 
     protected Case caze;
+    protected PlanItem planItem;
     protected Map<String, PlanItem> planItemMap = new LinkedHashMap<>();
     protected List<Sentry> sentries = new ArrayList<>();
     
@@ -83,6 +84,14 @@ public class PlanFragment extends PlanItemDefinition {
 
     public void setCase(Case caze) {
         this.caze = caze;
+    }
+
+    public PlanItem getPlanItem() {
+        return planItem;
+    }
+
+    public void setPlanItem(PlanItem planItem) {
+        this.planItem = planItem;
     }
 
     public List<PlanItem> getPlanItems() {

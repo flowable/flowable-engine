@@ -455,7 +455,9 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             }
 
             if (planItemDefinition instanceof PlanFragment) {
-                processPlanFragment(cmmnModel, (PlanFragment) planItemDefinition);
+                PlanFragment planItemPlanFragment = (PlanFragment) planItemDefinition;
+                planItemPlanFragment.setPlanItem(planItem);
+                processPlanFragment(cmmnModel, planItemPlanFragment);
 
             } else if (planItemDefinition instanceof ProcessTask) {
                 ProcessTask processTask = (ProcessTask) planItemDefinition;
