@@ -147,6 +147,9 @@
             <if test="originalPersistentState.processDefinitionId != processDefinitionId">
                 PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
             </if>
+            <if test="originalPersistentState.processInstanceId != processInstanceId">
+                PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR},
+            </if>
             <if test="originalPersistentState.activityId != activityId">
                 ACT_ID_ = #{activityId, jdbcType=VARCHAR},
             </if>

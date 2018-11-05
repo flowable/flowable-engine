@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.dynamic;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -158,8 +159,8 @@ public class MoveExecutionEntityContainer {
         return moveToFlowElementMap.get(activityId);
     }
 
-    public Collection<FlowElementMoveEntry> getMoveToFlowElements() {
-        return moveToFlowElementMap.values();
+    public List<FlowElementMoveEntry> getMoveToFlowElements() {
+        return new ArrayList<>(moveToFlowElementMap.values());
     }
 
     public static class FlowElementMoveEntry {

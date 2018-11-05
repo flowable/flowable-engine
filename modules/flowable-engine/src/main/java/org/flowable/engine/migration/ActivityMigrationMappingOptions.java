@@ -19,6 +19,20 @@ import java.util.Map;
  */
 public interface ActivityMigrationMappingOptions<T extends ActivityMigrationMapping> {
 
+    T inParentProcess();
+
+    boolean isToParentProcess();
+
+    T inCallActivity(String callActivityId);
+
+    T inCallActivity(String callActivityId, int subProcessDefVersion);
+
+    String getToCallActivityId();
+
+    Integer getCallActivityProcessDefinitionVersion();
+
+    boolean isToCallActivity();
+
     interface SingleToActivityOptions <T extends ActivityMigrationMapping> extends ActivityMigrationMappingOptions<T> {
 
         T withNewAssignee(String newAssigneeId);

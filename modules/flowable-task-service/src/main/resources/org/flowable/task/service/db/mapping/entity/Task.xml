@@ -169,6 +169,9 @@
       <if test="originalPersistentState.executionId != executionId">
           EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
       </if>
+      <if test="originalPersistentState.processInstanceId != processInstanceId">
+          PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR},
+      </if>
       <if test="originalPersistentState.processDefinitionId != processDefinitionId">
           PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
       </if>

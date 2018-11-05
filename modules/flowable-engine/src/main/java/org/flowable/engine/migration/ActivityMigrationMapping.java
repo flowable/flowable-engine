@@ -23,9 +23,29 @@ import java.util.Map;
  */
 public abstract class ActivityMigrationMapping {
 
+    protected String toCallActivityId;
+    protected Integer callActivityProcessDefinitionVersion;
+    protected boolean toParentProcess;
+
     public abstract List<String> getFromActivityIds();
 
     public abstract List<String> getToActivityIds();
+
+    public boolean isToParentProcess() {
+        return this.toParentProcess;
+    }
+
+    public boolean isToCallActivity() {
+        return this.toCallActivityId != null;
+    }
+
+    public String getToCallActivityId() {
+        return toCallActivityId;
+    }
+
+    public Integer getCallActivityProcessDefinitionVersion() {
+        return callActivityProcessDefinitionVersion;
+    }
 
     public static ActivityMigrationMapping.OneToOneMapping createMappingFor(String fromActivityId, String toActivityId) {
         return new OneToOneMapping(fromActivityId, toActivityId);
@@ -71,6 +91,29 @@ public abstract class ActivityMigrationMapping {
 
         public String getToActivityId() {
             return toActivityId;
+        }
+
+        public OneToOneMapping inParentProcess() {
+            this.toParentProcess = true;
+            this.toCallActivityId = null;
+            this.callActivityProcessDefinitionVersion = null;
+            return this;
+        }
+
+        @Override
+        public OneToOneMapping inCallActivity(String subProcessDefKey) {
+            this.toCallActivityId = subProcessDefKey;
+            this.callActivityProcessDefinitionVersion = null;
+            this.toParentProcess = false;
+            return this;
+        }
+
+        @Override
+        public OneToOneMapping inCallActivity(String subProcessDefKey, int subProcessDefVersion) {
+            this.toCallActivityId = subProcessDefKey;
+            this.callActivityProcessDefinitionVersion = subProcessDefVersion;
+            this.toParentProcess = false;
+            return this;
         }
 
         @Override
@@ -132,6 +175,29 @@ public abstract class ActivityMigrationMapping {
 
         public String getFromActivityId() {
             return fromActivityId;
+        }
+
+        public OneToManyMapping inParentProcess() {
+            this.toParentProcess = true;
+            this.toCallActivityId = null;
+            this.callActivityProcessDefinitionVersion = null;
+            return this;
+        }
+
+        @Override
+        public OneToManyMapping inCallActivity(String subProcessDefKey) {
+            this.toCallActivityId = subProcessDefKey;
+            this.callActivityProcessDefinitionVersion = null;
+            this.toParentProcess = false;
+            return this;
+        }
+
+        @Override
+        public OneToManyMapping inCallActivity(String subProcessDefKey, int subProcessDefVersion) {
+            this.toCallActivityId = subProcessDefKey;
+            this.callActivityProcessDefinitionVersion = subProcessDefVersion;
+            this.toParentProcess = false;
+            return this;
         }
 
         @Override
@@ -203,6 +269,29 @@ public abstract class ActivityMigrationMapping {
 
         public String getToActivityId() {
             return toActivityId;
+        }
+
+        public ManyToOneMapping inParentProcess() {
+            this.toParentProcess = true;
+            this.toCallActivityId = null;
+            this.callActivityProcessDefinitionVersion = null;
+            return this;
+        }
+
+        @Override
+        public ManyToOneMapping inCallActivity(String subProcessDefKey) {
+            this.toCallActivityId = subProcessDefKey;
+            this.callActivityProcessDefinitionVersion = null;
+            this.toParentProcess = false;
+            return this;
+        }
+
+        @Override
+        public ManyToOneMapping inCallActivity(String subProcessDefKey, int subProcessDefVersion) {
+            this.toCallActivityId = subProcessDefKey;
+            this.callActivityProcessDefinitionVersion = subProcessDefVersion;
+            this.toParentProcess = false;
+            return this;
         }
 
         @Override
