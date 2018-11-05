@@ -94,6 +94,10 @@ public class DecisionTableResource {
         return decisionTableService.getHistoricDecisionTable(historyModelId);
     }
 
+    @RequestMapping(value = "{modelId}/history/{historyModelId}", method = RequestMethod.GET, produces = "application/json")
+    public DecisionTableRepresentation getHistoricDecisionTable(@PathVariable String modelId, @PathVariable String historyModelId) {
+        return decisionTableService.getHistoricDecisionTable(historyModelId);
+    }
     @RequestMapping(value = "/history/{historyModelId}/export", method = RequestMethod.GET)
     public void exportHistoricDecisionTable(HttpServletResponse response, @PathVariable String historyModelId) {
         decisionTableService.exportHistoricDecisionTable(response, historyModelId);
