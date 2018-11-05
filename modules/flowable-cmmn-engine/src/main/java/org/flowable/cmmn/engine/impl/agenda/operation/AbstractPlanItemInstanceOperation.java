@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.converter.util.PlanItemDependencyUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity;
@@ -94,7 +95,8 @@ public abstract class AbstractPlanItemInstanceOperation extends CmmnOperation {
          * 3. For those event listeners, get the dependent plan items.
          *    These dependents are the plan items that depend in their sentries on this event listener.
          * 4. Fetch the plan item instances for these dependent plan items.
-         *    If they are all in a terminal state, the user event listener is an orphan and can be deleted.
+         *    If the event listener is used for an entry criterion: if they are all in a state different from available, it is an orphan.
+         *    If the event listener is used for an exit criterion: if they are all in a terminal state, the user event listener is an orphan and can be deleted.
          */
 
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
@@ -148,9 +150,25 @@ public abstract class AbstractPlanItemInstanceOperation extends CmmnOperation {
                             .findChildPlanItemInstances(caseInstanceEntity, dependentPlanItems);
 
                         // Step 4
-                        Optional<PlanItemInstanceEntity> nonTerminalPlanItemInstance = dependentPlanItemInstances.stream()
-                            .filter(p -> !PlanItemInstanceState.TERMINAL_STATES.contains(p.getState())).findFirst();
-                        if (!nonTerminalPlanItemInstance.isPresent()) {
+                        boolean isOrphan = true;
+                        for (PlanItemInstanceEntity dependentPlanItemInstance : dependentPlanItemInstances) {
+
+                            if (PlanItemDependencyUtil.isEntryDependency(dependentPlanItemInstance.getPlanItem(), eventListenerPlanItem)) {
+                              if (PlanItemInstanceState.AVAILABLE.equals(dependentPlanItemInstance.getState())
+                                    || PlanItemInstanceState.WAITING_FOR_REPETITION.equals(dependentPlanItemInstance.getState())) {
+                                  isOrphan = false;
+                              }
+                            }
+
+                            if (PlanItemDependencyUtil.isExitDependency(dependentPlanItemInstance.getPlanItem(), eventListenerPlanItem)) {
+                                if (!PlanItemInstanceState.TERMINAL_STATES.contains(dependentPlanItemInstance.getState())) {
+                                    isOrphan = false;
+                                }
+                            }
+
+                        }
+
+                        if (isOrphan) {
                             for (PlanItemInstanceEntity eventListenerPlanItemInstanceEntity : eventListenerPlanItemInstance) {
                                 CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(eventListenerPlanItemInstanceEntity);
                             }

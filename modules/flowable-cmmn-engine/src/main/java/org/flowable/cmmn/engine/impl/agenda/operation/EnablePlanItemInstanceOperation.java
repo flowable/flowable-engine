@@ -42,6 +42,10 @@ public class EnablePlanItemInstanceOperation extends AbstractChangePlanItemInsta
     
     @Override
     protected void internalExecute() {
+
+        // Sentries are not needed to be kept around, as the plan item is being enabled
+        removeSentryRelatedData();
+
         planItemInstanceEntity.setEntryCriterionId(entryCriterionId);
         planItemInstanceEntity.setLastEnabledTime(getCurrentTime(commandContext));
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceEnabled(planItemInstanceEntity);
