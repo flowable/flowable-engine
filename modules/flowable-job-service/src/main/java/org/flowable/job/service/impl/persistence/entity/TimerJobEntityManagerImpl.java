@@ -92,6 +92,11 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
     }
 
     @Override
+    public List<TimerJobEntity> findJobsByScopeIdAndSubScopeId(String scopeId, String subScopeId) {
+        return jobDataManager.findJobsByScopeIdAndSubScopeId(scopeId, subScopeId);
+    }
+
+    @Override
     public List<Job> findJobsByQueryCriteria(TimerJobQueryImpl jobQuery) {
         return jobDataManager.findJobsByQueryCriteria(jobQuery);
     }

@@ -283,13 +283,8 @@ public class RepetitionRuleTest extends FlowableCmmnTestCase {
         cmmnManagementService.executeJob(job.getId());
         assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
         
-        // new timer should be scheduled
-        assertEquals(1L, cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count());
-        
-        // Should only repeat two times
-        currentTime = new Date(currentTime.getTime() + (5 * 60 * 60 * 1000) + 10000);
-        setClockTo(currentTime);
-        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 10000L, 100L, true);
+        // new timer should NOT be scheduled. The orphan detection algorithm will take in account the waiting for repetition state and the fact its missing here
+        assertEquals(0L, cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count());
         
         assertEquals(0L, cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count());
         assertEquals(0L, cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).count());
