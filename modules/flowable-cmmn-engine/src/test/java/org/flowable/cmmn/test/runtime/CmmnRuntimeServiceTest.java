@@ -115,7 +115,7 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
     @Test
     public void createCaseInstanceAsyncWithNonExistingDefKey() {
         expectedException.expect(FlowableObjectNotFoundException.class);
-        expectedException.expectMessage("no case definition deployed with key 'nonExistingDefinition'");
+        expectedException.expectMessage("No case definition found for key nonExistingDefinition");
 
         cmmnRuntimeService.createCaseInstanceBuilder().
             caseDefinitionKey("nonExistingDefinition").
@@ -125,7 +125,7 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
     @Test
     public void createCaseInstanceAsyncWithNonExistingDefId() {
         expectedException.expect(FlowableObjectNotFoundException.class);
-        expectedException.expectMessage("no deployed case definition found with id 'nonExistingDefinition'");
+        expectedException.expectMessage("No case definition found for id nonExistingDefinition");
 
         cmmnRuntimeService.createCaseInstanceBuilder().
             caseDefinitionId("nonExistingDefinition").
