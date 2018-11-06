@@ -18,6 +18,7 @@ package org.flowable.cmmn.model;
 public class CaseTask extends Task {
 
     protected String caseRef;
+    protected boolean fallbackToDefaultTenant;
 
     public String getCaseRef() {
         return caseRef;
@@ -26,5 +27,12 @@ public class CaseTask extends Task {
     public void setCaseRef(String caseRef) {
         this.caseRef = caseRef;
     }
-    
+
+    public boolean isFallbackToDefaultTenant() {
+        return fallbackToDefaultTenant;
+    }
+
+    public void setFallbackToDefaultTenant(boolean fallbackToDefaultTenant) {
+        this.fallbackToDefaultTenant = fallbackToDefaultTenant;
+    }
 }

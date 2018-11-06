@@ -19,6 +19,7 @@ import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelp
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.PlanItem;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -52,7 +53,10 @@ public class CaseTaskJsonConverter extends BaseCmmnJsonConverter implements Case
     @Override
     protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor,
             BaseElement baseElement, CmmnModel cmmnModel) {
-        // todo
+        // todo implement rest of the properties
+        CaseTask caseTask = (CaseTask) ((PlanItem) baseElement).getPlanItemDefinition();
+
+        propertiesNode.put(PROPERTY_FALLBACK_TO_DEFAULT_TENANT, caseTask.isFallbackToDefaultTenant());
     }
 
     @Override
@@ -70,10 +74,15 @@ public class CaseTaskJsonConverter extends BaseCmmnJsonConverter implements Case
                 task.setCaseRef(caseModelKey);
             }
         }
-        
+
+        boolean fallbackToDefaultTenant = CmmnJsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_FALLBACK_TO_DEFAULT_TENANT, elementNode, false);
+        if (fallbackToDefaultTenant) {
+            task.setFallbackToDefaultTenant(true);
+        }
+
         return task;
     }
-    
+
     @Override
     public void setCaseModelMap(Map<String, String> caseModelMap) {
         this.caseModelMap = caseModelMap;
