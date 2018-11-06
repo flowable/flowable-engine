@@ -680,10 +680,20 @@
       "type" : "String",
       "title" : "Condition",
       "value" : "",
-      "description" : "An expression that must be true to satisfy the sentry",
+      "description" : "",
       "popular" : true
     } ]
   }, {
+      "name" : "triggermodepackage",
+      "properties" : [ {
+        "id" : "triggermode",
+        "type" : "flowable-triggermode",
+        "title" : "Trigger mode",
+        "value" : "",
+        "description" : "Determines if the sentry conditions are evaluated with memory (default) of without (on-event). The default means that the parts (on- and ifparts) of a sentry being satisfied will be stored. Subsequent evaluations will use the stored parts when the sentry is re-evaluated. Using 'on-event', all parts are evaluated and if all are true the sentry is satisfied. If not, all results are discarded and not stored.",
+        "popular" : true
+      } ]
+    }, {
     "name" : "autocompletepackage",
     "properties" : [ {
       "id" : "autocompleteenabled",
@@ -1160,7 +1170,8 @@
       "overrideidpackage",
       "namepackage",
       "documentationpackage",
-      "ifpartconditionpackage" ],
+      "ifpartconditionpackage",
+      "triggermodepackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "association_start", "association_end", "SentriesMorph", "EntryCriterionOnItemBoundary" ]
   }, {
@@ -1175,7 +1186,8 @@
       "overrideidpackage",
       "namepackage",
       "documentationpackage",
-      "ifpartconditionpackage" ],
+      "ifpartconditionpackage",
+      "triggermodepackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "association_start", "SentriesMorph", "ExitCriterionOnItemBoundary" ]
   }, {
