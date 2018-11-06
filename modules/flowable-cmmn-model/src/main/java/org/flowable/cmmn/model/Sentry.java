@@ -19,10 +19,20 @@ import java.util.List;
  * @author Joram Barrez
  */
 public class Sentry extends CaseElement {
-    
+
+    public static final String TRIGGER_MODE_DEFAULT = "default";
+    public static final String TRIGGER_MODE_ON_EVENT = "onEvent";
+
+    protected String triggerMode;
     protected List<SentryOnPart> onParts = new ArrayList<>();
     protected SentryIfPart sentryIfPart;
-    
+
+    public String getTriggerMode() {
+        return triggerMode;
+    }
+    public void setTriggerMode(String triggerMode) {
+        this.triggerMode = triggerMode;
+    }
     public List<SentryOnPart> getOnParts() {
         return onParts;
     }

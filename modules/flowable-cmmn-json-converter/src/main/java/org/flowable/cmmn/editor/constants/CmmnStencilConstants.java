@@ -128,6 +128,7 @@ public interface CmmnStencilConstants {
     String PROPERTY_OUT_PARAMETERS = "outParameters";
 
     String PROPERTY_IF_PART_CONDITION = "ifpartcondition";
+    String PROPERTY_TRIGGER_MODE = "triggermode";
 
     String PROPERTY_TRANSITION_EVENT = "transitionevent";
 
