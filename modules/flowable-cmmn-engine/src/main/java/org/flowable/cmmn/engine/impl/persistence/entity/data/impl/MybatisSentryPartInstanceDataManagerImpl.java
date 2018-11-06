@@ -45,10 +45,15 @@ public class MybatisSentryPartInstanceDataManagerImpl extends AbstractCmmnDataMa
     public SentryPartInstanceEntity create() {
         return new SentryPartInstanceEntityImpl();
     }
-    
+
+    @Override
+    public List<SentryPartInstanceEntity> findSentryPartInstancesByCaseInstanceId(String caseInstanceId) {
+        return getList("selectSentryPartInstanceByCaseInstanceId", caseInstanceId, sentryPartByCaseInstanceIdEntityMatched);
+    }
+
     @Override
     public List<SentryPartInstanceEntity> findSentryPartInstancesByCaseInstanceIdAndNullPlanItemInstanceId(String caseInstanceId) {
-        return getList("selectSentryPartInstanceByCaseInstanceId", caseInstanceId);
+        return getList("selectSentryPartInstanceByCaseInstanceIdAndNullPlanItemInstanceId", caseInstanceId);
     }
 
     @Override
@@ -81,5 +86,5 @@ public class MybatisSentryPartInstanceDataManagerImpl extends AbstractCmmnDataMa
         }
         
     }
-    
+
 }

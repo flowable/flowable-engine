@@ -204,7 +204,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         return null;
     }
 
-    protected String evaluateExitCriteria(EntityWithSentryPartInstances entityWithSentryPartInstances, HasExitCriteria hasExitCriteria) {
+    protected String evaluateExitCriteria(EntityWithSentryPartInstances entityWithSentryPartInstances, HasExitCriteria hasExitCriteria) { // EntityWithSentryPartInstances -> can be used for both case instance and plan item instance
         List<Criterion> criteria = hasExitCriteria.getExitCriteria();
         if (criteria != null && !criteria.isEmpty()) {
             return evaluateCriteria(entityWithSentryPartInstances, criteria);
@@ -218,6 +218,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
      */
     protected String evaluateCriteria(EntityWithSentryPartInstances entityWithSentryPartInstances, List<Criterion> criteria) {
         for (Criterion criterion : criteria) {
+
             Sentry sentry = criterion.getSentry();
 
             // There can be zero or more on parts and zero or one if part.
@@ -238,26 +239,34 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 
             } else {
 
-                // Go through the previously satisfied sentry parts and see if the ifPart was already satisfied
-                // and collect the ids of all previously satisfied onParts
+                boolean isDefaultTriggerMode = sentry.isDefaultTriggerMode();
 
                 boolean sentryIfPartSatisfied = false;
-                Set<String> previouslySatisfiedSentryOnPartIds = new HashSet<>(1);
-                for (SentryPartInstanceEntity sentryPartInstanceEntity : entityWithSentryPartInstances.getSatisfiedSentryPartInstances()) {
-                    if (sentryPartInstanceEntity.getOnPartId() != null) {
-                        previouslySatisfiedSentryOnPartIds.add(sentryPartInstanceEntity.getOnPartId());
-                    } else if (sentryPartInstanceEntity.getIfPartId() != null
+                Set<String> satisfiedSentryOnPartIds = new HashSet<>(1);
+
+                // Go through the previously satisfied sentry parts and see if the ifPart was already satisfied
+                // and collect the ids of all previously satisfied onParts
+                if (isDefaultTriggerMode) { // in the case of onEvent there will not have been anything stored
+                    for (SentryPartInstanceEntity sentryPartInstanceEntity : entityWithSentryPartInstances.getSatisfiedSentryPartInstances()) {
+                        if (sentryPartInstanceEntity.getOnPartId() != null) {
+                            satisfiedSentryOnPartIds.add(sentryPartInstanceEntity.getOnPartId());
+                        } else if (sentryPartInstanceEntity.getIfPartId() != null
                             && sentryPartInstanceEntity.getIfPartId().equals(sentry.getSentryIfPart().getId())) {
-                        sentryIfPartSatisfied = true;
+                            sentryIfPartSatisfied = true;
+                        }
                     }
                 }
 
                 // Verify if the onParts which are not yet satisfied, become satisifed due to the new event
                 for (SentryOnPart sentryOnPart : sentry.getOnParts()) {
-                    if (!previouslySatisfiedSentryOnPartIds.contains(sentryOnPart.getId())) {
+                    if (!satisfiedSentryOnPartIds.contains(sentryOnPart.getId())) {
                         if (planItemLifeCycleEvent != null && sentryOnPartMatchesCurrentLifeCycleEvent(sentryOnPart)) {
-                            createSentryPartInstanceEntity(entityWithSentryPartInstances, sentryOnPart, null);
-                            previouslySatisfiedSentryOnPartIds.add(sentryOnPart.getId());
+
+                            if (isDefaultTriggerMode) { // in the case of onEvent the results are discarded
+                                createSentryPartInstanceEntity(entityWithSentryPartInstances, sentryOnPart, null);
+                            }
+
+                            satisfiedSentryOnPartIds.add(sentryOnPart.getId());
                         }
                     }
                 }
@@ -265,11 +274,17 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 // Verify the ifPart in case it wasn't satisfied yet
                 if (sentry.getSentryIfPart() != null && !sentryIfPartSatisfied) {
                     if (evaluateSentryIfPart(sentry, entityWithSentryPartInstances)) {
-                        createSentryPartInstanceEntity(entityWithSentryPartInstances, null, sentry.getSentryIfPart());
+
+                        if (isDefaultTriggerMode) {
+                            createSentryPartInstanceEntity(entityWithSentryPartInstances, null, sentry.getSentryIfPart());
+                        }
+
+                        sentryIfPartSatisfied = true;
                     }
                 }
 
-                if (entityWithSentryPartInstances.getSatisfiedSentryPartInstances().size() == (sentry.getOnParts().size() + (sentry.getSentryIfPart() != null ? 1 : 0))) {
+                if ((satisfiedSentryOnPartIds.size() + (sentryIfPartSatisfied ? 1 : 0))
+                        == ((sentry.getOnParts().size() + (sentry.getSentryIfPart() != null ? 1 : 0)))) {
                     return criterion.getId();
                 }
 
