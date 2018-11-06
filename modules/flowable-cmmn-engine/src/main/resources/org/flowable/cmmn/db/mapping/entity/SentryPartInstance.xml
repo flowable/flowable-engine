@@ -108,9 +108,14 @@
         select * from ${prefix}ACT_CMMN_RU_SENTRY_PART_INST where PLAN_ITEM_INST_ID_ = #{parameter, jdbcType=VARCHAR}
     </select>
 
-    <select id="selectSentryPartInstanceByCaseInstanceId" parameterType="string" resultMap="sentryPartInstanceResultMap">
+    <select id="selectSentryPartInstanceByCaseInstanceIdAndNullPlanItemInstanceId" parameterType="string" resultMap="sentryPartInstanceResultMap">
         select * from ${prefix}ACT_CMMN_RU_SENTRY_PART_INST
         where CASE_INST_ID_ = #{parameter, jdbcType=VARCHAR} and PLAN_ITEM_INST_ID_ is null
+    </select>
+
+    <select id="selectSentryPartInstanceByCaseInstanceId" parameterType="string" resultMap="sentryPartInstanceResultMap">
+        select * from ${prefix}ACT_CMMN_RU_SENTRY_PART_INST
+        where CASE_INST_ID_ = #{parameter, jdbcType=VARCHAR}
     </select>
 
 </mapper>

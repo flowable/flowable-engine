@@ -27,6 +27,14 @@ public class Sentry extends CaseElement {
     protected List<SentryOnPart> onParts = new ArrayList<>();
     protected SentryIfPart sentryIfPart;
 
+    public boolean isDefaultTriggerMode() {
+        return triggerMode == null || TRIGGER_MODE_DEFAULT.equals(triggerMode);
+    }
+
+    public boolean isOnEventTriggerMde() {
+        return TRIGGER_MODE_ON_EVENT.equals(TRIGGER_MODE_ON_EVENT);
+    }
+
     public String getTriggerMode() {
         return triggerMode;
     }
