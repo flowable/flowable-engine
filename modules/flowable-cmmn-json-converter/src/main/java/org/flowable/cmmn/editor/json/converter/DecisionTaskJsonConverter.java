@@ -75,7 +75,7 @@ public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter implements 
         return decisionTask;
     }
 
-    private void addBooleanField(JsonNode elementNode, DecisionTask decisionTask, String propertyName, String fieldName) {
+    protected void addBooleanField(JsonNode elementNode, DecisionTask decisionTask, String propertyName, String fieldName) {
         boolean decisionTableThrowErrorOnNoHitsNode = CmmnJsonConverterUtil.getPropertyValueAsBoolean(propertyName, elementNode);
         FieldExtension decisionTableThrowErrorOnNoHitsField = new FieldExtension();
         decisionTableThrowErrorOnNoHitsField.setFieldName(fieldName);

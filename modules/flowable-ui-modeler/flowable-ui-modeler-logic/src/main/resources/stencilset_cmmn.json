@@ -1084,6 +1084,7 @@
       "documentationpackage",
       "blockingpackage",
       "casetaskcasereferencepackage",
+      "fallbacktodefaulttenantpackage",
       "asyncpackage",
       "requiredrulepackage",
       "repetitionrulepackage",

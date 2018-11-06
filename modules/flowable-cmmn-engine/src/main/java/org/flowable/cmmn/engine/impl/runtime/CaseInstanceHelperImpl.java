@@ -23,6 +23,7 @@ import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.job.AsyncInitializePlanModelJobHandler;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -71,9 +72,9 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         CaseDefinition caseDefinition = null;
         if (caseInstanceBuilder.getCaseDefinitionId() != null) {
             String caseDefinitionId = caseInstanceBuilder.getCaseDefinitionId();
-            CmmnDeploymentManager deploymentManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDeploymentManager();
+            CaseDefinitionEntityManager definitionEntityManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getCaseDefinitionEntityManager();
             if (caseDefinitionId != null) {
-                caseDefinition = deploymentManager.findDeployedCaseDefinitionById(caseDefinitionId);
+                caseDefinition = definitionEntityManager.findById(caseDefinitionId);
                 if (caseDefinition == null) {
                     throw new FlowableObjectNotFoundException("No case definition found for id " + caseDefinitionId, CaseDefinition.class);
                 }
@@ -81,17 +82,27 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
 
         } else if (caseInstanceBuilder.getCaseDefinitionKey() != null) {
             String caseDefinitionKey = caseInstanceBuilder.getCaseDefinitionKey();
-            CmmnDeploymentManager deploymentManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDeploymentManager();
+            CaseDefinitionEntityManager caseDefinitionEntityManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getCaseDefinitionEntityManager();
             String tenantId = caseInstanceBuilder.getTenantId();
             if (tenantId == null || CmmnEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-                caseDefinition = deploymentManager.findDeployedLatestCaseDefinitionByKey(caseDefinitionKey);
+                caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKey(caseDefinitionKey);
                 if (caseDefinition == null) {
                     throw new FlowableObjectNotFoundException("No case definition found for key " + caseDefinitionKey, CaseDefinition.class);
                 }
             } else if (!CmmnEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-                caseDefinition = deploymentManager.findDeployedLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, caseInstanceBuilder.getTenantId());
+                caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, tenantId);
+
                 if (caseDefinition == null) {
-                    throw new FlowableObjectNotFoundException("No case definition found for key " + caseDefinitionKey, CaseDefinition.class);
+                    if (caseInstanceBuilder.isFallbackToDefaultTenant()) {
+                        caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKey(caseDefinitionKey);
+                        if (caseDefinition == null) {
+                            throw new FlowableObjectNotFoundException(
+                                "Case definition was not found by key '" + caseDefinitionKey + "'. Fallback to default tenant was also used.");
+                        }
+                    } else {
+                        throw new FlowableObjectNotFoundException(
+                            "Case definition was not found by key '" + caseDefinitionKey + "' and tenant '" + tenantId + "'");
+                    }
                 }
             }
         } else {
