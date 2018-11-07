@@ -143,6 +143,15 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                     outgoingArrayNode.add(BpmnJsonConverterUtil.createResourceNode(messageFlow.getId()));
                 }
             }
+            for (Artifact artifact : model.getMainProcess().getArtifacts()) {
+                if (artifact instanceof  Association){
+                    Association association= (Association) artifact;
+                    if (association.getSourceRef().equals(flowNode.getId())){
+                        outgoingArrayNode.add(BpmnJsonConverterUtil.createResourceNode(artifact.getId()));
+                    }
+
+                }
+            }
         }
 
         if (baseElement instanceof Activity) {
