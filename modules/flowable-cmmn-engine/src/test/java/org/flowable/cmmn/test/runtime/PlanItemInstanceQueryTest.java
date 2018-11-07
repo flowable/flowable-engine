@@ -245,9 +245,7 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
             .orderByName().asc()
             .list();
         assertThat(planItemInstances)
-            .hasSize(3)
             .extracting(PlanItemInstance::getName)
-
             .containsExactly("A", "C", "The Stage");
     }
 

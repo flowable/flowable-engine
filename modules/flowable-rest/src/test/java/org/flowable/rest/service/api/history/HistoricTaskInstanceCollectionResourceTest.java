@@ -13,6 +13,9 @@
 
 package org.flowable.rest.service.api.history;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,8 +40,6 @@ import org.junit.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
-
-import static org.junit.Assert.*;
 
 /**
  * Test for REST-operation related to the historic task instance query resource.
@@ -103,6 +104,10 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
         assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance.getId(), 2, task.getId());
 
         assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance2.getId(), 1, task2.getId());
+        
+        assertResultsPresentInDataResponse(url + "?processInstanceIdWithChildren=" + processInstance.getId(), 2, task.getId());
+        
+        assertResultsPresentInDataResponse(url + "?processInstanceIdWithChildren=nonexisting", 0);
 
         assertResultsPresentInDataResponse(url + "?taskAssignee=kermit", 2, task2.getId());
 

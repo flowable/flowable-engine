@@ -48,6 +48,7 @@ import org.flowable.cmmn.engine.impl.cmd.SetLocalVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetLocalVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetVariablesCmd;
+import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceAsyncCmd;
 import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceWithFormCmd;
 import org.flowable.cmmn.engine.impl.cmd.StartPlanItemInstanceCmd;
@@ -77,6 +78,10 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
         return commandExecutor.execute(new StartCaseInstanceCmd(caseInstanceBuilder));
     }
     
+    public CaseInstance startCaseInstanceAsync(CaseInstanceBuilder caseInstanceBuilder) {
+        return commandExecutor.execute(new StartCaseInstanceAsyncCmd(caseInstanceBuilder));
+    }
+
     public CaseInstance startCaseInstanceWithForm(CaseInstanceBuilder caseInstanceBuilder) {
         return commandExecutor.execute(new StartCaseInstanceWithFormCmd(caseInstanceBuilder));
     }

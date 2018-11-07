@@ -370,6 +370,16 @@
       "popular" : true
     } ]
   }, {
+    "name" : "decisiontaskfallbacktodefaulttenantpackage",
+    "properties" : [ {
+      "id" : "decisiontaskfallbacktodefaulttenant",
+      "type" : "Boolean",
+      "title" : "Fallback to default tenant",
+      "value" : "false",
+      "description" : "Find decision definition without tenant when previous attemps to find it with tenant failed.",
+      "popular" : true
+    } ]
+  }, {
       "name": "httptaskrequestmethodpackage",
       "properties": [
         {
@@ -594,6 +604,16 @@
       "popular" : true
     } ]
   }, {
+    "name" : "fallbacktodefaulttenantpackage",
+    "properties" : [ {
+      "id" : "fallbacktodefaulttenant",
+      "type" : "Boolean",
+      "title" : "Fallback to default tenant",
+      "value" : "false",
+      "description" : "Use default tenant as a fallback when definition is not found by key in the specified tenant",
+      "popular" : true
+    } ]
+  }, {
       "name" : "processtaskinparameterspackage",
       "properties" : [ {
         "id" : "processtaskinparameters",
@@ -660,10 +680,20 @@
       "type" : "String",
       "title" : "Condition",
       "value" : "",
-      "description" : "An expression that must be true to satisfy the sentry",
+      "description" : "",
       "popular" : true
     } ]
   }, {
+      "name" : "triggermodepackage",
+      "properties" : [ {
+        "id" : "triggermode",
+        "type" : "flowable-triggermode",
+        "title" : "Trigger mode",
+        "value" : "",
+        "description" : "Determines if the sentry conditions are evaluated with memory (default) of without (on-event). The default means that the parts (on- and ifparts) of a sentry being satisfied will be stored. Subsequent evaluations will use the stored parts when the sentry is re-evaluated. Using 'on-event', all parts are evaluated and if all are true the sentry is satisfied. If not, all results are discarded and not stored.",
+        "popular" : true
+      } ]
+    }, {
     "name" : "autocompletepackage",
     "properties" : [ {
       "id" : "autocompleteenabled",
@@ -949,6 +979,7 @@
         "documentationpackage",
         "decisiontaskdecisiontablereferencepackage",
         "decisiontaskthrowerroronnohitspackage",
+        "decisiontaskfallbacktodefaulttenantpackage",
         "asyncpackage",
         "requiredrulepackage",
         "repetitionrulepackage",
@@ -1063,6 +1094,7 @@
       "documentationpackage",
       "blockingpackage",
       "casetaskcasereferencepackage",
+      "fallbacktodefaulttenantpackage",
       "asyncpackage",
       "requiredrulepackage",
       "repetitionrulepackage",
@@ -1084,6 +1116,7 @@
       "documentationpackage",
       "blockingpackage",
       "processtaskprocessreferencepackage",
+      "fallbacktodefaulttenantpackage",
       "processtaskinparameterspackage",
       "processtaskoutparameterspackage",
       "asyncpackage",
@@ -1137,7 +1170,8 @@
       "overrideidpackage",
       "namepackage",
       "documentationpackage",
-      "ifpartconditionpackage" ],
+      "ifpartconditionpackage",
+      "triggermodepackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "association_start", "association_end", "SentriesMorph", "EntryCriterionOnItemBoundary" ]
   }, {
@@ -1152,7 +1186,8 @@
       "overrideidpackage",
       "namepackage",
       "documentationpackage",
-      "ifpartconditionpackage" ],
+      "ifpartconditionpackage",
+      "triggermodepackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "association_start", "SentriesMorph", "ExitCriterionOnItemBoundary" ]
   }, {

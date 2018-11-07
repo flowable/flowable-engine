@@ -461,9 +461,12 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
         CallActivityBehavior callActivityBehaviour = null;
         if (StringUtils.isNotEmpty(callActivity.getCalledElement()) && callActivity.getCalledElement().matches(expressionRegex)) {
             callActivityBehaviour = new CallActivityBehavior(expressionManager.createExpression(callActivity.getCalledElement()),
-                callActivity.getCalledElementType(), callActivity.getMapExceptions());
+                callActivity.getCalledElementType(), callActivity.getMapExceptions(),
+                callActivity.isFallbackToDefaultTenant());
         } else {
-            callActivityBehaviour = new CallActivityBehavior(callActivity.getCalledElement(), callActivity.getCalledElementType(), callActivity.getMapExceptions());
+            callActivityBehaviour = new CallActivityBehavior(callActivity.getCalledElement(), callActivity.getCalledElementType(),
+                callActivity.isFallbackToDefaultTenant(),
+                callActivity.getMapExceptions());
         }
 
         return callActivityBehaviour;

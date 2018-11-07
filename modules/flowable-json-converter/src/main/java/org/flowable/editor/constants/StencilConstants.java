@@ -225,6 +225,7 @@ public interface StencilConstants {
     final String PROPERTY_CALLACTIVITY_CALLEDELEMENTTYPE = "callactivitycalledelementtype";
     final String PROPERTY_CALLACTIVITY_IN = "callactivityinparameters";
     final String PROPERTY_CALLACTIVITY_OUT = "callactivityoutparameters";
+    final String PROPERTY_CALLACTIVITY_FALLBACK_TO_DEFAULT_TENANT = "callactivityfallbacktodefaulttenant";
     final String PROPERTY_CALLACTIVITY_INHERIT_VARIABLES = "callactivityinheritvariables";
     final String PROPERTY_CALLACTIVITY_SAME_DEPLOYMENT = "callactivitysamedeployment";
     final String PROPERTY_CALLACTIVITY_PROCESS_INSTANCE_NAME = "callactivityprocessinstancename";
@@ -267,6 +268,8 @@ public interface StencilConstants {
     final String PROPERTY_DECISIONTABLE_REFERENCE_KEY = "decisionTableReferenceKey";
     final String PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS = "decisiontaskthrowerroronnohits";
     final String PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY = "decisionTaskThrowErrorOnNoHits";
+    final String PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT = "decisiontaskfallbacktodefaulttenant";
+    final String PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT_KEY = "fallbackToDefaultTenant";
 
     final String PROPERTY_HTTPTASK_REQ_METHOD = "httptaskrequestmethod";
     final String PROPERTY_HTTPTASK_REQ_URL = "httptaskrequesturl";

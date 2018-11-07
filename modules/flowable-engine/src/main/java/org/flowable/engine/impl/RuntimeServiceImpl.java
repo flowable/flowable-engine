@@ -65,6 +65,7 @@ import org.flowable.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.flowable.engine.impl.cmd.SetProcessInstanceBusinessKeyCmd;
 import org.flowable.engine.impl.cmd.SetProcessInstanceNameCmd;
 import org.flowable.engine.impl.cmd.SignalEventReceivedCmd;
+import org.flowable.engine.impl.cmd.StartProcessInstanceAsyncCmd;
 import org.flowable.engine.impl.cmd.StartProcessInstanceByMessageCmd;
 import org.flowable.engine.impl.cmd.StartProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.StartProcessInstanceWithFormCmd;
@@ -682,6 +683,14 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
             return commandExecutor.execute(new StartProcessInstanceByMessageCmd(processInstanceBuilder));
         } else {
             throw new FlowableIllegalArgumentException("No processDefinitionId, processDefinitionKey nor messageName provided");
+        }
+    }
+
+    public ProcessInstance startProcessInstanceAsync(ProcessInstanceBuilderImpl processInstanceBuilder) {
+        if (processInstanceBuilder.getProcessDefinitionId() != null || processInstanceBuilder.getProcessDefinitionKey() != null) {
+            return (ProcessInstance) commandExecutor.execute(new StartProcessInstanceAsyncCmd(processInstanceBuilder));
+        } else {
+            throw new FlowableIllegalArgumentException("No processDefinitionId, processDefinitionKey provided");
         }
     }
 

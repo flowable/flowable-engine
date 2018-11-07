@@ -63,6 +63,11 @@ public interface ExecuteDecisionBuilder {
     ExecuteDecisionBuilder tenantId(String tenantId);
 
     /**
+     * allow to search for definition by key in the default tenant when tenant specific search fails
+     */
+    ExecuteDecisionBuilder fallbackToDefaultTenant();
+
+    /**
      * Sets the variables
      */
     ExecuteDecisionBuilder variables(Map<String, Object> variables);

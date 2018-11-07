@@ -68,13 +68,19 @@ public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter implements 
             }
         }
 
-        boolean decisionTableThrowErrorOnNoHitsNode = CmmnJsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS, elementNode);
-        FieldExtension decisionTableThrowErrorOnNoHitsField = new FieldExtension();
-        decisionTableThrowErrorOnNoHitsField.setFieldName(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY);
-        decisionTableThrowErrorOnNoHitsField.setStringValue(decisionTableThrowErrorOnNoHitsNode ? "true" : "false");
-        decisionTask.getFieldExtensions().add(decisionTableThrowErrorOnNoHitsField);
+        addBooleanField(elementNode, decisionTask, PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS, PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY);
+
+        addBooleanField(elementNode, decisionTask, PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT, PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT_KEY);
 
         return decisionTask;
+    }
+
+    protected void addBooleanField(JsonNode elementNode, DecisionTask decisionTask, String propertyName, String fieldName) {
+        boolean decisionTableThrowErrorOnNoHitsNode = CmmnJsonConverterUtil.getPropertyValueAsBoolean(propertyName, elementNode);
+        FieldExtension decisionTableThrowErrorOnNoHitsField = new FieldExtension();
+        decisionTableThrowErrorOnNoHitsField.setFieldName(fieldName);
+        decisionTableThrowErrorOnNoHitsField.setStringValue(decisionTableThrowErrorOnNoHitsNode ? "true" : "false");
+        decisionTask.getFieldExtensions().add(decisionTableThrowErrorOnNoHitsField);
     }
 
     @Override
@@ -94,6 +100,9 @@ public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter implements 
         for (FieldExtension fieldExtension : decisionTask.getFieldExtensions()) {
             if (PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY.equals(fieldExtension.getFieldName())) {
                 propertiesNode.put(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS, Boolean.parseBoolean(fieldExtension.getStringValue()));
+            }
+            if (PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT_KEY.equals(fieldExtension.getFieldName())) {
+                propertiesNode.put(PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT, Boolean.parseBoolean(fieldExtension.getStringValue()));
             }
         }
     }

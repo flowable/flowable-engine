@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.Case;
@@ -201,6 +202,12 @@ public class ConversionHelper {
     public void addDiEdge(CmmnDiEdge diEdge) {
         diEdges.add(diEdge);
         setCurrentDiEdge(diEdge);
+    }
+
+    public Optional<PlanItem> findPlanItem(String planItemId) {
+        return planItems.stream()
+                        .filter(planItem -> planItem.getId().equals(planItemId))
+                        .findFirst();
     }
 
     public CmmnModel getCmmnModel() {

@@ -145,5 +145,9 @@ FLOWABLE.PROPERTY_CONFIG =
     "flowable-http-request-method" : {
         "readModeTemplateUrl": "editor-app/configuration/properties/http-request-method-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/http-request-method-property-write-template.html"
-    }
+    },
+    "flowable-triggermode" : {
+            "readModeTemplateUrl": "editor-app/configuration/properties/trigger-mode-read-template.html",
+            "writeModeTemplateUrl": "editor-app/configuration/properties/trigger-mode-write-template.html"
+        }
 };

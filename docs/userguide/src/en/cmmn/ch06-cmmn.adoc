@@ -777,7 +777,9 @@ image::images/cmmn.timereventlistener.png[align="center"]
 ===== User Event Listener
 
 A user event listener can be used when needing to capture a user interaction that directly influences a case state,
-instead of indirectly via impacting variables or information in the case. When the event is captured an Occur transition is triggered on the event listener.
+instead of indirectly via impacting variables or information in the case.
+A typical use case for a user event listener are buttons in a UI that a user can click to drive the state of the case instance.
+When the event is triggered an _Occur_ event is thrown to which sentries can listener to.
 Like timer event listeners, it has a much simpler lifecycle that a _task_.
 
 image::images/cmmn.usereventlistener.png[align="center"]
@@ -785,6 +787,36 @@ image::images/cmmn.usereventlistener.png[align="center"]
 User event listeners can be queried using the _org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery_. Such a query can be created by calling the _cmmnRuntimeService.createUserEventListenerInstanceQuery()_ method. Note that a user event listener is also a plan item instance, which means it can also be queried through the _org.flowable.cmmn.api.runtime.PlanItemInstanceQuery_ API.
 
 A user event listener can be completed by calling the _cmmnRuntimeService.completeUserEventListenerInstance(id)_ method.
+
+===== Automatic removal of event listeners
+
+The engine will automatically detect when event listeners (user or timer) are not useful anymore.
+Take for example the following case definition:
+
+image::images/cmmn.user-event-listener-removal-1.png[align="center"]
+
+Here, the _First stage_ contains two human tasks (A and B) and it can be exited by a user when the _Stop first stage_ user event is triggered.
+However, when both taks A and B are completed, the stage will also complete. If now the user event listener would be triggered, there is nothing that listens to this event anymore.
+The engine will detect this and terminate the user event automatically.
+
+The same mechanism also works for event listeners that are referenced by entry sentries:
+
+image::images/cmmn.user-event-listener-removal-2.png[align="center"]
+
+In this case, in the case that _EventListenerA_ would be triggered, _EventListenerB_ is terminated (as nothing is listening to its occurrence anymore).
+
+Or, when timer and user event listeners are mixed, the one that is triggered first will also cause the removal of others (when they are not referenced somewhere else):
+
+image::images/cmmn.user-event-listener-removal-3.png[align="center"]
+
+Here, the timer will be removed in case the user event is triggered first (and vice versa).
+
+The detection also takes in account plan items that have not yet been created. Take for example the following case definition:
+
+image::images/cmmn.user-event-listener-removal-4.png[align="center"]
+
+Here, human task _C_ is not yet created when a case instance is started for this case definition. The user event listener will not be removed as long that _C_ has a parent stage that is in a non-terminal state, as this means that the event could still be listened to in the future.
+
 
 ==== Item control: Repetition Rule
 

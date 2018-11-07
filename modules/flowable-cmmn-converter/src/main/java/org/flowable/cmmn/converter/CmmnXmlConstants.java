@@ -53,6 +53,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_PLAN_ITEM = "planItem";
     String ELEMENT_ITEM_CONTROL = "itemControl";
     String ELEMENT_DEFAULT_CONTROL = "defaultControl";
+
     String ELEMENT_SENTRY = "sentry";
     String ELEMENT_PLAN_ITEM_ON_PART = "planItemOnPart";
     String ELEMENT_STANDARD_EVENT = "standardEvent";
@@ -62,6 +63,8 @@ public interface CmmnXmlConstants {
     String ELEMENT_EXTENSION_ELEMENTS = "extensionElements";
     String ELEMENT_HTTP_RESPONSE_HANDLER = "httpResponseHandler";
     String ELEMENT_HTTP_REQUEST_HANDLER = "httpRequestHandler";
+
+    String ATTRIBUTE_TRIGGER_MODE = "triggerMode";
 
     String ELEMENT_REQUIRED_RULE = "requiredRule";
     String ELEMENT_MANUAL_ACTIVATION_RULE = "manualActivationRule";
@@ -95,6 +98,7 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_CASE_REF = "caseRef";
     String ATTRIBUTE_PROCESS_REF = "processRef";
     String ATTRIBUTE_DECISION_REF = "decisionRef";
+    String ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT = "fallbackToDefaultTenant";
 
     String ELEMENT_PROCESS_REF_EXPRESSION = "processRefExpression";
     String ELEMENT_DECISION_REF_EXPRESSION = "decisionRefExpression";

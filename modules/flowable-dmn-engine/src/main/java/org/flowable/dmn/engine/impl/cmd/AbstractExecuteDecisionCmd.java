@@ -25,7 +25,8 @@ import org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl;
 import org.flowable.dmn.engine.impl.ExecuteDecisionBuilderImpl;
 import org.flowable.dmn.engine.impl.ExecuteDecisionInfo;
 import org.flowable.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
-import org.flowable.dmn.engine.impl.persistence.deploy.DeploymentManager;
+import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
+import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.Decision;
 
 /**
@@ -46,6 +47,7 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
         executeDecisionInfo.setScopeType(decisionBuilder.getScopeType());
         executeDecisionInfo.setVariables(decisionBuilder.getVariables());
         executeDecisionInfo.setTenantId(decisionBuilder.getTenantId());
+        executeDecisionInfo.setFallbackToDefaultTenant(decisionBuilder.isFallbackToDefaultTenant());
     }
 
     public AbstractExecuteDecisionCmd(String decisionKey, Map<String, Object> variables) {
@@ -53,64 +55,82 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
         executeDecisionInfo.setVariables(variables);
     }
 
-    protected DmnDecisionTable resolveDecisionTable(DeploymentManager deploymentManager) {
+
+    protected DmnDecisionTable resolveDecisionTable() {
         DmnDecisionTable decisionTable = null;
+        DecisionTableEntityManager decisionTableManager = CommandContextUtil.getDmnEngineConfiguration().getDecisionTableEntityManager();
 
-        if (StringUtils.isNotEmpty(getDecisionKey()) && StringUtils.isNotEmpty(getParentDeploymentId()) && StringUtils.isNotEmpty(getTenantId())) {
-            try {
-                List<DmnDeployment> dmnDeployments = deploymentManager.getDeploymentEntityManager().findDeploymentsByQueryCriteria(
-                                new DmnDeploymentQueryImpl().parentDeploymentId(getParentDeploymentId()));
-                
-                if (dmnDeployments == null || dmnDeployments.size() == 0) {
-                    throw new FlowableObjectNotFoundException("no deployment found");
-                }
-                
-                decisionTable = deploymentManager.findDeployedLatestDecisionByKeyDeploymentIdAndTenantId(
-                                getDecisionKey(), dmnDeployments.get(0).getId(), getTenantId());
-                
-            } catch (FlowableObjectNotFoundException e) {
-                // Fall back
+        String decisionKey = executeDecisionInfo.getDecisionKey();
+        String parentDeploymentId = executeDecisionInfo.getParentDeploymentId();
+        String tenantId = executeDecisionInfo.getTenantId();
+        
+        if (StringUtils.isNotEmpty(decisionKey) && StringUtils.isNotEmpty(parentDeploymentId) && StringUtils.isNotEmpty(tenantId)) {
+            List<DmnDeployment> dmnDeployments = CommandContextUtil.getDeploymentEntityManager().findDeploymentsByQueryCriteria(
+                new DmnDeploymentQueryImpl().parentDeploymentId(parentDeploymentId));
+
+            if (dmnDeployments != null && dmnDeployments.size() != 0) {
+                decisionTable = decisionTableManager.findDecisionTableByDeploymentAndKeyAndTenantId(
+                    dmnDeployments.get(0).getId(), decisionKey, tenantId);
+            }
+
+            if (decisionTable == null) {
                 // If there is no decision table found linked to the deployment id, try to find one without a specific deployment id.
-                try {
-                    decisionTable = deploymentManager.findDeployedLatestDecisionByKeyAndTenantId(getDecisionKey(), getTenantId());
-                    
-                } catch (FlowableObjectNotFoundException ex) {
-                    throw new FlowableObjectNotFoundException("No decision found for key: " + getDecisionKey() +
-                            ", parent deployment id " + getParentDeploymentId() + " and tenant id: " + getTenantId() +
+                decisionTable = decisionTableManager.findLatestDecisionTableByKeyAndTenantId(decisionKey, tenantId);
+
+                if (decisionTable == null) {
+                    // if fallback to default tenant is enabled do a final lookup query
+                    if (executeDecisionInfo.isFallbackToDefaultTenant()) {
+                        decisionTable = decisionTableManager.findLatestDecisionTableByKey(decisionKey);
+                        if (decisionTable == null) {
+                            throw new FlowableObjectNotFoundException("No decision found for key: " + decisionKey +
+                                ". There was also no fall back decision table found without tenant.");
+                        }
+                        
+                    } else {
+                        throw new FlowableObjectNotFoundException("No decision found for key: " + decisionKey +
+                            ", parent deployment id " + parentDeploymentId + " and tenant id: " + tenantId +
                             ". There was also no fall back decision table found without parent deployment id.");
+                    }
                 }
             }
             
-        } else if (StringUtils.isNotEmpty(getDecisionKey()) && StringUtils.isNotEmpty(getParentDeploymentId())) {
-            try {
-                List<DmnDeployment> dmnDeployments = deploymentManager.getDeploymentEntityManager().findDeploymentsByQueryCriteria(
-                                new DmnDeploymentQueryImpl().parentDeploymentId(getParentDeploymentId()));
-                
-                if (dmnDeployments == null || dmnDeployments.size() == 0) {
-                    throw new FlowableObjectNotFoundException("no deployment found");
-                }
-                
-                decisionTable = deploymentManager.findDeployedLatestDecisionByKeyAndDeploymentId(getDecisionKey(), dmnDeployments.get(0).getId());
-                
-            } catch (FlowableObjectNotFoundException e) {
+        } else if (StringUtils.isNotEmpty(decisionKey) && StringUtils.isNotEmpty(parentDeploymentId)) {
+            List<DmnDeployment> dmnDeployments = CommandContextUtil.getDeploymentEntityManager().findDeploymentsByQueryCriteria(
+                new DmnDeploymentQueryImpl().parentDeploymentId(parentDeploymentId));
 
-                // Fall back
+            if (dmnDeployments != null && dmnDeployments.size() != 0) {
+                decisionTable = decisionTableManager.findDecisionTableByDeploymentAndKey(dmnDeployments.get(0).getId(), decisionKey);
+            }
+
+            if (decisionTable == null) {
                 // If there is no decision table found linked to the deployment id, try to find one without a specific deployment id.
-                try {
-                    decisionTable = deploymentManager.findDeployedLatestDecisionByKey(getDecisionKey());
-                    
-                } catch (FlowableObjectNotFoundException ex) {
-                    throw new FlowableObjectNotFoundException("No decision found for key: " + getDecisionKey() +
-                            " and parent deployment id " + getParentDeploymentId() +
-                            ". There was also no fall back decision table found without parent deployment id.");
+                decisionTable = decisionTableManager.findLatestDecisionTableByKey(decisionKey);
+
+                if (decisionTable == null) {
+                    throw new FlowableObjectNotFoundException("No decision found for key: " + decisionKey +
+                        " and parent deployment id " + parentDeploymentId +
+                        ". There was also no fall back decision table found without parent deployment id.");
                 }
             }
-            
-        } else if (StringUtils.isNotEmpty(getDecisionKey()) && StringUtils.isNotEmpty(getTenantId())) {
-            decisionTable = deploymentManager.findDeployedLatestDecisionByKeyAndTenantId(getDecisionKey(), getTenantId());
-            
-        } else if (StringUtils.isNotEmpty(getDecisionKey())) {
-            decisionTable = deploymentManager.findDeployedLatestDecisionByKey(getDecisionKey());
+        } else if (StringUtils.isNotEmpty(decisionKey) && StringUtils.isNotEmpty(tenantId)) {
+            decisionTable = decisionTableManager.findLatestDecisionTableByKeyAndTenantId(decisionKey, tenantId);
+            if (decisionTable == null) {
+                if (executeDecisionInfo.isFallbackToDefaultTenant()) {
+                    decisionTable = decisionTableManager.findLatestDecisionTableByKey(decisionKey);
+                    if (decisionTable == null) {
+                        throw new FlowableObjectNotFoundException("No decision found for key: " + decisionKey +
+                            ". There was also no fall back decision table found without tenant.");                    }
+                } else {
+                    throw new FlowableObjectNotFoundException(
+                        "Decision table for key [" + decisionKey + "] and tenantId [" + tenantId + "] was not found");
+                }
+            }
+
+        } else if (StringUtils.isNotEmpty(decisionKey)) {
+            decisionTable = decisionTableManager.findLatestDecisionTableByKey(decisionKey);
+            if (decisionTable == null) {
+                throw new FlowableObjectNotFoundException("Decision table for key [" + decisionKey + "] was not found");
+            }
             
         } else {
             throw new FlowableIllegalArgumentException("decisionKey is null");
@@ -122,26 +142,14 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
         return decisionTable;
     }
 
-    protected Decision resolveDecision(DeploymentManager deploymentManager, DmnDecisionTable decisionTable) {
+    protected Decision resolveDecision(DmnDecisionTable decisionTable) {
         if (decisionTable == null) {
             throw new FlowableIllegalArgumentException("decisionTable is null");
         }
 
-        DecisionTableCacheEntry decisionTableCacheEntry = deploymentManager.resolveDecisionTable(decisionTable);
+        DecisionTableCacheEntry decisionTableCacheEntry = CommandContextUtil.getDmnEngineConfiguration().getDeploymentManager().resolveDecisionTable(decisionTable);
         Decision decision = decisionTableCacheEntry.getDecision();
 
         return decision;
-    }
-
-    protected String getDecisionKey() {
-        return executeDecisionInfo.getDecisionKey();
-    }
-
-    protected String getParentDeploymentId() {
-        return executeDecisionInfo.getParentDeploymentId();
-    }
-
-    protected String getTenantId() {
-        return executeDecisionInfo.getTenantId();
     }
 }

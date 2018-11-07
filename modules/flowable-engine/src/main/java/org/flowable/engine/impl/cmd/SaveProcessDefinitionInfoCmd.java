@@ -62,7 +62,7 @@ public class SaveProcessDefinitionInfoCmd implements Command<Void>, Serializable
             ObjectWriter writer = CommandContextUtil.getProcessEngineConfiguration(commandContext).getObjectMapper().writer();
             CommandContextUtil.getProcessDefinitionInfoEntityManager().updateInfoJson(definitionInfoEntity.getId(), writer.writeValueAsBytes(infoNode));
         } catch (Exception e) {
-            throw new FlowableException("Unable to serialize info node " + infoNode);
+            throw new FlowableException("Unable to serialize info node " + infoNode, e);
         }
 
         return null;

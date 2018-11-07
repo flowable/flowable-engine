@@ -34,7 +34,7 @@ public class DeployNonExecutableProcessDefinitionTest extends PluggableFlowableT
             runtimeService.startProcessInstanceByKey("oneTaskProcessNonExecutable");
             fail();
         } catch (FlowableException e) {
-            assertTextPresent("no processes deployed with key 'oneTaskProcessNonExecutable'", e.getMessage());
+            assertTextPresent("No process definition found for key 'oneTaskProcessNonExecutable'", e.getMessage());
         }
     }
 

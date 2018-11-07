@@ -39,6 +39,7 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     protected String predefinedProcessInstanceId;
     protected Map<String, Object> variables;
     protected Map<String, Object> transientVariables;
+    protected boolean fallbackToDefaultTenant;
 
     public ProcessInstanceBuilderImpl(RuntimeServiceImpl runtimeService) {
         this.runtimeService = runtimeService;
@@ -149,8 +150,19 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     }
 
     @Override
+    public ProcessInstanceBuilder fallbackToDefaultTenant() {
+        this.fallbackToDefaultTenant = true;
+        return this;
+    }
+
+    @Override
     public ProcessInstance start() {
         return runtimeService.startProcessInstance(this);
+    }
+
+    @Override
+    public ProcessInstance startAsync() {
+        return runtimeService.startProcessInstanceAsync(this);
     }
 
     public String getProcessDefinitionId() {
@@ -199,6 +211,10 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
 
     public Map<String, Object> getTransientVariables() {
         return transientVariables;
+    }
+
+    public boolean isFallbackToDefaultTenant() {
+        return fallbackToDefaultTenant;
     }
 
 }

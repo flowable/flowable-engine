@@ -103,6 +103,11 @@ public interface ProcessInstanceBuilder {
     ProcessInstanceBuilder transientVariable(String variableName, Object value);
 
     /**
+     * Use default tenant as a fallback in the case when process definition was not found by key and tenant id
+     */
+    ProcessInstanceBuilder fallbackToDefaultTenant();
+
+    /**
      * Start the process instance
      * 
      * @throws FlowableIllegalArgumentException
@@ -111,5 +116,15 @@ public interface ProcessInstanceBuilder {
      *             when no process definition is deployed with the given processDefinitionKey or processDefinitionId
      **/
     ProcessInstance start();
+
+    /**
+     * Start the process instance asynchronously
+     *
+     * @throws FlowableIllegalArgumentException
+     *             if processDefinitionKey and processDefinitionId are null
+     * @throws FlowableObjectNotFoundException
+     *             when no process definition is deployed with the given processDefinitionKey or processDefinitionId
+     **/
+    ProcessInstance startAsync();
 
 }

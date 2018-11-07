@@ -1,0 +1,100 @@
+{
+  "modelId": "82214c4e-de6a-11e8-89f8-b46bfcd9c998",
+  "bounds": {
+    "lowerRight": {
+      "x": 1200,
+      "y": 1050
+    },
+    "upperLeft": {
+      "x": 0,
+      "y": 0
+    }
+  },
+  "properties": {
+    "case_id": "caseTaskModelId",
+    "name": "caseTaskModelName",
+    "documentation": "",
+    "case_initiatorvariablename": "",
+    "case_author": "",
+    "case_version": "",
+    "case_namespace": "http://www.flowable.org/casedef",
+    "process_id": "caseTaskModelId"
+  },
+  "childShapes": [
+    {
+      "resourceId": "casePlanModel",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": "",
+        "formkeydefinition": "",
+        "formreference": "",
+        "autocompleteenabled": "",
+        "autocompletecondition": ""
+      },
+      "stencil": {
+        "id": "CasePlanModel"
+      },
+      "childShapes": [
+        {
+          "resourceId": "sid-E06221FA-0225-4EF8-A1E8-8DC177326B77",
+          "properties": {
+            "overrideid": "",
+            "name": "caseTaskName",
+            "documentation": "",
+            "isblocking": true,
+            "isblockingexpression": "",
+            "casetaskcasereference": "",
+            "fallbacktodefaulttenant": true,
+            "isasync": "",
+            "isexclusive": "",
+            "requiredenabled": "",
+            "requiredrulecondition": "",
+            "repetitionenabled": "",
+            "repetitionrulecondition": "",
+            "repetitioncountervariablename": "",
+            "manualactivationenabled": "",
+            "manualactivationrulecondition": "",
+            "completionneutralenabled": "",
+            "completionneutralrulecondition": ""
+          },
+          "stencil": {
+            "id": "CaseTask"
+          },
+          "childShapes": [],
+          "outgoing": [],
+          "bounds": {
+            "lowerRight": {
+              "x": 314,
+              "y": 272
+            },
+            "upperLeft": {
+              "x": 214,
+              "y": 192
+            }
+          },
+          "dockers": []
+        }
+      ],
+      "outgoing": [],
+      "bounds": {
+        "lowerRight": {
+          "x": 758,
+          "y": 754
+        },
+        "upperLeft": {
+          "x": 40,
+          "y": 40
+        }
+      },
+      "dockers": []
+    }
+  ],
+  "stencil": {
+    "id": "CMMNDiagram"
+  },
+  "stencilset": {
+    "namespace": "http://b3mn.org/stencilset/cmmn1.1#",
+    "url": "../editor/stencilsets/cmmn1.1/cmmn1.1.json"
+  }
+}

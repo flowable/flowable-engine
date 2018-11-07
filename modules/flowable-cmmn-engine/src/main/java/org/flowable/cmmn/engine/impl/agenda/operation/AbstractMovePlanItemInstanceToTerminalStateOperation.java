@@ -22,6 +22,8 @@ import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
+ * Operation that moves a given {@link org.flowable.cmmn.api.runtime.PlanItemInstance} to a terminal state (completed, terminated or failed).
+ *
  * @author Joram Barrez
  */
 public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation extends AbstractChangePlanItemInstanceStateOperation {
@@ -50,7 +52,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
             CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(newPlanItemInstanceEntity, null);
         }
         
-        deleteSentryPartInstances();
+        removeSentryRelatedData();
     }
 
     /**
