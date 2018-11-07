@@ -31,7 +31,7 @@ public class Sentry extends CaseElement {
         return triggerMode == null || TRIGGER_MODE_DEFAULT.equals(triggerMode);
     }
 
-    public boolean isOnEventTriggerMde() {
+    public boolean isOnEventTriggerMode() {
         return TRIGGER_MODE_ON_EVENT.equals(TRIGGER_MODE_ON_EVENT);
     }
 

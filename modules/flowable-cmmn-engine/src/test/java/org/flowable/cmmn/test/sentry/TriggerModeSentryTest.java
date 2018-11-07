@@ -94,6 +94,24 @@ public class TriggerModeSentryTest extends FlowableCmmnTestCase {
         assertThat(tasks).hasSize(0);
     }
 
+    @Test
+    @CmmnDeployment
+    public void testExitTriggersAnotherExit() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("exitTriggersAnotherExit")
+            .variable("var", true)
+            .start();
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("A", "B", "C");
+
+        // Completing A cascades into exiting B and C when using the default trigger mode, as there is memory.
+        // This should be the same case in 'onEvent', as both events are part of the same 'evaluation cycle'.
+        cmmnTaskService.complete(tasks.get(0).getId());
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).hasSize(0);
+        assertCaseInstanceEnded(caseInstance);
+    }
+
     private void assertSentryPartInstanceCount(CaseInstance caseInstance, int count) {
         List<SentryPartInstanceEntity> sentryPartInstanceEntities = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
             @Override
