@@ -720,7 +720,7 @@ image::images/cmmn.processtask.png[align="center"]
 
 ==== Criteria
 
-===== Entry criterion
+===== Entry criterion (entry sentry)
 
 Entry criteria form a sentry for a given plan item instance. They consist of two parts:
 
@@ -728,14 +728,15 @@ Entry criteria form a sentry for a given plan item instance. They consist of two
 * One optional _if part_ or _condition_: this is an expression that allows the definition of a complex condition
 
 A sentry is satisfied when all its criteria are resolved to _true_. When a criterion evaluates to true, this is stored and remembered for future evaluations. Note that entry criteria of all plan item instances in the _available_ state are evaluated whenever something changes in the case instance.
-
 Multiple sentries are possible on a plan item. However, when one is satisfied, the plan item moves from state _available_ to _active_.
+
+See <<cmmn_sentry_evaluation,the section on sentry evaluation>> for more information.
 
 An entry criterion is visualized as a diamond shape (white color inside) on the border of a plan item:
 
 image::images/cmmn.entrycriteria.png[align="center"]
 
-===== Exit criterion
+===== Exit criterion (exit sentry)
 
 Exit criteria form a sentry for a given plan item instance. They consist of two parts:
 
@@ -743,8 +744,9 @@ Exit criteria form a sentry for a given plan item instance. They consist of two 
 * One optional _if part_ or _condition_: this is an expression that allows a complex condition to be defined
 
 A sentry is satisfied when all its criteria are resolved to _true_. When a criterion evaluates to true, this is stored and remembered for future evaluations. Note that exit criteria of all plan item instances in the _active_ state are evaluated whenever something changes in the case instance.
-
 Multiple sentries are possible on a plan item. However, when one is satisfied, the plan item moves from state _active_ to _exit_.
+
+See <<cmmn_sentry_evaluation,the section on sentry evaluation>> for more information.
 
 An exit criterion is visualized as a diamond shape (white color inside) on the border of a plan item:
 
@@ -940,3 +942,102 @@ To summarize:
     1. It contains no plan items or all child plan items are in a _Terminal_ or _Semi-terminal_ state (CLOSED, COMPLETED, DISABLED, FAILED)
     2. It is not marked as _autoComplete_ and all remaining child plan items are in *AVAILABLE* state and are _completionNeutral_ and not _required_
     3. It is _autoComplete_ and all remaining plan items are _not required_ in *ENABLED* or *AVAILABLE* state (regardless of its completion neutrality, as required rule gets precedence)
+
+[[cmmn_sentry_evaluation]]
+=== Sentry evaluation
+
+Sentries play a big role in any case definition as they offer a powerful way of configuring in a declarative way when certain plan item instances activate or when they are automatically stopped.
+As such, one of the most important parts of the Flowable CMMN engine core logic is to evaluate the sentries to see what state changes happen in a case instance.
+
+==== When are sentries evaluated?
+
+Sentries are evaluated whenever state changes happen in the case instance or new events happen. Concretely this means:
+
+* When a case instance is started.
+* When a wait state plan item such as a human task is triggered to continue.
+* When variables related to the case instance change (added, updated or deleted).
+* When the state of a plan item instance is changed (e.g. terminated through RuntimeService, a manual plan item instance is started, etc.).
+* When manually triggered through the RuntimeService#evaluateCriteria method.
+
+The engine will continue to plan new evaluations of all currently active sentries as long as changes keep happening.
+For example, suppose the completion of a human task satisfies the exit sentry of another human task. The state change of the second human task will again schedule a new evaluation of all active sentries with this new information. When no changes have happened during the last evaluation, the engine deems the state stable and evaluation is stopped.
+
+==== Concepts
+
+Sentries consist of two parts:
+
+- One or more _onParts_ that reference lifecycle events from other plan items
+- Zero or one ifPart with a condition
+
+Take for example the following case definition:
+
+image::images/cmmn.sentry-eval-01.png[align="center"]
+
+Assume (not shown in the diagram here)
+
+* The entry sentry on task C listens to the _complete_ event from task A and B.
+* The exit sentry listens to the _occur_ event of the user event listener _'Stop  C'_
+* The entry sentry has a condition expression set to _${var:eq(myVar, 'hello world')}_
+
+In this simple example, the _entry sentry_ has two onParts and one ifPart. The _exit sentry_ only has onPart.
+
+When the case instance is started, human tasks A and B are created (as they have no entry sentry) and move immediately to state _active_. C is not _active_, but _available_ as the sentry has not yet been satisfied. The user event listener _'Stop C'_ is also _available_ from the start and it can thus be triggered.
+
+When both task A and B have been completed and the variable _myVar_ is set to _'hello world'_, the entry sentry is satisfied and fires. The plan item instance behind C is moved to the _active_ state and as a side-effect the human task C is created (it can now be queried through the _TaskService_ for example).
+When _'Stop C'_ is triggered (through the _CmmnRuntimeService#completeUserEventListenerInstance_ method, the exit sentry for C is satisfied and C is terminated.
+
+If _'Stop C'_ would be triggered before C moves to _active_, its plan item instance would be terminated and the entry sentry won't be listening anymore to anything.
+
+==== Default behavior
+
+When the case instance is started
+
+----
+CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+    .caseDefinitionKey("myCase")
+    .start();
+----
+
+the condition on the entry sentry is immediately evaluated, as a regular evaluation cycle happens on case instance start.
+
+Note that, if an expression for the condition like _${myVar == 'hello world'}_ would be used this would not work. The engine would throw a _PropertyNotFound_ exception as it doesn't know the _myVar_ variable.
+
+To solve this:
+
+ * pass a variable value for _myVar_ on case instance start
+ * do a null check in the expression, like _${planItemInstance.getVariable('myVar') != null && planItemInstance.getVariable('myVar') == 'hello world'}_
+ * or (and probably easiest), check <<cmmnExpressionsFunctions,expression functions>> to use a function such as _${var:eq(myVar, 'hello world')}_ which takes in account the fact the variable might not exist.
+
+*The default evaluation logic has "memory", which means that when a part of a sentry is satisfied the engine will store and "remember" this in subsequent evaluations.*
+
+This means that, from the moment a part (an onPart or ifPart of the sentry) is satisfied, that particular part is not evaluated anymore in next evaluations and it is deemed true.
+
+In the example above, this is needed as task A will typically be completed at another point in time than task B. For example if task A is completed, the part of the sentry on task C that says "i'm listening to the complete event of task A" is now satisfied and this fact is remembered for the future. If now B completes, this is also stored. If now the _myVar_ variable gets the right value, the ifPart also fires and the whole sentry fires and task C gets activated. Of course, it could also be that the variable value is satisfied first and the tasks after. The point is that it doesn't matter as the engine will remember the parts that were satisfied in the past.
+
+This behavior "with memory" is the default behavior of the engine and is covered by setting the _triggerMode_ of a sentry to *default*. This is automatically set in the Flowable Modeler when adding a new plan item. When no value has been set (for example when importing a case model from another tool), the _triggerMode_ is assumed to be _default_.
+
+==== Trigger mode "onEvent"
+
+The default behavior (see previous section) will remember which parts have been satisfied previously. This is the most used and safest approach (and also what is typically expected when reasoning about sentries).
+
+There is an alternative mode of sentry triggering that is called *"onEvent"*. In this mode, the engine will have memory with regards to parts of the sentry and will *not remember* any part that was satisfied in the past. This is sometimes needed in advanced use cases. Take for example the following example:
+
+image::images/cmmn.sentry-eval-02.png[align="center"]
+
+Here, the case model has a stage with with three substages. All substage are repeating. Substage B and C have an entry sentry for the completion of stage B. Also (not visually shown), both sentries have a condition that depends on a variable.
+
+In advanced use cases, it could be wanted or needed that that the sentry parts (and especially the ifPart containing the condition) are evaluated only _when the lifecycle event of the dependent plan item_ happens. In this case, this is the _complete_ event of _Stage A_. For these use cases, the _triggerMode_ of the sentry can be set to _onEvent_. As the name imples, this means that the sentry evaluation only happens when a referenced event happens and no memory of past things are taken into account.
+
+Concretely, in the example here, the condition of the entry sentries will be evaluated *only* when Stage A completed (and on no other moment). This is very different from the general evaluation rules. In this particular example, it does make managing the variables easier as the conditions are only evaluated on one precise moment and there needs to be no fear of some sentry part being fired due to a variable having a value at a certain point in time. Especially as in the example here all substages are repeating, this would be a lot of work to do. This is a powerful mechanism, but meant for advanced modelers that have an intrinsic knowledge of the case model and the semantics of this triggerMode.
+
+Do note that the engine deems all events to happen simultaneously when it comes to evaluating sentries. Take the following case definition:
+
+image::images/cmmn.sentry-eval-03.png[align="center"]
+
+Assume that all sentries use the _triggerMode onEvent_ setting. If task A is completed, this exits task B. Task C will now exit too. So, even though there are two distinct lifecycle events (A being completed and B being exited) and one might assume that _onEvent_ literally means that there are two distinct evaluations happening where the memory of the other part of the exit sentry on task C is forgotten, the engine is smart enough to see that they are part of the same evaluation cycle and task C will be exited too.
+
+Technically spoken: there is _some_ memory for the _onEvent_ sentry, more specifically for evaluations that happen during the same API call (or transaction, lower-level spoken).
+
+*Important: onEvent is a powerful mechanism and should only be used when the semantics are well understood. It's possible to create a case model that gets stuck due to not having the correct sentry configuration if the use case is not carefully examined.*
+
+(For example, suppose a sentry has an onPart listening to the completion of a plan item and an ifPart with a condition. If the plan item completes - thus triggering the onPart - but a variable used in the condition is missing for some reason ... the ifPart would never fire and the case instance might get stuck in an unwanted state).
