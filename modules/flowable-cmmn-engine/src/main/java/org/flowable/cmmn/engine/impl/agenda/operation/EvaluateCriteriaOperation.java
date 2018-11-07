@@ -240,6 +240,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             } else {
 
                 boolean isDefaultTriggerMode = sentry.isDefaultTriggerMode();
+                boolean isOnEventTriggerMode = sentry.isOnEventTriggerMde();
 
                 boolean sentryIfPartSatisfied = false;
                 Set<String> satisfiedSentryOnPartIds = new HashSet<>(1);
@@ -270,21 +271,28 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                         }
                     }
                 }
-                
+
+                boolean allOnPartsSatisfied = (satisfiedSentryOnPartIds.size() == sentry.getOnParts().size());
+
                 // Verify the ifPart in case it wasn't satisfied yet
-                if (sentry.getSentryIfPart() != null && !sentryIfPartSatisfied) {
-                    if (evaluateSentryIfPart(sentry, entityWithSentryPartInstances)) {
-
-                        if (isDefaultTriggerMode) {
+                if (isDefaultTriggerMode) {
+                    if (sentry.getSentryIfPart() != null && !sentryIfPartSatisfied) {
+                        if (evaluateSentryIfPart(sentry, entityWithSentryPartInstances)) {
                             createSentryPartInstanceEntity(entityWithSentryPartInstances, null, sentry.getSentryIfPart());
+                            sentryIfPartSatisfied = true;
                         }
-
-                        sentryIfPartSatisfied = true;
                     }
+
+                } else { // onEvent triggerMode
+                    if (allOnPartsSatisfied && sentry.getSentryIfPart() != null && !sentryIfPartSatisfied) {
+                        if (evaluateSentryIfPart(sentry, entityWithSentryPartInstances)) {
+                            sentryIfPartSatisfied = true;
+                        }
+                    }
+
                 }
 
-                if ((satisfiedSentryOnPartIds.size() + (sentryIfPartSatisfied ? 1 : 0))
-                        == ((sentry.getOnParts().size() + (sentry.getSentryIfPart() != null ? 1 : 0)))) {
+                if (allOnPartsSatisfied && (sentryIfPartSatisfied || sentry.getSentryIfPart() == null)) {
                     return criterion.getId();
                 }
 
