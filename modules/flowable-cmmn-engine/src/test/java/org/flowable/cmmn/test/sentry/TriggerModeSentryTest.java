@@ -13,9 +13,12 @@
 package org.flowable.cmmn.test.sentry;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity;
@@ -30,7 +33,7 @@ import org.junit.Test;
 /**
  * @author Joram Barrez
  */
-public class SentryTest extends FlowableCmmnTestCase {
+public class TriggerModeSentryTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment
@@ -70,6 +73,27 @@ public class SentryTest extends FlowableCmmnTestCase {
 
     }
 
+    @Test
+    @CmmnDeployment
+    public void testTriggerModeOnEventConditionCalledOnce() {
+
+        // This tests verifies that the ifPart of an onEvent triggered sentry doesn't get called unless the event happens
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testIfPartTriggeredOnce")
+            .variable("var", new TestCondition())
+            .start();
+        assertEquals(0, TestCondition.COUNTER.get());
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery().orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("Guarded task", "The task");
+
+        cmmnTaskService.complete(tasks.get(1).getId());
+        assertEquals(1, TestCondition.COUNTER.get());
+        tasks = cmmnTaskService.createTaskQuery().orderByTaskName().asc().list();
+        assertThat(tasks).hasSize(0);
+    }
+
     private void assertSentryPartInstanceCount(CaseInstance caseInstance, int count) {
         List<SentryPartInstanceEntity> sentryPartInstanceEntities = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
             @Override
@@ -78,6 +102,18 @@ public class SentryTest extends FlowableCmmnTestCase {
             }
         });
         assertThat(sentryPartInstanceEntities).hasSize(count);
+    }
+
+    // Just for testing purposes using a serialized variable
+    public static class TestCondition implements Serializable {
+
+        public static AtomicInteger COUNTER = new AtomicInteger(0);
+
+        public static boolean calculate() {
+            COUNTER.incrementAndGet();
+            return true;
+        }
+
     }
 
 }
