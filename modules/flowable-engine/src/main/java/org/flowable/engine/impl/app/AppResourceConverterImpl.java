@@ -12,9 +12,9 @@
  */
 package org.flowable.engine.impl.app;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.app.AppModel;
 import org.flowable.engine.app.AppResourceConverter;
-import org.flowable.engine.common.api.FlowableException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -26,7 +26,8 @@ public class AppResourceConverterImpl implements AppResourceConverter {
         this.objectMapper = objectMapper;
     }
 
-    public Object convertAppResourceToModel(byte[] appResourceBytes) {
+    @Override
+    public AppModel convertAppResourceToModel(byte[] appResourceBytes) {
         AppModel appModel;
         try {
             appModel = objectMapper.readValue(appResourceBytes, AppModel.class);

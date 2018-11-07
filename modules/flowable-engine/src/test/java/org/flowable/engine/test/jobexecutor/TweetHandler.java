@@ -15,21 +15,23 @@ package org.flowable.engine.test.jobexecutor;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.jobexecutor.JobHandler;
-import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.job.service.JobHandler;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.variable.api.delegate.VariableScope;
 import org.junit.Assert;
 
 public class TweetHandler implements JobHandler {
 
     List<String> messages = new ArrayList<>();
 
+    @Override
     public String getType() {
         return "tweet";
     }
 
-    public void execute(JobEntity job, String configuration, ExecutionEntity execution, CommandContext commandContext) {
+    @Override
+    public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
         messages.add(configuration);
         Assert.assertNotNull(commandContext);
     }

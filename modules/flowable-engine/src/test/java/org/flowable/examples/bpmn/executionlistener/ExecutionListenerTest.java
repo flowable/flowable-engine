@@ -17,18 +17,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.examples.bpmn.executionlistener.CurrentActivityExecutionListener.CurrentActivity;
 import org.flowable.examples.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Frederik Heremans
  */
 public class ExecutionListenerTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersProcess.bpmn20.xml" })
     public void testExecutionListenersOnAllPossibleElements() {
         RecorderExecutionListener.clear();
@@ -47,7 +49,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         assertEquals("businessKey123", businessKey);
 
         // Transition take executionListener will set 2 variables
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
         taskService.complete(task.getId());
 
@@ -81,6 +83,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         assertEquals("End Process Listener", event.getParameter());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersStartEndEvent.bpmn20.xml" })
     public void testExecutionListenersOnStartEndEvents() {
         RecorderExecutionListener.clear();
@@ -113,6 +116,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersFieldInjectionProcess.bpmn20.xml" })
     public void testExecutionListenerFieldInjection() {
         Map<String, Object> variables = new HashMap<>();
@@ -129,6 +133,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         assertEquals("Yes, I am listening!", varSetByListener);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersCurrentActivity.bpmn20.xml" })
     public void testExecutionListenerCurrentActivity() {
 
@@ -150,6 +155,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         assertEquals("End Event", currentActivities.get(2).getActivityName());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersForSubprocessStartEndEvent.bpmn20.xml" })
     public void testExecutionListenersForSubprocessStartEndEvents() {
         RecorderExecutionListener.clear();
@@ -162,7 +168,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
 
         RecorderExecutionListener.clear();
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
@@ -174,4 +180,31 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         assertEquals("Subprocess End", recordedEvents.get(1).getParameter());
         assertEquals("Process End", recordedEvents.get(2).getParameter());
     }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersProcess.bpmn20.xml" })
+    public void testExecutionListenersOnAsyncProcessStart() {
+        RecorderExecutionListener.clear();
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("executionListenersProcess").
+            businessKey("businessKey123").startAsync();
+        String varSetInExecutionListener = (String) runtimeService.getVariable(processInstance.getId(), "variableSetInExecutionListener");
+        // ProcessStartExecutionListeners are executed from the asynchronous job
+        assertNull(varSetInExecutionListener);
+
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 2000, 200);
+
+        // Process start executionListener will have executionListener class
+        // that sets 2 variables
+        varSetInExecutionListener = (String) runtimeService.getVariable(processInstance.getId(), "variableSetInExecutionListener");
+        assertNotNull(varSetInExecutionListener);
+        assertEquals("firstValue", varSetInExecutionListener);
+
+        // Check if business key was available in execution listener
+        String businessKey = (String) runtimeService.getVariable(processInstance.getId(), "businessKeyInExecution");
+        assertNotNull(businessKey);
+        assertEquals("businessKey123", businessKey);
+
+    }
+
 }

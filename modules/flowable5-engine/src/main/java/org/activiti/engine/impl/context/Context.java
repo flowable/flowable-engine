@@ -36,11 +36,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class Context {
 
-    protected static ThreadLocal<Stack<CommandContext>> commandContextThreadLocal = new ThreadLocal<Stack<CommandContext>>();
-    protected static ThreadLocal<Stack<ProcessEngineConfigurationImpl>> processEngineConfigurationStackThreadLocal = new ThreadLocal<Stack<ProcessEngineConfigurationImpl>>();
-    protected static ThreadLocal<Stack<ExecutionContext>> executionContextStackThreadLocal = new ThreadLocal<Stack<ExecutionContext>>();
-    protected static ThreadLocal<JobExecutorContext> jobExecutorContextThreadLocal = new ThreadLocal<JobExecutorContext>();
-    protected static ThreadLocal<Map<String, ObjectNode>> bpmnOverrideContextThreadLocal = new ThreadLocal<Map<String, ObjectNode>>();
+    protected static ThreadLocal<Stack<CommandContext>> commandContextThreadLocal = new ThreadLocal<>();
+    protected static ThreadLocal<Stack<ProcessEngineConfigurationImpl>> processEngineConfigurationStackThreadLocal = new ThreadLocal<>();
+    protected static ThreadLocal<Stack<ExecutionContext>> executionContextStackThreadLocal = new ThreadLocal<>();
+    protected static ThreadLocal<JobExecutorContext> jobExecutorContextThreadLocal = new ThreadLocal<>();
+    protected static ThreadLocal<Map<String, ObjectNode>> bpmnOverrideContextThreadLocal = new ThreadLocal<>();
     protected static ResourceBundle.Control resourceBundleControl = new ResourceBundleControl();
 
     public static CommandContext getCommandContext() {
@@ -95,7 +95,7 @@ public class Context {
     protected static <T> Stack<T> getStack(ThreadLocal<Stack<T>> threadLocal) {
         Stack<T> stack = threadLocal.get();
         if (stack == null) {
-            stack = new Stack<T>();
+            stack = new Stack<>();
             threadLocal.set(stack);
         }
         return stack;
@@ -131,7 +131,7 @@ public class Context {
                         language, id, definitionInfoNode);
 
             } else {
-                HashSet<Locale> candidateLocales = new LinkedHashSet<Locale>();
+                HashSet<Locale> candidateLocales = new LinkedHashSet<>();
                 candidateLocales.addAll(resourceBundleControl.getCandidateLocales(id, new Locale(language)));
                 candidateLocales.addAll(resourceBundleControl.getCandidateLocales(id, Locale.getDefault()));
                 for (Locale locale : candidateLocales) {
@@ -167,7 +167,7 @@ public class Context {
     protected static Map<String, ObjectNode> getBpmnOverrideContext() {
         Map<String, ObjectNode> bpmnOverrideMap = bpmnOverrideContextThreadLocal.get();
         if (bpmnOverrideMap == null) {
-            bpmnOverrideMap = new HashMap<String, ObjectNode>();
+            bpmnOverrideMap = new HashMap<>();
         }
         return bpmnOverrideMap;
     }
@@ -175,7 +175,7 @@ public class Context {
     protected static void addBpmnOverrideElement(String id, ObjectNode infoNode) {
         Map<String, ObjectNode> bpmnOverrideMap = bpmnOverrideContextThreadLocal.get();
         if (bpmnOverrideMap == null) {
-            bpmnOverrideMap = new HashMap<String, ObjectNode>();
+            bpmnOverrideMap = new HashMap<>();
             bpmnOverrideContextThreadLocal.set(bpmnOverrideMap);
         }
         bpmnOverrideMap.put(id, infoNode);

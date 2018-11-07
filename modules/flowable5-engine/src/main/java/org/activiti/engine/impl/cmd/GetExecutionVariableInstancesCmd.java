@@ -20,9 +20,9 @@ import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.runtime.Execution;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 public class GetExecutionVariableInstancesCmd implements Command<Map<String, VariableInstance>>, Serializable {
 
@@ -37,6 +37,7 @@ public class GetExecutionVariableInstancesCmd implements Command<Map<String, Var
         this.isLocal = isLocal;
     }
 
+    @Override
     public Map<String, VariableInstance> execute(CommandContext commandContext) {
 
         // Verify existence of execution

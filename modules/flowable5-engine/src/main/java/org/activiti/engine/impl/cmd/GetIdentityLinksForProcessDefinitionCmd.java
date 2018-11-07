@@ -20,7 +20,7 @@ import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.api.IdentityLink;
 
 /**
  * @author Tijs Rademakers
@@ -34,6 +34,7 @@ public class GetIdentityLinksForProcessDefinitionCmd implements Command<List<Ide
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<IdentityLink> execute(CommandContext commandContext) {
         ProcessDefinitionEntity processDefinition = commandContext

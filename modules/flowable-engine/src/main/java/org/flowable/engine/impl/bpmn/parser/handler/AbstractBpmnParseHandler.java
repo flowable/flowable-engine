@@ -29,15 +29,11 @@ import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 import org.flowable.engine.parse.BpmnParseHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Joram Barrez
  */
 public abstract class AbstractBpmnParseHandler<T extends BaseElement> implements BpmnParseHandler {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractBpmnParseHandler.class);
 
     public static final String PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION = "eventDefinitions";
 
@@ -45,6 +41,7 @@ public abstract class AbstractBpmnParseHandler<T extends BaseElement> implements
 
     public static final String PROPERTYNAME_TIMER_DECLARATION = "timerDeclarations";
 
+    @Override
     public Set<Class<? extends BaseElement>> getHandledTypes() {
         Set<Class<? extends BaseElement>> types = new HashSet<>();
         types.add(getHandledType());
@@ -54,6 +51,7 @@ public abstract class AbstractBpmnParseHandler<T extends BaseElement> implements
     protected abstract Class<? extends BaseElement> getHandledType();
 
     @SuppressWarnings("unchecked")
+    @Override
     public void parse(BpmnParse bpmnParse, BaseElement element) {
         T baseElement = (T) element;
         executeParse(bpmnParse, baseElement);

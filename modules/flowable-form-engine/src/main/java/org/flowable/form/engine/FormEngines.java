@@ -14,8 +14,6 @@ package org.flowable.form.engine;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -29,9 +27,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
-import org.flowable.engine.common.EngineInfo;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.EngineInfo;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,13 +47,13 @@ public abstract class FormEngines {
     protected static List<EngineInfo> formEngineInfos = new ArrayList<>();
 
     /**
-     * Initializes all form engines that can be found on the classpath for resources <code>flowable.form.cfg.xml</code> and for resources <code>flowable-dmn-context.xml</code> (Spring style
+     * Initializes all form engines that can be found on the classpath for resources <code>flowable.form.cfg.xml</code> and for resources <code>flowable-form-context.xml</code> (Spring style
      * configuration).
      */
     public static synchronized void init() {
         if (!isInitialized()) {
             if (formEngines == null) {
-                // Create new map to store dmn engines if current map is null
+                // Create new map to store form engines if current map is null
                 formEngines = new HashMap<>();
             }
             ClassLoader classLoader = FormEngines.class.getClassLoader();
@@ -98,7 +97,7 @@ public abstract class FormEngines {
     protected static void initFormEngineFromSpringResource(URL resource) {
         try {
             Class<?> springConfigurationHelperClass = ReflectUtil.loadClass("org.flowable.form.spring.SpringFormConfigurationHelper");
-            Method method = springConfigurationHelperClass.getDeclaredMethod("buildContentEngine", new Class<?>[] { URL.class });
+            Method method = springConfigurationHelperClass.getDeclaredMethod("buildFormEngine", new Class<?>[] { URL.class });
             FormEngine formEngine = (FormEngine) method.invoke(null, new Object[] { resource });
 
             String formEngineName = formEngine.getName();
@@ -112,14 +111,14 @@ public abstract class FormEngines {
     }
 
     /**
-     * Registers the given dmn engine. No {@link EngineInfo} will be available for this dmn engine. An engine that is registered will be closed when the {@link FormEngines#destroy()} is called.
+     * Registers the given form engine. No {@link EngineInfo} will be available for this form engine. An engine that is registered will be closed when the {@link FormEngines#destroy()} is called.
      */
     public static void registerFormEngine(FormEngine formEngine) {
         formEngines.put(formEngine.getName(), formEngine);
     }
 
     /**
-     * Unregisters the given dmn engine.
+     * Unregisters the given form engine.
      */
     public static void unregister(FormEngine formEngine) {
         formEngines.remove(formEngine.getName());
@@ -127,9 +126,9 @@ public abstract class FormEngines {
 
     private static EngineInfo initFormEngineFromResource(URL resourceUrl) {
         EngineInfo formEngineInfo = formEngineInfosByResourceUrl.get(resourceUrl.toString());
-        // if there is an existing dmn engine info
+        // if there is an existing form engine info
         if (formEngineInfo != null) {
-            // remove that dmn engine from the member fields
+            // remove that form engine from the member fields
             formEngineInfos.remove(formEngineInfo);
             if (formEngineInfo.getException() == null) {
                 String formEngineName = formEngineInfo.getName();
@@ -141,7 +140,7 @@ public abstract class FormEngines {
 
         String resourceUrlString = resourceUrl.toString();
         try {
-            LOGGER.info("initializing dmn engine for resource {}", resourceUrl);
+            LOGGER.info("initializing form engine for resource {}", resourceUrl);
             FormEngine formEngine = buildFormEngine(resourceUrl);
             String formEngineName = formEngine.getName();
             LOGGER.info("initialised form engine {}", formEngineName);
@@ -150,31 +149,20 @@ public abstract class FormEngines {
             formEngineInfosByName.put(formEngineName, formEngineInfo);
         } catch (Throwable e) {
             LOGGER.error("Exception while initializing form engine: {}", e.getMessage(), e);
-            formEngineInfo = new EngineInfo(null, resourceUrlString, getExceptionString(e));
+            formEngineInfo = new EngineInfo(null, resourceUrlString, ExceptionUtils.getStackTrace(e));
         }
         formEngineInfosByResourceUrl.put(resourceUrlString, formEngineInfo);
         formEngineInfos.add(formEngineInfo);
         return formEngineInfo;
     }
 
-    private static String getExceptionString(Throwable e) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-        return sw.toString();
-    }
-
     protected static FormEngine buildFormEngine(URL resource) {
-        InputStream inputStream = null;
-        try {
-            inputStream = resource.openStream();
+        try (InputStream inputStream = resource.openStream()) {
             FormEngineConfiguration formEngineConfiguration = FormEngineConfiguration.createFormEngineConfigurationFromInputStream(inputStream);
             return formEngineConfiguration.buildFormEngine();
 
         } catch (IOException e) {
             throw new FlowableException("couldn't open resource stream: " + e.getMessage(), e);
-        } finally {
-            IOUtils.closeQuietly(inputStream);
         }
     }
 

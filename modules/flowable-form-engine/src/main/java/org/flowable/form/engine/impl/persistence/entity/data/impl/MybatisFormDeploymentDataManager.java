@@ -20,14 +20,14 @@ import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.FormDeploymentQueryImpl;
 import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntity;
 import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntityImpl;
-import org.flowable.form.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.form.engine.impl.persistence.entity.data.AbstractFormDataManager;
 import org.flowable.form.engine.impl.persistence.entity.data.FormDeploymentDataManager;
 
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class MybatisFormDeploymentDataManager extends AbstractDataManager<FormDeploymentEntity> implements FormDeploymentDataManager {
+public class MybatisFormDeploymentDataManager extends AbstractFormDataManager<FormDeploymentEntity> implements FormDeploymentDataManager {
 
     public MybatisFormDeploymentDataManager(FormEngineConfiguration formEngineConfiguration) {
         super(formEngineConfiguration);

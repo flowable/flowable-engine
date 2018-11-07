@@ -25,10 +25,12 @@ import org.flowable.bpmn.model.Event;
  */
 public class ErrorEventDefinitionParser extends BaseChildElementParser {
 
+    @Override
     public String getElementName() {
         return ELEMENT_EVENT_ERRORDEFINITION;
     }
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
         if (!(parentElement instanceof Event))
             return;

@@ -70,6 +70,7 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
         this.processDefinitionVersion = processDefinitionVersion;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         // check that the new process definition is just another version of the same
         // process definition that the process instance is using

@@ -34,14 +34,14 @@ import org.activiti.engine.task.TaskQuery;
 
 /**
  * Contains the possible properties that can be used in a {@link TaskQuery}.
- * 
+ *
  * @author Joram Barrez
  */
 public class TaskQueryProperty implements QueryProperty {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Map<String, TaskQueryProperty> properties = new HashMap<String, TaskQueryProperty>();
+    private static final Map<String, TaskQueryProperty> properties = new HashMap<>();
 
     public static final TaskQueryProperty TASK_ID = new TaskQueryProperty("RES.ID_");
     public static final TaskQueryProperty NAME = new TaskQueryProperty("RES.NAME_");
@@ -64,6 +64,7 @@ public class TaskQueryProperty implements QueryProperty {
         properties.put(name, this);
     }
 
+    @Override
     public String getName() {
         return name;
     }

@@ -44,7 +44,7 @@ public class TestProcessUtil {
         process.addFlowElement(startEvent);
 
         UserTask userTask = new UserTask();
-        userTask.setName("The Task");
+        userTask.setName("The org.flowable.task.service.Task");
         userTask.setId("theTask");
         userTask.setAssignee("kermit");
         process.addFlowElement(userTask);
@@ -71,13 +71,13 @@ public class TestProcessUtil {
         process.addFlowElement(startEvent);
 
         UserTask userTask = new UserTask();
-        userTask.setName("The First Task");
+        userTask.setName("The First org.flowable.task.service.Task");
         userTask.setId("task1");
         userTask.setAssignee("kermit");
         process.addFlowElement(userTask);
 
         UserTask userTask2 = new UserTask();
-        userTask2.setName("The Second Task");
+        userTask2.setName("The Second org.flowable.task.service.Task");
         userTask2.setId("task2");
         userTask2.setAssignee("kermit");
         process.addFlowElement(userTask2);

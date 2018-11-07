@@ -1,0 +1,7 @@
+<div ng-click="showSubProcess(child)" class="process-treeview-list-item" ng-class="{'current-process': child.current}">
+    <img ng-src="editor-app/stencilsets/{{getStencilSetName()}}/icons/activity/{{child.icon}}" width="16px;" height="16px;"/> {{child.name}}
+    <img ng-show="!child.current && child.type === 'CollapsedSubProcess'" ng-src="editor-app/images/pencil.png" class="pull-right" ng-click="edit(child.id)" />
+</div>
+<ul ng-if="child.children" class="process-treeview-list">
+    <li ng-repeat="child in child.children" ng-include="'editor-app/partials/process-tree-list.html?version=4'"/>
+</ul>

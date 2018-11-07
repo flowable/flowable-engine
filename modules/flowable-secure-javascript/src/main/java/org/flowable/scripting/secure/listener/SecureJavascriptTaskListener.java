@@ -12,10 +12,10 @@
  */
 package org.flowable.scripting.secure.listener;
 
-import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.impl.bpmn.listener.ScriptTaskListener;
 import org.flowable.scripting.secure.behavior.SecureJavascriptTaskParseHandler;
 import org.flowable.scripting.secure.impl.SecureJavascriptUtil;
+import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * @author Joram Barrez

@@ -35,6 +35,7 @@ public abstract class NeedsActiveExecutionCmd<T> implements Command<T>, Serializ
         this.executionId = executionId;
     }
 
+    @Override
     public T execute(CommandContext commandContext) {
         if (executionId == null) {
             throw new ActivitiIllegalArgumentException("executionId is null");

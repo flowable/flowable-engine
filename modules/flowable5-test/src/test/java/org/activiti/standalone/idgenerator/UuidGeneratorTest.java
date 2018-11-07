@@ -18,7 +18,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.activiti.engine.impl.test.ResourceFlowableTestCase;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -56,8 +55,8 @@ public class UuidGeneratorTest extends ResourceFlowableTestCase {
                 boolean tasksFound = true;
                 while (tasksFound) {
 
-                    List<Task> tasks = taskService.createTaskQuery().list();
-                    for (Task task : tasks) {
+                    List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
+                    for (org.flowable.task.api.Task task : tasks) {
                         taskService.complete(task.getId());
                     }
 

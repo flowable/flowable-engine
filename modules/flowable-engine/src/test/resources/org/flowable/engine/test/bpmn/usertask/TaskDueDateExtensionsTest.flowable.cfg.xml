@@ -44,24 +44,24 @@
         <property name="clock" ref="clock"/>
 
         <property name="businessCalendarManager">
-            <bean class="org.flowable.engine.impl.calendar.MapBusinessCalendarManager">
+            <bean class="org.flowable.common.engine.impl.calendar.MapBusinessCalendarManager">
                 <constructor-arg name="businessCalendars">
                     <map>
                         <entry key="custom">
                             <bean class="org.flowable.engine.test.bpmn.usertask.TaskDueDateExtensionsTest.CustomBusinessCalendar"/>
                         </entry>
                         <entry key="cycle">
-                            <bean class="org.flowable.engine.impl.calendar.CycleBusinessCalendar">
+                            <bean class="org.flowable.common.engine.impl.calendar.CycleBusinessCalendar">
                                 <constructor-arg name="clockReader" ref="clock"/>
                             </bean>
                         </entry>
                         <entry key="duration">
-                            <bean class="org.flowable.engine.impl.calendar.DurationBusinessCalendar">
+                            <bean class="org.flowable.common.engine.impl.calendar.DurationBusinessCalendar">
                                 <constructor-arg name="clockReader" ref="clock"/>
                             </bean>
                         </entry>
                         <entry key="dueDate">
-                            <bean class="org.flowable.engine.impl.calendar.DueDateBusinessCalendar">
+                            <bean class="org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar">
                                 <constructor-arg name="clockReader" ref="clock"/>
                             </bean>
                         </entry>
@@ -74,15 +74,15 @@
         <property name="asyncHistoryEnabled" value="false" />
     </bean>
 
-    <bean id="asyncExecutor" class="org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor">
+    <bean id="asyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">
         <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000"/>
         <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000"/>
     </bean>
     
-    <bean id="asyncHistoryExecutor" class="org.flowable.engine.impl.asyncexecutor.DefaultAsyncHistoryJobExecutor">
+    <bean id="asyncHistoryExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncHistoryJobExecutor">
     	<property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
   	</bean>
 
-    <bean id="clock" class="org.flowable.engine.common.impl.util.DefaultClockImpl"/>
+    <bean id="clock" class="org.flowable.common.engine.impl.util.DefaultClockImpl"/>
 
 </beans>

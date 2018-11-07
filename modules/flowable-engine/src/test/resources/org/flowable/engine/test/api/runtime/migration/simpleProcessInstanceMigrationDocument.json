@@ -1,0 +1,11 @@
+{
+  "toProcessDefinitionId": "someProcessId",
+  "toProcessDefinitionKey": "MyProcessKey",
+  "toProcessDefinitionVersion": 9,
+  "toProcessDefinitionTenantId": "admin",
+  "nonMappedDocumentProperty": "someValue",
+  "activityMappings": {
+    "originalActivity1": "newActivity1",
+    "originalActivity2": "newActivity2"
+  }
+}

@@ -23,9 +23,9 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.MapExceptionEntry;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -57,6 +57,7 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
         this.mapExceptions = mapExceptions;
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
         ActivityExecution activityExecution = (ActivityExecution) execution;
         Object value = null;

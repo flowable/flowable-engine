@@ -14,9 +14,9 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ModelEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
@@ -32,6 +32,7 @@ public class SaveModelCmd implements Command<Void>, Serializable {
         this.model = model;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (model == null) {
             throw new FlowableIllegalArgumentException("model is null");

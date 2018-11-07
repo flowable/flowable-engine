@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.delegate.event.impl;
 
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableErrorEvent;
 
 /**
@@ -29,6 +29,7 @@ public class FlowableErrorEventImpl extends FlowableActivityEventImpl implements
         super(type);
     }
 
+    @Override
     public String getErrorId() {
         return errorId;
     }

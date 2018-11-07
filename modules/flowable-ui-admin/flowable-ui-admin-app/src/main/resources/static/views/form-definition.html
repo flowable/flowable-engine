@@ -1,0 +1,60 @@
+<div class="container" id="detail-container">
+	<div class="row">
+		<div class="col-md-9">
+			<div class="component" ng-show="form">
+				<div class="title">
+					<div class="pull-right">
+						<a ng-click="returnToList()" class="action">&larr; {{'GENERAL.ACTION.RETURN-TO-LIST' | translate}}</a>
+					</div>
+					<h2>{{form.name &amp;&amp; form.name +" - " || ""}}{{form.id}}</h2>
+				</div>
+
+				<div class="property-wrapper">
+					<table>
+						<tr class="property">
+							<td class="property-name" translate="FORM-DEFINITION.ID"></td>
+							<td>{{form.id}}</td>
+							<td class="property-name" translate="FORM-DEFINITION.NAME"></td>
+							<td>{{form.name | empty}}</td>
+						</tr>
+						<tr class="property">
+							<td class="property-name" translate="FORM-DEFINITION.DEPLOYMENT-ID"></td>
+							<td><a ng-href="#/form-deployment/{{form.deploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{form.deploymentId}}</a></td>
+							<td ng-if="form.parentDeploymentId" class="property-name" translate="FORM-DEFINITION.PARENT-DEPLOYMENT-ID"></td>
+							<td ng-if="form.parentDeploymentId"><a ng-href="#/app-deployment/{{form.parentDeploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{form.parentDeploymentId}}</a></td>
+						</tr>
+						<tr class="property">
+							<td class="property-name" translate="FORM-DEFINITION.DESCRIPTION"></td>
+							<td>{{form.description | empty}}</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-3">
+			<div class="component tip-left">
+				<div class="title">
+					<h2 translate="GENERAL.TITLE.ACTIONS"></h2>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-9">
+            <div class="component">
+                <div class="title">
+                    <h2 translate="FORM-DEFINITION.TITLE.FORM-INSTANCES"></h2>
+                </div>
+                <div class="grid-wrapper grid-wrapper-compact" ng-if="formInstances">
+                    <div class="grid-message" ng-if="formInstances.size > 0">
+                        <span>{{'FORM-DEFINITION.FORM-INSTANCES-MESSAGE' | translate:formInstances}}</span>
+                    </div>
+                    <div class="grid-message" ng-if="formInstances.size == 0">
+                        <span>{{'FORM-DEFINITION.FORM-INSTANCES-MESSAGE-EMPTY' | translate}}</span>
+                    </div>
+                    <div ng-grid="gridFormInstances" class="gridStyle" ng-if="gridFormInstances && formInstances.data" ng-show="formInstances.size > 0"></div>
+                </div>
+            </div>
+		</div>
+	</div>
+</div>

@@ -14,7 +14,7 @@
 package org.flowable.engine.impl.persistence.entity;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.variable.api.types.VariableType;
 
 /**
  * @author Tom Baeyens
@@ -41,12 +41,14 @@ public class HistoricDetailVariableInstanceUpdateEntityImpl extends HistoricDeta
         this.detailType = "VariableUpdate";
     }
 
+    @Override
     public Object getPersistentState() {
         // HistoricDetailVariableInstanceUpdateEntity is immutable, so always
         // the same object is returned
         return HistoricDetailVariableInstanceUpdateEntityImpl.class;
     }
 
+    @Override
     public Object getValue() {
         if (!variableType.isCachable() || cachedValue == null) {
             cachedValue = variableType.getValue(this);
@@ -54,10 +56,12 @@ public class HistoricDetailVariableInstanceUpdateEntityImpl extends HistoricDeta
         return cachedValue;
     }
 
+    @Override
     public String getVariableTypeName() {
         return (variableType != null ? variableType.getTypeName() : null);
     }
 
+    @Override
     public int getRevisionNext() {
         return revision + 1;
     }
@@ -72,10 +76,12 @@ public class HistoricDetailVariableInstanceUpdateEntityImpl extends HistoricDeta
         return null;
     }
 
+    @Override
     public ByteArrayRef getByteArrayRef() {
         return byteArrayRef;
     }
 
+    @Override
     public void setBytes(byte[] bytes) {
         String byteArrayName = "hist.detail.var-" + name;
         if (byteArrayRef == null) {
@@ -86,70 +92,87 @@ public class HistoricDetailVariableInstanceUpdateEntityImpl extends HistoricDeta
 
     // getters and setters ////////////////////////////////////////////////////////
 
+    @Override
     public int getRevision() {
         return revision;
     }
 
+    @Override
     public void setRevision(int revision) {
         this.revision = revision;
     }
 
+    @Override
     public String getVariableName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public VariableType getVariableType() {
         return variableType;
     }
 
+    @Override
     public void setVariableType(VariableType variableType) {
         this.variableType = variableType;
     }
 
+    @Override
     public Long getLongValue() {
         return longValue;
     }
 
+    @Override
     public void setLongValue(Long longValue) {
         this.longValue = longValue;
     }
 
+    @Override
     public Double getDoubleValue() {
         return doubleValue;
     }
 
+    @Override
     public void setDoubleValue(Double doubleValue) {
         this.doubleValue = doubleValue;
     }
 
+    @Override
     public String getTextValue() {
         return textValue;
     }
 
+    @Override
     public void setTextValue(String textValue) {
         this.textValue = textValue;
     }
 
+    @Override
     public String getTextValue2() {
         return textValue2;
     }
 
+    @Override
     public void setTextValue2(String textValue2) {
         this.textValue2 = textValue2;
     }
 
+    @Override
     public Object getCachedValue() {
         return cachedValue;
     }
 
+    @Override
     public void setCachedValue(Object cachedValue) {
         this.cachedValue = cachedValue;
     }
@@ -180,6 +203,21 @@ public class HistoricDetailVariableInstanceUpdateEntityImpl extends HistoricDeta
         }
         sb.append("]");
         return sb.toString();
+    }
+    
+    @Override
+    public String getScopeId() {
+        return null;
+    }
+    
+    @Override
+    public String getSubScopeId() {
+        return null;
+    }
+
+    @Override
+    public String getScopeType() {
+        return null;
     }
 
 }

@@ -14,12 +14,15 @@ package org.flowable.engine.impl.history;
 
 import java.util.Map;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
-import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.flowable.entitylink.api.EntityLink;
+import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
+import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 public interface HistoryManager {
@@ -28,11 +31,21 @@ public interface HistoryManager {
      * @return true, if the configured history-level is equal to OR set to a higher value than the given level.
      */
     boolean isHistoryLevelAtLeast(HistoryLevel level);
+    
+    /**
+     * @return true, if the configured process definition history-level is equal to OR set to a higher value than the given level.
+     */
+    boolean isHistoryLevelAtLeast(HistoryLevel level, String processDefinitionId);
 
     /**
      * @return true, if history-level is configured to level other than "none".
      */
     boolean isHistoryEnabled();
+    
+    /**
+     * @return true, if process definition history-level is configured to level other than "none".
+     */
+    boolean isHistoryEnabled(String processDefinitionId);
 
     /**
      * Record a process-instance ended. Updates the historic process instance if activity history is enabled.
@@ -47,7 +60,7 @@ public interface HistoryManager {
     /**
      * Record a process-instance name change.
      */
-    void recordProcessInstanceNameChange(String processInstanceId, String newName);
+    void recordProcessInstanceNameChange(ExecutionEntity processInstanceExecution, String newName);
 
     /**
      * Record a sub-process-instance started and alters the calledProcessinstanceId on the current active activity's historic counterpart. Only effective when activity history is enabled.
@@ -57,7 +70,7 @@ public interface HistoryManager {
     /**
      * Deletes a historic process instance and all historic data included
      */
-    void recordProcessInstanceDeleted(String processInstanceId);
+    void recordProcessInstanceDeleted(String processInstanceId, String processDefinitionId);
     
     /**
      * Deletes historic process instances for a provided process definition id
@@ -122,42 +135,42 @@ public interface HistoryManager {
     /**
      * Creates a new comment to indicate a new {@link IdentityLink} has been created or deleted, if history is enabled.
      */
-    void createIdentityLinkComment(String taskId, String userId, String groupId, String type, boolean create);
+    void createIdentityLinkComment(TaskEntity task, String userId, String groupId, String type, boolean create);
 
     /**
      * Creates a new comment to indicate a new user {@link IdentityLink} has been created or deleted, if history is enabled.
      */
-    void createUserIdentityLinkComment(String taskId, String userId, String type, boolean create);
+    void createUserIdentityLinkComment(TaskEntity task, String userId, String type, boolean create);
 
     /**
      * Creates a new comment to indicate a new group {@link IdentityLink} has been created or deleted, if history is enabled.
      */
-    void createGroupIdentityLinkComment(String taskId, String groupId, String type, boolean create);
+    void createGroupIdentityLinkComment(TaskEntity task, String groupId, String type, boolean create);
 
     /**
      * Creates a new comment to indicate a new {@link IdentityLink} has been created or deleted, if history is enabled.
      */
-    void createIdentityLinkComment(String taskId, String userId, String groupId, String type, boolean create, boolean forceNullUserId);
+    void createIdentityLinkComment(TaskEntity task, String userId, String groupId, String type, boolean create, boolean forceNullUserId);
 
     /**
      * Creates a new comment to indicate a new user {@link IdentityLink} has been created or deleted, if history is enabled.
      */
-    void createUserIdentityLinkComment(String taskId, String userId, String type, boolean create, boolean forceNullUserId);
+    void createUserIdentityLinkComment(TaskEntity task, String userId, String type, boolean create, boolean forceNullUserId);
 
     /**
      * Creates a new comment to indicate a new {@link IdentityLink} has been created or deleted, if history is enabled.
      */
-    void createProcessInstanceIdentityLinkComment(String processInstanceId, String userId, String groupId, String type, boolean create);
+    void createProcessInstanceIdentityLinkComment(ExecutionEntity processInstance, String userId, String groupId, String type, boolean create);
 
     /**
      * Creates a new comment to indicate a new {@link IdentityLink} has been created or deleted, if history is enabled.
      */
-    void createProcessInstanceIdentityLinkComment(String processInstanceId, String userId, String groupId, String type, boolean create, boolean forceNullUserId);
+    void createProcessInstanceIdentityLinkComment(ExecutionEntity processInstance, String userId, String groupId, String type, boolean create, boolean forceNullUserId);
 
     /**
      * Creates a new comment to indicate a new attachment has been created or deleted, if history is enabled.
      */
-    void createAttachmentComment(String taskId, String processInstanceId, String attachmentName, boolean create);
+    void createAttachmentComment(TaskEntity task, ExecutionEntity processInstance, String attachmentName, boolean create);
 
     /**
      * Report form properties submitted, if audit history is enabled.
@@ -172,8 +185,23 @@ public interface HistoryManager {
     /**
      * Record the deletion of a {@link IdentityLink}, if audit history is enabled
      */
-    void recordIdentityLinkDeleted(String identityLinkId);
+    void recordIdentityLinkDeleted(IdentityLinkEntity identityLink);
+    
+    /**
+     * Record the creation of a new {@link EntityLink}, if audit history is enabled.
+     */
+    void recordEntityLinkCreated(EntityLinkEntity entityLink);
+    
+    /**
+     * Record the deletion of a {@link EntityLink}, if audit history is enabled
+     */
+    void recordEntityLinkDeleted(EntityLinkEntity entityLink);
 
     void updateProcessBusinessKeyInHistory(ExecutionEntity processInstance);
+    
+    /**
+     * Record the update of a process definition for historic process instance, task, and activity instance, if history is enabled.
+     */
+    void updateProcessDefinitionIdInHistory(ProcessDefinitionEntity processDefinitionEntity, ExecutionEntity processInstance);
 
 }

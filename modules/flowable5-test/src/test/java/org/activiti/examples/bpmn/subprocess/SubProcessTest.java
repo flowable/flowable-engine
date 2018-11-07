@@ -19,7 +19,6 @@ import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 
 /**
  * @author Joram Barrez
@@ -35,7 +34,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
 
         // After staring the process, both tasks in the subprocess should be active
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("fixSystemFailure");
-        List<Task> tasks = taskService.createTaskQuery()
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery()
                 .processInstanceId(pi.getId())
                 .orderByTaskName()
                 .asc()
@@ -43,8 +42,8 @@ public class SubProcessTest extends PluggableFlowableTestCase {
 
         // Tasks are ordered by name (see query)
         assertEquals(2, tasks.size());
-        Task investigateHardwareTask = tasks.get(0);
-        Task investigateSoftwareTask = tasks.get(1);
+        org.flowable.task.api.Task investigateHardwareTask = tasks.get(0);
+        org.flowable.task.api.Task investigateSoftwareTask = tasks.get(1);
         assertEquals("Investigate hardware", investigateHardwareTask.getName());
         assertEquals("Investigate software", investigateSoftwareTask.getName());
 
@@ -52,7 +51,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         taskService.complete(investigateHardwareTask.getId());
         taskService.complete(investigateSoftwareTask.getId());
 
-        Task writeReportTask = taskService
+        org.flowable.task.api.Task writeReportTask = taskService
                 .createTaskQuery()
                 .processInstanceId(pi.getId())
                 .singleResult();

@@ -1,0 +1,437 @@
+{
+    "COMMON" : {
+        "SELECT-FOLDER": "Choisir un répertoire..."
+    },
+    "GENERAL": {
+        "MAIN-TITLE": "Flowable - Mes Tâches",
+        "ERROR": {
+            "GENERIC": "Désolé, une erreur s'est produite...",
+            "UNKNOWN": "Désolé, une erreur s'est produite lors de l'exécution de l'opération.",
+            "BAD_REQUEST": "Une erreur s'est produite lors de l'exécution de l'opération demandée.",
+            "NOT_FOUND": "La resource demandée n'existe pas",
+            "UNAUTHORIZED": "Veuillez d'abord vous connecter pour effectuer cette opération.",
+            "FORBIDDEN": "Vous n'êtes pas autorisé à effectuer cette opération.",
+            "INTERNAL_SERVER_ERROR": "Désolé, une erreur inattendue s'est produite lors de l'exécution de l'opération."
+        },
+        "NAVIGATION": {
+            "TASKS": "Tâches",
+            "PROCESSES": "Processus",
+            "CASES": "Cas",
+            "DESIGN": "Conception",
+            "CREATE": "+ Création",
+            "LOGIN": "Se connecter"
+        },
+        "TITLE": {
+            "ADD-COMMENT": "Ajouter un commentaire",
+            "INVOLVE-PEOPLE": "Sélectionner une personne",
+            "RECENT-PEOPLE": "Personnes récentes",
+            "MATCHING-PEOPLE": "Personnes correspondantes",
+            "SELECT-GROUP": "Sélectionner un groupe",
+            "MATCHING-GROUPS": "Groupes correspondants",
+            "FILTER": "Filtres",
+            "SELECT-DATE": "Sélectionner a date"
+        },
+        "ACTION": {
+            "LOGOUT": "Se déconnecter",
+            "ADD-COMMENT": "Ajouter un commentaire",
+            "SAVE": "Enregistrer",
+            "CANCEL": "Annuler",
+            "CLOSE": "Fermer",
+            "CONFIRM": "Confirmer",
+            "SHOW-MORE": "Voir plus..."
+        },
+        "MESSAGE": {
+            "SELECT-PEOPLE-HELP": "Utiliser &uparrow; et &downarrow; pour sélectionner et appuyez sur Entrée pour confirmer",
+            "SELECT-GROUP-HELP": "Utiliser &uparrow; et &downarrow; pour sélectionner et appuyez sur Entrée pour confirmer",
+            "SELECT-GROUP-SEARCH-PLACEHOLDER": "Rechercher un groupe",
+            "SELECT-GROUP-NO-MATCHING-RESULTS": "Utilisez le champ de recherche ci-dessus pour trouver des groupes.",
+            "UPLOAD-CONTENT": "Sélectionner ou déposer un fichier",
+            "UPLOAD-CONTENT-NO-DROP": "Sélectionner un fichier à télécharger",
+            "DROPZONE": "Déposer un fichier à télécharger",
+            "YES": "Oui",
+            "NO": "Non"
+        },
+        "TIME": {
+            "HOURS": "heures",
+            "MINUTES": "minutes",
+            "SECONDS": "secondes"
+        },
+        "ABOUT": {
+            "TYPE": "Type",
+            "LICENSED-TO": "Licensed To",
+            "EXPIRES": "Expires",
+            "COPYRIGHT": "© 2005-2015 Alfresco Software Inc. All rights reserved.",
+            "LEGAL": "Legal and License"
+        }
+    },
+    "LOGIN": {
+        "TITLE": "Se connecter",
+        "USERNAME": "Nom d'utilisateur",
+        "USERNAME-PLACEHOLDER": "Veuillez saisir votre nom d'utilisateur",
+        "PASSWORD": "Mot de passe",
+        "PASSWORD-PLACEHOLDER": "Veuillez saisir votre mot de passe",
+        "ACTION": {
+            "CONFIRM": "Connexion"
+        }
+    },
+    "TASK": {
+        "SECTION": {
+            "PEOPLE": "Personnes",
+            "CONTENT": "Contenu",
+            "COMMENTS": "Commentaires",
+            "NOTES": "Notes"
+        },
+        "FILTER": {
+            "CREATED-DESC": "Plus récent",
+            "CREATED-ASC": "Plus ancien",
+            "DUE-DESC": "Dû en dernier",
+            "DUE-ASC": "Dû en premier",
+            "TEXT": "Filtres",
+            "TEXT-PLACEHOLDER": "Recherche par nom d'utilisateur",
+            "TEXT-SUMMARY": "Filtré par: {{text}}",
+            "PROCESS-DEFINITION": "Définition du Processus",
+            "PROCESS-DEFINITION-PLACEHOLDER": "Sélectionner une définition de processus...",
+            "STATE": "État",
+            "STATE-OPEN": "ouvert",
+            "STATE-COMPLETED": "terminé",
+            "ASSIGNMENT": "Assignment",
+            "ASSIGNMENT-INVOLVED": "Tâches auxquelles je suis impliqué",
+            "ASSIGNMENT-ASSIGNEE": "Tâches où je suis la personne assignée",
+            "ASSIGNMENT-CANDIDATE": "Tâches où je suis l'un des candidats",
+            "ASSIGNMENT-GROUP": "Tâches assignées au groupe \"{{name}}\"",
+            "RESET": "Réinitialiser les filtres"
+        },
+        "ALERT": {
+            "COMMENT-ADDED": "Des commentaires ont été ajoutés par \"{{name}}\"",
+            "PERSON-INVOLVED": "{{firstName}} {{lastName}} est maintenant impliqué dans \"{{taskName}}\"",
+            "PERSON-NO-LONGER-INVOLVED": "{{firstName}} {{lastName}} n'est plus impliqué dans \"{{taskName}}\"",
+            "CREATED": "La tâche \"{{name}}\" a été créée",
+            "COMPLETED": "Tâche terminée",
+            "SAVED": "Le fomulaire de la tâche a été sauvé",
+            "ASSIGNED": "La tâche \"{{taskName}}\" est maintenant assignée à  {{firstName}} {{lastName}}",
+            "RELATED-CONTENT-ADDED": "\"{{name}}\" a été ajoutée à la tâche",
+            "RELATED-CONTENT-ADDED-LOADING": "\"{{name}}\" a été ajoutée à la tâche. Le contenu sera disponible une fois récupéré de la source externe."
+        },
+        "ACTION": {
+            "COMPLETE-TASK-WITH-FORM": "Fomulaire",
+            "COMPLETE": "Terminer",
+            "CLAIM": "Revendiquer",
+            "ASSIGN": "Assigner",
+            "REASSIGN": "Réassigner",
+            "CREATE": "+ Créer La tâche",
+            "CREATE-SUB-TASK": "Créer une sous-tâche",
+            "CREATE-CONFIRM": "Créer",
+            "INVOLVE": "+ Impliquer des personnes",
+            "ADD-COMMENT": "+ Ajouter un commentaire",
+            "ADD-COMMENT-CONFIRM": "Ajouter un commentaire",
+            "ADD-CONTENT": "+ Ajouter un contenu",
+            "CLEAR-DUEDATE": "Vider la date d'échéance",
+            "DUE-TODAY": "Dû aujourd'hui",
+            "CLEAR-DATE": "Vider la date",
+            "DATE-TODAY": "Date d'aujourd'hui",
+            "AUDIT-LOG": "Audit Log"
+        },
+        "TITLE": {
+            "ASSIGN": "Sélectionner une personne assignée",
+            "ASSIGNEE": "Personne assignée",
+            "CONTENT": "Contenu connexe",
+            "SUBTASK": "Sous-tâches",
+            "CREATE-NEW": "Nouvelle tâche",
+            "FORM": "Formulaire",
+            "DETAILS": "Détails",
+            "ADD-RELATED-CONTENT": "Ajouter un contenu connexe",
+            "SELECT-DUEDATE": "Sélectionner une date d'échéance",
+            "SELECT-DATE": "Sélectionner une date",
+            "NO-CONTENT-ITEMS": "Aucun contenu",
+            "NO-PEOPLE-INVOLVED": "Aucune personne impliqué",
+            "NO-COMMENTS": "Aucun commentaires",
+            "COMMENT-COUNT": "commentaire",
+            "COMMENTS-COUNT": "commentaires",
+            "NO-SUBTASKS": "Aucune sous tâche",
+            "SUBTASK-COUNT": "sous-tâche ",
+            "SUBTASKS-COUNT": "sous-tâches",
+            "SHOW-DETAILS": "Afficher les détails",
+            "SHOW-FORM": "Afficher le formulaire"
+        },
+        "FIELD": {
+            "NAME": "Nom",
+            "DESCRIPTION": "Description",
+            "ASSIGNEE": "Personne assignée",
+
+            "DUE": "Dû",
+            "PROCESS-INSTANCE": "Partie du processus",
+            "CASE-INSTANCE": "Partie du cas",
+            "PARENT-TASK": "Partie de la tâche",
+            "ENDED": "Terminé",
+            "DURATION": "Durée"
+        },
+        "MESSAGE": {
+            "NO-NAME": "Tâche sans nom",
+            "NO-ASSIGNEE": "Assigné à personne",
+            "NO-DUEDATE": "Aucune date d'échéance",
+            "DUE-ON": "Dû",
+            "CREATED-ON": "Créée le",
+            "ENDED-ON": "Terminée le",
+            "REACHED-ON": "Atteint",
+            "COMPLETED-BY": "Terminée par",
+            "NO-DESCRIPTION": "Cette tâche n'a pas de description",
+            "NO-RELATED-CONTENT": "Cette tâche n'a pas encore de contenu connexe...",
+            "NO-PEOPLE-INVOLVED": "Cette tâche n'a pas encore de personnes impliquées...",
+            "NO-COMMENTS": "Cette tâche n'a pas encore de commentaires...",
+            "INVOLVE-PEOPLE-PLACEHOLDER": "+ Ajouter des personnes",
+            "CONTENT-UPLOADED-BY": "Ajouté par ",
+            "ASSIGNEE": "Assigné à",
+            "NEW-COMMENT-PLACEHOLDER": "Entrer un commenataire à ajouter à cette tâche",
+            "COMMENT-HEADER": "Ajouté par {{createdBy | username}}, {{created | dateformat:\"fromNow\"}}",
+            "NO-FILTER": "Montrer vos tâches, pas de filtre appliqué",
+            "FILTERED": "Montrer vos tâches, filtré",
+            "NO-TASKS": "Aucune tâche correspondante n'a été trouvée ...",
+            "DURATION": "A pris {{duration}}",
+            "CLAIM-TASK-FIRST": "Pour voir et remplir le formulaire de cette tâche, vous devez d'abord réclamer cette tâche. Vous pouvez le faire en appuyant sur le bouton bleu en haut à droite de la page.",
+            "NO-TASKS-HELP": "Bien, il semble qu'il n'y ait aucune tâche pour vous! Pour commencer quelque chose, vous pouvez:",
+            "NO-SUCH-TASK-HELP": "La tâche que vous recherchez ne peut être trouvée! Si vous le souhaitez, vous pouvez plutôt:",
+            "NO-SUCH-TASK-RETURN-TO-LIST": "Retournez à votre liste de tâches",
+            "NO-TASKS-CREATE-TASK": "Créez une tâche pour vous-même ou attribuez-la à quelqu'un d'autre",
+            "NO-TASKS-CREATE-PROCESS": "Démarrez un nouveau processus et suivez son avancement"
+
+        },
+        "HELP" : {
+            "DESCRIPTION": "Cette tâche n'a pas encore de détails. Vous pouvez changer cela en choisissant l'une de ces actions:",
+            "COMPLETED-DESCRIPTION": "Cette tâche terminée n'a pas de détails.",
+            "DESCRIPTION-WITH-CLAIM": "Cette tâche n'a pas encore de détails. Vous pouvez modifier cela en choisissant l'une des actions suivantes. De plus, pour compléter cette tâche, vous devez d'abord la revendiquer en appuyant sur le bouton bleu en haut à droite de la page.",
+            "ADD-PEOPLE": "Invitez quelqu'un d'autre et commencez à collaborer",
+            "ADD-COMMENT": "Eclairer les autres en ajoutant un commentaire",
+            "ADD-CONTENT": "Ajouter un document et partager les connaissances",
+            "ADD-SUBTASK": "Créer une sous-tâche"
+        }
+    },
+    "PROCESS": {
+        "ALERT": {
+            "COMMENT-ADDED": "Le commentaire a été ajouté",
+            "STARTED": "Un nouveau processus  \"{{processDefinitionName}}\" a été démarré",
+            "START-PROCESS-CONTENT-ADD-FAILED": "Impossible d'ajouter {{noOfFiles}} fichier(s) au processus"
+        },
+        "TITLE": {
+            "DIAGRAM": "Diagramme de processus",
+            "EXECUTION": "Exécution",
+            "EXECUTIONS": "Exécutions",
+            "EXPRESSION": "Expression",
+            "SCRIPT": "Script",
+            "RESULT": "Resultat",
+            "VARIABLES": "Variables",
+            "LOG": "Log"
+        },
+        "FILTER": {
+            "CREATED-DESC": "Le plus récent en premier",
+            "CREATED-ASC": "Le plus ancient en premier",
+            "ENDED-DESC": "Terminé récemment",
+            "ENDED-ASC": "Terminé le moins récemment",
+            "STATE-SUMMARY": "Afficher {{state.title | translate}} processus",
+            "STATE": "Etat de processus",
+            "STATE-RUNNING": "en cours",
+            "STATE-COMPLETED": "terminé",
+            "STATE-ALL": "tous"
+        },
+        "MESSAGE": {
+            "NO-DESCRIPTION": "Cette instance de processus n'a pas de description",
+            "NO-FILTER": "Afficher toutes les instances de processus, non filtré",
+            "NO-INSTANCES": "Aucune instance de processus correspondante n'a été trouvée ...",
+            "NO-INSTANCES-HELP": "Il n'y a pas de processus en cours d'exécution. Si vos processus sont terminés, vous pouvez les trouver en utilisant le filtre dans la liste des processus. Pour aller de l'avant avec quelque chose de nouveau, vous pouvez:",
+            "NO-INSTANCES-HELP-START": "Démarrer un nouveau processus et suivre son avancement",
+            "NO-TASKS": "Aucune tâche n'est active actuellement...",
+            "NO-COMPLETED-TASKS": "Aucune tâche n'a été terminée...",
+            "NO-BUSINESS-KEY": "Aucune clé métier definie",
+            "NO-ACTIVE-MILESTONES": "No active milestones",
+            "CATEGORY": "Categorie: {{processDefinitionCategory}}",
+            "NEW-COMMENT-PLACEHOLDER": "Entrez un commentaire à ajouter à ce processus",
+            "COMMENT-HEADER": "Ajouter par {{createdBy | username}}, {{created | dateformat:\"fromNow\"}}",
+            "SELECT-DEFINITION": "Sélectionner dans la liste ci-dessous un processus à démarrer",
+            "NO-PROCESS-DEFINITIONS": "Vous ne pouvez pas démarrer un processus car il n'y a pas de définitions de processus disponibles",
+            "START-PROCESS": "Commencer le processus",
+            "STARTED-BY": "Démarré par",
+            "NO-PROCESS-DEFINITION-SELECTED-HELP": "Sélectionnez une définition de processus"
+        },
+        "ACTION" : {
+            "CREATE": "+ Démarrer un processus",
+            "BACK-TO-LIST": "Retour aux instances de processus",
+            "SHOW-DIAGRAM": "Afficher le diagramme",
+            "CANCEL": "Annuler le processus",
+            "EXECUTE": "Exécuter",
+            "DELETE": "Supprimer le processus",
+            "ADD-COMMENT": "+ Ajouter un commentaire",
+            "ADD-COMMENT-CONFIRM": "Ajouter un commentaire",
+            "AUDIT-LOG": "Audit Log"
+        },
+        "FIELD": {
+            "BUSINESS-KEY": "Clé métier",
+            "CATEGORY": "Categorie",
+            "PROCESS-DEFINITION": "Définition de Processus",
+            "STARTED": "Démarré",
+            "STARTED-BY": "Démarré par",
+            "ENDED": "Terminé",
+            "NAME": "Nom de l'instance de processus",
+            "NAME-PLACEHOLDER" : "Entrez un nom facultatif pour la procédure en cours de démarrage"
+        },
+        "SECTION": {
+            "ACTIVE-TASKS": "Tâches actives",
+            "START-FORM": "Formulaire de départ",
+            "COMPLETED-TASKS": "Tâches terminées ",
+            "COMMENTS": "Commentaires",
+            "CONTENT" : "Contenus"
+        },
+        "POPUP": {
+            "CANCEL-TITLE": "Annuler le processus?",
+            "CANCEL-DESCRIPTION": "Êtes-vous sûr de vouloir annuler le processus {{name}}?",
+            "DELETE-TITLE": "Supprimer le processus?",
+            "DELETE-DESCRIPTION": "Êtes-vous sûr de vouloir supprimer le processus {{name}}? Toutes les tâches, le contenu et les commentaires liés à ce processus seront supprimés définitivement."
+        }
+    },
+    "CASE": {
+        "ALERT": {
+            "STARTED": "Un nouveau case  \"{{caseDefinitionName}}\"  a été démarré",
+            "START-CASE-CONTENT-ADD-FAILED": "Impossible d'ajouter {{noOfFiles}} fichier(s) au cas"
+        },
+        "TITLE": {
+            "DIAGRAM": "Diagramme de case"
+        },
+        "FILTER": {
+            "CREATED-DESC": "Le plus récent en premier",
+            "CREATED-ASC": "Le plus ancient en premier",
+            "ENDED-DESC": "Terminé récemment",
+            "ENDED-ASC": "Terminé le moins récemment",
+            "STATE-SUMMARY": "Afficher {{state.title | translate}} cas",
+            "STATE": "Etat du cas",
+            "STATE-RUNNING": "en cours",
+            "STATE-COMPLETED": "terminé",
+            "STATE-ALL": "tous"
+        },
+        "MESSAGE": {
+            "NO-DESCRIPTION": "Cette instance de cas n'a pas de description",
+            "NO-FILTER": "Montrer tous les cas, non filtré",
+            "NO-INSTANCES": "Aucune instance de cas correspondante n'a été trouvée...",
+            "NO-INSTANCES-HELP": "Il n'y a pas de cas en cours d'exécution. Si vos cas sont terminés, vous pouvez les trouver en utilisant le filtre dans la liste des cas. Pour aller de l'avant avec quelque chose de nouveau, vous pouvez:",
+            "NO-INSTANCES-HELP-START": "Démarrer un nouveau cas et suivre son avancement",
+            "NO-TASKS": "Aucune tâche n'est active actuellement...",
+            "NO-COMPLETED-TASKS": "Aucune tâche n'a été terminée...",
+            "NO-BUSINESS-KEY": "Aucune clé métier definie",
+            "CATEGORY": "Catégorie: {{processDefinitionCategory}}",
+            "SELECT-DEFINITION": "Sélectionner dans la liste ci-dessous un cas à démarrer",
+            "NO-CASE-DEFINITIONS": "Vous ne pouvez pas démarrer un cas car il n'y a pas de définitions de cas disponibles",
+            "START-CASE": "Commencer le cas",
+            "STARTED-BY": "Démarré par",
+            "STAGE-STARTED": "Commencé",
+            "STAGE-ENDED": "Terminé",
+            "STAGE-NOT-STARTED": "Pas encore commencé",
+            "STATE": "Etat",
+            "STAGE-NO-NAME": "Étape sans nom",
+            "MILESTONE-REACHED-ON": "Atteint",
+            "MILESTONE-TERMINATED-ON": "Terminé",
+            "NO-CASE-DEFINITION-SELECTED-HELP": "Sélectionnez une définition de processus",
+            "NO-ACTIVE-STAGES": "Pas d'étapes actives",
+            "NO-ENDED-STAGES": "Étapes non terminées",
+            "NO-AVAILABLE-MILESTONES": "Pas de Jalons disponible",
+            "NO-REACHED-MILESTONES": "Pas de Jalons atteints",
+            "NO-AVAILABLE-USER-EVENT-LISTENERS":"Aucun événement utilisateur disponible",
+            "NO-COMPLETED-USER-EVENT-LISTENERS":"Aucun événement utilisateur terminé",
+            "USER-EVENT-LISTENER-NO-NAME": "Evénement utilisateur sans nom",
+            "USER-EVENT-LISTENER-COMPLETED": "Terminé",
+            "ENABLED-PLAN-ITEM_INSTANCE-NO-NAME": "Sans nom",
+            "START-PLAN-ITEM-INSTANCE": "Démarrer"
+        },
+        "ACTION" : {
+            "CREATE": "+ Démarrer un cas",
+            "BACK-TO-LIST": "Retour aux instances de cas",
+            "SHOW-DIAGRAM": "Afficher le diagramme",
+            "CANCEL": "Annuler le cas",
+            "DELETE": "Supprimer le cas",
+            "TRIGGER-USER-EVENT-LISTENER": "Déclencheur",
+            "AUDIT-LOG": "Audit Log"
+        },
+        "FIELD": {
+            "BUSINESS-KEY": "Clé métier",
+            "CATEGORY": "Categorie",
+            "CASE-DEFINITION": "Définition de Cas",
+            "STARTED": "Démarré",
+            "STARTED-BY": "Démarré par",
+            "ENDED": "Terminé",
+            "NAME": "Nom de l'instance de cas",
+            "NAME-PLACEHOLDER" : "Entrez un nom facultatif pour le cas en cours de démarrage"
+        },
+        "SECTION": {
+            "ACTIVE-TASKS": "Tâches actives",
+            "COMPLETED-TASKS": "Tâches terminées",
+            "ACTIVE-STAGES": "Étapes disponible/actives",
+            "ENDED-STAGES": "Étapes terminées",
+            "AVAILABLE-MILESTONES": "Jalons disponible",
+            "REACHED-MILESTONES": "Atteint des Jalons",
+            "AVAILABLE-USER-EVENT-LISTENERS": "Evénement utilisateur disponible",
+            "COMPLETED-USER-EVENT-LISTENERS": "Événement utilisateur terminé",
+            "CONTENT" : "Contenus",
+            "ENABLED-PLAN-ITEM-INSTANCES": "Plan item instances activées"
+        },
+        "POPUP": {
+            "CANCEL-TITLE": "Annuler le cas?",
+            "CANCEL-DESCRIPTION": "Êtes-vous sûr de vouloir annuler le cas {{name}}?",
+            "DELETE-TITLE": "Supprimer le cas?",
+            "DELETE-DESCRIPTION": "Êtes-vous sûr de vouloir supprimer le cas {{name}}? Toutes les tâches, le contenu et les commentaires liés à ce cas seront supprimés définitivement."
+        }
+    },
+    "INVOLVE-PEOPLE": {
+        "NO-MATCHING-RESULTS": "Utilisez le champ de recherche ci-dessus pour trouver des utilisateurs",
+        "SEARCH-PLACEHOLDER": "Rerchercher les utilisateurs",
+        "BACK-TO-SEARCH": "Retour vers la recherche",
+        "ACTION-SELECT": "Sélectionner"
+    },
+    "INTEGRATION": {
+        "ALERT": {
+        }
+    },
+    "CONTENT": {
+        "SIMPLE-TYPE": {
+            "WORD": "Document",
+            "EXCEL": "Feuille de calcul",
+            "PDF": "Document PDF ",
+            "IMAGE": "Image",
+            "FOLDER": "Répertoire",
+            "CONTENT": "Contenu"
+        },
+        "MESSAGE": {
+            "NO-PREVIEW-AVAILABLE": "Aucun aperçu disponible",
+            "PREVIEW-PENDING": "Creation de l'aperçu...",
+            "CONTENT-PENDING": "Téléchargement du contenu...",
+            "NOT-FOUND": "TLe contenu ne peut être trouvé",
+            "DELETE-CONFIRMATION": "Etes-vous sûr de vouloir supprimer {{name}}?",
+            "DROP": "Déposer ou ",
+            "SELECT": "Sélectionner un fichier",
+            "DRAGOVER": "Déposer un fichier à télécharger ",
+            "EXTERNAL-ONLY": "Sélectionner la source du contenu"
+        },
+        "TITLE": {
+            "DELETE": "Supprimer le contenu",
+            "NOT-FOUND": "Fichier non trouvé"
+        },
+        "ACTION":  {
+        }
+    },
+    "FORM" : {
+        "ACTION": {
+            "SAVE": "Enregistrer"
+        },
+        "DEFAULT-OUTCOME": {
+            "COMPLETE": "Terminer",
+            "START-PROCESS": "Démarrer le processus",
+            "START-CASE": "Démarrer le cas"
+        },
+        "MESSAGE" : {
+            "SELECT-PERSON": "Aucune personne choisie...",
+            "SELECT-GROUP": "Aucun groupe choisi...",
+            "EMPTY": "(vide)"
+        }
+    },
+    "APP-DEFINITION" : {
+        "MESSAGE" : {
+            "NOT-FOUND": "Aucune définition d'app definition n'a été trouvé avec cet identifiant",
+            "MISSING": "Flowable s'exécute en mode d'intégration, mais la définition de l'application requise est manquante"
+        }
+    }
+}

@@ -14,10 +14,7 @@ package org.flowable.variable.service;
 
 import java.util.List;
 
-import org.flowable.engine.common.api.query.NativeQuery;
-import org.flowable.variable.service.history.HistoricVariableInstance;
-import org.flowable.variable.service.history.HistoricVariableInstanceQuery;
-import org.flowable.variable.service.history.NativeHistoricVariableInstanceQuery;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -26,20 +23,11 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  * Service which provides access to historic variables.
  * 
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public interface HistoricVariableService {
     
     HistoricVariableInstanceEntity getHistoricVariableInstance(String id);
-
-    /**
-     * Returns a new {@link HistoricVariableInstanceQuery} that can be used to dynamically query tasks.
-     */
-    HistoricVariableInstanceQuery createHistoricVariableInstanceQuery();
-
-    /**
-     * Returns a new {@link NativeQuery} for tasks.
-     */
-    NativeHistoricVariableInstanceQuery createNativeHistoricVariableInstanceQuery();
     
     HistoricVariableInstanceEntity createHistoricVariableInstance();
     
@@ -47,15 +35,16 @@ public interface HistoricVariableService {
     
     void insertHistoricVariableInstance(HistoricVariableInstanceEntity variable);
     
-    HistoricVariableInstanceEntity copyAndInsert(VariableInstanceEntity variable);
+    HistoricVariableInstanceEntity createAndInsert(VariableInstanceEntity variable);
     
-    void copyVariableValue(HistoricVariableInstanceEntity historicVariable, VariableInstanceEntity variable);
+    void recordVariableUpdate(VariableInstanceEntity variableInstanceEntity);
     
-    void deleteHistoricVariableInstance(String id);
+    void recordVariableRemoved(VariableInstanceEntity variableInstanceEntity);
     
     void deleteHistoricVariableInstance(HistoricVariableInstanceEntity historicVariable);
     
     void deleteHistoricVariableInstancesByProcessInstanceId(String processInstanceId);
     
     void deleteHistoricVariableInstancesByTaskId(String taskId);
+    
 }

@@ -22,7 +22,7 @@ import org.activiti.engine.impl.pvm.process.TransitionImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.SequenceFlow;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.common.engine.api.delegate.Expression;
 
 /**
  * @author Joram Barrez
@@ -32,10 +32,12 @@ public class SequenceFlowParseHandler extends AbstractBpmnParseHandler<SequenceF
     public static final String PROPERTYNAME_CONDITION = "condition";
     public static final String PROPERTYNAME_CONDITION_TEXT = "conditionText";
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return SequenceFlow.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, SequenceFlow sequenceFlow) {
 
         ScopeImpl scope = bpmnParse.getCurrentScope();

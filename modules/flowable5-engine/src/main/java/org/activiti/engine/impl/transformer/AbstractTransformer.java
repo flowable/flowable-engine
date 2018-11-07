@@ -21,12 +21,13 @@ import org.activiti.engine.ActivitiException;
  */
 public abstract class AbstractTransformer implements Transformer {
 
+    @Override
     public Object transform(Object anObject) {
         try {
             return this.primTransform(anObject);
         } catch (Exception e) {
 
-            throw new ActivitiException("Error while executing transformation from object: " + anObject + " using transformer " + this);
+            throw new ActivitiException("Error while executing transformation from object: " + anObject + " using transformer " + this, e);
         }
     }
 

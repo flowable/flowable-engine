@@ -19,21 +19,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.query.NativeQuery;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.query.NativeQuery;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
-import org.flowable.engine.task.DelegationState;
 import org.flowable.engine.task.Event;
-import org.flowable.engine.task.NativeTaskQuery;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskQuery;
-import org.flowable.form.model.FormModel;
-import org.flowable.identitylink.service.IdentityLink;
-import org.flowable.identitylink.service.IdentityLinkType;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
+import org.flowable.form.api.FormInfo;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.task.api.DelegationState;
+import org.flowable.task.api.NativeTaskQuery;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskBuilder;
+import org.flowable.task.api.TaskQuery;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
  * Service which provides access to {@link Task} and form related operations.
@@ -53,6 +54,13 @@ public interface TaskService {
     /** create a new task with a user defined task id */
     Task newTask(String taskId);
 
+    /**
+     * Create a builder for the task
+     * 
+     * @return task builder
+     */
+    TaskBuilder createTaskBuilder();
+    
     /**
      * Saves the given task to the persistent data store. If the task is already present in the persistent store, it is updated. After a new task has been saved, the task instance passed into this
      * method is updated with the id of the newly created task.
@@ -152,8 +160,8 @@ public interface TaskService {
      *            user that claims the task. When userId is null the task is unclaimed, assigned to no one.
      * @throws FlowableObjectNotFoundException
      *             when the task doesn't exist.
-     * @throws FlowableTaskAlreadyClaimedException
-     *             when the task is already claimed by another user.
+     * @throws org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException
+     *             when the task is already claimed by another user
      */
     void claim(String taskId, String userId);
 
@@ -312,7 +320,19 @@ public interface TaskService {
      * @throws FlowableObjectNotFoundException
      *             when the task or form definition doesn't exist.
      */
-    FormModel getTaskFormModel(String taskId);
+    FormInfo getTaskFormModel(String taskId);
+    
+    /**
+     * Gets a Form model instance of the task form of a specific task without any variable handling
+     * 
+     * @param taskId
+     *            id of the task, cannot be null.
+     * @param ignoreVariables
+     *            should the variables be ignored when fetching the form model?
+     * @throws FlowableObjectNotFoundException
+     *             when the task or form definition doesn't exist.
+     */
+    FormInfo getTaskFormModel(String taskId, boolean ignoreVariables);
 
     /**
      * Changes the assignee of the given task to the given userId. No check is done whether the user is known by the identity component.

@@ -14,8 +14,8 @@ package org.flowable.identitylink.service.impl.persistence.entity;
 
 import java.util.Date;
 
-import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.identitylink.service.history.HistoricIdentityLink;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 
 /**
  * @author Joram Barrez
@@ -37,5 +37,11 @@ public interface HistoricIdentityLinkEntity extends HistoricIdentityLink, Entity
     void setCreateTime(Date createTime);
 
     void setProcessInstanceId(String processInstanceId);
+    
+    void setScopeId(String scopeId);
+    
+    void setScopeType(String scopeType);
+    
+    void setScopeDefinitionId(String scopeDefinitionId);
 
 }

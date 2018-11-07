@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.impl.persistence.entity;
 
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 
 /**
  * Abstract superclass for the common properties of all {@link Entity} implementations.
@@ -36,26 +36,32 @@ public abstract class AbstractEntityNoRevision implements Entity {
         this.id = id;
     }
 
+    @Override
     public boolean isInserted() {
         return isInserted;
     }
 
+    @Override
     public void setInserted(boolean isInserted) {
         this.isInserted = isInserted;
     }
 
+    @Override
     public boolean isUpdated() {
         return isUpdated;
     }
 
+    @Override
     public void setUpdated(boolean isUpdated) {
         this.isUpdated = isUpdated;
     }
 
+    @Override
     public boolean isDeleted() {
         return isDeleted;
     }
 
+    @Override
     public void setDeleted(boolean isDeleted) {
         this.isDeleted = isDeleted;
     }

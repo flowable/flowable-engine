@@ -15,10 +15,10 @@ package org.flowable.crystalball.simulator.delegate.event.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.crystalball.simulator.SimulationEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
@@ -41,7 +41,7 @@ public class DeploymentCreateTransformer extends Flowable2SimulationEventFunctio
 
             DeploymentEntity deploymentEntity = (DeploymentEntity) ((FlowableEntityEvent) event).getEntity();
 
-            Map<String, Object> simEventProperties = new HashMap<String, Object>();
+            Map<String, Object> simEventProperties = new HashMap<>();
             simEventProperties.put(resourcesKey, deploymentEntity.getResources());
 
             return new SimulationEvent.Builder(simulationEventType).simulationTime(CommandContextUtil.getProcessEngineConfiguration().getClock().getCurrentTime().getTime()).properties(simEventProperties).priority(1).build();

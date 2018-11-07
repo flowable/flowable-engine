@@ -22,6 +22,7 @@ public class EndEventTestJavaDelegate implements JavaDelegate {
 
     public static int timesCalled;
 
+    @Override
     public void execute(DelegateExecution execution) {
         timesCalled++;
         try {

@@ -11,13 +11,15 @@ import java.util.List;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.impl.context.Context;
-import org.flowable.variable.service.impl.types.ValueFields;
-import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.service.impl.types.CacheableVariable;
+import org.flowable.variable.service.impl.types.JPAEntityMappings;
 
 /**
  * Variable type capable of storing a list of reference to JPA-entities. Only JPA-Entities which are configured by annotations are supported. Use of compound primary keys is not supported. <br>
  * The variable value should be of type {@link List} and can only contain objects of the same type.
- * 
+ *
  * @author Frederik Heremans
  */
 public class JPAEntityListVariableType implements VariableType, CacheableVariable {
@@ -87,7 +89,7 @@ public class JPAEntityListVariableType implements VariableType, CacheableVariabl
 
         if (value instanceof List<?> && ((List<?>) value).size() > 0) {
             List<?> list = (List<?>) value;
-            List<String> ids = new ArrayList<String>();
+            List<String> ids = new ArrayList<>();
 
             String type = mappings.getJPAClassString(list.get(0));
             for (Object entry : list) {
@@ -113,7 +115,7 @@ public class JPAEntityListVariableType implements VariableType, CacheableVariabl
         if (valueFields.getTextValue() != null && bytes != null) {
             String entityClass = valueFields.getTextValue();
 
-            List<Object> result = new ArrayList<Object>();
+            List<Object> result = new ArrayList<>();
             String[] ids = deserializeIds(bytes);
 
             for (String id : ids) {
@@ -130,7 +132,7 @@ public class JPAEntityListVariableType implements VariableType, CacheableVariabl
      */
     protected byte[] serializeIds(List<String> ids) {
         try {
-            String[] toStore = ids.toArray(new String[] {});
+            String[] toStore = ids.toArray(new String[]{});
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ObjectOutputStream out = new ObjectOutputStream(baos);
 

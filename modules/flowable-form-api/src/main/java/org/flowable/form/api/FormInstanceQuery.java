@@ -16,7 +16,7 @@ package org.flowable.form.api;
 import java.util.Date;
 import java.util.Set;
 
-import org.flowable.engine.common.api.query.Query;
+import org.flowable.common.engine.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link FormInstance}s.
@@ -74,6 +74,21 @@ public interface FormInstanceQuery extends Query<FormInstanceQuery, FormInstance
      * Only select submitted forms with a process definition id like the given string.
      */
     FormInstanceQuery processDefinitionIdLike(String processDefinitionIdLike);
+    
+    /**
+     * Only select submitted forms with the given scope id.
+     */
+    FormInstanceQuery scopeId(String scopeId);
+    
+    /**
+     * Only select submitted forms with the given scope type.
+     */
+    FormInstanceQuery scopeType(String scopeType);
+    
+    /**
+     * Only select submitted forms with the given scope definition id.
+     */
+    FormInstanceQuery scopeDefinitionId(String scopeDefinitionId);
 
     /**
      * Only select submitted forms submitted on the given time
@@ -114,6 +129,11 @@ public interface FormInstanceQuery extends Query<FormInstanceQuery, FormInstance
      * Only select submitted forms that do not have a tenant id.
      */
     FormInstanceQuery deploymentWithoutTenantId();
+
+    /**
+     * Only select submitted forms that do not have a task id.
+     */
+    FormInstanceQuery withoutTaskId();
 
     // sorting ////////////////////////////////////////////////////////
 

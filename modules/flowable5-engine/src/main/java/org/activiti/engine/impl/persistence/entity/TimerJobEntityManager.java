@@ -23,8 +23,8 @@ import org.activiti.engine.impl.Page;
 import org.activiti.engine.impl.TimerJobQueryImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.AbstractManager;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.runtime.Job;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.job.api.Job;
 
 /**
  * @author Joram Barrez
@@ -85,7 +85,7 @@ public class TimerJobEntityManager extends AbstractManager {
 
     @SuppressWarnings("unchecked")
     public List<Job> findTimerJobsByTypeAndProcessDefinitionKeyNoTenantId(String jobHandlerType, String processDefinitionKey) {
-        Map<String, String> params = new HashMap<String, String>(2);
+        Map<String, String> params = new HashMap<>(2);
         params.put("handlerType", jobHandlerType);
         params.put("processDefinitionKey", processDefinitionKey);
         return getDbSqlSession().selectList("selectTimerJobByTypeAndProcessDefinitionKeyNoTenantId", params);
@@ -93,7 +93,7 @@ public class TimerJobEntityManager extends AbstractManager {
 
     @SuppressWarnings("unchecked")
     public List<Job> findTimerJobsByTypeAndProcessDefinitionKeyAndTenantId(String jobHandlerType, String processDefinitionKey, String tenantId) {
-        Map<String, String> params = new HashMap<String, String>(3);
+        Map<String, String> params = new HashMap<>(3);
         params.put("handlerType", jobHandlerType);
         params.put("processDefinitionKey", processDefinitionKey);
         params.put("tenantId", tenantId);
@@ -102,7 +102,7 @@ public class TimerJobEntityManager extends AbstractManager {
 
     @SuppressWarnings("unchecked")
     public List<Job> findTimerJobsByTypeAndProcessDefinitionId(String jobHandlerType, String processDefinitionId) {
-        Map<String, String> params = new HashMap<String, String>(2);
+        Map<String, String> params = new HashMap<>(2);
         params.put("handlerType", jobHandlerType);
         params.put("processDefinitionId", processDefinitionId);
         return getDbSqlSession().selectList("selectTimerJobByTypeAndProcessDefinitionId", params);
@@ -113,7 +113,7 @@ public class TimerJobEntityManager extends AbstractManager {
     }
 
     public void updateTimerJobTenantIdForDeployment(String deploymentId, String newTenantId) {
-        HashMap<String, Object> params = new HashMap<String, Object>();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
         getDbSqlSession().update("updateTimerJobTenantIdForDeployment", params);

@@ -31,6 +31,7 @@ public class MockSupportWithFlowableRuleTest {
     @Rule
     public FlowableRule flowableRule = new FlowableRule() {
 
+        @Override
         protected void configureProcessEngine() {
             ServiceTaskTestMock.CALL_COUNT.set(0);
 

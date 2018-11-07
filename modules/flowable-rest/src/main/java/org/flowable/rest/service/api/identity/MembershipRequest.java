@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.identity;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * @author Frederik Heremans
  */
@@ -24,6 +26,7 @@ public class MembershipRequest {
         this.userId = userId;
     }
 
+    @ApiModelProperty(example = "kermit")
     public String getUserId() {
         return userId;
     }

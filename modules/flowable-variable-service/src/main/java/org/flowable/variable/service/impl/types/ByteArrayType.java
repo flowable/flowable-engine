@@ -12,6 +12,9 @@
  */
 package org.flowable.variable.service.impl.types;
 
+import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.api.types.VariableType;
+
 /**
  * @author Tom Baeyens
  */
@@ -19,22 +22,27 @@ public class ByteArrayType implements VariableType {
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public String getTypeName() {
         return "bytes";
     }
 
+    @Override
     public boolean isCachable() {
         return true;
     }
 
+    @Override
     public Object getValue(ValueFields valueFields) {
         return valueFields.getBytes();
     }
 
+    @Override
     public void setValue(Object value, ValueFields valueFields) {
         valueFields.setBytes((byte[]) value);
     }
 
+    @Override
     public boolean isAbleToStore(Object value) {
         if (value == null) {
             return true;

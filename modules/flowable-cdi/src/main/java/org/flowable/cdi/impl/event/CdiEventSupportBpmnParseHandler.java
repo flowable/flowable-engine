@@ -70,7 +70,6 @@ public class CdiEventSupportBpmnParseHandler implements BpmnParseHandler {
         supportedTypes.add(Task.class);
         supportedTypes.add(ManualTask.class);
         supportedTypes.add(UserTask.class);
-        supportedTypes.add(EndEvent.class);
         supportedTypes.add(SubProcess.class);
         supportedTypes.add(EventSubProcess.class);
         supportedTypes.add(CallActivity.class);
@@ -87,10 +86,12 @@ public class CdiEventSupportBpmnParseHandler implements BpmnParseHandler {
         supportedTypes.add(SequenceFlow.class);
     }
 
+    @Override
     public Set<Class<? extends BaseElement>> getHandledTypes() {
         return supportedTypes;
     }
 
+    @Override
     public void parse(BpmnParse bpmnParse, BaseElement element) {
 
         if (element instanceof SequenceFlow) {

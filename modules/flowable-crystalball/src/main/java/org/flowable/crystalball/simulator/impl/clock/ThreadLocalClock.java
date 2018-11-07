@@ -12,19 +12,19 @@
  */
 package org.flowable.crystalball.simulator.impl.clock;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.runtime.Clock;
-import org.springframework.beans.factory.FactoryBean;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
+
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.runtime.Clock;
+import org.springframework.beans.factory.FactoryBean;
 
 /**
  * This class provides thread local clock implementation. Each thread can run its own simulation engine and can behave according to its internal thread local clock
  */
 public class ThreadLocalClock implements Clock {
-    private static volatile ThreadLocal<Clock> THREAD_CLOCK = new ThreadLocal<Clock>();
+    private static volatile ThreadLocal<Clock> THREAD_CLOCK = new ThreadLocal<>();
     protected FactoryBean<Clock> clockFactory;
 
     public ThreadLocalClock(FactoryBean<Clock> clockFactory) {

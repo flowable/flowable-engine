@@ -14,6 +14,7 @@ package org.flowable.cdi.spi;
 
 import java.util.ServiceLoader;
 
+import org.flowable.cdi.impl.FlowableExtension;
 import org.flowable.engine.ProcessEngine;
 
 /**

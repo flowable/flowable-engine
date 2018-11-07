@@ -12,15 +12,14 @@
  */
 package org.flowable.editor.language.json.converter;
 
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ServiceTask;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Map;
 
 /**
  * @author Tijs Rademakers
@@ -31,7 +30,7 @@ public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter implements 
     protected Map<String, String> decisionTableMap;
 
     public static void fillTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap,
-            Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
+                                 Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
 
         fillJsonTypes(convertersToBpmnMap);
         fillBpmnTypes(convertersToJsonMap);
@@ -44,10 +43,12 @@ public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter implements 
     public static void fillBpmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
     }
 
+    @Override
     protected String getStencilId(BaseElement baseElement) {
         return STENCIL_TASK_DECISION;
     }
 
+    @Override
     protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
 
         ServiceTask serviceTask = new ServiceTask();
@@ -66,6 +67,18 @@ public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter implements 
                 serviceTask.getFieldExtensions().add(decisionTableKeyField);
             }
         }
+
+        boolean decisionTableThrowErrorOnNoHitsNode = getPropertyValueAsBoolean(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS, elementNode);
+        FieldExtension decisionTableThrowErrorOnNoHitsField = new FieldExtension();
+        decisionTableThrowErrorOnNoHitsField.setFieldName(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY);
+        decisionTableThrowErrorOnNoHitsField.setStringValue(decisionTableThrowErrorOnNoHitsNode ? "true" : "false");
+        serviceTask.getFieldExtensions().add(decisionTableThrowErrorOnNoHitsField);
+
+        boolean fallbackToDefaultTenant = getPropertyValueAsBoolean(PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT, elementNode);
+        FieldExtension fallbackToDefaultTenantField = new FieldExtension();
+        fallbackToDefaultTenantField.setFieldName(PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT_KEY);
+        fallbackToDefaultTenantField.setStringValue(fallbackToDefaultTenant ? "true" : "false");
+        serviceTask.getFieldExtensions().add(fallbackToDefaultTenantField);
 
         return serviceTask;
     }

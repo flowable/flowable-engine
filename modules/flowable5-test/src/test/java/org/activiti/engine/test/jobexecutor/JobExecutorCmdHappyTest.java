@@ -21,11 +21,11 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.JobEntity;
 import org.activiti.engine.impl.persistence.entity.TimerJobEntity;
-import org.flowable.engine.common.runtime.Clock;
-import org.flowable.engine.impl.asyncexecutor.AcquiredTimerJobEntities;
-import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.engine.impl.cmd.AcquireTimerJobsCmd;
-import org.flowable.engine.runtime.Job;
+import org.flowable.common.engine.impl.runtime.Clock;
+import org.flowable.job.api.Job;
+import org.flowable.job.service.impl.asyncexecutor.AcquiredTimerJobEntities;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.job.service.impl.cmd.AcquireTimerJobsCmd;
 
 /**
  * @author Tom Baeyens

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,6 +14,7 @@
 package org.flowable.compatibility;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -22,56 +23,62 @@ import java.util.Map;
 
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngineConfiguration;
+import org.activiti.engine.impl.JobProcessorContextImpl;
 import org.activiti.engine.impl.asyncexecutor.AsyncJobUtil;
 import org.activiti.engine.impl.bpmn.behavior.BpmnActivityBehavior;
 import org.activiti.engine.impl.bpmn.helper.ErrorPropagation;
 import org.activiti.engine.impl.bpmn.helper.ErrorThrowingEventListener;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.cmd.ExecuteJobsCmd;
+import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.deploy.DeploymentManager;
+import org.activiti.engine.impl.persistence.entity.AbstractJobEntity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti.engine.impl.scripting.ScriptingEngines;
 import org.activiti.engine.repository.DeploymentBuilder;
+import org.activiti.engine.runtime.JobProcessor;
+import org.activiti.engine.runtime.JobProcessorContext;
 import org.activiti.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.MapExceptionEntry;
+import org.flowable.common.engine.api.FlowableClassLoadingException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableOptimisticLockingException;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.compatibility.wrapper.Flowable5AttachmentWrapper;
 import org.flowable.compatibility.wrapper.Flowable5CommentWrapper;
 import org.flowable.compatibility.wrapper.Flowable5DeploymentWrapper;
 import org.flowable.compatibility.wrapper.Flowable5ProcessInstanceWrapper;
-import org.flowable.engine.common.api.FlowableClassLoadingException;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.FlowableOptimisticLockingException;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.impl.javax.el.PropertyNotFoundException;
-import org.flowable.engine.common.runtime.Clock;
+import org.flowable.compatibility.wrapper.Flowable5TaskFormDataWrapper;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.form.StartFormData;
+import org.flowable.engine.form.TaskFormData;
 import org.flowable.engine.impl.cmd.AddIdentityLinkCmd;
-import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
-import org.flowable.engine.impl.persistence.entity.ResourceEntity;
 import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
-import org.flowable.engine.impl.persistence.entity.TaskEntityImpl;
 import org.flowable.engine.impl.repository.DeploymentBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
+import org.flowable.job.api.Job;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -85,6 +92,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
     protected volatile ProcessEngine processEngine;
     protected volatile org.flowable.engine.ProcessEngineConfiguration flowable6ProcessEngineConfiguration;
 
+    @Override
     public ProcessDefinition getProcessDefinition(final String processDefinitionId) {
         final ProcessEngineConfigurationImpl processEngineConfig = (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
         ProcessDefinition processDefinitionEntity = processEngineConfig.getCommandExecutor().execute(new Command<ProcessDefinition>() {
@@ -98,6 +106,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         return processDefinitionEntity;
     }
 
+    @Override
     public ProcessDefinition getProcessDefinitionByKey(final String processDefinitionKey) {
         final ProcessEngineConfigurationImpl processEngineConfig = (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
         ProcessDefinition processDefinition = processEngineConfig.getCommandExecutor().execute(new Command<ProcessDefinition>() {
@@ -111,6 +120,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         return processDefinition;
     }
 
+    @Override
     public org.flowable.bpmn.model.Process getProcessDefinitionProcessObject(final String processDefinitionId) {
         final ProcessEngineConfigurationImpl processEngineConfig = (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
         org.flowable.bpmn.model.Process process = processEngineConfig.getCommandExecutor().execute(new Command<org.flowable.bpmn.model.Process>() {
@@ -133,11 +143,13 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         return process;
     }
 
+    @Override
     public BpmnModel getProcessDefinitionBpmnModel(final String processDefinitionId) {
         final ProcessEngineConfigurationImpl processEngineConfig = (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
         return processEngineConfig.getDeploymentManager().getBpmnModelById(processDefinitionId);
     }
 
+    @Override
     public void addCandidateStarter(String processDefinitionId, String userId, String groupId) {
         try {
             if (userId != null) {
@@ -150,6 +162,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public ObjectNode getProcessDefinitionInfo(String processDefinitionId) {
         try {
             return getProcessEngine().getDynamicBpmnService().getProcessDefinitionInfo(processDefinitionId);
@@ -160,6 +173,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public ProcessDefinitionCacheEntry resolveProcessDefinition(final ProcessDefinition processDefinition) {
         try {
             final ProcessEngineConfigurationImpl processEngineConfig = (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
@@ -179,6 +193,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public boolean isProcessDefinitionSuspended(String processDefinitionId) {
         try {
             return getProcessEngine().getRepositoryService().isProcessDefinitionSuspended(processDefinitionId);
@@ -189,6 +204,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void deleteCandidateStarter(String processDefinitionId, String userId, String groupId) {
         try {
             if (userId != null) {
@@ -201,6 +217,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void suspendProcessDefinition(String processDefinitionId, String processDefinitionKey, boolean suspendProcessInstances, Date suspensionDate, String tenantId) {
         try {
             if (processDefinitionId != null) {
@@ -213,6 +230,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void activateProcessDefinition(String processDefinitionId, String processDefinitionKey, boolean activateProcessInstances, Date activationDate, String tenantId) {
         try {
             if (processDefinitionId != null) {
@@ -225,6 +243,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void setProcessDefinitionCategory(String processDefinitionId, String category) {
         try {
             getProcessEngine().getRepositoryService().setProcessDefinitionCategory(processDefinitionId, category);
@@ -234,6 +253,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public Deployment deploy(DeploymentBuilderImpl activiti6DeploymentBuilder) {
         try {
             DeploymentBuilder deploymentBuilder = getProcessEngine().getRepositoryService().createDeployment();
@@ -264,9 +284,9 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
 
             // Copy resources
             DeploymentEntity activiti6DeploymentEntity = activiti6DeploymentBuilder.getDeployment();
-            Map<String, org.activiti.engine.impl.persistence.entity.ResourceEntity> activiti5Resources = new HashMap<String, org.activiti.engine.impl.persistence.entity.ResourceEntity>();
+            Map<String, org.activiti.engine.impl.persistence.entity.ResourceEntity> activiti5Resources = new HashMap<>();
             for (String resourceKey : activiti6DeploymentEntity.getResources().keySet()) {
-                ResourceEntity activiti6ResourceEntity = activiti6DeploymentEntity.getResources().get(resourceKey);
+                EngineResource activiti6ResourceEntity = activiti6DeploymentEntity.getResources().get(resourceKey);
 
                 org.activiti.engine.impl.persistence.entity.ResourceEntity activiti5ResourceEntity = new org.activiti.engine.impl.persistence.entity.ResourceEntity();
                 activiti5ResourceEntity.setName(activiti6ResourceEntity.getName());
@@ -285,6 +305,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void setDeploymentCategory(String deploymentId, String category) {
         try {
             getProcessEngine().getRepositoryService().setDeploymentCategory(deploymentId, category);
@@ -293,6 +314,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void changeDeploymentTenantId(String deploymentId, String newTenantId) {
         try {
             getProcessEngine().getRepositoryService().changeDeploymentTenantId(deploymentId, newTenantId);
@@ -301,6 +323,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void deleteDeployment(String deploymentId, boolean cascade) {
         try {
             final ProcessEngineConfigurationImpl processEngineConfig = (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
@@ -311,8 +334,9 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public ProcessInstance startProcessInstance(String processDefinitionKey, String processDefinitionId,
-            Map<String, Object> variables, Map<String, Object> transientVariables, String businessKey, String tenantId, String processInstanceName) {
+                                                Map<String, Object> variables, Map<String, Object> transientVariables, String businessKey, String tenantId, String processInstanceName) {
 
         org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(Authentication.getAuthenticatedUserId());
 
@@ -350,8 +374,9 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public ProcessInstance startProcessInstanceByMessage(String messageName, Map<String, Object> variables,
-            Map<String, Object> transientVariables, String businessKey, String tenantId) {
+                                                         Map<String, Object> transientVariables, String businessKey, String tenantId) {
 
         try {
 
@@ -380,7 +405,33 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
             return null;
         }
     }
+    
+    @Override
+    public ProcessInstance getProcessInstance(String processInstanceId) {
+        org.activiti.engine.runtime.ProcessInstance processInstance = getProcessEngine().getRuntimeService()
+                .createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        if (processInstance != null) {
+            return new Flowable5ProcessInstanceWrapper(processInstance);
+        } else {
+            CommandContext commandContext = Context.getCommandContext();
+            if (commandContext != null) {
+                ExecutionEntity execution = commandContext
+                        .getExecutionEntityManager()
+                        .findExecutionById(processInstanceId);
+                if (execution != null) {
+                    return new Flowable5ProcessInstanceWrapper(execution);
+                }
+            }
+        }
+        return null;
+    }
+    
+    @Override
+    public void setProcessInstanceName(String processInstanceId, String processInstanceName) {
+        getProcessEngine().getRuntimeService().setProcessInstanceName(processInstanceId, processInstanceName);
+    }
 
+    @Override
     public Object getExecutionVariable(String executionId, String variableName, boolean isLocal) {
         try {
             if (isLocal) {
@@ -394,6 +445,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public VariableInstance getExecutionVariableInstance(String executionId, String variableName, boolean isLocal) {
         try {
             if (isLocal) {
@@ -407,6 +459,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public Map<String, Object> getExecutionVariables(String executionId, Collection<String> variableNames, boolean isLocal) {
         try {
             if (isLocal) {
@@ -420,6 +473,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public Map<String, VariableInstance> getExecutionVariableInstances(String executionId, Collection<String> variableNames, boolean isLocal) {
         try {
             if (isLocal) {
@@ -433,6 +487,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void setExecutionVariables(String executionId, Map<String, ? extends Object> variables, boolean isLocal) {
         try {
             if (isLocal) {
@@ -445,6 +500,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void removeExecutionVariables(String executionId, Collection<String> variableNames, boolean isLocal) {
         try {
             if (isLocal) {
@@ -457,6 +513,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void updateBusinessKey(String processInstanceId, String businessKey) {
         try {
             getProcessEngine().getRuntimeService().updateBusinessKey(processInstanceId, businessKey);
@@ -465,6 +522,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void suspendProcessInstance(String processInstanceId) {
         try {
             getProcessEngine().getRuntimeService().suspendProcessInstanceById(processInstanceId);
@@ -473,6 +531,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void activateProcessInstance(String processInstanceId) {
         try {
             getProcessEngine().getRuntimeService().activateProcessInstanceById(processInstanceId);
@@ -481,6 +540,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void deleteProcessInstance(String processInstanceId, String deleteReason) {
         try {
             getProcessEngine().getRuntimeService().deleteProcessInstance(processInstanceId, deleteReason);
@@ -489,6 +549,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void deleteHistoricProcessInstance(String processInstanceId) {
         try {
             getProcessEngine().getHistoryService().deleteHistoricProcessInstance(processInstanceId);
@@ -497,6 +558,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void addIdentityLinkForProcessInstance(String processInstanceId, String userId, String groupId, String identityLinkType) {
         try {
             if (userId != null) {
@@ -509,6 +571,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void deleteIdentityLinkForProcessInstance(String processInstanceId, String userId, String groupId, String identityLinkType) {
         try {
             if (userId != null) {
@@ -521,6 +584,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void completeTask(TaskEntity taskEntity, Map<String, Object> variables, boolean localScope) {
         org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(Authentication.getAuthenticatedUserId());
         try {
@@ -540,6 +604,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void claimTask(String taskId, String userId) {
         org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(Authentication.getAuthenticatedUserId());
         try {
@@ -549,6 +614,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void setTaskVariables(String taskId, Map<String, ? extends Object> variables, boolean isLocal) {
         try {
             if (isLocal) {
@@ -561,6 +627,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void removeTaskVariables(String taskId, Collection<String> variableNames, boolean isLocal) {
         try {
             if (isLocal) {
@@ -573,6 +640,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void setTaskDueDate(String taskId, Date dueDate) {
         try {
             getProcessEngine().getTaskService().setDueDate(taskId, dueDate);
@@ -581,6 +649,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void setTaskPriority(String taskId, int priority) {
         try {
             getProcessEngine().getTaskService().setPriority(taskId, priority);
@@ -589,6 +658,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void deleteTask(String taskId, String deleteReason, boolean cascade) {
         try {
             if (deleteReason != null) {
@@ -601,6 +671,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void deleteHistoricTask(String taskId) {
         try {
             getProcessEngine().getHistoryService().deleteHistoricTaskInstance(taskId);
@@ -610,6 +681,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public StartFormData getStartFormData(String processDefinitionId) {
         try {
             return getProcessEngine().getFormService().getStartFormData(processDefinitionId);
@@ -619,6 +691,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public String getFormKey(String processDefinitionId, String taskDefinitionKey) {
         try {
             if (taskDefinitionKey != null) {
@@ -632,6 +705,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public Object getRenderedStartForm(String processDefinitionId, String formEngineName) {
         try {
             return getProcessEngine().getFormService().getRenderedStartForm(processDefinitionId, formEngineName);
@@ -641,6 +715,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public ProcessInstance submitStartFormData(String processDefinitionId, String businessKey, Map<String, String> properties) {
         org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(Authentication.getAuthenticatedUserId());
         try {
@@ -650,7 +725,19 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
             return null;
         }
     }
+    
+    @Override
+    public TaskFormData getTaskFormData(String taskId) {
+        try {
+            return new Flowable5TaskFormDataWrapper(getProcessEngine().getFormService().getTaskFormData(taskId));
+            
+        } catch (org.activiti.engine.ActivitiException e) {
+            handleActivitiException(e);
+            return null;
+        }
+    }
 
+    @Override
     public void submitTaskFormData(String taskId, Map<String, String> properties, boolean completeTask) {
         org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(Authentication.getAuthenticatedUserId());
         try {
@@ -664,6 +751,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void saveTask(TaskEntity task) {
         try {
             org.activiti.engine.impl.persistence.entity.TaskEntity activiti5Task = convertToActiviti5TaskEntity(task);
@@ -673,6 +761,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void addIdentityLink(String taskId, String identityId, int identityIdType, String identityType) {
         if (identityIdType == AddIdentityLinkCmd.IDENTITY_USER) {
             getProcessEngine().getTaskService().addUserIdentityLink(taskId, identityId, identityType);
@@ -681,6 +770,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void deleteIdentityLink(String taskId, String userId, String groupId, String identityLinkType) {
         if (userId != null) {
             getProcessEngine().getTaskService().deleteUserIdentityLink(taskId, userId, identityLinkType);
@@ -689,6 +779,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public Comment addComment(String taskId, String processInstanceId, String type, String message) {
         try {
             return new Flowable5CommentWrapper(getProcessEngine().getTaskService().addComment(taskId, processInstanceId, type, message));
@@ -699,6 +790,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void deleteComment(String commentId, String taskId, String processInstanceId) {
         try {
             if (commentId != null) {
@@ -712,6 +804,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public Attachment createAttachment(String attachmentType, String taskId, String processInstanceId, String attachmentName, String attachmentDescription, InputStream content, String url) {
         try {
             org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(Authentication.getAuthenticatedUserId());
@@ -726,6 +819,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void saveAttachment(Attachment attachment) {
         try {
             org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(Authentication.getAuthenticatedUserId());
@@ -740,6 +834,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void deleteAttachment(String attachmentId) {
         try {
             org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(Authentication.getAuthenticatedUserId());
@@ -750,6 +845,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void trigger(String executionId, Map<String, Object> processVariables, Map<String, Object> transientVariables) {
         try {
             if (transientVariables == null) {
@@ -762,6 +858,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void messageEventReceived(String messageName, String executionId, Map<String, Object> processVariables, boolean async) {
         try {
             if (!async) {
@@ -774,6 +871,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void signalEventReceived(String signalName, String executionId, Map<String, Object> processVariables, boolean async, String tenantId) {
         try {
             if (tenantId != null) {
@@ -794,6 +892,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void signalEventReceived(final SignalEventSubscriptionEntity signalEventSubscriptionEntity, final Object payload, final boolean async) {
         final ProcessEngineConfigurationImpl processEngineConfig = (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
         processEngineConfig.getCommandExecutor().execute(new Command<Void>() {
@@ -818,35 +917,43 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
 
     }
 
+    @Override
     public void executeJob(Job job) {
         if (job == null)
             return;
         final ProcessEngineConfigurationImpl processEngineConfig = (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
-        final org.activiti.engine.impl.persistence.entity.JobEntity activiti5Job = convertToActiviti5JobEntity((JobEntity) job, processEngineConfig);
+        final org.activiti.engine.impl.persistence.entity.JobEntity activiti5Job = convertToActiviti5JobEntity((JobEntity) job);
+
+        callJobProcessors(JobProcessorContext.Phase.BEFORE_EXECUTE, activiti5Job, processEngineConfig);
         processEngineConfig.getCommandExecutor().execute(new ExecuteJobsCmd(activiti5Job));
     }
 
+    @Override
     public void executeJobWithLockAndRetry(Job job) {
         if (job == null)
             return;
         final ProcessEngineConfigurationImpl processEngineConfig = (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
-        org.activiti.engine.impl.persistence.entity.JobEntity activity5Job = null;
+        org.activiti.engine.impl.persistence.entity.JobEntity activiti5Job;
         if (job instanceof org.activiti.engine.impl.persistence.entity.JobEntity) {
-            activity5Job = (org.activiti.engine.impl.persistence.entity.JobEntity) job;
+            activiti5Job = (org.activiti.engine.impl.persistence.entity.JobEntity) job;
         } else {
-            activity5Job = convertToActiviti5JobEntity((JobEntity) job, processEngineConfig);
+            activiti5Job = convertToActiviti5JobEntity((JobEntity) job);
         }
-        AsyncJobUtil.executeJob(activity5Job, processEngineConfig.getCommandExecutor());
+
+        callJobProcessors(JobProcessorContext.Phase.BEFORE_EXECUTE, activiti5Job, processEngineConfig);
+        AsyncJobUtil.executeJob(activiti5Job, processEngineConfig.getCommandExecutor());
     }
 
+    @Override
     public void handleFailedJob(Job job, Throwable exception) {
         if (job == null)
             return;
         final ProcessEngineConfigurationImpl processEngineConfig = (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
-        final org.activiti.engine.impl.persistence.entity.JobEntity activity5Job = convertToActiviti5JobEntity((JobEntity) job, processEngineConfig);
+        final org.activiti.engine.impl.persistence.entity.JobEntity activity5Job = convertToActiviti5JobEntity((JobEntity) job);
         AsyncJobUtil.handleFailedJob(activity5Job, exception, processEngineConfig.getCommandExecutor());
     }
 
+    @Override
     public void deleteJob(String jobId) {
         try {
             getProcessEngine().getManagementService().deleteJob(jobId);
@@ -855,6 +962,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void leaveExecution(DelegateExecution execution) {
         try {
             BpmnActivityBehavior bpmnActivityBehavior = new BpmnActivityBehavior();
@@ -864,6 +972,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void propagateError(BpmnError bpmnError, DelegateExecution execution) {
         try {
             org.activiti.engine.delegate.BpmnError activiti5BpmnError = new org.activiti.engine.delegate.BpmnError(bpmnError.getErrorCode(), bpmnError.getMessage());
@@ -873,6 +982,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public boolean mapException(Exception camelException, DelegateExecution execution, List<MapExceptionEntry> mapExceptions) {
         try {
             return ErrorPropagation.mapException(camelException, (ExecutionEntity) execution, mapExceptions);
@@ -882,11 +992,13 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public Map<String, Object> getVariables(ProcessInstance processInstance) {
         org.activiti.engine.runtime.ProcessInstance activiti5ProcessInstance = ((Flowable5ProcessInstanceWrapper) processInstance).getRawObject();
         return ((ExecutionEntity) activiti5ProcessInstance).getVariables();
     }
 
+    @Override
     public Object getScriptingEngineValue(String payloadExpressionValue, String languageValue, DelegateExecution execution) {
         try {
             final ProcessEngineConfigurationImpl processEngineConfig = (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
@@ -899,11 +1011,13 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void throwErrorEvent(FlowableEvent event) {
         ErrorThrowingEventListener eventListener = new ErrorThrowingEventListener();
         eventListener.onEvent(event);
     }
 
+    @Override
     public void setClock(Clock clock) {
         ProcessEngineConfiguration processEngineConfig = getProcessEngine().getProcessEngineConfiguration();
         if (processEngineConfig.getClock() == null) {
@@ -914,6 +1028,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public void resetClock() {
         ProcessEngineConfiguration processEngineConfig = getProcessEngine().getProcessEngineConfiguration();
         if (processEngineConfig.getClock() != null) {
@@ -921,21 +1036,38 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         }
     }
 
+    @Override
     public Object getRawProcessEngine() {
         return getProcessEngine();
     }
 
+    @Override
     public Object getRawProcessConfiguration() {
         return getProcessEngine().getProcessEngineConfiguration();
     }
 
+    @Override
     public Object getRawCommandExecutor() {
         ProcessEngineConfigurationImpl processEngineConfig = (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
         return processEngineConfig.getCommandExecutor();
     }
 
+    @Override
     public Object getCamelContextObject(String camelContextValue) {
         throw new FlowableException("Getting the Camel context is not support in this engine configuration");
+    }
+
+    @Override
+    public void setJobProcessor(List<Object> flowable5JobProcessors) {
+        getProcessEngine().getProcessEngineConfiguration().setJobProcessors(convertToFlowable5JobProcessors(flowable5JobProcessors));
+    }
+
+    private List<JobProcessor> convertToFlowable5JobProcessors(List<Object> jobProcessors) {
+        ArrayList<JobProcessor> flowable5JobProcessors = new ArrayList<>();
+        for (Object jobProcessor : jobProcessors) {
+            flowable5JobProcessors.add((org.activiti.engine.runtime.JobProcessor) jobProcessor);
+        }
+        return flowable5JobProcessors;
     }
 
     protected ProcessEngine getProcessEngine() {
@@ -960,10 +1092,12 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         this.processEngineFactory = processEngineFactory;
     }
 
+    @Override
     public org.flowable.engine.ProcessEngineConfiguration getFlowable6ProcessEngineConfiguration() {
         return flowable6ProcessEngineConfiguration;
     }
 
+    @Override
     public void setFlowable6ProcessEngineConfiguration(org.flowable.engine.ProcessEngineConfiguration flowable6ProcessEngineConfiguration) {
         this.flowable6ProcessEngineConfiguration = flowable6ProcessEngineConfiguration;
     }
@@ -992,7 +1126,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         return activiti5Task;
     }
 
-    protected org.activiti.engine.impl.persistence.entity.JobEntity convertToActiviti5JobEntity(final JobEntity job, final ProcessEngineConfigurationImpl processEngineConfiguration) {
+    protected org.activiti.engine.impl.persistence.entity.JobEntity convertToActiviti5JobEntity(final JobEntity job) {
         org.activiti.engine.impl.persistence.entity.JobEntity activity5Job = new org.activiti.engine.impl.persistence.entity.JobEntity();
         activity5Job.setJobType(job.getJobType());
         activity5Job.setDuedate(job.getDuedate());
@@ -1034,13 +1168,18 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         } else {
             if (e.getCause() instanceof org.activiti.engine.ActivitiClassLoadingException) {
                 throw new FlowableException(e.getMessage(), new FlowableClassLoadingException(e.getCause().getMessage(), e.getCause().getCause()));
-            } else if (e.getCause() instanceof org.activiti.engine.impl.javax.el.PropertyNotFoundException) {
-                throw new FlowableException(e.getMessage(), new PropertyNotFoundException(e.getCause().getMessage(), e.getCause().getCause()));
             } else if (e.getCause() instanceof org.activiti.engine.ActivitiException) {
                 throw new FlowableException(e.getMessage(), new FlowableException(e.getCause().getMessage(), e.getCause().getCause()));
             } else {
                 throw new FlowableException(e.getMessage(), e.getCause());
             }
+        }
+    }
+
+    protected void callJobProcessors(JobProcessorContext.Phase processorType, AbstractJobEntity abstractJobEntity, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        JobProcessorContextImpl jobProcessorContext = new JobProcessorContextImpl(processorType, abstractJobEntity);
+        for (JobProcessor jobProcessor : processEngineConfiguration.getJobProcessors()) {
+            jobProcessor.process(jobProcessorContext);
         }
     }
 

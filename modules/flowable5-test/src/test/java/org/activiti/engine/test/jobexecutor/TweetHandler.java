@@ -18,7 +18,7 @@ import java.util.List;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.jobexecutor.JobHandler;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.api.Job;
 import org.junit.Assert;
 
 public class TweetHandler implements JobHandler {

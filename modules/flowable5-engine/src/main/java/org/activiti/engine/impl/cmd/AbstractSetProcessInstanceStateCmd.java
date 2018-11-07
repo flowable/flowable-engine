@@ -27,7 +27,7 @@ import org.activiti.engine.impl.persistence.entity.SuspensionState.SuspensionSta
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.persistence.entity.TimerJobEntity;
 import org.activiti.engine.runtime.Execution;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.api.Job;
 
 /**
  * @author Daniel Meyer
@@ -41,6 +41,7 @@ public abstract class AbstractSetProcessInstanceStateCmd implements Command<Void
         this.executionId = executionId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
 
         if (executionId == null) {

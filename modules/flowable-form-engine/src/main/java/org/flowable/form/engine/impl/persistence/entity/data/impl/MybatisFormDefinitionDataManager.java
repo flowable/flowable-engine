@@ -16,19 +16,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.FormDefinitionQueryImpl;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntityImpl;
-import org.flowable.form.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.form.engine.impl.persistence.entity.data.AbstractFormDataManager;
 import org.flowable.form.engine.impl.persistence.entity.data.FormDefinitionDataManager;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisFormDefinitionDataManager extends AbstractDataManager<FormDefinitionEntity> implements FormDefinitionDataManager {
+public class MybatisFormDefinitionDataManager extends AbstractFormDataManager<FormDefinitionEntity> implements FormDefinitionDataManager {
 
     public MybatisFormDefinitionDataManager(FormEngineConfiguration formEngineConfiguration) {
         super(formEngineConfiguration);
@@ -76,7 +76,7 @@ public class MybatisFormDefinitionDataManager extends AbstractDataManager<FormDe
 
     @Override
     public void deleteFormDefinitionsByDeploymentId(String deploymentId) {
-        getDbSqlSession().delete("deleteFormDefinitionsByDeploymentId", deploymentId);
+        getDbSqlSession().delete("deleteFormDefinitionsByDeploymentId", deploymentId, getManagedEntityClass());
     }
 
     @Override

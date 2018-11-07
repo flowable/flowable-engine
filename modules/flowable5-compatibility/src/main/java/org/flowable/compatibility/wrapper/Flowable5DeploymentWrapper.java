@@ -13,7 +13,10 @@
 package org.flowable.compatibility.wrapper;
 
 import java.util.Date;
+import java.util.Map;
 
+import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
+import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.repository.Deployment;
 
@@ -56,6 +59,31 @@ public class Flowable5DeploymentWrapper implements Deployment {
     @Override
     public String getTenantId() {
         return activiti5Deployment.getTenantId();
+    }
+    
+    @Override
+    public boolean isNew() {
+        return ((DeploymentEntity) activiti5Deployment).isNew();
+    }
+
+    @Override
+    public Map<String, EngineResource> getResources() {
+        return null;
+    }
+    
+    @Override
+    public String getDerivedFrom() {
+        return null;
+    }
+
+    @Override
+    public String getDerivedFromRoot() {
+        return null;
+    }
+    
+    @Override
+    public String getParentDeploymentId() {
+        return null;
     }
 
     @Override

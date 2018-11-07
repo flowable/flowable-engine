@@ -23,7 +23,7 @@ import org.flowable.engine.IdentityService;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 

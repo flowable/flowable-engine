@@ -15,8 +15,8 @@ package org.flowable.dmn.api;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 
 /**
  * Service for executing DMN decisions (decision tables)
@@ -47,6 +47,7 @@ public interface DmnRuleService {
      *             when an error occurs while executing the decision.
      * @deprecated Use the createExecuteDecisionBuilder method instead
      */
+    @Deprecated
     List<Map<String, Object>> executeDecisionByKey(String decisionKey, Map<String, Object> inputVariables);
 
     /**
@@ -63,6 +64,7 @@ public interface DmnRuleService {
      *             when execution has multiple rule results or when an error occurs while executing the decision.
      * @deprecated Use the createExecuteDecisionBuilder method instead
      */
+    @Deprecated
     Map<String, Object> executeDecisionByKeySingleResult(String decisionKey, Map<String, Object> inputVariables);
 
     /**
@@ -80,6 +82,7 @@ public interface DmnRuleService {
      *             when an error occurs while executing the decision.
      * @deprecated Use the createExecuteDecisionBuilder method instead
      */
+    @Deprecated
     DecisionExecutionAuditContainer executeDecisionByKeyWithAuditTrail(String decisionKey, Map<String, Object> inputVariables);
 
     /**
@@ -96,6 +99,7 @@ public interface DmnRuleService {
      *             when an error occurs while executing the decision.
      * @deprecated Use the createExecuteDecisionBuilder method instead
      */
+    @Deprecated
     List<Map<String, Object>> executeDecisionByKeyAndTenantId(String decisionKey, Map<String, Object> inputVariables, String tenantId);
 
     /**
@@ -112,6 +116,7 @@ public interface DmnRuleService {
      *             when execution has multiple rule results or when an error occurs while executing the decision.
      * @deprecated Use the createExecuteDecisionBuilder method instead
      */
+    @Deprecated
     Map<String, Object> executeDecisionByKeyAndTenantIdSingleResult(String decisionKey, Map<String, Object> inputVariables, String tenantId);
 
     /**
@@ -129,6 +134,7 @@ public interface DmnRuleService {
      *             when an error occurs while executing the decision.
      * @deprecated Use the createExecuteDecisionBuilder method instead
      */
+    @Deprecated
     DecisionExecutionAuditContainer executeDecisionByKeyAndTenantIdWithAuditTrail(String decisionKey, Map<String, Object> inputVariables, String tenantId);
 
     /**
@@ -145,6 +151,7 @@ public interface DmnRuleService {
      *             when an error occurs while executing the decision.
      * @deprecated Use the createExecuteDecisionBuilder method instead
      */
+    @Deprecated
     List<Map<String, Object>> executeDecisionByKeyAndParentDeploymentId(String decisionKey, String parentDeploymentId, Map<String, Object> inputVariables);
 
     /**
@@ -161,6 +168,7 @@ public interface DmnRuleService {
      *             when execution has multiple rule results or when an error occurs while executing the decision.
      * @deprecated Use the createExecuteDecisionBuilder method instead
      */
+    @Deprecated
     Map<String, Object> executeDecisionByKeyAndParentDeploymentIdSingleResult(String decisionKey, String parentDeploymentId, Map<String, Object> inputVariables);
 
     /**
@@ -178,6 +186,7 @@ public interface DmnRuleService {
      *             when an error occurs while executing the decision.
      * @deprecated Use the createExecuteDecisionBuilder method instead
      */
+    @Deprecated
     DecisionExecutionAuditContainer executeDecisionByKeyAndParentDeploymentIdWithAuditTrail(String decisionKey, String parentDeploymentId, Map<String, Object> inputVariables, String tenantId);
 
     /**
@@ -194,6 +203,7 @@ public interface DmnRuleService {
      *             when an error occurs while executing the decision.
      * @deprecated Use the createExecuteDecisionBuilder method instead
      */
+    @Deprecated
     List<Map<String, Object>> executeDecisionByKeyParentDeploymentIdAndTenantId(String decisionKey, String parentDeploymentId, Map<String, Object> inputVariables, String tenantId);
 
     /**
@@ -210,6 +220,7 @@ public interface DmnRuleService {
      *             when execution has multiple rule results or when an error occurs while executing the decision.
      * @deprecated Use the createExecuteDecisionBuilder method instead
      */
+    @Deprecated
     Map<String, Object> executeDecisionByKeyParentDeploymentIdAndTenantIdSingleResult(String decisionKey, String parentDeploymentId, Map<String, Object> inputVariables, String tenantId);
 
     /**
@@ -227,6 +238,7 @@ public interface DmnRuleService {
      *             when an error occurs while executing the decision.
      * @deprecated Use the createExecuteDecisionBuilder method instead
      */
+    @Deprecated
     DecisionExecutionAuditContainer executeDecisionByKeyParentDeploymentIdAndTenantIdWithAuditTrail(String decisionKey, String parentDeploymentId, Map<String, Object> inputVariables, String tenantId);
 
 }

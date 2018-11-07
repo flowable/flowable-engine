@@ -45,6 +45,7 @@ public class Interface extends BaseElement {
         this.operations = operations;
     }
 
+    @Override
     public Interface clone() {
         Interface clone = new Interface();
         clone.setValues(this);

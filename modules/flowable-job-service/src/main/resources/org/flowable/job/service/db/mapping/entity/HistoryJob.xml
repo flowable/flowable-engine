@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.flowable.job.service.impl.persistence.entity.HistoryJobEntityImpl">
+
+    <!-- JOB RESULTMAP -->
+
+    <resultMap id="historyJobResultMap" type="org.flowable.job.service.impl.persistence.entity.HistoryJobEntityImpl">
+        <id property="id" column="ID_" jdbcType="VARCHAR" />
+        <result property="revision" column="REV_" jdbcType="INTEGER" />
+        <result property="lockOwner" column="LOCK_OWNER_" jdbcType="VARCHAR" />
+        <result property="lockExpirationTime" column="LOCK_EXP_TIME_" jdbcType="TIMESTAMP" />
+        <result property="retries" column="RETRIES_" jdbcType="INTEGER" />
+        <result property="exceptionByteArrayRef" column="EXCEPTION_STACK_ID_" typeHandler="JobByteArrayRefTypeHandler" />
+        <result property="exceptionMessage" column="EXCEPTION_MSG_" jdbcType="VARCHAR" />
+        <result property="jobHandlerType" column="HANDLER_TYPE_" jdbcType="VARCHAR" />
+        <result property="jobHandlerConfiguration" column="HANDLER_CFG_" jdbcType="VARCHAR" />
+        <result property="customValuesByteArrayRef" column="CUSTOM_VALUES_ID_" typeHandler="JobByteArrayRefTypeHandler" />
+        <result property="advancedJobHandlerConfigurationByteArrayRef" column="ADV_HANDLER_CFG_ID_" typeHandler="JobByteArrayRefTypeHandler" />
+        <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
+        <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR" />
+        <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <!-- HISTORY JOB SELECT -->
+
+    <select id="selectHistoryJob" parameterType="string" resultMap="historyJobResultMap">
+        select * from ${prefix}ACT_RU_HISTORY_JOB where ID_ = #{id, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectHistoryJobsToExecute" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historyJobResultMap">
+        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+        select
+        RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        from ${prefix}ACT_RU_HISTORY_JOB RES
+        <where> 
+            <if test="parameter == null">
+                SCOPE_TYPE_ is null and LOCK_EXP_TIME_ is null
+            </if>
+            <if test="parameter != null and parameter != 'all'">
+                SCOPE_TYPE_ = #{parameter, jdbcType=VARCHAR} and LOCK_EXP_TIME_ is null
+            </if>
+            <if test="parameter != null and parameter == 'all'">
+                LOCK_EXP_TIME_ is null
+            </if>
+        </where>
+        ${orderBy}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    </select>
+
+    <select id="selectExpiredHistoryJobs" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historyJobResultMap">
+        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+        select
+        RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        from ${prefix}ACT_RU_HISTORY_JOB RES
+        <where> 
+            <if test="parameter.jobExecutionScope == null">
+                SCOPE_TYPE_ is null
+            </if>
+            <if test="parameter.jobExecutionScope != null and parameter.jobExecutionScope != 'all'">
+                SCOPE_TYPE_ = #{parameter.jobExecutionScope}
+            </if>
+            and (LOCK_EXP_TIME_ is not null and LOCK_EXP_TIME_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
+            or (LOCK_EXP_TIME_ is null and CREATE_TIME_ &lt; #{parameter.maxTimeout, jdbcType=TIMESTAMP})
+        </where>
+        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    </select>
+
+    <select id="selectHistoryJobsByConfiguration" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historyJobResultMap">
+        select * from ${prefix}ACT_RU_HISTORY_JOB
+        where HANDLER_TYPE_ = #{parameter.handlerType}
+        and HANDLER_CFG_ like #{parameter.handlerConfiguration}${wildcardEscapeClause}
+    </select>
+
+    <select id="selectHistoryJobByQueryCriteria" parameterType="org.flowable.job.service.impl.HistoryJobQueryImpl" resultMap="historyJobResultMap">
+        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+        select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <include refid="selectHistoryJobByQueryCriteriaSql" />
+        ${orderBy}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    </select>
+
+    <select id="selectHistoryJobCountByQueryCriteria" parameterType="org.flowable.job.service.impl.HistoryJobQueryImpl" resultType="long">
+        select count(RES.ID_)
+        <include refid="selectHistoryJobByQueryCriteriaSql" />
+    </select>
+
+    <sql id="selectHistoryJobByQueryCriteriaSql">
+        from ${prefix}ACT_RU_HISTORY_JOB RES
+        <where>
+            <if test="id != null">
+                RES.ID_ = #{id}
+            </if>
+            <if test="handlerType != null">
+                and RES.HANDLER_TYPE_ = #{handlerType}
+            </if>
+            <if test="withException">
+                and (RES.EXCEPTION_MSG_ is not null or RES.EXCEPTION_STACK_ID_ is not null)
+            </if>
+            <if test="exceptionMessage">
+                and RES.EXCEPTION_MSG_ = #{exceptionMessage}
+            </if>
+            <if test="scopeType != null">
+                and RES.SCOPE_TYPE_ = #{scopeType}
+            </if>
+            <if test="lockOwner != null">
+                and RES.LOCK_OWNER_ = #{lockOwner}
+            </if>
+            <if test="onlyLocked">
+                and RES.LOCK_EXP_TIME_ is not null
+            </if>
+            <if test="onlyUnlocked">
+                and RES.LOCK_EXP_TIME_ is null
+            </if>
+            <if test="tenantId != null">
+                and RES.TENANT_ID_ = #{tenantId}
+            </if>
+            <if test="tenantIdLike != null">
+                and RES.TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
+            </if>
+            <if test="withoutTenantId">
+                and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
+            </if>
+        </where>
+    </sql>
+
+    <!-- JOB DELETE STATEMENTS -->
+
+    <delete id="deleteHistoryJob" parameterType="org.flowable.job.service.impl.persistence.entity.HistoryJobEntityImpl">
+        delete from ${prefix}ACT_RU_HISTORY_JOB where ID_ = #{id} and REV_ = #{revision}
+    </delete>
+
+    <delete id="bulkDeleteHistoryJob" parameterType="java.util.Collection">
+        delete from ${prefix}ACT_RU_HISTORY_JOB where
+        <foreach item="job" collection="list" index="index" separator=" or ">
+            ID_ = #{job.id, jdbcType=VARCHAR}
+        </foreach>
+    </delete>
+
+    <!-- HISTORY JOB INSERT -->
+
+    <insert id="insertHistoryJob" parameterType="org.flowable.job.service.impl.persistence.entity.HistoryJobEntityImpl">
+        insert into ${prefix}ACT_RU_HISTORY_JOB (
+        ID_,
+        REV_,
+        LOCK_OWNER_,
+        LOCK_EXP_TIME_,
+        RETRIES_,
+        EXCEPTION_STACK_ID_,
+        EXCEPTION_MSG_,
+        HANDLER_TYPE_,
+        HANDLER_CFG_,
+        CUSTOM_VALUES_ID_,
+        ADV_HANDLER_CFG_ID_,
+        CREATE_TIME_,
+        SCOPE_TYPE_,
+        TENANT_ID_)
+        values (#{id, jdbcType=VARCHAR},
+        #{revision, jdbcType=INTEGER},
+        #{lockOwner, jdbcType=VARCHAR},
+        #{lockExpirationTime, jdbcType=TIMESTAMP},
+        #{retries, jdbcType=INTEGER},
+        #{exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
+        #{exceptionMessage, jdbcType=VARCHAR},
+        #{jobHandlerType, jdbcType=VARCHAR},
+        #{jobHandlerConfiguration, jdbcType=VARCHAR},
+        #{customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
+        #{advancedJobHandlerConfigurationByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
+        #{createTime, jdbcType=TIMESTAMP},
+        #{scopeType, jdbcType=VARCHAR},
+        #{tenantId, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <insert id="bulkInsertHistoryJob" parameterType="java.util.List">
+        INSERT INTO ${prefix}ACT_RU_HISTORY_JOB (
+        ID_,
+        REV_,
+        LOCK_OWNER_,
+        LOCK_EXP_TIME_,
+        RETRIES_,
+        EXCEPTION_STACK_ID_,
+        EXCEPTION_MSG_,
+        HANDLER_TYPE_,
+        HANDLER_CFG_,
+        CUSTOM_VALUES_ID_,
+        ADV_HANDLER_CFG_ID_,
+        CREATE_TIME_,
+        SCOPE_TYPE_,
+        TENANT_ID_
+        ) VALUES
+        <foreach collection="list" item="job" index="index" separator=",">
+            (#{job.id, jdbcType=VARCHAR},
+            #{job.revision, jdbcType=INTEGER},
+            #{job.lockOwner, jdbcType=VARCHAR},
+            #{job.lockExpirationTime, jdbcType=TIMESTAMP},
+            #{job.retries, jdbcType=INTEGER},
+            #{job.exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
+            #{job.exceptionMessage, jdbcType=VARCHAR},
+            #{job.jobHandlerType, jdbcType=VARCHAR},
+            #{job.jobHandlerConfiguration, jdbcType=VARCHAR},
+            #{job.customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
+            #{job.advancedJobHandlerConfigurationByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
+            #{job.createTime, jdbcType=TIMESTAMP},
+            #{job.scopeType, jdbcType=VARCHAR},
+            #{job.tenantId, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="bulkInsertHistoryJob" databaseId="oracle" parameterType="java.util.List">
+        INSERT ALL
+        <foreach collection="list" item="job" index="index">
+            INTO ${prefix}ACT_RU_HISTORY_JOB (
+            ID_,
+            REV_,
+            LOCK_OWNER_,
+            LOCK_EXP_TIME_,
+            RETRIES_,
+            EXCEPTION_STACK_ID_,
+            EXCEPTION_MSG_,
+            HANDLER_TYPE_,
+            HANDLER_CFG_,
+            CUSTOM_VALUES_ID_,
+            ADV_HANDLER_CFG_ID_,
+            CREATE_TIME_,
+            SCOPE_TYPE_,
+            TENANT_ID_) VALUES
+            (#{job.id, jdbcType=VARCHAR},
+            #{job.revision, jdbcType=INTEGER},
+            #{job.lockOwner, jdbcType=VARCHAR},
+            #{job.lockExpirationTime, jdbcType=TIMESTAMP},
+            #{job.retries, jdbcType=INTEGER},
+            #{job.exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
+            #{job.exceptionMessage, jdbcType=VARCHAR},
+            #{job.jobHandlerType, jdbcType=VARCHAR},
+            #{job.jobHandlerConfiguration, jdbcType=VARCHAR},
+            #{job.customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
+            #{job.advancedJobHandlerConfigurationByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
+            #{job.createTime, jdbcType=TIMESTAMP},
+            #{job.scopeType, jdbcType=VARCHAR},
+            #{job.tenantId, jdbcType=VARCHAR})
+        </foreach>
+        SELECT * FROM dual
+    </insert>
+
+    <!-- HISTORY JOB UPDATE -->
+
+    <update id="updateHistoryJob" parameterType="org.flowable.job.service.impl.persistence.entity.HistoryJobEntityImpl">
+        update ${prefix}ACT_RU_HISTORY_JOB
+        <set>
+            REV_ = #{revisionNext, jdbcType=INTEGER},
+            <if test="originalPersistentState.lockExpirationTime != lockExpirationTime">
+                LOCK_EXP_TIME_ = #{lockExpirationTime, jdbcType=TIMESTAMP},
+            </if>
+            <if test="originalPersistentState.lockOwner != lockOwner">
+                LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.jobHandlerType != jobHandlerType">
+                HANDLER_TYPE_ = #{jobHandlerType, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.retries != retries">
+                RETRIES_ = #{retries, jdbcType=INTEGER},
+            </if>
+            <if test="(originalPersistentState.exceptionByteArrayRef != null and exceptionByteArrayRef == null) or (exceptionByteArrayRef == null and originalPersistentState.exceptionByteArrayRef != null) or (originalPersistentState.exceptionByteArrayRef != exceptionByteArrayRef)">
+                EXCEPTION_STACK_ID_ = #{exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
+            </if>
+            <if test="originalPersistentState.exceptionMessage != exceptionMessage">
+                EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR}
+            </if>
+            <if test="originalPersistentState.scopeType != scopeType">
+                SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR}
+            </if>
+        </set>
+        where ID_= #{id, jdbcType=VARCHAR}
+        and REV_ = #{revision, jdbcType=INTEGER}
+    </update>
+
+    <update id="resetExpiredHistoryJob" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
+        update ${prefix}ACT_RU_HISTORY_JOB
+        set LOCK_OWNER_ = null, LOCK_EXP_TIME_ = null
+        where ID_ = #{id,jdbcType=VARCHAR}
+    </update>
+
+</mapper>

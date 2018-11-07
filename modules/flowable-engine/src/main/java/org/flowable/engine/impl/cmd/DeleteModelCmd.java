@@ -14,9 +14,9 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
@@ -31,6 +31,7 @@ public class DeleteModelCmd implements Command<Void>, Serializable {
         this.modelId = modelId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (modelId == null) {
             throw new FlowableIllegalArgumentException("modelId is null");

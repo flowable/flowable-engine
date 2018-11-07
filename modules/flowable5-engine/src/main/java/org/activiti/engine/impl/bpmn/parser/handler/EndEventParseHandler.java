@@ -32,10 +32,12 @@ public class EndEventParseHandler extends AbstractActivityBpmnParseHandler<EndEv
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EndEventParseHandler.class);
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return EndEvent.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, EndEvent endEvent) {
 
         ActivityImpl endEventActivity = createActivityOnCurrentScope(bpmnParse, endEvent, BpmnXMLConstants.ELEMENT_EVENT_END);

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+  <case id="testManuallyActivatedServiceTask" name="testRepeatedAndManuallyActivatedServiceTask" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="casePlanModel">
+      <planItem id="planItem1" name="A" definitionRef="sid-7FF4C8D1-7F70-4B41-ABB3-689E7AE364EA"></planItem>
+      <planItem id="planItem2" name="B" definitionRef="sid-E184BF0B-28D4-488D-8D78-FF98ED15531F">
+        <itemControl>
+          <manualActivationRule>
+            <condition><![CDATA[${manual}]]></condition>
+          </manualActivationRule>
+        </itemControl>
+      </planItem>
+      <humanTask id="sid-7FF4C8D1-7F70-4B41-ABB3-689E7AE364EA" name="A"></humanTask>
+      <task id="sid-E184BF0B-28D4-488D-8D78-FF98ED15531F" name="B" isBlocking="false" flowable:type="java" flowable:expression="${caseInstance.setVariable('variable', 'test')}"></task>
+    </casePlanModel>
+  </case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="CMMNDiagram_testManuallyActivatedServiceTask">
+      <cmmndi:CMMNShape id="CMMNShape_casePlanModel" cmmnElementRef="casePlanModel">
+        <dc:Bounds height="714.0" width="718.0" x="30.0" y="30.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+        <dc:Bounds height="80.0" width="100.0" x="124.0" y="184.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+        <dc:Bounds height="80.0" width="100.0" x="360.0" y="165.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</definitions>

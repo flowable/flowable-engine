@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             targetNamespace="Examples">
+
+    <process id="exclusiveGwDefaultSequenceFlow">
+
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="beforeSubProcessTask"/>
+        <userTask id="beforeSubProcessTask"/>
+        <sequenceFlow id="flow2" sourceRef="beforeSubProcessTask" targetRef="theSubProcess"/>
+        <subProcess id="theSubProcess">
+
+            <startEvent id="subProcessStart"/>
+            <sequenceFlow id="subflow1" sourceRef="subProcessStart" targetRef="exclusiveGw"/>
+            <exclusiveGateway id="exclusiveGw" name="Exclusive Gateway" default="subFlow3"/>
+            <sequenceFlow id="subflow2" sourceRef="exclusiveGw" targetRef="theTask1">
+                <conditionExpression xsi:type="tFormalExpression">${var:equals(input,1)}</conditionExpression>
+            </sequenceFlow>
+
+            <sequenceFlow id="subFlow3" sourceRef="exclusiveGw" targetRef="defaultFlowTask"/>
+
+            <sequenceFlow id="subFlow4" sourceRef="exclusiveGw" targetRef="theTask2">
+                <conditionExpression xsi:type="tFormalExpression">${var:equals(input,2)}</conditionExpression>
+            </sequenceFlow>
+
+            <userTask id="theTask1" name="Input is one"/>
+            <sequenceFlow id="subFlow5" sourceRef="theTask1" targetRef="subProcessEnd"/>
+
+            <userTask id="defaultFlowTask" name="Default task"/>
+            <sequenceFlow id="flow6" sourceRef="defaultFlowTask" targetRef="subProcessEnd"/>
+
+            <userTask id="theTask2" name="Input is two"/>
+            <sequenceFlow id="flow7" sourceRef="theTask2" targetRef="subProcessEnd"/>
+
+            <endEvent id="subProcessEnd"/>
+
+        </subProcess>
+
+        <sequenceFlow sourceRef="theSubProcess" targetRef="afterSubProcessTask"/>
+        <userTask id="afterSubProcessTask"/>
+        <sequenceFlow sourceRef="afterSubProcessTask" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

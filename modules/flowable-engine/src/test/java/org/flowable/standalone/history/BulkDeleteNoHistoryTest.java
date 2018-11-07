@@ -17,8 +17,8 @@ import java.util.Map;
 
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 public class BulkDeleteNoHistoryTest extends ResourceFlowableTestCase {
 
@@ -29,6 +29,7 @@ public class BulkDeleteNoHistoryTest extends ResourceFlowableTestCase {
         super("org/flowable/standalone/history/nohistory.flowable.cfg.xml");
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testLargeAmountOfVariableBulkDelete() throws Exception {
         Map<String, Object> variables = new HashMap<>();
@@ -39,7 +40,7 @@ public class BulkDeleteNoHistoryTest extends ResourceFlowableTestCase {
         }
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         // Completing the task will cause a bulk delete of 4001 entities

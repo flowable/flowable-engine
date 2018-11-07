@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             targetNamespace="Examples">
+
+    <message id="myNewMessage" name="someNewMessage"/>
+
+    <process id="simpleIntermediateEvent">
+
+        <startEvent id="theStart"/>
+
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="beforeNewCatchEvent"/>
+        <userTask id="beforeNewCatchEvent"/>
+
+        <sequenceFlow id="flow2" sourceRef="beforeNewCatchEvent" targetRef="intermediateNewCatchEvent"/>
+        <intermediateCatchEvent id="intermediateNewCatchEvent">
+            <messageEventDefinition messageRef="myNewMessage"/>
+        </intermediateCatchEvent>
+
+        <sequenceFlow id="flow3" sourceRef="intermediateNewCatchEvent" targetRef="afterNewCatchEvent"/>
+        <userTask id="afterNewCatchEvent"/>
+
+        <sequenceFlow id="flow4" sourceRef="afterNewCatchEvent" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

@@ -15,7 +15,9 @@ package org.flowable.dmn.engine.impl.el;
 
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.el.VariableContainerWrapper;
 
 /**
  * Resolves an boolean EL expression at runtime.
@@ -32,7 +34,7 @@ public class RuleExpressionCondition {
     }
 
     public boolean evaluate(Map<String, Object> variables) {
-        Object result = expression.getValue(variables);
+        Object result = expression.getValue(new VariableContainerWrapper(variables));
 
         if (result == null) {
             throw new FlowableException("condition expression returns null");

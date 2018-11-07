@@ -15,7 +15,7 @@ package org.flowable.engine.impl.webservice;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.engine.impl.bpmn.webservice.BpmnInterface;
 import org.flowable.engine.impl.bpmn.webservice.BpmnInterfaceImplementation;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -64,6 +64,7 @@ public class WSService implements BpmnInterfaceImplementation {
         return this.client;
     }
 
+    @Override
     public String getName() {
         return this.name;
     }

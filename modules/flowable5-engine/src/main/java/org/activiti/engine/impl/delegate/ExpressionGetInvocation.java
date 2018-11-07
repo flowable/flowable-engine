@@ -12,8 +12,8 @@
  */
 package org.activiti.engine.impl.delegate;
 
-import org.activiti.engine.impl.javax.el.ELContext;
-import org.activiti.engine.impl.javax.el.ValueExpression;
+import org.flowable.common.engine.impl.javax.el.ELContext;
+import org.flowable.common.engine.impl.javax.el.ValueExpression;
 
 /**
  * Class responsible for handling Expression.getValue invocations
@@ -29,6 +29,7 @@ public class ExpressionGetInvocation extends ExpressionInvocation {
         this.elContext = elContext;
     }
 
+    @Override
     protected void invoke() {
         invocationResult = valueExpression.getValue(elContext);
     }

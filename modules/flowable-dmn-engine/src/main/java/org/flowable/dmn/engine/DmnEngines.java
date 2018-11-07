@@ -14,8 +14,6 @@ package org.flowable.dmn.engine;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -29,9 +27,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
-import org.flowable.engine.common.EngineInfo;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.EngineInfo;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,31 +149,20 @@ public abstract class DmnEngines {
             dmnEngineInfosByName.put(dmnEngineName, dmnEngineInfo);
         } catch (Throwable e) {
             LOGGER.error("Exception while initializing dmn engine: {}", e.getMessage(), e);
-            dmnEngineInfo = new EngineInfo(null, resourceUrlString, getExceptionString(e));
+            dmnEngineInfo = new EngineInfo(null, resourceUrlString, ExceptionUtils.getStackTrace(e));
         }
         dmnEngineInfosByResourceUrl.put(resourceUrlString, dmnEngineInfo);
         dmnEngineInfos.add(dmnEngineInfo);
         return dmnEngineInfo;
     }
 
-    private static String getExceptionString(Throwable e) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-        return sw.toString();
-    }
-
     protected static DmnEngine buildDmnEngine(URL resource) {
-        InputStream inputStream = null;
-        try {
-            inputStream = resource.openStream();
+        try (InputStream inputStream = resource.openStream()) {
             DmnEngineConfiguration dmnEngineConfiguration = DmnEngineConfiguration.createDmnEngineConfigurationFromInputStream(inputStream);
             return dmnEngineConfiguration.buildDmnEngine();
 
         } catch (IOException e) {
             throw new FlowableException("couldn't open resource stream: " + e.getMessage(), e);
-        } finally {
-            IOUtils.closeQuietly(inputStream);
         }
     }
 

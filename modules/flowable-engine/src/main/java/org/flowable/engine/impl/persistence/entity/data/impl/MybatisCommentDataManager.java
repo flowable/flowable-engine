@@ -19,7 +19,7 @@ import java.util.Map;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.CommentEntityImpl;
-import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
 import org.flowable.engine.impl.persistence.entity.data.CommentDataManager;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Event;
@@ -27,7 +27,7 @@ import org.flowable.engine.task.Event;
 /**
  * @author Joram Barrez
  */
-public class MybatisCommentDataManager extends AbstractDataManager<CommentEntity> implements CommentDataManager {
+public class MybatisCommentDataManager extends AbstractProcessDataManager<CommentEntity> implements CommentDataManager {
 
     public MybatisCommentDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);

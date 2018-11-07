@@ -21,7 +21,7 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.Rdn;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +53,7 @@ public class LDAPQueryBuilder {
             LDAPTemplate ldapTemplate = new LDAPTemplate(ldapConfigurator);
             String userDn = ldapTemplate.execute(new LDAPCallBack<String>() {
 
+                @Override
                 public String executeInContext(InitialDirContext initialDirContext) {
 
                     String userDnSearch = buildQueryByUserId(ldapConfigurator, userId);
@@ -87,6 +88,16 @@ public class LDAPQueryBuilder {
                     searchText);
         } else {
             throw new FlowableIllegalArgumentException("No 'queryUserByFullNameLike' configured");
+        }
+        return searchExpression;
+    }
+
+    public String buildQueryGroupsById(LDAPConfiguration ldapConfigurator, String groupId) {
+        String searchExpression;
+        if (ldapConfigurator.getQueryGroupByGroupId() != null) {
+            searchExpression = MessageFormat.format(ldapConfigurator.getQueryGroupByGroupId(), groupId);
+        } else {
+            searchExpression = groupId;
         }
         return searchExpression;
     }

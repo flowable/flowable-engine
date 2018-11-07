@@ -51,6 +51,7 @@ public class Lane extends BaseElement {
         this.flowReferences = flowReferences;
     }
 
+    @Override
     public Lane clone() {
         Lane clone = new Lane();
         clone.setValues(this);

@@ -16,19 +16,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.DecisionTableQueryImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityImpl;
-import org.flowable.dmn.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.dmn.engine.impl.persistence.entity.data.AbstractDmnDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.DecisionTableDataManager;
-import org.flowable.engine.common.api.FlowableException;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisDecisionTableDataManager extends AbstractDataManager<DecisionTableEntity> implements DecisionTableDataManager {
+public class MybatisDecisionTableDataManager extends AbstractDmnDataManager<DecisionTableEntity> implements DecisionTableDataManager {
 
     public MybatisDecisionTableDataManager(DmnEngineConfiguration dmnEngineConfiguration) {
         super(dmnEngineConfiguration);
@@ -76,7 +76,7 @@ public class MybatisDecisionTableDataManager extends AbstractDataManager<Decisio
 
     @Override
     public void deleteDecisionTablesByDeploymentId(String deploymentId) {
-        getDbSqlSession().delete("deleteDecisionTablesByDeploymentId", deploymentId);
+        getDbSqlSession().delete("deleteDecisionTablesByDeploymentId", deploymentId, getManagedEntityClass());
     }
 
     @Override

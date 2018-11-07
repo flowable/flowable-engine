@@ -16,14 +16,13 @@ package org.flowable.rest.service.api.identity;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.rest.exception.FlowableConflictException;
 import org.flowable.idm.api.Group;
-import org.flowable.rest.exception.FlowableConflictException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -47,7 +46,7 @@ public class GroupMembershipCollectionResource extends BaseGroupResource {
             @ApiResponse(code = 404, message = "Indicates the requested group was not found."),
             @ApiResponse(code = 409, message = "Indicates the requested user is already a member of the group.")
     })
-    @RequestMapping(value = "/identity/groups/{groupId}/members", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/identity/groups/{groupId}/members", produces = "application/json")
     public MembershipResponse createMembership(@ApiParam(name = "groupId") @PathVariable String groupId, @RequestBody MembershipRequest memberShip, HttpServletRequest request, HttpServletResponse response) {
 
         Group group = getGroupFromRequest(groupId);

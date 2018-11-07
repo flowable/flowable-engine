@@ -40,6 +40,7 @@ public class SignalConverterTest extends AbstractConverterTest {
         assertEquals(2, signals.size());
     }
 
+    @Override
     protected String getResource() {
         return "signaltest.bpmn";
     }

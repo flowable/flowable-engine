@@ -17,13 +17,14 @@ import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.delegate.ExpressionGetInvocation;
 import org.activiti.engine.impl.delegate.ExpressionSetInvocation;
-import org.activiti.engine.impl.javax.el.ELContext;
-import org.activiti.engine.impl.javax.el.ELException;
-import org.activiti.engine.impl.javax.el.MethodNotFoundException;
-import org.activiti.engine.impl.javax.el.PropertyNotFoundException;
-import org.activiti.engine.impl.javax.el.ValueExpression;
-import org.flowable.engine.delegate.Expression;
-import org.flowable.engine.delegate.VariableScope;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.common.engine.impl.javax.el.ELContext;
+import org.flowable.common.engine.impl.javax.el.ELException;
+import org.flowable.common.engine.impl.javax.el.MethodNotFoundException;
+import org.flowable.common.engine.impl.javax.el.PropertyNotFoundException;
+import org.flowable.common.engine.impl.javax.el.ValueExpression;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * Expression implementation backed by a JUEL {@link ValueExpression}.
@@ -41,8 +42,9 @@ public class JuelExpression implements Expression {
         this.expressionText = expressionText;
     }
 
-    public Object getValue(VariableScope variableScope) {
-        ELContext elContext = Context.getProcessEngineConfiguration().getExpressionManager().getElContext(variableScope);
+    @Override
+    public Object getValue(VariableContainer variableContainer) {
+        ELContext elContext = Context.getProcessEngineConfiguration().getExpressionManager().getElContext((VariableScope) variableContainer);
         try {
             ExpressionGetInvocation invocation = new ExpressionGetInvocation(valueExpression, elContext);
             Context.getProcessEngineConfiguration()
@@ -59,9 +61,10 @@ public class JuelExpression implements Expression {
             throw new ActivitiException("Error while evaluating expression: " + expressionText, e);
         }
     }
-
-    public void setValue(Object value, VariableScope variableScope) {
-        ELContext elContext = Context.getProcessEngineConfiguration().getExpressionManager().getElContext(variableScope);
+    
+    @Override
+    public void setValue(Object value, VariableContainer variableContainer) {
+        ELContext elContext = Context.getProcessEngineConfiguration().getExpressionManager().getElContext((VariableScope) variableContainer);
         try {
             ExpressionSetInvocation invocation = new ExpressionSetInvocation(valueExpression, elContext, value);
             Context.getProcessEngineConfiguration()
@@ -80,6 +83,7 @@ public class JuelExpression implements Expression {
         return super.toString();
     }
 
+    @Override
     public String getExpressionText() {
         return expressionText;
     }

@@ -58,6 +58,7 @@ public class LDAPConfiguration {
     protected String queryUserByFullNameLike;
     protected String queryAllUsers;
     protected String queryAllGroups;
+    protected String queryGroupByGroupId;
 
     // Attribute names
     protected String userIdAttribute;
@@ -259,6 +260,9 @@ public class LDAPConfiguration {
         return queryAllUsers;
     }
 
+    /**
+     * The query that is executed when searching for all users.
+     */
     public void setQueryAllUsers(String queryAllUsers) {
         this.queryAllUsers = queryAllUsers;
     }
@@ -267,8 +271,25 @@ public class LDAPConfiguration {
         return queryAllGroups;
     }
 
+    /**
+     * The query that is executed when searching for all groups.
+     */
     public void setQueryAllGroups(String queryAllGroups) {
         this.queryAllGroups = queryAllGroups;
+    }
+
+    /**
+     * Query that is executed when searching for one group by a specific group id
+     */
+    public String getQueryGroupByGroupId() {
+        return queryGroupByGroupId;
+    }
+
+    /**
+     * Query that is executed when searching for one group by a specific group id
+     */
+    public void setQueryGroupByGroupId(String queryGroupByGroupId) {
+        this.queryGroupByGroupId = queryGroupByGroupId;
     }
 
     /**

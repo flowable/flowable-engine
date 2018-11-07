@@ -13,6 +13,7 @@
 
 package org.flowable.engine.test.mock;
 
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -20,6 +21,7 @@ import java.lang.annotation.RetentionPolicy;
  * @author Joram Barrez
  */
 @Retention(RetentionPolicy.RUNTIME)
+@Repeatable(MockServiceTasks.class)
 public @interface MockServiceTask {
 
     public String id() default "";
@@ -27,5 +29,7 @@ public @interface MockServiceTask {
     public String originalClassName() default "";
 
     public String mockedClassName() default "";
+
+    Class<?> mockedClass() default Void.class;
 
 }

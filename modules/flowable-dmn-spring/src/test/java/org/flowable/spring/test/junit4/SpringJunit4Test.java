@@ -19,7 +19,7 @@ import java.util.Map;
 
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
-import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
+import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
 import org.junit.After;
 import org.junit.Rule;
@@ -54,7 +54,7 @@ public class SpringJunit4Test {
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void simpleDecisionTest() {
         Map<String, Object> executionResult = ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")

@@ -21,15 +21,19 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.TaskWithFieldExtensions;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.bpmn.model.UserTask;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
-import org.flowable.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.el.FixedValue;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * Class that provides helper operations for use in the {@link JavaDelegate}, {@link ActivityBehavior}, {@link ExecutionListener} and {@link TaskListener} interfaces.
@@ -214,12 +218,25 @@ public class DelegateHelper {
      * Similar to {@link #getFieldExpression(DelegateExecution, String)}, but for use within a {@link TaskListener}.
      */
     public static Expression getFieldExpression(DelegateTask task, String fieldName) {
-        if (task.getCurrentFlowableListener() != null) {
-            List<FieldExtension> fieldExtensions = task.getCurrentFlowableListener().getFieldExtensions();
-            if (fieldExtensions != null && fieldExtensions.size() > 0) {
-                for (FieldExtension fieldExtension : fieldExtensions) {
-                    if (fieldName.equals(fieldExtension.getFieldName())) {
-                        return createExpressionForField(fieldExtension);
+        String eventHandlerId = task.getEventHandlerId();
+        if (eventHandlerId != null && task.getProcessDefinitionId() != null) {
+            org.flowable.bpmn.model.Process process = ProcessDefinitionUtil.getProcess(task.getProcessDefinitionId());
+            UserTask userTask = (UserTask) process.getFlowElementMap().get(task.getTaskDefinitionKey());
+            
+            FlowableListener flowableListener = null;
+            for (FlowableListener f : userTask.getTaskListeners()) {
+                if (f.getId() != null && f.getId().equals(eventHandlerId)) {
+                    flowableListener = f;
+                }
+            }
+            
+            if (flowableListener != null) {
+                List<FieldExtension> fieldExtensions = flowableListener.getFieldExtensions();
+                if (fieldExtensions != null && fieldExtensions.size() > 0) {
+                    for (FieldExtension fieldExtension : fieldExtensions) {
+                        if (fieldName.equals(fieldExtension.getFieldName())) {
+                            return createExpressionForField(fieldExtension);
+                        }
                     }
                 }
             }

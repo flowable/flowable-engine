@@ -14,17 +14,18 @@
 package org.flowable.engine.impl.test;
 
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.ProcessEngines;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
+@Tag("resource")
 public abstract class ResourceFlowableTestCase extends AbstractFlowableTestCase {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ResourceFlowableTestCase.class);
+    @RegisterExtension
+    protected final ResourceFlowableExtension extension;
 
     protected String activitiConfigurationResource;
     protected String processEngineName;
@@ -36,29 +37,15 @@ public abstract class ResourceFlowableTestCase extends AbstractFlowableTestCase 
     public ResourceFlowableTestCase(String activitiConfigurationResource, String processEngineName) {
         this.activitiConfigurationResource = activitiConfigurationResource;
         this.processEngineName = processEngineName;
-    }
-
-    @Override
-    protected void closeDownProcessEngine() {
-        super.closeDownProcessEngine();
-        ProcessEngines.unregister(processEngine);
-        processEngine = null;
-        nullifyServices();
-    }
-
-    @Override
-    protected void initializeProcessEngine() {
-        ProcessEngineConfiguration config = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource(activitiConfigurationResource);
-        if (processEngineName != null) {
-            LOGGER.info("Initializing process engine with name '{}'", processEngineName);
-            config.setEngineName(processEngineName);
-        }
-        additionalConfiguration(config);
-        processEngine = config.buildProcessEngine();
+        this.extension = new ResourceFlowableExtension(activitiConfigurationResource, processEngineName, this::additionalConfiguration);
     }
 
     protected void additionalConfiguration(ProcessEngineConfiguration processEngineConfiguration) {
 
+    }
+
+    protected void rebootEngine() {
+        initializeServices(extension.rebootEngine());
     }
 
 }

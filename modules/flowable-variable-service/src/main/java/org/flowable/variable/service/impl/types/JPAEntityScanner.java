@@ -19,7 +19,7 @@ import java.lang.reflect.Method;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * Scans class and creates {@link EntityMetaData} based on it.
@@ -30,8 +30,7 @@ public class JPAEntityScanner {
 
     public EntityMetaData scanClass(Class<?> clazz) {
         EntityMetaData metaData = new EntityMetaData();
-        // in case with JPA Enhancement
-        // method should iterate over superclasses list
+        // in case with JPA Enhancement method should iterate over superclasses list
         // to find @Entity and @Id annotations
         while (clazz != null && !clazz.equals(Object.class)) {
 
@@ -63,8 +62,7 @@ public class JPAEntityScanner {
 
     private Method getIdMethod(Class<?> clazz) {
         Method idMethod = null;
-        // Get all public declared methods on the class. According to spec, @Id
-        // should only be
+        // Get all public declared methods on the class. According to spec, @Id should only be
         // applied to fields and property get methods
         Method[] methods = clazz.getMethods();
         Id idAnnotation = null;
@@ -92,8 +90,7 @@ public class JPAEntityScanner {
 
         if (idField == null) {
             // Check superClass for fields with @Id, since getDeclaredFields
-            // does
-            // not return superclass-fields.
+            // does not return superclass-fields.
             Class<?> superClass = clazz.getSuperclass();
             if (superClass != null && !superClass.equals(Object.class)) {
                 // Recursively go up class hierarchy

@@ -39,6 +39,7 @@ public class SimpleConverterTest extends AbstractConverterTest {
         validateModel(bpmnModel);
     }
 
+    @Override
     protected String getResource() {
         return "test.simplemodel.json";
     }

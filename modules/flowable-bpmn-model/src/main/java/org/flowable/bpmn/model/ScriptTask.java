@@ -55,6 +55,7 @@ public class ScriptTask extends Task {
         this.autoStoreVariables = autoStoreVariables;
     }
 
+    @Override
     public ScriptTask clone() {
         ScriptTask clone = new ScriptTask();
         clone.setValues(this);

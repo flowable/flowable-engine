@@ -17,6 +17,7 @@ package org.flowable.bpmn.model;
  */
 public class EventGateway extends Gateway {
 
+    @Override
     public EventGateway clone() {
         EventGateway clone = new EventGateway();
         clone.setValues(this);

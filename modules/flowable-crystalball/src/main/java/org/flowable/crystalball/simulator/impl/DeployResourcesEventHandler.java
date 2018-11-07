@@ -29,14 +29,16 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Start new process event handler for playback purposes
- * 
+ *
  * @author martin.grofcik
  */
 public class DeployResourcesEventHandler implements SimulationEventHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DeployResourcesEventHandler.class);
 
-    /** process to start key */
+    /**
+     * process to start key
+     */
     protected String resourcesKey;
 
     public DeployResourcesEventHandler(String resourcesKey) {
@@ -53,7 +55,7 @@ public class DeployResourcesEventHandler implements SimulationEventHandler {
         @SuppressWarnings("unchecked")
         Map<String, ResourceEntity> resources = (Map<String, ResourceEntity>) event.getProperty(resourcesKey);
 
-        List<InputStream> inputStreams = new ArrayList<InputStream>();
+        List<InputStream> inputStreams = new ArrayList<>();
 
         try {
             DeploymentBuilder deploymentBuilder = SimulationRunContext.getRepositoryService().createDeployment();

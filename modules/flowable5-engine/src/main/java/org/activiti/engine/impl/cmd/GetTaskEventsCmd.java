@@ -32,6 +32,7 @@ public class GetTaskEventsCmd implements Command<List<Event>>, Serializable {
         this.taskId = taskId;
     }
 
+    @Override
     public List<Event> execute(CommandContext commandContext) {
         return commandContext
                 .getCommentEntityManager()

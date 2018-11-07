@@ -7,16 +7,62 @@
   <!-- FORM INSTANCE INSERT -->
 
   <insert id="insertFormInstance" parameterType="org.flowable.form.engine.impl.persistence.entity.FormInstanceEntityImpl">
-    insert into ${prefix}ACT_FO_FORM_INSTANCE(ID_, FORM_DEFINITION_ID_, TASK_ID_, PROC_INST_ID_, PROC_DEF_ID_, SUBMITTED_DATE_, SUBMITTED_BY_, FORM_VALUES_ID_, TENANT_ID_)
+    insert into ${prefix}ACT_FO_FORM_INSTANCE(ID_, FORM_DEFINITION_ID_, TASK_ID_, PROC_INST_ID_, PROC_DEF_ID_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_,
+                    SUBMITTED_DATE_, SUBMITTED_BY_, FORM_VALUES_ID_, TENANT_ID_)
     values (#{id, jdbcType=VARCHAR},
             #{formDefinitionId, jdbcType=VARCHAR},
             #{taskId, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR}, 
             #{processDefinitionId, jdbcType=VARCHAR},
+            #{scopeId, jdbcType=VARCHAR},
+            #{scopeType, jdbcType=VARCHAR},
+            #{scopeDefinitionId, jdbcType=VARCHAR},
             #{submittedDate, jdbcType=TIMESTAMP},
             #{submittedBy, jdbcType=VARCHAR},
             #{resourceRef, typeHandler=ResourceRefTypeHandler},
             #{tenantId, jdbcType=VARCHAR})
+  </insert>
+  
+  
+  <insert id="bulkInsertFormInstance" parameterType="java.util.List">
+    insert into ${prefix}ACT_FO_FORM_INSTANCE(ID_, FORM_DEFINITION_ID_, TASK_ID_, PROC_INST_ID_, PROC_DEF_ID_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_,
+                    SUBMITTED_DATE_, SUBMITTED_BY_, FORM_VALUES_ID_, TENANT_ID_)
+    values 
+    <foreach collection="list" item="formInstance" index="index" separator=",">
+        (#{formInstance.id, jdbcType=VARCHAR},
+         #{formInstance.formDefinitionId, jdbcType=VARCHAR},
+         #{formInstance.taskId, jdbcType=VARCHAR},
+         #{formInstance.processInstanceId, jdbcType=VARCHAR}, 
+         #{formInstance.processDefinitionId, jdbcType=VARCHAR},
+         #{formInstance.scopeId, jdbcType=VARCHAR},
+         #{formInstance.scopeType, jdbcType=VARCHAR},
+         #{formInstance.scopeDefinitionId, jdbcType=VARCHAR},
+         #{formInstance.submittedDate, jdbcType=TIMESTAMP},
+         #{formInstance.submittedBy, jdbcType=VARCHAR},
+         #{formInstance.resourceRef, typeHandler=ResourceRefTypeHandler},
+         #{formInstance.tenantId, jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+  
+  <insert id="bulkInsertFormInstance" databaseId="oracle" parameterType="java.util.List">
+    INSERT ALL
+    <foreach collection="list" item="formInstance" index="index">
+        INTO ${prefix}ACT_FO_FORM_INSTANCE(ID_, FORM_DEFINITION_ID_, TASK_ID_, PROC_INST_ID_, PROC_DEF_ID_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_,
+                    SUBMITTED_DATE_, SUBMITTED_BY_, FORM_VALUES_ID_, TENANT_ID_) VALUES 
+        (#{formInstance.id, jdbcType=VARCHAR},
+         #{formInstance.formDefinitionId, jdbcType=VARCHAR},
+         #{formInstance.taskId, jdbcType=VARCHAR},
+         #{formInstance.processInstanceId, jdbcType=VARCHAR}, 
+         #{formInstance.processDefinitionId, jdbcType=VARCHAR},
+         #{formInstance.scopeId, jdbcType=VARCHAR},
+         #{formInstance.scopeType, jdbcType=VARCHAR},
+         #{formInstance.scopeDefinitionId, jdbcType=VARCHAR},
+         #{formInstance.submittedDate, jdbcType=TIMESTAMP},
+         #{formInstance.submittedBy, jdbcType=VARCHAR},
+         #{formInstance.resourceRef, typeHandler=ResourceRefTypeHandler},
+         #{formInstance.tenantId, jdbcType=VARCHAR})
+    </foreach>
+    SELECT * FROM dual
   </insert>
 
   <update id="updateFormInstance" parameterType="org.flowable.form.engine.impl.persistence.entity.FormInstanceEntityImpl">
@@ -43,6 +89,9 @@
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR"/>
+    <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
+    <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
+    <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
     <result property="submittedDate" column="SUBMITTED_DATE_" jdbcType="TIMESTAMP"/>
     <result property="submittedBy" column="SUBMITTED_BY_" jdbcType="VARCHAR"/>
     <result property="resourceRef" column="FORM_VALUES_ID_" typeHandler="ResourceRefTypeHandler" />
@@ -108,6 +157,15 @@
       <if test="processDefinitionIdLike != null">
         and RES.PROC_DEF_ID_ like #{processDefinitionIdLike}
       </if>
+      <if test="scopeId != null">
+        and RES.SCOPE_ID_ = #{scopeId}
+      </if>
+      <if test="scopeType != null">
+        and RES.SCOPE_TYPE_ = #{scopeType}
+      </if>
+      <if test="scopeDefinitionId != null">
+        and RES.SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
+      </if>
       <if test="submittedDate != null">
         and RES.SUBMITTED_DATE_ = #{submittedDate}
       </if>
@@ -132,22 +190,10 @@
       <if test="withoutTenantId">
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
       </if>
+      <if test="withoutTaskId">
+        and (RES.TASK_ID_ is null)
+      </if>
     </where>
   </sql>
     
-  <!-- mysql specific sql -->
-  <select id="selectFormInstancesByQueryCriteria" databaseId="mysql" parameterType="org.flowable.form.engine.impl.FormInstanceQueryImpl" resultMap="formInstanceResultMap">
-  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
-    <include refid="selectFormInstancesByQueryCriteriaSql"/>
-    ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
-  </select>
-
-  <!-- mysql specific sql -->
-  <select id="selectFormInstancesCountByQueryCriteria" databaseId="mysql" parameterType="org.flowable.form.engine.impl.FormInstanceQueryImpl" resultType="long">
-    select distinct count(RES.ID_)
-    <include refid="selectFormInstancesByQueryCriteriaSql"/>
-  </select>
-
 </mapper>

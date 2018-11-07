@@ -12,8 +12,8 @@
  */
 package org.flowable.engine.impl.persistence.entity;
 
-import org.flowable.engine.common.impl.db.HasRevision;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.db.HasRevision;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 
 /**
  * @author Tom Baeyens
@@ -28,8 +28,10 @@ public interface PropertyEntity extends Entity, HasRevision {
 
     void setValue(String value);
 
+    @Override
     String getId();
 
+    @Override
     Object getPersistentState();
 
 }

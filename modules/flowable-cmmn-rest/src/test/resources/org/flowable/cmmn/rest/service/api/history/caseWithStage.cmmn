@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn"
+             xsi:schemaLocation="http://www.omg.org/spec/CMMN/20151109/MODEL https://www.omg.org/spec/CMMN/20151109/CMMN11.xsd"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="caseWithStage">
+        <casePlanModel id="myCasePlanModel">
+            <planItem id="planItemStageOne" definitionRef="stageOne">
+                <exitCriterion sentryRef="abortStageSentry"/>
+            </planItem>
+            <planItem id="planItemAbortStage" definitionRef="abortStageEvent">
+                <itemControl>
+                    <extensionElements>
+                        <flowable:completionNeutralRule/>
+                    </extensionElements>
+                </itemControl>
+            </planItem>
+            <sentry id="abortStageSentry">
+                <planItemOnPart sourceRef="planItemAbortStage">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <stage id="stageOne">
+                <planItem id="planItemTask" definitionRef="myManualTask"/>
+                <humanTask id="myManualTask"/>
+            </stage>
+            <userEventListener id="abortStageEvent"/>
+        </casePlanModel>
+    </case>
+
+</definitions>

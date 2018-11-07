@@ -18,12 +18,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.dmn.engine.impl.DeploymentSettings;
 import org.flowable.dmn.engine.impl.parser.DmnParse;
 import org.flowable.dmn.engine.impl.parser.DmnParseFactory;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
-import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntity;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +31,6 @@ import org.slf4j.LoggerFactory;
 public class ParsedDeploymentBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ParsedDeploymentBuilder.class);
-
-    public static final String[] DMN_RESOURCE_SUFFIXES = new String[] { "dmn" };
 
     protected DmnDeploymentEntity deployment;
     protected DmnParseFactory dmnParseFactory;
@@ -47,10 +45,10 @@ public class ParsedDeploymentBuilder {
     public ParsedDeployment build() {
         List<DecisionTableEntity> decisionTables = new ArrayList<>();
         Map<DecisionTableEntity, DmnParse> decisionTablesToDmnParseMap = new LinkedHashMap<>();
-        Map<DecisionTableEntity, DmnResourceEntity> decisionTablesToResourceMap = new LinkedHashMap<>();
+        Map<DecisionTableEntity, EngineResource> decisionTablesToResourceMap = new LinkedHashMap<>();
 
-        for (DmnResourceEntity resource : deployment.getResources().values()) {
-            if (isDmnResource(resource.getName())) {
+        for (EngineResource resource : deployment.getResources().values()) {
+            if (DmnResourceUtil.isDmnResource(resource.getName())) {
                 LOGGER.debug("Processing DMN resource {}", resource.getName());
                 DmnParse parse = createDmnParseFromResource(resource);
                 for (DecisionTableEntity decisionTable : parse.getDecisionTables()) {
@@ -64,7 +62,7 @@ public class ParsedDeploymentBuilder {
         return new ParsedDeployment(deployment, decisionTables, decisionTablesToDmnParseMap, decisionTablesToResourceMap);
     }
 
-    protected DmnParse createDmnParseFromResource(DmnResourceEntity resource) {
+    protected DmnParse createDmnParseFromResource(EngineResource resource) {
         String resourceName = resource.getName();
         ByteArrayInputStream inputStream = new ByteArrayInputStream(resource.getBytes());
 
@@ -88,16 +86,6 @@ public class ParsedDeploymentBuilder {
 
         dmnParse.execute(CommandContextUtil.getDmnEngineConfiguration());
         return dmnParse;
-    }
-
-    protected boolean isDmnResource(String resourceName) {
-        for (String suffix : DMN_RESOURCE_SUFFIXES) {
-            if (resourceName.endsWith(suffix)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
 }

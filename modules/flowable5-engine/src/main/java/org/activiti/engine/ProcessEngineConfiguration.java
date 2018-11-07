@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,7 +14,9 @@
 package org.activiti.engine;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -22,54 +24,55 @@ import javax.sql.DataSource;
 import org.activiti.engine.impl.cfg.BeansConfigurationHelper;
 import org.activiti.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
+import org.activiti.engine.runtime.JobProcessor;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.cfg.MailServerInfo;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.runtime.Clock;
-import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.image.ProcessDiagramGenerator;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 
 /**
  * Configuration information from which a process engine can be build.
- * 
+ * <p>
  * <p>
  * Most common is to create a process engine based on the default configuration file:
- * 
+ * <p>
  * <pre>
  * ProcessEngine processEngine = ProcessEngineConfiguration
  *         .createProcessEngineConfigurationFromResourceDefault()
  *         .buildProcessEngine();
  * </pre>
  * </p>
- * 
+ * <p>
  * <p>
  * To create a process engine programatic, without a configuration file, the first option is {@link #createStandaloneProcessEngineConfiguration()}
- * 
+ * <p>
  * <pre>
  * ProcessEngine processEngine = ProcessEngineConfiguration
  *         .createStandaloneProcessEngineConfiguration()
  *         .buildProcessEngine();
  * </pre>
- * 
+ * <p>
  * This creates a new process engine with all the defaults to connect to a remote h2 database (jdbc:h2:tcp://localhost/activiti) in standalone mode. Standalone mode means that Activiti will manage the
  * transactions on the JDBC connections that it creates. One transaction per service method. For a description of how to write the configuration files, see the userguide.
  * </p>
- * 
+ * <p>
  * <p>
  * The second option is great for testing: {@link #createStandaloneInMemProcessEngineConfiguration()}
- * 
+ * <p>
  * <pre>
  * ProcessEngine processEngine = ProcessEngineConfiguration
  *         .createStandaloneInMemProcessEngineConfiguration()
  *         .buildProcessEngine();
  * </pre>
- * 
+ * <p>
  * This creates a new process engine with all the defaults to connect to an memory h2 database (jdbc:h2:tcp://localhost/activiti) in standalone mode. The DB schema strategy default is in this case
  * <code>create-drop</code>. Standalone mode means that Activiti will manage the transactions on the JDBC connections that it creates. One transaction per service method.
  * </p>
- * 
+ * <p>
  * <p>
  * On all forms of creating a process engine, you can first customize the configuration before calling the {@link #buildProcessEngine()} method by calling any of the setters like this:
- * 
+ * <p>
  * <pre>
  * ProcessEngine processEngine = ProcessEngineConfiguration
  *         .createProcessEngineConfigurationFromResourceDefault()
@@ -79,9 +82,9 @@ import org.flowable.image.ProcessDiagramGenerator;
  *         .buildProcessEngine();
  * </pre>
  * </p>
- * 
- * @see ProcessEngines
+ *
  * @author Tom Baeyens
+ * @see ProcessEngines
  */
 public abstract class ProcessEngineConfiguration {
 
@@ -100,7 +103,9 @@ public abstract class ProcessEngineConfiguration {
      */
     public static final String DB_SCHEMA_UPDATE_TRUE = "true";
 
-    /** The tenant id indicating 'no tenant' */
+    /**
+     * The tenant id indicating 'no tenant'
+     */
     public static final String NO_TENANT_ID = "";
 
     protected String processEngineName = ProcessEngines.NAME_DEFAULT;
@@ -116,8 +121,8 @@ public abstract class ProcessEngineConfiguration {
     protected boolean useTLS;
     protected String mailServerDefaultFrom = "activiti@localhost";
     protected String mailSessionJndi;
-    protected Map<String, MailServerInfo> mailServers = new HashMap<String, MailServerInfo>();
-    protected Map<String, String> mailSessionsJndi = new HashMap<String, String>();
+    protected Map<String, MailServerInfo> mailServers = new HashMap<>();
+    protected Map<String, String> mailSessionsJndi = new HashMap<>();
 
     protected String databaseType;
     protected String databaseSchemaUpdate = DB_SCHEMA_UPDATE_FALSE;
@@ -152,29 +157,35 @@ public abstract class ProcessEngineConfiguration {
      * retried again.
      */
     protected int lockTimeAsyncJobWaitTime = 60;
-    /** define the default wait time for a failed job in seconds */
+    /**
+     * define the default wait time for a failed job in seconds
+     */
     protected int defaultFailedJobWaitTime = 10;
-    /** define the default wait time for a failed async job in seconds */
+    /**
+     * define the default wait time for a failed async job in seconds
+     */
     protected int asyncFailedJobWaitTime = 10;
 
-    /** process diagram generator. Default value is DefaultProcessDiagramGenerator */
+    /**
+     * process diagram generator. Default value is DefaultProcessDiagramGenerator
+     */
     protected ProcessDiagramGenerator processDiagramGenerator;
 
     /**
      * Allows configuring a database table prefix which is used for all runtime operations of the process engine. For example, if you specify a prefix named 'PRE1.', activiti will query for executions
      * in a table named 'PRE1.ACT_RU_EXECUTION_'.
-     * 
-     * <p />
+     * <p>
+     * <p/>
      * <strong>NOTE: the prefix is not respected by automatic database schema management. If you use {@link ProcessEngineConfiguration#DB_SCHEMA_UPDATE_CREATE_DROP} or
      * {@link ProcessEngineConfiguration#DB_SCHEMA_UPDATE_TRUE}, activiti will create the database tables using the default names, regardless of the prefix configured here.</strong>
-     * 
+     *
      * @since 5.9
      */
     protected String databaseTablePrefix = "";
 
     /**
      * Escape character for doing wildcard searches.
-     * 
+     * <p>
      * This will be added at then end of queries that include for example a LIKE clause. For example: SELECT * FROM table WHERE column LIKE '%\%%' ESCAPE '\';
      */
     protected String databaseWildcardEscapeCharacter;
@@ -193,12 +204,17 @@ public abstract class ProcessEngineConfiguration {
     /**
      * Set to true in case the defined databaseTablePrefix is a schema-name, instead of an actual table name prefix. This is relevant for checking if Activiti-tables exist, the databaseTablePrefix
      * will not be used here - since the schema is taken into account already, adding a prefix for the table-check will result in wrong table-names.
-     * 
+     *
      * @since 5.15
      */
     protected boolean tablePrefixIsSchema;
 
     protected boolean isCreateDiagramOnDeploy = true;
+    
+    /**
+     *  include the sequence flow name in case there's no Label DI, 
+     */
+    protected boolean drawSequenceFlowNameWithNoLabelDI = false;
 
     protected String xmlEncoding = "UTF-8";
 
@@ -217,7 +233,11 @@ public abstract class ProcessEngineConfiguration {
 
     protected boolean enableProcessDefinitionInfoCache;
 
-    /** use one of the static createXxxx methods instead */
+    protected List<JobProcessor> jobProcessors = Collections.emptyList();
+
+    /**
+     * use one of the static createXxxx methods instead
+     */
     protected ProcessEngineConfiguration() {
     }
 
@@ -578,7 +598,16 @@ public abstract class ProcessEngineConfiguration {
         this.classLoader = classLoader;
         return this;
     }
-
+    
+    public boolean isDrawSequenceFlowNameWithNoLabelDI() {
+        return drawSequenceFlowNameWithNoLabelDI;
+    }
+    
+    public ProcessEngineConfiguration setDrawSequenceFlowNameWithNoLabelDI(boolean drawSequenceFlowNameWithNoLabelDI) {
+        this.drawSequenceFlowNameWithNoLabelDI = drawSequenceFlowNameWithNoLabelDI;
+        return this;
+    }
+    
     public boolean isUseClassForNameClassLoading() {
         return useClassForNameClassLoading;
     }
@@ -803,4 +832,14 @@ public abstract class ProcessEngineConfiguration {
         this.enableProcessDefinitionInfoCache = enableProcessDefinitionInfoCache;
         return this;
     }
+
+    public List<JobProcessor> getJobProcessors() {
+        return jobProcessors;
+    }
+
+    public ProcessEngineConfiguration setJobProcessors(List<JobProcessor> jobProcessors) {
+        this.jobProcessors = jobProcessors;
+        return this;
+    }
+
 }

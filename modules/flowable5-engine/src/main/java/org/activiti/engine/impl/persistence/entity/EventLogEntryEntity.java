@@ -55,6 +55,7 @@ public class EventLogEntryEntity implements PersistentObject, EventLogEntry {
         return null; // Not updatable
     }
 
+    @Override
     public long getLogNumber() {
         return logNumber;
     }
@@ -63,6 +64,7 @@ public class EventLogEntryEntity implements PersistentObject, EventLogEntry {
         this.logNumber = logNumber;
     }
 
+    @Override
     public String getType() {
         return type;
     }
@@ -71,6 +73,7 @@ public class EventLogEntryEntity implements PersistentObject, EventLogEntry {
         this.type = type;
     }
 
+    @Override
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
@@ -79,6 +82,7 @@ public class EventLogEntryEntity implements PersistentObject, EventLogEntry {
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public String getProcessInstanceId() {
         return processInstanceId;
     }
@@ -87,6 +91,7 @@ public class EventLogEntryEntity implements PersistentObject, EventLogEntry {
         this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public String getExecutionId() {
         return executionId;
     }
@@ -95,6 +100,7 @@ public class EventLogEntryEntity implements PersistentObject, EventLogEntry {
         this.executionId = executionId;
     }
 
+    @Override
     public String getTaskId() {
         return taskId;
     }
@@ -103,6 +109,7 @@ public class EventLogEntryEntity implements PersistentObject, EventLogEntry {
         this.taskId = taskId;
     }
 
+    @Override
     public Date getTimeStamp() {
         return timeStamp;
     }
@@ -111,6 +118,7 @@ public class EventLogEntryEntity implements PersistentObject, EventLogEntry {
         this.timeStamp = timeStamp;
     }
 
+    @Override
     public String getUserId() {
         return userId;
     }
@@ -119,6 +127,7 @@ public class EventLogEntryEntity implements PersistentObject, EventLogEntry {
         this.userId = userId;
     }
 
+    @Override
     public byte[] getData() {
         return data;
     }

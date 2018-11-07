@@ -16,9 +16,9 @@ package org.flowable.spring;
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.javax.el.ELContext;
-import org.flowable.engine.common.impl.javax.el.ELResolver;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.javax.el.ELContext;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -33,6 +33,7 @@ public class ApplicationContextElResolver extends ELResolver {
         this.applicationContext = applicationContext;
     }
 
+    @Override
     public Object getValue(ELContext context, Object base, Object property) {
         if (base == null) {
             // according to javadoc, can only be a String
@@ -47,10 +48,12 @@ public class ApplicationContextElResolver extends ELResolver {
         return null;
     }
 
+    @Override
     public boolean isReadOnly(ELContext context, Object base, Object property) {
         return true;
     }
 
+    @Override
     public void setValue(ELContext context, Object base, Object property, Object value) {
         if (base == null) {
             String key = (String) property;
@@ -60,14 +63,17 @@ public class ApplicationContextElResolver extends ELResolver {
         }
     }
 
+    @Override
     public Class<?> getCommonPropertyType(ELContext context, Object arg) {
         return Object.class;
     }
 
+    @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object arg) {
         return null;
     }
 
+    @Override
     public Class<?> getType(ELContext context, Object arg1, Object arg2) {
         return Object.class;
     }

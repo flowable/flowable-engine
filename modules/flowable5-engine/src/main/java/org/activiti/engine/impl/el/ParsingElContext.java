@@ -12,11 +12,11 @@
  */
 package org.activiti.engine.impl.el;
 
-import org.activiti.engine.impl.javax.el.ELContext;
-import org.activiti.engine.impl.javax.el.ELResolver;
-import org.activiti.engine.impl.javax.el.ExpressionFactory;
-import org.activiti.engine.impl.javax.el.FunctionMapper;
-import org.activiti.engine.impl.javax.el.VariableMapper;
+import org.flowable.common.engine.impl.javax.el.ELContext;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
+import org.flowable.common.engine.impl.javax.el.ExpressionFactory;
+import org.flowable.common.engine.impl.javax.el.FunctionMapper;
+import org.flowable.common.engine.impl.javax.el.VariableMapper;
 
 /**
  * Simple implementation of the {@link ELContext} used during parsings.
@@ -30,14 +30,17 @@ import org.activiti.engine.impl.javax.el.VariableMapper;
  */
 public class ParsingElContext extends ELContext {
 
+    @Override
     public ELResolver getELResolver() {
         return null;
     }
 
+    @Override
     public FunctionMapper getFunctionMapper() {
         return null;
     }
 
+    @Override
     public VariableMapper getVariableMapper() {
         return null;
     }

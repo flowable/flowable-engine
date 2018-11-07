@@ -24,10 +24,12 @@ import org.flowable.engine.delegate.ExecutionListener;
  */
 public abstract class AbstractEventAtomicOperation implements AtomicOperation {
 
+    @Override
     public boolean isAsync(InterpretableExecution execution) {
         return false;
     }
 
+    @Override
     public void execute(InterpretableExecution execution) {
         ScopeImpl scope = getScope(execution);
         List<ExecutionListener> executionListeners = scope.getExecutionListeners(getEventName());

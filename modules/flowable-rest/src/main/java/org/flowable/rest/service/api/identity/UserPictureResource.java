@@ -13,33 +13,33 @@
 
 package org.flowable.rest.service.api.identity;
 
-import java.io.ByteArrayOutputStream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.io.IOUtils;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.idm.api.Picture;
-import org.flowable.idm.api.User;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import org.apache.commons.io.IOUtils;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.idm.api.Picture;
+import org.flowable.idm.api.User;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 
 /**
  * @author Frederik Heremans
@@ -48,13 +48,14 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Users" }, description = "Manage Users", authorizations = { @Authorization(value = "basicAuth") })
 public class UserPictureResource extends BaseUserResource {
 
-    @ApiOperation(value = "Get a user’s picture", tags = {
+
+    @ApiOperation(value = "Get a user’s picture", produces = "application/octet-stream", tags = {
             "Users" }, notes = "The response body contains the raw picture data, representing the user’s picture. The Content-type of the response corresponds to the mimeType that was set when creating the picture.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the user was found and has a picture, which is returned in the body."),
             @ApiResponse(code = 404, message = "Indicates the requested user was not found or the user does not have a profile picture. Status-description contains additional information about the error.")
     })
-    @RequestMapping(value = "/identity/users/{userId}/picture", method = RequestMethod.GET)
+    @GetMapping(value = "/identity/users/{userId}/picture")
     public ResponseEntity<byte[]> getUserPicture(@ApiParam(name = "userId") @PathVariable String userId, HttpServletRequest request, HttpServletResponse response) {
         User user = getUserFromRequest(userId);
         Picture userPicture = identityService.getUserPicture(user.getId());
@@ -77,15 +78,18 @@ public class UserPictureResource extends BaseUserResource {
         }
     }
 
-    @ApiOperation(value = "Updating a user’s picture", tags = {
-            "Users" }, consumes = "multipart/form-data", notes = "The request should be of type multipart/form-data. There should be a single file-part included with the binary value of the picture. On top of that, the following additional form-fields can be present:\n"
+    @ApiOperation(consumes = "multipart/form-data", value = "Updating a user’s picture", tags = {
+            "Users" },  notes = "The request should be of type multipart/form-data. There should be a single file-part included with the binary value of the picture. On top of that, the following additional form-fields can be present:\n"
                     + "\n"
                     + "mimeType: Optional mime-type for the uploaded picture. If omitted, the default of image/jpeg is used as a mime-type for the picture.")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "file", dataType = "file", value = "Picture to update", paramType = "form", required = true)
+    })
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates the user was found and the picture has been updated. The response-body is left empty intentionally."),
+            @ApiResponse(code = 204, message = "Indicates the user was found and the picture has been updated. The response-body is left empty intentionally."),
             @ApiResponse(code = 404, message = "Indicates the requested user was not found.")
     })
-    @RequestMapping(value = "/identity/users/{userId}/picture", method = RequestMethod.PUT)
+    @PutMapping(value = "/identity/users/{userId}/picture", consumes = "multipart/form-data")
     public void updateUserPicture(@ApiParam(name = "userId") @PathVariable String userId, HttpServletRequest request, HttpServletResponse response) {
         User user = getUserFromRequest(userId);
 

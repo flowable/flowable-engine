@@ -15,8 +15,8 @@ package org.flowable.engine.repository;
 
 import java.util.Set;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.query.Query;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link ProcessDefinition}s.

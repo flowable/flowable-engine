@@ -1,0 +1,762 @@
+openapi: 3.0.0
+servers:
+  - url: 'http://localhost:8080/flowable-rest/content-api'
+  - url: 'https://localhost:8080/flowable-rest/content-api'
+info:
+  description: >-
+    # flowable / flow??b(??)l /
+
+
+    - a compact and highly efficient workflow and Business Process Management
+    (BPM) platform for developers, system admins and business users.
+
+    - a lightning fast, tried and tested BPMN 2 process engine written in Java.
+    It is Apache 2.0 licensed open source, with a committed community.
+
+    - can run embedded in a Java application, or as a service on a server, a
+    cluster, and in the cloud. It integrates perfectly with Spring. With a rich
+    Java and REST API, it is the ideal engine for orchestrating human or system
+    activities.
+  version: v1
+  title: Flowable Content REST API
+  contact:
+    name: Flowable
+    url: 'http://www.flowable.org/'
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: Content item
+  - name: Engine
+  - name: Query
+paths:
+  /content-management/engine:
+    get:
+      tags:
+        - Engine
+      summary: Get Content engine info
+      description: ''
+      operationId: getEngineInfo
+      responses:
+        '200':
+          description: Indicates the engine info is returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentEngineInfoResponse'
+      security:
+        - basicAuth: []
+      parameters: []
+  /content-service/content-items:
+    get:
+      tags:
+        - Content item
+      summary: List content items
+      description: ''
+      operationId: listContentItems
+      parameters:
+        - name: id
+          in: query
+          description: Only return content items with the given id.
+          required: false
+          schema:
+            type: string
+        - name: name
+          in: query
+          description: Only return content items with the given name.
+          required: false
+          schema:
+            type: string
+        - name: nameLike
+          in: query
+          description: Only return content items with a name like the given value.
+          required: false
+          schema:
+            type: string
+        - name: mimeType
+          in: query
+          description: Only return content items with the given mime type.
+          required: false
+          schema:
+            type: string
+        - name: mimeTypeLike
+          in: query
+          description: Only return content items with a mime type like the given value.
+          required: false
+          schema:
+            type: string
+        - name: taskId
+          in: query
+          description: Only return content items with the given task id.
+          required: false
+          schema:
+            type: string
+        - name: taskIdLike
+          in: query
+          description: Only return content items with a task like the given value.
+          required: false
+          schema:
+            type: string
+        - name: processInstanceId
+          in: query
+          description: Only return content items with the given process instance id.
+          required: false
+          schema:
+            type: string
+        - name: processInstanceIdLike
+          in: query
+          description: >-
+            Only return content items with a process instance like the given
+            value.
+          required: false
+          schema:
+            type: string
+        - name: contentStoreId
+          in: query
+          description: Only return content items with the given content store id.
+          required: false
+          schema:
+            type: string
+        - name: contentStoreIdLike
+          in: query
+          description: >-
+            Only return content items with a content store id like the given
+            value.
+          required: false
+          schema:
+            type: string
+        - name: contentStoreName
+          in: query
+          description: Only return content items with the given content store name.
+          required: false
+          schema:
+            type: string
+        - name: contentStoreNameLike
+          in: query
+          description: >-
+            Only return content items with a content store name like the given
+            value.
+          required: false
+          schema:
+            type: string
+        - name: contentAvailable
+          in: query
+          description: Only return content items with or without content available.
+          required: false
+          schema:
+            type: boolean
+        - name: contentSize
+          in: query
+          description: Only return content items with the given content size.
+          required: false
+          schema:
+            type: number
+            format: int64
+        - name: minimumContentSize
+          in: query
+          description: >-
+            Only return content items with the a minimum content size of the
+            given value.
+          required: false
+          schema:
+            type: number
+            format: int64
+        - name: maximumContentSize
+          in: query
+          description: >-
+            Only return content items with the a maximum content size of the
+            given value.
+          required: false
+          schema:
+            type: number
+            format: int64
+        - name: field
+          in: query
+          description: Only return content items with the given field.
+          required: false
+          schema:
+            type: string
+        - name: fieldLike
+          in: query
+          description: Only return content items with a field like the given value.
+          required: false
+          schema:
+            type: string
+        - name: createdOn
+          in: query
+          description: Only return content items with the given create date.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: createdBefore
+          in: query
+          description: Only return content items before given create date.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: createdAfter
+          in: query
+          description: Only return content items after given create date.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: createdBy
+          in: query
+          description: Only return content items with the given created by.
+          required: false
+          schema:
+            type: string
+        - name: createdByLike
+          in: query
+          description: Only return content items with a created by like the given value.
+          required: false
+          schema:
+            type: string
+        - name: lastModifiedOn
+          in: query
+          description: Only return content items with the given last modified date.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: lastModifiedBefore
+          in: query
+          description: Only return content items before given last modified date.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: lastModifiedAfter
+          in: query
+          description: Only return content items after given last modified date.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: lastModifiedBy
+          in: query
+          description: Only return content items with the given last modified by.
+          required: false
+          schema:
+            type: string
+        - name: lastModifiedByLike
+          in: query
+          description: >-
+            Only return content items with a last modified by like the given
+            value.
+          required: false
+          schema:
+            type: string
+        - name: tenantId
+          in: query
+          description: Only return content items with the given tenantId.
+          required: false
+          schema:
+            type: string
+        - name: tenantIdLike
+          in: query
+          description: Only return content items with a tenantId like the given value.
+          required: false
+          schema:
+            type: string
+        - name: withoutTenantId
+          in: query
+          description: >-
+            If true, only returns content items without a tenantId set. If
+            false, the withoutTenantId parameter is ignored.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: The content items are returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataResponseContentItemResponse'
+      security:
+        - basicAuth: []
+    post:
+      tags:
+        - Content item
+      summary: >-
+        Create a new content item, with content item information and an optional
+        attached file
+      description: >-
+        This endpoint can be used in 2 ways: By passing a JSON Body
+        (ContentItemRequest) to link an external resource or by passing a
+        multipart/form-data Object to attach a file.
+      operationId: createContentItem
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentItemResponse'
+        '201':
+          description: Indicates the content item was created and the result is returned.
+        '400':
+          description: Indicates required content item info is missing from the request.
+      security:
+        - basicAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContentItemRequest'
+              description: 'Create a new content item, with content item information'
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  description: 'Attachment File'
+                  type: string
+                  format: binary
+                name:
+                  description: Required name of the variable
+                  type: string
+                mimeType:
+                  description: 'Mime type of the content item, optional'
+                  type: string
+                taskId:
+                  description: 'Task identifier for the content item, optional'
+                  type: string
+                processInstanceId:
+                  description: 'Process instance identifier for the content item, optional'
+                  type: string
+                contentStoreId:
+                  description: >-
+                    The identifier of the content item in an external content
+                    store, optional
+                  type: string
+                contentStoreName:
+                  description: 'The name of an external content store, optional'
+                  type: string
+                field:
+                  description: 'The form field for the content item, optional'
+                  type: string
+                createdBy:
+                  description: 'The user identifier that created the content item, optional'
+                  type: string
+                lastModifiedBy:
+                  description: >-
+                    The user identifier that last modified the content item,
+                    optional
+                  type: string
+                tenantId:
+                  description: 'The tenant identifier of the content item, optional'
+                  type: string
+      parameters: []
+  '/content-service/content-items/{contentItemId}':
+    get:
+      tags:
+        - Content item
+      summary: Get a content item
+      description: ''
+      operationId: getContentItem
+      parameters:
+        - name: contentItemId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Indicates the content item was found and returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentItemResponse'
+        '404':
+          description: Indicates the requested content item was not found.
+      security:
+        - basicAuth: []
+    put:
+      tags:
+        - Content item
+      summary: 'Updates a content item, with the provided content item information'
+      description: ''
+      operationId: updateContentItem
+      parameters:
+        - name: contentItemId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Indicates the content item was updated and the result is returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentItemResponse'
+        '404':
+          description: Indicates content item could not be found.
+      security:
+        - basicAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContentItemRequest'
+    delete:
+      tags:
+        - Content item
+      summary: Delete a content item
+      description: ''
+      operationId: deleteContentItem
+      parameters:
+        - name: contentItemId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Indicates the content item was deleted.
+        '404':
+          description: Indicates the content item was not found.
+      security:
+        - basicAuth: []
+  '/content-service/content-items/{contentItemId}/data':
+    get:
+      tags:
+        - Content item
+      summary: Get the data of a content item
+      description: >-
+        The response body contains the binary content. By default, the
+        content-type of the response is set to application/octet-stream unless
+        the content item type contains a valid mime type.
+      operationId: getContentItemData
+      parameters:
+        - name: contentItemId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: >-
+            Indicates the content item was found and the requested content is
+            returned.
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: byte
+        '404':
+          description: >-
+            Indicates the content item was not found or the content item doesn?t
+            have a binary stream available. Status message provides additional
+            information.
+      security:
+        - basicAuth: []
+    post:
+      tags:
+        - Content item
+      summary: Save the content item data
+      description: >-
+        Save the content item data with an attached fileThe request should be of
+        type multipart/form-data. There should be a single file-part included
+        with the binary value of the content item.
+      operationId: saveContentItemData
+      parameters:
+        - name: contentItemId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentItemResponse'
+        '201':
+          description: >-
+            Indicates the content item data was saved and the result is
+            returned.
+        '400':
+          description: Indicates required content item data is missing from the request.
+      security:
+        - basicAuth: []
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+        required: true
+  /query/content-items:
+    post:
+      tags:
+        - Content item
+        - Query
+      summary: Query for content items
+      description: >-
+        All supported JSON parameter fields allowed are exactly the same as the
+        parameters found for getting a collection of content items, but passed
+        in as JSON-body arguments rather than URL-parameters to allow for more
+        advanced querying and preventing errors with request-uri?s that are too
+        long.
+      operationId: getQueryResult
+      responses:
+        '200':
+          description: Indicates request was successful and the content items are returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataResponseContentItemResponse'
+        '400':
+          description: >-
+            Indicates a parameter was passed in the wrong format. The
+            status-message contains additional information.
+      security:
+        - basicAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContentItemQueryRequest'
+      parameters: []
+components:
+  schemas:
+    ContentEngineInfoResponse:
+      type: object
+      properties:
+        name:
+          type: string
+          example: default
+        resourceUrl:
+          type: string
+          example: 'file://flowable/flowable.content.cfg.xml'
+        exception:
+          type: string
+          example: 'null'
+        version:
+          type: string
+          example: 6.2.0
+    ContentItemQueryRequest:
+      type: object
+      properties:
+        start:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        sort:
+          type: string
+        order:
+          type: string
+        id:
+          type: string
+        ids:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+        name:
+          type: string
+        nameLike:
+          type: string
+        mimeType:
+          type: string
+        mimeTypeLike:
+          type: string
+        taskId:
+          type: string
+        taskIdLike:
+          type: string
+        processInstanceId:
+          type: string
+        processInstanceIdLike:
+          type: string
+        contentStoreId:
+          type: string
+        contentStoreIdLike:
+          type: string
+        contentStoreName:
+          type: string
+        contentStoreNameLike:
+          type: string
+        contentSize:
+          type: integer
+          format: int64
+        minimumContentSize:
+          type: integer
+          format: int64
+        maximumContentSize:
+          type: integer
+          format: int64
+        contentAvailable:
+          type: boolean
+        field:
+          type: string
+        fieldLike:
+          type: string
+        createdOn:
+          type: string
+          format: date-time
+        createdBefore:
+          type: string
+          format: date-time
+        createdAfter:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByLike:
+          type: string
+        lastModifiedOn:
+          type: string
+          format: date-time
+        lastModifiedBefore:
+          type: string
+          format: date-time
+        lastModifiedAfter:
+          type: string
+          format: date-time
+        lastModifiedBy:
+          type: string
+        lastModifiedByLike:
+          type: string
+        tenantId:
+          type: string
+        tenantIdLike:
+          type: string
+        withoutTenantId:
+          type: boolean
+    ContentItemRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Simple content item
+          description: Name of the content item
+        mimeType:
+          type: string
+          example: application/pdf
+          description: 'Mime type of the content item, optional'
+        taskId:
+          type: string
+          example: '12345'
+          description: 'Task identifier for the content item, optional'
+        processInstanceId:
+          type: string
+          example: '1234'
+          description: 'Process instance identifier for the content item, optional'
+        contentStoreId:
+          type: string
+          example: '5678'
+          description: >-
+            The identifier of the content item in an external content store,
+            optional.
+        contentStoreName:
+          type: string
+          example: myFileStore
+          description: 'The name of an external content store, optional'
+        field:
+          type: string
+          example: uploadField
+          description: 'The form field for the content item, optional'
+        tenantId:
+          type: string
+          example: myTenantId
+          description: 'The tenant identifier of the content item, optional.'
+        createdBy:
+          type: string
+          example: johndoe
+          description: 'The user identifier that created the content item, optional'
+        lastModifiedBy:
+          type: string
+          example: johndoe
+          description: 'The user identifier that last modified the content item, optional'
+    ContentItemResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        mimeType:
+          type: string
+        taskId:
+          type: string
+        processInstanceId:
+          type: string
+        contentStoreId:
+          type: string
+        contentStoreName:
+          type: string
+        contentAvailable:
+          type: boolean
+        tenantId:
+          type: string
+        created:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        lastModified:
+          type: string
+          format: date-time
+        lastModifiedBy:
+          type: string
+        url:
+          type: string
+    DataResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+        total:
+          type: integer
+          format: int64
+        start:
+          type: integer
+          format: int32
+        sort:
+          type: string
+        order:
+          type: string
+        size:
+          type: integer
+          format: int32
+    DataResponseContentItemResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContentItemResponse'
+        total:
+          type: integer
+          format: int64
+        start:
+          type: integer
+          format: int32
+        sort:
+          type: string
+        order:
+          type: string
+        size:
+          type: integer
+          format: int32
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  links: {}
+  callbacks: {}
+security: []

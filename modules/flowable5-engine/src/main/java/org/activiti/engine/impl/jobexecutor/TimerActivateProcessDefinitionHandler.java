@@ -12,11 +12,14 @@
  */
 package org.activiti.engine.impl.jobexecutor;
 
+import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.cmd.ActivateProcessDefinitionCmd;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
-import org.activiti.engine.impl.util.json.JSONObject;
-import org.flowable.engine.runtime.Job;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.job.api.Job;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author Joram Barrez
@@ -25,14 +28,24 @@ public class TimerActivateProcessDefinitionHandler extends TimerChangeProcessDef
 
     public static final String TYPE = "activate-processdefinition";
 
+    @Override
     public String getType() {
         return TYPE;
     }
 
+    @Override
     public void execute(Job job, String configuration, ExecutionEntity execution, CommandContext commandContext) {
-        JSONObject cfgJson = new JSONObject(configuration);
+        ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+
+        boolean activateProcessInstances = false;
+        try {
+            JsonNode configNode = processEngineConfiguration.getObjectMapper().readTree(configuration);
+            activateProcessInstances = getIncludeProcessInstances(configNode);
+        } catch (Exception e) {
+            throw new FlowableException("Error reading json value " + configuration, e);
+        }
+
         String processDefinitionId = job.getProcessDefinitionId();
-        boolean activateProcessInstances = getIncludeProcessInstances(cfgJson);
 
         ActivateProcessDefinitionCmd activateProcessDefinitionCmd = new ActivateProcessDefinitionCmd(processDefinitionId, null, activateProcessInstances, null, job.getTenantId());
         activateProcessDefinitionCmd.execute(commandContext);

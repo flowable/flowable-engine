@@ -14,10 +14,13 @@ package org.flowable.engine.test.regression;
 
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.validation.ProcessValidator;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * From http://forums.activiti.org/content/skip-parse-validation-while-fetching- startformdata
@@ -28,6 +31,7 @@ import org.flowable.validation.ProcessValidator;
 public class ProcessValidationExecutedAfterDeployTest extends PluggableFlowableTestCase {
 
     protected ProcessValidator processValidator;
+    protected ProcessValidator initialProcessValidator;
 
     private void disableValidation() {
         processValidator = processEngineConfiguration.getProcessValidator();
@@ -42,9 +46,16 @@ public class ProcessValidationExecutedAfterDeployTest extends PluggableFlowableT
         processEngineConfiguration.getProcessDefinitionCache().clear();
     }
 
+    @BeforeEach
+    public void setUp() {
+        // We need to make sure that we have the initial validator before we run the tests
+        initialProcessValidator = processEngineConfiguration.getProcessValidator();
+    }
+
+    @AfterEach
     protected void tearDown() throws Exception {
-        enableValidation();
-        super.tearDown();
+        // Set the initial validator at the end of the tests
+        processEngineConfiguration.setProcessValidator(initialProcessValidator);
     }
 
     private ProcessDefinition getLatestProcessDefinitionVersionByKey(String processDefinitionKey) {
@@ -60,6 +71,7 @@ public class ProcessValidationExecutedAfterDeployTest extends PluggableFlowableT
         return definitions.get(0);
     }
 
+    @Test
     public void testGetLatestProcessDefinitionTextByKey() {
 
         disableValidation();
@@ -83,6 +95,7 @@ public class ProcessValidationExecutedAfterDeployTest extends PluggableFlowableT
         }
     }
 
+    @Test
     public void testGetStartFormData() {
 
         disableValidation();

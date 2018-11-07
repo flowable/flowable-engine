@@ -13,6 +13,10 @@
 
 package org.flowable.rest.service.api.identity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +28,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.idm.api.Group;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -36,6 +41,7 @@ public class GroupCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting all groups.
      */
+    @Test
     @Deployment
     public void testGetGroups() throws Exception {
         List<Group> savedGroups = new ArrayList<>();
@@ -54,10 +60,13 @@ public class GroupCollectionResourceTest extends BaseSpringRestTestCase {
 
             Group group3 = identityService.createGroupQuery().groupId("admin").singleResult();
             assertNotNull(group3);
+            
+            Group group4 = identityService.createGroupQuery().groupId("sales").singleResult();
+            assertNotNull(group4);
 
             // Test filter-less
             String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP_COLLECTION);
-            assertResultsPresentInDataResponse(url, group1.getId(), group2.getId(), group3.getId());
+            assertResultsPresentInDataResponse(url, group1.getId(), group2.getId(), group3.getId(), group4.getId());
 
             // Test based on name
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP_COLLECTION) + "?name=" + encode("Test group");
@@ -86,6 +95,7 @@ public class GroupCollectionResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testCreateGroup() throws Exception {
         try {
             ObjectNode requestNode = objectMapper.createObjectNode();
@@ -114,6 +124,7 @@ public class GroupCollectionResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testCreateGroupExceptions() throws Exception {
         // Create without ID
         ObjectNode requestNode = objectMapper.createObjectNode();

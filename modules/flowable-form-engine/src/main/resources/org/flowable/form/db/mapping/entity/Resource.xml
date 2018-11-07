@@ -12,25 +12,23 @@
   </insert>
 
   <insert id="bulkInsertFormResource" parameterType="java.util.List">
-    INSERT INTO ${prefix}ACT_FO_FORM_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_, GENERATED_) VALUES 
+    INSERT INTO ${prefix}ACT_FO_FORM_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_) VALUES 
       <foreach collection="list" item="byteArr" index="index" separator=","> 
         (#{byteArr.id, jdbcType=VARCHAR},
          #{byteArr.name, jdbcType=VARCHAR},
          #{byteArr.bytes, jdbcType=${blobType}},
-         #{byteArr.deploymentId, jdbcType=VARCHAR},
-         #{byteArr.generated, jdbcType=BOOLEAN})
+         #{byteArr.deploymentId, jdbcType=VARCHAR})
       </foreach>
   </insert>
 
   <insert id="bulkInsertFormResource" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL
       <foreach collection="list" item="resource" index="index"> 
-        INTO ${prefix}ACT_FO_FORM_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_, GENERATED_) VALUES 
+        INTO ${prefix}ACT_FO_FORM_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_) VALUES 
         (#{resource.id, jdbcType=VARCHAR},
          #{resource.name, jdbcType=VARCHAR},
          #{resource.bytes, jdbcType=${blobType}},
-         #{resource.deploymentId, jdbcType=VARCHAR},
-         #{resource.generated, jdbcType=BOOLEAN})
+         #{resource.deploymentId, jdbcType=VARCHAR})
       </foreach>
     SELECT * FROM dual
   </insert>
@@ -60,7 +58,7 @@
   
   <!-- RESOURCE SELECT -->
 
-  <select id="selectFormResourceNamesByDeploymentId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultType="string">
+  <select id="selectFormResourceNamesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultType="string">
     select NAME_ from ${prefix}ACT_FO_FORM_RESOURCE where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
   </select>
   
@@ -70,7 +68,7 @@
           AND NAME_ = #{resourceName}
   </select>
 
-  <select id="selectFormResourcesByDeploymentId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="formResourceResultMap">
+  <select id="selectFormResourcesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="formResourceResultMap">
     select * from ${prefix}ACT_FO_FORM_RESOURCE where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
   </select>
   

@@ -1,0 +1,75 @@
+<div class="container" id="detail-container">
+	<div class="row">
+		<div class="col-md-9">
+			<div class="component" ng-show="decisionTable">
+				<div class="title">
+					<div class="pull-right">
+						<a ng-click="returnToList()" class="action">&larr; {{'GENERAL.ACTION.RETURN-TO-LIST' | translate}}</a>
+					</div>
+					<h2>{{decisionTable.name &amp;&amp; decisionTable.name +" - " || ""}}{{decisionTable.id}}</h2>
+				</div>
+
+				<div class="property-wrapper">
+					<table>
+						<tr class="property">
+							<td class="property-name" translate="DECISION-TABLE.ID"></td>
+							<td>{{decisionTable.id}}</td>
+							<td class="property-name" translate="DECISION-TABLE.VERSION"></td>
+							<td>{{decisionTable.version}}</td>
+						</tr>
+						<tr class="property">
+							<td class="property-name" translate="DECISION-TABLE.NAME"></td>
+							<td>{{decisionTable.name | empty}}</td>
+							<td class="property-name" translate="DECISION-TABLE.KEY"></td>
+							<td>{{decisionTable.key}}</td>
+						</tr>
+						<tr class="property">
+							<td class="property-name" translate="DECISION-TABLE.RESOURCE-NAME"></td>
+							<td>{{decisionTable.resourceName | empty}}</td>
+							<td class="property-name" translate="DECISION-TABLE.DESCRIPTION"></td>
+							<td>{{decisionTable.description | empty}}</td>
+						</tr>
+						<tr class="property">
+							<td class="property-name" translate="DECISION-TABLE.DEPLOYMENT-ID"></td>
+							<td><a ng-href="#/decision-table-deployment/{{decisionTable.deploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{decisionTable.deploymentId}}</a></td>
+							<td ng-if="decisionTable.parentDeploymentId" class="property-name" translate="DECISION-TABLE.PARENT-DEPLOYMENT-ID"></td>
+							<td ng-if="decisionTable.parentDeploymentId"><a ng-href="#/deployment/{{decisionTable.parentDeploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{decisionTable.parentDeploymentId}}</a></td>
+						</tr>
+						<tr class="property">
+                            <td class="property-name" translate="DECISION-TABLE.TENANT"></td>
+                            <td>{{decisionTable.tenantId | empty}}</td>
+                        </tr>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-3">
+			<div class="component tip-left">
+				<div class="title">
+					<h2 translate="GENERAL.TITLE.ACTIONS"></h2>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-9">
+			<div class="component">
+				<div class="title">
+					<div class="pull-right">
+						<a ng-click="showAllExecutions()" class="action"><i class="glyphicon glyphicon-zoom-in"></i> {{'DECISION-TABLE.ACTION.SHOW-ALL-EXECUTIONS' | translate}}</a>
+					</div>
+					<h2 translate="DECISION-TABLE-EXECUTIONS.TITLE"></h2>
+				</div>
+				<div class="grid-wrapper grid-wrapper-compact" ng-if="decisionExecutions">
+					<div class="grid-message" ng-if="decisionExecutions.size > 0">
+						<span>{{'DECISION-TABLE.DECISION-EXECUTION-MESSAGE' | translate:decisionExecutions}}</span>
+					</div>
+					<div class="grid-message" ng-if="decisionExecutions.size == 0">
+						<span>{{'DECISION-TABLE.DECISION-EXECUTION-MESSAGE-EMPTY' | translate}}</span>
+					</div>
+					<div ng-grid="gridDecisionExecutions" class="gridStyle" ng-if="gridDecisionExecutions && decisionExecutions.data" ng-show="decisionExecutions.size > 0"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

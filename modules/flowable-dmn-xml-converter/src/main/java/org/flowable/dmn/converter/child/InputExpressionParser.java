@@ -24,10 +24,12 @@ import org.flowable.dmn.model.LiteralExpression;
  */
 public class InputExpressionParser extends BaseChildElementParser {
 
+    @Override
     public String getElementName() {
         return ELEMENT_INPUT_EXPRESSION;
     }
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, DecisionTable decisionTable) throws Exception {
         if (!(parentElement instanceof InputClause))
             return;

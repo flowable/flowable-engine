@@ -15,11 +15,11 @@ package org.flowable.variable.service.impl.persistence.entity;
 
 import java.util.Date;
 
-import org.flowable.engine.common.impl.db.HasRevision;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.variable.service.history.HistoricVariableInstance;
-import org.flowable.variable.service.impl.types.ValueFields;
-import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.common.engine.impl.db.HasRevision;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.api.types.VariableType;
 
 /**
  * @author Christian Lipphardt (camunda)
@@ -41,9 +41,13 @@ public interface HistoricVariableInstanceEntity extends ValueFields, HistoricVar
 
     void setLastUpdatedTime(Date lastUpdatedTime);
 
-    String getExecutionId();
-
     void setExecutionId(String executionId);
+    
+    void setScopeId(String scopeId);
+    
+    void setSubScopeId(String subScopeId);
+    
+    void setScopeType(String scopeType);
 
     VariableByteArrayRef getByteArrayRef();
 

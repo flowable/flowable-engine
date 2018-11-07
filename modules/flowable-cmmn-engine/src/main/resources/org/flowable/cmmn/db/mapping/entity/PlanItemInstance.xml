@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl">
+
+    <insert id="insertPlanItemInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl">
+        insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_,
+                                                         NAME_, STATE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
+                                                         LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_,
+                                                         START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_)
+        values (
+            #{id ,jdbcType=VARCHAR},
+            1,
+            #{caseDefinitionId ,jdbcType=VARCHAR},
+            #{caseInstanceId ,jdbcType=VARCHAR},
+            #{stageInstanceId ,jdbcType=VARCHAR},
+            #{isStage, jdbcType=BOOLEAN},
+            #{elementId ,jdbcType=VARCHAR},
+            #{planItemDefinitionId, jdbcType=VARCHAR},
+            #{planItemDefinitionType, jdbcType=VARCHAR},
+            #{name ,jdbcType=VARCHAR},
+            #{state ,jdbcType=VARCHAR},
+            #{createTime ,jdbcType=TIMESTAMP},
+            #{lastAvailableTime ,jdbcType=TIMESTAMP},
+            #{lastEnabledTime ,jdbcType=TIMESTAMP},
+            #{lastDisabledTime ,jdbcType=TIMESTAMP},
+            #{lastStartedTime ,jdbcType=TIMESTAMP},
+            #{lastSuspendedTime ,jdbcType=TIMESTAMP},
+            #{completedTime ,jdbcType=TIMESTAMP},
+            #{occurredTime ,jdbcType=TIMESTAMP},
+            #{terminatedTime ,jdbcType=TIMESTAMP},
+            #{exitTime ,jdbcType=TIMESTAMP},
+            #{endedTime ,jdbcType=TIMESTAMP},
+            #{startUserId ,jdbcType=VARCHAR},
+            #{referenceId ,jdbcType=VARCHAR},
+            #{referenceType ,jdbcType=VARCHAR},
+            #{completeable ,jdbcType=BOOLEAN},
+            #{entryCriterionId, jdbcType=VARCHAR},
+            #{exitCriterionId, jdbcType=VARCHAR},
+            #{countEnabled, jdbcType=BOOLEAN},
+            #{variableCount, jdbcType=INTEGER},
+            #{sentryPartInstanceCount, jdbcType=INTEGER},
+            #{tenantId ,jdbcType=VARCHAR}
+        )
+    </insert>
+
+  <insert id="bulkInsertPlanItemInstance" parameterType="java.util.List">
+    insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_,
+                                                     NAME_, STATE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
+                                                     LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_,
+                                                     ENDED_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_,
+                                                     IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_)
+    values
+      <foreach collection="list" item="planItemInstance" index="index" separator=",">
+        (
+        	#{planItemInstance.id ,jdbcType=VARCHAR},
+            1,
+            #{planItemInstance.caseDefinitionId ,jdbcType=VARCHAR},
+            #{planItemInstance.caseInstanceId ,jdbcType=VARCHAR},
+            #{planItemInstance.stageInstanceId ,jdbcType=VARCHAR},
+            #{planItemInstance.isStage, jdbcType=BOOLEAN},
+            #{planItemInstance.elementId ,jdbcType=VARCHAR},
+            #{planItemInstance.planItemDefinitionId, jdbcType=VARCHAR},
+            #{planItemInstance.planItemDefinitionType, jdbcType=VARCHAR},
+            #{planItemInstance.name ,jdbcType=VARCHAR},
+            #{planItemInstance.state ,jdbcType=VARCHAR},
+            #{planItemInstance.createTime ,jdbcType=TIMESTAMP},
+            #{planItemInstance.lastAvailableTime ,jdbcType=TIMESTAMP},
+            #{planItemInstance.lastEnabledTime ,jdbcType=TIMESTAMP},
+            #{planItemInstance.lastDisabledTime ,jdbcType=TIMESTAMP},
+            #{planItemInstance.lastStartedTime ,jdbcType=TIMESTAMP},
+            #{planItemInstance.lastSuspendedTime ,jdbcType=TIMESTAMP},
+            #{planItemInstance.completedTime ,jdbcType=TIMESTAMP},
+            #{planItemInstance.occurredTime ,jdbcType=TIMESTAMP},
+            #{planItemInstance.terminatedTime ,jdbcType=TIMESTAMP},
+            #{planItemInstance.exitTime ,jdbcType=TIMESTAMP},
+            #{planItemInstance.endedTime ,jdbcType=TIMESTAMP},
+            #{planItemInstance.startUserId ,jdbcType=VARCHAR},
+            #{planItemInstance.referenceId, jdbcType=VARCHAR},
+            #{planItemInstance.referenceType, jdbcType=VARCHAR},
+            #{planItemInstance.completeable, jdbcType=BOOLEAN},
+            #{planItemInstance.entryCriterionId, jdbcType=VARCHAR},
+            #{planItemInstance.exitCriterionId, jdbcType=VARCHAR},
+            #{planItemInstance.countEnabled, jdbcType=BOOLEAN},
+            #{planItemInstance.variableCount, jdbcType=INTEGER},
+            #{planItemInstance.sentryPartInstanceCount, jdbcType=INTEGER},
+            #{planItemInstance.tenantId ,jdbcType=VARCHAR}
+        )
+      </foreach>
+  </insert>
+
+    <insert id="bulkInsertPlanItemInstance" databaseId="oracle" parameterType="java.util.List">
+        INSERT ALL
+        <foreach collection="list" item="planItemInstance" index="index">
+            into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_,
+                                                      NAME_, STATE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
+                                                      LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_,
+                                                      START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_,
+                                                      IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_) VALUES
+            (
+                #{planItemInstance.id ,jdbcType=VARCHAR},
+                1,
+                #{planItemInstance.caseDefinitionId ,jdbcType=VARCHAR},
+                #{planItemInstance.caseInstanceId ,jdbcType=VARCHAR},
+                #{planItemInstance.stageInstanceId ,jdbcType=VARCHAR},
+                #{planItemInstance.isStage ,jdbcType=VARCHAR},
+                #{planItemInstance.elementId ,jdbcType=VARCHAR},
+                #{planItemInstance.planItemDefinitionId, jdbcType=VARCHAR},
+                #{planItemInstance.planItemDefinitionType, jdbcType=VARCHAR},
+                #{planItemInstance.name ,jdbcType=VARCHAR},
+                #{planItemInstance.state ,jdbcType=VARCHAR},
+                #{planItemInstance.createTime ,jdbcType=TIMESTAMP},
+                #{planItemInstance.lastAvailableTime ,jdbcType=TIMESTAMP},
+                #{planItemInstance.lastEnabledTime ,jdbcType=TIMESTAMP},
+                #{planItemInstance.lastDisabledTime ,jdbcType=TIMESTAMP},
+                #{planItemInstance.lastStartedTime ,jdbcType=TIMESTAMP},
+                #{planItemInstance.lastSuspendedTime ,jdbcType=TIMESTAMP},
+                #{planItemInstance.completedTime ,jdbcType=TIMESTAMP},
+                #{planItemInstance.occurredTime ,jdbcType=TIMESTAMP},
+                #{planItemInstance.terminatedTime ,jdbcType=TIMESTAMP},
+                #{planItemInstance.exitTime ,jdbcType=TIMESTAMP},
+                #{planItemInstance.endedTime ,jdbcType=TIMESTAMP},
+                #{planItemInstance.startUserId ,jdbcType=VARCHAR},
+                #{planItemInstance.referenceId, jdbcType=VARCHAR},
+                #{planItemInstance.referenceType, jdbcType=VARCHAR},
+                #{planItemInstance.completeable, jdbcType=BOOLEAN},
+                #{planItemInstance.entryCriterionId, jdbcType=VARCHAR},
+                #{planItemInstance.exitCriterionId, jdbcType=VARCHAR},
+                #{planItemInstance.countEnabled, jdbcType=BOOLEAN},
+                #{planItemInstance.variableCount, jdbcType=INTEGER},
+                #{planItemInstance.sentryPartInstanceCount, jdbcType=INTEGER},
+                #{planItemInstance.tenantId ,jdbcType=VARCHAR}
+            )
+        </foreach>
+        SELECT * FROM dual
+    </insert>
+
+  <update id="updatePlanItemInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl">
+    update ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST
+    <set>
+        REV_ = #{revisionNext, jdbcType=INTEGER},
+        <if test="originalPersistentState.caseDefinitionId != caseDefinitionId">
+            CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.caseInstanceId != caseInstanceId">
+            CASE_INST_ID_ = #{caseInstanceId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.stageInstanceId != stageInstanceId">
+            STAGE_INST_ID_ = #{stageInstanceId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.isStage != isStage">
+            IS_STAGE_ = #{isStage, jdbcType=BOOLEAN},
+        </if>
+        <if test="originalPersistentState.elementId != elementId">
+            ELEMENT_ID_ = #{elementId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.planItemDefinitionId != planItemDefinitionId">
+            ITEM_DEFINITION_ID_ = #{planItemDefinitionId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.planItemDefinitionType != planItemDefinitionType">
+            ITEM_DEFINITION_TYPE_ = #{planItemDefinitionType, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.name != name">
+            NAME_ = #{name, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.state != state">
+            STATE_ = #{state, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.createTime != createTime">
+            CREATE_TIME_ = #{createTime, jdbcType=TIMESTAMP},
+        </if>
+        <if test="originalPersistentState.lastAvailableTime != lastAvailableTime">
+            LAST_AVAILABLE_TIME_ = #{lastAvailableTime, jdbcType=TIMESTAMP},
+        </if>
+        <if test="originalPersistentState.lastEnabledTime != lastEnabledTime">
+            LAST_ENABLED_TIME_ = #{lastEnabledTime, jdbcType=TIMESTAMP},
+        </if>
+        <if test="originalPersistentState.lastDisabledTime != lastDisabledTime">
+            LAST_DISABLED_TIME_ = #{lastDisabledTime, jdbcType=TIMESTAMP},
+        </if>
+        <if test="originalPersistentState.lastStartedTime != lastStartedTime">
+            LAST_STARTED_TIME_ = #{lastStartedTime, jdbcType=TIMESTAMP},
+        </if>
+        <if test="originalPersistentState.lastSuspendedTime != lastSuspendedTime">
+            LAST_SUSPENDED_TIME_ = #{lastSuspendedTime, jdbcType=TIMESTAMP},
+        </if>
+        <if test="originalPersistentState.completedTime != completedTime">
+            COMPLETED_TIME_ = #{completedTime, jdbcType=TIMESTAMP},
+        </if>
+        <if test="originalPersistentState.occurredTime != occurredTime">
+            OCCURRED_TIME_ = #{occurredTime, jdbcType=TIMESTAMP},
+        </if>
+        <if test="originalPersistentState.terminatedTime != terminatedTime">
+            TERMINATED_TIME_ = #{terminatedTime, jdbcType=TIMESTAMP},
+        </if>
+        <if test="originalPersistentState.exitTime != exitTime">
+            EXIT_TIME_ = #{exitTime, jdbcType=TIMESTAMP},
+        </if>
+        <if test="originalPersistentState.endedTime != endedTime">
+            ENDED_TIME_ = #{endedTime, jdbcType=TIMESTAMP},
+        </if>
+        <if test="originalPersistentState.startUserId != startUserId">
+            START_USER_ID_ = #{startUserId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.referenceId != referenceId">
+            REFERENCE_ID_ = #{referenceId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.referenceType != referenceType">
+            REFERENCE_TYPE_ = #{referenceType, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.completeable != completeable">
+            IS_COMPLETEABLE_ = #{completeable, jdbcType=BOOLEAN},
+        </if>
+        <if test="originalPersistentState.entryCriterionId != entryCriterionId">
+            ENTRY_CRITERION_ID_ = #{entryCriterionId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.exitCriterionId != exitCriterionId">
+            EXIT_CRITERION_ID_ = #{exitCriterionId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.countEnabled != countEnabled">
+            IS_COUNT_ENABLED_ = #{countEnabled, jdbcType=BOOLEAN},
+        </if>
+        <if test="originalPersistentState.variableCount != variableCount">
+            VAR_COUNT_ = #{variableCount, jdbcType=INTEGER},
+        </if>
+        <if test="originalPersistentState.sentryPartInstanceCount != sentryPartInstanceCount">
+            SENTRY_PART_INST_COUNT_ = #{sentryPartInstanceCount, jdbcType=INTEGER},
+        </if>
+        <if test="originalPersistentState.tenantId != tenantId">
+            TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+        </if>
+    </set>
+    where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
+</update>
+
+  <delete id="deletePlanItemInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl">
+    delete from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where ID_ = #{id} and REV_ = #{revision}
+  </delete>
+
+  <delete id="deletePlanItemInstancesByCaseDefinitionId" parameterType="string">
+    delete from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where CASE_DEF_ID_ = #{value}
+  </delete>
+
+  <delete id="deletePlanItemInstancesByStageInstanceId" parameterType="string">
+    delete from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where STAGE_INST_ID_ = #{value}
+  </delete>
+
+  <delete id="deletePlanItemInstancesByCaseInstanceId" parameterType="string">
+    delete from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where CASE_INST_ID_ = #{value}
+  </delete>
+
+  <!--
+    Don't forget to add new properties to the selectCaseInstanceEagerFetchPlanItemInstances in CaseInstance.xml too
+  -->
+  <resultMap id="planItemInstanceResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER" />
+    <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
+    <result property="stageInstanceId" column="STAGE_INST_ID_" jdbcType="VARCHAR" />
+    <result property="isStage" column="IS_STAGE_" jdbcType="BOOLEAN" />
+    <result property="elementId" column="ELEMENT_ID_" jdbcType="VARCHAR" />
+    <result property="planItemDefinitionId" column="ITEM_DEFINITION_ID_" jdbcType="VARCHAR" />
+    <result property="planItemDefinitionType" column="ITEM_DEFINITION_TYPE_" jdbcType="VARCHAR" />
+    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="state" column="STATE_" jdbcType="VARCHAR" />
+    <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
+    <result property="lastAvailableTime" column="LAST_AVAILABLE_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="lastEnabledTime" column="LAST_ENABLED_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="lastDisabledTime" column="LAST_DISABLED_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="lastStartedTime" column="LAST_STARTED_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="lastSuspendedTime" column="LAST_SUSPENDED_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="completedTime" column="COMPLETED_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="occurredTime" column="OCCURRED_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="terminatedTime" column="TERMINATED_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="exitTime" column="EXIT_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="endedTime" column="ENDED_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
+    <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR" />
+    <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR" />
+    <result property="completeable" column="IS_COMPLETEABLE_" jdbcType="BOOLEAN" />
+    <result property="entryCriterionId" column="ENTRY_CRITERION_ID_" jdbcType="VARCHAR" />
+    <result property="exitCriterionId" column="EXIT_CRITERION_ID_" jdbcType="VARCHAR" />
+    <result property="countEnabled" column="IS_COUNT_ENABLED_" jdbcType="BOOLEAN" />
+    <result property="variableCount" column="VAR_COUNT_" jdbcType="INTEGER" />
+    <result property="sentryPartInstanceCount" column="SENTRY_PART_INST_COUNT_" jdbcType="INTEGER" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <!-- Do not forget to update selectCaseInstanceAndAllPlanItemInstances select when adding/changing columns of planItemInstance -->
+  </resultMap>
+
+  <select id="selectPlanItemInstance" parameterType="string" resultMap="planItemInstanceResultMap">
+      select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where ID_ = #{id, jdbcType=VARCHAR}
+  </select>
+
+   <select id="selectPlanItemInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl" resultMap="planItemInstanceResultMap">
+        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+        select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <include refid="selectPlanItemInstancesByQueryCriteriaSql"/>
+        ${orderBy}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+  </select>
+
+  <select id="selectPlanItemInstanceCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl" resultType="long">
+        select count(RES.ID_)
+        <include refid="selectPlanItemInstancesByQueryCriteriaSql"/>
+  </select>
+
+  <sql id="selectPlanItemInstancesByQueryCriteriaSql">
+    from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST RES
+    <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
+      <if test="!queryVariableValue.operator.equals('EXISTS') &amp;&amp; !queryVariableValue.operator.equals('NOT_EXISTS')">
+        <choose>
+            <when test="queryVariableValue.local">
+                inner join ${prefix}ACT_RU_VARIABLE A${index} on RES.ID_ = A${index}.SUB_SCOPE_ID_ and A${index}.SCOPE_TYPE_ = 'cmmn'
+            </when>
+            <otherwise>
+                inner join ${prefix}ACT_RU_VARIABLE A${index} on RES.CASE_INST_ID_ = A${index}.SCOPE_ID_ and
+                A${index}.SUB_SCOPE_ID_ is null and A${index}.SCOPE_TYPE_ = 'cmmn'
+            </otherwise>
+        </choose>
+      </if>
+    </foreach>
+    <where>
+        <if test="caseDefinitionId != null">
+            RES.CASE_DEF_ID_ = #{caseDefinitionId}
+        </if>
+        <if test="caseInstanceId != null">
+            and RES.CASE_INST_ID_ = #{caseInstanceId}
+        </if>
+        <if test="stageInstanceId != null">
+            and RES.STAGE_INST_ID_ = #{stageInstanceId}
+        </if>
+        <if test="planItemInstanceId != null">
+            and RES.ID_ = #{planItemInstanceId}
+        </if>
+        <if test="elementId != null">
+            and RES.ELEMENT_ID_ = #{elementId}
+        </if>
+        <if test="planItemDefinitionId != null">
+            and RES.ITEM_DEFINITION_ID_ = #{planItemDefinitionId}
+        </if>
+        <if test="planItemDefinitionType != null">
+            and RES.ITEM_DEFINITION_TYPE_ = #{planItemDefinitionType}
+        </if>
+        <if test="planItemDefinitionTypes != null">
+             and RES.ITEM_DEFINITION_TYPE_ in <foreach item="type" index="index" collection="planItemDefinitionTypes" open="(" separator="," close=")">#{type}</foreach>
+        </if>
+        <if test="name != null">
+            and RES.NAME_ = #{name}
+        </if>
+        <if test="state != null">
+            and RES.STATE_ = #{state}
+        </if>
+        <if test="createdBefore != null">
+            and RES.CREATE_TIME_ &lt;= #{createdBefore}
+        </if>
+        <if test="createdAfter != null">
+            and RES.CREATE_TIME_ &gt;= #{createdAfter}
+        </if>
+        <if test="lastAvailableBefore != null">
+            and RES.LAST_AVAILABLE_TIME_ &lt;= #{lastAvailableBefore}
+        </if>
+        <if test="lastAvailableAfter != null">
+            and RES.LAST_AVAILABLE_TIME_ &gt;= #{lastAvailableAfter}
+        </if>
+        <if test="lastEnabledBefore != null">
+            and RES.LAST_ENABLED_TIME_ &lt;= #{lastEnabledBefore}
+        </if>
+        <if test="lastEnabledAfter != null">
+            and RES.LAST_ENABLED_TIME_ &gt;= #{lastEnabledAfter}
+        </if>
+        <if test="lastDisabledBefore != null">
+            and RES.LAST_DISABLED_TIME_ &lt;= #{lastDisabledBefore}
+        </if>
+        <if test="lastDisabledAfter != null">
+            and RES.LAST_DISABLED_TIME_ &gt;= #{lastDisabledAfter}
+        </if>
+        <if test="lastStartedBefore != null">
+            and RES.LAST_STARTED_TIME_ &lt;= #{lastStartedBefore}
+        </if>
+        <if test="lastStartedAfter != null">
+            and RES.LAST_STARTED_TIME_ &gt;= #{lastStartedAfter}
+        </if>
+        <if test="lastSuspendedBefore != null">
+            and RES.LAST_SUSPENDED_TIME_ &lt;= #{lastSuspendedBefore}
+        </if>
+        <if test="lastSuspendedAfter != null">
+            and RES.LAST_SUSPENDED_TIME_ &gt;= #{lastSuspendedAfter}
+        </if>
+        <if test="completedBefore != null">
+            and RES.COMPLETED_TIME_ &lt;= #{completedBefore}
+        </if>
+        <if test="completedAfter != null">
+            and RES.COMPLETED_TIME_ &gt;= #{completedAfter}
+        </if>
+        <if test="occurredBefore != null">
+            and RES.OCCURRED_TIME_ &lt;= #{occurredBefore}
+        </if>
+        <if test="occurredAfter != null">
+            and RES.OCCURRED_TIME_ &gt;= #{occurredAfter}
+        </if>
+        <if test="terminatedBefore != null">
+            and RES.TERMINATED_TIME_ &lt;= #{terminatedBefore}
+        </if>
+        <if test="terminatedAfter != null">
+            and RES.TERMINATED_TIME_ &gt;= #{terminatedAfter}
+        </if>
+        <if test="exitBefore != null">
+            and RES.EXIT_TIME_ &lt;= #{exitBefore}
+        </if>
+        <if test="exitAfter != null">
+            and RES.EXIT_TIME_ &gt;= #{exitAfter}
+        </if>
+        <if test="endedBefore != null">
+            and RES.ENDED_TIME_ &lt;= #{endedBefore}
+        </if>
+        <if test="endedAfter != null">
+            and RES.ENDED_TIME_ &gt;= #{endedAfter}
+        </if>
+        <if test="ended">
+            and RES.ENDED_TIME_ is not null
+        </if>
+        <!-- Note the inverse check on includeEnded here:
+             by default, this will be applied (as it's the default value of the query object)
+             and only by calling .includeEnded() all plan item instances will be returned as this if won't be true anymore.-->
+        <if test="!includeEnded &amp;&amp; !ended">
+            and RES.ENDED_TIME_ is null
+        </if>
+        <if test="startUserId != null">
+            and RES.START_USER_ID_ = #{startUserId}
+        </if>
+        <if test="referenceId != null">
+            and RES.REFERENCE_ID_ = #{referenceId}
+        </if>
+        <if test="referenceType != null">
+            and RES.REFERENCE_TYPE_ = #{referenceType}
+        </if>
+        <if test="completeable">
+            and RES.IS_COMPLETEABLE_ = #{completeable, jdbcType=BOOLEAN}
+        </if>
+        <if test="entryCriterionId != null">
+            and RES.ENTRY_CRITERION_ID_ = #{entryCriterionId, jdbcType=VARCHAR}
+        </if>
+        <if test="exitCriterionId != null">
+            and RES.EXIT_CRITERION_ID_ = #{exitCriterionId, jdbcType=VARCHAR}
+        </if>
+        <if test="tenantId != null">
+            and RES.TENANT_ID_ = #{tenantId}
+        </if>
+        <if test="withoutTenantId">
+            and (RES.TENANT_ID_ is null or RES.TENANT_ID_ = '')
+        </if>
+        <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
+        <choose>
+            <when test="queryVariableValue.operator.equals('EXISTS')">
+              and EXISTS (
+                select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVariableValue.name}
+                <if test="!queryVariableValue.local">
+                    and RES.CASE_INST_ID_ = SCOPE_ID_ and SUB_SCOPE_ID_ is null and SCOPE_TYPE_ = 'cmmn'
+                </if>
+                <if test="queryVariableValue.local">
+                    and RES.ID_ = SUB_SCOPE_ID_ and SCOPE_TYPE_ = 'cmmn'
+                </if>
+              )
+            </when>
+            <when test="queryVariableValue.operator.equals('NOT_EXISTS')">
+              and NOT EXISTS (
+                select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVariableValue.name}
+                <if test="!queryVariableValue.local">
+                    and RES.CASE_INST_ID_ = SCOPE_ID_ and SUB_SCOPE_ID_ is null and SCOPE_TYPE_ = 'cmmn'
+                </if>
+                <if test="queryVariableValue.local">
+                    and RES.ID_ = SUB_SCOPE_ID_ and SCOPE_TYPE_ = 'cmmn'
+                </if>
+              )
+            </when>
+            <otherwise>
+                <if test="queryVariableValue.name != null">
+                  <!-- Match-all variable-names when name is null -->
+                  and A${index}.NAME_= #{queryVariableValue.name}
+                </if>
+                <if test="!queryVariableValue.type.equals('null')">
+                <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
+                  and A${index}.TYPE_ = #{queryVariableValue.type}
+                </if>
+                <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+                  <choose>
+                    <when test="queryVariableValue.operator.equals('EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">
+                      and lower(A${index}.TEXT_)
+                    </when>
+                    <otherwise>
+                      and A${index}.TEXT_
+                    </otherwise>
+                  </choose>
+                  <choose>
+                    <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">LIKE</when>
+                    <otherwise><include refid="variableOperator" /></otherwise>
+                  </choose>
+                  #{queryVariableValue.textValue}
+                  <choose>
+                    <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
+                  </choose>
+                </if>
+                <if test="queryVariableValue.textValue2 != null">
+                  and A${index}.TEXT2_
+                  <choose>
+                    <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
+                    <otherwise><include refid="variableOperator" /></otherwise>
+                  </choose>
+                    #{queryVariableValue.textValue2}
+                  <choose>
+                    <when test="queryVariableValue.operator.equals('LIKE')">${wildcardEscapeClause}</when>
+                  </choose>
+                </if>
+                <if test="queryVariableValue.longValue != null">
+                  and A${index}.LONG_
+                  <include refid="variableOperator" />
+                  #{queryVariableValue.longValue}
+                </if>
+                <if test="queryVariableValue.doubleValue != null">
+                  and A${index}.DOUBLE_
+                  <include refid="variableOperator" />
+                  #{queryVariableValue.doubleValue}
+                </if>
+                <!-- Null variable type -->
+                <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+                  <choose>
+                    <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
+                      and (A${index}.TEXT_ is not null or A${index}.TEXT2_ is not null or A${index}.LONG_ is not null or A${index}.DOUBLE_ is not null or A${index}.BYTEARRAY_ID_ is not null)
+                    </when>
+                    <otherwise>
+                      and A${index}.TEXT_ is null and A${index}.TEXT2_ is null and A${index}.LONG_ is null and A${index}.DOUBLE_ is null and A${index}.BYTEARRAY_ID_ is null
+                    </otherwise>
+                  </choose>
+                </if>
+            </otherwise>
+        </choose>
+      </foreach>
+    </where>
+
+  </sql>
+
+  <sql id="variableOperator">
+    <choose>
+      <when test="queryVariableValue.operator.equals('EQUALS')">=</when>
+      <when test="queryVariableValue.operator.equals('EQUALS_IGNORE_CASE')">=</when>
+      <when test="queryVariableValue.operator.equals('NOT_EQUALS')">&lt;&gt;</when>
+      <when test="queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">&lt;&gt;</when>
+      <when test="queryVariableValue.operator.equals('GREATER_THAN')">&gt;</when>
+      <when test="queryVariableValue.operator.equals('GREATER_THAN_OR_EQUAL')">&gt;=</when>
+      <when test="queryVariableValue.operator.equals('LESS_THAN')">&lt;</when>
+      <when test="queryVariableValue.operator.equals('LESS_THAN_OR_EQUAL')">&lt;=</when>
+    </choose>
+  </sql>
+
+</mapper>

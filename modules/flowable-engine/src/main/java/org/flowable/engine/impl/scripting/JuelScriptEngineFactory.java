@@ -34,41 +34,50 @@ public class JuelScriptEngineFactory implements ScriptEngineFactory {
     static {
         names = Collections.unmodifiableList(Collections.singletonList("juel"));
         extensions = names;
-        mimeTypes = Collections.unmodifiableList(new ArrayList<String>(0));
+        mimeTypes = Collections.unmodifiableList(new ArrayList<>(0));
     }
 
+    @Override
     public String getEngineName() {
         return "juel";
     }
 
+    @Override
     public String getEngineVersion() {
         return "1.0";
     }
 
+    @Override
     public List<String> getExtensions() {
         return extensions;
     }
 
+    @Override
     public String getLanguageName() {
         return "JSP 2.1 EL";
     }
 
+    @Override
     public String getLanguageVersion() {
         return "2.1";
     }
 
+    @Override
     public String getMethodCallSyntax(String obj, String method, String... arguments) {
         throw new UnsupportedOperationException("Method getMethodCallSyntax is not supported");
     }
 
+    @Override
     public List<String> getMimeTypes() {
         return mimeTypes;
     }
 
+    @Override
     public List<String> getNames() {
         return names;
     }
 
+    @Override
     public String getOutputStatement(String toDisplay) {
         // We will use out:print function to output statements
         StringBuilder stringBuffer = new StringBuilder();
@@ -93,6 +102,7 @@ public class JuelScriptEngineFactory implements ScriptEngineFactory {
         return stringBuffer.toString();
     }
 
+    @Override
     public String getParameter(String key) {
         if (key.equals(ScriptEngine.NAME)) {
             return getLanguageName();
@@ -111,6 +121,7 @@ public class JuelScriptEngineFactory implements ScriptEngineFactory {
         }
     }
 
+    @Override
     public String getProgram(String... statements) {
         // Each statement is wrapped in '${}' to comply with EL
         StringBuilder buf = new StringBuilder();
@@ -124,6 +135,7 @@ public class JuelScriptEngineFactory implements ScriptEngineFactory {
         return buf.toString();
     }
 
+    @Override
     public ScriptEngine getScriptEngine() {
         return new JuelScriptEngine(this);
     }

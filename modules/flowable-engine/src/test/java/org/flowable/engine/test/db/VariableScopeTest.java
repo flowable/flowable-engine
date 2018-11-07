@@ -18,17 +18,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
@@ -37,6 +37,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class VariableScopeTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testVariableScope() {
 
@@ -45,7 +46,7 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
         Map<String, Object> varMap = new HashMap<>();
         varMap.put("test", "test");
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess", varMap);
-        Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals("Task in subprocess", subProcessTask.getName());
 
         // get variables for execution id user task, should return the new value
@@ -90,6 +91,7 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
     /**
      * A testcase to produce and fix issue ACT-862.
      */
+    @Test
     @Deployment
     public void testVariableNamesScope() {
 
@@ -99,7 +101,7 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
         varMap.put("test", "test");
         varMap.put("helloWorld", "helloWorld");
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess", varMap);
-        Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         runtimeService.setVariableLocal(pi.getProcessInstanceId(), "mainProcessLocalVariable", "Hello World");
 
         assertEquals("Task in subprocess", subProcessTask.getName());
@@ -151,6 +153,7 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
         taskService.complete(subProcessTask.getId());
     }
 
+    @Test
     @Deployment
     public void testModeledVariableScope() {
 
@@ -158,7 +161,7 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
         // active
         Map<String, Object> varMap = new HashMap<>();
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("nestedSubProcess", varMap);
-        Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals("Task in subprocess1", subProcessTask.getName());
 
         // get variables for execution id user task, should return the new value
@@ -204,9 +207,9 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
         // the subprocess scope is destroyed and the complete process ends
         taskService.complete(subProcessTask.getId());
 
-        List<Task> subProcessTasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
+        List<org.flowable.task.api.Task> subProcessTasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
 
-        for (Task subProcTask : subProcessTasks) {
+        for (org.flowable.task.api.Task subProcTask : subProcessTasks) {
             if (subProcTask.getName().equals("Task in subprocess2")) {
                 // get variables for execution id user task, should return the
                 // old value
@@ -237,11 +240,12 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
         }
 
         // finish process
-        for (Task subProcTask : subProcessTasks) {
+        for (org.flowable.task.api.Task subProcTask : subProcessTasks) {
             taskService.complete(subProcTask.getId());
         }
     }
 
+    @Test
     @Deployment
     public void testGetVariableLocal() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("getVariableLocal");
@@ -267,6 +271,7 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
             this.isLocal = isLocal;
         }
 
+        @Override
         public List<String> execute(CommandContext commandContext) {
             if (executionId == null) {
                 throw new FlowableIllegalArgumentException("executionId is null");

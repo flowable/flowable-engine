@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+  <case id="testRepeatingTimer" name="testRepeatingTimer" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="casePlanModel">
+      <planItem id="planItem1" definitionRef="sid-5427322D-539C-4DC0-AD47-6DA9421ED309"></planItem>
+      <planItem id="planItem2" name="Task after timer" definitionRef="sid-2255BF13-E956-49AA-9054-F3EAD06DA08F">
+        <itemControl>
+          <repetitionRule flowable:counterVariable="repetitionCounter">
+            <condition><![CDATA[${true}]]></condition>
+          </repetitionRule>
+        </itemControl>
+        <entryCriterion id="sid-A5BD6737-2F53-4934-A78B-B4600DE95DBB" sentryRef="sentry1"></entryCriterion>
+      </planItem>
+      <sentry id="sentry1">
+        <planItemOnPart id="sentryOnPart1" sourceRef="planItem1">
+          <standardEvent>occur</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <timerEventListener id="sid-5427322D-539C-4DC0-AD47-6DA9421ED309">
+        <timerExpression><![CDATA[R/PT1H]]></timerExpression>
+      </timerEventListener>
+      <humanTask id="sid-2255BF13-E956-49AA-9054-F3EAD06DA08F" name="Task after timer"></humanTask>
+    </casePlanModel>
+  </case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="CMMNDiagram_testRepeatingTimer">
+      <cmmndi:CMMNShape id="CMMNShape_casePlanModel" cmmnElementRef="casePlanModel">
+        <dc:Bounds height="714.0" width="718.0" x="40.0" y="40.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+        <dc:Bounds height="31.0" width="31.0" x="210.0" y="208.77550942496018"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+        <dc:Bounds height="82.0" width="168.0" x="360.0" y="180.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_sid-A5BD6737-2F53-4934-A78B-B4600DE95DBB" cmmnElementRef="sid-A5BD6737-2F53-4934-A78B-B4600DE95DBB">
+        <dc:Bounds height="22.0" width="14.0" x="352.8913092049252" y="213.27550942496018"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="CMMNEdge_sid-8EA4329E-0C88-4C55-B9CE-C316C3156521" cmmnElementRef="sid-A5BD6737-2F53-4934-A78B-B4600DE95DBB" targetCMMNElementRef="planItem1">
+        <di:waypoint x="353.4928989753394" y="223.33015407145214"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</definitions>

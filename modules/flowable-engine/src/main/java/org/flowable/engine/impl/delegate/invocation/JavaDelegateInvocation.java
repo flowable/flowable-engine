@@ -30,10 +30,12 @@ public class JavaDelegateInvocation extends DelegateInvocation {
         this.execution = execution;
     }
 
+    @Override
     protected void invoke() {
         delegateInstance.execute(execution);
     }
 
+    @Override
     public Object getTarget() {
         return delegateInstance;
     }

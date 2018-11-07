@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.repository;
 
-import java.util.Date;
+import org.flowable.common.engine.api.repository.EngineDeployment;
 
 /**
  * Represents a deployment that is already present in the process repository.
@@ -28,20 +28,7 @@ import java.util.Date;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public interface Deployment {
+public interface Deployment extends EngineDeployment {
 
-    String getId();
-
-    String getName();
-
-    Date getDeploymentTime();
-
-    String getCategory();
-
-    String getKey();
-
-    String getTenantId();
-
-    String getEngineVersion();
-
+    String getParentDeploymentId();
 }

@@ -22,13 +22,16 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.flowable.task.api.Task;
+import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for REST-operation related to the historic detail query resource.
@@ -40,6 +43,7 @@ public class HistoricDetailCollectionResourceTest extends BaseSpringRestTestCase
     /**
      * Test querying historic detail. GET history/historic-detail
      */
+    @Test
     @Deployment
     public void testQueryDetail() throws Exception {
         HashMap<String, Object> processVariables = new HashMap<>();

@@ -16,9 +16,9 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
-import org.flowable.engine.impl.asyncexecutor.message.AbstractMessageBasedJobManager;
-import org.flowable.engine.runtime.HistoryJob;
-import org.flowable.engine.runtime.JobInfo;
+import org.flowable.job.api.HistoryJob;
+import org.flowable.job.api.JobInfo;
+import org.flowable.job.service.impl.asyncexecutor.message.AbstractMessageBasedJobManager;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 
@@ -30,9 +30,11 @@ public class MessageBasedJobManager extends AbstractMessageBasedJobManager {
     protected JmsTemplate jmsTemplate;
     protected JmsTemplate historyJmsTemplate;
 
+    @Override
     protected void sendMessage(final JobInfo job) {
         JmsTemplate actualJmsTemplate = (job instanceof HistoryJob) ? historyJmsTemplate : jmsTemplate;
         actualJmsTemplate.send(new MessageCreator() {
+            @Override
             public Message createMessage(Session session) throws JMSException {
                 return session.createTextMessage(job.getId());
             }

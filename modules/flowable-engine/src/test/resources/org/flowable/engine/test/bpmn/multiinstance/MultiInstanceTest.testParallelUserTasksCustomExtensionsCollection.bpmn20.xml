@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="miParallelUserTasksCollection">
+  
+    <dataObject itemSubjectRef="xsd:string" name="potentialOwnerList" id="ID_91ee51f3-481d-439c-a62d-8b382a1cf7a1">
+      <extensionElements>
+        <flowable:value>
+        <![CDATA[
+        [
+          {
+            "principalType" : "User",
+            "role" : "PotentialOwner",
+            "principal" : "wfuser1",
+            "version" : 1
+          },
+          {
+            "principalType" : "User",
+            "role" : "PotentialOwner",
+            "principal" : "wfuser2",
+            "version" : 1
+          }
+        ]
+        ]]>
+        </flowable:value>
+      </extensionElements>
+    </dataObject>
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="miTasks" />
+    
+    <userTask id="miTasks" name="My Task ${loopCounter}" flowable:candidateUsers="${participant}">
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${potentialOwnerList}" flowable:elementVariable="participant">
+        <extensionElements>
+          <flowable:collection flowable:class="org.flowable.engine.test.bpmn.multiinstance.JSONCollectionHandler"/>
+        </extensionElements>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+    
+    <sequenceFlow id="flow3" sourceRef="miTasks" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

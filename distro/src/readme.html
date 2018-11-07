@@ -13,6 +13,7 @@
 <h1>Documentation</h1>
 <ul>
     <li><a href="docs/userguide/index.html">The Flowable User Guide</a></li>
+    <li><a href="docs/userguide-cmmn/index.html">The Flowable CMMN User Guide</a></li>
     <li><a href="docs/userguide-dmn/index.html">The Flowable DMN User Guide</a></li>
     <li><a href="docs/userguide-form/index.html">The Flowable Form User Guide</a></li>
     <li><a href="docs/javadocs/index.html">Flowable Javadocs</a></li>
@@ -25,6 +26,284 @@
 </ul>
 
 <h1>Flowable Release Notes</h1>
+
+<h3>Release Notes - Flowable - 6.4.0</h3>
+
+<h4>Highlights</h4>
+
+<ul>
+    <li>A first version of process instance migration has been added to the Flowable BPMN Engine. In the RuntimeService you can now use the createProcessInstanceMigrationBuilder to define and execute the process instance migration.
+    This first version supports migrating process instances with wait states, embedded (event) sub processes and boundary events. 
+    In the next version more support will be added for more complex cases like parallel and inclusive gateways, multi-instance activities and call activities.</li>
+    <li>Expression support have been added for the BPMN and CMMN engines to make it easier to work with variables and in specific variables that may not have been initialized yet.
+    When you reference a variable in an expression like ${customerNumber > 40} and there is no customerNumber variable yet, an exception would be thrown.
+    With the variable expression support this can be handled without an exception with ${variables:getOrDefault(customerNumber, 0) > 0}. 
+    A similar expression is possible for strings with ${variables:get(customerName) == "test"}. The user guide describes the full set of available variable expressions.</li>
+    <li>A first version with support for MongoDB persistence has been added. The MongoDB module is available from a separate Git repository at <a href="https://github.com/flowable/flowable-mongodb">https://github.com/flowable/flowable-mongodb</a>.
+    The MongoDB module is made available in a separate repository, so that it can be released in a different pace than the full Flowable Engine releases.
+    The support of MongoDB already includes most BPMN constructs, but in the coming releases it will be extended to be on par with the relational database support.</li>
+    <li>Upgrade to Spring 5.x for all the integration modules using Spring.</li>
+    <li>Added plan item lifecycle listener to the CMMN engine, to allow for listening to plan item instance state changes</li>
+    <li>In the Task app support for activating manual plan items and triggering user event listeners has been added</li>
+    <li>Added support for JUnit 5.</li>
+    <li>Support for using java.time.Duration variables and expressions for Timer durations.</li>
+    <li>Chinese translation has been added for the UI apps.</li>
+    <li>Various small bugfixes and improvements all around.</li>
+</ul>
+
+<h4>Upgrade notes</h4>
+
+<h5>Idm Engine SpringEncoder</h5>
+<p>
+    The deprecated constructor from SpringEncoder that accepted <i>org.springframework.security.authentication.encoding.PasswordEncoder</i> has been removed
+</p>
+
+<h5>Custom IdGenerator using a Bean in Spring Boot</h5>
+<p>
+    It is now possible to define the custom IdGenerator for the Flowable Process engine, by creating a bean of type IdGenerator.
+    If no bean is provided the StrongUuidGenerator will be used.
+    If there is a bean qualified with @Process then this one would be used, otherwise a unique global one would be used.
+    If there are more global beans then the default StrongUuidGenerator will be used.
+</p>
+
+<h5>FlowableFunctionDelegate changes</h5>
+<p>
+    The method <i>functionClass</i> has been removed from the <i>org.flowable.common.engine.api.delegate.FlowableFunctionDelegate</i> interface.
+    This doesn't change anything with regards to adding custom functions to expressions: returning the right Method in <i>functionMethod()</i> is enough.
+</p>
+
+<h3>Release Notes - Flowable - 6.3.1</h3>
+
+<h4>Highlights</h4>
+
+<ul>
+    <li>Introduction of an app engine, so apps are now a first class citizen and the process engine is not misused any more to handle app deployments. 
+    When starting the Flowable Task application all app deployments are automatically migrated to the new app engine.</li>
+    <li>Added async history support to the CMMN engine.</li>
+    <li>Added more history information to the CMMN engine with historic plan items.</li>
+    <li>Improved the Spring Boot support and upgraded to Spring Boot 2.0.2.</li>
+    <li>Enhanced debugger in the Flowable Task application to evaluate expressions and scripts.</li>
+    <li>Made the job service more generic with the scope type property to improve the possibility to run different job handlers for different job types.</li>
+    <li>Various small bugfixes all around.</li>
+</ul>
+
+<h4>Community contributors</h4>
+
+<ul>
+    <li>Pascal Schumacher (PascalSchumacher)</li>
+    <li>Amina Zoheir (AminaZoheir)</li>
+    <li>Toni (ttonl)</li>
+    <li>David Malkovsky (dbmalkovsky)</li>
+    <li>Michael Lippens (mlippens)</li>
+</ul>
+
+<h4>Upgrade notes</h4>
+	
+<h5>Package renaming</h5>
+	
+<p>To make the Flowable modules compatible with OSGi and Java 9 modules some package renaming was needed to prevent clashes.
+The renaming has been done according to this pattern org.flowable.engine.common -> org.flowable.common.engine</p>
+
+<h5>StrongUuidGenerator usage with Spring Boot</h5>
+
+<p>The Spring Boot process auto configuration now uses the StrongUuidGenerator. In case you were overwriting the default one you can remove that.
+In case you want to keep using the DbIdGenerator, then just add the following bean to your configuration:
+<pre><code>
+    @Bean
+    public EngineConfigurationConfigurer&lt;SpringProcessEngineConfiguration&gt; processEngineDbIdGeneratorConfigurer() {
+        return engineConfiguration -> engineConfiguration.setIdGenerator(new DbIdGenerator());
+    }
+</code></pre>
+The default values of the DbIdGenerator would be filled in during the creation of the Process Engine.
+
+<h5>IdmEngineConfigurator</h5>
+
+<p>
+    The default <code>IdmEngineConfigurator</code> and <code>SpringIdmEngineConfigurator</code> have been moved from <code>org.flowable.app.engine.impl.cfg</code>
+    and <code>org.flowable.spring.configurator</code> to <code>org.flowable.idm.engine.configurator</code> and <code>org.flowable.idm.spring.configurator</code>
+    respectively. In case you have used them please replace your imports.
+</p>
+
+<h5>Async history classes package change</h5>
+<p>
+    The async history classes have been moved from the process engine module to the job service, to make them available for other components. Generally, the packages now have <code>job.service</code> added to make this clear.
+    <ul>
+      <li>
+          Classes with regards to async history collection and execution (<code>AbstractAsyncHistoryJobHandler, AsyncHistoryJobHandler, AsyncHistoryListener, AsyncHistorySessionFactory, 
+          AsyncHistorySession, DefaultAsyncHistoryJobProducer, HistoryJsonTransformer</code>) in the <code>org.flowable.engine.impl.history.async</code> have been moved to the <code>org.flowable.job.service.impl.history.async</code> package.</li>
+      <li>
+          Classes related to executing async jobs using a message queue (most notably <code>AsyncHistoryJobMessageHandler and AsyncHistoryJobMessageReceiver</code>) have been moved from the 
+          <code>org.flowable.engine.impl.asyncexecutor.message</code> to the <code>org.flowable.job.service.impl.asyncexecutor.message</code> package.     
+      </li>
+      <li>
+          Similarly, for executing async history jobs using a message queue: the classes in the package <code>org.flowable.engine.impl.history.async.message</code> are now found in the <code>org.flowable.job.service.impl.history.async.message</code> package.
+      </li>
+    </ul>  
+    Updating the imports is sufficient when upgrading.
+</p>
+
+<h3>Release Notes - Flowable - 6.3.0</h3>
+
+<p>Flowable 6.3.0 has turned out to be a big release with many new features (and even more fixes). Many thanks to all the community contributers that participated in the release
+and a special shout-out to Pascal Schumacher, Zach Visagie, Robert Hafner, Christophe Deneux and Seif El Deen Khaled</p>
+
+<h4>Highlights</h4>
+
+<h4>Note: Flowable now requires JDK 8 as a minimum version!</h4>
+
+<h4>GENERAL</h4>
+
+<p>The Spring Boot starters have all been updated to version 2.0. There are now starters available for each engine (BPMN, CMMN and DMN). 
+Check the completely revised documentation for more details!</p>
+
+<ul>
+    <li>Support and fixes for running various modules on JDK 9 (the engines themselves already ran on JDK 9)</li>
+    <li>Updated all 3rd-party libraries to latest versions</li>
+    <li>The REST app can now be configured to use privileges, instead of all users being able to make REST calls.</li>
+</ul>
+
+<h4>BPMN</h4>
+
+<ul>
+    <li>Performance enhancements with great results. Read all about it here: <a href="https://blog.flowable.org/2018/03/05/flowable-6-3-0-performance-benchmark/">https://blog.flowable.org/2018/03/05/flowable-6-3-0-performance-benchmark/</a></li>
+    <li>Dynamic task and subprocess injection into running process instances is now fully supported and out of experimental state</li>
+    <li>Allow the configuration of history on individual process definitions, overriding the engine default setting</li>
+    <li>Introduce the 'triggerable' service task: a service task that provides configurable service calls that are executed externally and call the engine when done. 
+    The implementation is guaranteed to be correct with regards to the transactional behavior of the engine.</li>
+    <li>Support for a transaction-lifecycle based event listener</li>
+    <li>Support for 'sameDeployment' when looking up the called process definition for a call activity</li>
+    <li>HTTP task: support for storing response variables transiently</li>
+    <li>Multi instance: support for Iterable when resolving a collection (e.g. ArrayNode)</li>
+</ul>
+
+<h4>CMMN</h4>
+
+<ul>
+    <li>REST API support for all CMMN services and operations</li>
+    <li>Support for asynchronous service tasks</li>
+    <li>Support for manual activation rules and enabling/manually starting plan items through the runtime service</li>
+    <li>Support for required rule</li>
+    <li>Support for autocomplete</li>
+    <li>Support for completion neutral</li>
+    <li>A Script task type has been added</li>
+    <li>Support for User event listeners</li>
+    <li>Support for viewing and managing CMMN date in the Admin app</li>
+</ul>
+
+<h4>DMN</h4>
+
+<ul>
+    <li>Support for collection expressions, such as IN and NOT IN</li>
+    <li>Improved decision table editor user experience to make it easier to add JUEL expressions in specific rules</li>
+    <li>Support for viewing and managing decision executions in the Admin app</li>
+</ul>
+
+<h4>APPS</h4>
+
+<ul>
+    <li>All apps have been rewritten to use Spring Boot 2.0. All apps now use one property file for configuration. 
+    Please check the documentation, as many new configuration options are available (with backwards compatibility for old properties).</li>
+    <li>Support for expressions in the options fields, including dropdown, radio and hyperlink fields</li>
+    <li>Support for a password fields in the form editor and runtime</li>
+    <li>Multi-tenancy support in the Modeler by defining the active tenant in the Modeler property file</li>
+</ul>
+
+<h4>Upgrade notes</h4>
+
+<p>
+To remove duplicate code, some more logic has been added to the common modules, such as flowable-engine-common and flowable-common-rest. 
+For example, the scripting engine has been moved to the flowable-engine-common module so it can be used by both the BPMN and the CMMN engine.
+If you are using Flowable internal classes then it is possible that some package changes to the common modules are required.
+Most of this should be automatically handled by your IDE.
+</p>
+
+<p>
+All Flowable apps (IDM, Modeler, Task, Admin and REST) now read their configuration from the <i>flowable-app.properties</i> file, which is included in each WAR file in the <i>META-INF/flowable-app</i> folder.
+Consequently, a single, shared <i>flowable-app.properties</i> can be placed on the classpath for all apps.
+All property files (e.g. <i>db.properties</i> for the REST app) are still read and work in a backwards-compatible way.  
+</p>
+
+<p>
+The default way user credentials are authenticated and verified when calling the Flowable REST API has changed. A user now needs to have the <i>access-rest-api</i> privilege (before, any valid credentials could be used).
+An admin user can be given this privilege by setting the <i>flowable.rest.app.admin.user-id</i> and <i>flowable.rest.app.admin.password</i> properties in the <i>flowable-app.properties</i> file. On start-up, the admin user will be created if it doesn't exist, or it will be given the <i>access-rest-api</i> privilege. This admin user can then give other users this privilige using the Flowable IDM app or through a REST call (doing an HTTP post to <i>privileges/{privilegeId}/users</i> with the userId in the body).
+</p>
+
+<p>
+By default, all Flowable apps (IDM, Modeler, Task, Admin and REST) are configured to use an in-memory H2 database that is persisted in the user home folder, which is shared between all apps by default. Previously, each app had its own in-memory H2 database.
+</p>
+
+<p>
+Due to upgrading to the latest Spring Security dependencies for handling the authentication for all the Flowable apps, users can get a "cookie theft exception" when accessing the apps with a cookie from a previous version that is still present in the browser.
+The reason for this is that Spring Security has changed the way cookie tokens are hashed. A hard refresh or relogin fixes this by generating a new cookie.
+If you don't want to force your users to do this, you can delete all rows from the <i>ACT_ID_TOKEN</i> database table. This will invalidate all old cookies and all users will have to login again.
+</p>
+
+<h3>Release Notes - Flowable - 6.2.1</h3>
+
+<h4>Highlights</h4>
+
+<ul>
+    <li>Lots of additions to the CMMN 1.1 Engine, including timer support, repetition support, DMN and HTTP task support and variable query support.</li>
+    <li>Rest documentation is now also generated based on the Swagger definitions to ensure it's always in sync with the REST controller code</li>
+    <li>Improved support of ChangeActivityStateBuilder to move an execution in a process instance to another activity that's part of the process definition</li>
+    <li>Enhanced the CMMN Modeler palette with timer event listeners, DMN and HTTP tasks and additional properties like timer expressions and repetition expressions.</li>
+    <li>Improved support of CMMN in the Flowable Task app.</li>
+    <li>Various small bugfixes all around.</li>
+</ul>
+
+<h4>Community contributors</h4>
+
+<ul>
+    <li>Pascal Schumacher (PascalSchumacher)</li>
+    <li>Stijn de Pestel (stijndepestel)</li>
+    <li>Robert Hafner (roberthafner)</li>
+    <li>Xin Wang (dram)</li>
+    <li>David Malkovsky (dbmalkovsky)</li>
+    <li>Michael Lippens (mlippens)</li>
+    <li>Marco van Zwetselaar (zwets)</li>
+    <li>Yanming Zhou (quaff)</li>
+    <li>Christophe Deneux (cdeneux)</li>
+</ul>
+
+<h4>Upgrade notes</h4>
+
+<p>To harmonize the deployers between the BPMN and CMMN engine the ProcessEngineConfigurator interface has been renamed to EngineConfigurator and moved to the flowable-engine-common module.
+In addition a new flowable-spring-common module has been added to shared common Spring classes between the BPMN and CMMN spring modules.</p>
+
+<h3>Release Notes - Flowable - 6.2.0</h3>
+
+<h4>Highlights</h4>
+
+<ul>
+    <li>Introduction of a new CMMN 1.1 Engine. This provides an implementation of the <a href="http://www.omg.org/spec/CMMN/1.1/">CMMN 1.1 OMG standard</a>. A lot of effort has been put in this
+    new Engine, and it uses a new set of database tables optimized for CMMN execution. We've added a new CMMN user guide to help you getting started. Note that since this is a first release, the
+    CMMN Engine is marked as an experimental feature and missing features like timers and HTTP and Decision tasks will be added in next releases.</li>
+    <li>Added a CMMN editor to the Flowable Modeler app.</li>
+    <li>Added support for CMMN cases ot the Flowable Task app.</li>
+    <li>The BPMN and CMMN engine share a number of common services like Tasks, Variables, Identity links and Jobs. Therefore these services are extracted from the core BPMN engine module and
+    new modules have been created for each one of these services. The BPMN and CMMN engines make use of these services to provide for example Task and Variable support. With this approach Flowable is very
+    flexible in the deployment model. You can run only the BPMN Engine, only the CMMN Engine or run them both together without any issues.</li>
+    <li>Various small bugfixes all around.</li>
+</ul>
+
+<h4>Community contributors</h4>
+
+<ul>
+    <li>David Malkovsky (dbmalkovsky)</li>
+    <li>Filip Hrisafov (filiphr)</li>
+    <li>Robert Hafner (roberthafner)</li>
+    <li>Marco van Zwetselaar (zwets)</li>
+    <li>Lori Small (lsmall)</li>
+    <li>Michael Lippens (mlippens)</li>
+</ul>
+
+<h4>Upgrade notes</h4>
+
+<p>Because of the extraction of the Task, Variable, Identity Link and Job services, we had to change the package names of the classes used in these modules.
+This means that for example TaskQuery and Job Query have been moved to a new package. This was done to adhere to OSGi standards and to be ready for the new Java 9 version.
+This however does mean that you run into some compilation issues while migration to version 6.2.0. We always try to prevent this as much as we can, but due to the new modules this wasn't possible in this release.
+The common naming pattern of these new service is org.flowable.{servicename}.api for the API module and org.flowable.{servicename}.service for the service implementation module.
+So org.flowable.task.api and org.flowable.task.service for example.</p>
 
 <h3>Release Notes - Flowable - 6.1.2</h3>
 

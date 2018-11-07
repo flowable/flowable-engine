@@ -12,9 +12,14 @@
  */
 package org.flowable.idm.engine.test.api.identity;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.engine.test.ResourceFlowableIdmTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class GroupQueryEscapeClauseTest extends ResourceFlowableIdmTestCase {
 
@@ -22,20 +27,19 @@ public class GroupQueryEscapeClauseTest extends ResourceFlowableIdmTestCase {
         super("escapeclause/flowable.idm.cfg.xml");
     }
 
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
-
         createGroup("muppets", "muppets%", "user");
         createGroup("frogs", "frogs_", "user");
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         idmIdentityService.deleteGroup("muppets");
         idmIdentityService.deleteGroup("frogs");
-        super.tearDown();
     }
 
+    @Test
     public void testQueryByNameLike() {
         GroupQuery query = idmIdentityService.createGroupQuery().groupNameLike("%\\%%");
         assertEquals(1, query.list().size());

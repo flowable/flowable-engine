@@ -8,17 +8,51 @@
 
   <insert id="insertFormDefinition" parameterType="org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntityImpl">
     insert into ${prefix}ACT_FO_FORM_DEFINITION(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, 
-    	PARENT_DEPLOYMENT_ID_, RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_)
+    	RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_)
     values (#{id, jdbcType=VARCHAR},
             #{category, jdbcType=VARCHAR},
             #{name, jdbcType=VARCHAR},
             #{key, jdbcType=VARCHAR}, 
             #{version, jdbcType=INTEGER},
             #{deploymentId, jdbcType=VARCHAR},
-            #{parentDeploymentId, jdbcType=VARCHAR},
             #{resourceName, jdbcType=VARCHAR},
             #{description, jdbcType=VARCHAR},
             #{tenantId, jdbcType=VARCHAR})
+  </insert>
+  
+  <insert id="bulkInsertFormDefinition" parameterType="java.util.List">
+    insert into ${prefix}ACT_FO_FORM_DEFINITION(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, 
+                        RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_)
+    values 
+    <foreach collection="list" item="formDefinition" index="index" separator=",">
+        (#{formDefinition.id, jdbcType=VARCHAR},
+         #{formDefinition.category, jdbcType=VARCHAR},
+         #{formDefinition.name, jdbcType=VARCHAR},
+         #{formDefinition.key, jdbcType=VARCHAR}, 
+         #{formDefinition.version, jdbcType=INTEGER},
+         #{formDefinition.deploymentId, jdbcType=VARCHAR},
+         #{formDefinition.resourceName, jdbcType=VARCHAR},
+         #{formDefinition.description, jdbcType=VARCHAR},
+         #{formDefinition.tenantId, jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+  
+  <insert id="bulkInsertFormDefinition" databaseId="oracle" parameterType="java.util.List">
+    INSERT ALL
+    <foreach collection="list" item="formDefinition" index="index">
+        INTO ${prefix}ACT_FO_FORM_DEFINITION(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, 
+                RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_) VALUES 
+        (#{formDefinition.id, jdbcType=VARCHAR},
+         #{formDefinition.category, jdbcType=VARCHAR},
+         #{formDefinition.name, jdbcType=VARCHAR},
+         #{formDefinition.key, jdbcType=VARCHAR}, 
+         #{formDefinition.version, jdbcType=INTEGER},
+         #{formDefinition.deploymentId, jdbcType=VARCHAR},
+         #{formDefinition.resourceName, jdbcType=VARCHAR},
+         #{formDefinition.description, jdbcType=VARCHAR},
+         #{formDefinition.tenantId, jdbcType=VARCHAR})                        
+    </foreach>
+    SELECT * FROM dual
   </insert>
   
   <!-- FORM DEFINITION UPDATE -->
@@ -50,7 +84,6 @@
     <result property="key" column="KEY_" jdbcType="VARCHAR" />
     <result property="version" column="VERSION_" jdbcType="INTEGER"/>
     <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
-    <result property="parentDeploymentId" column="PARENT_DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
     <result property="resourceName" column="RESOURCE_NAME_" jdbcType="VARCHAR"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
@@ -142,20 +175,8 @@
           #{item}
         </foreach>
       </if>
-      <if test="parentDeploymentId != null">
-        and RES.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId}
-      </if>
-      <if test="parentDeploymentIdLike != null">
-        and RES.PARENT_DEPLOYMENT_ID_ like #{parentDeploymentIdLike}
-      </if>
       <if test="latest">
         and RES.VERSION_ = (select max(VERSION_) from ${prefix}ACT_FO_FORM_DEFINITION where KEY_ = RES.KEY_ 
-             <if test="parentDeploymentId != null">
-        		and PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId}
-      		</if>
-      		<if test="parentDeploymentIdLike != null">
-        		and PARENT_DEPLOYMENT_ID_ like #{parentDeploymentIdLike}
-     	 	</if>
              <if test="tenantId != null">
 	           and TENANT_ID_ = #{tenantId}
 	         </if>
@@ -198,14 +219,14 @@
       and TENANT_ID_ = #{tenantId}
   </select>
   
-  <select id="selectFormDefinitionsByKeyAndVersion" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="formDefinitionResultMap">
+  <select id="selectFormDefinitionsByKeyAndVersion" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="formDefinitionResultMap">
     select *
     from ${prefix}ACT_FO_FORM_DEFINITION 
     where KEY_ = #{parameter.formDefinitionKey} and VERSION_ = #{parameter.formVersion} and (TENANT_ID_ = '' or TENANT_ID_ is null)
   </select>
     
   
-   <select id="selectFormDefinitionsByKeyAndVersionAndTenantId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="formDefinitionResultMap">
+   <select id="selectFormDefinitionsByKeyAndVersionAndTenantId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="formDefinitionResultMap">
     select *
     from ${prefix}ACT_FO_FORM_DEFINITION 
     where KEY_ = #{parameter.formDefinitionKey} and VERSION_ = #{parameter.formVersion} and TENANT_ID_ = #{parameter.tenantId}
@@ -227,40 +248,6 @@
           VERSION_ = (select max(VERSION_) from ${prefix}ACT_FO_FORM_DEFINITION where KEY_ = #{formDefinitionKey} and TENANT_ID_ = #{tenantId})
   </select>
   
-  <select id="selectLatestFormDefinitionByKeyAndParentDeploymentId" parameterType="map" resultMap="formDefinitionResultMap">
-    select *
-    from ${prefix}ACT_FO_FORM_DEFINITION 
-    where KEY_ = #{formDefinitionKey} and PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and
-          (TENANT_ID_ = ''  or TENANT_ID_ is null) and
-          VERSION_ = (select max(VERSION_) from ${prefix}ACT_FO_FORM_DEFINITION where KEY_ = #{formDefinitionKey} and 
-          PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and (TENANT_ID_ = '' or TENANT_ID_ is null))
-  </select>
-  
-  <select id="selectLatestFormDefinitionByKeyParentDeploymentIdAndTenantId" parameterType="map" resultMap="formDefinitionResultMap">
-    select *
-    from ${prefix}ACT_FO_FORM_DEFINITION 
-    where KEY_ = #{formDefinitionKey} and
-    	  PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and
-          TENANT_ID_ = #{tenantId} and
-          VERSION_ = (select max(VERSION_) from ${prefix}ACT_FO_FORM_DEFINITION where KEY_ = #{formDefinitionKey} and 
-          PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and TENANT_ID_ = #{tenantId})
-  </select>
-  
-  <!-- mysql specific sql -->
-  <select id="selectFormDefinitionsByQueryCriteria" databaseId="mysql" parameterType="org.flowable.form.engine.impl.FormDefinitionQueryImpl" resultMap="formDefinitionResultMap">
-  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
-    <include refid="selectFormDefinitionsByQueryCriteriaSql"/>
-    ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
-  </select>
-
-  <!-- mysql specific sql -->
-  <select id="selectFormDefinitionCountByQueryCriteria" databaseId="mysql" parameterType="org.flowable.form.engine.impl.FormDefinitionQueryImpl" resultType="long">
-    select distinct count(RES.ID_)
-    <include refid="selectFormDefinitionsByQueryCriteriaSql"/>
-  </select>
-
   <select id="selectFormDefinitionByNativeQuery" parameterType="java.util.Map" resultMap="formDefinitionResultMap">
     <include refid="org.flowable.form.engine.db.common.selectByNativeQuery"/>
   </select>

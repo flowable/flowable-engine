@@ -143,6 +143,7 @@ public class ScopeUtil {
 
         // signal compensation events in reverse order of their 'created' timestamp
         Collections.sort(eventSubscriptions, new Comparator<EventSubscriptionEntity>() {
+            @Override
             public int compare(EventSubscriptionEntity o1, EventSubscriptionEntity o2) {
                 return o2.getCreated().compareTo(o1.getCreated());
             }

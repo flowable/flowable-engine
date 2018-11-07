@@ -20,11 +20,10 @@ import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.activiti.engine.task.Task;
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.impl.event.FlowableEventDispatcherImpl;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.event.FlowableEventDispatcherImpl;
 import org.flowable.engine.delegate.event.BaseEntityEventListener;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 /**
  * 
@@ -174,7 +173,7 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
         listener.reset();
 
         // Test typed entity-listener
-        listener = new TestBaseEntityEventListener(Task.class);
+        listener = new TestBaseEntityEventListener(org.flowable.task.api.Task.class);
 
         // Dispatch event for a task, should be received
         dispatcher.addEventListener(listener);

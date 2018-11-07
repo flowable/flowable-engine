@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntityImpl">
+  
+   <!-- INSERT HISTORIC ENTITY LINK -->
+  
+  <insert id="insertHistoricEntityLink" parameterType="org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntityImpl">
+    insert into ${prefix}ACT_HI_ENTITYLINK (ID_, LINK_TYPE_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_, CREATE_TIME_)
+    values (#{id, jdbcType=VARCHAR},
+            #{linkType, jdbcType=VARCHAR},
+            #{scopeId, jdbcType=VARCHAR},
+            #{scopeType, jdbcType=VARCHAR},
+            #{scopeDefinitionId, jdbcType=VARCHAR},
+            #{referenceScopeId, jdbcType=VARCHAR},
+            #{referenceScopeType, jdbcType=VARCHAR},
+            #{referenceScopeDefinitionId, jdbcType=VARCHAR},
+            #{createTime, jdbcType=TIMESTAMP})
+  </insert>
+  
+  <insert id="bulkInsertHistoricEntityLink" parameterType="java.util.List">
+    insert into ${prefix}ACT_HI_ENTITYLINK (ID_, LINK_TYPE_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_, CREATE_TIME_)
+    values 
+      <foreach collection="list" item="historicEntityLink" index="index" separator=",">
+        (#{historicEntityLink.id, jdbcType=VARCHAR},
+         #{historicEntityLink.linkType, jdbcType=VARCHAR},
+         #{historicEntityLink.scopeId, jdbcType=VARCHAR},
+         #{historicEntityLink.scopeType, jdbcType=VARCHAR},
+         #{historicEntityLink.scopeDefinitionId, jdbcType=VARCHAR},
+         #{historicEntityLink.referenceScopeId, jdbcType=VARCHAR},
+         #{historicEntityLink.referenceScopeType, jdbcType=VARCHAR},
+         #{historicEntityLink.referenceScopeDefinitionId, jdbcType=VARCHAR},
+         #{historicEntityLink.createTime, jdbcType=TIMESTAMP})
+      </foreach>
+  </insert>
+  
+  <insert id="bulkInsertHistoricEntityLink" databaseId="oracle" parameterType="java.util.List">
+    INSERT ALL 
+      <foreach collection="list" item="historicEntityLink" index="index">
+        INTO ${prefix}ACT_HI_ENTITYLINK (ID_, LINK_TYPE_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_, CREATE_TIME_) VALUES 
+          (#{historicEntityLink.id, jdbcType=VARCHAR},
+           #{historicEntityLink.linkType, jdbcType=VARCHAR},
+           #{historicEntityLink.scopeId, jdbcType=VARCHAR},
+           #{historicEntityLink.scopeType, jdbcType=VARCHAR},
+           #{historicEntityLink.scopeDefinitionId, jdbcType=VARCHAR},
+           #{historicEntityLink.referenceScopeId, jdbcType=VARCHAR},
+           #{historicEntityLink.referenceScopeType, jdbcType=VARCHAR},
+           #{historicEntityLink.referenceScopeDefinitionId, jdbcType=VARCHAR},
+           #{historicEntityLink.createTime, jdbcType=TIMESTAMP})
+      </foreach>
+    SELECT * FROM dual
+  </insert>
+  
+  <!-- HISTORIC ENTITY LINK DELETE -->
+  
+  <delete id="deleteHistoricEntityLink" parameterType="string">
+    delete from ${prefix}ACT_HI_ENTITYLINK where ID_ = #{id}
+  </delete>
+  
+  <delete id="bulkDeleteHistoricEntityLink" parameterType="java.util.Collection">
+    delete from ${prefix}ACT_HI_ENTITYLINK where  
+    <foreach item="entityLink" collection="list" index="index" separator=" or ">
+        ID_ = #{entityLink.id, jdbcType=VARCHAR}
+    </foreach>
+  </delete>
+  
+  <delete id="deleteHistoricEntityLinksByScopeIdAndScopeType" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_ENTITYLINK where SCOPE_ID_ = #{scopeId} and SCOPE_TYPE_ = #{scopeType}
+  </delete>
+  
+  <delete id="deleteHistoricEntityLinksByScopeDefinitionIdAndScopeType" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_ENTITYLINK where SCOPE_DEFINITION_ID_ = #{scopeDefinitionId} and SCOPE_TYPE_ = #{scopeType}
+  </delete>
+  
+  <!-- HISTORIC ENTITY LINK RESULTMAP -->
+
+  <resultMap id="historicEntityLinkResultMap" type="org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntityImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="linkType" column="LINK_TYPE_" jdbcType="VARCHAR" />
+    <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
+    <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
+    <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
+    <result property="referenceScopeId" column="REF_SCOPE_ID_" jdbcType="VARCHAR"/>
+    <result property="referenceScopeType" column="REF_SCOPE_TYPE_" jdbcType="VARCHAR"/>
+    <result property="referenceScopeDefinitionId" column="REF_SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
+    <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />       
+  </resultMap>
+
+  <!-- HISTORIC ENTITY LINK SELECT -->
+
+  <select id="selectHistoricEntityLink" parameterType="string" resultMap="historicEntityLinkResultMap">
+    select * from ${prefix}ACT_HI_ENTITYLINK where ID_ = #{id, jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectHistoricEntityLinksByScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicEntityLinkResultMap">
+    select * from ${prefix}ACT_HI_ENTITYLINK where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType}
+  </select>
+  
+  <select id="selectHistoricEntityLinksByScopeDefinitionIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicEntityLinkResultMap">
+    select * from ${prefix}ACT_HI_ENTITYLINK where SCOPE_DEFINITION_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType}
+  </select>
+  
+  <select id="selectEntityLinks" resultMap="historicEntityLinkResultMap">
+    select * from ${prefix}ACT_HI_ENTITYLINK
+  </select>
+  
+</mapper>

@@ -14,19 +14,21 @@ package org.flowable.examples.bpmn.tasklistener;
 
 import java.util.Map;
 
-import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.ExecutionHelper;
+import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * @author Falko Menge <falko.menge@camunda.com>
  */
 public class AssigneeOverwriteFromVariable implements TaskListener {
 
+    @Override
     @SuppressWarnings("unchecked")
     public void notify(DelegateTask delegateTask) {
         // get mapping table from variable
-        DelegateExecution execution = delegateTask.getExecution();
+        ExecutionEntity execution = ExecutionHelper.getExecution(delegateTask.getExecutionId());
         Map<String, String> assigneeMappingTable = (Map<String, String>) execution.getVariable("assigneeMappingTable");
 
         // get assignee from process

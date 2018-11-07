@@ -30,6 +30,7 @@ public class RetryInterceptor extends AbstractCommandInterceptor {
     protected int waitTimeInMs = 50;
     protected int waitIncreaseFactor = 5;
 
+    @Override
     public <T> T execute(CommandConfig config, Command<T> command) {
         long waitTime = waitTimeInMs;
         int failedAttempts = 0;

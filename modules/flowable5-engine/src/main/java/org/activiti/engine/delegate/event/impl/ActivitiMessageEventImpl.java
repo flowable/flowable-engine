@@ -12,7 +12,7 @@
  */
 package org.activiti.engine.delegate.event.impl;
 
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableMessageEvent;
 import org.flowable.engine.delegate.event.FlowableSignalEvent;
 
@@ -34,6 +34,7 @@ public class ActivitiMessageEventImpl extends ActivitiActivityEventImpl implemen
         this.messageName = messageName;
     }
 
+    @Override
     public String getMessageName() {
         return messageName;
     }
@@ -42,6 +43,7 @@ public class ActivitiMessageEventImpl extends ActivitiActivityEventImpl implemen
         this.messageData = messageData;
     }
 
+    @Override
     public Object getMessageData() {
         return messageData;
     }

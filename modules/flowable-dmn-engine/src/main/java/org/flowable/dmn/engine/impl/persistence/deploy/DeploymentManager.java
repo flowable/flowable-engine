@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +15,9 @@ package org.flowable.dmn.engine.impl.persistence.deploy;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.DecisionTableQueryImpl;
@@ -24,8 +27,6 @@ import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntity;
 import org.flowable.dmn.model.DmnDefinition;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 
 /**
  * @author Tijs Rademakers
@@ -75,6 +76,7 @@ public class DeploymentManager {
     }
 
     public DecisionTableEntity findDeployedLatestDecisionByKey(String decisionKey) {
+
         DecisionTableEntity decisionTable = decisionTableEntityManager.findLatestDecisionTableByKey(decisionKey);
 
         if (decisionTable == null) {
@@ -94,26 +96,25 @@ public class DeploymentManager {
         return decisionTable;
     }
 
-    public DecisionTableEntity findDeployedLatestDecisionByKeyAndParentDeploymentId(String decisionTableKey, String parentDeploymentId) {
-        DecisionTableEntity decisionTable = decisionTableEntityManager.findLatestDecisionTableByKeyAndParentDeploymentId(decisionTableKey, parentDeploymentId);
+    public DecisionTableEntity findDeployedLatestDecisionByKeyAndDeploymentId(String decisionTableKey, String deploymentId) {
+        DecisionTableEntity decisionTable = decisionTableEntityManager.findDecisionTableByDeploymentAndKey(deploymentId, decisionTableKey);
 
         if (decisionTable == null) {
             throw new FlowableObjectNotFoundException("no decisions deployed with key '" + decisionTableKey +
-                    "' for parent deployment id '" + parentDeploymentId + "'");
+                            "' for deployment id '" + deploymentId + "'");
         }
         decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
         return decisionTable;
     }
 
-    public DecisionTableEntity findDeployedLatestDecisionByKeyParentDeploymentIdAndTenantId(String decisionTableKey,
-            String parentDeploymentId, String tenantId) {
+    public DecisionTableEntity findDeployedLatestDecisionByKeyDeploymentIdAndTenantId(String decisionTableKey,
+            String deploymentId, String tenantId) {
 
-        DecisionTableEntity decisionTable = decisionTableEntityManager.findLatestDecisionTableByKeyParentDeploymentIdAndTenantId(
-                decisionTableKey, parentDeploymentId, tenantId);
+        DecisionTableEntity decisionTable = decisionTableEntityManager.findDecisionTableByDeploymentAndKeyAndTenantId(deploymentId, decisionTableKey, tenantId);
 
         if (decisionTable == null) {
             throw new FlowableObjectNotFoundException("no decisions deployed with key '" + decisionTableKey +
-                    "' for parent deployment id '" + parentDeploymentId + "' and tenant identifier " + tenantId);
+                            "' for deployment id '" + deploymentId + "' and tenant identifier " + tenantId);
         }
         decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
         return decisionTable;
@@ -164,7 +165,7 @@ public class DeploymentManager {
             throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.");
         }
 
-        // Remove any process definition from the cache
+        // Remove any dmn definition from the cache
         List<DmnDecisionTable> decisionTables = new DecisionTableQueryImpl().deploymentId(deploymentId).list();
 
         // Delete data

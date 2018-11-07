@@ -13,7 +13,6 @@
 package org.activiti.engine.test.bpmn.event.error;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -34,14 +33,14 @@ public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
         String procId = runtimeService.startProcessInstanceByKey("CatchErrorInEmbeddedSubProcess").getId();
 
         // The process will throw an error event,
-        // which is caught and escalated by a User Task
+        // which is caught and escalated by a User org.flowable.task.service.Task
         assertEquals("No tasks found in task list.", 1, taskService.createTaskQuery()
                 .taskDefinitionKey("taskAfterErrorCatch2") // <!>
                 .count());
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Escalated Task", task.getName());
 
-        // Completing the Task will end the process instance
+        // Completing the org.flowable.task.service.Task will end the process instance
         taskService.complete(task.getId());
         assertProcessEnded(procId);
 
@@ -87,12 +86,12 @@ public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
 
     private void assertThatErrorHasBeenCaught(String procId) {
         // The process will throw an error event,
-        // which is caught and escalated by a User Task
+        // which is caught and escalated by a User org.flowable.task.service.Task
         assertEquals("No tasks found in task list.", 1, taskService.createTaskQuery().count());
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Escalated Task", task.getName());
 
-        // Completing the Task will end the process instance
+        // Completing the org.flowable.task.service.Task will end the process instance
         taskService.complete(task.getId());
         assertProcessEnded(procId);
     }

@@ -13,14 +13,15 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-import org.flowable.rest.service.api.engine.variable.RestVariable;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.rest.service.api.engine.variable.RestVariable;
+
+import java.util.List;
 
 /**
  * Modified to add a "returnVariables" flag, which determines whether the variables that exist within the process instance when the first wait state is encountered (or when the process instance
@@ -30,19 +31,23 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
  * @author Ryan Johnston (@rjfsu)
  * @author Joram Barrez
  */
+@ApiModel(description = "Only one of processDefinitionId, processDefinitionKey or message can be used in the request body")
 public class ProcessInstanceCreateRequest {
 
-    private String processDefinitionId;
-    private String processDefinitionKey;
-    private String message;
-    private String businessKey;
-    private List<RestVariable> variables;
-    private List<RestVariable> transientVariables;
-    private String tenantId;
+    protected String processDefinitionId;
+    protected String processDefinitionKey;
+    protected String message;
+    protected String name;
+    protected String businessKey;
+    protected List<RestVariable> variables;
+    protected List<RestVariable> transientVariables;
+    protected String tenantId;
+    protected String overrideDefinitionTenantId;
 
     // Added by Ryan Johnston
     private boolean returnVariables;
 
+    @ApiModelProperty(example = "oneTaskProcess:1:158")
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
@@ -51,6 +56,7 @@ public class ProcessInstanceCreateRequest {
         this.processDefinitionId = processDefinitionId;
     }
 
+    @ApiModelProperty(example = "oneTaskProcess")
     public String getProcessDefinitionKey() {
         return processDefinitionKey;
     }
@@ -59,6 +65,16 @@ public class ProcessInstanceCreateRequest {
         this.processDefinitionKey = processDefinitionKey;
     }
 
+    @ApiModelProperty(example = "myProcessInstanceName")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @ApiModelProperty(example = "myBusinessKey")
     public String getBusinessKey() {
         return businessKey;
     }
@@ -67,6 +83,7 @@ public class ProcessInstanceCreateRequest {
         this.businessKey = businessKey;
     }
 
+    @ApiModelProperty(example = "newOrderMessage")
     public String getMessage() {
         return message;
     }
@@ -79,8 +96,18 @@ public class ProcessInstanceCreateRequest {
         this.tenantId = tenantId;
     }
 
+    @ApiModelProperty(example = "tenant1")
     public String getTenantId() {
         return tenantId;
+    }
+    
+    @ApiModelProperty(example = "overrideTenant1")
+    public String getOverrideDefinitionTenantId() {
+        return overrideDefinitionTenantId;
+    }
+
+    public void setOverrideDefinitionTenantId(String overrideDefinitionTenantId) {
+        this.overrideDefinitionTenantId = overrideDefinitionTenantId;
     }
 
     @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)

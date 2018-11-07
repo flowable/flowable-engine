@@ -15,8 +15,8 @@ package org.flowable.form.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
 import org.flowable.form.engine.impl.util.CommandContextUtil;
 
@@ -32,6 +32,7 @@ public class GetFormDefinitionCmd implements Command<FormDefinitionEntity>, Seri
         this.formDefinitionId = formDefinitionId;
     }
 
+    @Override
     public FormDefinitionEntity execute(CommandContext commandContext) {
         return CommandContextUtil.getFormEngineConfiguration().getDeploymentManager()
                 .findDeployedFormDefinitionById(formDefinitionId);

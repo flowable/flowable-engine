@@ -17,12 +17,10 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
-
 /**
  * @author Tijs Rademakers
  */
-public class ProcessDefinitionInfoEntityImpl extends AbstractEntity implements ProcessDefinitionInfoEntity, Serializable {
+public class ProcessDefinitionInfoEntityImpl extends AbstractBpmnEngineEntity implements ProcessDefinitionInfoEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -33,6 +31,7 @@ public class ProcessDefinitionInfoEntityImpl extends AbstractEntity implements P
 
     }
 
+    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("processDefinitionId", this.processDefinitionId);
@@ -42,18 +41,22 @@ public class ProcessDefinitionInfoEntityImpl extends AbstractEntity implements P
 
     // getters and setters //////////////////////////////////////////////////////
 
+    @Override
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
 
+    @Override
     public void setProcessDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public String getInfoJsonId() {
         return infoJsonId;
     }
 
+    @Override
     public void setInfoJsonId(String infoJsonId) {
         this.infoJsonId = infoJsonId;
     }

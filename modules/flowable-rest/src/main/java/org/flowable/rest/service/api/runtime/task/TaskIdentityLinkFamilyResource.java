@@ -13,21 +13,6 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.task.Task;
-import org.flowable.identitylink.service.IdentityLink;
-import org.flowable.rest.service.api.RestUrls;
-import org.flowable.rest.service.api.engine.RestIdentityLink;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -35,22 +20,33 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.rest.service.api.RestUrls;
+import org.flowable.rest.service.api.engine.RestIdentityLink;
+import org.flowable.task.api.Task;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Task Identity Links" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
 public class TaskIdentityLinkFamilyResource extends TaskBaseResource {
 
-    @ApiOperation(value = "Get all identitylinks for a task for either groups or users", tags = { "Tasks" }, notes = "## Get all identitylinks for a task URL\n\n"
-            + " ```\n GET runtime/tasks/{taskId}/identitylinks/users\n" + "GET runtime/tasks/{taskId}/identitylinks/groups  ```"
-            + "\n\n\n"
-            + "Returns only identity links targetting either users or groups. Response body and status-codes are exactly the same as when getting the full list of identity links for a task.")
+    @ApiOperation(value = "List identity links for a task for either groups or users", tags = { "Task Identity Links" },  nickname = "listIdentityLinksForFamily",
+            notes = "Returns only identity links targetting either users or groups. Response body and status-codes are exactly the same as when getting the full list of identity links for a task.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task was found and the requested identity links are returned."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
     })
-    @RequestMapping(value = "/runtime/tasks/{taskId}/identitylinks/{family}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/runtime/tasks/{taskId}/identitylinks/{family}", produces = "application/json")
     public List<RestIdentityLink> getIdentityLinksForFamily(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "family") @PathVariable("family") String family, HttpServletRequest request) {
 
         Task task = getTaskFromRequest(taskId);

@@ -14,14 +14,14 @@ package org.flowable.engine.impl.bpmn.behavior;
 
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.impl.asyncexecutor.JobManager;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.TimerUtil;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 
 /**
  * @author Joram Barrez
@@ -45,11 +45,10 @@ public class BoundaryTimerEventActivityBehavior extends BoundaryEventActivityBeh
             throw new FlowableException("Programmatic error: " + this.getClass() + " should not be used for anything else than a boundary event");
         }
 
-        JobManager jobManager = CommandContextUtil.getJobManager();
-        TimerJobEntity timerJob = jobManager.createTimerJob(timerEventDefinition, interrupting, executionEntity, TriggerTimerEventJobHandler.TYPE,
+        TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, interrupting, executionEntity, TriggerTimerEventJobHandler.TYPE,
                 TimerEventHandler.createConfiguration(execution.getCurrentActivityId(), timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
         if (timerJob != null) {
-            jobManager.scheduleTimerJob(timerJob);
+            CommandContextUtil.getTimerJobService().scheduleTimerJob(timerJob);
         }
     }
 

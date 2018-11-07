@@ -16,15 +16,15 @@ package org.flowable.rest.service.api.runtime.task;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.task.Event;
-import org.flowable.engine.task.Task;
 import org.flowable.rest.service.api.engine.EventResponse;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -44,9 +44,9 @@ public class TaskEventResource extends TaskBaseResource {
     @ApiOperation(value = "Get an event on a task", tags = { "Tasks" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task and event were found and the event is returned."),
-            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the tasks doesn’t have an event with the given ID.")
+            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the tasks does not have an event with the given ID.")
     })
-    @RequestMapping(value = "/runtime/tasks/{taskId}/events/{eventId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/runtime/tasks/{taskId}/events/{eventId}", produces = "application/json")
     public EventResponse getEvent(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "eventId") @PathVariable("eventId") String eventId, HttpServletRequest request) {
 
         HistoricTaskInstance task = getHistoricTaskFromRequest(taskId);
@@ -59,13 +59,12 @@ public class TaskEventResource extends TaskBaseResource {
         return restResponseFactory.createEventResponse(event);
     }
 
-    // Fixme Documentation
     @ApiOperation(value = "Delete an event on a task", tags = { "Tasks" })
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the task was found and the events are returned."),
-            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task doesn’t have the requested event.")
+            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task does not have the requested event.")
     })
-    @RequestMapping(value = "/runtime/tasks/{taskId}/events/{eventId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/runtime/tasks/{taskId}/events/{eventId}")
     public void deleteEvent(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "eventId") @PathVariable("eventId") String eventId, HttpServletResponse response) {
 
         // Check if task exists

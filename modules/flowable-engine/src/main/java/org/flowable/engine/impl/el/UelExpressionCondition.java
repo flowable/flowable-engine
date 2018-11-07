@@ -13,9 +13,9 @@
 
 package org.flowable.engine.impl.el;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.impl.Condition;
 
 /**
@@ -32,14 +32,15 @@ public class UelExpressionCondition implements Condition {
         this.expression = expression;
     }
 
+    @Override
     public boolean evaluate(String sequenceFlowId, DelegateExecution execution) {
         Object result = expression.getValue(execution);
 
         if (result == null) {
-            throw new FlowableException("condition expression returns null");
+            throw new FlowableException("condition expression returns null (sequenceFlowId: " + sequenceFlowId + ")" );
         }
         if (!(result instanceof Boolean)) {
-            throw new FlowableException("condition expression returns non-Boolean: " + result + " (" + result.getClass().getName() + ")");
+            throw new FlowableException("condition expression returns non-Boolean (sequenceFlowId: " + sequenceFlowId + "): " + result + " (" + result.getClass().getName() + ")");
         }
         return (Boolean) result;
     }

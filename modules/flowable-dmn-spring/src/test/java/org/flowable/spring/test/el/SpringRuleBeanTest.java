@@ -39,6 +39,7 @@ public class SpringRuleBeanTest extends AbstractDmnTestCase {
         this.ruleService = applicationContext.getBean(DmnRuleService.class);
     }
 
+    @Override
     protected void tearDown() throws Exception {
         removeAllDeployments();
         this.applicationContext = null;

@@ -12,14 +12,14 @@
  */
 package org.flowable.engine.test.api.event;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.impl.bpmn.helper.ErrorThrowingEventListener;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case for all {@link FlowableEventListener}s that throws an error BPMN event when an {@link FlowableEvent} has been dispatched.
@@ -28,6 +28,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testThrowError() throws Exception {
         ErrorThrowingEventListener listener = null;
@@ -40,7 +41,7 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
             assertNotNull(processInstance);
 
             // Fetch the task and assign it. Should cause error-event to be dispatched
-            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
             assertNotNull(task);
             taskService.setAssignee(task.getId(), "kermit");
 
@@ -49,13 +50,14 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
             task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("escalatedTask").singleResult();
             assertNotNull(task);
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
         } finally {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
         }
     }
 
+    @Test
     @Deployment
     public void testThrowErrorDefinedInProcessDefinition() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testError");
@@ -63,7 +65,7 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
 
         // Fetch the task and assign it. Should cause error-event to be
         // dispatched
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
         assertNotNull(task);
         taskService.setAssignee(task.getId(), "kermit");
 
@@ -72,9 +74,10 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("escalatedTask").singleResult();
         assertNotNull(task);
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
     }
 
+    @Test
     @Deployment
     public void testThrowErrorWithErrorcode() throws Exception {
         ErrorThrowingEventListener listener = null;
@@ -89,7 +92,7 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
 
             // Fetch the task and assign it. Should cause error-event to be
             // dispatched
-            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
             assertNotNull(task);
             taskService.setAssignee(task.getId(), "kermit");
 
@@ -112,20 +115,21 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
             task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("escalatedTask2").singleResult();
             assertNotNull(task);
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
             
         } finally {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
         }
     }
 
+    @Test
     @Deployment
     public void testThrowErrorWithErrorcodeDefinedInProcessDefinition() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testError");
         assertNotNull(processInstance);
 
         // Fetch the task and assign it. Should cause error-event to be dispatched
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
         assertNotNull(task);
         taskService.setAssignee(task.getId(), "kermit");
 
@@ -134,6 +138,6 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("escalatedTask").singleResult();
         assertNotNull(task);
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
     }
 }

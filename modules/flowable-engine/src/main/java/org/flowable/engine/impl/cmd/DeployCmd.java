@@ -19,18 +19,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.DeploymentQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.flowable.engine.impl.persistence.entity.ResourceEntity;
 import org.flowable.engine.impl.repository.DeploymentBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.Deployment;
@@ -49,6 +49,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
         this.deploymentBuilder = deploymentBuilder;
     }
 
+    @Override
     public Deployment execute(CommandContext commandContext) {
 
         // Backwards compatibility with v5
@@ -79,13 +80,15 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
             if (deployment.getTenantId() == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(deployment.getTenantId())) {
                 List<Deployment> deploymentEntities = new DeploymentQueryImpl(processEngineConfiguration.getCommandExecutor())
                         .deploymentName(deployment.getName())
+                        .orderByDeploymenTime().desc()
                         .listPage(0, 1);
                 if (!deploymentEntities.isEmpty()) {
                     existingDeployments.add(deploymentEntities.get(0));
                 }
+                
             } else {
                 List<Deployment> deploymentList = processEngineConfiguration.getRepositoryService().createDeploymentQuery().deploymentName(deployment.getName())
-                        .deploymentTenantId(deployment.getTenantId()).orderByDeploymentId().desc().list();
+                        .deploymentTenantId(deployment.getTenantId()).orderByDeploymenTime().desc().list();
 
                 if (!deploymentList.isEmpty()) {
                     existingDeployments.addAll(deploymentList);
@@ -97,7 +100,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
                 existingDeployment = (DeploymentEntity) existingDeployments.get(0);
             }
 
-            if ((existingDeployment != null) && !deploymentsDiffer(deployment, existingDeployment)) {
+            if (existingDeployment != null && !deploymentsDiffer(deployment, existingDeployment)) {
                 return existingDeployment;
             }
         }
@@ -145,17 +148,17 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
             return true;
         }
 
-        Map<String, ResourceEntity> resources = deployment.getResources();
-        Map<String, ResourceEntity> savedResources = saved.getResources();
+        Map<String, EngineResource> resources = deployment.getResources();
+        Map<String, EngineResource> savedResources = saved.getResources();
 
         for (String resourceName : resources.keySet()) {
-            ResourceEntity savedResource = savedResources.get(resourceName);
+            EngineResource savedResource = savedResources.get(resourceName);
 
             if (savedResource == null)
                 return true;
 
             if (!savedResource.isGenerated()) {
-                ResourceEntity resource = resources.get(resourceName);
+                EngineResource resource = resources.get(resourceName);
 
                 byte[] bytes = resource.getBytes();
                 byte[] savedBytes = savedResource.getBytes();

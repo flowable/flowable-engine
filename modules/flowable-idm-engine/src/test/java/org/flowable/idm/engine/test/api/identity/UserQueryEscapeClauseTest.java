@@ -12,9 +12,14 @@
  */
 package org.flowable.idm.engine.test.api.identity;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
 import org.flowable.idm.engine.test.ResourceFlowableIdmTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class UserQueryEscapeClauseTest extends ResourceFlowableIdmTestCase {
 
@@ -22,9 +27,8 @@ public class UserQueryEscapeClauseTest extends ResourceFlowableIdmTestCase {
         super("escapeclause/flowable.idm.cfg.xml");
     }
 
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
-
         createUser("kermit", "Kermit%", "Thefrog%", "kermit%@muppetshow.com");
         createUser("fozzie", "Fozzie_", "Bear_", "fozzie_@muppetshow.com");
     }
@@ -38,14 +42,13 @@ public class UserQueryEscapeClauseTest extends ResourceFlowableIdmTestCase {
         return user;
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         idmIdentityService.deleteUser("kermit");
         idmIdentityService.deleteUser("fozzie");
-
-        super.tearDown();
     }
 
+    @Test
     public void testQueryByFirstNameLike() {
         UserQuery query = idmIdentityService.createUserQuery().userFirstNameLike("%\\%%");
         assertEquals(1, query.list().size());
@@ -58,6 +61,7 @@ public class UserQueryEscapeClauseTest extends ResourceFlowableIdmTestCase {
         assertEquals("fozzie", query.singleResult().getId());
     }
 
+    @Test
     public void testQueryByLastNameLike() {
         UserQuery query = idmIdentityService.createUserQuery().userLastNameLike("%\\%%");
         assertEquals(1, query.list().size());
@@ -70,6 +74,7 @@ public class UserQueryEscapeClauseTest extends ResourceFlowableIdmTestCase {
         assertEquals("fozzie", query.singleResult().getId());
     }
 
+    @Test
     public void testQueryByFullNameLike() {
         UserQuery query = idmIdentityService.createUserQuery().userFullNameLike("%og\\%%");
         assertEquals(1, query.list().size());
@@ -92,6 +97,7 @@ public class UserQueryEscapeClauseTest extends ResourceFlowableIdmTestCase {
         assertEquals("fozzie", query.singleResult().getId());
     }
 
+    @Test
     public void testQueryByEmailLike() {
         UserQuery query = idmIdentityService.createUserQuery().userEmailLike("%\\%%");
         assertEquals(1, query.list().size());

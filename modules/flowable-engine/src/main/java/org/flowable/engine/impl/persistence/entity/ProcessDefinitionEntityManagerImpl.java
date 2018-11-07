@@ -16,8 +16,8 @@ package org.flowable.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.data.ProcessDefinitionDataManager;
@@ -51,6 +51,16 @@ public class ProcessDefinitionEntityManagerImpl extends AbstractEntityManager<Pr
     @Override
     public ProcessDefinitionEntity findLatestProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId) {
         return processDefinitionDataManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
+    }
+    
+    @Override
+    public ProcessDefinitionEntity findLatestDerivedProcessDefinitionByKey(String processDefinitionKey) {
+        return processDefinitionDataManager.findLatestDerivedProcessDefinitionByKey(processDefinitionKey);
+    }
+
+    @Override
+    public ProcessDefinitionEntity findLatestDerivedProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId) {
+        return processDefinitionDataManager.findLatestDerivedProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
     }
 
     @Override

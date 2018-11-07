@@ -15,11 +15,11 @@ package org.flowable.form.api;
 import java.util.Date;
 
 /**
- * Represents a deployment that is already present in the process repository.
+ * Represents a deployment that is already present in the form repository.
  * 
- * A deployment is a container for resources such as process definitions, images, forms, etc.
+ * A deployment is a container for resources such as form definitions, image, etc.
  * 
- * When a deployment is 'deployed' through the {@link org.flowable.engine.RuntimeService}, the Flowable engine will recognize certain of such resource types and act upon them (eg process definitions
+ * When a deployment is 'deployed' through the {@link org.flowable.engine.RuntimeService}, the Flowable engine will recognize certain of such resource types and act upon them (eg form definitions
  * will be parsed to an executable Java artifact).
  * 
  * To create a Deployment, use the {@link org.flowable.engine.repository.DeploymentBuilder}. A Deployment on itself is a <b>read-only</b> object and its content cannot be changed after deployment

@@ -9,7 +9,7 @@
     <endEvent id="endevent1" name="End"></endEvent>
     <sequenceFlow id="toEnd" sourceRef="exclusivegateway1" targetRef="endevent1"></sequenceFlow>
     <sequenceFlow id="flow4" sourceRef="exclusivegateway1" targetRef="counterUp">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${counter < 1000}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${counter < 500}]]></conditionExpression>
     </sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_testSimpleStraightThroughProcess">

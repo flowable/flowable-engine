@@ -16,7 +16,7 @@ package org.activiti.engine.runtime;
 import java.util.Date;
 
 import org.activiti.engine.query.Query;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.api.Job;
 
 /**
  * Allows programmatic querying of {@link Job}s.

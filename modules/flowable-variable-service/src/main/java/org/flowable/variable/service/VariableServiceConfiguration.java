@@ -12,12 +12,10 @@
  */
 package org.flowable.variable.service;
 
-import java.util.List;
-
-import org.flowable.engine.common.AbstractServiceConfiguration;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.AbstractServiceConfiguration;
+import org.flowable.variable.api.types.VariableTypes;
+import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.HistoricVariableServiceImpl;
-import org.flowable.variable.service.impl.ServiceImpl;
 import org.flowable.variable.service.impl.VariableServiceImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityManager;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityManagerImpl;
@@ -31,29 +29,8 @@ import org.flowable.variable.service.impl.persistence.entity.data.VariableInstan
 import org.flowable.variable.service.impl.persistence.entity.data.impl.MybatisHistoricVariableInstanceDataManager;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.MybatisVariableByteArrayDataManager;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.MybatisVariableInstanceDataManager;
-import org.flowable.variable.service.impl.types.BooleanType;
-import org.flowable.variable.service.impl.types.ByteArrayType;
-import org.flowable.variable.service.impl.types.DateType;
-import org.flowable.variable.service.impl.types.DefaultVariableTypes;
-import org.flowable.variable.service.impl.types.DoubleType;
-import org.flowable.variable.service.impl.types.IntegerType;
-import org.flowable.variable.service.impl.types.JodaDateTimeType;
-import org.flowable.variable.service.impl.types.JodaDateType;
-import org.flowable.variable.service.impl.types.JsonType;
-import org.flowable.variable.service.impl.types.LongJsonType;
-import org.flowable.variable.service.impl.types.LongStringType;
-import org.flowable.variable.service.impl.types.LongType;
-import org.flowable.variable.service.impl.types.NullType;
-import org.flowable.variable.service.impl.types.SerializableType;
-import org.flowable.variable.service.impl.types.ShortType;
-import org.flowable.variable.service.impl.types.StringType;
-import org.flowable.variable.service.impl.types.UUIDType;
-import org.flowable.variable.service.impl.types.VariableType;
-import org.flowable.variable.service.impl.types.VariableTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tijs Rademakers
@@ -83,13 +60,9 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
     protected VariableByteArrayEntityManager byteArrayEntityManager;
     protected HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager;
     
-    protected HistoryLevel historyLevel;
-    
-    protected ObjectMapper objectMapper;
-    
-    protected List<VariableType> customPreVariableTypes;
-    protected List<VariableType> customPostVariableTypes;
     protected VariableTypes variableTypes;
+    
+    protected InternalHistoryVariableManager internalHistoryVariableManager;
     
     protected int maxLengthString;
     
@@ -108,71 +81,8 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
     // /////////////////////////////////////////////////////////////////////
 
     public void init() {
-        initVariableTypes();
-        initServices();
         initDataManagers();
         initEntityManagers();
-    }
-    
-    public boolean isHistoryLevelAtLeast(HistoryLevel level) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Current history level: {}, level required: {}", historyLevel, level);
-        }
-        // Comparing enums actually compares the location of values declared in the enum
-        return historyLevel.isAtLeast(level);
-    }
-
-    public boolean isHistoryEnabled() {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Current history level: {}", historyLevel);
-        }
-        return historyLevel != HistoryLevel.NONE;
-    }
-    
-    public void initVariableTypes() {
-        if (variableTypes == null) {
-            variableTypes = new DefaultVariableTypes();
-            if (customPreVariableTypes != null) {
-                for (VariableType customVariableType : customPreVariableTypes) {
-                    variableTypes.addType(customVariableType);
-                }
-            }
-            variableTypes.addType(new NullType());
-            variableTypes.addType(new StringType(getMaxLengthString()));
-            variableTypes.addType(new LongStringType(getMaxLengthString() + 1));
-            variableTypes.addType(new BooleanType());
-            variableTypes.addType(new ShortType());
-            variableTypes.addType(new IntegerType());
-            variableTypes.addType(new LongType());
-            variableTypes.addType(new DateType());
-            variableTypes.addType(new JodaDateType());
-            variableTypes.addType(new JodaDateTimeType());
-            variableTypes.addType(new DoubleType());
-            variableTypes.addType(new UUIDType());
-            variableTypes.addType(new JsonType(getMaxLengthString(), objectMapper));
-            variableTypes.addType(new LongJsonType(getMaxLengthString() + 1, objectMapper));
-            variableTypes.addType(new ByteArrayType());
-            variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects));
-            if (customPostVariableTypes != null) {
-                for (VariableType customVariableType : customPostVariableTypes) {
-                    variableTypes.addType(customVariableType);
-                }
-            }
-        }
-    }
-
-    // services
-    // /////////////////////////////////////////////////////////////////
-
-    protected void initServices() {
-        initService(variableService);
-        initService(historicVariableService);
-    }
-
-    protected void initService(Object service) {
-        if (service instanceof ServiceImpl) {
-            ((ServiceImpl) service).setCommandExecutor(commandExecutor);
-        }
     }
 
     // Data managers
@@ -180,13 +90,13 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
 
     public void initDataManagers() {
         if (variableInstanceDataManager == null) {
-            variableInstanceDataManager = new MybatisVariableInstanceDataManager(this);
+            variableInstanceDataManager = new MybatisVariableInstanceDataManager();
         }
         if (byteArrayDataManager == null) {
-            byteArrayDataManager = new MybatisVariableByteArrayDataManager(this);
+            byteArrayDataManager = new MybatisVariableByteArrayDataManager();
         }
         if (historicVariableInstanceDataManager == null) {
-            historicVariableInstanceDataManager = new MybatisHistoricVariableInstanceDataManager(this);
+            historicVariableInstanceDataManager = new MybatisHistoricVariableInstanceDataManager();
         }
     }
 
@@ -281,24 +191,6 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
         return this;
     }
     
-    public HistoryLevel getHistoryLevel() {
-        return historyLevel;
-    }
-    
-    public VariableServiceConfiguration setHistoryLevel(HistoryLevel historyLevel) {
-        this.historyLevel = historyLevel;
-        return this;
-    }
-    
-    public List<VariableType> getCustomPreVariableTypes() {
-        return customPreVariableTypes;
-    }
-    
-    public VariableServiceConfiguration setCustomPreVariableTypes(List<VariableType> customPreVariableTypes) {
-        this.customPreVariableTypes = customPreVariableTypes;
-        return this;
-    }
-    
     public VariableTypes getVariableTypes() {
         return variableTypes;
     }
@@ -308,15 +200,15 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
         return this;
     }
     
-    public List<VariableType> getCustomPostVariableTypes() {
-        return customPostVariableTypes;
+    public InternalHistoryVariableManager getInternalHistoryVariableManager() {
+        return internalHistoryVariableManager;
     }
-    
-    public VariableServiceConfiguration setCustomPostVariableTypes(List<VariableType> customPostVariableTypes) {
-        this.customPostVariableTypes = customPostVariableTypes;
+
+    public VariableServiceConfiguration setInternalHistoryVariableManager(InternalHistoryVariableManager internalHistoryVariableManager) {
+        this.internalHistoryVariableManager = internalHistoryVariableManager;
         return this;
     }
-    
+
     public int getMaxLengthString() {
         return maxLengthString;
     }
@@ -332,14 +224,5 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
 
     public void setSerializableVariableTypeTrackDeserializedObjects(boolean serializableVariableTypeTrackDeserializedObjects) {
         this.serializableVariableTypeTrackDeserializedObjects = serializableVariableTypeTrackDeserializedObjects;
-    }
-    
-    public ObjectMapper getObjectMapper() {
-        return objectMapper;
-    }
-
-    public VariableServiceConfiguration setObjectMapper(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-        return this;
     }
 }

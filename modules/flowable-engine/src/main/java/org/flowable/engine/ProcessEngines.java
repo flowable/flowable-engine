@@ -14,8 +14,6 @@ package org.flowable.engine;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -28,11 +26,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.flowable.engine.common.EngineInfo;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.util.IoUtil;
-import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.EngineInfo;
+import org.flowable.common.engine.impl.util.IoUtil;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -168,18 +167,11 @@ public abstract class ProcessEngines {
             processEngineInfosByName.put(processEngineName, processEngineInfo);
         } catch (Throwable e) {
             LOGGER.error("Exception while initializing process engine: {}", e.getMessage(), e);
-            processEngineInfo = new EngineInfo(null, resourceUrlString, getExceptionString(e));
+            processEngineInfo = new EngineInfo(null, resourceUrlString, ExceptionUtils.getStackTrace(e));
         }
         processEngineInfosByResourceUrl.put(resourceUrlString, processEngineInfo);
         processEngineInfos.add(processEngineInfo);
         return processEngineInfo;
-    }
-
-    private static String getExceptionString(Throwable e) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-        return sw.toString();
     }
 
     private static ProcessEngine buildProcessEngine(URL resource) {

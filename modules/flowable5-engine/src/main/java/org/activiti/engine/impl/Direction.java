@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public class Direction {
 
-    private static final Map<String, Direction> directions = new HashMap<String, Direction>();
+    private static final Map<String, Direction> directions = new HashMap<>();
 
     public static final Direction ASCENDING = new Direction("asc");
     public static final Direction DESCENDING = new Direction("desc");

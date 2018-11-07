@@ -33,21 +33,21 @@ import org.activiti.engine.impl.pvm.delegate.SubProcessActivityBehavior;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.runtime.AtomicOperation;
 import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of the multi-instance functionality as described in the BPMN 2.0 spec.
- * 
+ * <p>
  * Multi instance functionality is implemented as an {@link ActivityBehavior} that wraps the original {@link ActivityBehavior} of the activity.
- *
+ * <p>
  * Only subclasses of {@link AbstractBpmnActivityBehavior} can have multi-instance behavior. As such, special logic is contained in the {@link AbstractBpmnActivityBehavior} to delegate to the
  * {@link MultiInstanceActivityBehavior} if needed.
- * 
+ *
  * @author Joram Barrez
  * @author Falko Menge
  */
@@ -74,14 +74,14 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
     /**
      * @param activity
-     * @param innerActivityBehavior
-     *            The original {@link ActivityBehavior} of the activity that will be wrapped inside this behavior.
+     * @param innerActivityBehavior The original {@link ActivityBehavior} of the activity that will be wrapped inside this behavior.
      */
     public MultiInstanceActivityBehavior(ActivityImpl activity, AbstractBpmnActivityBehavior innerActivityBehavior) {
         this.activity = activity;
         setInnerActivityBehavior(innerActivityBehavior);
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
         ActivityExecution activityExecution = (ActivityExecution) execution;
         if (getLocalLoopVariable(activityExecution, getCollectionElementIndexVariable()) == null) {
@@ -102,21 +102,25 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     protected abstract void createInstances(ActivityExecution execution);
 
     // Intercepts signals, and delegates it to the wrapped {@link ActivityBehavior}.
+    @Override
     public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
         innerActivityBehavior.signal(execution, signalName, signalData);
     }
 
     // required for supporting embedded subprocesses
+    @Override
     public void lastExecutionEnded(ActivityExecution execution) {
         ScopeUtil.createEventScopeExecution((ExecutionEntity) execution);
         leave(execution);
     }
 
     // required for supporting external subprocesses
+    @Override
     public void completing(DelegateExecution execution, DelegateExecution subProcessInstance) throws Exception {
     }
 
     // required for supporting external subprocesses
+    @Override
     public void completed(ActivityExecution execution) throws Exception {
         leave(execution);
     }
@@ -137,7 +141,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         } else if (collectionVariable != null) {
             Object obj = execution.getVariable(collectionVariable);
             if (obj == null) {
-                throw new ActivitiIllegalArgumentException("Variable " + collectionVariable + " is not found");
+                throw new ActivitiIllegalArgumentException("Variable " + collectionVariable + " was not found");
             }
             if (!(obj instanceof Collection)) {
                 throw new ActivitiIllegalArgumentException("Variable " + collectionVariable + "' is not a Collection");
@@ -244,7 +248,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         List<ExecutionListener> listeners = activity.getExecutionListeners(org.activiti.engine.impl.pvm.PvmEvent.EVENTNAME_START);
 
         if (listeners != null) {
-            List<ExecutionListener> filteredExecutionListeners = new ArrayList<ExecutionListener>(listeners.size());
+            List<ExecutionListener> filteredExecutionListeners = new ArrayList<>(listeners.size());
             // Sad that we have to do this, but it's the only way I could find (which is also safe for backwards compatibility)
 
             for (ExecutionListener executionListener : listeners) {
@@ -269,7 +273,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     }
 
     protected void logLoopDetails(ActivityExecution execution, String custom, int loopCounter,
-            int nrOfCompletedInstances, int nrOfActiveInstances, int nrOfInstances) {
+                                  int nrOfCompletedInstances, int nrOfActiveInstances, int nrOfInstances) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Multi-instance '{}' {}. Details: loopCounter={}, nrOrCompletedInstances={},nrOfActiveInstances={},nrOfInstances={}",
                     execution.getActivity(), custom, loopCounter, nrOfCompletedInstances, nrOfActiveInstances, nrOfInstances);
@@ -337,10 +341,9 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
     /**
      * ACT-1339. Calling ActivityEndListeners within an {@link AtomicOperation} so that an executionContext is present.
-     * 
+     *
      * @author Aris Tzoumas
      * @author Joram Barrez
-     *
      */
     private static final class CallActivityListenersOperation implements AtomicOperation {
 

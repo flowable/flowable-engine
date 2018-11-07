@@ -20,7 +20,7 @@ import org.activiti.engine.impl.el.ExpressionManager;
 import org.activiti.engine.impl.el.FixedValue;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.FieldExtension;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.common.engine.api.delegate.Expression;
 
 /**
  * @author Joram Barrez
@@ -30,7 +30,7 @@ public abstract class AbstractBehaviorFactory {
     protected ExpressionManager expressionManager;
 
     public List<FieldDeclaration> createFieldDeclarations(List<FieldExtension> fieldList) {
-        List<FieldDeclaration> fieldDeclarations = new ArrayList<FieldDeclaration>();
+        List<FieldDeclaration> fieldDeclarations = new ArrayList<>();
 
         for (FieldExtension fieldExtension : fieldList) {
             FieldDeclaration fieldDeclaration = null;

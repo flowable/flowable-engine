@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -61,6 +61,7 @@ public class ScopeUtil {
 
         // signal compensation events in reverse order of their 'created' timestamp
         Collections.sort(eventSubscriptions, new Comparator<EventSubscriptionEntity>() {
+            @Override
             public int compare(EventSubscriptionEntity o1, EventSubscriptionEntity o2) {
                 return o2.getCreated().compareTo(o1.getCreated());
             }

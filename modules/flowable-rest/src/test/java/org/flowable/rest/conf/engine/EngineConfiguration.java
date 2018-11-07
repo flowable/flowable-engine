@@ -14,6 +14,9 @@ package org.flowable.rest.conf.engine;
 
 import javax.sql.DataSource;
 
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.engine.DynamicBpmnService;
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.IdentityService;
@@ -23,8 +26,9 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.idm.api.IdmEngineConfigurationApi;
+import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.spring.ProcessEngineFactoryBean;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -83,6 +87,7 @@ public class EngineConfiguration {
         processEngineConfiguration.setTransactionManager(annotationDrivenTransactionManager());
         processEngineConfiguration.setAsyncExecutorActivate(false);
         processEngineConfiguration.setHistoryLevel(HistoryLevel.FULL);
+        processEngineConfiguration.setEnableEntityLinks(true);
         return processEngineConfiguration;
     }
 
@@ -115,9 +120,20 @@ public class EngineConfiguration {
     public IdentityService identityService() {
         return processEngine().getIdentityService();
     }
+    
+    @Bean
+    public IdmIdentityService idmIdentityService() {
+        return ((IdmEngineConfigurationApi) processEngine().getProcessEngineConfiguration().getEngineConfigurations()
+                .get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)).getIdmIdentityService();
+    }
 
     @Bean
     public ManagementService managementService() {
         return processEngine().getManagementService();
+    }
+    
+    @Bean
+    public DynamicBpmnService dynamicBpmnService() {
+        return processEngine().getDynamicBpmnService();
     }
 }

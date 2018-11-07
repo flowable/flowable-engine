@@ -16,8 +16,8 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.engine.ManagementService;
-import org.flowable.engine.common.api.management.TableMetaData;
 
 /**
  * Test case for the various operations of the {@link ManagementService}
@@ -32,7 +32,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
 
         String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
 
-        assertEquals(new Long(5), tableCount.get(tablePrefix + "ACT_GE_PROPERTY"));
+        assertEquals(new Long(10), tableCount.get(tablePrefix + "ACT_GE_PROPERTY"));
         assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_GE_BYTEARRAY"));
         assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_RE_DEPLOYMENT"));
         assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_RU_EXECUTION"));
@@ -50,7 +50,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
 
         TableMetaData tableMetaData = managementService.getTableMetaData(tablePrefix + "ACT_RU_TASK");
         assertEquals(tableMetaData.getColumnNames().size(), tableMetaData.getColumnTypes().size());
-        assertEquals(23, tableMetaData.getColumnNames().size());
+        assertEquals(29, tableMetaData.getColumnNames().size());
 
         int assigneeIndex = tableMetaData.getColumnNames().indexOf("ASSIGNEE_");
         int createTimeIndex = tableMetaData.getColumnNames().indexOf("CREATE_TIME_");

@@ -43,15 +43,12 @@ public interface FormDefinition {
     int getVersion();
 
     /**
-     * name of {@link FormRepositoryService#getResourceAsStream(String, String) the resource} of this process definition.
+     * name of {@link FormRepositoryService#getResourceAsStream(String, String) the resource} of this form definition.
      */
     String getResourceName();
 
     /** The deployment in which this form is contained. */
     String getDeploymentId();
-
-    /** The parent deployment id in which this form is contained. */
-    String getParentDeploymentId();
 
     /** The tenant identifier of this form */
     String getTenantId();

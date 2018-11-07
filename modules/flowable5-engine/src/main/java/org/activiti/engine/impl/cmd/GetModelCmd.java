@@ -31,6 +31,7 @@ public class GetModelCmd implements Command<ModelEntity>, Serializable {
         this.modelId = modelId;
     }
 
+    @Override
     public ModelEntity execute(CommandContext commandContext) {
         return commandContext.getModelEntityManager().findModelById(modelId);
     }

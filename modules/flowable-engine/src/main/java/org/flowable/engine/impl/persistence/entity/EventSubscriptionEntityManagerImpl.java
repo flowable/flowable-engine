@@ -17,16 +17,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.bpmn.model.Signal;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.event.EventHandler;
 import org.flowable.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.data.EventSubscriptionDataManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.runtime.EventSubscription;
+import org.flowable.job.service.JobService;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 
 /**
  * @author Joram Barrez
@@ -246,6 +249,11 @@ public class EventSubscriptionEntityManagerImpl extends AbstractEntityManager<Ev
     public void deleteEventSubscriptionsForProcessDefinition(String processDefinitionId) {
         eventSubscriptionDataManager.deleteEventSubscriptionsForProcessDefinition(processDefinitionId);
     }
+    
+    @Override
+    public void deleteEventSubscriptionsByExecutionId(String executionId) {
+        eventSubscriptionDataManager.deleteEventSubscriptionsByExecutionId(executionId);
+    }
 
     // Processing /////////////////////////////////////////////////////////////
 
@@ -273,7 +281,8 @@ public class EventSubscriptionEntityManagerImpl extends AbstractEntityManager<Ev
     }
 
     protected void scheduleEventAsync(EventSubscriptionEntity eventSubscriptionEntity, Object payload) {
-        JobEntity message = getJobEntityManager().create();
+        JobService jobService = CommandContextUtil.getJobService();
+        JobEntity message = jobService.createJob();
         message.setJobType(JobEntity.JOB_TYPE_MESSAGE);
         message.setJobHandlerType(ProcessEventJobHandler.TYPE);
         message.setJobHandlerConfiguration(eventSubscriptionEntity.getId());
@@ -284,7 +293,7 @@ public class EventSubscriptionEntityManagerImpl extends AbstractEntityManager<Ev
         // message.setEventPayload(payload);
         // }
 
-        getJobManager().scheduleAsyncJob(message);
+        jobService.scheduleAsyncJob(message);
     }
 
     protected List<SignalEventSubscriptionEntity> toSignalEventSubscriptionEntityList(List<EventSubscriptionEntity> result) {

@@ -19,17 +19,8 @@ package org.flowable.identitylink.service;
  * see TaskService#addGroupIdentityLink(String, String, String)
  * 
  * @author Joram Barrez
+ * @deprecated use {@link org.flowable.identitylink.api.IdentityLinkType} instead
  */
-public class IdentityLinkType {
-
-    public static final String ASSIGNEE = "assignee";
-
-    public static final String CANDIDATE = "candidate";
-
-    public static final String OWNER = "owner";
-
-    public static final String STARTER = "starter";
-
-    public static final String PARTICIPANT = "participant";
+public class IdentityLinkType extends org.flowable.identitylink.api.IdentityLinkType {
 
 }

@@ -21,7 +21,7 @@ import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
  * @author Daisuke Yoshimoto
@@ -45,7 +45,7 @@ public class GetExecutionsVariablesCmd implements Command<List<VariableInstance>
             throw new ActivitiIllegalArgumentException("Set of executionIds is empty");
         }
 
-        List<VariableInstance> instances = new ArrayList<VariableInstance>();
+        List<VariableInstance> instances = new ArrayList<>();
         List<VariableInstanceEntity> entities = commandContext.getVariableInstanceEntityManager().findVariableInstancesByExecutionIds(executionIds);
         for (VariableInstanceEntity entity : entities) {
             entity.getValue();

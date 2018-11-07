@@ -1,5 +1,16 @@
 package org.flowable.crystalball.simulator.impl.playback;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.impl.runtime.Clock;
+import org.flowable.common.engine.impl.util.DefaultClockImpl;
 import org.flowable.crystalball.simulator.SimpleEventCalendarFactory;
 import org.flowable.crystalball.simulator.SimpleSimulationRun;
 import org.flowable.crystalball.simulator.SimulationEvent;
@@ -22,23 +33,12 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.ProcessEngines;
 import org.flowable.engine.RepositoryService;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.impl.util.DefaultClockImpl;
-import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.el.NoExecutionVariableScope;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * @author martin.grofcik
@@ -99,7 +99,7 @@ public class PlaybackRunTest {
         processEngine.getProcessEngineConfiguration().setClock(clock);
         processEngine.getRepositoryService().createDeployment().addClasspathResource(THE_SIMPLEST_PROCESS).deploy();
 
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put(TEST_VARIABLE, TEST_VALUE);
         processEngine.getRuntimeService().startProcessInstanceByKey(SIMPLEST_PROCESS, BUSINESS_KEY, variables);
         checkStatus(processEngine);
@@ -121,7 +121,7 @@ public class PlaybackRunTest {
     }
 
     private List<Function<FlowableEvent, SimulationEvent>> getTransformers() {
-        List<Function<FlowableEvent, SimulationEvent>> transformers = new ArrayList<Function<FlowableEvent, SimulationEvent>>();
+        List<Function<FlowableEvent, SimulationEvent>> transformers = new ArrayList<>();
         transformers.add(new DeploymentCreateTransformer(DEPLOYMENT_CREATED_EVENT_TYPE, DEPLOYMENT_RESOURCES_KEY));
         transformers.add(new ProcessInstanceCreateTransformer(PROCESS_INSTANCE_START_EVENT_TYPE, PROCESS_DEFINITION_ID_KEY, BUSINESS_KEY, VARIABLES_KEY));
         transformers.add(new UserTaskCompleteTransformer(USER_TASK_COMPLETED_EVENT_TYPE));
@@ -129,7 +129,7 @@ public class PlaybackRunTest {
     }
 
     public static Map<String, SimulationEventHandler> getHandlers() {
-        Map<String, SimulationEventHandler> handlers = new HashMap<String, SimulationEventHandler>();
+        Map<String, SimulationEventHandler> handlers = new HashMap<>();
         handlers.put(DEPLOYMENT_CREATED_EVENT_TYPE, new DeployResourcesEventHandler(DEPLOYMENT_RESOURCES_KEY));
         handlers.put(PROCESS_INSTANCE_START_EVENT_TYPE, new StartProcessByIdEventHandler(PROCESS_DEFINITION_ID_KEY, BUSINESS_KEY, VARIABLES_KEY));
         handlers.put(USER_TASK_COMPLETED_EVENT_TYPE, new PlaybackUserTaskCompleteEventHandler());

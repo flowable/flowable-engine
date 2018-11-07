@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.javax.el.ELContext;
-import org.flowable.engine.common.impl.javax.el.ELResolver;
+import org.flowable.common.engine.impl.javax.el.ELContext;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.slf4j.Logger;
@@ -21,6 +21,7 @@ public class BlueprintELResolver extends ELResolver {
     private Map<String, JavaDelegate> delegateMap = new HashMap<>();
     private Map<String, ActivityBehavior> activityBehaviourMap = new HashMap<>();
 
+    @Override
     public Object getValue(ELContext context, Object base, Object property) {
         if (base == null) {
             // according to javadoc, can only be a String
@@ -74,21 +75,26 @@ public class BlueprintELResolver extends ELResolver {
         LOGGER.info("removed Flowable service from activity behaviour cache {}", name);
     }
 
+    @Override
     public boolean isReadOnly(ELContext context, Object base, Object property) {
         return true;
     }
 
+    @Override
     public void setValue(ELContext context, Object base, Object property, Object value) {
     }
 
+    @Override
     public Class<?> getCommonPropertyType(ELContext context, Object arg) {
         return Object.class;
     }
 
+    @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object arg) {
         return null;
     }
 
+    @Override
     public Class<?> getType(ELContext context, Object arg1, Object arg2) {
         return Object.class;
     }

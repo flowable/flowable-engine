@@ -1,0 +1,319 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>Flowable - Open Api Specification Generator</name>
+    <artifactId>flowable-oas-generator</artifactId>
+
+    <parent>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-root</artifactId>
+        <relativePath>../../../../</relativePath>
+        <version>6.4.1-SNAPSHOT</version>
+    </parent>
+
+    <properties>
+        <flowable.prefix>flowable-swagger</flowable.prefix>
+        <flowable.app.host>localhost:8080</flowable.app.host>
+        <flowable.app.name>flowable-rest</flowable.app.name>
+        <flowable.process.api.endpoint>service</flowable.process.api.endpoint>
+        <swagger.generated.directory>target/generated-swagger</swagger.generated.directory>
+    </properties>
+
+
+    <build>
+        <defaultGoal>process-resources</defaultGoal>
+        <finalName>flowable-swagger</finalName>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.5.3</version>
+                <configuration>
+                    <descriptor>src/assembly/assembly.xml</descriptor>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>create-archive</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.kongchen</groupId>
+                <artifactId>swagger-maven-plugin</artifactId>
+                <version>3.1.5</version>
+                <configuration>
+                    <apiSources>
+                        <apiSource>
+                            <springmvc>true</springmvc>
+                            <locations>
+                                <location>org.flowable.rest.service.api</location>
+                            </locations>
+                            <schemes>
+                                <scheme>http</scheme>
+                                <scheme>https</scheme>
+                            </schemes>
+                            <host>${flowable.app.host}</host>
+                            <basePath>/${flowable.app.name}/${flowable.process.api.endpoint}</basePath>
+                            <info>
+                                <title>Flowable Process REST API</title>
+                                <version>v1</version>
+                                <contact>
+                                    <email></email>
+                                    <name>Flowable</name>
+                                    <url>http://www.flowable.org/</url>
+                                </contact>
+                                <license>
+                                    <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+                                    <name>Apache 2.0</name>
+                                </license>
+                            </info>
+                            <securityDefinitions>
+                                <securityDefinition>
+                                    <name>basicAuth</name>
+                                    <type>basic</type>
+                                </securityDefinition>
+                            </securityDefinitions>
+                            <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
+                            <outputFormats>yaml</outputFormats>
+                            <jsonExampleValues>true</jsonExampleValues>
+                            <swaggerFileName>${flowable.prefix}-process</swaggerFileName>
+                            <swaggerDirectory>${project.build.directory}/oas/v2/process</swaggerDirectory>
+                        </apiSource>
+                        <!-- ++++++++++ -->
+                        <!-- DMN -->
+                        <!-- ++++++++++ -->
+                        <apiSource>
+                            <springmvc>true</springmvc>
+                            <locations>
+                                <location>org.flowable.dmn.rest.service.api</location>
+                            </locations>
+                            <schemes>
+                                <scheme>http</scheme>
+                                <scheme>https</scheme>
+                            </schemes>
+                            <host>${flowable.app.host}</host>
+                            <basePath>/${flowable.app.name}/dmn-api</basePath>
+                            <info>
+                                <title>Flowable Decision REST API</title>
+                                <version>v1</version>
+                                <contact>
+                                    <email></email>
+                                    <name>Flowable</name>
+                                    <url>http://www.flowable.org/</url>
+                                </contact>
+                                <license>
+                                    <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+                                    <name>Apache 2.0</name>
+                                </license>
+                            </info>
+                            <securityDefinitions>
+                                <securityDefinition>
+                                    <name>basicAuth</name>
+                                    <type>basic</type>
+                                </securityDefinition>
+                            </securityDefinitions>
+                            <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
+                            <outputFormats>yaml</outputFormats>
+                            <swaggerFileName>${flowable.prefix}-decision</swaggerFileName>
+                            <jsonExampleValues>true</jsonExampleValues>
+                            <swaggerDirectory>${project.build.directory}/oas/v2/decision</swaggerDirectory>
+                        </apiSource>
+                        <!-- ++++++++++ -->
+                        <!-- FORM -->
+                        <!-- ++++++++++ -->
+                        <apiSource>
+                            <springmvc>true</springmvc>
+                            <locations>
+                                <location>org.flowable.form.rest.service.api</location>
+                            </locations>
+                            <schemes>
+                                <scheme>http</scheme>
+                                <scheme>https</scheme>
+                            </schemes>
+                            <host>${flowable.app.host}</host>
+                            <basePath>/${flowable.app.name}/form-api</basePath>
+                            <info>
+                                <title>Flowable Form REST API</title>
+                                <version>v1</version>
+                                <contact>
+                                    <email></email>
+                                    <name>Flowable</name>
+                                    <url>http://www.flowable.org/</url>
+                                </contact>
+                                <license>
+                                    <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+                                    <name>Apache 2.0</name>
+                                </license>
+                            </info>
+                            <securityDefinitions>
+                                <securityDefinition>
+                                    <name>basicAuth</name>
+                                    <type>basic</type>
+                                </securityDefinition>
+                            </securityDefinitions>
+                            <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
+                            <outputFormats>yaml</outputFormats>
+                            <jsonExampleValues>true</jsonExampleValues>
+                            <swaggerFileName>${flowable.prefix}-form</swaggerFileName>
+                            <swaggerDirectory>${project.build.directory}/oas/v2/form</swaggerDirectory>
+                        </apiSource>
+                        <!-- ++++++++++ -->
+                        <!-- CONTENT -->
+                        <!-- ++++++++++ -->
+                        <apiSource>
+                            <springmvc>true</springmvc>
+                            <locations>
+                                <location>org.flowable.content.rest.service.api</location>
+                            </locations>
+                            <schemes>
+                                <scheme>http</scheme>
+                                <scheme>https</scheme>
+                            </schemes>
+                            <host>${flowable.app.host}</host>
+                            <basePath>/${flowable.app.name}/content-api</basePath>
+                            <info>
+                                <title>Flowable Content REST API</title>
+                                <version>v1</version>
+                                <contact>
+                                    <email></email>
+                                    <name>Flowable</name>
+                                    <url>http://www.flowable.org/</url>
+                                </contact>
+                                <license>
+                                    <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+                                    <name>Apache 2.0</name>
+                                </license>
+                            </info>
+                            <securityDefinitions>
+                                <securityDefinition>
+                                    <name>basicAuth</name>
+                                    <type>basic</type>
+                                </securityDefinition>
+                            </securityDefinitions>
+                            <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
+                            <outputFormats>yaml</outputFormats>
+                            <jsonExampleValues>true</jsonExampleValues>
+                            <swaggerFileName>${flowable.prefix}-content</swaggerFileName>
+                            <swaggerDirectory>${project.build.directory}/oas/v2/content</swaggerDirectory>
+                        </apiSource>
+                    </apiSources>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>rest-app</id>
+            <properties>
+                <flowable.app.name>flowable-rest</flowable.app.name>
+                <flowable.process.api.endpoint>service</flowable.process.api.endpoint>
+            </properties>
+        </profile>
+        <profile>
+            <id>task-app</id>
+            <properties>
+                <flowable.app.name>flowable-task</flowable.app.name>
+                <flowable.process.api.endpoint>process-api</flowable.process.api.endpoint>
+            </properties>
+        </profile>
+    </profiles>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-engine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-spring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-json-converter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-dmn-rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-dmn-spring-configurator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-form-rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-form-spring-configurator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-content-rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-content-spring-configurator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-groovy-script-static-engine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-http</artifactId>
+        </dependency>
+
+        <!-- LOGGING -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>2.4.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-jsr223</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+</project>

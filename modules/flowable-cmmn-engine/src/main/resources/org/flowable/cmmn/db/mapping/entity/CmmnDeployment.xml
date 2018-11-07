@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityImpl">
+
+  <!-- DEPLOYMENT INSERT -->
+  
+  <insert id="insertCmmnDeployment" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityImpl">
+    insert into ${prefix}ACT_CMMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_)
+    values(
+        #{id, jdbcType=VARCHAR},
+        #{name, jdbcType=VARCHAR},
+        #{category, jdbcType=VARCHAR},
+        #{key, jdbcType=VARCHAR},
+        #{tenantId, jdbcType=VARCHAR},
+        #{deploymentTime, jdbcType=TIMESTAMP},
+        #{parentDeploymentId, jdbcType=VARCHAR}
+    )
+  </insert>
+  
+  <insert id="bulkInsertCmmnDeployment" parameterType="java.util.List">
+        insert into ${prefix}ACT_CMMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_)
+        values
+        <foreach collection="list" item="deployment" index="index" separator=",">
+            (
+                #{deployment.id, jdbcType=VARCHAR},
+                #{deployment.name, jdbcType=VARCHAR},
+                #{deployment.category, jdbcType=VARCHAR},
+                #{deployment.key, jdbcType=VARCHAR},
+                #{deployment.tenantId, jdbcType=VARCHAR},
+                #{deployment.deploymentTime, jdbcType=TIMESTAMP},
+                #{deployment.parentDeploymentId, jdbcType=VARCHAR}
+            )
+        </foreach>
+  </insert>
+  
+  <insert id="bulkInsertCmmnDeployment" databaseId="oracle" parameterType="java.util.List">
+        INSERT ALL
+        <foreach collection="list" item="deployment" index="index">
+            into ${prefix}ACT_CMMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_) values
+            (
+                #{deployment.id, jdbcType=VARCHAR},
+                #{deployment.name, jdbcType=VARCHAR},
+                #{deployment.category, jdbcType=VARCHAR},
+                #{deployment.key, jdbcType=VARCHAR},
+                #{deployment.tenantId, jdbcType=VARCHAR},
+                #{deployment.deploymentTime, jdbcType=TIMESTAMP},
+                #{deployment.parentDeploymentId, jdbcType=VARCHAR}
+            )
+        </foreach>
+        SELECT * FROM dual
+    </insert>
+
+  <!-- DEPLOYMENT UPDATE -->
+  
+  <update id="updateCmmnDeployment" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityImpl">
+    update ${prefix}ACT_CMMN_DEPLOYMENT
+    <set>
+      <if test="originalPersistentState.category != category">
+        CATEGORY_ = #{category, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.key != key">
+        KEY_ = #{key, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.tenantId != tenantId">
+        TENANT_ID_ = #{tenantId, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.parentDeploymentId != parentDeploymentId">
+        PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId, jdbcType=VARCHAR}
+      </if>
+    </set>  
+    where ID_ = #{id, jdbcType=VARCHAR}
+  </update>
+  
+  <!-- DEPLOYMENT DELETE -->
+  
+  <delete id="deleteCmmnDeployment" parameterType="string">
+    delete from ${prefix}ACT_CMMN_DEPLOYMENT where ID_ = #{id}
+  </delete>
+
+  <!-- DEPLOYMENT RESULTMAP -->
+  
+  <resultMap id="cmmnDeploymentResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
+    <result property="key" column="KEY_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="parentDeploymentId" column="PARENT_DEPLOYMENT_ID_" jdbcType="VARCHAR" />
+    <result property="deploymentTime" column="DEPLOY_TIME_" jdbcType="TIMESTAMP"/>
+  </resultMap>
+
+  <!-- DEPLOYMENT SELECT -->
+
+  <select id="selectCmmnDeploymentsByName" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="cmmnDeploymentResultMap">
+    select * from ${prefix}ACT_CMMN_DEPLOYMENT D where NAME_=#{parameter} order by D.DEPLOY_TIME_ desc
+  </select>
+  
+  <select id="selectCmmnDeployment" parameterType="string" resultMap="cmmnDeploymentResultMap">
+    select * from ${prefix}ACT_CMMN_DEPLOYMENT where ID_ = #{id, jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectCmmnDeploymentsByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryImpl" resultMap="cmmnDeploymentResultMap">
+    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select RES.* <if test="nullHandlingColumn != null">, ${nullHandlingColumn}</if> <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <include refid="selectCmmnDeploymentsByQueryCriteriaSql"/>
+    ${orderBy}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+  </select>
+
+  <select id="selectCmmnDeploymentCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryImpl" resultType="long">
+    select count(RES.ID_)
+    <include refid="selectCmmnDeploymentsByQueryCriteriaSql"/>
+  </select>
+  
+  <sql id="selectCmmnDeploymentsByQueryCriteriaSql">  
+    from ${prefix}ACT_CMMN_DEPLOYMENT RES
+    <where>
+      <if test="deploymentId != null">
+        RES.ID_ = #{deploymentId}
+      </if>
+      <if test="deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0">
+        and RES.ID_ IN
+        <foreach item="deploymentId" index="index" collection="deploymentIds" 
+                 open="(" separator="," close=")">
+          #{deploymentId}
+        </foreach>
+      </if>
+      <if test="name != null">
+        and RES.NAME_ = #{name}
+      </if>
+      <if test="nameLike != null">
+        and RES.NAME_ like #{nameLike}
+      </if>
+      <if test="category != null">
+        and RES.CATEGORY_ = #{category}
+      </if>
+      <if test="categoryNotEquals != null">
+        and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals} OR RES.CATEGORY_ is null )  
+      </if>
+      <if test="key != null">
+        and RES.KEY_ = #{key}
+      </if>
+      <if test="withoutTenantId">
+        and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
+      </if>
+      <if test="parentDeploymentId != null">
+        and RES.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId}
+      </if>
+      <if test="parentDeploymentIdLike != null">
+        and RES.PARENT_DEPLOYMENT_ID_ like #{parentDeploymentIdLike}
+      </if>
+      <if test="parentDeploymentIds != null &amp;&amp; parentDeploymentIds.size() &gt; 0">
+        and RES.PARENT_DEPLOYMENT_ID_ IN
+        <foreach item="parentDeploymentId" index="index" collection="parentDeploymentIds" 
+                 open="(" separator="," close=")">
+          #{parentDeploymentId}
+        </foreach>
+      </if>
+      <if test="tenantId != null">
+        and RES.TENANT_ID_ = #{tenantId}
+      </if>
+      <if test="tenantIdLike != null">
+        and RES.TENANT_ID_ like #{tenantIdLike}
+      </if>
+      <if test="latest">
+        and RES.DEPLOY_TIME_ = (select max(DEPLOY_TIME_) from ${prefix}ACT_CMMN_DEPLOYMENT where KEY_ = RES.KEY_ 
+             <if test="tenantId != null">
+               and TENANT_ID_ = #{tenantId}
+             </if>
+             <if test="tenantIdLike != null">
+               and TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
+             </if>
+        )
+      </if>
+    </where>
+  </sql>
+  
+</mapper>

@@ -15,13 +15,13 @@ package org.flowable.engine.impl.bpmn.helper;
 import java.util.List;
 
 import org.flowable.bpmn.model.MapExceptionEntry;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 
 /** Constructs {@link ClassDelegate}s. */
 public interface ClassDelegateFactory {
     public ClassDelegate create(String id, String className, List<FieldDeclaration> fieldDeclarations,
-            Expression skipExpression, List<MapExceptionEntry> mapExceptions);
+            boolean triggerable, Expression skipExpression, List<MapExceptionEntry> mapExceptions);
 
     public ClassDelegate create(String className, List<FieldDeclaration> fieldDeclarations);
 }

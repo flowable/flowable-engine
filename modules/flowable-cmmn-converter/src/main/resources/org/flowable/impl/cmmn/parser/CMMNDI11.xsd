@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+            xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" 
+            xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" 
+            xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" 
+            targetNamespace="http://www.omg.org/spec/CMMN/20151109/CMMNDI" 
+            elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:import namespace="http://www.omg.org/spec/CMMN/20151109/DC" 
+                    schemaLocation="DC.xsd"/>
+	<xsd:import namespace="http://www.omg.org/spec/CMMN/20151109/DI"
+                    schemaLocation="DI.xsd"/>	
+	<xsd:element name="CMMNDI" type="cmmndi:CMMNDI"/>
+	<xsd:element name="CMMNDiagram" type="cmmndi:CMMNDiagram"/>
+	<xsd:element name="CMMNDiagramElement" type="di:DiagramElement">
+		<xsd:annotation>
+			<xsd:documentation>This element should never be instantiated directly, but rather concrete implementation should. It is placed there only to be referred in the sequence</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="CMMNShape" type="cmmndi:CMMNShape" substitutionGroup="cmmndi:CMMNDiagramElement"/>
+	<xsd:element name="CMMNEdge" type="cmmndi:CMMNEdge" substitutionGroup="cmmndi:CMMNDiagramElement"/>
+	<xsd:element name="CMMNStyle" type="cmmndi:CMMNStyle" substitutionGroup="di:Style"/>
+	<xsd:element name="CMMNLabel" type="cmmndi:CMMNLabel"/>
+	<xsd:complexType name="CMMNDI">
+		<xsd:sequence>
+			<xsd:element ref="cmmndi:CMMNDiagram" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="cmmndi:CMMNStyle" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="CMMNDiagram">
+		<xsd:complexContent>
+			<xsd:extension base="di:Diagram">
+				<xsd:sequence>
+					<xsd:element name="Size" type="dc:Dimension" minOccurs="0" maxOccurs="1"/>
+					<xsd:element ref="cmmndi:CMMNDiagramElement" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:attribute name="cmmnElementRef" type="xsd:QName"/>	
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CMMNShape">
+		<xsd:complexContent>
+			<xsd:extension base="di:Shape">
+				<xsd:sequence>
+					<xsd:element ref="cmmndi:CMMNLabel"/>
+				</xsd:sequence>
+				<xsd:attribute name="cmmnElementRef" type="xsd:QName" use="required"/>
+				<xsd:attribute name="isCollapsed" type="xsd:boolean"/>
+				<xsd:attribute name="isPlanningTableCollapsed" type="xsd:boolean"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CMMNEdge">
+		<xsd:complexContent>
+			<xsd:extension base="di:Edge">
+				<xsd:sequence>
+					<xsd:element ref="cmmndi:CMMNLabel"/>
+				</xsd:sequence>
+				<xsd:attribute name="cmmnElementRef" type="xsd:QName"/>
+				<xsd:attribute name="sourceCMMNElementRef" type="xsd:QName"/>
+				<xsd:attribute name="targetCMMNElementRef" type="xsd:QName"/>
+				<xsd:attribute name="isStandardEventVisible" type="xsd:boolean"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CMMNLabel">
+		<xsd:complexContent>
+			<xsd:extension base="di:Shape"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CMMNStyle">
+		<xsd:complexContent>
+			<xsd:extension base="di:Style">
+				<xsd:sequence>
+					<xsd:element name="FillColor" type="dc:Color" minOccurs="0" maxOccurs="1"/>
+					<xsd:element name="StrokeColor" type="dc:Color" minOccurs="0" maxOccurs="1"/>
+					<xsd:element name="FontColor" type="dc:Color" minOccurs="0" maxOccurs="1"/>
+				</xsd:sequence>
+				<xsd:attribute name="fontFamily" type="xsd:string"/>
+				<xsd:attribute name="fontSize" type="xsd:double"/>
+				<xsd:attribute name="fontItalic" type="xsd:boolean"/>
+				<xsd:attribute name="fontBold" type="xsd:boolean"/>
+				<xsd:attribute name="fontUnderline" type="xsd:boolean"/>
+				<xsd:attribute name="fontStrikeThrough" type="xsd:boolean"/>
+				<xsd:attribute name="labelHorizontalAlignement" type="dc:AlignmentKind"/>
+				<xsd:attribute name="labelVerticalAlignment" type="dc:AlignmentKind"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

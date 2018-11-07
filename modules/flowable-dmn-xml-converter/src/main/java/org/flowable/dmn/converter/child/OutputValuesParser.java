@@ -27,10 +27,12 @@ import java.util.Arrays;
  */
 public class OutputValuesParser extends BaseChildElementParser {
 
+    @Override
     public String getElementName() {
         return ELEMENT_OUTPUT_VALUES;
     }
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, DecisionTable decisionTable) throws Exception {
         if (!(parentElement instanceof OutputClause))
             return;
@@ -47,7 +49,7 @@ public class OutputValuesParser extends BaseChildElementParser {
 
                     if (StringUtils.isNotEmpty(outputValuesText)) {
                         String[] outputValuesSplit = outputValuesText.replaceAll("^\"", "").split("\"?(,|$)(?=(([^\"]*\"){2})*[^\"]*$) *\"?");
-                        outputValues.setTextValues(new ArrayList<Object>(Arrays.asList(outputValuesSplit)));
+                        outputValues.setTextValues(new ArrayList<>(Arrays.asList(outputValuesSplit)));
                     }
 
 

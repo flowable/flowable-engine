@@ -20,14 +20,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
 import org.flowable.form.engine.FormEngineConfiguration;
 
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class FormDeploymentEntityImpl extends AbstractEntityNoRevision implements FormDeploymentEntity, Serializable {
+public class FormDeploymentEntityImpl extends AbstractFormEngineNoRevisionEntity implements FormDeploymentEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -40,7 +39,7 @@ public class FormDeploymentEntityImpl extends AbstractEntityNoRevision implement
     protected boolean isNew;
 
     /**
-     * Will only be used during actual deployment to pass deployed artifacts (eg process definitions). Will be null otherwise.
+     * Will only be used during actual deployment to pass deployed artifacts (eg form definitions). Will be null otherwise.
      */
     protected Map<Class<?>, List<Object>> deployedArtifacts;
 
@@ -48,6 +47,7 @@ public class FormDeploymentEntityImpl extends AbstractEntityNoRevision implement
 
     }
 
+    @Override
     public void addResource(FormResourceEntity resource) {
         if (resources == null) {
             resources = new HashMap<>();
@@ -55,19 +55,23 @@ public class FormDeploymentEntityImpl extends AbstractEntityNoRevision implement
         resources.put(resource.getName(), resource);
     }
 
+    @Override
     public Map<String, FormResourceEntity> getResources() {
         return resources;
     }
 
+    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("category", this.category);
         persistentState.put("tenantId", tenantId);
+        persistentState.put("parentDeploymentId", parentDeploymentId);
         return persistentState;
     }
 
     // Deployed artifacts manipulation ////////////////////////////////////////////
 
+    @Override
     public void addDeployedArtifact(Object deployedArtifact) {
         if (deployedArtifacts == null) {
             deployedArtifacts = new HashMap<>();
@@ -83,6 +87,7 @@ public class FormDeploymentEntityImpl extends AbstractEntityNoRevision implement
         artifacts.add(deployedArtifact);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <T> List<T> getDeployedArtifacts(Class<T> clazz) {
         for (Class<?> deployedArtifactsClass : deployedArtifacts.keySet()) {
@@ -95,54 +100,67 @@ public class FormDeploymentEntityImpl extends AbstractEntityNoRevision implement
 
     // getters and setters ////////////////////////////////////////////////////////
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public String getCategory() {
         return category;
     }
 
+    @Override
     public void setCategory(String category) {
         this.category = category;
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
 
+    @Override
     public String getParentDeploymentId() {
         return parentDeploymentId;
     }
 
+    @Override
     public void setParentDeploymentId(String parentDeploymentId) {
         this.parentDeploymentId = parentDeploymentId;
     }
 
+    @Override
     public void setResources(Map<String, FormResourceEntity> resources) {
         this.resources = resources;
     }
 
+    @Override
     public Date getDeploymentTime() {
         return deploymentTime;
     }
 
+    @Override
     public void setDeploymentTime(Date deploymentTime) {
         this.deploymentTime = deploymentTime;
     }
 
+    @Override
     public boolean isNew() {
         return isNew;
     }
 
+    @Override
     public void setNew(boolean isNew) {
         this.isNew = isNew;
     }

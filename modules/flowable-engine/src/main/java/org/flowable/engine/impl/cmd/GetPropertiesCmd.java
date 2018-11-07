@@ -18,8 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
@@ -31,6 +31,7 @@ public class GetPropertiesCmd implements Command<Map<String, String>>, Serializa
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unchecked")
+    @Override
     public Map<String, String> execute(CommandContext commandContext) {
         List<PropertyEntity> propertyEntities = CommandContextUtil.getPropertyEntityManager(commandContext).findAll();
 

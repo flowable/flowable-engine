@@ -15,6 +15,10 @@ package org.flowable.examples.bpmn.shell;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 public class ShellTaskTest extends PluggableFlowableTestCase {
 
@@ -38,15 +42,19 @@ public class ShellTaskTest extends PluggableFlowableTestCase {
             return OsType.UNKOWN;
     }
 
+    @BeforeEach
     protected void setUp() throws Exception {
         osType = getSystemOsType();
     }
 
+    @Test
     public void testOsDetection() throws Exception {
         assertNotSame(OsType.UNKOWN, osType);
     }
 
+    @Test
     @Deployment
+    @EnabledOnOs(OS.WINDOWS)
     public void testEchoShellWindows() {
         if (osType == OsType.WINDOWS) {
 
@@ -58,7 +66,9 @@ public class ShellTaskTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
+    @EnabledOnOs(OS.LINUX)
     public void testEchoShellLinux() {
         if (osType == OsType.LINUX) {
 
@@ -70,7 +80,9 @@ public class ShellTaskTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
+    @EnabledOnOs(OS.MAC)
     public void testEchoShellMac() {
         if (osType == OsType.MAC) {
 

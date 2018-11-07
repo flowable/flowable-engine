@@ -14,7 +14,7 @@
 package org.flowable.camel.impl;
 
 import org.flowable.camel.FlowableEndpoint;
-import org.flowable.camel.CamelBehavior;
+import org.flowable.camel.SpringCamelBehavior;
 
 /**
  * This implementation of the CamelBehavior abstract class works by copying a single variable value into the Camel Exchange body. The variable must be named "camelBody" to be copied into the Camel
@@ -22,7 +22,7 @@ import org.flowable.camel.CamelBehavior;
  * 
  * @author Ryan Johnston (@rjfsu), Tijs Rademakers, Saeid Mirzaei
  */
-public class CamelBehaviorCamelBodyImpl extends CamelBehavior {
+public class CamelBehaviorCamelBodyImpl extends SpringCamelBehavior {
 
     private static final long serialVersionUID = 1L;
 

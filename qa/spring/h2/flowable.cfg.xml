@@ -44,10 +44,11 @@
         </entry>
       </map>
     </property>
+    <property name="enableProcessDefinitionHistoryLevel" value="true" />
     <property name="enableProcessDefinitionInfoCache" value="true" />
   </bean>
   
-  <bean id="asyncExecutor" class="org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor">
+  <bean id="asyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">
     <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
     <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
   </bean>

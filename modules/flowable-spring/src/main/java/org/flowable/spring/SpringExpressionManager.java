@@ -15,25 +15,27 @@ package org.flowable.spring;
 
 import java.util.Map;
 
-import org.flowable.engine.common.impl.el.JsonNodeELResolver;
-import org.flowable.engine.common.impl.el.ReadOnlyMapELResolver;
-import org.flowable.engine.common.impl.javax.el.ArrayELResolver;
-import org.flowable.engine.common.impl.javax.el.BeanELResolver;
-import org.flowable.engine.common.impl.javax.el.CompositeELResolver;
-import org.flowable.engine.common.impl.javax.el.ELResolver;
-import org.flowable.engine.common.impl.javax.el.ListELResolver;
-import org.flowable.engine.common.impl.javax.el.MapELResolver;
-import org.flowable.engine.delegate.VariableScope;
-import org.flowable.engine.impl.el.DefaultExpressionManager;
-import org.flowable.engine.impl.el.VariableScopeElResolver;
+import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.common.engine.impl.el.DefaultExpressionManager;
+import org.flowable.common.engine.impl.el.JsonNodeELResolver;
+import org.flowable.common.engine.impl.el.ReadOnlyMapELResolver;
+import org.flowable.common.engine.impl.javax.el.ArrayELResolver;
+import org.flowable.common.engine.impl.javax.el.BeanELResolver;
+import org.flowable.common.engine.impl.javax.el.CompositeELResolver;
+import org.flowable.common.engine.impl.javax.el.CouldNotResolvePropertyELResolver;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
+import org.flowable.common.engine.impl.javax.el.ListELResolver;
+import org.flowable.common.engine.impl.javax.el.MapELResolver;
+import org.flowable.engine.impl.el.ProcessExpressionManager;
 import org.springframework.context.ApplicationContext;
 
 /**
  * {@link DefaultExpressionManager} that exposes the full application-context or a limited set of beans in expressions.
  * 
  * @author Tom Baeyens
+ * @author Joram Barrez
  */
-public class SpringExpressionManager extends DefaultExpressionManager {
+public class SpringExpressionManager extends ProcessExpressionManager {
 
     protected ApplicationContext applicationContext;
 
@@ -47,26 +49,30 @@ public class SpringExpressionManager extends DefaultExpressionManager {
         super(beans);
         this.applicationContext = applicationContext;
     }
-
+    
     @Override
-    protected ELResolver createElResolver(VariableScope variableScope) {
+    protected ELResolver createElResolver(VariableContainer variableContainer) {
         CompositeELResolver compositeElResolver = new CompositeELResolver();
-        compositeElResolver.add(new VariableScopeElResolver(variableScope));
+        compositeElResolver.add(createVariableElResolver(variableContainer));
 
-        if (beans != null) {
-            // Only expose limited set of beans in expressions
-            compositeElResolver.add(new ReadOnlyMapELResolver(beans));
-        } else {
-            // Expose full application-context in expressions
-            compositeElResolver.add(new ApplicationContextElResolver(applicationContext));
-        }
-
+        compositeElResolver.add(createSpringElResolver());
         compositeElResolver.add(new ArrayELResolver());
         compositeElResolver.add(new ListELResolver());
         compositeElResolver.add(new MapELResolver());
         compositeElResolver.add(new JsonNodeELResolver());
         compositeElResolver.add(new BeanELResolver());
+        compositeElResolver.add(new CouldNotResolvePropertyELResolver());
         return compositeElResolver;
+    }
+    
+    protected ELResolver createSpringElResolver() {
+        if (beans != null) {
+            // Only expose limited set of beans in expressions
+            return new ReadOnlyMapELResolver(beans);
+        } else {
+            // Expose full application-context in expressions
+            return new ApplicationContextElResolver(applicationContext);
+        }
     }
 
 }

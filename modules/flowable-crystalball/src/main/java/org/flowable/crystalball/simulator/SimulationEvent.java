@@ -12,10 +12,10 @@
  */
 package org.flowable.crystalball.simulator;
 
-import org.springframework.beans.factory.FactoryBean;
-
 import java.util.Date;
 import java.util.Map;
+
+import org.springframework.beans.factory.FactoryBean;
 
 /**
  * Simulation event representation

@@ -16,6 +16,7 @@ import org.flowable.bpmn.model.ServiceTask;
 
 public class AlfrescoMailTask extends ServiceTask {
 
+    @Override
     public AlfrescoMailTask clone() {
         AlfrescoMailTask clone = new AlfrescoMailTask();
         clone.setValues(this);

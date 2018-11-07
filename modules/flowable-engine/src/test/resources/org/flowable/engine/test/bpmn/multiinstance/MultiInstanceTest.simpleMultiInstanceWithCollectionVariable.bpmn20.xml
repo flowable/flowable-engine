@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+    <process id="simple_multi" name="Test Multi" isExecutable="true">
+        <startEvent id="start" name="Start"/>
+        <endEvent id="end" name="End"/>
+        <userTask id="multi" name="Multi">
+            <multiInstanceLoopCharacteristics
+                    isSequential="false"
+                    flowable:collection="elements"
+                    flowable:elementVariable="element"/>
+        </userTask>
+        <sequenceFlow id="flow1" sourceRef="start" targetRef="multi"/>
+        <sequenceFlow id="flow2" sourceRef="multi" targetRef="end"/>
+    </process>
+</definitions>

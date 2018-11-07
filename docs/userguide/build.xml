@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="userguide" default="build.userguide">
+
+    <property name="project.name" value="bpmn"/>
+
+	<target name="build.userguide" depends="build.docs.distro" />
+
+    <target name="clean.all"  description="Cleans up all generated files.">
+        <delete dir="target" />
+        <antcall target="clean">
+            <param name="project.name" value="all"/>
+        </antcall>
+    </target>
+
+    <target name="build.docs.form">
+        <antcall target="build.docs">
+            <param name="project.name" value="form"/>
+        </antcall>
+    </target>
+
+    <target name="build.docs.single">
+        <antcall target="build.docs">
+            <param name="project.name" value="single"/>
+        </antcall>
+    </target>
+
+    <target name="build.docs.bpmn">
+        <antcall target="build.docs">
+            <param name="project.name" value="bpmn"/>
+        </antcall>
+    </target>
+
+    <target name="build.docs.cmmn">
+        <antcall target="build.docs">
+            <param name="project.name" value="cmmn"/>
+        </antcall>
+    </target>
+
+    <target name="build.docs.dmn">
+        <antcall target="build.docs">
+            <param name="project.name" value="dmn"/>
+        </antcall>
+    </target>
+
+    <!-- Only Distro Docs -->
+    <target name="build.docs.distro" depends="clean.all">
+        <antcall target="build.docs.bpmn"/>
+        <antcall target="build.docs.cmmn"/>
+        <antcall target="build.docs.dmn"/>
+        <antcall target="build.docs.form"/>
+    </target>
+
+    <!-- All docs even project in progress. -->
+    <target name="build.docs.all" depends="clean.all">
+        <antcall target="build.docs.single"/>
+        <antcall target="build.docs.bpmn"/>
+        <antcall target="build.docs.cmmn"/>
+        <antcall target="build.docs.dmn"/>
+        <antcall target="build.docs.form"/>
+    </target>
+
+
+
+    <target name="clean" description="Cleans up generated files.">
+        <exec dir="scripts" executable="./clean.sh" >
+            <arg value="${project.name}"/>
+        </exec>
+    </target>
+
+    <target name="build.docs" depends="clean">
+        <mkdir dir="target/html" />
+        <exec dir="scripts" executable="./generate-html.sh" >
+            <arg value="${project.name}"/>
+        </exec>
+        <mkdir dir="src/en/${project.name}/output" />
+        <copy todir="target/html/en/${project.name}">
+            <fileset dir="src/en/${project.name}/output">
+                <include name="**/**" />
+            </fileset>
+        </copy>
+    </target>
+	
+</project>

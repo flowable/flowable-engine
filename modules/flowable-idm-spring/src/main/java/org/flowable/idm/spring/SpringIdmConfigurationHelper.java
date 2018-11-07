@@ -16,7 +16,7 @@ package org.flowable.idm.spring;
 import java.net.URL;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.idm.engine.IdmEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,7 @@ public class SpringIdmConfigurationHelper {
 
         ApplicationContext applicationContext = new GenericXmlApplicationContext(new UrlResource(resource));
         Map<String, IdmEngine> beansOfType = applicationContext.getBeansOfType(IdmEngine.class);
-        if ((beansOfType == null) || (beansOfType.isEmpty())) {
+        if ((beansOfType == null) || beansOfType.isEmpty()) {
             throw new FlowableException("no " + IdmEngine.class.getName() + " defined in the application context " + resource.toString());
         }
 

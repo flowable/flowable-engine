@@ -33,10 +33,10 @@ import org.flowable.engine.impl.delegate.ActivityBehavior;
 public class ProcessDefinitionBuilder {
 
     protected ProcessDefinitionImpl processDefinition;
-    protected Stack<ScopeImpl> scopeStack = new Stack<ScopeImpl>();
+    protected Stack<ScopeImpl> scopeStack = new Stack<>();
     protected ProcessElementImpl processElement = processDefinition;
     protected TransitionImpl transition;
-    protected List<Object[]> unresolvedTransitions = new ArrayList<Object[]>();
+    protected List<Object[]> unresolvedTransitions = new ArrayList<>();
 
     public ProcessDefinitionBuilder() {
         this(null);
@@ -81,7 +81,7 @@ public class ProcessDefinitionBuilder {
         }
         ActivityImpl activity = getActivity();
         transition = activity.createOutgoingTransition(transitionId);
-        unresolvedTransitions.add(new Object[] { transition, destinationActivityId });
+        unresolvedTransitions.add(new Object[]{transition, destinationActivityId});
         processElement = transition;
         return this;
     }

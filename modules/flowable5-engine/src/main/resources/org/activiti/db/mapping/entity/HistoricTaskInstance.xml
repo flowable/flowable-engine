@@ -247,7 +247,7 @@
     <collection property="queryVariables" column="TASK_ID_" javaType="ArrayList" ofType="org.activiti.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
       <id property="id" column="VAR_ID_"/>
       <result property="name" column="VAR_NAME_" javaType="String" jdbcType="VARCHAR" />
-      <result property="variableType" column="VAR_TYPE_" javaType="org.flowable.variable.service.impl.types.VariableType" jdbcType="VARCHAR" />
+      <result property="variableType" column="VAR_TYPE_" javaType="org.flowable.variable.api.types.VariableType" jdbcType="VARCHAR" />
       <result property="revision" column="VAR_REV_" jdbcType="INTEGER" />
       <result property="processInstanceId" column="VAR_PROC_INST_ID_" jdbcType="VARCHAR" />
       <result property="executionId" column="VAR_EXECUTION_ID_" jdbcType="VARCHAR" />
@@ -266,7 +266,7 @@
     select * from ${prefix}ACT_HI_TASKINST where ID_ = #{historicTaskInstanceId, jdbcType=VARCHAR}
   </select>
   
-  <select id="selectHistoricTasksByParentTaskId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historicTaskInstanceResultMap">
+  <select id="selectHistoricTasksByParentTaskId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicTaskInstanceResultMap">
     select * from ${prefix}ACT_HI_TASKINST where PARENT_TASK_ID_ = #{parameter}
   </select>
   

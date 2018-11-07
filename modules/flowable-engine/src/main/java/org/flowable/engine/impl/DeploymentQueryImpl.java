@@ -16,10 +16,10 @@ package org.flowable.engine.impl;
 import java.io.Serializable;
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.engine.common.impl.query.AbstractQuery;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.AbstractQuery;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentQuery;
@@ -44,6 +44,10 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
     protected String tenantIdLike;
     protected boolean withoutTenantId;
     protected String engineVersion;
+    protected String derivedFrom;
+    protected String parentDeploymentId;
+    protected String parentDeploymentIdLike;
+    protected List<String> parentDeploymentIds;
     protected String processDefinitionKey;
     protected String processDefinitionKeyLike;
     protected boolean latest;
@@ -59,6 +63,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
         super(commandExecutor);
     }
 
+    @Override
     public DeploymentQueryImpl deploymentId(String deploymentId) {
         if (deploymentId == null) {
             throw new FlowableIllegalArgumentException("Deployment id is null");
@@ -67,6 +72,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
         return this;
     }
 
+    @Override
     public DeploymentQueryImpl deploymentIds(List<String> deploymentIds) {
         if (deploymentIds == null) {
             throw new FlowableIllegalArgumentException("Deployment ids is null");
@@ -75,6 +81,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
         return this;
     }
 
+    @Override
     public DeploymentQueryImpl deploymentName(String deploymentName) {
         if (deploymentName == null) {
             throw new FlowableIllegalArgumentException("deploymentName is null");
@@ -83,6 +90,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
         return this;
     }
 
+    @Override
     public DeploymentQueryImpl deploymentNameLike(String nameLike) {
         if (nameLike == null) {
             throw new FlowableIllegalArgumentException("deploymentNameLike is null");
@@ -91,6 +99,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
         return this;
     }
 
+    @Override
     public DeploymentQueryImpl deploymentCategory(String deploymentCategory) {
         if (deploymentCategory == null) {
             throw new FlowableIllegalArgumentException("deploymentCategory is null");
@@ -99,6 +108,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
         return this;
     }
 
+    @Override
     public DeploymentQueryImpl deploymentCategoryLike(String categoryLike) {
         if (categoryLike == null) {
             throw new FlowableIllegalArgumentException("deploymentCategoryLike is null");
@@ -107,6 +117,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
         return this;
     }
 
+    @Override
     public DeploymentQueryImpl deploymentCategoryNotEquals(String deploymentCategoryNotEquals) {
         if (deploymentCategoryNotEquals == null) {
             throw new FlowableIllegalArgumentException("deploymentCategoryExclude is null");
@@ -115,6 +126,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
         return this;
     }
 
+    @Override
     public DeploymentQueryImpl deploymentKey(String deploymentKey) {
         if (deploymentKey == null) {
             throw new FlowableIllegalArgumentException("deploymentKey is null");
@@ -123,6 +135,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
         return this;
     }
 
+    @Override
     public DeploymentQueryImpl deploymentKeyLike(String deploymentKeyLike) {
         if (deploymentKeyLike == null) {
             throw new FlowableIllegalArgumentException("deploymentKeyLike is null");
@@ -131,6 +144,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
         return this;
     }
 
+    @Override
     public DeploymentQueryImpl deploymentTenantId(String tenantId) {
         if (tenantId == null) {
             throw new FlowableIllegalArgumentException("deploymentTenantId is null");
@@ -139,6 +153,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
         return this;
     }
 
+    @Override
     public DeploymentQueryImpl deploymentTenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
             throw new FlowableIllegalArgumentException("deploymentTenantIdLike is null");
@@ -147,16 +162,46 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
         return this;
     }
 
+    @Override
     public DeploymentQueryImpl deploymentWithoutTenantId() {
         this.withoutTenantId = true;
         return this;
     }
 
+    @Override
     public DeploymentQueryImpl deploymentEngineVersion(String engineVersion) {
         this.engineVersion = engineVersion;
         return this;
     }
+    
+    @Override
+    public DeploymentQuery deploymentDerivedFrom(String deploymentId) {
+        this.derivedFrom = deploymentId;
+        return this;
+    }
+    
+    @Override
+    public DeploymentQuery parentDeploymentId(String parentDeploymentId) {
+        this.parentDeploymentId = parentDeploymentId;
+        return this;
+    }
+    
+    @Override
+    public DeploymentQuery parentDeploymentIdLike(String parentDeploymentIdLike) {
+        this.parentDeploymentIdLike = parentDeploymentIdLike;
+        return this;
+    }
+    
+    @Override
+    public DeploymentQuery parentDeploymentIds(List<String> parentDeploymentIds) {
+        if (parentDeploymentIds == null) {
+            throw new FlowableIllegalArgumentException("parentDeploymentIds is null");
+        }
+        this.parentDeploymentIds = parentDeploymentIds;
+        return this;
+    }
 
+    @Override
     public DeploymentQueryImpl processDefinitionKey(String key) {
         if (key == null) {
             throw new FlowableIllegalArgumentException("key is null");
@@ -165,6 +210,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
         return this;
     }
 
+    @Override
     public DeploymentQueryImpl processDefinitionKeyLike(String keyLike) {
         if (keyLike == null) {
             throw new FlowableIllegalArgumentException("keyLike is null");
@@ -173,6 +219,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
         return this;
     }
 
+    @Override
     public DeploymentQueryImpl latest() {
         if (key == null) {
             throw new FlowableIllegalArgumentException("latest can only be used together with a deployment key");
@@ -184,18 +231,22 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
 
     // sorting ////////////////////////////////////////////////////////
 
+    @Override
     public DeploymentQuery orderByDeploymentId() {
         return orderBy(DeploymentQueryProperty.DEPLOYMENT_ID);
     }
 
+    @Override
     public DeploymentQuery orderByDeploymenTime() {
         return orderBy(DeploymentQueryProperty.DEPLOY_TIME);
     }
 
+    @Override
     public DeploymentQuery orderByDeploymentName() {
         return orderBy(DeploymentQueryProperty.DEPLOYMENT_NAME);
     }
 
+    @Override
     public DeploymentQuery orderByTenantId() {
         return orderBy(DeploymentQueryProperty.DEPLOYMENT_TENANT_ID);
     }
@@ -254,6 +305,14 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
 
     public String getEngineVersion() {
         return engineVersion;
+    }
+    
+    public String getDerivedFrom() {
+        return derivedFrom;
+    }
+    
+    public String getParentDeploymentId() {
+        return parentDeploymentId;
     }
 
     public String getProcessDefinitionKey() {

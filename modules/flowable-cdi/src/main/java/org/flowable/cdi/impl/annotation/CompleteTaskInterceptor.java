@@ -20,8 +20,8 @@ import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
 
-import org.flowable.cdi.FlowableCdiException;
 import org.flowable.cdi.BusinessProcess;
+import org.flowable.cdi.FlowableCdiException;
 import org.flowable.cdi.annotation.CompleteTask;
 
 /**

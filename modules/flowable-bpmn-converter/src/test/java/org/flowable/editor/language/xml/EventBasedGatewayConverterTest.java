@@ -38,6 +38,7 @@ public class EventBasedGatewayConverterTest extends AbstractConverterTest {
         validateModel(bpmnModel);
     }
 
+    @Override
     protected String getResource() {
         return "eventgatewaymodel.bpmn";
     }

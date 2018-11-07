@@ -15,8 +15,6 @@ package org.flowable.form.api;
 import java.io.InputStream;
 import java.util.List;
 
-import org.flowable.form.model.FormModel;
-
 /**
  * Service providing access to the repository of forms.
  *
@@ -32,9 +30,35 @@ public interface FormRepositoryService {
 
     NativeFormDefinitionQuery createNativeFormDefinitionQuery();
 
+    /**
+     * Changes the category of a deployment.
+     * 
+     * @param deploymentId
+     *              The id of the deployment of which the category will be changed.
+     * @param newTenantId
+     *              The new category.
+     */
     void setDeploymentCategory(String deploymentId, String category);
 
+    /**
+     * Changes the tenant id of a deployment.
+     * 
+     * @param deploymentId
+     *              The id of the deployment of which the tenant identifier will be changed.
+     * @param newTenantId
+     *              The new tenant identifier.
+     */
     void setDeploymentTenantId(String deploymentId, String newTenantId);
+    
+    /**
+     * Changes the parent deployment id of a deployment. This is used to move deployments to a different app deployment parent.
+     * 
+     * @param deploymentId
+     *              The id of the deployment of which the parent deployment identifier will be changed.
+     * @param newParentDeploymentId
+     *              The new parent deployment identifier.
+     */
+    void changeDeploymentParentDeploymentId(String deploymentId, String newParentDeploymentId);
 
     List<String> getDeploymentResourceNames(String deploymentId);
 
@@ -46,15 +70,15 @@ public interface FormRepositoryService {
 
     FormDefinition getFormDefinition(String formDefinitionId);
 
-    FormModel getFormModelById(String formDefinitionId);
+    FormInfo getFormModelById(String formDefinitionId);
 
-    FormModel getFormModelByKey(String formDefinitionKey);
+    FormInfo getFormModelByKey(String formDefinitionKey);
 
-    FormModel getFormModelByKey(String formDefinitionKey, String tenantId);
+    FormInfo getFormModelByKey(String formDefinitionKey, String tenantId);
 
-    FormModel getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId);
+    FormInfo getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId);
 
-    FormModel getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String tenantId);
+    FormInfo getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String tenantId);
 
     InputStream getFormDefinitionResource(String formDefinitionId);
 

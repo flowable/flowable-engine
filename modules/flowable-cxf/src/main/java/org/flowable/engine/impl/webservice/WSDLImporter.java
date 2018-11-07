@@ -36,8 +36,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.flowable.bpmn.model.Import;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.engine.impl.bpmn.data.SimpleStructureDefinition;
 import org.flowable.engine.impl.bpmn.data.StructureDefinition;
 import org.flowable.engine.impl.bpmn.parser.XMLImporter;
@@ -76,6 +76,7 @@ public class WSDLImporter implements XMLImporter {
         this.namespace = "";
     }
 
+    @Override
     public void importFrom(Import theImport, String sourceSystemId) {
         this.namespace = theImport.getNamespace() == null ? "" : theImport.getNamespace() + ":";
         this.importFrom(theImport.getLocation());
@@ -220,14 +221,17 @@ public class WSDLImporter implements XMLImporter {
         }
     }
 
+    @Override
     public Map<String, StructureDefinition> getStructures() {
         return this.structures;
     }
 
+    @Override
     public Map<String, WSService> getServices() {
         return this.wsServices;
     }
 
+    @Override
     public Map<String, WSOperation> getOperations() {
         return this.wsOperations;
     }

@@ -1,0 +1,15 @@
+= Flowable DMN DOCS (v 6.4.1-SNAPSHOT)
+:doctype: book
+:toc: left
+:toclevels: 4
+:icons: font
+:numbered:
+:source-highlighter: pygments
+:pygments-css: class
+:pygments-linenums-mode: table
+:compat-mode:
+:pdf-page-size: A4
+:nofooter:
+ifndef::imagesdir[:imagesdir: output]
+
+include::index-common.adoc[]

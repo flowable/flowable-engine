@@ -15,8 +15,8 @@ package org.flowable.engine.impl.bpmn.deployer;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.flowable.engine.impl.persistence.entity.ResourceEntity;
 
 /**
  * Static methods for working with BPMN and image resource names.
@@ -57,7 +57,7 @@ public class ResourceNameUtil {
      * @return name of an existing resource, or null if no matching image resource is found in the resources.
      */
     public static String getProcessDiagramResourceNameFromDeployment(
-            ProcessDefinitionEntity processDefinition, Map<String, ResourceEntity> resources) {
+            ProcessDefinitionEntity processDefinition, Map<String, EngineResource> resources) {
 
         if (StringUtils.isEmpty(processDefinition.getResourceName())) {
             throw new IllegalStateException("Provided process definition must have its resource name set.");

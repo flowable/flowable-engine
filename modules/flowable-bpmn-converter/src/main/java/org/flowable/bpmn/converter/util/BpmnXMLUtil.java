@@ -147,7 +147,9 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
             } else if (xtr.isEndElement()) {
                 if (ELEMENT_EXTENSIONS.equals(xtr.getLocalName())) {
                     inExtensionElements = false;
-                } else if (elementName.equalsIgnoreCase(xtr.getLocalName())) {
+                }
+                
+                if (elementName.equalsIgnoreCase(xtr.getLocalName())) {
                     readyWithChildElements = true;
                 }
             }
@@ -320,7 +322,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                     strb.delete(0, strb.length());
                 }
 
-                if (c != ',' || (insideExpression)) {
+                if (c != ',' || insideExpression) {
                     strb.append(c);
                 }
 
@@ -374,7 +376,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
     }
 
     public static void writeCustomAttributes(Collection<List<ExtensionAttribute>> attributes, XMLStreamWriter xtw, List<ExtensionAttribute>... blackLists) throws XMLStreamException {
-        writeCustomAttributes(attributes, xtw, new LinkedHashMap<String, String>(), blackLists);
+        writeCustomAttributes(attributes, xtw, new LinkedHashMap<>(), blackLists);
     }
 
     /**

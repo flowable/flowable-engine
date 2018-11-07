@@ -13,6 +13,7 @@
 
 package org.flowable.content.spring;
 
+import org.flowable.common.engine.impl.cfg.SpringBeanFactoryProxyMap;
 import org.flowable.content.engine.ContentEngine;
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.springframework.beans.BeansException;
@@ -34,18 +35,25 @@ public class ContentEngineFactoryBean implements FactoryBean<ContentEngine>, Dis
     protected ApplicationContext applicationContext;
     protected ContentEngine contentEngine;
 
+    @Override
     public void destroy() throws Exception {
         if (contentEngine != null) {
             contentEngine.close();
         }
     }
 
+    @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
 
+    @Override
     public ContentEngine getObject() throws Exception {
         configureExternallyManagedTransactions();
+        
+        if (contentEngineConfiguration.getBeans() == null) {
+            contentEngineConfiguration.setBeans(new SpringBeanFactoryProxyMap(applicationContext));
+        }
 
         this.contentEngine = contentEngineConfiguration.buildContentEngine();
         return this.contentEngine;
@@ -60,10 +68,12 @@ public class ContentEngineFactoryBean implements FactoryBean<ContentEngine>, Dis
         }
     }
 
+    @Override
     public Class<ContentEngine> getObjectType() {
         return ContentEngine.class;
     }
 
+    @Override
     public boolean isSingleton() {
         return true;
     }

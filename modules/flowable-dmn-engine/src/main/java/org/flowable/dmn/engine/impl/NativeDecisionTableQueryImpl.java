@@ -15,12 +15,12 @@ package org.flowable.dmn.engine.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.AbstractNativeQuery;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.NativeDecisionTableQuery;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.engine.common.impl.query.AbstractNativeQuery;
 
 public class NativeDecisionTableQueryImpl extends AbstractNativeQuery<NativeDecisionTableQuery, DmnDecisionTable> implements NativeDecisionTableQuery {
 
@@ -36,10 +36,12 @@ public class NativeDecisionTableQueryImpl extends AbstractNativeQuery<NativeDeci
 
     // results ////////////////////////////////////////////////////////////////
 
+    @Override
     public List<DmnDecisionTable> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getDecisionTableEntityManager(commandContext).findDecisionTablesByNativeQuery(parameterMap);
     }
 
+    @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getDecisionTableEntityManager(commandContext).findDecisionTableCountByNativeQuery(parameterMap);
     }

@@ -50,6 +50,7 @@ public class FlowNodeInSubProcessConverterTest extends AbstractConverterTest {
         assertEquals("sid-A0E0B174-36DF-4C4F-A952-311CC3C031FC", sequenceFlows.get(1).getSourceRef());
     }
 
+    @Override
     protected String getResource() {
         return "test.flownodeinsubprocessmodel.json";
     }

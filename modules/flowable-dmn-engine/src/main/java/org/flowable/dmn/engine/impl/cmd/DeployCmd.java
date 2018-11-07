@@ -19,6 +19,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.DeploymentSettings;
@@ -27,8 +30,6 @@ import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntity;
 import org.flowable.dmn.engine.impl.repository.DmnDeploymentBuilderImpl;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Tijs Rademakers
@@ -43,6 +44,7 @@ public class DeployCmd<T> implements Command<DmnDeployment>, Serializable {
         this.deploymentBuilder = deploymentBuilder;
     }
 
+    @Override
     public DmnDeployment execute(CommandContext commandContext) {
 
         DmnDeploymentEntity deployment = deploymentBuilder.getDeployment();
@@ -74,7 +76,7 @@ public class DeployCmd<T> implements Command<DmnDeployment>, Serializable {
             if (!existingDeployments.isEmpty()) {
                 existingDeployment = (DmnDeploymentEntity) existingDeployments.get(0);
 
-                Map<String, DmnResourceEntity> resourceMap = new HashMap<>();
+                Map<String, EngineResource> resourceMap = new HashMap<>();
                 List<DmnResourceEntity> resourceList = CommandContextUtil.getResourceEntityManager().findResourcesByDeploymentId(existingDeployment.getId());
                 for (DmnResourceEntity resourceEntity : resourceList) {
                     resourceMap.put(resourceEntity.getName(), resourceEntity);
@@ -108,16 +110,16 @@ public class DeployCmd<T> implements Command<DmnDeployment>, Serializable {
             return true;
         }
 
-        Map<String, DmnResourceEntity> resources = deployment.getResources();
-        Map<String, DmnResourceEntity> savedResources = saved.getResources();
+        Map<String, EngineResource> resources = deployment.getResources();
+        Map<String, EngineResource> savedResources = saved.getResources();
 
         for (String resourceName : resources.keySet()) {
-            DmnResourceEntity savedResource = savedResources.get(resourceName);
+            EngineResource savedResource = savedResources.get(resourceName);
 
             if (savedResource == null)
                 return true;
 
-            DmnResourceEntity resource = resources.get(resourceName);
+            EngineResource resource = resources.get(resourceName);
 
             byte[] bytes = resource.getBytes();
             byte[] savedBytes = savedResource.getBytes();

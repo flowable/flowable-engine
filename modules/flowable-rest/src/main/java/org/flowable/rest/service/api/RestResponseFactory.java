@@ -20,8 +20,19 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.rest.resolver.ContentTypeResolver;
+import org.flowable.common.rest.util.RestUrlBuilder;
+import org.flowable.common.rest.variable.BooleanRestVariableConverter;
+import org.flowable.common.rest.variable.DateRestVariableConverter;
+import org.flowable.common.rest.variable.DoubleRestVariableConverter;
+import org.flowable.common.rest.variable.IntegerRestVariableConverter;
+import org.flowable.common.rest.variable.JsonObjectRestVariableConverter;
+import org.flowable.common.rest.variable.LongRestVariableConverter;
+import org.flowable.common.rest.variable.RestVariableConverter;
+import org.flowable.common.rest.variable.ShortRestVariableConverter;
+import org.flowable.common.rest.variable.StringRestVariableConverter;
 import org.flowable.dmn.api.DmnDecisionTable;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.form.FormData;
 import org.flowable.engine.form.FormProperty;
 import org.flowable.engine.form.StartFormData;
@@ -30,7 +41,6 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.history.HistoricFormProperty;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.history.HistoricVariableUpdate;
 import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
 import org.flowable.engine.repository.Deployment;
@@ -38,18 +48,16 @@ import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Event;
-import org.flowable.engine.task.Task;
 import org.flowable.form.api.FormDefinition;
-import org.flowable.identitylink.service.IdentityLink;
-import org.flowable.identitylink.service.history.HistoricIdentityLink;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
-import org.flowable.rest.application.ContentTypeResolver;
+import org.flowable.job.api.Job;
 import org.flowable.rest.service.api.engine.AttachmentResponse;
 import org.flowable.rest.service.api.engine.CommentResponse;
 import org.flowable.rest.service.api.engine.EventResponse;
@@ -82,15 +90,11 @@ import org.flowable.rest.service.api.runtime.process.EventSubscriptionResponse;
 import org.flowable.rest.service.api.runtime.process.ExecutionResponse;
 import org.flowable.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.flowable.rest.service.api.runtime.task.TaskResponse;
-import org.flowable.rest.variable.BooleanRestVariableConverter;
-import org.flowable.rest.variable.DateRestVariableConverter;
-import org.flowable.rest.variable.DoubleRestVariableConverter;
-import org.flowable.rest.variable.IntegerRestVariableConverter;
-import org.flowable.rest.variable.LongRestVariableConverter;
-import org.flowable.rest.variable.RestVariableConverter;
-import org.flowable.rest.variable.ShortRestVariableConverter;
-import org.flowable.rest.variable.StringRestVariableConverter;
-import org.flowable.variable.service.history.HistoricVariableInstance;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Default implementation of a {@link RestResponseFactory}.
@@ -115,9 +119,11 @@ public class RestResponseFactory {
     public static final String BYTE_ARRAY_VARIABLE_TYPE = "binary";
     public static final String SERIALIZABLE_VARIABLE_TYPE = "serializable";
 
+    protected ObjectMapper objectMapper;
     protected List<RestVariableConverter> variableConverters = new ArrayList<>();
 
-    public RestResponseFactory() {
+    public RestResponseFactory(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
         initializeVariableConverters();
     }
 
@@ -547,13 +553,18 @@ public class RestResponseFactory {
     public ProcessInstanceResponse createProcessInstanceResponse(ProcessInstance processInstance, RestUrlBuilder urlBuilder) {
         ProcessInstanceResponse result = new ProcessInstanceResponse();
         result.setActivityId(processInstance.getActivityId());
+        result.setStartUserId(processInstance.getStartUserId());
+        result.setStartTime(processInstance.getStartTime());
         result.setBusinessKey(processInstance.getBusinessKey());
         result.setId(processInstance.getId());
+        result.setName(processInstance.getName());
         result.setProcessDefinitionId(processInstance.getProcessDefinitionId());
         result.setProcessDefinitionUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION, processInstance.getProcessDefinitionId()));
         result.setEnded(processInstance.isEnded());
         result.setSuspended(processInstance.isSuspended());
         result.setUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId()));
+        result.setCallbackId(processInstance.getCallbackId());
+        result.setCallbackType(processInstance.getCallbackType());
         result.setTenantId(processInstance.getTenantId());
 
         // Added by Ryan Johnston
@@ -582,13 +593,18 @@ public class RestResponseFactory {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         ProcessInstanceResponse result = new ProcessInstanceResponse();
         result.setActivityId(processInstance.getActivityId());
+        result.setStartUserId(processInstance.getStartUserId());
+        result.setStartTime(processInstance.getStartTime());
         result.setBusinessKey(processInstance.getBusinessKey());
         result.setId(processInstance.getId());
+        result.setName(processInstance.getName());
         result.setProcessDefinitionId(processInstance.getProcessDefinitionId());
         result.setProcessDefinitionUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION, processInstance.getProcessDefinitionId()));
         result.setEnded(processInstance.isEnded());
         result.setSuspended(processInstance.isSuspended());
         result.setUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId()));
+        result.setCallbackId(processInstance.getCallbackId());
+        result.setCallbackType(processInstance.getCallbackType());
         result.setTenantId(processInstance.getTenantId());
 
         // Added by Ryan Johnston
@@ -725,7 +741,6 @@ public class RestResponseFactory {
         return createHistoricProcessInstanceResponse(processInstance, createUrlBuilder());
     }
 
-    @SuppressWarnings("deprecation")
     public HistoricProcessInstanceResponse createHistoricProcessInstanceResponse(HistoricProcessInstance processInstance, RestUrlBuilder urlBuilder) {
         HistoricProcessInstanceResponse result = new HistoricProcessInstanceResponse();
         result.setBusinessKey(processInstance.getBusinessKey());
@@ -734,6 +749,7 @@ public class RestResponseFactory {
         result.setEndActivityId(processInstance.getEndActivityId());
         result.setEndTime(processInstance.getEndTime());
         result.setId(processInstance.getId());
+        result.setName(processInstance.getName());
         result.setProcessDefinitionId(processInstance.getProcessDefinitionId());
         result.setProcessDefinitionUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION, processInstance.getProcessDefinitionId()));
         result.setStartActivityId(processInstance.getStartActivityId());
@@ -747,6 +763,8 @@ public class RestResponseFactory {
                 result.addVariable(createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, processInstance.getId(), VARIABLE_HISTORY_PROCESS, false, urlBuilder));
             }
         }
+        result.setCallbackId(processInstance.getCallbackId());
+        result.setCallbackType(processInstance.getCallbackType());
         result.setTenantId(processInstance.getTenantId());
         return result;
     }
@@ -781,6 +799,9 @@ public class RestResponseFactory {
         result.setParentTaskId(taskInstance.getParentTaskId());
         result.setPriority(taskInstance.getPriority());
         result.setProcessDefinitionId(taskInstance.getProcessDefinitionId());
+        result.setScopeDefinitionId(taskInstance.getScopeDefinitionId());
+        result.setScopeId(taskInstance.getScopeId());
+        result.setScopeType(taskInstance.getScopeType());
         result.setTenantId(taskInstance.getTenantId());
         result.setCategory(taskInstance.getCategory());
         if (taskInstance.getProcessDefinitionId() != null) {
@@ -1044,6 +1065,10 @@ public class RestResponseFactory {
         return response;
     }
 
+    public List<UserResponse> createUserResponseList(List<User> users) {
+        return createUserResponseList(users, false);
+    }
+
     public List<UserResponse> createUserResponseList(List<User> users, boolean incudePassword) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         List<UserResponse> responseList = new ArrayList<>();
@@ -1061,6 +1086,7 @@ public class RestResponseFactory {
         UserResponse response = new UserResponse();
         response.setFirstName(user.getFirstName());
         response.setLastName(user.getLastName());
+        response.setDisplayName(user.getDisplayName());
         response.setId(user.getId());
         response.setEmail(user.getEmail());
         response.setUrl(urlBuilder.buildUrl(RestUrls.URL_USER, user.getId()));
@@ -1232,6 +1258,7 @@ public class RestResponseFactory {
         variableConverters.add(new DoubleRestVariableConverter());
         variableConverters.add(new BooleanRestVariableConverter());
         variableConverters.add(new DateRestVariableConverter());
+        variableConverters.add(new JsonObjectRestVariableConverter(objectMapper));
     }
 
     protected String formatUrl(String serverRootUrl, String[] fragments, Object... arguments) {

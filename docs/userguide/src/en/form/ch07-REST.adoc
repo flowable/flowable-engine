@@ -1,0 +1,640 @@
+
+=== Deployment
+
+*When using tomcat, please read <<restUsageInTomcat,Usage in Tomcat>>.*
+
+==== List of Deployments
+
+----
+GET form-repository/deployments
+----
+
+.URL query parameters
+[options="header"]
+|===============
+|Parameter|Required|Value|Description
+|name|No|String|Only return deployments with the given name.
+|nameLike|No|String|Only return deployments with a name like the given name.
+|category|No|String|Only return deployments with the given category.
+|categoryNotEquals|No|String|Only return deployments which don't have the given category.
+|tenantId|No|String|Only return deployments with the given tenantId.
+|tenantIdLike|No|String|Only return deployments with a tenantId like the given value.
+|withoutTenantId|No|Boolean|If +true+, only returns deployments without a tenantId set. If +false+, the +withoutTenantId+ parameter is ignored.
+|sort|No|'id' (default), 'name', 'deploytime' or 'tenantId'|Property to sort on, to be used together with the 'order'.
+|The general <<restPagingAndSort,paging and sorting query-parameters>> can be used for this URL.
+
+|===============
+
+
+.REST Response codes
+[options="header"]
+|===============
+|Response code|Description
+|200|Indicates the request was successful.
+
+|===============
+
+*Success response body:*
+
+[source,json,linenums]
+----
+{
+  "data": [
+    {
+      "id": "10",
+      "name": "flowable-form-examples",
+      "deploymentTime": "2010-10-13T14:54:26.750+02:00",
+      "category": "examples",
+      "url": "http://localhost:8081/form-api/form-repository/deployments/10",
+      "tenantId": null
+    }
+  ],
+  "total": 1,
+  "start": 0,
+  "sort": "id",
+  "order": "asc",
+  "size": 1
+}
+----
+
+
+==== Get a deployment
+
+----
+GET form-repository/deployments/{deploymentId}
+----
+
+.Get a deployment - URL parameters
+[options="header"]
+|===============
+|Parameter|Required|Value|Description
+|deploymentId|Yes|String|The ID of the deployment to get.
+
+|===============
+
+
+.Get a deployment - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|200|Indicates the deployment was found and returned.
+|404|Indicates the requested deployment was not found.
+
+|===============
+
+*Success response body:*
+
+[source,json,linenums]
+----
+{
+  "id": "10",
+  "name": "flowable-form-examples",
+  "deploymentTime": "2010-10-13T14:54:26.750+02:00",
+  "category": "examples",
+  "url": "http://localhost:8081/form-api/form-repository/deployments/10",
+  "tenantId" : null
+}
+----
+
+
+==== Create a new deployment
+
+----
+POST form-repository/deployments
+----
+
+*Request body:*
+
+The request body should contain data of type _multipart/form-data_. There should be exactly one file in the request, any additional files will be ignored. The deployment name is the name of the file-field passed in.
+
+An additional parameter (form-field) can be passed in the request body with name +tenantId+. The value of this field will be used as the identifier of the tenant in which this deployment is done.
+
+.Create a new deployment - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|201|Indicates the deployment was created.
+|400|Indicates there was no content present in the request body or the content mime-type is not supported for deployment. The status-description contains additional information.
+
+|===============
+
+*Success response body:*
+
+
+[source,json,linenums]
+----
+{
+  "id": "10",
+  "name": "simple.form",
+  "deploymentTime": "2010-10-13T14:54:26.750+02:00",
+  "category": null,
+  "url": "http://localhost:8081/form-api/form-repository/deployments/10",
+  "tenantId" : "myTenant"
+}
+----
+
+
+==== Delete a deployment
+
+----
+DELETE form-repository/deployments/{deploymentId}
+----
+
+.Delete a deployment - URL parameters
+[options="header"]
+|===============
+|Parameter|Required|Value|Description
+|deploymentId|Yes|String|The identifier of the deployment to delete.
+
+|===============
+
+
+.Delete a deployment - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|204|Indicates the deployment was found and has been deleted. Response-body is intentionally empty.
+|404|Indicates the requested deployment was not found.
+
+|===============
+
+
+==== Get a deployment resource content
+
+----
+GET form-repository/deployments/{deploymentId}/resourcedata/{resourceId}
+----
+
+.Get a deployment resource content - URL parameters
+[options="header"]
+|===============
+|Parameter|Required|Value|Description
+|deploymentId|Yes|String|The identifier of the deployment the requested resource is part of.
+|resourceId|Yes|String|The identifier of the resource to get the data for. *Make sure you URL-encode the resourceId in case it contains forward slashes. Fro example, use 'forms%2Fmy-form.form' instead of 'forms/my-form.form'.*
+
+|===============
+
+
+
+.Get a deployment resource content - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|200|Indicates both deployment and resource have been found and the resource data has been returned.
+|404|Indicates the requested deployment was not found or there is no resource with the given ID present in the deployment. The status-description contains additional information.
+
+|===============
+
+*Success response body:*
+
+
+The response body will contain the binary resource-content for the requested resource. The response content-type will be the same as the type returned in the resources 'mimeType' property. Also, a content-disposition header is set, allowing browsers to download the file instead of displaying it.
+
+
+=== Form Definitions
+
+
+==== List of Form definitions
+
+----
+GET form-repository/form-definitions
+----
+
+.List of form definitions - URL parameters
+[options="header"]
+|===============
+|Parameter|Required|Value|Description
+|version|No|integer|Only return form definitions with the given version.
+|name|No|String|Only return form definitions with the given name.
+|nameLike|No|String|Only return form definitions with a name like the given name.
+|key|No|String|Only return form definitions with the given key.
+|keyLike|No|String|Only return form definitions with a name like the given key.
+|resourceName|No|String|Only return form definitions with the given resource name.
+|resourceNameLike|No|String|Only return form definitions with a name like the given resource name.
+|category|No|String|Only return form definitions with the given category.
+|categoryLike|No|String|Only return form definitions with a category like the given name.
+|categoryNotEquals|No|String|Only return form definitions which don't have the given category.
+|deploymentId|No|String|Only return form definitions which are part of a deployment with the given identifier.
+|latest|No|Boolean|Only return the latest form definition versions. Can only be used together with 'key' and 'keyLike' parameters, using any other parameter will result in a 400-response.
+|sort|No|'name' (default), 'id', 'key', 'category', 'deploymentId' and 'version'|Property to sort on, to be used together with the 'order'.
+|The general <<restPagingAndSort,paging and sorting query-parameters>> can be used for this URL.
+
+|===============
+
+
+.List of form definitions - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|200|Indicates request was successful and the form definitions are returned
+|400|Indicates a parameter was passed in the wrong format or that 'latest' is used with other parameters other than 'key' and 'keyLike'. The status-message contains additional information.
+
+|===============
+
+
+*Success response body:*
+
+[source,json,linenums]
+----
+{
+  "data": [
+    {
+      "id" : "818e4703-f1d2-11e6-8549-acde48001122",
+      "url" : "http://localhost:8182/form-repository/form-definitions/simpleForm",
+      "version" : 1,
+      "key" : "simpleForm",
+      "category" : "Examples",
+      "deploymentId" : "818e4703-f1d2-11e6-8549-acde48001121",
+      "parentDeploymentId" : "2",
+      "name" : "The Simple Form",
+      "description" : "This is a form for testing purposes",
+    }
+  ],
+  "total": 1,
+  "start": 0,
+  "sort": "name",
+  "order": "asc",
+  "size": 1
+}
+----
+
+
+==== Get a form definition
+
+----
+GET repository/form-definitions/{formDefinitionId}
+----
+
+.Get a form definition - URL parameters
+[options="header"]
+|===============
+|Parameter|Required|Value|Description
+|formDefinitionId|Yes|String|The identifier of the process definition to get.
+
+|===============
+
+
+.Get a form definition - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|200|Indicates the form definition was found and returned.
+|404|Indicates the requested form definition was not found.
+
+|===============
+
+
+*Success response body:*
+
+[source,json,linenums]
+----
+{
+  "id" : "818e4703-f1d2-11e6-8549-acde48001122",
+  "url" : "http://localhost:8182/form-repository/form-definitions/simpleForm",
+  "version" : 1,
+  "key" : "simpleForm",
+  "category" : "Examples",
+  "deploymentId" : "818e4703-f1d2-11e6-8549-acde48001121",
+  "parentDeploymentId" : "2",
+  "name" : "The Simple Form",
+  "description" : "This is a form for testing purposes",
+}
+----
+
+
+==== Get a form definition resource content
+
+----
+GET repository/form-definitions/{formDefinitionId}/resourcedata
+----
+
+.Get a form definition resource content - URL parameters
+[options="header"]
+|===============
+|Parameter|Required|Value|Description
+|formDefinitionId|Yes|String|The identifier of the form definition to get the resource data for.
+
+|===============
+
+*Response:*
+
+Exactly the same response codes/boy as +GET form-repository/deployment/{deploymentId}/resourcedata/{resourceId}+.
+
+
+==== Get a form definition Form model
+
+----
+GET form-repository/form-definitions/{formDefinitionId}/model
+----
+
+.Get a form definition Form model - URL parameters
+[options="header"]
+|===============
+|Parameter|Required|Value|Description
+|formDefinitionId|Yes|String|The identifier of the form definition to get the model for.
+
+|===============
+
+
+.Get a form definition Form model - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|200|Indicates the form definition was found and the model is returned.
+|404|Indicates the requested form definition was not found.
+
+|===============
+
+
+*Response body:*
+The response body is a JSON representation of the +org.flowable.form.model.FormModel+ and contains the full form definition model.
+
+
+=== Form Instances
+
+
+==== Get a form instance
+
+
+----
+GET form/form-instances/{formInstanceId}
+----
+
+.Get a form instance - URL parameters
+[options="header"]
+|===============
+|Parameter|Required|Value|Description
+|formInstanceId|Yes|String|The identifier of the form instance to get.
+
+|===============
+
+
+.Get a form instance - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|200|Indicates the form instance was found and returned.
+|404|Indicates the requested form instance was not found.
+
+|===============
+
+
+*Success response body:*
+
+[source,json,linenums]
+----
+{
+   "id":"48b9ac82-f1d3-11e6-8549-acde48001122",
+   "url":"http://localhost:8182/form/form-instances/48b9ac82-f1d3-11e6-8549-acde48001122",
+   "formDefinitionId":"818e4703-f1d2-11e6-8549-acde48001122",
+   "taskId":"88",
+   "processInstanceId":"66",
+   "processDefinitionId":"oneTaskProcess:1:158",
+   "submittedDate":"2013-04-17T10:17:43.902+0000",
+   "submittedBy":"testUser",
+   "formValuesId":"818e4703-f1d2-11e6-8549-acde48001110",
+   "tenantId": null
+}
+----
+
+
+==== Store a form instance
+
+----
+POST form/form-instances
+----
+
+*Request body (start by process definition id):*
+
+[source,json,linenums]
+----
+{
+   "formDefinitionId":"818e4703-f1d2-11e6-8549-acde48001122",
+   "taskId":"88",
+   "processInstanceId":"66",
+   "processDefinitionId":"oneTaskProcess:1:158",
+   "businessKey":"myBusinessKey",
+   "variables": [
+      {
+        "name":"input1",
+        "value":"test",
+      }
+   ]
+}
+----
+
+*Request body (start by form definition key):*
+
+[source,json,linenums]
+----
+{
+   "formDefinitionKey":"simpleForm",
+   "taskId":"88",
+   "processInstanceId":"66",
+   "processDefinitionId":"oneTaskProcess:1:158",
+   "businessKey":"myBusinessKey",
+   "variables": [
+      {
+        "name":"input1",
+        "value":"test",
+      }
+   ]
+}
+----
+
+
+Only one of +formDefinitionId+ or +formDefinitionKey+ can be used in the request body. Parameters +variables+ and +tenantId+ are optional. If +tenantId+ is omitted, the default tenant will be used. More information about the variable format can be found in <<restVariables,the REST variables section>>.
+
+
+.Store a form instance - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|201|Indicates the form instance was created.
+|400|Indicates either the form definition was not found (based on identifier or key), no form instance was stored by sending the given message, or an invalid variable has been passed. Status description contains additional information about the error.
+
+|===============
+
+
+*Success response body:*
+
+[source,json,linenums]
+----
+{
+   "id":"48b9ac82-f1d3-11e6-8549-acde48001122",
+   "url":"http://localhost:8182/form/form-instances/48b9ac82-f1d3-11e6-8549-acde48001122",
+   "formDefinitionId":"818e4703-f1d2-11e6-8549-acde48001122",
+   "taskId":"88",
+   "processInstanceId":"66",
+   "processDefinitionId":"oneTaskProcess:1:158",
+   "submittedDate":"2013-04-17T10:17:43.902+0000",
+   "submittedBy":"testUser",
+   "formValuesId":"818e4703-f1d2-11e6-8549-acde48001110",
+   "tenantId": null
+}
+----
+
+
+[[restProcessInstancesGet]]
+
+
+==== List of form instances
+
+----
+GET form/form-instances
+----
+
+.List of form instances - URL query parameters
+[options="header"]
+|===============
+|Parameter|Required|Value|Description
+|id|No|String|Only return process instance with the given identifier.
+|formDefinitionId|No|String|Only return form instances with the given form definition identifier.
+|formDefinitionIdLike|No|String|Only return form instances with a form definition identifier like the given value.
+|taskId|No|String|Only return form instances with the given task identifier.
+|taskIdLike|No|String|Only return form instances with a task identifier like the given value.
+|processInstanceId|No|String|Only return form instances with the given process instance identifier.
+|processInstanceIdLike|No|String|Only return form instances with a process instance identifier like the given value.
+|processDefinitionId|No|String|Only return form instances with the given process definition identifier.
+|processDefinitionIdLike|No|String|Only return form instances with a process definition identifier like the given value.
+|submittedBy|No|String|Only return form instances with the given submitted by.
+|submittedByLike|No|String|Only return form instances with a submitted by like the given value.
+|tenantId|No|String|Only return process instances with the given tenantId.
+|tenantIdLike|No|String|Only return process instances with a tenantId like the given value.
+|withoutTenantId|No|Boolean|If +true+, only returns process instances without a tenantId set. If +false+, the +withoutTenantId+ parameter is ignored.
+|sort|No|String|Sort field, should be either one of +submittedDate+ (default) or +tenantId+.
+|The general <<restPagingAndSort,paging and sorting query-parameters>> can be used for this URL.
+
+|===============
+
+
+.List of form instances - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|200|Indicates request was successful and the form instances are returned
+|400|Indicates a parameter was passed in the wrong format. The status message contains additional information.
+
+|===============
+
+
+*Success response body:*
+
+[source,json,linenums]
+----
+{
+   "data":[
+      {
+	   "id":"48b9ac82-f1d3-11e6-8549-acde48001122",
+	   "url":"http://localhost:8182/form/form-instances/48b9ac82-f1d3-11e6-8549-acde48001122",
+	   "formDefinitionId":"818e4703-f1d2-11e6-8549-acde48001122",
+	   "taskId":"88",
+	   "processInstanceId":"66",
+	   "processDefinitionId":"oneTaskProcess:1:158",
+	   "submittedDate":"2013-04-17T10:17:43.902+0000",
+	   "submittedBy":"testUser",
+	   "formValuesId":"818e4703-f1d2-11e6-8549-acde48001110",
+	   "tenantId": null
+	  }
+   ],
+   "total":1,
+   "start":0,
+   "sort":"submittedDate",
+   "order":"asc",
+   "size":1
+}
+----
+
+
+==== Query form instances
+
+----
+POST query/form-instances
+----
+
+*Request body:*
+
+[source,json,linenums]
+----
+{
+  "formDefinitionId":"818e4703-f1d2-11e6-8549-acde48001122"
+}
+----
+
+The request body can contain all possible filters that can be used in the <<restFormInstancesGet,List process instances>> URL query.
+
+
+The general <<restPagingAndSort,paging and sorting query-parameters>> can be used for this URL.
+
+
+.Query form instances - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|200|Indicates request was successful and the form instances are returned
+|400|Indicates a parameter was passed in the wrong format. The status message contains additional information.
+
+|===============
+
+*Success response body:*
+
+[source,json,linenums]
+----
+{
+   "data":[
+      {
+	   "id":"48b9ac82-f1d3-11e6-8549-acde48001122",
+	   "url":"http://localhost:8182/form/form-instances/48b9ac82-f1d3-11e6-8549-acde48001122",
+	   "formDefinitionId":"818e4703-f1d2-11e6-8549-acde48001122",
+	   "taskId":"88",
+	   "processInstanceId":"66",
+	   "processDefinitionId":"oneTaskProcess:1:158",
+	   "submittedDate":"2013-04-17T10:17:43.902+0000",
+	   "submittedBy":"testUser",
+	   "formValuesId":"818e4703-f1d2-11e6-8549-acde48001110",
+	   "tenantId": null
+	  }
+   ],
+   "total":1,
+   "start":0,
+   "sort":"submittedDate",
+   "order":"asc",
+   "size":1
+}
+----
+
+
+=== Form Engine
+
+
+==== Get form engine info
+
+----
+GET form-management/engine
+----
+
+
+Returns a read-only view of the engine that is used in this REST-service.
+
+
+*Success response body:*
+
+[source,json,linenums]
+----
+{
+   "name":"default",
+   "version":"6.4.1-SNAPSHOT",
+   "resourceUrl":"file://flowable/flowable.form.cfg.xml",
+   "exception":null
+}
+----
+
+
+.Get engine information - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|200|Indicates the form engine information is returned.
+
+|===============
+

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:activiti="http://activiti.org/bpmn"
+	xmlns:fox="http://www.camunda.com/fox"
+	targetNamespace="Examples">
+
+	<process id="asyncTask">
+		<startEvent id="theStart" />
+		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="userTask" />
+
+		<userTask id="userTask" name="Task after timer" activiti:async="true" />
+
+		<sequenceFlow id="flow2" sourceRef="userTask" targetRef="theEnd" />
+		<endEvent id="theEnd" />
+	</process>
+
+</definitions>

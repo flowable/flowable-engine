@@ -14,13 +14,13 @@ package org.flowable.dmn.engine.impl;
 
 import java.io.Serializable;
 
+import org.flowable.common.engine.api.management.TablePage;
+import org.flowable.common.engine.api.management.TablePageQuery;
+import org.flowable.common.engine.impl.db.ListQueryParameterObject;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.api.management.TablePage;
-import org.flowable.engine.common.api.management.TablePageQuery;
-import org.flowable.engine.common.impl.db.ListQueryParameterObject;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 
 /**
  * 
@@ -44,16 +44,19 @@ public class TablePageQueryImpl implements TablePageQuery, Command<TablePage>, S
         this.commandExecutor = commandExecutor;
     }
 
+    @Override
     public TablePageQueryImpl tableName(String tableName) {
         this.tableName = tableName;
         return this;
     }
 
+    @Override
     public TablePageQueryImpl orderAsc(String column) {
         addOrder(column, ListQueryParameterObject.SORTORDER_ASC);
         return this;
     }
 
+    @Override
     public TablePageQueryImpl orderDesc(String column) {
         addOrder(column, ListQueryParameterObject.SORTORDER_DESC);
         return this;
@@ -72,12 +75,14 @@ public class TablePageQueryImpl implements TablePageQuery, Command<TablePage>, S
         order = order + column + " " + sortOrder;
     }
 
+    @Override
     public TablePage listPage(int firstResult, int maxResults) {
         this.firstResult = firstResult;
         this.maxResults = maxResults;
         return commandExecutor.execute(this);
     }
 
+    @Override
     public TablePage execute(CommandContext commandContext) {
         return CommandContextUtil.getTableDataManager(commandContext).getTablePage(this, firstResult, maxResults);
     }

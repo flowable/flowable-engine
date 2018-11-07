@@ -27,7 +27,8 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.engine.impl.util.ReflectUtil;
-import org.flowable.variable.service.impl.types.ValueFields;
+import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.service.impl.types.ByteArrayType;
 
 /**
  * @author Tom Baeyens
@@ -37,10 +38,12 @@ public class SerializableType extends ByteArrayType {
 
     public static final String TYPE_NAME = "serializable";
 
+    @Override
     public String getTypeName() {
         return TYPE_NAME;
     }
 
+    @Override
     public Object getValue(ValueFields valueFields) {
         Object cachedObject = valueFields.getCachedValue();
         if (cachedObject != null) {
@@ -66,6 +69,7 @@ public class SerializableType extends ByteArrayType {
         return null; // byte array is null
     }
 
+    @Override
     public void setValue(Object value, ValueFields valueFields) {
         byte[] byteArray = serialize(value, valueFields);
         valueFields.setCachedValue(value);
@@ -114,6 +118,7 @@ public class SerializableType extends ByteArrayType {
         }
     }
 
+    @Override
     public boolean isAbleToStore(Object value) {
         // TODO don't we need null support here?
         return value instanceof Serializable;
@@ -121,6 +126,7 @@ public class SerializableType extends ByteArrayType {
 
     protected ObjectInputStream createObjectInputStream(InputStream is) throws IOException {
         return new ObjectInputStream(is) {
+            @Override
             protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
                 return ReflectUtil.loadClass(desc.getName());
             }

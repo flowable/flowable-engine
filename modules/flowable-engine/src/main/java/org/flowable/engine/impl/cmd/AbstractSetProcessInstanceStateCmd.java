@@ -15,22 +15,24 @@ package org.flowable.engine.impl.cmd;
 import java.util.Collection;
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.db.SuspensionState;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
-import org.flowable.engine.impl.persistence.entity.SuspendedJobEntity;
-import org.flowable.engine.impl.persistence.entity.SuspensionState;
-import org.flowable.engine.impl.persistence.entity.SuspensionState.SuspensionStateUtil;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
-import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
+import org.flowable.engine.impl.persistence.entity.SuspensionStateUtil;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.runtime.Execution;
+import org.flowable.job.service.JobService;
+import org.flowable.job.service.TimerJobService;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Joram Barrez
@@ -44,6 +46,7 @@ public abstract class AbstractSetProcessInstanceStateCmd implements Command<Void
         this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
 
         if (processInstanceId == null) {
@@ -82,28 +85,30 @@ public abstract class AbstractSetProcessInstanceStateCmd implements Command<Void
         }
 
         // All tasks are suspended
-        List<TaskEntity> tasks = CommandContextUtil.getTaskEntityManager(commandContext).findTasksByProcessInstanceId(processInstanceId);
+        List<TaskEntity> tasks = CommandContextUtil.getTaskService().findTasksByProcessInstanceId(processInstanceId);
         for (TaskEntity taskEntity : tasks) {
             SuspensionStateUtil.setSuspensionState(taskEntity, getNewState());
-            CommandContextUtil.getTaskEntityManager(commandContext).update(taskEntity, false);
+            CommandContextUtil.getTaskService().updateTask(taskEntity, false);
         }
 
         // All jobs are suspended
+        JobService jobService = CommandContextUtil.getJobService(commandContext);
         if (getNewState() == SuspensionState.ACTIVE) {
-            List<SuspendedJobEntity> suspendedJobs = CommandContextUtil.getSuspendedJobEntityManager(commandContext).findJobsByProcessInstanceId(processInstanceId);
+            List<SuspendedJobEntity> suspendedJobs = jobService.findSuspendedJobsByProcessInstanceId(processInstanceId);
             for (SuspendedJobEntity suspendedJob : suspendedJobs) {
-                CommandContextUtil.getJobManager(commandContext).activateSuspendedJob(suspendedJob);
+                jobService.activateSuspendedJob(suspendedJob);
             }
 
         } else {
-            List<TimerJobEntity> timerJobs = CommandContextUtil.getTimerJobEntityManager(commandContext).findJobsByProcessInstanceId(processInstanceId);
+            TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);
+            List<TimerJobEntity> timerJobs = timerJobService.findTimerJobsByProcessInstanceId(processInstanceId);
             for (TimerJobEntity timerJob : timerJobs) {
-                CommandContextUtil.getJobManager(commandContext).moveJobToSuspendedJob(timerJob);
+                jobService.moveJobToSuspendedJob(timerJob);
             }
 
-            List<JobEntity> jobs = CommandContextUtil.getJobEntityManager(commandContext).findJobsByProcessInstanceId(processInstanceId);
+            List<JobEntity> jobs = jobService.findJobsByProcessInstanceId(processInstanceId);
             for (JobEntity job : jobs) {
-                CommandContextUtil.getJobManager(commandContext).moveJobToSuspendedJob(job);
+                jobService.moveJobToSuspendedJob(job);
             }
         }
 

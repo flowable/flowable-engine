@@ -18,9 +18,8 @@ import java.util.List;
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskQuery;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.TaskQuery;
 
 /**
  * @author Joram Barrez
@@ -68,11 +67,11 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
 
         // After process starts, only task 0 should be active
         TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc();
-        List<Task> tasks = query.list();
+        List<org.flowable.task.api.Task> tasks = query.list();
         assertEquals(1, tasks.size());
         assertEquals("Task 0", tasks.get(0).getName());
 
-        // Completing task 0 will create Task A and B
+        // Completing task 0 will create org.flowable.task.service.Task A and B
         taskService.complete(tasks.get(0).getId());
         tasks = query.list();
         assertEquals(2, tasks.size());
@@ -109,7 +108,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
 
         // After process start we have two tasks, one from the parent and one from the sub process
         TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc();
-        List<Task> tasks = query.list();
+        List<org.flowable.task.api.Task> tasks = query.list();
         assertEquals(2, tasks.size());
         assertEquals("Another task", tasks.get(0).getName());
         assertEquals("Some Task", tasks.get(1).getName());
@@ -149,7 +148,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
     @Deployment
     public void testAsyncBehavior() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("async");
-        waitForJobExecutorToProcessAllJobs(5000, 500);
+        waitForJobExecutorToProcessAllJobs(7000, 500);
         assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
     }
 

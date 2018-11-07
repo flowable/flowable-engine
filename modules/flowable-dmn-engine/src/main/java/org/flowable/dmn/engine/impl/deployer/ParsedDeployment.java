@@ -15,15 +15,15 @@ package org.flowable.dmn.engine.impl.deployer;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.dmn.engine.impl.parser.DmnParse;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
-import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntity;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnDefinition;
 
 /**
- * An intermediate representation of a DeploymentEntity which keeps track of all of the entity's DecisionTableEntities and resources, and BPMN parses, models, and processes associated with each
+ * An intermediate representation of a DeploymentEntity which keeps track of all of the entity's DecisionTableEntities and resources and processes associated with each
  * DecisionTableEntity - all produced by parsing the deployment.
  * 
  * The DecisionTableEntities are expected to be "not fully set-up" - they may be inconsistent with the DeploymentEntity and/or the persisted versions, and if the deployment is new, they will not yet
@@ -35,12 +35,12 @@ public class ParsedDeployment {
 
     protected List<DecisionTableEntity> decisionTables;
     protected Map<DecisionTableEntity, DmnParse> mapDecisionTablesToParses;
-    protected Map<DecisionTableEntity, DmnResourceEntity> mapDecisionTablesToResources;
+    protected Map<DecisionTableEntity, EngineResource> mapDecisionTablesToResources;
 
     public ParsedDeployment(
             DmnDeploymentEntity entity, List<DecisionTableEntity> decisionTables,
             Map<DecisionTableEntity, DmnParse> mapDecisionTablesToParses,
-            Map<DecisionTableEntity, DmnResourceEntity> mapDecisionTablesToResources) {
+            Map<DecisionTableEntity, EngineResource> mapDecisionTablesToResources) {
 
         this.deploymentEntity = entity;
         this.decisionTables = decisionTables;
@@ -56,7 +56,7 @@ public class ParsedDeployment {
         return decisionTables;
     }
 
-    public DmnResourceEntity getResourceForDecisionTable(DecisionTableEntity decisionTable) {
+    public EngineResource getResourceForDecisionTable(DecisionTableEntity decisionTable) {
         return mapDecisionTablesToResources.get(decisionTable);
     }
 

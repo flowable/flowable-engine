@@ -16,9 +16,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.task.Task;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 /**
  * @author Joram Barrez
@@ -28,7 +27,7 @@ public class TaskDueDateTest extends PluggableFlowableTestCase {
     @Override
     protected void tearDown() throws Exception {
 
-        for (Task task : taskService.createTaskQuery().list()) {
+        for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
             taskService.deleteTask(task.getId(), true);
         }
 
@@ -54,7 +53,7 @@ public class TaskDueDateTest extends PluggableFlowableTestCase {
         assertEquals(6, taskService.createTaskQuery().count());
 
         // Sorting on due date asc should put the nulls at the end
-        List<Task> tasks = taskService.createTaskQuery().orderByDueDateNullsLast().asc().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByDueDateNullsLast().asc().list();
 
         for (int i = 0; i < 4; i++) {
             assertNotNull(tasks.get(i).getDueDate());
@@ -152,8 +151,8 @@ public class TaskDueDateTest extends PluggableFlowableTestCase {
         }
     }
 
-    private Task createTask(String name, Date dueDate) {
-        Task task = taskService.newTask();
+    private org.flowable.task.api.Task createTask(String name, Date dueDate) {
+        org.flowable.task.api.Task task = taskService.newTask();
         task.setName(name);
         task.setDueDate(dueDate);
         taskService.saveTask(task);

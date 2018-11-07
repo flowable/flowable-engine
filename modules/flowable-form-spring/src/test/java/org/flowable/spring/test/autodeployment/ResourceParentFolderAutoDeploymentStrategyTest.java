@@ -13,11 +13,12 @@
 
 package org.flowable.spring.test.autodeployment;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -27,19 +28,19 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.form.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.core.io.Resource;
 
 /**
  * @author Tiese Barrell
  */
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class ResourceParentFolderAutoDeploymentStrategyTest extends AbstractAutoDeploymentStrategyTest {
 
     private ResourceParentFolderAutoDeploymentStrategy classUnderTest;
@@ -53,7 +54,8 @@ public class ResourceParentFolderAutoDeploymentStrategyTest extends AbstractAuto
     private final String parentFilename1 = "parentFilename1";
     private final String parentFilename2 = "parentFilename2";
 
-    @Before
+    @BeforeEach
+    @Override
     public void before() throws Exception {
         super.before();
         classUnderTest = new ResourceParentFolderAutoDeploymentStrategy();
@@ -150,11 +152,6 @@ public class ResourceParentFolderAutoDeploymentStrategyTest extends AbstractAuto
         final Resource[] resources = new Resource[] { resourceMock1, resourceMock2, resourceMock3 };
         classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
 
-        when(fileMock1.getParentFile()).thenReturn(null);
-        when(fileMock2.getParentFile()).thenReturn(parentFile2Mock);
-        when(parentFile2Mock.isDirectory()).thenReturn(false);
-        when(fileMock3.getParentFile()).thenReturn(null);
-
         verify(repositoryServiceMock, times(3)).createDeployment();
         verify(deploymentBuilderMock, times(3)).enableDuplicateFiltering();
         verify(deploymentBuilderMock, times(1)).name(deploymentNameHint + "." + resourceName1);
@@ -190,14 +187,6 @@ public class ResourceParentFolderAutoDeploymentStrategyTest extends AbstractAuto
         verify(deploymentBuilderMock, times(1)).enableDuplicateFiltering();
         verify(deploymentBuilderMock, times(1)).name(deploymentNameHint + "." + resourceName3);
         verify(deploymentBuilderMock, times(1)).deploy();
-    }
-
-    @Test(expected = FlowableException.class)
-    public void testDeployResourcesIOExceptionYieldsFlowableException() throws Exception {
-        when(resourceMock3.getInputStream()).thenThrow(new IOException());
-
-        final Resource[] resources = new Resource[] { resourceMock3 };
-        classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
     }
 
 }

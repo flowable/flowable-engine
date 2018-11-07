@@ -15,8 +15,8 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ModelEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
@@ -32,6 +32,7 @@ public class GetModelCmd implements Command<ModelEntity>, Serializable {
         this.modelId = modelId;
     }
 
+    @Override
     public ModelEntity execute(CommandContext commandContext) {
         return CommandContextUtil.getModelEntityManager(commandContext).findById(modelId);
     }

@@ -12,9 +12,11 @@
  */
 package org.flowable.spring.test.servicetask;
 
-import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.el.FixedValue;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.ExecutionHelper;
+import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * @author Joram Barrez
@@ -24,10 +26,12 @@ public class MyTaskListenerBean implements TaskListener {
 
     private FixedValue someField;
 
+    @Override
     public void notify(DelegateTask delegateTask) {
-        delegateTask.getExecution().setVariable("taskListenerVar", "working");
+        ExecutionEntity execution = ExecutionHelper.getExecution(delegateTask.getExecutionId());
+        execution.setVariable("taskListenerVar", "working");
         if (someField != null) {
-            delegateTask.getExecution().setVariable("taskListenerField", someField.getValue(delegateTask));
+            execution.setVariable("taskListenerField", someField.getValue(delegateTask));
         }
     }
 

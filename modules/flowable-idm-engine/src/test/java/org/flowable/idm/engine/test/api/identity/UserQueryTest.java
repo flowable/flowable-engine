@@ -13,26 +13,33 @@
 
 package org.flowable.idm.engine.test.api.identity;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
 import org.flowable.idm.engine.impl.persistence.entity.UserEntity;
 import org.flowable.idm.engine.test.PluggableFlowableIdmTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class UserQueryTest extends PluggableFlowableIdmTestCase {
 
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
-
-        createUser("kermit", "Kermit", "Thefrog", "kermit@muppetshow.com");
-        createUser("fozzie", "Fozzie", "Bear", "fozzie@muppetshow.com");
-        createUser("gonzo", "Gonzo", "The great", "gonzo@muppetshow.com");
+        createUser("kermit", "Kermit", "Thefrog", "Kermit Thefrog", "kermit@muppetshow.com");
+        createUser("fozzie", "Fozzie", "Bear", "Fozzie Bear", "fozzie@muppetshow.com");
+        createUser("gonzo", "Gonzo", "The great", "Gonzo The great", "gonzo@muppetshow.com");
 
         idmIdentityService.saveGroup(idmIdentityService.newGroup("muppets"));
         idmIdentityService.saveGroup(idmIdentityService.newGroup("frogs"));
@@ -43,16 +50,17 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         idmIdentityService.createMembership("gonzo", "muppets");
     }
 
-    private User createUser(String id, String firstName, String lastName, String email) {
+    private User createUser(String id, String firstName, String lastName, String displayName, String email) {
         User user = idmIdentityService.newUser(id);
         user.setFirstName(firstName);
         user.setLastName(lastName);
+        user.setDisplayName(displayName);
         user.setEmail(email);
         idmIdentityService.saveUser(user);
         return user;
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         idmIdentityService.deleteUser("kermit");
         idmIdentityService.deleteUser("fozzie");
@@ -60,20 +68,21 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
 
         idmIdentityService.deleteGroup("muppets");
         idmIdentityService.deleteGroup("frogs");
-
-        super.tearDown();
     }
 
+    @Test
     public void testQueryByNoCriteria() {
         UserQuery query = idmIdentityService.createUserQuery();
         verifyQueryResults(query, 3);
     }
 
+    @Test
     public void testQueryById() {
         UserQuery query = idmIdentityService.createUserQuery().userId("kermit");
         verifyQueryResults(query, 1);
     }
 
+    @Test
     public void testQueryByInvalidId() {
         UserQuery query = idmIdentityService.createUserQuery().userId("invalid");
         verifyQueryResults(query, 0);
@@ -85,11 +94,13 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testQueryByIdIgnoreCase() {
         UserQuery query = idmIdentityService.createUserQuery().userIdIgnoreCase("KErmit");
         verifyQueryResults(query, 1);
     }
 
+    @Test
     public void testQueryByFirstName() {
         UserQuery query = idmIdentityService.createUserQuery().userFirstName("Gonzo");
         verifyQueryResults(query, 1);
@@ -98,6 +109,7 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         assertEquals("gonzo", result.getId());
     }
 
+    @Test
     public void testQueryByInvalidFirstName() {
         UserQuery query = idmIdentityService.createUserQuery().userFirstName("invalid");
         verifyQueryResults(query, 0);
@@ -109,6 +121,7 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testQueryByFirstNameLike() {
         UserQuery query = idmIdentityService.createUserQuery().userFirstNameLike("%o%");
         verifyQueryResults(query, 2);
@@ -117,6 +130,7 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         verifyQueryResults(query, 1);
     }
 
+    @Test
     public void testQueryByInvalidFirstNameLike() {
         UserQuery query = idmIdentityService.createUserQuery().userFirstNameLike("%mispiggy%");
         verifyQueryResults(query, 0);
@@ -128,6 +142,7 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testQueryByFirstNameLikeIgnoreCase() {
         UserQuery query = idmIdentityService.createUserQuery().userFirstNameLikeIgnoreCase("%O%");
         verifyQueryResults(query, 2);
@@ -136,6 +151,7 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         verifyQueryResults(query, 1);
     }
 
+    @Test
     public void testQueryByLastName() {
         UserQuery query = idmIdentityService.createUserQuery().userLastName("Bear");
         verifyQueryResults(query, 1);
@@ -144,6 +160,7 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         assertEquals("fozzie", result.getId());
     }
 
+    @Test
     public void testQueryByInvalidLastName() {
         UserQuery query = idmIdentityService.createUserQuery().userLastName("invalid");
         verifyQueryResults(query, 0);
@@ -155,6 +172,7 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testQueryByLastNameLike() {
         UserQuery query = idmIdentityService.createUserQuery().userLastNameLike("%rog%");
         verifyQueryResults(query, 1);
@@ -163,6 +181,7 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         verifyQueryResults(query, 2);
     }
 
+    @Test
     public void testQueryByLastNameLikeIgnoreCase() {
         UserQuery query = idmIdentityService.createUserQuery().userLastNameLikeIgnoreCase("%ROg%");
         verifyQueryResults(query, 1);
@@ -171,6 +190,7 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         verifyQueryResults(query, 2);
     }
 
+    @Test
     public void testQueryByFullNameLike() {
         UserQuery query = idmIdentityService.createUserQuery().userFullNameLike("%erm%");
         verifyQueryResults(query, 1);
@@ -182,6 +202,7 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         verifyQueryResults(query, 3);
     }
 
+    @Test
     public void testQueryByFullNameLikeIgnoreCase() {
         UserQuery query = idmIdentityService.createUserQuery().userFullNameLikeIgnoreCase("%ERm%");
         verifyQueryResults(query, 1);
@@ -192,12 +213,14 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         query = idmIdentityService.createUserQuery().userFullNameLikeIgnoreCase("%E%");
         verifyQueryResults(query, 3);
     }
-    
+
+    @Test
     public void testQueryByFirstAndLastNameCombinedLike() {
         UserQuery query = idmIdentityService.createUserQuery().userFullNameLike("%ermit The%");
         verifyQueryResults(query, 1);
     }
 
+    @Test
     public void testQueryByInvalidLastNameLike() {
         UserQuery query = idmIdentityService.createUserQuery().userLastNameLike("%invalid%");
         verifyQueryResults(query, 0);
@@ -209,11 +232,52 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
+    public void testQueryByDisplayName() {
+        UserQuery query = idmIdentityService.createUserQuery().userDisplayName("Fozzie Bear");
+        verifyQueryResults(query, 1);
+
+        User result = query.singleResult();
+        assertEquals("fozzie", result.getId());
+    }
+
+    @Test
+    public void testQueryByInvalidDisplayName() {
+        UserQuery query = idmIdentityService.createUserQuery().userDisplayName("invalid");
+        verifyQueryResults(query, 0);
+
+        try {
+            idmIdentityService.createUserQuery().userDisplayName(null).singleResult();
+            fail();
+        } catch (FlowableIllegalArgumentException e) {
+        }
+    }
+
+    @Test
+    public void testQueryByDisplayNameLike() {
+        UserQuery query = idmIdentityService.createUserQuery().userDisplayNameLike("%rog%");
+        verifyQueryResults(query, 1);
+
+        query = idmIdentityService.createUserQuery().userDisplayNameLike("%ea%");
+        verifyQueryResults(query, 2);
+    }
+
+    @Test
+    public void testQueryByDisplayNameLikeIgnoreCase() {
+        UserQuery query = idmIdentityService.createUserQuery().userDisplayNameLikeIgnoreCase("%ROg%");
+        verifyQueryResults(query, 1);
+
+        query = idmIdentityService.createUserQuery().userDisplayNameLikeIgnoreCase("%Ea%");
+        verifyQueryResults(query, 2);
+    }
+
+    @Test
     public void testQueryByEmail() {
         UserQuery query = idmIdentityService.createUserQuery().userEmail("kermit@muppetshow.com");
         verifyQueryResults(query, 1);
     }
 
+    @Test
     public void testQueryByInvalidEmail() {
         UserQuery query = idmIdentityService.createUserQuery().userEmail("invalid");
         verifyQueryResults(query, 0);
@@ -225,6 +289,7 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testQueryByEmailLike() {
         UserQuery query = idmIdentityService.createUserQuery().userEmailLike("%muppetshow.com");
         verifyQueryResults(query, 3);
@@ -233,6 +298,7 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         verifyQueryResults(query, 1);
     }
 
+    @Test
     public void testQueryByInvalidEmailLike() {
         UserQuery query = idmIdentityService.createUserQuery().userEmailLike("%invalid%");
         verifyQueryResults(query, 0);
@@ -244,6 +310,7 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testQuerySorting() {
         // asc
         assertEquals(3, idmIdentityService.createUserQuery().orderByUserId().asc().count());
@@ -265,6 +332,7 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         assertEquals("Gonzo", users.get(1).getFirstName());
     }
 
+    @Test
     public void testQueryInvalidSortingUsage() {
         try {
             idmIdentityService.createUserQuery().orderByUserId().list();
@@ -279,6 +347,7 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testQueryByMemberOf() {
         UserQuery query = idmIdentityService.createUserQuery().memberOfGroup("muppets");
         verifyQueryResults(query, 3);
@@ -290,6 +359,7 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         assertEquals("kermit", result.getId());
     }
 
+    @Test
     public void testQueryByInvalidMemberOf() {
         UserQuery query = idmIdentityService.createUserQuery().memberOfGroup("invalid");
         verifyQueryResults(query, 0);
@@ -322,6 +392,7 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testNativeQuery() {
         assertEquals("ACT_ID_USER", idmManagementService.getTableName(User.class));
         assertEquals("ACT_ID_USER", idmManagementService.getTableName(UserEntity.class));

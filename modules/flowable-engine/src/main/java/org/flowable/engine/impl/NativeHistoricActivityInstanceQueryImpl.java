@@ -15,9 +15,9 @@ package org.flowable.engine.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.engine.common.impl.query.AbstractNativeQuery;
+import org.flowable.common.engine.impl.AbstractNativeQuery;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.NativeHistoricActivityInstanceQuery;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -36,10 +36,12 @@ public class NativeHistoricActivityInstanceQueryImpl extends AbstractNativeQuery
 
     // results ////////////////////////////////////////////////////////////////
 
+    @Override
     public List<HistoricActivityInstance> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext).findHistoricActivityInstancesByNativeQuery(parameterMap);
     }
 
+    @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext).findHistoricActivityInstanceCountByNativeQuery(parameterMap);
     }

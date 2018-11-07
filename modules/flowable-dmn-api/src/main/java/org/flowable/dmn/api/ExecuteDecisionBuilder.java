@@ -51,19 +51,29 @@ public interface ExecuteDecisionBuilder {
      * Set the activity id
      **/
     ExecuteDecisionBuilder activityId(String activityId);
+    
+    /**
+     * Set the scope type
+     **/
+    ExecuteDecisionBuilder scopeType(String scopeType);
 
     /**
-     * Set the tenantId of process instance
+     * Set the tenantId
      **/
     ExecuteDecisionBuilder tenantId(String tenantId);
 
     /**
-     * Sets the process variables
+     * allow to search for definition by key in the default tenant when tenant specific search fails
+     */
+    ExecuteDecisionBuilder fallbackToDefaultTenant();
+
+    /**
+     * Sets the variables
      */
     ExecuteDecisionBuilder variables(Map<String, Object> variables);
 
     /**
-     * Adds a variable to the process instance
+     * Adds a variable
      **/
     ExecuteDecisionBuilder variable(String variableName, Object value);
 

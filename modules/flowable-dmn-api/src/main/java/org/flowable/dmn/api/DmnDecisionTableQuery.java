@@ -15,24 +15,30 @@ package org.flowable.dmn.api;
 
 import java.util.Set;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.query.Query;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link DmnDecisionTable}s.
- * 
+ *
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
 public interface DmnDecisionTableQuery extends Query<DmnDecisionTableQuery, DmnDecisionTable> {
 
-    /** Only select decision table with the given id. */
+    /**
+     * Only select decision table with the given id.
+     */
     DmnDecisionTableQuery decisionTableId(String decisionTableId);
 
-    /** Only select decision tables with the given ids. */
+    /**
+     * Only select decision tables with the given ids.
+     */
     DmnDecisionTableQuery decisionTableIds(Set<String> decisionTableIds);
 
-    /** Only select decision tables with the given category. */
+    /**
+     * Only select decision tables with the given category.
+     */
     DmnDecisionTableQuery decisionTableCategory(String decisionTableCategory);
 
     /**
@@ -42,12 +48,14 @@ public interface DmnDecisionTableQuery extends Query<DmnDecisionTableQuery, DmnD
 
     /**
      * Only select deployments that have a different category then the given one.
-     * 
+     *
      * @see DeploymentBuilder#category(String)
      */
     DmnDecisionTableQuery decisionTableCategoryNotEquals(String categoryNotEquals);
 
-    /** Only select decision tables with the given name. */
+    /**
+     * Only select decision tables with the given name.
+     */
     DmnDecisionTableQuery decisionTableName(String decisionTableName);
 
     /**
@@ -66,16 +74,6 @@ public interface DmnDecisionTableQuery extends Query<DmnDecisionTableQuery, DmnD
     DmnDecisionTableQuery deploymentIds(Set<String> deploymentIds);
 
     /**
-     * Only select decision tables that are deployed in a deployment with the given parent deployment id
-     */
-    DmnDecisionTableQuery parentDeploymentId(String parentDeploymentId);
-
-    /**
-     * Only select decision tables that are deployed in a deployment like the given parent deployment id
-     */
-    DmnDecisionTableQuery parentDeploymentIdLike(String parentDeploymentIdLike);
-
-    /**
      * Only select decision table with the given key.
      */
     DmnDecisionTableQuery decisionTableKey(String decisionTableKey);
@@ -86,7 +84,7 @@ public interface DmnDecisionTableQuery extends Query<DmnDecisionTableQuery, DmnD
     DmnDecisionTableQuery decisionTableKeyLike(String decisionTableKeyLike);
 
     /**
-     * Only select process definition with a certain version. Particularly useful when used in combination with {@link #processDefinitionKey(String)}
+     * Only select decision tables with a certain version. Particularly useful when used in combination with {@link #decisionTableKey(String)}
      */
     DmnDecisionTableQuery decisionTableVersion(Integer decisionTableVersion);
 
@@ -112,18 +110,21 @@ public interface DmnDecisionTableQuery extends Query<DmnDecisionTableQuery, DmnD
 
     /**
      * Only select the decision tables which are the latest deployed (ie. which have the highest version number for the given key).
-     * 
+     * <p>
      * Can also be used without any other criteria (ie. query.latest().list()), which will then give all the latest versions of all the deployed decision tables.
-     * 
-     * @throws FlowableIllegalArgumentException
-     *             if used in combination with {@link #groupId(string)}, {@link #decisionTableVersion(int)} or {@link #deploymentId(String)}
+     *
+     * @throws FlowableIllegalArgumentException if used in combination with {@link #groupId(String)}, {@link #decisionTableVersion(int)} or {@link #deploymentId(String)}
      */
     DmnDecisionTableQuery latestVersion();
 
-    /** Only select decision table with the given resource name. */
+    /**
+     * Only select decision table with the given resource name.
+     */
     DmnDecisionTableQuery decisionTableResourceName(String resourceName);
 
-    /** Only select decision table with a resource name like the given . */
+    /**
+     * Only select decision table with a resource name like the given .
+     */
     DmnDecisionTableQuery decisionTableResourceNameLike(String resourceNameLike);
 
     /**
@@ -149,7 +150,7 @@ public interface DmnDecisionTableQuery extends Query<DmnDecisionTableQuery, DmnD
     DmnDecisionTableQuery orderByDecisionTableCategory();
 
     /**
-     * Order by process definition key (needs to be followed by {@link #asc()} or {@link #desc()}).
+     * Order by decision table key (needs to be followed by {@link #asc()} or {@link #desc()}).
      */
     DmnDecisionTableQuery orderByDecisionTableKey();
 

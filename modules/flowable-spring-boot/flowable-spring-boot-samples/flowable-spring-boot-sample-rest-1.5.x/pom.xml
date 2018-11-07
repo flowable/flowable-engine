@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-spring-boot-samples</artifactId>
+        <version>6.4.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>flowable-spring-boot-sample-rest-1.5.x</artifactId>
+
+    <properties>
+        <spring.framework.version>4.3.14.RELEASE</spring.framework.version>
+        <spring.security.version>4.2.4.RELEASE</spring.security.version>
+        <jackson.version>2.8.11</jackson.version>
+        <spring.boot.version>1.5.10.RELEASE</spring.boot.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-spring-boot-starter-rest</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

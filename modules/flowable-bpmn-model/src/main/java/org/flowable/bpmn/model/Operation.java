@@ -63,6 +63,7 @@ public class Operation extends BaseElement {
         this.errorMessageRef = errorMessageRef;
     }
 
+    @Override
     public Operation clone() {
         Operation clone = new Operation();
         clone.setValues(this);

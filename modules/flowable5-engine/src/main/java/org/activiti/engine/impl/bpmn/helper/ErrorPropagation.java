@@ -35,8 +35,9 @@ import org.activiti.engine.impl.pvm.runtime.AtomicOperation;
 import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
 import org.activiti.engine.impl.util.ReflectUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.flowable.bpmn.model.MapExceptionEntry;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -215,11 +216,20 @@ public class ErrorPropagation {
         for (MapExceptionEntry me : exceptionMap) {
             String exceptionClass = me.getClassName();
             String errorCode = me.getErrorCode();
+            String rootCause = me.getRootCause();
 
             // save the first mapping with no exception class as default map
             if (StringUtils.isNotEmpty(errorCode) && StringUtils.isEmpty(exceptionClass) && defaultMap == null) {
-                defaultMap = errorCode;
-                continue;
+                // if rootCause is set, check if it matches the exception
+                if (StringUtils.isNotEmpty(rootCause)) {
+                    if (ExceptionUtils.getRootCause(e).getClass().getName().equals(rootCause)) {
+                        defaultMap = errorCode;
+                        continue;
+                    }
+                } else {
+                    defaultMap = errorCode;
+                    continue;
+                }
             }
 
             // ignore if error code or class are not defined
@@ -227,14 +237,27 @@ public class ErrorPropagation {
                 continue;
 
             if (e.getClass().getName().equals(exceptionClass)) {
+                if (StringUtils.isNotEmpty(rootCause)) {
+                    if (ExceptionUtils.getRootCause(e).getClass().getName().equals(rootCause)) {
+                        propagateError(errorCode, execution);
+                    }
+                    continue;
+                }
                 propagateError(errorCode, execution);
                 return true;
             }
             if (me.isAndChildren()) {
                 Class<?> exceptionClassClass = ReflectUtil.loadClass(exceptionClass);
                 if (exceptionClassClass.isAssignableFrom(e.getClass())) {
-                    propagateError(errorCode, execution);
-                    return true;
+                    if (StringUtils.isNotEmpty(rootCause)) {
+                        if (ExceptionUtils.getRootCause(e).getClass().getName().equals(rootCause)) {
+                            propagateError(errorCode, execution);
+                            return true;
+                        }
+                    } else {
+                        propagateError(errorCode, execution);
+                        return true;
+                    }
                 }
             }
         }

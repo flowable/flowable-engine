@@ -13,7 +13,6 @@
 package org.flowable.engine.impl.bpmn.behavior;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -25,9 +24,8 @@ import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.Transaction;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.helper.ScopeUtil;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
@@ -50,6 +48,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
     /**
      * Handles the parallel case of spawning the instances. Will create child executions accordingly for every instance needed.
      */
+    @Override
     protected int createInstances(DelegateExecution multiInstanceRootExecution) {
         int nrOfInstances = resolveNrOfInstances(multiInstanceRootExecution);
         if (nrOfInstances < 0) {
@@ -84,7 +83,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
             if (concurrentExecution.isActive() 
                     && !concurrentExecution.isEnded() 
                     && !concurrentExecution.getParent().isEnded()) {
-                executeOriginalBehavior(concurrentExecution, loopCounter);
+                executeOriginalBehavior(concurrentExecution, (ExecutionEntity) multiInstanceRootExecution, loopCounter);
             } 
         }
 
@@ -102,6 +101,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
     /**
      * Called when the wrapped {@link ActivityBehavior} calls the {@link AbstractBpmnActivityBehavior#leave(DelegateExecution)} method. Handles the completion of one of the parallel instances
      */
+    @Override
     public void leave(DelegateExecution execution) {
 
         boolean zeroNrOfInstances = false;
@@ -115,21 +115,21 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         int nrOfInstances = getLoopVariable(execution, NUMBER_OF_INSTANCES);
         int nrOfCompletedInstances = getLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES) + 1;
         int nrOfActiveInstances = getLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES) - 1;
-
-        CommandContextUtil.getHistoryManager().recordActivityEnd((ExecutionEntity) execution, null);
-        callActivityEndListeners(execution);
-
-        if (zeroNrOfInstances) {
-            return;
-        }
-
+        
         DelegateExecution miRootExecution = getMultiInstanceRootExecution(execution);
         if (miRootExecution != null) { // will be null in case of empty collection
             setLoopVariable(miRootExecution, NUMBER_OF_COMPLETED_INSTANCES, nrOfCompletedInstances);
             setLoopVariable(miRootExecution, NUMBER_OF_ACTIVE_INSTANCES, nrOfActiveInstances);
         }
 
+        CommandContextUtil.getHistoryManager().recordActivityEnd((ExecutionEntity) execution, null);
+        callActivityEndListeners(execution);
+        
         logLoopDetails(execution, "instance completed", loopCounter, nrOfCompletedInstances, nrOfActiveInstances, nrOfInstances);
+
+        if (zeroNrOfInstances) {
+            return;
+        }
 
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
         if (executionEntity.getParent() != null) {
@@ -165,12 +165,17 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
                             toVerify.addAll(childExecutions);
                         }
                     }
+                    sendCompletedWithConditionEvent(leavingExecution);
                 }
-                
+                else {
+                    sendCompletedEvent(leavingExecution);
+                }
+
                 super.leave(leavingExecution);
-            }
+              }
 
         } else {
+            sendCompletedEvent(execution);
             super.leave(execution);
         }
     }
@@ -253,21 +258,4 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
 
         parentScopeExecution.forceUpdate();
     }
-
-    // TODO: can the ExecutionManager.deleteChildExecution not be used?
-    protected void deleteChildExecutions(ExecutionEntity parentExecution, boolean deleteExecution, CommandContext commandContext) {
-        // Delete all child executions
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-        Collection<ExecutionEntity> childExecutions = executionEntityManager.findChildExecutionsByParentExecutionId(parentExecution.getId());
-        if (CollectionUtil.isNotEmpty(childExecutions)) {
-            for (ExecutionEntity childExecution : childExecutions) {
-                deleteChildExecutions(childExecution, true, commandContext);
-            }
-        }
-
-        if (deleteExecution) {
-            executionEntityManager.deleteExecutionAndRelatedData(parentExecution, null);
-        }
-    }
-
 }

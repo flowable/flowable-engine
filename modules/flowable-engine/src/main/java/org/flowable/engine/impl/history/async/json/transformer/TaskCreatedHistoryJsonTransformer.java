@@ -12,22 +12,29 @@
  */
 package org.flowable.engine.impl.history.async.json.transformer;
 
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDateFromJson;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getIntegerFromJson;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
+
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.task.service.HistoricTaskService;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class TaskCreatedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
     @Override
-    public String getType() {
-        return HistoryJsonConstants.TYPE_TASK_CREATED;
+    public List<String> getTypes() {
+        return Collections.singletonList(HistoryJsonConstants.TYPE_TASK_CREATED);
     }
     
     @Override
@@ -48,15 +55,15 @@ public class TaskCreatedHistoryJsonTransformer extends AbstractHistoryJsonTransf
 
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-        HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager = CommandContextUtil.getHistoricTaskInstanceEntityManager(commandContext);
+        HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
 
         String taskId = getStringFromJson(historicalData, HistoryJsonConstants.ID);
         String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);
         
-        HistoricTaskInstanceEntity historicTaskInstance = historicTaskInstanceEntityManager.findById(taskId);
+        HistoricTaskInstanceEntity historicTaskInstance = historicTaskService.getHistoricTask(taskId);
         
         if (historicTaskInstance == null) {
-            historicTaskInstance = historicTaskInstanceEntityManager.create();
+            historicTaskInstance = historicTaskService.createHistoricTask();
             historicTaskInstance.setId(taskId);
             historicTaskInstance.setProcessDefinitionId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_ID));
             historicTaskInstance.setProcessInstanceId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID));
@@ -66,15 +73,21 @@ public class TaskCreatedHistoryJsonTransformer extends AbstractHistoryJsonTransf
             historicTaskInstance.setDescription(getStringFromJson(historicalData, HistoryJsonConstants.DESCRIPTION));
             historicTaskInstance.setOwner(getStringFromJson(historicalData, HistoryJsonConstants.OWNER));
             historicTaskInstance.setAssignee(getStringFromJson(historicalData, HistoryJsonConstants.ASSIGNEE));
-            historicTaskInstance.setStartTime(getDateFromJson(historicalData, HistoryJsonConstants.START_TIME));
+            if (historicalData.has(HistoryJsonConstants.CREATE_TIME)) {
+                historicTaskInstance.setCreateTime(getDateFromJson(historicalData, HistoryJsonConstants.CREATE_TIME));
+            } else {
+                // For backwards compatibility. New async data uses the CREATE_TIME. This should be removed eventually
+                historicTaskInstance.setCreateTime(getDateFromJson(historicalData, HistoryJsonConstants.START_TIME));
+            }
             historicTaskInstance.setTaskDefinitionKey(getStringFromJson(historicalData, HistoryJsonConstants.TASK_DEFINITION_KEY));
+            historicTaskInstance.setTaskDefinitionId(getStringFromJson(historicalData, HistoryJsonConstants.TASK_DEFINITION_ID));
             historicTaskInstance.setPriority(getIntegerFromJson(historicalData, HistoryJsonConstants.PRIORITY));
             historicTaskInstance.setDueDate(getDateFromJson(historicalData, HistoryJsonConstants.DUE_DATE));
             historicTaskInstance.setCategory(getStringFromJson(historicalData, HistoryJsonConstants.CATEGORY));
             historicTaskInstance.setTenantId(getStringFromJson(historicalData, HistoryJsonConstants.TENANT_ID));
             historicTaskInstance.setLastUpdateTime(getDateFromJson(historicalData, HistoryJsonConstants.TIMESTAMP));
     
-            historicTaskInstanceEntityManager.insert(historicTaskInstance);
+            historicTaskService.insertHistoricTask(historicTaskInstance, true);
         }
 
         if (StringUtils.isNotEmpty(executionId)) {

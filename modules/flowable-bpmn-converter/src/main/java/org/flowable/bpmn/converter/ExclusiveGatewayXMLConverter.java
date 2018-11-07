@@ -25,6 +25,7 @@ import org.flowable.bpmn.model.ExclusiveGateway;
  */
 public class ExclusiveGatewayXMLConverter extends BaseBpmnXMLConverter {
 
+    @Override
     public Class<? extends BaseElement> getBpmnElementType() {
         return ExclusiveGateway.class;
     }

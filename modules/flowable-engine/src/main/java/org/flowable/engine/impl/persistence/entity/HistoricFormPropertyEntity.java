@@ -21,10 +21,12 @@ import org.flowable.engine.history.HistoricFormProperty;
  */
 public interface HistoricFormPropertyEntity extends HistoricDetailEntity, HistoricFormProperty {
 
+    @Override
     String getPropertyId();
 
     void setPropertyId(String propertyId);
 
+    @Override
     String getPropertyValue();
 
     void setPropertyValue(String propertyValue);

@@ -18,7 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.api.types.VariableTypes;
 
 /**
  * @author Tom Baeyens
@@ -30,10 +32,12 @@ public class DefaultVariableTypes implements VariableTypes, Serializable {
     private final List<VariableType> typesList = new ArrayList<>();
     private final Map<String, VariableType> typesMap = new HashMap<>();
 
+    @Override
     public DefaultVariableTypes addType(VariableType type) {
         return addType(type, typesList.size());
     }
 
+    @Override
     public DefaultVariableTypes addType(VariableType type, int index) {
         typesList.add(index, type);
         typesMap.put(type.getTypeName(), type);
@@ -49,10 +53,12 @@ public class DefaultVariableTypes implements VariableTypes, Serializable {
         }
     }
 
+    @Override
     public VariableType getVariableType(String typeName) {
         return typesMap.get(typeName);
     }
 
+    @Override
     public VariableType findVariableType(Object value) {
         for (VariableType type : typesList) {
             if (type.isAbleToStore(value)) {
@@ -62,10 +68,12 @@ public class DefaultVariableTypes implements VariableTypes, Serializable {
         throw new FlowableException("couldn't find a variable type that is able to serialize " + value);
     }
 
+    @Override
     public int getTypeIndex(VariableType type) {
         return typesList.indexOf(type);
     }
 
+    @Override
     public int getTypeIndex(String typeName) {
         VariableType type = typesMap.get(typeName);
         if (type != null) {
@@ -75,6 +83,7 @@ public class DefaultVariableTypes implements VariableTypes, Serializable {
         }
     }
 
+    @Override
     public VariableTypes removeType(VariableType type) {
         typesList.remove(type);
         typesMap.remove(type.getTypeName());

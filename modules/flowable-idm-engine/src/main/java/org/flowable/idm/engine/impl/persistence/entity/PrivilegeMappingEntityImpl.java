@@ -15,9 +15,7 @@ package org.flowable.idm.engine.impl.persistence.entity;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
-
-public class PrivilegeMappingEntityImpl extends AbstractEntity implements PrivilegeMappingEntity {
+public class PrivilegeMappingEntityImpl extends AbstractIdmEngineEntity implements PrivilegeMappingEntity {
 
     protected String privilegeId;
     protected String userId;
@@ -33,26 +31,32 @@ public class PrivilegeMappingEntityImpl extends AbstractEntity implements Privil
         return state;
     }
 
+    @Override
     public String getPrivilegeId() {
         return privilegeId;
     }
 
+    @Override
     public void setPrivilegeId(String privilegeId) {
         this.privilegeId = privilegeId;
     }
 
+    @Override
     public String getUserId() {
         return userId;
     }
 
+    @Override
     public void setUserId(String userId) {
         this.userId = userId;
     }
 
+    @Override
     public String getGroupId() {
         return groupId;
     }
 
+    @Override
     public void setGroupId(String groupId) {
         this.groupId = groupId;
     }

@@ -89,5 +89,37 @@
 
     </changeSet>
 
+    <changeSet id="2" author="flowable">
+    
+        <addColumn tableName="ACT_FO_FORM_INSTANCE">
+            <column name="SCOPE_ID_" type="varchar(255)" />
+            <column name="SCOPE_TYPE_" type="varchar(255)" />
+            <column name="SCOPE_DEFINITION_ID_" type="varchar(255)" />
+        </addColumn>
+    
+    </changeSet>
+    
+    <changeSet id="3" author="flowable">
+    
+        <dropColumn columnName="PARENT_DEPLOYMENT_ID_" tableName="ACT_FO_FORM_DEFINITION" />
+        
+    </changeSet>
+
+    <changeSet id="4" author="flowable" dbms="mysql">
+
+        <modifyDataType tableName="ACT_FO_FORM_DEPLOYMENT" columnName="DEPLOY_TIME_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_FO_FORM_INSTANCE" columnName="SUBMITTED_DATE_" newDataType="datetime(3)" />
+
+    </changeSet>
+
+    <changeSet id="5" author="flowable">
+
+        <createIndex tableName="ACT_FO_FORM_DEFINITION" indexName="ACT_IDX_FORM_DEF_UNIQ" unique="true">
+            <column name="KEY_" />
+            <column name="VERSION_" />
+            <column name="TENANT_ID_" />
+        </createIndex>
+
+    </changeSet>
 
 </databaseChangeLog>

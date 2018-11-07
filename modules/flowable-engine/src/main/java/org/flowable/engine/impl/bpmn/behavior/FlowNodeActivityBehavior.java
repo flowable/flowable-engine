@@ -13,7 +13,7 @@
 package org.flowable.engine.impl.bpmn.behavior;
 
 import org.flowable.bpmn.model.FlowNode;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.delegate.TriggerableActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -34,6 +34,7 @@ public abstract class FlowNodeActivityBehavior implements TriggerableActivityBeh
     /**
      * Default behaviour: just leave the activity with no extra functionality.
      */
+    @Override
     public void execute(DelegateExecution execution) {
         leave(execution);
     }
@@ -49,6 +50,7 @@ public abstract class FlowNodeActivityBehavior implements TriggerableActivityBeh
         bpmnActivityBehavior.performIgnoreConditionsOutgoingBehavior((ExecutionEntity) execution);
     }
 
+    @Override
     public void trigger(DelegateExecution execution, String signalName, Object signalData) {
         // concrete activity behaviours that do accept signals should override this method;
         throw new FlowableException("this activity isn't waiting for a trigger");

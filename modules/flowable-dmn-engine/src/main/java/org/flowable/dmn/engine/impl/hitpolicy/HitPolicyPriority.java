@@ -19,10 +19,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.engine.impl.el.ELExecutionContext;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.HitPolicy;
-import org.flowable.engine.common.api.FlowableException;
 
 /**
  * @author Yvo Swillens
@@ -34,6 +34,7 @@ public class HitPolicyPriority extends AbstractHitPolicy implements ComposeDecis
         return HitPolicy.PRIORITY.getValue();
     }
 
+    @Override
     public void composeDecisionResults(final ELExecutionContext executionContext) {
 
         List<Map<String, Object>> ruleResults = new ArrayList<>(executionContext.getRuleResults().values());
@@ -43,6 +44,7 @@ public class HitPolicyPriority extends AbstractHitPolicy implements ComposeDecis
             boolean noOutputValuesPresent = true;
 
             @SuppressWarnings("unchecked")
+            @Override
             public int compare(Object o1, Object o2) {
                 CompareToBuilder compareToBuilder = new CompareToBuilder();
                 for (Map.Entry<String, List<Object>> entry : executionContext.getOutputValues().entrySet()) {
@@ -57,10 +59,11 @@ public class HitPolicyPriority extends AbstractHitPolicy implements ComposeDecis
 
                 if (!noOutputValuesPresent) {
                     return compareToBuilder.toComparison();
-                    
                 } else {
                     if (CommandContextUtil.getDmnEngineConfiguration().isStrictMode()) {
-                        throw new FlowableException(String.format("HitPolicy: %s; no output values present", getHitPolicyName()));
+                        throw new FlowableException(String.format("HitPolicy %s violated; no output values present.", getHitPolicyName()));
+                    } else {
+                        executionContext.getAuditContainer().setValidationMessage(String.format("HitPolicy %s violated; no output values present. Setting first valid result as final result.", getHitPolicyName()));
                     }
                     
                     return 0;

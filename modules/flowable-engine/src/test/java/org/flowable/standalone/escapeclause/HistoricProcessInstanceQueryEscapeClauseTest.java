@@ -17,12 +17,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class HistoricProcessInstanceQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
 
@@ -34,7 +36,7 @@ public class HistoricProcessInstanceQueryEscapeClauseTest extends AbstractEscape
 
     private ProcessInstance processInstance2;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
         deploymentOneId = repositoryService
                 .createDeployment()
@@ -60,22 +62,21 @@ public class HistoricProcessInstanceQueryEscapeClauseTest extends AbstractEscape
         processInstance2 = runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", vars, "Two_");
         runtimeService.setProcessInstanceName(processInstance2.getId(), "Two_");
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
         taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult();
         taskService.complete(task.getId());
 
-        super.setUp();
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
-        super.tearDown();
         repositoryService.deleteDeployment(deploymentOneId, true);
         repositoryService.deleteDeployment(deploymentTwoId, true);
     }
 
+    @Test
     public void testQueryByProcessKeyNotIn() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // processKeyNotIn
@@ -126,6 +127,7 @@ public class HistoricProcessInstanceQueryEscapeClauseTest extends AbstractEscape
         }
     }
 
+    @Test
     public void testQueryByTenantIdLike() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // tenantIdLike
@@ -148,6 +150,7 @@ public class HistoricProcessInstanceQueryEscapeClauseTest extends AbstractEscape
         }
     }
 
+    @Test
     public void testQueryByProcessInstanceNameLike() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // processInstanceNameLike
@@ -170,6 +173,7 @@ public class HistoricProcessInstanceQueryEscapeClauseTest extends AbstractEscape
         }
     }
 
+    @Test
     public void testQueryByProcessInstanceNameLikeIgnoreCase() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // processInstanceNameLike
@@ -192,6 +196,7 @@ public class HistoricProcessInstanceQueryEscapeClauseTest extends AbstractEscape
         }
     }
 
+    @Test
     public void testQueryLikeByQueryVariableValue() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // queryVariableValue
@@ -214,6 +219,7 @@ public class HistoricProcessInstanceQueryEscapeClauseTest extends AbstractEscape
         }
     }
 
+    @Test
     public void testQueryLikeIgnoreCaseByQueryVariableValue() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // queryVariableValueIgnoreCase

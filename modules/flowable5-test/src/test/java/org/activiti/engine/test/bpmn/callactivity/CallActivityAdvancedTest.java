@@ -22,13 +22,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskQuery;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.TaskQuery;
 
 /**
  * @author Joram Barrez
@@ -46,17 +45,17 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
 
         // one task in the subprocess should be active after starting the process instance
         TaskQuery taskQuery = taskService.createTaskQuery();
-        Task taskBeforeSubProcess = taskQuery.singleResult();
+        org.flowable.task.api.Task taskBeforeSubProcess = taskQuery.singleResult();
         assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
 
         // Completing the task continues the process which leads to calling the subprocess
         taskService.complete(taskBeforeSubProcess.getId());
-        Task taskInSubProcess = taskQuery.singleResult();
+        org.flowable.task.api.Task taskInSubProcess = taskQuery.singleResult();
         assertEquals("Task in subprocess", taskInSubProcess.getName());
 
         // Completing the task in the subprocess, finishes the subprocess
         taskService.complete(taskInSubProcess.getId());
-        Task taskAfterSubProcess = taskQuery.singleResult();
+        org.flowable.task.api.Task taskAfterSubProcess = taskQuery.singleResult();
         assertEquals("Task after subprocess", taskAfterSubProcess.getName());
 
         // Completing this task end the process instance
@@ -100,7 +99,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         // one task in the subprocess should be active after starting the process
         // instance
         TaskQuery taskQuery = taskService.createTaskQuery();
-        Task taskBeforeSubProcess = taskQuery.singleResult();
+        org.flowable.task.api.Task taskBeforeSubProcess = taskQuery.singleResult();
         assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
 
         // Completing the task continues the process which leads to calling the
@@ -108,12 +107,12 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         // into this task
         taskService.setVariable(taskBeforeSubProcess.getId(), "simpleSubProcessExpression", "simpleSubProcess");
         taskService.complete(taskBeforeSubProcess.getId());
-        Task taskInSubProcess = taskQuery.singleResult();
+        org.flowable.task.api.Task taskInSubProcess = taskQuery.singleResult();
         assertEquals("Task in subprocess", taskInSubProcess.getName());
 
         // Completing the task in the subprocess, finishes the subprocess
         taskService.complete(taskInSubProcess.getId());
-        Task taskAfterSubProcess = taskQuery.singleResult();
+        org.flowable.task.api.Task taskAfterSubProcess = taskQuery.singleResult();
         assertEquals("Task after subprocess", taskAfterSubProcess.getName());
 
         // Completing this task end the process instance
@@ -132,7 +131,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
 
         // one task in the subprocess should be active after starting the process instance
         TaskQuery taskQuery = taskService.createTaskQuery();
-        Task taskBeforeSubProcess = taskQuery.singleResult();
+        org.flowable.task.api.Task taskBeforeSubProcess = taskQuery.singleResult();
         assertEquals("Task in subprocess", taskBeforeSubProcess.getName());
 
         // Completing this task ends the subprocess which leads to the end of the whole process instance
@@ -152,11 +151,11 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
                 .createTaskQuery()
                 .orderByTaskName()
                 .asc();
-        List<Task> tasks = taskQuery.list();
+        List<org.flowable.task.api.Task> tasks = taskQuery.list();
         assertEquals(2, tasks.size());
 
-        Task taskA = tasks.get(0);
-        Task taskB = tasks.get(1);
+        org.flowable.task.api.Task taskA = tasks.get(0);
+        org.flowable.task.api.Task taskB = tasks.get(1);
         assertEquals("Task A", taskA.getName());
         assertEquals("Task B", taskB.getName());
 
@@ -182,7 +181,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         // one task in the subprocess should be active after starting the process
         // instance
         TaskQuery taskQuery = taskService.createTaskQuery();
-        Task taskBeforeSubProcess = taskQuery.singleResult();
+        org.flowable.task.api.Task taskBeforeSubProcess = taskQuery.singleResult();
         assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
 
         // Completing the task continues the process which leads to calling the
@@ -190,12 +189,12 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         // into this task
         taskService.setVariable(taskBeforeSubProcess.getId(), "simpleSubProcessExpression", "simpleSubProcess");
         taskService.complete(taskBeforeSubProcess.getId());
-        Task taskInSubProcess = taskQuery.singleResult();
+        org.flowable.task.api.Task taskInSubProcess = taskQuery.singleResult();
         assertEquals("Task in subprocess", taskInSubProcess.getName());
 
         // Completing the task in the subprocess, finishes the subprocess
         taskService.complete(taskInSubProcess.getId());
-        Task taskAfterSubProcess = taskQuery.singleResult();
+        org.flowable.task.api.Task taskAfterSubProcess = taskQuery.singleResult();
         assertEquals("Task after subprocess", taskAfterSubProcess.getName());
 
         // Completing this task end the process instance
@@ -236,14 +235,14 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         // After process start, the task in the subprocess should be active
         runtimeService.startProcessInstanceByKey("timerOnCallActivity");
         TaskQuery taskQuery = taskService.createTaskQuery();
-        Task taskInSubProcess = taskQuery.singleResult();
+        org.flowable.task.api.Task taskInSubProcess = taskQuery.singleResult();
         assertEquals("Task in subprocess", taskInSubProcess.getName());
 
         // When the timer on the subprocess is fired, the complete subprocess is destroyed
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + (6 * 60 * 1000))); // + 6 minutes, timer fires on 5 minutes
-        waitForJobExecutorToProcessAllJobs(10000, 5000L);
+        waitForJobExecutorToProcessAllJobs(10000, 200L);
 
-        Task escalatedTask = taskQuery.singleResult();
+        org.flowable.task.api.Task escalatedTask = taskQuery.singleResult();
         assertEquals("Escalated Task", escalatedTask.getName());
 
         // Completing the task ends the complete process
@@ -265,7 +264,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
 
         // one task in the subprocess should be active after starting the process instance
         TaskQuery taskQuery = taskService.createTaskQuery();
-        Task taskBeforeSubProcess = taskQuery.singleResult();
+        org.flowable.task.api.Task taskBeforeSubProcess = taskQuery.singleResult();
         assertEquals("Task in subprocess", taskBeforeSubProcess.getName());
         assertEquals("Hello from the super process.", runtimeService.getVariable(taskBeforeSubProcess.getProcessInstanceId(), "subVariable"));
         assertEquals("Hello from the super process.", taskService.getVariable(taskBeforeSubProcess.getId(), "subVariable"));
@@ -279,7 +278,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         taskService.complete(taskBeforeSubProcess.getId());
 
         // one task in the subprocess should be active after starting the process instance
-        Task taskAfterSubProcess = taskQuery.singleResult();
+        org.flowable.task.api.Task taskAfterSubProcess = taskQuery.singleResult();
         assertEquals("Task in super process", taskAfterSubProcess.getName());
         assertEquals("Hello from sub process.", runtimeService.getVariable(processInstance.getId(), "superVariable"));
         assertEquals("Hello from sub process.", taskService.getVariable(taskAfterSubProcess.getId(), "superVariable"));
@@ -291,7 +290,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         taskService.complete(taskAfterSubProcess.getId(), vars);
 
         // now we are the second time in the sub process but passed variables via expressions
-        Task taskInSecondSubProcess = taskQuery.singleResult();
+        org.flowable.task.api.Task taskInSecondSubProcess = taskQuery.singleResult();
         assertEquals("Task in subprocess", taskInSecondSubProcess.getName());
         assertEquals(10l, runtimeService.getVariable(taskInSecondSubProcess.getProcessInstanceId(), "y"));
         assertEquals(10l, taskService.getVariable(taskInSecondSubProcess.getId(), "y"));
@@ -300,7 +299,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         taskService.complete(taskInSecondSubProcess.getId());
 
         // one task in the subprocess should be active after starting the process instance
-        Task taskAfterSecondSubProcess = taskQuery.singleResult();
+        org.flowable.task.api.Task taskAfterSecondSubProcess = taskQuery.singleResult();
         assertEquals("Task in super process", taskAfterSecondSubProcess.getName());
         assertEquals(15l, runtimeService.getVariable(taskAfterSecondSubProcess.getProcessInstanceId(), "z"));
         assertEquals(15l, taskService.getVariable(taskAfterSecondSubProcess.getId(), "z"));
@@ -325,7 +324,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertNotNull(instanceList);
         assertEquals(3, instanceList.size());
 
-        List<Task> taskList = taskService.createTaskQuery().list();
+        List<org.flowable.task.api.Task> taskList = taskService.createTaskQuery().list();
         assertNotNull(taskList);
         assertEquals(2, taskList.size());
 

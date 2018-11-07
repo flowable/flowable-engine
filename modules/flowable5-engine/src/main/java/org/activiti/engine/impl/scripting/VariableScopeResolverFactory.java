@@ -13,13 +13,14 @@
 
 package org.activiti.engine.impl.scripting;
 
-import org.flowable.engine.delegate.VariableScope;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Tom Baeyens
  */
 public class VariableScopeResolverFactory implements ResolverFactory {
 
+    @Override
     public Resolver createResolver(VariableScope variableScope) {
         if (variableScope != null) {
             return new VariableScopeResolver(variableScope);

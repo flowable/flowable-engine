@@ -140,9 +140,11 @@ public abstract class AbstractManager implements Session {
         return Context.getProcessEngineConfiguration();
     }
 
+    @Override
     public void close() {
     }
 
+    @Override
     public void flush() {
     }
 }

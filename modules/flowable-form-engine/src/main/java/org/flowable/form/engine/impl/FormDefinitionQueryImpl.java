@@ -16,10 +16,10 @@ package org.flowable.form.engine.impl;
 import java.util.List;
 import java.util.Set;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.engine.common.impl.query.AbstractQuery;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.AbstractQuery;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDefinitionQuery;
 import org.flowable.form.engine.impl.util.CommandContextUtil;
@@ -40,8 +40,6 @@ public class FormDefinitionQueryImpl extends AbstractQuery<FormDefinitionQuery, 
     protected String nameLike;
     protected String deploymentId;
     protected Set<String> deploymentIds;
-    protected String parentDeploymentId;
-    protected String parentDeploymentIdLike;
     protected String key;
     protected String keyLike;
     protected String resourceName;
@@ -67,6 +65,7 @@ public class FormDefinitionQueryImpl extends AbstractQuery<FormDefinitionQuery, 
         super(commandExecutor);
     }
 
+    @Override
     public FormDefinitionQueryImpl formId(String formId) {
         this.id = formId;
         return this;
@@ -78,6 +77,7 @@ public class FormDefinitionQueryImpl extends AbstractQuery<FormDefinitionQuery, 
         return this;
     }
 
+    @Override
     public FormDefinitionQueryImpl formCategory(String category) {
         if (category == null) {
             throw new FlowableIllegalArgumentException("category is null");
@@ -86,6 +86,7 @@ public class FormDefinitionQueryImpl extends AbstractQuery<FormDefinitionQuery, 
         return this;
     }
 
+    @Override
     public FormDefinitionQueryImpl formCategoryLike(String categoryLike) {
         if (categoryLike == null) {
             throw new FlowableIllegalArgumentException("categoryLike is null");
@@ -94,6 +95,7 @@ public class FormDefinitionQueryImpl extends AbstractQuery<FormDefinitionQuery, 
         return this;
     }
 
+    @Override
     public FormDefinitionQueryImpl formCategoryNotEquals(String categoryNotEquals) {
         if (categoryNotEquals == null) {
             throw new FlowableIllegalArgumentException("categoryNotEquals is null");
@@ -102,6 +104,7 @@ public class FormDefinitionQueryImpl extends AbstractQuery<FormDefinitionQuery, 
         return this;
     }
 
+    @Override
     public FormDefinitionQueryImpl formName(String name) {
         if (name == null) {
             throw new FlowableIllegalArgumentException("name is null");
@@ -110,6 +113,7 @@ public class FormDefinitionQueryImpl extends AbstractQuery<FormDefinitionQuery, 
         return this;
     }
 
+    @Override
     public FormDefinitionQueryImpl formNameLike(String nameLike) {
         if (nameLike == null) {
             throw new FlowableIllegalArgumentException("nameLike is null");
@@ -118,6 +122,7 @@ public class FormDefinitionQueryImpl extends AbstractQuery<FormDefinitionQuery, 
         return this;
     }
 
+    @Override
     public FormDefinitionQueryImpl deploymentId(String deploymentId) {
         if (deploymentId == null) {
             throw new FlowableIllegalArgumentException("id is null");
@@ -126,6 +131,7 @@ public class FormDefinitionQueryImpl extends AbstractQuery<FormDefinitionQuery, 
         return this;
     }
 
+    @Override
     public FormDefinitionQueryImpl deploymentIds(Set<String> deploymentIds) {
         if (deploymentIds == null) {
             throw new FlowableIllegalArgumentException("ids are null");
@@ -134,22 +140,7 @@ public class FormDefinitionQueryImpl extends AbstractQuery<FormDefinitionQuery, 
         return this;
     }
 
-    public FormDefinitionQueryImpl parentDeploymentId(String parentDeploymentId) {
-        if (parentDeploymentId == null) {
-            throw new FlowableIllegalArgumentException("parentDeploymentId is null");
-        }
-        this.parentDeploymentId = parentDeploymentId;
-        return this;
-    }
-
-    public FormDefinitionQueryImpl parentDeploymentIdLike(String parentDeploymentIdLike) {
-        if (parentDeploymentIdLike == null) {
-            throw new FlowableIllegalArgumentException("parentDeploymentIdLike is null");
-        }
-        this.parentDeploymentIdLike = parentDeploymentIdLike;
-        return this;
-    }
-
+    @Override
     public FormDefinitionQueryImpl formDefinitionKey(String key) {
         if (key == null) {
             throw new FlowableIllegalArgumentException("key is null");
@@ -158,6 +149,7 @@ public class FormDefinitionQueryImpl extends AbstractQuery<FormDefinitionQuery, 
         return this;
     }
 
+    @Override
     public FormDefinitionQueryImpl formDefinitionKeyLike(String keyLike) {
         if (keyLike == null) {
             throw new FlowableIllegalArgumentException("keyLike is null");
@@ -166,6 +158,7 @@ public class FormDefinitionQueryImpl extends AbstractQuery<FormDefinitionQuery, 
         return this;
     }
 
+    @Override
     public FormDefinitionQueryImpl formResourceName(String resourceName) {
         if (resourceName == null) {
             throw new FlowableIllegalArgumentException("resourceName is null");
@@ -174,6 +167,7 @@ public class FormDefinitionQueryImpl extends AbstractQuery<FormDefinitionQuery, 
         return this;
     }
 
+    @Override
     public FormDefinitionQueryImpl formResourceNameLike(String resourceNameLike) {
         if (resourceNameLike == null) {
             throw new FlowableIllegalArgumentException("resourceNameLike is null");
@@ -182,30 +176,35 @@ public class FormDefinitionQueryImpl extends AbstractQuery<FormDefinitionQuery, 
         return this;
     }
 
+    @Override
     public FormDefinitionQueryImpl formVersion(Integer version) {
         checkVersion(version);
         this.version = version;
         return this;
     }
 
+    @Override
     public FormDefinitionQuery formVersionGreaterThan(Integer formVersion) {
         checkVersion(formVersion);
         this.versionGt = formVersion;
         return this;
     }
 
+    @Override
     public FormDefinitionQuery formVersionGreaterThanOrEquals(Integer formVersion) {
         checkVersion(formVersion);
         this.versionGte = formVersion;
         return this;
     }
 
+    @Override
     public FormDefinitionQuery formVersionLowerThan(Integer formVersion) {
         checkVersion(formVersion);
         this.versionLt = formVersion;
         return this;
     }
 
+    @Override
     public FormDefinitionQuery formVersionLowerThanOrEquals(Integer formVersion) {
         checkVersion(formVersion);
         this.versionLte = formVersion;
@@ -220,11 +219,13 @@ public class FormDefinitionQueryImpl extends AbstractQuery<FormDefinitionQuery, 
         }
     }
 
+    @Override
     public FormDefinitionQueryImpl latestVersion() {
         this.latest = true;
         return this;
     }
 
+    @Override
     public FormDefinitionQuery formTenantId(String tenantId) {
         if (tenantId == null) {
             throw new FlowableIllegalArgumentException("form tenantId is null");
@@ -233,6 +234,7 @@ public class FormDefinitionQueryImpl extends AbstractQuery<FormDefinitionQuery, 
         return this;
     }
 
+    @Override
     public FormDefinitionQuery formTenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
             throw new FlowableIllegalArgumentException("form tenantId is null");
@@ -241,6 +243,7 @@ public class FormDefinitionQueryImpl extends AbstractQuery<FormDefinitionQuery, 
         return this;
     }
 
+    @Override
     public FormDefinitionQuery formWithoutTenantId() {
         this.withoutTenantId = true;
         return this;
@@ -248,46 +251,56 @@ public class FormDefinitionQueryImpl extends AbstractQuery<FormDefinitionQuery, 
 
     // sorting ////////////////////////////////////////////
 
+    @Override
     public FormDefinitionQuery orderByDeploymentId() {
         return orderBy(FormQueryProperty.DEPLOYMENT_ID);
     }
 
+    @Override
     public FormDefinitionQuery orderByFormDefinitionKey() {
         return orderBy(FormQueryProperty.FORM_DEFINITION_KEY);
     }
 
+    @Override
     public FormDefinitionQuery orderByFormCategory() {
         return orderBy(FormQueryProperty.FORM_CATEGORY);
     }
 
+    @Override
     public FormDefinitionQuery orderByFormId() {
         return orderBy(FormQueryProperty.FORM_ID);
     }
 
+    @Override
     public FormDefinitionQuery orderByFormVersion() {
         return orderBy(FormQueryProperty.FORM_VERSION);
     }
 
+    @Override
     public FormDefinitionQuery orderByFormName() {
         return orderBy(FormQueryProperty.FORM_NAME);
     }
 
+    @Override
     public FormDefinitionQuery orderByTenantId() {
         return orderBy(FormQueryProperty.FORM_TENANT_ID);
     }
 
     // results ////////////////////////////////////////////
 
+    @Override
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
         return CommandContextUtil.getFormDefinitionEntityManager(commandContext).findFormDefinitionCountByQueryCriteria(this);
     }
 
+    @Override
     public List<FormDefinition> executeList(CommandContext commandContext) {
         checkQueryOk();
         return CommandContextUtil.getFormDefinitionEntityManager(commandContext).findFormDefinitionsByQueryCriteria(this);
     }
 
+    @Override
     public void checkQueryOk() {
         super.checkQueryOk();
     }

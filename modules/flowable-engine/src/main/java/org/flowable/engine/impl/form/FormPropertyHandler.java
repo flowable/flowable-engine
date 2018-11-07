@@ -16,12 +16,12 @@ package org.flowable.engine.impl.form;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.form.AbstractFormType;
 import org.flowable.engine.form.FormProperty;
-import org.flowable.engine.impl.el.NoExecutionVariableScope;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 
 /**
  * @author Tom Baeyens
@@ -57,9 +57,7 @@ public class FormPropertyHandler implements Serializable {
             }
         } else {
             // Execution is null, the form-property is used in a start-form.
-            // Default value
-            // should be available (ACT-1028) even though no execution is
-            // available.
+            // Default value should be available (ACT-1028) even though no execution is available.
             if (defaultExpression != null) {
                 modelValue = defaultExpression.getValue(NoExecutionVariableScope.getSharedInstance());
             }
@@ -85,10 +83,10 @@ public class FormPropertyHandler implements Serializable {
         if (isRequired && !properties.containsKey(id) && defaultExpression == null) {
             throw new FlowableException("form property '" + id + "' is required");
         }
-        boolean propertyExits = false;
+        boolean propertyExists = false;
         Object modelValue = null;
         if (properties.containsKey(id)) {
-            propertyExits = true;
+            propertyExists = true;
             final String propertyValue = properties.remove(id);
             if (type != null) {
                 modelValue = type.convertFormValueToModelValue(propertyValue);
@@ -105,7 +103,7 @@ public class FormPropertyHandler implements Serializable {
                 throw new FlowableException("form property '" + id + "' is required");
             }
         }
-        if (propertyExits || (modelValue != null)) {
+        if (propertyExists || (modelValue != null)) {
             if (variableName != null) {
                 execution.setVariable(variableName, modelValue);
             } else if (variableExpression != null) {

@@ -12,7 +12,10 @@
  */
 package org.flowable.standalone.escapeclause;
 
-import org.flowable.engine.runtime.TimerJobQuery;
+import org.flowable.job.api.TimerJobQuery;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class JobQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
 
@@ -20,8 +23,8 @@ public class JobQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     private String deploymentTwoId;
     private String deploymentThreeId;
 
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
 
         deploymentId = repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/engine/test/api/mgmt/timerOnTask.bpmn20.xml")
@@ -48,14 +51,14 @@ public class JobQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
         runtimeService.startProcessInstanceByKeyAndTenantId("timerOnTask", "test").getId();
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         repositoryService.deleteDeployment(deploymentId, true);
         repositoryService.deleteDeployment(deploymentTwoId, true);
         repositoryService.deleteDeployment(deploymentThreeId, true);
-        super.tearDown();
     }
 
+    @Test
     public void testQueryByTenantIdLike() {
         TimerJobQuery query = managementService.createTimerJobQuery().jobTenantIdLike("%\\%%");
         assertEquals("tenant%", query.singleResult().getTenantId());

@@ -42,6 +42,7 @@ public class DataStoreReference extends FlowElement {
         this.dataStoreRef = dataStoreRef;
     }
 
+    @Override
     public DataStoreReference clone() {
         DataStoreReference clone = new DataStoreReference();
         clone.setValues(this);

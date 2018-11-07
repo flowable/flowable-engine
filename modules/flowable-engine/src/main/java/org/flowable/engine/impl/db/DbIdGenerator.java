@@ -13,10 +13,10 @@
 
 package org.flowable.engine.impl.db;
 
-import org.flowable.engine.common.impl.cfg.IdGenerator;
-import org.flowable.engine.common.impl.db.IdBlock;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
+import org.flowable.common.engine.impl.db.IdBlock;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.cmd.GetNextIdBlockCmd;
 
 /**
@@ -31,6 +31,7 @@ public class DbIdGenerator implements IdGenerator {
     protected CommandExecutor commandExecutor;
     protected CommandConfig commandConfig;
 
+    @Override
     public synchronized String getNextId() {
         if (lastId < nextId) {
             getNewBlock();

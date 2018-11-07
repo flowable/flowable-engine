@@ -20,7 +20,7 @@ import org.flowable.crystalball.simulator.SimulationRunContext;
 import org.flowable.crystalball.simulator.delegate.event.impl.EventLogUserTaskCompleteTransformer;
 import org.flowable.crystalball.simulator.impl.StartReplayLogEventHandler;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
+import org.flowable.task.api.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

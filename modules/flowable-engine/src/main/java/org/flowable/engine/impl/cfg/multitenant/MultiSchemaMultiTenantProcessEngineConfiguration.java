@@ -16,21 +16,23 @@ import java.util.concurrent.ExecutorService;
 
 import javax.sql.DataSource;
 
+import org.flowable.common.engine.impl.cfg.multitenant.TenantAwareDataSource;
+import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
-import org.flowable.engine.common.impl.persistence.StrongUuidGenerator;
 import org.flowable.engine.impl.SchemaOperationProcessEngineClose;
-import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.engine.impl.asyncexecutor.multitenant.ExecutorPerTenantAsyncExecutor;
-import org.flowable.engine.impl.asyncexecutor.multitenant.SharedExecutorServiceAsyncExecutor;
-import org.flowable.engine.impl.asyncexecutor.multitenant.TenantAwareAsyncExecutor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.db.DbIdGenerator;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.DeploymentBuilder;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.job.service.impl.asyncexecutor.multitenant.ExecutorPerTenantAsyncExecutor;
+import org.flowable.job.service.impl.asyncexecutor.multitenant.SharedExecutorServiceAsyncExecutor;
+import org.flowable.job.service.impl.asyncexecutor.multitenant.TenantAwareAsyncExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -169,6 +171,7 @@ public class MultiSchemaMultiTenantProcessEngineConfiguration extends ProcessEng
     @Override
     public Runnable getProcessEngineCloseRunnable() {
         return new Runnable() {
+            @Override
             public void run() {
                 for (String tenantId : tenantInfoHolder.getAllTenants()) {
                     tenantInfoHolder.setCurrentTenantId(tenantId);
@@ -181,6 +184,7 @@ public class MultiSchemaMultiTenantProcessEngineConfiguration extends ProcessEng
 
     public Command<Void> getProcessEngineCloseCommand() {
         return new Command<Void>() {
+            @Override
             public Void execute(CommandContext commandContext) {
                 CommandContextUtil.getProcessEngineConfiguration(commandContext).getCommandExecutor().execute(new SchemaOperationProcessEngineClose());
                 return null;

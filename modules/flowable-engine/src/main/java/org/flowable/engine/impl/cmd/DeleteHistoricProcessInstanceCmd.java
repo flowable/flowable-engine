@@ -15,11 +15,11 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -37,6 +37,7 @@ public class DeleteHistoricProcessInstanceCmd implements Command<Object>, Serial
         this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public Object execute(CommandContext commandContext) {
         if (processInstanceId == null) {
             throw new FlowableIllegalArgumentException("processInstanceId is null");
@@ -57,7 +58,7 @@ public class DeleteHistoricProcessInstanceCmd implements Command<Object>, Serial
             return null;
         }
 
-        CommandContextUtil.getHistoryManager(commandContext).recordProcessInstanceDeleted(processInstanceId);
+        CommandContextUtil.getHistoryManager(commandContext).recordProcessInstanceDeleted(processInstanceId, instance.getProcessDefinitionId());
 
         return null;
     }

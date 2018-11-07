@@ -15,8 +15,8 @@ package org.flowable.idm.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeMappingEntityManager;
 import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
@@ -34,6 +34,7 @@ public class DeletePrivilegeMappingCmd implements Command<Void>, Serializable {
         this.groupId = groupId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         PrivilegeMappingEntityManager privilegeMappingEntityManager = CommandContextUtil.getPrivilegeMappingEntityManager(commandContext);
         if (userId != null) {

@@ -27,10 +27,12 @@ import org.flowable.bpmn.model.TerminateEventDefinition;
  */
 public class TerminateEventDefinitionParser extends BaseChildElementParser {
 
+    @Override
     public String getElementName() {
         return ELEMENT_EVENT_TERMINATEDEFINITION;
     }
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
         if (!(parentElement instanceof EndEvent)) {
             return;

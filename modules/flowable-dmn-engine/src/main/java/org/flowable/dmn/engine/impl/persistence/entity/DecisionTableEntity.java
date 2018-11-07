@@ -12,8 +12,8 @@
  */
 package org.flowable.dmn.engine.impl.persistence.entity;
 
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.dmn.api.DmnDecisionTable;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
 
 /**
  * @author Joram Barrez
@@ -28,8 +28,6 @@ public interface DecisionTableEntity extends DmnDecisionTable, Entity {
     void setDescription(String description);
 
     void setDeploymentId(String deploymentId);
-
-    void setParentDeploymentId(String parentDeploymentId);
 
     void setVersion(int version);
 

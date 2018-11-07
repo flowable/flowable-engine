@@ -12,21 +12,29 @@
  */
 package org.flowable.examples.bpmn.servicetask;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author Christian Stettler
  */
 public class ExpressionServiceTaskTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testSetServiceResultToProcessVariables() {
         Map<String, Object> variables = new HashMap<>();
@@ -35,6 +43,7 @@ public class ExpressionServiceTaskTest extends PluggableFlowableTestCase {
         assertEquals("ok", runtimeService.getVariable(pi.getId(), "result"));
     }
 
+    @Test
     @Deployment
     public void testSetServiceResultToProcessVariablesWithSkipExpression() {
         Map<String, Object> variables = new HashMap<>();
@@ -66,11 +75,50 @@ public class ExpressionServiceTaskTest extends PluggableFlowableTestCase {
         assertEquals("okBean", runtimeService.getVariable(pi3.getId(), "result"));
     }
 
+    @Test
     @Deployment
     public void testBackwardsCompatibleExpression() {
         Map<String, Object> variables = new HashMap<>();
         variables.put("var", "---");
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("BackwardsCompatibleExpressionProcess", variables);
         assertEquals("...---...", runtimeService.getVariable(pi.getId(), "result"));
+    }
+
+    @Test
+    @Deployment
+    public void testSetServiceResultWithParallelMultiInstance() {
+        Map<String, Object> variables = new HashMap<>();
+        List<ValueBean> beans = Arrays.asList(new ValueBean("OK"), new ValueBean("NOT_OK"));
+        variables.put("beans", beans);
+
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("setServiceResultToWithParallelMultiInstance", variables);
+
+        assertEquals("NOT_OK", runtimeService.getVariable(pi.getId(), "subProcessVar"));
+
+        List<Task> tasks = taskService.createTaskQuery()
+            .processInstanceId(pi.getProcessInstanceId())
+            .list();
+
+        assertThat(tasks.size(), is(1));
+        assertThat(tasks.get(0).getTaskDefinitionKey(), is("processWaitState"));
+    }
+
+    @Test
+    @Deployment
+    public void testSetServiceLocalScopedResultWithParallelMultiInstance() {
+        Map<String, Object> variables = new HashMap<>();
+        List<ValueBean> beans = Arrays.asList(new ValueBean("OK"), new ValueBean("NOT_OK"));
+        variables.put("beans", beans);
+
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("setServiceLocalScopedResultWithParallelMultiInstance", variables);
+
+        assertNull("subProcessVar should not be on process instance scope", runtimeService.getVariable(pi.getId(), "subProcessVar"));
+
+        List<Task> tasks = taskService.createTaskQuery()
+            .processInstanceId(pi.getProcessInstanceId())
+            .list();
+
+        assertThat(tasks.size(), is(1));
+        assertThat(tasks.get(0).getTaskDefinitionKey(), is("subProcessWaitState"));
     }
 }

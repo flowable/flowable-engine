@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -101,13 +101,15 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                 stencilId = STENCIL_TASK_HTTP;
             } else if ("dmn".equalsIgnoreCase(serviceTask.getType())) {
                 stencilId = STENCIL_TASK_DECISION;
+            } else if ("shell".equalsIgnoreCase(serviceTask.getType())) {
+                stencilId = STENCIL_TASK_SHELL;
             } else {
                 stencilId = getStencilId(baseElement);
             }
         } else {
             stencilId = getStencilId(baseElement);
         }
-        
+
         flowElementNode = BpmnJsonConverterUtil.createChildShape(baseElement.getId(), stencilId, graphicInfo.getX() - subProcessX + graphicInfo.getWidth(),
                 graphicInfo.getY() - subProcessY + graphicInfo.getHeight(), graphicInfo.getX() - subProcessX, graphicInfo.getY() - subProcessY);
         shapesArrayNode.add(flowElementNode);
@@ -417,6 +419,11 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
             } else {
                 propertyItemNode.putNull(PROPERTY_FORM_VARIABLE);
             }
+            if (StringUtils.isNotEmpty(property.getDefaultExpression())) {
+                propertyItemNode.put(PROPERTY_FORM_DEFAULT, property.getDefaultExpression());
+            } else {
+                propertyItemNode.putNull(PROPERTY_FORM_DEFAULT);
+            }
             if (StringUtils.isNotEmpty(property.getDatePattern())) {
                 propertyItemNode.put(PROPERTY_FORM_DATE_PATTERN, property.getDatePattern());
             }
@@ -522,7 +529,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                         formProperty.setType(getValueAsString(PROPERTY_FORM_TYPE, formNode));
                         formProperty.setExpression(getValueAsString(PROPERTY_FORM_EXPRESSION, formNode));
                         formProperty.setVariable(getValueAsString(PROPERTY_FORM_VARIABLE, formNode));
-
+                        formProperty.setDefaultExpression(getValueAsString(PROPERTY_FORM_DEFAULT, formNode));
                         if ("date".equalsIgnoreCase(formProperty.getType())) {
                             formProperty.setDatePattern(getValueAsString(PROPERTY_FORM_DATE_PATTERN, formNode));
 
@@ -657,6 +664,10 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
     }
 
     protected void addField(String name, String propertyName, JsonNode elementNode, ServiceTask task) {
+        addField(name, propertyName, null, elementNode, task);
+    }
+    
+    protected void addField(String name, String propertyName, String defaultValue, JsonNode elementNode, ServiceTask task) {
         FieldExtension field = new FieldExtension();
         field.setFieldName(name);
         String value = getPropertyValueAsString(propertyName, elementNode);
@@ -666,6 +677,9 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
             } else {
                 field.setStringValue(value);
             }
+            task.getFieldExtensions().add(field);
+        } else if (StringUtils.isNotEmpty(defaultValue)) {
+            field.setStringValue(defaultValue);
             task.getFieldExtensions().add(field);
         }
     }

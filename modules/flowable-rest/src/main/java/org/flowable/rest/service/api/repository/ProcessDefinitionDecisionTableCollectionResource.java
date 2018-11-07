@@ -17,9 +17,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -36,17 +36,19 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessDefinitionDecisionTableCollectionResource extends BaseProcessDefinitionResource {
 
-    @ApiOperation(value = "Get all decision tables for a process-definition", tags = { "Process Definitions" })
+    @ApiOperation(value = "List decision tables for a process-definition", nickname = "listProcessDefinitionDecisionTables", tags = { "Process Definitions" })
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates the process definition was found and the decision tables are returned.", response = DmnDecisionTable.class, responseContainer = "List"),
+            @ApiResponse(code = 200, message = "Indicates the process definition was found and the decision tables are returned.", response = DecisionTableResponse.class, responseContainer = "List"),
             @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
     })
-    @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/decision-tables", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/repository/process-definitions/{processDefinitionId}/decision-tables", produces = "application/json")
     public List<DecisionTableResponse> getDecisionTablesForProcessDefinition(
             @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
             HttpServletRequest request) {
 
-        List<DmnDecisionTable> decisionTables = repositoryService.getDecisionTablesForProcessDefinition(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        
+        List<DmnDecisionTable> decisionTables = repositoryService.getDecisionTablesForProcessDefinition(processDefinition.getId());
 
         return restResponseFactory.createDecisionTableResponseList(decisionTables, processDefinitionId);
     }

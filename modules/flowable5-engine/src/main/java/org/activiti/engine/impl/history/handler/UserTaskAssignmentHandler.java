@@ -15,14 +15,15 @@ package org.activiti.engine.impl.history.handler;
 
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
-import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * @author Tom Baeyens
  */
 public class UserTaskAssignmentHandler implements TaskListener {
 
+    @Override
     public void notify(DelegateTask task) {
         Context.getCommandContext().getHistoryManager()
                 .recordTaskAssignment((TaskEntity) task);

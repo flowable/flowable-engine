@@ -15,7 +15,7 @@ package org.flowable.engine.impl.event.logger;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.event.logger.handler.EventLoggerEventHandler;
 
 /**
@@ -30,14 +30,17 @@ public abstract class AbstractEventFlusher implements EventFlusher {
         // Not interested in closed
     }
 
+    @Override
     public List<EventLoggerEventHandler> getEventHandlers() {
         return eventHandlers;
     }
 
+    @Override
     public void setEventHandlers(List<EventLoggerEventHandler> eventHandlers) {
         this.eventHandlers = eventHandlers;
     }
 
+    @Override
     public void addEventHandler(EventLoggerEventHandler databaseEventLoggerEventHandler) {
         eventHandlers.add(databaseEventLoggerEventHandler);
     }

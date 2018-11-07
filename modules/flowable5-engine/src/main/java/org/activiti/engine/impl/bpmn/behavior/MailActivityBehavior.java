@@ -33,9 +33,9 @@ import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import org.apache.commons.mail.MultiPartEmail;
 import org.apache.commons.mail.SimpleEmail;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.cfg.MailServerInfo;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MailActivityBehavior.class);
 
-    private static final Class<?>[] ALLOWED_ATT_TYPES = new Class<?>[] {
+    private static final Class<?>[] ALLOWED_ATT_TYPES = new Class<?>[]{
             File.class, File[].class, String.class, String[].class, DataSource.class, DataSource[].class
     };
 
@@ -85,8 +85,8 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
             String htmlStr = htmlVar == null ? getStringFromField(html, execution)
                     : getStringFromField(getExpression(execution, htmlVar), execution);
             String charSetStr = getStringFromField(charset, execution);
-            List<File> files = new LinkedList<File>();
-            List<DataSource> dataSources = new LinkedList<DataSource>();
+            List<File> files = new LinkedList<>();
+            List<DataSource> dataSources = new LinkedList<>();
             getFilesFromFields(attachments, execution, files, dataSources);
 
             email = createEmail(textStr, htmlStr, attachmentsExist(files, dataSources));
@@ -365,7 +365,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
                 }
             }
         }
-        for (Iterator<File> it = files.iterator(); it.hasNext();) {
+        for (Iterator<File> it = files.iterator(); it.hasNext(); ) {
             File file = it.next();
             if (!fileExists(file)) {
                 it.remove();

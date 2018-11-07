@@ -16,6 +16,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
+import org.flowable.bpmn.model.AbstractFlowableHttpHandler;
 import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
@@ -28,14 +29,17 @@ import org.flowable.bpmn.model.ServiceTask;
  */
 public class FieldExtensionParser extends BaseChildElementParser {
 
+    @Override
     public String getElementName() {
         return ELEMENT_FIELD;
     }
 
+    @Override
     public boolean accepts(BaseElement element) {
-        return ((element instanceof FlowableListener) || (element instanceof ServiceTask) || (element instanceof SendTask));
+        return ((element instanceof FlowableListener) || (element instanceof ServiceTask) || (element instanceof SendTask) || (element instanceof AbstractFlowableHttpHandler));
     }
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
 
         if (!accepts(parentElement))
@@ -75,8 +79,10 @@ public class FieldExtensionParser extends BaseChildElementParser {
             ((FlowableListener) parentElement).getFieldExtensions().add(extension);
         } else if (parentElement instanceof ServiceTask) {
             ((ServiceTask) parentElement).getFieldExtensions().add(extension);
-        } else {
+        } else if (parentElement instanceof SendTask) {
             ((SendTask) parentElement).getFieldExtensions().add(extension);
+        } else {
+            ((AbstractFlowableHttpHandler) parentElement).getFieldExtensions().add(extension);
         }
     }
 }

@@ -16,17 +16,20 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.engine.common.impl.Page;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
+import org.flowable.common.engine.impl.Page;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
+import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
+import org.junit.jupiter.api.Test;
 
 /**
  * 
@@ -34,6 +37,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/db/oneJobProcess.bpmn20.xml" })
     public void testJobsNotVisibleToAcquisitionIfInstanceSuspended() {
 
@@ -58,6 +62,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         assertEquals(0, acquiredJobs.size());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/db/oneJobProcess.bpmn20.xml" })
     public void testJobsNotVisibleToAcquisitionIfDefinitionSuspended() {
 
@@ -82,6 +87,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         assertEquals(0, acquiredJobs.size());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/db/oneJobProcess.bpmn20.xml" })
     public void testJobsVisibleToAcquisitionIfDefinitionSuspendedWithoutProcessInstances() {
 
@@ -106,6 +112,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         assertEquals(1, acquiredJobs.size());
     }
 
+    @Test
     @Deployment
     public void testSuspendedProcessTimerExecution() throws Exception {
         // Process with boundary timer-event that fires in 1 hour
@@ -119,12 +126,13 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         processEngineConfiguration.getClock().setCurrentTime(tomorrow.getTime());
 
         // Check if timer is eligible to be executed, when process in not yet suspended
+        final JobServiceConfiguration jobServiceConfiguration = (JobServiceConfiguration) processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
         List<TimerJobEntity> jobs = commandExecutor.execute(new Command<List<TimerJobEntity>>() {
 
             @Override
             public List<TimerJobEntity> execute(CommandContext commandContext) {
-                return processEngineConfiguration.getTimerJobEntityManager().findTimerJobsToExecute(new Page(0, 1));
+                return jobServiceConfiguration.getTimerJobEntityManager().findTimerJobsToExecute(new Page(0, 1));
             }
 
         });
@@ -138,7 +146,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
             @Override
             public List<TimerJobEntity> execute(CommandContext commandContext) {
-                return processEngineConfiguration.getTimerJobEntityManager().findTimerJobsToExecute(new Page(0, 1));
+                return jobServiceConfiguration.getTimerJobEntityManager().findTimerJobsToExecute(new Page(0, 1));
             }
         });
 
@@ -147,9 +155,10 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
     protected void makeSureJobDue(final Job job) {
         processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+            @Override
             public Void execute(CommandContext commandContext) {
                 Date currentTime = processEngineConfiguration.getClock().getCurrentTime();
-                CommandContextUtil.getTimerJobEntityManager(commandContext).findById(job.getId()).setDuedate(new Date(currentTime.getTime() - 10000));
+                CommandContextUtil.getTimerJobService(commandContext).findTimerJobById(job.getId()).setDuedate(new Date(currentTime.getTime() - 10000));
                 return null;
             }
 
@@ -158,8 +167,10 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
     protected List<TimerJobEntity> executeAcquireJobsCommand() {
         return processEngineConfiguration.getCommandExecutor().execute(new Command<List<TimerJobEntity>>() {
+            @Override
             public List<TimerJobEntity> execute(CommandContext commandContext) {
-                return CommandContextUtil.getTimerJobEntityManager(commandContext).findTimerJobsToExecute(new Page(0, 1));
+                JobServiceConfiguration jobServiceConfiguration = (JobServiceConfiguration) processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
+                return jobServiceConfiguration.getTimerJobEntityManager().findTimerJobsToExecute(new Page(0, 1));
             }
 
         });

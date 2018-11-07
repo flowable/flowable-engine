@@ -17,16 +17,16 @@ import java.util.List;
 
 /**
  * Structure containing meta data (column names, column types, etc.) about a certain database table.
- * 
+ *
  * @author Joram Barrez
  */
 public class TableMetaData {
 
     protected String tableName;
 
-    protected List<String> columnNames = new ArrayList<String>();
+    protected List<String> columnNames = new ArrayList<>();
 
-    protected List<String> columnTypes = new ArrayList<String>();
+    protected List<String> columnTypes = new ArrayList<>();
 
     public TableMetaData() {
 

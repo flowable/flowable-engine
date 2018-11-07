@@ -46,6 +46,7 @@ public class CatchEventJsonConverter extends BaseBpmnJsonConverter {
         convertersToJsonMap.put(IntermediateCatchEvent.class, CatchEventJsonConverter.class);
     }
 
+    @Override
     protected String getStencilId(BaseElement baseElement) {
         IntermediateCatchEvent catchEvent = (IntermediateCatchEvent) baseElement;
         List<EventDefinition> eventDefinitions = catchEvent.getEventDefinitions();
@@ -64,11 +65,13 @@ public class CatchEventJsonConverter extends BaseBpmnJsonConverter {
         }
     }
 
+    @Override
     protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
         IntermediateCatchEvent catchEvent = (IntermediateCatchEvent) baseElement;
         addEventProperties(catchEvent, propertiesNode);
     }
 
+    @Override
     protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
         IntermediateCatchEvent catchEvent = new IntermediateCatchEvent();
         String stencilId = BpmnJsonConverterUtil.getStencilId(elementNode);

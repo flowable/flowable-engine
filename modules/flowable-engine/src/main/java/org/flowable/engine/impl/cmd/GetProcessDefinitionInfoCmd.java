@@ -14,9 +14,9 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionInfoCacheObject;
@@ -39,6 +39,7 @@ public class GetProcessDefinitionInfoCmd implements Command<ObjectNode>, Seriali
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public ObjectNode execute(CommandContext commandContext) {
         if (processDefinitionId == null) {
             throw new FlowableIllegalArgumentException("process definition id is null");

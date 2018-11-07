@@ -23,6 +23,7 @@ import org.flowable.bpmn.model.BusinessRuleTask;
  */
 public class BusinessRuleParseHandler extends AbstractActivityBpmnParseHandler<BusinessRuleTask> {
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return BusinessRuleTask.class;
     }

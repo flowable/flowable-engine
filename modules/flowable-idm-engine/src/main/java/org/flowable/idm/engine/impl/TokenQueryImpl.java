@@ -16,10 +16,10 @@ package org.flowable.idm.engine.impl;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.engine.common.impl.query.AbstractQuery;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.AbstractQuery;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.idm.api.Token;
 import org.flowable.idm.api.TokenQuery;
 import org.flowable.idm.api.TokenQueryProperty;
@@ -57,6 +57,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
         super(commandExecutor);
     }
 
+    @Override
     public TokenQuery tokenId(String id) {
         if (id == null) {
             throw new FlowableIllegalArgumentException("Provided id is null");
@@ -65,6 +66,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
         return this;
     }
 
+    @Override
     public TokenQuery tokenIds(List<String> ids) {
         if (ids == null) {
             throw new FlowableIllegalArgumentException("Provided ids is null");
@@ -73,6 +75,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
         return this;
     }
 
+    @Override
     public TokenQuery tokenValue(String tokenValue) {
         if (tokenValue == null) {
             throw new FlowableIllegalArgumentException("Provided token value is null");
@@ -81,6 +84,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
         return this;
     }
 
+    @Override
     public TokenQuery tokenDate(Date tokenDate) {
         if (tokenDate == null) {
             throw new FlowableIllegalArgumentException("Provided token date is null");
@@ -89,6 +93,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
         return this;
     }
 
+    @Override
     public TokenQuery tokenDateBefore(Date tokenDateBefore) {
         if (tokenDateBefore == null) {
             throw new FlowableIllegalArgumentException("Provided tokenDateBefore is null");
@@ -97,6 +102,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
         return this;
     }
 
+    @Override
     public TokenQuery tokenDateAfter(Date tokenDateAfter) {
         if (tokenDateAfter == null) {
             throw new FlowableIllegalArgumentException("Provided tokenDateAfter is null");
@@ -105,6 +111,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
         return this;
     }
 
+    @Override
     public TokenQuery ipAddress(String ipAddress) {
         if (ipAddress == null) {
             throw new FlowableIllegalArgumentException("Provided ip address is null");
@@ -113,6 +120,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
         return this;
     }
 
+    @Override
     public TokenQuery ipAddressLike(String ipAddressLike) {
         if (ipAddressLike == null) {
             throw new FlowableIllegalArgumentException("Provided ipAddressLike is null");
@@ -121,6 +129,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
         return this;
     }
 
+    @Override
     public TokenQuery userAgent(String userAgent) {
         if (userAgent == null) {
             throw new FlowableIllegalArgumentException("Provided user agent is null");
@@ -129,6 +138,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
         return this;
     }
 
+    @Override
     public TokenQuery userAgentLike(String userAgentLike) {
         if (userAgentLike == null) {
             throw new FlowableIllegalArgumentException("Provided userAgentLike is null");
@@ -137,6 +147,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
         return this;
     }
 
+    @Override
     public TokenQuery userId(String userId) {
         if (userId == null) {
             throw new FlowableIllegalArgumentException("Provided user id is null");
@@ -145,6 +156,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
         return this;
     }
 
+    @Override
     public TokenQuery userIdLike(String userIdLike) {
         if (userIdLike == null) {
             throw new FlowableIllegalArgumentException("Provided userIdLike is null");
@@ -153,6 +165,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
         return this;
     }
 
+    @Override
     public TokenQuery tokenData(String tokenData) {
         if (tokenData == null) {
             throw new FlowableIllegalArgumentException("Provided token data is null");
@@ -161,6 +174,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
         return this;
     }
 
+    @Override
     public TokenQuery tokenDataLike(String tokenDataLike) {
         if (tokenDataLike == null) {
             throw new FlowableIllegalArgumentException("Provided tokenDataLike is null");
@@ -171,21 +185,25 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
 
     // sorting //////////////////////////////////////////////////////////
 
+    @Override
     public TokenQuery orderByTokenId() {
         return orderBy(TokenQueryProperty.TOKEN_ID);
     }
 
+    @Override
     public TokenQuery orderByTokenDate() {
         return orderBy(TokenQueryProperty.TOKEN_DATE);
     }
 
     // results //////////////////////////////////////////////////////////
 
+    @Override
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
         return CommandContextUtil.getTokenEntityManager(commandContext).findTokenCountByQueryCriteria(this);
     }
 
+    @Override
     public List<Token> executeList(CommandContext commandContext) {
         checkQueryOk();
         return CommandContextUtil.getTokenEntityManager(commandContext).findTokenByQueryCriteria(this);

@@ -16,9 +16,9 @@ package org.flowable.engine.impl.cmd;
 import java.io.InputStream;
 import java.io.Serializable;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 
@@ -39,6 +39,7 @@ public class GetDeploymentProcessModelCmd implements Command<InputStream>, Seria
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public InputStream execute(CommandContext commandContext) {
         ProcessDefinition processDefinition = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDeploymentManager().findDeployedProcessDefinitionById(processDefinitionId);
         String deploymentId = processDefinition.getDeploymentId();

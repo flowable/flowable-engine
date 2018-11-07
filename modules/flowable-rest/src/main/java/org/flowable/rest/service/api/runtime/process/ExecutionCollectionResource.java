@@ -18,12 +18,12 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.rest.api.DataResponse;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.rest.api.DataResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,7 +44,7 @@ import io.swagger.annotations.Authorization;
 public class ExecutionCollectionResource extends ExecutionBaseResource {
 
     // FIXME naming issue ?
-    @ApiOperation(value = "List of executions", tags = { "Executions" }, nickname = "getExecutions")
+    @ApiOperation(value = "List of executions", tags = { "Executions" }, nickname = "listExecutions")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "activityId", dataType = "string", value = "Only return executions with the given activity id.", paramType = "query"),
@@ -61,10 +61,10 @@ public class ExecutionCollectionResource extends ExecutionBaseResource {
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the executions are returned"),
-            @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
+            @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
-    @RequestMapping(value = "/runtime/executions", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    @GetMapping(value = "/runtime/executions", produces = "application/json")
+    public DataResponse<ExecutionResponse> getProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         // Populate query based on request
         ExecutionQueryRequest queryRequest = new ExecutionQueryRequest();
 
@@ -121,13 +121,18 @@ public class ExecutionCollectionResource extends ExecutionBaseResource {
         return getQueryResponse(queryRequest, allRequestParams, request.getRequestURL().toString().replace("/runtime/executions", ""));
     }
 
+    //FIXME Documentation ?
     @ApiOperation(value = "Signal event received", tags = { "Executions" })
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates request was successful and the executions are returned"),
+            @ApiResponse(code = 204, message = "Indicates request was successful and the executions are returned"),
             @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
-    @RequestMapping(value = "/runtime/executions", method = RequestMethod.PUT)
+    @PutMapping(value = "/runtime/executions")
     public void executeExecutionAction(@RequestBody ExecutionActionRequest actionRequest, HttpServletResponse response) {
+        if (restApiInterceptor != null) {
+            restApiInterceptor.doExecutionActionRequest(actionRequest);
+        }
+        
         if (!ExecutionActionRequest.ACTION_SIGNAL_EVENT_RECEIVED.equals(actionRequest.getAction())) {
             throw new FlowableIllegalArgumentException("Illegal action: '" + actionRequest.getAction() + "'.");
         }

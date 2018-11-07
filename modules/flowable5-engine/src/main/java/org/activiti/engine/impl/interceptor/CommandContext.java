@@ -57,7 +57,7 @@ import org.activiti.engine.impl.persistence.entity.VariableInstanceEntityManager
 import org.activiti.engine.impl.pvm.runtime.AtomicOperation;
 import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
 import org.activiti.engine.logging.LogMDC;
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,9 +73,9 @@ public class CommandContext {
     protected Command<?> command;
     protected TransactionContext transactionContext;
     protected Map<Class<?>, SessionFactory> sessionFactories;
-    protected Map<Class<?>, Session> sessions = new HashMap<Class<?>, Session>();
+    protected Map<Class<?>, Session> sessions = new HashMap<>();
     protected Throwable exception;
-    protected LinkedList<AtomicOperation> nextOperations = new LinkedList<AtomicOperation>();
+    protected LinkedList<AtomicOperation> nextOperations = new LinkedList<>();
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
     protected FailedJobCommandFactory failedJobCommandFactory;
     protected List<CommandContextCloseListener> closeListeners;
@@ -196,7 +196,7 @@ public class CommandContext {
 
     public void addCloseListener(CommandContextCloseListener commandContextCloseListener) {
         if (closeListeners == null) {
-            closeListeners = new ArrayList<CommandContextCloseListener>(1);
+            closeListeners = new ArrayList<>(1);
         }
         closeListeners.add(commandContextCloseListener);
     }
@@ -235,7 +235,7 @@ public class CommandContext {
 
     public void addAttribute(String key, Object value) {
         if (attributes == null) {
-            attributes = new HashMap<String, Object>(1);
+            attributes = new HashMap<>(1);
         }
         attributes.put(key, value);
     }
@@ -247,7 +247,7 @@ public class CommandContext {
         return null;
     }
 
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked"})
     public <T> T getSession(Class<T> sessionClass) {
         Session session = sessions.get(sessionClass);
         if (session == null) {

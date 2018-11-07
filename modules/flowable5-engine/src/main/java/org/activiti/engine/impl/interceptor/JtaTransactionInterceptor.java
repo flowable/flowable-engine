@@ -25,7 +25,7 @@ import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
-import org.flowable.engine.common.impl.cfg.TransactionPropagation;
+import org.flowable.common.engine.impl.cfg.TransactionPropagation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +42,7 @@ public class JtaTransactionInterceptor extends AbstractCommandInterceptor {
         this.transactionManager = transactionManager;
     }
 
+    @Override
     public <T> T execute(CommandConfig config, Command<T> command) {
         LOGGER.debug("Running command with propagation {}", config.getTransactionPropagation());
 

@@ -14,11 +14,11 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.task.Task;
+import org.flowable.task.api.Task;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Tijs Rademakers
@@ -33,8 +33,9 @@ public class NewTaskCmd implements Command<Task>, Serializable {
         this.taskId = taskId;
     }
 
+    @Override
     public Task execute(CommandContext commandContext) {
-        TaskEntity task = CommandContextUtil.getTaskEntityManager(commandContext).create();
+        TaskEntity task = CommandContextUtil.getTaskService().createTask();
         task.setId(taskId);
         task.setRevision(0);
         return task;

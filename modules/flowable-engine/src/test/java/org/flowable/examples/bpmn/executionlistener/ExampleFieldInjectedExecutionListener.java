@@ -13,9 +13,9 @@
 
 package org.flowable.examples.bpmn.executionlistener;
 
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.delegate.Expression;
 
 /**
  * Example {@link ExecutionListener} which gets 2 fields injected.
@@ -28,6 +28,7 @@ public class ExampleFieldInjectedExecutionListener implements ExecutionListener 
 
     private Expression dynamicValue;
 
+    @Override
     public void notify(DelegateExecution execution) {
         execution.setVariable("var", fixedValue.getValue(execution).toString() + dynamicValue.getValue(execution).toString());
     }

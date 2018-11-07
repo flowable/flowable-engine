@@ -16,8 +16,8 @@ package org.flowable.dmn.engine.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.dmn.api.DmnHistoricDecisionExecutionQuery;
-import org.flowable.engine.common.api.query.QueryProperty;
 
 /**
  * Contains the possible properties that can be used in a {@link DmnHistoricDecisionExecutionQuery}.
@@ -41,6 +41,7 @@ public class HistoricDecisionExecutionQueryProperty implements QueryProperty {
         properties.put(name, this);
     }
 
+    @Override
     public String getName() {
         return name;
     }

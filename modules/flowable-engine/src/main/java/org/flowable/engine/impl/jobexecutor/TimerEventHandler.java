@@ -12,8 +12,13 @@
  */
 package org.flowable.engine.impl.jobexecutor;
 
-import org.flowable.engine.impl.util.json.JSONException;
-import org.flowable.engine.impl.util.json.JSONObject;
+import java.io.IOException;
+
+import org.flowable.engine.impl.util.CommandContextUtil;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class TimerEventHandler {
 
@@ -22,7 +27,7 @@ public class TimerEventHandler {
     public static final String PROPERTYNAME_CALENDAR_NAME_EXPRESSION = "calendarName";
 
     public static String createConfiguration(String id, String endDate, String calendarName) {
-        JSONObject cfgJson = new JSONObject();
+        ObjectNode cfgJson = createObjectNode();
         cfgJson.put(PROPERTYNAME_TIMER_ACTIVITY_ID, id);
         if (endDate != null) {
             cfgJson.put(PROPERTYNAME_END_DATE_EXPRESSION, endDate);
@@ -35,42 +40,55 @@ public class TimerEventHandler {
 
     public static String setActivityIdToConfiguration(String jobHandlerConfiguration, String activityId) {
         try {
-            JSONObject cfgJson = new JSONObject(jobHandlerConfiguration);
+            ObjectNode cfgJson = readJsonValueAsObjectNode(jobHandlerConfiguration);
             cfgJson.put(PROPERTYNAME_TIMER_ACTIVITY_ID, activityId);
             return cfgJson.toString();
-        } catch (JSONException ex) {
+        } catch (IOException ex) {
             return jobHandlerConfiguration;
         }
     }
 
     public static String getActivityIdFromConfiguration(String jobHandlerConfiguration) {
         try {
-            JSONObject cfgJson = new JSONObject(jobHandlerConfiguration);
-            return cfgJson.get(PROPERTYNAME_TIMER_ACTIVITY_ID).toString();
-        } catch (JSONException ex) {
+            JsonNode cfgJson = readJsonValue(jobHandlerConfiguration);
+            JsonNode activityIdNode = cfgJson.get(PROPERTYNAME_TIMER_ACTIVITY_ID);
+            if (activityIdNode != null) {
+                return activityIdNode.asText();
+            } else {
+                return jobHandlerConfiguration;
+            }
+            
+        } catch (IOException ex) {
             return jobHandlerConfiguration;
         }
     }
 
-    public static String geCalendarNameFromConfiguration(String jobHandlerConfiguration) {
+    public static String getCalendarNameFromConfiguration(String jobHandlerConfiguration) {
         try {
-            JSONObject cfgJson = new JSONObject(jobHandlerConfiguration);
-            return cfgJson.get(PROPERTYNAME_CALENDAR_NAME_EXPRESSION).toString();
-        } catch (JSONException ex) {
+            JsonNode cfgJson = readJsonValue(jobHandlerConfiguration);
+            JsonNode calendarNameNode = cfgJson.get(PROPERTYNAME_CALENDAR_NAME_EXPRESSION);
+            if (calendarNameNode != null) {
+                return calendarNameNode.asText();
+            } else {
+                return "";
+            }
+            
+        } catch (IOException ex) {
             // calendar name is not specified
             return "";
         }
     }
 
     public static String setEndDateToConfiguration(String jobHandlerConfiguration, String endDate) {
-        JSONObject cfgJson = null;
+        ObjectNode cfgJson = null;
         try {
-            cfgJson = new JSONObject(jobHandlerConfiguration);
-        } catch (JSONException ex) {
+            cfgJson = readJsonValueAsObjectNode(jobHandlerConfiguration);
+        } catch (IOException ex) {
             // create the json config
-            cfgJson = new JSONObject();
+            cfgJson = createObjectNode();
             cfgJson.put(PROPERTYNAME_TIMER_ACTIVITY_ID, jobHandlerConfiguration);
         }
+        
         if (endDate != null) {
             cfgJson.put(PROPERTYNAME_END_DATE_EXPRESSION, endDate);
         }
@@ -80,10 +98,32 @@ public class TimerEventHandler {
 
     public static String getEndDateFromConfiguration(String jobHandlerConfiguration) {
         try {
-            JSONObject cfgJson = new JSONObject(jobHandlerConfiguration);
-            return cfgJson.get(PROPERTYNAME_END_DATE_EXPRESSION).toString();
-        } catch (JSONException ex) {
+            JsonNode cfgJson = readJsonValue(jobHandlerConfiguration);
+            JsonNode endDateNode = cfgJson.get(PROPERTYNAME_END_DATE_EXPRESSION);
+            if (endDateNode != null) {
+                return endDateNode.asText();
+            } else {
+                return null;
+            }
+            
+        } catch (IOException ex) {
             return null;
+        }
+    }
+    
+    protected static ObjectNode createObjectNode() {
+        return CommandContextUtil.getProcessEngineConfiguration().getObjectMapper().createObjectNode();
+    }
+    
+    protected static ObjectNode readJsonValueAsObjectNode(String config) throws IOException {
+        return (ObjectNode) readJsonValue(config);
+    }
+    
+    protected static JsonNode readJsonValue(String config) throws IOException {
+        if (CommandContextUtil.getCommandContext() != null) {
+            return CommandContextUtil.getProcessEngineConfiguration().getObjectMapper().readTree(config);
+        } else {
+            return new ObjectMapper().readTree(config);
         }
     }
 

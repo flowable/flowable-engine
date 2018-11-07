@@ -21,7 +21,6 @@ import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.examples.bpmn.executionlistener.CurrentActivityExecutionListener.CurrentActivity;
 import org.activiti.examples.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -45,7 +44,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         assertEquals("businessKey123", businessKey);
 
         // Transition take executionListener will set 2 variables
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
         taskService.complete(task.getId());
 

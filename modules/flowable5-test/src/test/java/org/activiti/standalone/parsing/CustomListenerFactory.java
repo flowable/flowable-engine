@@ -14,8 +14,8 @@ package org.activiti.standalone.parsing;
 
 import org.activiti.engine.impl.bpmn.parser.factory.DefaultListenerFactory;
 import org.flowable.bpmn.model.FlowableListener;
-import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * @author Joram Barrez

@@ -22,21 +22,24 @@ import org.activiti.engine.impl.persistence.entity.JobEntity;
  */
 public class SingleJobExecutorContext implements JobExecutorContext {
 
-    protected List<JobEntity> currentProcessorJobQueue = new LinkedList<JobEntity>();
+    protected List<JobEntity> currentProcessorJobQueue = new LinkedList<>();
     protected JobEntity currentJob;
 
     public List<JobEntity> getCurrentProcessorJobQueue() {
         return currentProcessorJobQueue;
     }
 
+    @Override
     public boolean isExecutingExclusiveJob() {
         return currentJob == null ? false : currentJob.isExclusive();
     }
 
+    @Override
     public void setCurrentJob(JobEntity currentJob) {
         this.currentJob = currentJob;
     }
 
+    @Override
     public JobEntity getCurrentJob() {
         return currentJob;
     }

@@ -18,17 +18,17 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.identitylink.service.IdentityLink;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.rest.service.api.engine.RestIdentityLink;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -47,10 +47,10 @@ public class ProcessDefinitionIdentityLinkResource extends BaseProcessDefinition
 
     @ApiOperation(value = "Get a candidate starter from a process definition", tags = { "Process Definitions" })
     @ApiResponses(value = {
-            @ApiResponse(code = 204, message = "Indicates the process definition was found and the identity link was returned."),
-            @ApiResponse(code = 404, message = "Indicates the requested process definition was not found or the process definition doesn’t have an identity-link that matches the url.")
+            @ApiResponse(code = 200, message = "Indicates the process definition was found and the identity link was returned."),
+            @ApiResponse(code = 404, message = "Indicates the requested process definition was not found or the process definition does not have an identity-link that matches the url.")
     })
-    @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/identitylinks/{family}/{identityId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/repository/process-definitions/{processDefinitionId}/identitylinks/{family}/{identityId}", produces = "application/json")
     public RestIdentityLink getIdentityLink(@ApiParam(name = "processDefinitionId") @PathVariable("processDefinitionId") String processDefinitionId,
             @ApiParam(name = "family") @PathVariable("family") String family, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
             HttpServletRequest request) {
@@ -68,9 +68,9 @@ public class ProcessDefinitionIdentityLinkResource extends BaseProcessDefinition
     @ApiOperation(value = "Delete a candidate starter from a process definition", tags = { "Process Definitions" })
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the process definition was found and the identity link was removed. The response body is intentionally empty."),
-            @ApiResponse(code = 404, message = "Indicates the requested process definition was not found or the process definition doesn’t have an identity-link that matches the url.")
+            @ApiResponse(code = 404, message = "Indicates the requested process definition was not found or the process definition does not have an identity-link that matches the url.")
     })
-    @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/identitylinks/{family}/{identityId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/repository/process-definitions/{processDefinitionId}/identitylinks/{family}/{identityId}")
     public void deleteIdentityLink(@ApiParam(name = "processDefinitionId") @PathVariable("processDefinitionId") String processDefinitionId,
             @ApiParam(name = "family") @PathVariable("family") String family, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
             HttpServletResponse response) {

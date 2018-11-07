@@ -18,16 +18,16 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.RuntimeService;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.runtime.process.SignalEventReceivedRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -50,17 +50,24 @@ public class SignalResource {
 
     @Autowired
     protected RuntimeService runtimeService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Signal event received", tags = { "Runtime" })
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicated signal has been processed and no errors occurred."),
+            @ApiResponse(code = 204, message = "Indicated signal has been processed and no errors occurred."),
             @ApiResponse(code = 202, message = "Indicated signal processing is queued as a job, ready to be executed."),
             @ApiResponse(code = 400, message = "Signal not processed. The signal name is missing or variables are used together with async, which is not allowed. Response body contains additional information about the error.")
     })
-    @RequestMapping(value = "/runtime/signals", method = RequestMethod.POST)
+    @PostMapping(value = "/runtime/signals")
     public void signalEventReceived(@RequestBody SignalEventReceivedRequest signalRequest, HttpServletResponse response) {
         if (signalRequest.getSignalName() == null) {
             throw new FlowableIllegalArgumentException("signalName is required");
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.sendSignal(signalRequest);
         }
 
         Map<String, Object> signalVariables = null;

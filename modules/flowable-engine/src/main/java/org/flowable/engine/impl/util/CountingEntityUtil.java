@@ -12,15 +12,14 @@
  */
 package org.flowable.engine.impl.util;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
-import org.flowable.engine.impl.persistence.CountingTaskEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
-import org.flowable.variable.service.event.FlowableVariableEvent;
+import org.flowable.task.service.impl.persistence.CountingTaskEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
@@ -31,7 +30,7 @@ public class CountingEntityUtil {
     public static void handleDeleteVariableInstanceEntityCount(VariableInstanceEntity variableInstance, boolean fireDeleteEvent) {
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         if (variableInstance.getTaskId() != null && isTaskRelatedEntityCountEnabledGlobally()) {
-            CountingTaskEntity countingTaskEntity = (CountingTaskEntity) CommandContextUtil.getTaskEntityManager(commandContext).findById(variableInstance.getTaskId());
+            CountingTaskEntity countingTaskEntity = (CountingTaskEntity) CommandContextUtil.getTaskService().getTask(variableInstance.getTaskId());
             if (isTaskRelatedEntityCountEnabled(countingTaskEntity)) {
                 countingTaskEntity.setVariableCount(countingTaskEntity.getVariableCount() - 1);
             }
@@ -46,14 +45,14 @@ public class CountingEntityUtil {
         if (fireDeleteEvent && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, variableInstance));
     
-            eventDispatcher.dispatchEvent(createVariableDeleteEvent(variableInstance));
+            eventDispatcher.dispatchEvent(EventUtil.createVariableDeleteEvent(variableInstance));
         }
     }
     
     public static void handleInsertVariableInstanceEntityCount(VariableInstanceEntity variableInstance) {
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         if (variableInstance.getTaskId() != null && isTaskRelatedEntityCountEnabledGlobally()) {
-            CountingTaskEntity countingTaskEntity = (CountingTaskEntity) CommandContextUtil.getTaskEntityManager(commandContext).findById(variableInstance.getTaskId());
+            CountingTaskEntity countingTaskEntity = (CountingTaskEntity) CommandContextUtil.getTaskService().getTask(variableInstance.getTaskId());
             if (isTaskRelatedEntityCountEnabled(countingTaskEntity)) {
                 countingTaskEntity.setVariableCount(countingTaskEntity.getVariableCount() + 1);
             }
@@ -79,7 +78,7 @@ public class CountingEntityUtil {
     }
 
     public static boolean isExecutionRelatedEntityCountEnabled(ExecutionEntity executionEntity) {
-        if (executionEntity instanceof CountingExecutionEntity) {
+        if (executionEntity.isProcessInstanceType() || executionEntity instanceof CountingExecutionEntity) {
             return isExecutionRelatedEntityCountEnabled((CountingExecutionEntity) executionEntity);
         }
         return false;
@@ -93,18 +92,22 @@ public class CountingEntityUtil {
     }
 
     /**
-     * There are two flags here: a global flag and a flag on the execution entity. The global flag can be switched on and off between different reboots, however the flag on the executionEntity refers
-     * to the state at that particular moment.
+     * There are two flags here: a global flag and a flag on the execution entity. 
+     * The global flag can be switched on and off between different reboots, however the flag on the executionEntity refers
+     * to the state at that particular moment of the last insert/update.
      * 
      * Global flag / ExecutionEntity flag : result
      * 
-     * T / T : T (all true, regular mode with flags enabled) T / F : F (global is true, but execution was of a time when it was disabled, thus treating it as disabled) F / T : F (execution was of time
-     * when counting was done. But this is overruled by the global flag and thus the queries will be done) F / F : F (all disabled)
+     * T / T : T (all true, regular mode with flags enabled) 
+     * T / F : F (global is true, but execution was of a time when it was disabled, thus treating it as disabled as the counts can't be guessed) 
+     * F / T : F (execution was of time when counting was done. But this is overruled by the global flag and thus the queries will o
+     * be done) 
+     * F / F : F (all disabled)
      * 
      * From this table it is clear that only when both are true, the result should be true, which is the regular AND rule for booleans.
      */
     public static boolean isExecutionRelatedEntityCountEnabled(CountingExecutionEntity executionEntity) {
-        return isExecutionRelatedEntityCountEnabledGlobally() && executionEntity.isCountEnabled();
+        return !executionEntity.isProcessInstanceType() && isExecutionRelatedEntityCountEnabledGlobally() && executionEntity.isCountEnabled();
     }
 
     /**
@@ -114,24 +117,4 @@ public class CountingEntityUtil {
         return isTaskRelatedEntityCountEnabledGlobally() && taskEntity.isCountEnabled();
     }
     
-    protected static FlowableVariableEvent createVariableDeleteEvent(VariableInstanceEntity variableInstance) {
-
-        String processDefinitionId = null;
-        if (variableInstance.getProcessInstanceId() != null) {
-            ExecutionEntity executionEntity = CommandContextUtil.getExecutionEntityManager().findById(variableInstance.getProcessInstanceId());
-            if (executionEntity != null) {
-                processDefinitionId = executionEntity.getProcessDefinitionId();
-            }
-        }
-
-        return FlowableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_DELETED,
-                variableInstance.getName(),
-                null,
-                variableInstance.getType(),
-                variableInstance.getTaskId(),
-                variableInstance.getExecutionId(),
-                variableInstance.getProcessInstanceId(),
-                processDefinitionId);
-    }
-
 }

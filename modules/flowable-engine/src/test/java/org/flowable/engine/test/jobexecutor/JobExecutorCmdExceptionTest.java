@@ -12,14 +12,17 @@
  */
 package org.flowable.engine.test.jobexecutor;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntityImpl;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.api.Job;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.JobEntityImpl;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
@@ -30,21 +33,25 @@ public class JobExecutorCmdExceptionTest extends PluggableFlowableTestCase {
 
     private CommandExecutor commandExecutor;
 
+    @BeforeEach
     public void setUp() throws Exception {
-        processEngineConfiguration.getJobHandlers().put(tweetExceptionHandler.getType(), tweetExceptionHandler);
+        processEngineConfiguration.addJobHandler(tweetExceptionHandler);
         this.commandExecutor = processEngineConfiguration.getCommandExecutor();
     }
 
+    @AfterEach
     public void tearDown() throws Exception {
-        processEngineConfiguration.getJobHandlers().remove(tweetExceptionHandler.getType());
+        processEngineConfiguration.removeJobHandler(tweetExceptionHandler.getType());
     }
 
+    @Test
     public void testJobCommandsWith2Exceptions() {
         commandExecutor.execute(new Command<String>() {
 
+            @Override
             public String execute(CommandContext commandContext) {
                 JobEntity message = createTweetExceptionMessage();
-                CommandContextUtil.getJobManager(commandContext).scheduleAsyncJob(message);
+                CommandContextUtil.getJobService(commandContext).scheduleAsyncJob(message);
                 return message.getId();
             }
         });
@@ -77,14 +84,16 @@ public class JobExecutorCmdExceptionTest extends PluggableFlowableTestCase {
         managementService.executeJob(job.getId());
     }
 
+    @Test
     public void testJobCommandsWith3Exceptions() {
         tweetExceptionHandler.setExceptionsRemaining(3);
 
         commandExecutor.execute(new Command<String>() {
 
+            @Override
             public String execute(CommandContext commandContext) {
                 JobEntity message = createTweetExceptionMessage();
-                CommandContextUtil.getJobManager(commandContext).scheduleAsyncJob(message);
+                CommandContextUtil.getJobService(commandContext).scheduleAsyncJob(message);
                 return message.getId();
             }
         });

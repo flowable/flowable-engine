@@ -21,17 +21,16 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.impl.asyncexecutor.multitenant.ExecutorPerTenantAsyncExecutor;
-import org.flowable.engine.impl.asyncexecutor.multitenant.SharedExecutorServiceAsyncExecutor;
 import org.flowable.engine.impl.cfg.multitenant.MultiSchemaMultiTenantProcessEngineConfiguration;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
+import org.flowable.job.service.impl.asyncexecutor.multitenant.ExecutorPerTenantAsyncExecutor;
+import org.flowable.job.service.impl.asyncexecutor.multitenant.SharedExecutorServiceAsyncExecutor;
 import org.h2.jdbcx.JdbcDataSource;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -42,12 +41,12 @@ public class MultiTenantProcessEngineTest {
     private MultiSchemaMultiTenantProcessEngineConfiguration config;
     private ProcessEngine processEngine;
 
-    @Before
+    @BeforeEach
     public void setup() {
         setupTenantInfoHolder();
     }
 
-    @After
+    @AfterEach
     public void close() {
         processEngine.close();
     }
@@ -55,11 +54,11 @@ public class MultiTenantProcessEngineTest {
     private void setupTenantInfoHolder() {
         DummyTenantInfoHolder tenantInfoHolder = new DummyTenantInfoHolder();
 
-        tenantInfoHolder.addTenant("alfresco");
-        tenantInfoHolder.addUser("alfresco", "joram");
-        tenantInfoHolder.addUser("alfresco", "tijs");
-        tenantInfoHolder.addUser("alfresco", "paul");
-        tenantInfoHolder.addUser("alfresco", "yvo");
+        tenantInfoHolder.addTenant("flowable");
+        tenantInfoHolder.addUser("flowable", "joram");
+        tenantInfoHolder.addUser("flowable", "tijs");
+        tenantInfoHolder.addUser("flowable", "paul");
+        tenantInfoHolder.addUser("flowable", "yvo");
 
         tenantInfoHolder.addTenant("acme");
         tenantInfoHolder.addUser("acme", "raphael");
@@ -86,7 +85,7 @@ public class MultiTenantProcessEngineTest {
             config.setAsyncExecutor(new ExecutorPerTenantAsyncExecutor(tenantInfoHolder));
         }
 
-        config.registerTenant("alfresco", createDataSource("jdbc:h2:mem:activiti-mt-alfresco;DB_CLOSE_DELAY=1000", "sa", ""));
+        config.registerTenant("flowable", createDataSource("jdbc:h2:mem:activiti-mt-flowable;DB_CLOSE_DELAY=1000", "sa", ""));
         config.registerTenant("acme", createDataSource("jdbc:h2:mem:activiti-mt-acme;DB_CLOSE_DELAY=1000", "sa", ""));
         config.registerTenant("starkindustries", createDataSource("jdbc:h2:mem:activiti-mt-stark;DB_CLOSE_DELAY=1000", "sa", ""));
 
@@ -160,7 +159,7 @@ public class MultiTenantProcessEngineTest {
         vars.put("data", "Hello from " + userId);
 
         ProcessInstance processInstance = processEngine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess", vars);
-        List<Task> tasks = processEngine.getTaskService().createTaskQuery().processInstanceId(processInstance.getId()).list();
+        List<org.flowable.task.api.Task> tasks = processEngine.getTaskService().createTaskQuery().processInstanceId(processInstance.getId()).list();
         System.out.println("Got " + tasks.size() + " tasks");
 
         System.out.println("Got " + processEngine.getHistoryService().createHistoricProcessInstanceQuery().count() + " process instances in the system");
@@ -175,7 +174,7 @@ public class MultiTenantProcessEngineTest {
     private void completeTasks(String userId) {
         tenantInfoHolder.setCurrentUserId(userId);
 
-        for (Task task : processEngine.getTaskService().createTaskQuery().list()) {
+        for (org.flowable.task.api.Task task : processEngine.getTaskService().createTaskQuery().list()) {
             processEngine.getTaskService().complete(task.getId());
         }
 

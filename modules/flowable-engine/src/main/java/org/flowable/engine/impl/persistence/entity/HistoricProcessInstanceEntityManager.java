@@ -15,7 +15,7 @@ package org.flowable.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.HistoricProcessInstanceQueryImpl;
 
@@ -24,6 +24,7 @@ import org.flowable.engine.impl.HistoricProcessInstanceQueryImpl;
  */
 public interface HistoricProcessInstanceEntityManager extends EntityManager<HistoricProcessInstanceEntity> {
 
+    @Override
     HistoricProcessInstanceEntity create();
   
     HistoricProcessInstanceEntity create(ExecutionEntity processInstanceExecutionEntity);

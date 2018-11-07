@@ -1,0 +1,4 @@
+{
+  "invokerPackage":"org.flowable.rest.client.js",
+  "projectName":"flowable-js-client"
+}

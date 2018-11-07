@@ -19,13 +19,13 @@ import java.util.Map;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.persistence.entity.FormResourceEntity;
 import org.flowable.form.engine.impl.persistence.entity.FormResourceEntityImpl;
-import org.flowable.form.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.form.engine.impl.persistence.entity.data.AbstractFormDataManager;
 import org.flowable.form.engine.impl.persistence.entity.data.FormResourceDataManager;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisFormResourceDataManager extends AbstractDataManager<FormResourceEntity> implements FormResourceDataManager {
+public class MybatisFormResourceDataManager extends AbstractFormDataManager<FormResourceEntity> implements FormResourceDataManager {
 
     public MybatisFormResourceDataManager(FormEngineConfiguration formEngineConfiguration) {
         super(formEngineConfiguration);
@@ -43,7 +43,7 @@ public class MybatisFormResourceDataManager extends AbstractDataManager<FormReso
 
     @Override
     public void deleteResourcesByDeploymentId(String deploymentId) {
-        getDbSqlSession().delete("deleteFormResourcesByDeploymentId", deploymentId);
+        getDbSqlSession().delete("deleteFormResourcesByDeploymentId", deploymentId, getManagedEntityClass());
     }
 
     @Override

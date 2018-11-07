@@ -17,9 +17,9 @@ import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandContextCloseListener;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
-import org.flowable.engine.common.impl.cfg.TransactionPropagation;
-import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.engine.runtime.Job;
+import org.flowable.common.engine.impl.cfg.TransactionPropagation;
+import org.flowable.job.api.Job;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +43,7 @@ public class AsyncJobAddedNotification implements CommandContextCloseListener {
         CommandExecutor commandExecutor = commandContext.getProcessEngineConfiguration().getCommandExecutor();
         CommandConfig commandConfig = new CommandConfig(false, TransactionPropagation.REQUIRES_NEW);
         commandExecutor.execute(commandConfig, new Command<Void>() {
+            @Override
             public Void execute(CommandContext commandContext) {
                 LOGGER.debug("notifying job executor of new job");
                 asyncExecutor.executeAsyncJob(job);

@@ -20,7 +20,7 @@ import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.JobEntity;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.api.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +40,7 @@ public class DeleteJobCmd implements Command<Object>, Serializable {
         this.jobId = jobId;
     }
 
+    @Override
     public Object execute(CommandContext commandContext) {
         JobEntity jobToDelete = getJobToDelete(commandContext);
 
@@ -61,7 +62,7 @@ public class DeleteJobCmd implements Command<Object>, Serializable {
         }
 
         // We need to check if the job was locked, ie acquired by the job acquisition thread
-        // This happens if the the job was already acquired, but not yet executed.
+        // This happens if the job was already acquired, but not yet executed.
         // In that case, we can't allow to delete the job.
         if (job.getLockOwner() != null) {
             throw new ActivitiException("Cannot delete job when the job is being executed. Try again later.");

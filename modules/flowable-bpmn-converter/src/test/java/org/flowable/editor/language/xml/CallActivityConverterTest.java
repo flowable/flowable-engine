@@ -37,9 +37,9 @@ public class CallActivityConverterTest extends AbstractConverterTest {
         BpmnModel bpmnModel = readXMLFile();
         BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
         validateModel(parsedModel);
-        deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "callactivity.bpmn";
     }
@@ -53,6 +53,8 @@ public class CallActivityConverterTest extends AbstractConverterTest {
         assertEquals("Call activity", callActivity.getName());
 
         assertEquals("processId", callActivity.getCalledElement());
+
+        assertTrue(callActivity.isFallbackToDefaultTenant());
 
         List<IOParameter> parameters = callActivity.getInParameters();
         assertEquals(2, parameters.size());

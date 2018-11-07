@@ -8,11 +8,11 @@ import java.util.Date;
 import java.util.List;
 
 import org.activiti.engine.impl.test.ResourceFlowableTestCase;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.calendar.BusinessCalendar;
-import org.flowable.engine.runtime.Job;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
 
 /**
  * testing custom calendar for timer definitions Created by martin.grofcik

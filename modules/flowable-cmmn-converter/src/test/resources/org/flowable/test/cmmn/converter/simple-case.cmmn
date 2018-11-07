@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+        xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+        xmlns:flowable="http://flowable.org/cmmn"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        targetNamespace="http://flowable.org/cmmn" xsi:schemaLocation="http://www.omg.org/spec/CMMN/20151109/MODEL ">
+
+    <case id="myCase">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel" flowable:formKey="casePlanForm">
+
+            <planItem id="planItemTaskA" definitionRef="taskA">
+                <entryCriterion id="criterion4" sentryRef="ifPart"/>
+            </planItem>
+            <planItem id="planItemMileStoneOne" definitionRef="mileStoneOne">
+                <entryCriterion id="criterion1" sentryRef="sentryMileStoneOne"/>
+            </planItem>
+            <planItem id="planItemTaskB" definitionRef="taskB">
+                <entryCriterion id="criterion2" sentryRef="sentryTaskB"/>
+            </planItem>
+            <planItem id="planItemMileStoneTwo" definitionRef="mileStoneTwo">
+                <entryCriterion id="criterion3" sentryRef="sentryMileStoneTwo"/>
+            </planItem>
+
+            <sentry id="sentryMileStoneTwo">
+                <planItemOnPart id="onPart1" sourceRef="planItemTaskA">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="sentryTaskB">
+                <planItemOnPart id="onPart2" sourceRef="planItemMileStoneTwo">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="sentryMileStoneOne">
+                <planItemOnPart id="onPart3" sourceRef="planItemTaskB">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="ifPart" name="criterion name">
+                <documentation>sentry doc</documentation>
+                <ifPart>
+                    <condition><![CDATA[${true}]]></condition>
+                </ifPart>
+            </sentry>
+
+            <task id="taskA" name="A"/>
+            <milestone id="mileStoneOne" name="Milestone 2"/>
+            <task id="taskB" name="B" isBlocking="false"/>
+            <milestone id="mileStoneTwo" name="Milestone 1"/>
+
+        </casePlanModel>
+    </case>
+
+</definitions>

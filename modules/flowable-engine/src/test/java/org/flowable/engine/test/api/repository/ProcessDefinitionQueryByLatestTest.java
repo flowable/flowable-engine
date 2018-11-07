@@ -19,20 +19,11 @@ import java.util.List;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
+import org.junit.jupiter.api.Test;
 
 public class ProcessDefinitionQueryByLatestTest extends PluggableFlowableTestCase {
 
     private static final String XML_FILE_PATH = "org/flowable/engine/test/repository/latest/";
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
 
     protected List<String> deploy(List<String> xmlFileNameList) throws Exception {
         List<String> deploymentIdList = new ArrayList<>();
@@ -54,6 +45,7 @@ public class ProcessDefinitionQueryByLatestTest extends PluggableFlowableTestCas
         }
     }
 
+    @Test
     public void testQueryByLatestAndId() throws Exception {
         // Deploy
         List<String> xmlFileNameList = Arrays.asList("name_testProcess1_one.bpmn20.xml",
@@ -84,6 +76,7 @@ public class ProcessDefinitionQueryByLatestTest extends PluggableFlowableTestCas
         unDeploy(deploymentIdList);
     }
 
+    @Test
     public void testQueryByLatestAndName() throws Exception {
         // Deploy
         List<String> xmlFileNameList = Arrays.asList("name_testProcess1_one.bpmn20.xml",
@@ -108,6 +101,7 @@ public class ProcessDefinitionQueryByLatestTest extends PluggableFlowableTestCas
         unDeploy(deploymentIdList);
     }
 
+    @Test
     public void testQueryByLatestAndVersion() throws Exception {
         // Deploy
         List<String> xmlFileNameList = Arrays.asList("version_testProcess1_one.bpmn20.xml",
@@ -124,6 +118,7 @@ public class ProcessDefinitionQueryByLatestTest extends PluggableFlowableTestCas
         unDeploy(deploymentIdList);
     }
 
+    @Test
     public void testQueryByLatestAndDeploymentId() throws Exception {
         // Deploy
         List<String> xmlFileNameList = Arrays.asList("name_testProcess1_one.bpmn20.xml",

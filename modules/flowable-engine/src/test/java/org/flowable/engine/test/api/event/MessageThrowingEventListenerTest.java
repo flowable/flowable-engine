@@ -12,14 +12,14 @@
  */
 package org.flowable.engine.test.api.event;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.impl.bpmn.helper.MessageThrowingEventListener;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case for all {@link FlowableEventListener}s that throw a message BPMN event when an {@link FlowableEvent} has been dispatched.
@@ -28,6 +28,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class MessageThrowingEventListenerTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testThrowMessage() throws Exception {
         MessageThrowingEventListener listener = null;
@@ -41,7 +42,7 @@ public class MessageThrowingEventListenerTest extends PluggableFlowableTestCase 
             assertNotNull(processInstance);
 
             // Fetch the task and reassign it to trigger the event-listener
-            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             assertNotNull(task);
             taskService.setAssignee(task.getId(), "kermit");
 
@@ -52,7 +53,7 @@ public class MessageThrowingEventListenerTest extends PluggableFlowableTestCase 
             assertNotNull(task);
             assertEquals("kermit", task.getAssignee());
 
-            Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("boundaryTask").singleResult();
+            org.flowable.task.api.Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("boundaryTask").singleResult();
             assertNotNull(boundaryTask);
 
         } finally {
@@ -60,13 +61,14 @@ public class MessageThrowingEventListenerTest extends PluggableFlowableTestCase 
         }
     }
 
+    @Test
     @Deployment
     public void testThrowMessageDefinedInProcessDefinition() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testMessage");
         assertNotNull(processInstance);
 
         // Fetch the task and re-assign it to trigger the event-listener
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
         taskService.setAssignee(task.getId(), "kermit");
 
@@ -76,10 +78,11 @@ public class MessageThrowingEventListenerTest extends PluggableFlowableTestCase 
         assertNotNull(task);
         assertEquals("kermit", task.getAssignee());
 
-        Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("boundaryTask").singleResult();
+        org.flowable.task.api.Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("boundaryTask").singleResult();
         assertNotNull(boundaryTask);
     }
 
+    @Test
     @Deployment
     public void testThrowMessageInterrupting() throws Exception {
         MessageThrowingEventListener listener = null;
@@ -93,7 +96,7 @@ public class MessageThrowingEventListenerTest extends PluggableFlowableTestCase 
             assertNotNull(processInstance);
 
             // Fetch the task and reassign it to trigger the event-listener
-            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             assertNotNull(task);
             taskService.setAssignee(task.getId(), "kermit");
 
@@ -102,10 +105,10 @@ public class MessageThrowingEventListenerTest extends PluggableFlowableTestCase 
             task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subTask").singleResult();
             assertNull(task);
 
-            Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("boundaryTask").singleResult();
+            org.flowable.task.api.Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("boundaryTask").singleResult();
             assertNotNull(boundaryTask);
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
             
         } finally {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);

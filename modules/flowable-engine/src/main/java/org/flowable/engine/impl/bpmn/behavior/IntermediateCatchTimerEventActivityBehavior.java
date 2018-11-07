@@ -17,14 +17,14 @@ import java.util.List;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.history.DeleteReason;
-import org.flowable.engine.impl.asyncexecutor.JobManager;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntityManager;
-import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.TimerUtil;
+import org.flowable.job.service.JobService;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 
 public class IntermediateCatchTimerEventActivityBehavior extends IntermediateCatchEventActivityBehavior {
 
@@ -38,24 +38,22 @@ public class IntermediateCatchTimerEventActivityBehavior extends IntermediateCat
 
     @Override
     public void execute(DelegateExecution execution) {
-        JobManager jobManager = CommandContextUtil.getJobManager();
-
         // end date should be ignored for intermediate timer events.
-        TimerJobEntity timerJob = jobManager.createTimerJob(timerEventDefinition, false, (ExecutionEntity) execution, TriggerTimerEventJobHandler.TYPE,
+        TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, false, (ExecutionEntity) execution, TriggerTimerEventJobHandler.TYPE,
                 TimerEventHandler.createConfiguration(execution.getCurrentActivityId(), null, timerEventDefinition.getCalendarName()));
 
         if (timerJob != null) {
-            jobManager.scheduleTimerJob(timerJob);
+            CommandContextUtil.getTimerJobService().scheduleTimerJob(timerJob);
         }
     }
 
     @Override
     public void eventCancelledByEventGateway(DelegateExecution execution) {
-        JobEntityManager jobEntityManager = CommandContextUtil.getJobEntityManager();
-        List<JobEntity> jobEntities = jobEntityManager.findJobsByExecutionId(execution.getId());
+        JobService jobService = CommandContextUtil.getJobService();
+        List<JobEntity> jobEntities = jobService.findJobsByExecutionId(execution.getId());
 
         for (JobEntity jobEntity : jobEntities) { // Should be only one
-            jobEntityManager.delete(jobEntity);
+            jobService.deleteJob(jobEntity);
         }
 
         CommandContextUtil.getExecutionEntityManager().deleteExecutionAndRelatedData((ExecutionEntity) execution,

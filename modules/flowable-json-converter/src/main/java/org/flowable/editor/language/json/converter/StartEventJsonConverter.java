@@ -57,6 +57,7 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
         convertersToJsonMap.put(StartEvent.class, StartEventJsonConverter.class);
     }
 
+    @Override
     protected String getStencilId(BaseElement baseElement) {
         Event event = (Event) baseElement;
         if (event.getEventDefinitions().size() > 0) {
@@ -74,6 +75,7 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
         return STENCIL_EVENT_START_NONE;
     }
 
+    @Override
     protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
         StartEvent startEvent = (StartEvent) baseElement;
         if (StringUtils.isNotEmpty(startEvent.getInitiator())) {
@@ -104,6 +106,7 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
         addEventProperties(startEvent, propertiesNode);
     }
 
+    @Override
     protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
         StartEvent startEvent = new StartEvent();
         startEvent.setInitiator(getPropertyValueAsString(PROPERTY_NONE_STARTEVENT_INITIATOR, elementNode));

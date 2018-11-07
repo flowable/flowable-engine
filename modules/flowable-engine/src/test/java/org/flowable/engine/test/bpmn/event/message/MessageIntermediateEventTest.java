@@ -22,14 +22,15 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
  */
 public class MessageIntermediateEventTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testSingleIntermediateMessageEvent() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
@@ -54,12 +55,13 @@ public class MessageIntermediateEventTest extends PluggableFlowableTestCase {
 
         runtimeService.messageEventReceived(messageName, execution.getId());
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
         taskService.complete(task.getId());
 
     }
 
+    @Test
     @Deployment
     public void testSingleIntermediateMessageExpressionEvent() {
         Map<String, Object> variableMap = new HashMap<>();
@@ -77,11 +79,12 @@ public class MessageIntermediateEventTest extends PluggableFlowableTestCase {
 
         runtimeService.messageEventReceived(messageName, execution.getId());
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
         taskService.complete(task.getId());
     }
 
+    @Test
     @Deployment
     public void testConcurrentIntermediateMessageEvent() {
 
@@ -101,7 +104,7 @@ public class MessageIntermediateEventTest extends PluggableFlowableTestCase {
 
         runtimeService.messageEventReceived(messageName, executions.get(0).getId());
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNull(task);
 
         runtimeService.messageEventReceived(messageName, executions.get(1).getId());
@@ -112,6 +115,7 @@ public class MessageIntermediateEventTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
     }
 
+    @Test
     @Deployment
     public void testAsyncTriggeredMessageEvent() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");

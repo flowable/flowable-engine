@@ -15,12 +15,12 @@ package org.flowable.crystalball.simulator.delegate.event.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.crystalball.simulator.SimulationEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.task.Task;
+import org.flowable.task.api.Task;
 
 /**
  * @author martin.grofcik
@@ -40,7 +40,7 @@ public class UserTaskCompleteTransformer extends Flowable2SimulationEventFunctio
         if (FlowableEngineEventType.TASK_COMPLETED == event.getType()) {
             Task task = (Task) ((FlowableEntityEvent) event).getEntity();
 
-            Map<String, Object> properties = new HashMap<String, Object>();
+            Map<String, Object> properties = new HashMap<>();
             properties.put("taskId", task.getId());
             properties.put(TASK_DEFINITION_KEY, task.getTaskDefinitionKey());
             properties.put(PROCESS_INSTANCE_ID, task.getProcessInstanceId());

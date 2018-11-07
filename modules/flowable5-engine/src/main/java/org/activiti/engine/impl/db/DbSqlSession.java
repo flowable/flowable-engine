@@ -51,9 +51,9 @@ import org.activiti.engine.impl.interceptor.Session;
 import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.activiti.engine.impl.variable.DeserializedObject;
 import org.apache.ibatis.session.SqlSession;
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.variable.service.event.FlowableVariableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.variable.api.event.FlowableVariableEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,10 +71,10 @@ public class DbSqlSession implements Session {
 
     protected SqlSession sqlSession;
     protected DbSqlSessionFactory dbSqlSessionFactory;
-    protected Map<Class<? extends PersistentObject>, List<PersistentObject>> insertedObjects = new HashMap<Class<? extends PersistentObject>, List<PersistentObject>>();
-    protected Map<Class<?>, Map<String, CachedObject>> cachedObjects = new HashMap<Class<?>, Map<String, CachedObject>>();
-    protected List<DeleteOperation> deleteOperations = new ArrayList<DeleteOperation>();
-    protected List<DeserializedObject> deserializedObjects = new ArrayList<DeserializedObject>();
+    protected Map<Class<? extends PersistentObject>, List<PersistentObject>> insertedObjects = new HashMap<>();
+    protected Map<Class<?>, Map<String, CachedObject>> cachedObjects = new HashMap<>();
+    protected List<DeleteOperation> deleteOperations = new ArrayList<>();
+    protected List<DeserializedObject> deserializedObjects = new ArrayList<>();
     protected String connectionMetadataDefaultCatalog;
     protected String connectionMetadataDefaultSchema;
 
@@ -104,7 +104,7 @@ public class DbSqlSession implements Session {
 
         Class<? extends PersistentObject> clazz = persistentObject.getClass();
         if (!insertedObjects.containsKey(clazz)) {
-            insertedObjects.put(clazz, new ArrayList<PersistentObject>());
+            insertedObjects.put(clazz, new ArrayList<>());
         }
 
         insertedObjects.get(clazz).add(persistentObject);
@@ -156,7 +156,7 @@ public class DbSqlSession implements Session {
 
     /**
      * Use this {@link DeleteOperation} to execute a dedicated delete statement. It is important to note there won't be any optimistic locking checks done for these kind of delete operations!
-     *
+     * <p>
      * For example, a usage of this operation would be to delete all variables for a certain execution, when that certain execution is removed. The optimistic locking happens on the execution, but the
      * variables can be removed by a simple 'delete from var_table where execution_id is xxx'. It could very well be there are no variables, which would also work with this query, but not with the
      * regular {@link CheckedDeleteOperation}.
@@ -259,7 +259,7 @@ public class DbSqlSession implements Session {
     public class BulkCheckedDeleteOperation implements DeleteOperation {
 
         protected Class<? extends PersistentObject> persistentObjectClass;
-        protected List<PersistentObject> persistentObjects = new ArrayList<PersistentObject>();
+        protected List<PersistentObject> persistentObjects = new ArrayList<>();
 
         public BulkCheckedDeleteOperation(Class<? extends PersistentObject> persistentObjectClass) {
             this.persistentObjectClass = persistentObjectClass;
@@ -311,6 +311,7 @@ public class DbSqlSession implements Session {
             }
         }
 
+        @Override
         public Class<? extends PersistentObject> getPersistentObjectClass() {
             return persistentObjectClass;
         }
@@ -336,7 +337,7 @@ public class DbSqlSession implements Session {
 
     // select ///////////////////////////////////////////////////////////////////
 
-    @SuppressWarnings({ "rawtypes" })
+    @SuppressWarnings({"rawtypes"})
     public List selectList(String statement) {
         return selectList(statement, null, 0, Integer.MAX_VALUE);
     }
@@ -374,7 +375,7 @@ public class DbSqlSession implements Session {
         return selectListWithRawParameter(statement, parameter, parameter.getFirstResult(), parameter.getMaxResults());
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public List selectListWithRawParameter(String statement, Object parameter, int firstResult, int maxResults) {
         statement = dbSqlSessionFactory.mapStatement(statement);
         if (firstResult == -1 || maxResults == -1) {
@@ -384,7 +385,7 @@ public class DbSqlSession implements Session {
         return filterLoadedObjects(loadedObjects);
     }
 
-    @SuppressWarnings({ "rawtypes" })
+    @SuppressWarnings({"rawtypes"})
     public List selectListWithRawParameterWithoutFilter(String statement, Object parameter, int firstResult, int maxResults) {
         statement = dbSqlSessionFactory.mapStatement(statement);
         if (firstResult == -1 || maxResults == -1) {
@@ -430,7 +431,7 @@ public class DbSqlSession implements Session {
             return loadedObjects;
         }
 
-        List<PersistentObject> filteredObjects = new ArrayList<PersistentObject>(loadedObjects.size());
+        List<PersistentObject> filteredObjects = new ArrayList<>(loadedObjects.size());
         for (Object loadedObject : loadedObjects) {
             PersistentObject cachedPersistentObject = cacheFilter((PersistentObject) loadedObject);
             filteredObjects.add(cachedPersistentObject);
@@ -441,7 +442,7 @@ public class DbSqlSession implements Session {
     protected CachedObject cachePut(PersistentObject persistentObject, boolean storeState) {
         Map<String, CachedObject> classCache = cachedObjects.get(persistentObject.getClass());
         if (classCache == null) {
-            classCache = new HashMap<String, CachedObject>();
+            classCache = new HashMap<>();
             cachedObjects.put(persistentObject.getClass(), classCache);
         }
         CachedObject cachedObject = new CachedObject(persistentObject, storeState);
@@ -487,7 +488,7 @@ public class DbSqlSession implements Session {
     public <T> List<T> findInCache(Class<T> entityClass) {
         Map<String, CachedObject> classCache = cachedObjects.get(entityClass);
         if (classCache != null) {
-            List<T> entities = new ArrayList<T>(classCache.size());
+            List<T> entities = new ArrayList<>(classCache.size());
             for (CachedObject cachedObject : classCache.values()) {
                 entities.add((T) cachedObject.getPersistentObject());
             }
@@ -567,9 +568,9 @@ public class DbSqlSession implements Session {
      * Clears all deleted and inserted objects from the cache, and removes inserts and deletes that cancel each other.
      */
     protected List<DeleteOperation> removeUnnecessaryOperations() {
-        List<DeleteOperation> removedDeleteOperations = new ArrayList<DeleteOperation>();
+        List<DeleteOperation> removedDeleteOperations = new ArrayList<>();
 
-        for (Iterator<DeleteOperation> deleteIterator = deleteOperations.iterator(); deleteIterator.hasNext();) {
+        for (Iterator<DeleteOperation> deleteIterator = deleteOperations.iterator(); deleteIterator.hasNext(); ) {
 
             DeleteOperation deleteOperation = deleteIterator.next();
             Class<? extends PersistentObject> deletedPersistentObjectClass = deleteOperation.getPersistentObjectClass();
@@ -577,7 +578,7 @@ public class DbSqlSession implements Session {
             List<PersistentObject> insertedObjectsOfSameClass = insertedObjects.get(deletedPersistentObjectClass);
             if (insertedObjectsOfSameClass != null && insertedObjectsOfSameClass.size() > 0) {
 
-                for (Iterator<PersistentObject> insertIterator = insertedObjectsOfSameClass.iterator(); insertIterator.hasNext();) {
+                for (Iterator<PersistentObject> insertIterator = insertedObjectsOfSameClass.iterator(); insertIterator.hasNext(); ) {
                     PersistentObject insertedObject = insertIterator.next();
 
                     // if the deleted object is inserted,
@@ -685,7 +686,7 @@ public class DbSqlSession implements Session {
     }
 
     public List<PersistentObject> getUpdatedObjects() {
-        List<PersistentObject> updatedObjects = new ArrayList<PersistentObject>();
+        List<PersistentObject> updatedObjects = new ArrayList<>();
         for (Class<?> clazz : cachedObjects.keySet()) {
 
             Map<String, CachedObject> classCache = cachedObjects.get(clazz);
@@ -719,7 +720,7 @@ public class DbSqlSession implements Session {
     }
 
     public <T extends PersistentObject> List<T> pruneDeletedEntities(List<T> listToPrune) {
-        List<T> prunedList = new ArrayList<T>(listToPrune);
+        List<T> prunedList = new ArrayList<>(listToPrune);
         for (T potentiallyDeleted : listToPrune) {
             for (DeleteOperation deleteOperation : deleteOperations) {
 
@@ -968,7 +969,7 @@ public class DbSqlSession implements Session {
         return (String) sqlSession.selectOne(selectSchemaVersionStatement);
     }
 
-    public static String[] JDBC_METADATA_TABLE_TYPES = { "TABLE" };
+    public static String[] JDBC_METADATA_TABLE_TYPES = {"TABLE"};
 
     public boolean isEngineTablePresent() {
         return isTablePresent("ACT_RU_EXECUTION");
@@ -1034,7 +1035,7 @@ public class DbSqlSession implements Session {
             Double.parseDouble(cleanString); // try to parse it, to see if it is really a number
             return cleanString;
         } catch (NumberFormatException nfe) {
-            throw new ActivitiException("Illegal format for version: " + versionString);
+            throw new ActivitiException("Illegal format for version: " + versionString, nfe);
         }
     }
 

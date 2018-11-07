@@ -23,10 +23,12 @@ import org.flowable.bpmn.model.ExclusiveGateway;
  */
 public class ExclusiveGatewayParseHandler extends AbstractActivityBpmnParseHandler<ExclusiveGateway> {
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return ExclusiveGateway.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, ExclusiveGateway gateway) {
         ActivityImpl activity = createActivityOnCurrentScope(bpmnParse, gateway, BpmnXMLConstants.ELEMENT_GATEWAY_EXCLUSIVE);
 

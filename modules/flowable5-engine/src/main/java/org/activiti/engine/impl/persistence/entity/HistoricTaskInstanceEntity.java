@@ -79,8 +79,9 @@ public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity impl
 
     // persistence //////////////////////////////////////////////////////////////
 
+    @Override
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("name", name);
         persistentState.put("owner", owner);
         persistentState.put("assignee", assignee);
@@ -106,6 +107,7 @@ public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity impl
     }
 
     // getters and setters //////////////////////////////////////////////////////
+    @Override
     public String getExecutionId() {
         return executionId;
     }
@@ -114,6 +116,7 @@ public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity impl
         this.executionId = executionId;
     }
 
+    @Override
     public String getName() {
         if (localizedName != null && localizedName.length() > 0) {
             return localizedName;
@@ -126,10 +129,12 @@ public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity impl
         this.name = name;
     }
 
+    @Override
     public void setLocalizedName(String name) {
         this.localizedName = name;
     }
 
+    @Override
     public String getDescription() {
         if (localizedDescription != null && localizedDescription.length() > 0) {
             return localizedDescription;
@@ -142,10 +147,12 @@ public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity impl
         this.description = description;
     }
 
+    @Override
     public void setLocalizedDescription(String description) {
         this.localizedDescription = description;
     }
 
+    @Override
     public String getAssignee() {
         return assignee;
     }
@@ -154,6 +161,7 @@ public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity impl
         this.assignee = assignee;
     }
 
+    @Override
     public String getTaskDefinitionKey() {
         return taskDefinitionKey;
     }
@@ -167,6 +175,7 @@ public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity impl
         return getStartTime(); // For backwards compatible reason implemented with createTime and startTime
     }
 
+    @Override
     public String getFormKey() {
         return formKey;
     }
@@ -175,6 +184,7 @@ public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity impl
         this.formKey = formKey;
     }
 
+    @Override
     public int getPriority() {
         return priority;
     }
@@ -183,6 +193,7 @@ public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity impl
         this.priority = priority;
     }
 
+    @Override
     public Date getDueDate() {
         return dueDate;
     }
@@ -191,6 +202,7 @@ public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity impl
         this.dueDate = dueDate;
     }
 
+    @Override
     public String getCategory() {
         return category;
     }
@@ -199,6 +211,7 @@ public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity impl
         this.category = category;
     }
 
+    @Override
     public String getOwner() {
         return owner;
     }
@@ -207,6 +220,7 @@ public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity impl
         this.owner = owner;
     }
 
+    @Override
     public String getParentTaskId() {
         return parentTaskId;
     }
@@ -215,6 +229,7 @@ public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity impl
         this.parentTaskId = parentTaskId;
     }
 
+    @Override
     public Date getClaimTime() {
         return claimTime;
     }
@@ -223,6 +238,7 @@ public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity impl
         this.claimTime = claimTime;
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
@@ -231,10 +247,12 @@ public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity impl
         this.tenantId = tenantId;
     }
 
+    @Override
     public Date getTime() {
         return getStartTime();
     }
 
+    @Override
     public Long getWorkTimeInMillis() {
         if (endTime == null || claimTime == null) {
             return null;
@@ -242,8 +260,9 @@ public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity impl
         return endTime.getTime() - claimTime.getTime();
     }
 
+    @Override
     public Map<String, Object> getTaskLocalVariables() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         if (queryVariables != null) {
             for (HistoricVariableInstanceEntity variableInstance : queryVariables) {
                 if (variableInstance.getId() != null && variableInstance.getTaskId() != null) {
@@ -254,8 +273,9 @@ public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity impl
         return variables;
     }
 
+    @Override
     public Map<String, Object> getProcessVariables() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         if (queryVariables != null) {
             for (HistoricVariableInstanceEntity variableInstance : queryVariables) {
                 if (variableInstance.getId() != null && variableInstance.getTaskId() == null) {

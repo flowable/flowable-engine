@@ -16,12 +16,11 @@ package org.activiti.engine.test.bpmn.gateway;
 import java.util.Date;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.runtime.Clock;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -46,7 +45,7 @@ public class EventBasedGatewayTest extends PluggableFlowableTestCase {
         assertEquals(1, runtimeService.createProcessInstanceQuery().count());
         assertEquals(0, managementService.createTimerJobQuery().count());
 
-        Task task = taskService.createTaskQuery()
+        org.flowable.task.api.Task task = taskService.createTaskQuery()
                 .taskName("afterSignal")
                 .singleResult();
 
@@ -79,7 +78,7 @@ public class EventBasedGatewayTest extends PluggableFlowableTestCase {
             assertEquals(1, runtimeService.createProcessInstanceQuery().count());
             assertEquals(0, managementService.createTimerJobQuery().count());
 
-            Task task = taskService.createTaskQuery()
+            org.flowable.task.api.Task task = taskService.createTaskQuery()
                     .taskName("afterTimer")
                     .singleResult();
 
@@ -123,7 +122,7 @@ public class EventBasedGatewayTest extends PluggableFlowableTestCase {
             assertEquals(1, runtimeService.createProcessInstanceQuery().count());
             assertEquals(0, managementService.createTimerJobQuery().count());
 
-            Task task = taskService.createTaskQuery()
+            org.flowable.task.api.Task task = taskService.createTaskQuery()
                     .taskName("afterMessage")
                     .singleResult();
 

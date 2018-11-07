@@ -35,6 +35,7 @@ public class GetAttachmentContentCmd implements Command<InputStream>, Serializab
         this.attachmentId = attachmentId;
     }
 
+    @Override
     public InputStream execute(CommandContext commandContext) {
         DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
         AttachmentEntity attachment = dbSqlSession.selectById(AttachmentEntity.class, attachmentId);

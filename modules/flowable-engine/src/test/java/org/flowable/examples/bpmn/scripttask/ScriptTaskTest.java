@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,18 +12,17 @@
  */
 package org.flowable.examples.bpmn.scripttask;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import groovy.lang.MissingPropertyException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import groovy.lang.MissingPropertyException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -31,6 +30,7 @@ import groovy.lang.MissingPropertyException;
  */
 public class ScriptTaskTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testSetScriptResultToProcessVariable() {
         Map<String, Object> variables = new HashMap<>();
@@ -43,6 +43,7 @@ public class ScriptTaskTest extends PluggableFlowableTestCase {
         assertEquals(pi.getId(), runtimeService.getVariable(pi.getId(), "newProcessVariableName"));
     }
 
+    @Test
     @Deployment
     public void testFailingScript() {
         Exception expectedException = null;
@@ -56,6 +57,7 @@ public class ScriptTaskTest extends PluggableFlowableTestCase {
         verifyExceptionInStacktrace(expectedException, MissingPropertyException.class);
     }
 
+    @Test
     @Deployment
     public void testExceptionThrownInScript() {
         Exception expectedException = null;
@@ -68,6 +70,7 @@ public class ScriptTaskTest extends PluggableFlowableTestCase {
         verifyExceptionInStacktrace(expectedException, IllegalStateException.class);
     }
 
+    @Test
     @Deployment
     public void testAutoStoreVariables() {
         // The first script should NOT store anything as 'autoStoreVariables' is set to false
@@ -79,14 +82,57 @@ public class ScriptTaskTest extends PluggableFlowableTestCase {
         assertEquals(42, ((Number) runtimeService.getVariable(id, "sum")).intValue());
     }
 
+    @Test
     public void testNoScriptProvided() {
         try {
-            repositoryService.createDeployment().addClasspathResource("org/flowable/examples/bpmn/scripttask/ScriptTaskTest.testNoScriptProvided.bpmn20.xml").deploy();
+            deploymentIdsForAutoCleanup.add(
+                repositoryService.createDeployment().addClasspathResource("org/flowable/examples/bpmn/scripttask/ScriptTaskTest.testNoScriptProvided.bpmn20.xml").deploy().getId()
+            );
+            fail("Deployment should not have worked");
         } catch (FlowableException e) {
             assertTextPresent("No script provided", e.getMessage());
         }
     }
 
+    @Test
+    @Deployment
+    public void testErrorInScript() {
+        try {
+            runtimeService.startProcessInstanceByKey("testErrorInScript");
+            fail("Starting process should result in error in script");
+        } catch (FlowableException e) {
+            assertTextPresent("Error in Script", e.getMessage());
+        }
+    }
+
+    @Test
+    @Deployment
+    public void testNoErrorInScript() {
+        boolean noError = true;
+        try {
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("scriptVar", "1212");
+            runtimeService.startProcessInstanceByKey("testNoErrorInScript", variables);
+        } catch (FlowableException e) {
+            noError = false;
+        }
+        assertTrue(noError);
+    }
+
+    @Test
+    @Deployment
+    public void testSetScriptResultToProcessVariableWithoutFormat() {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("echo", "hello");
+        variables.put("existingProcessVariableName", "one");
+
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("setScriptResultToProcessVariable", variables);
+
+        assertEquals("hello", runtimeService.getVariable(pi.getId(), "existingProcessVariableName"));
+        assertEquals(pi.getId(), runtimeService.getVariable(pi.getId(), "newProcessVariableName"));
+    }
+
+    @Test
     @Deployment
     public void testDynamicScript() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testDynamicScript", CollectionUtil.map("a", 20, "b", 22));

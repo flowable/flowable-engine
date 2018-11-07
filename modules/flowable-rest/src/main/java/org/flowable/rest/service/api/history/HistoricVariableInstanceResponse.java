@@ -13,6 +13,7 @@
 
 package org.flowable.rest.service.api.history;
 
+import io.swagger.annotations.ApiModelProperty;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 
 /**
@@ -26,6 +27,7 @@ public class HistoricVariableInstanceResponse {
     protected String taskId;
     protected RestVariable variable;
 
+    @ApiModelProperty(example = "14")
     public String getId() {
         return id;
     }
@@ -34,6 +36,7 @@ public class HistoricVariableInstanceResponse {
         this.id = id;
     }
 
+    @ApiModelProperty(example = "5")
     public String getProcessInstanceId() {
         return processInstanceId;
     }
@@ -42,6 +45,7 @@ public class HistoricVariableInstanceResponse {
         this.processInstanceId = processInstanceId;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/history/historic-process-instances/5")
     public String getProcessInstanceUrl() {
         return processInstanceUrl;
     }
@@ -50,6 +54,7 @@ public class HistoricVariableInstanceResponse {
         this.processInstanceUrl = processInstanceUrl;
     }
 
+    @ApiModelProperty(example = "6")
     public String getTaskId() {
         return taskId;
     }

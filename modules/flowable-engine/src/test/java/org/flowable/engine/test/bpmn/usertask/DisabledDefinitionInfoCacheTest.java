@@ -16,40 +16,30 @@ package org.flowable.engine.test.bpmn.usertask;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.test.AbstractFlowableTestCase;
+import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
  */
-public class DisabledDefinitionInfoCacheTest extends AbstractFlowableTestCase {
+public class DisabledDefinitionInfoCacheTest extends ResourceFlowableTestCase {
 
-    protected static ProcessEngine cachedProcessEngine;
-
-    protected void initializeProcessEngine() {
-        if (cachedProcessEngine == null) {
-            ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-                    .createProcessEngineConfigurationFromResource("org/flowable/engine/test/bpmn/usertask/flowable.cfg.xml");
-
-            cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
-        }
-        processEngine = cachedProcessEngine;
+    public DisabledDefinitionInfoCacheTest() {
+        super("org/flowable/engine/test/bpmn/usertask/flowable.cfg.xml");
     }
 
+    @Test
     @Deployment
     public void testChangeFormKey() {
         // first test without changing the form key
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask");
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("test", task.getFormKey());
         taskService.complete(task.getId());
 
@@ -68,6 +58,7 @@ public class DisabledDefinitionInfoCacheTest extends AbstractFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment
     public void testChangeClassName() {
         // first test without changing the class name
@@ -76,7 +67,7 @@ public class DisabledDefinitionInfoCacheTest extends AbstractFlowableTestCase {
         varMap.put("count2", 0);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
         assertEquals(1, runtimeService.getVariable(processInstance.getId(), "count"));

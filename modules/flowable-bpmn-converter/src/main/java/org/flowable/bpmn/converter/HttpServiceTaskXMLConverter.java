@@ -20,6 +20,7 @@ import org.flowable.bpmn.model.HttpServiceTask;
  */
 public class HttpServiceTaskXMLConverter extends ServiceTaskXMLConverter {
 
+    @Override
     public Class<? extends BaseElement> getBpmnElementType() {
         return HttpServiceTask.class;
     }

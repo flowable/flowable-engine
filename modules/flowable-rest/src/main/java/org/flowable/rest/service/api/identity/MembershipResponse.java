@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.identity;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * @author Frederik Heremans
  */
@@ -25,10 +27,12 @@ public class MembershipResponse extends MembershipRequest {
         this.groupId = groupId;
     }
 
+    @ApiModelProperty(example = "sales")
     public String getGroupId() {
         return groupId;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/identity/groups/sales/members/kermit")
     public String getUrl() {
         return url;
     }

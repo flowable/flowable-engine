@@ -13,11 +13,12 @@
 
 package org.flowable.engine.test.transactions;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
@@ -28,11 +29,13 @@ public class TransactionRollbackTest extends PluggableFlowableTestCase {
 
         private static final long serialVersionUID = 1L;
 
+        @Override
         public void execute(DelegateExecution execution) {
             throw new FlowableException("Buzzz");
         }
     }
 
+    @Test
     @Deployment
     public void testRollback() {
         try {
@@ -47,6 +50,7 @@ public class TransactionRollbackTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createExecutionQuery().count());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/transactions/trivial.bpmn20.xml", "org/flowable/engine/test/transactions/rollbackAfterSubProcess.bpmn20.xml" })
     public void testRollbackAfterSubProcess() {
         try {

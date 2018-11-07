@@ -14,17 +14,17 @@ package org.flowable.crystalball.simulator;
 
 import java.util.Stack;
 
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.common.runtime.Clock;
-import org.flowable.engine.delegate.VariableScope;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * Context in which simulation is run. It contains references to process engine, event calendar.
- * 
+ *
  * @author martin.grofcik
  */
 public abstract class SimulationRunContext {
@@ -32,22 +32,22 @@ public abstract class SimulationRunContext {
     //
     // Process engine on which simulation will be executed
     //
-    protected static ThreadLocal<Stack<ProcessEngine>> processEngineThreadLocal = new ThreadLocal<Stack<ProcessEngine>>();
+    protected static ThreadLocal<Stack<ProcessEngine>> processEngineThreadLocal = new ThreadLocal<>();
 
     //
     // Simulation objects
     //
-    protected static ThreadLocal<Stack<EventCalendar>> eventCalendarThreadLocal = new ThreadLocal<Stack<EventCalendar>>();
+    protected static ThreadLocal<Stack<EventCalendar>> eventCalendarThreadLocal = new ThreadLocal<>();
 
     //
     // Simulation run Id
     //
-    protected static ThreadLocal<Stack<String>> simulationRunIdThreadLocal = new ThreadLocal<Stack<String>>();
+    protected static ThreadLocal<Stack<String>> simulationRunIdThreadLocal = new ThreadLocal<>();
 
     //
     // Variable scope used for getting/setting variables to the simulationManager
     //
-    protected static ThreadLocal<Stack<VariableScope>> executionThreadLocal = new ThreadLocal<Stack<VariableScope>>();
+    protected static ThreadLocal<Stack<VariableScope>> executionThreadLocal = new ThreadLocal<>();
 
     public static RuntimeService getRuntimeService() {
         Stack<ProcessEngine> stack = getStack(processEngineThreadLocal);
@@ -140,7 +140,7 @@ public abstract class SimulationRunContext {
     protected static <T> Stack<T> getStack(ThreadLocal<Stack<T>> threadLocal) {
         Stack<T> stack = threadLocal.get();
         if (stack == null) {
-            stack = new Stack<T>();
+            stack = new Stack<>();
             threadLocal.set(stack);
         }
         return stack;

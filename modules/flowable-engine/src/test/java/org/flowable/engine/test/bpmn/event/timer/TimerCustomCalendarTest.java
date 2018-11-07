@@ -20,13 +20,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.calendar.BusinessCalendar;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
+import org.junit.jupiter.api.Test;
 
 /**
  * testing custom calendar for timer definitions Created by martin.grofcik
@@ -37,6 +38,7 @@ public class TimerCustomCalendarTest extends ResourceFlowableTestCase {
         super("org/flowable/engine/test/bpmn/event/timer/TimerCustomCalendarTest.flowable.cfg.xml");
     }
 
+    @Test
     @Deployment
     public void testCycleTimer() {
         List<Job> jobs = this.managementService.createTimerJobQuery().list();
@@ -59,6 +61,7 @@ public class TimerCustomCalendarTest extends ResourceFlowableTestCase {
         assertThat("There must be no job.", jobs.isEmpty());
     }
 
+    @Test
     @Deployment
     public void testCustomDurationTimerCalendar() {
         ProcessInstance processInstance = this.runtimeService.startProcessInstanceByKey("testCustomDurationCalendar");
@@ -76,6 +79,7 @@ public class TimerCustomCalendarTest extends ResourceFlowableTestCase {
         runtimeService.trigger(execution.getId());
     }
 
+    @Test
     @Deployment
     public void testInvalidDurationTimerCalendar() {
         try {
@@ -86,6 +90,7 @@ public class TimerCustomCalendarTest extends ResourceFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testBoundaryTimer() {
         this.runtimeService.startProcessInstanceByKey("testBoundaryTimer");

@@ -69,6 +69,7 @@ public class FlowNodeMultipleOutgoingFlowsConverterTest extends AbstractConverte
         assertEquals("parallel2", sequenceFlows.get(2).getTargetRef());
     }
 
+    @Override
     protected String getResource() {
         return "test.flownodemultipleoutgoingflowsmodel.json";
     }

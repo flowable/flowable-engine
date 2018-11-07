@@ -34,8 +34,8 @@ import org.activiti.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
 import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.task.IdentityLinkType;
-import org.flowable.engine.delegate.Expression;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.repository.ProcessDefinition;
 
 /**
@@ -62,9 +62,9 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     protected boolean hasStartFormKey;
     protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
     protected boolean isIdentityLinksInitialized;
-    protected List<IdentityLinkEntity> definitionIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
-    protected Set<Expression> candidateStarterUserIdExpressions = new HashSet<Expression>();
-    protected Set<Expression> candidateStarterGroupIdExpressions = new HashSet<Expression>();
+    protected List<IdentityLinkEntity> definitionIdentityLinkEntities = new ArrayList<>();
+    protected Set<Expression> candidateStarterUserIdExpressions = new HashSet<>();
+    protected Set<Expression> candidateStarterGroupIdExpressions = new HashSet<>();
 
     // Backwards compatibility
     protected String engineVersion;
@@ -86,7 +86,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
             processInstance = (ExecutionEntity) super.createProcessInstanceForInitial(initial);
         }
 
-        processInstance.setExecutions(new ArrayList<ExecutionEntity>());
+        processInstance.setExecutions(new ArrayList<>());
         processInstance.setProcessDefinition(processDefinition);
         // Do not initialize variable map (let it happen lazily)
 
@@ -133,6 +133,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
         return createProcessInstance(businessKey, null);
     }
 
+    @Override
     public ExecutionEntity createProcessInstance() {
         return createProcessInstance(null);
     }
@@ -181,23 +182,27 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
         return definitionIdentityLinkEntities;
     }
 
+    @Override
     public String toString() {
         return "ProcessDefinitionEntity[" + id + "]";
     }
 
     // getters and setters //////////////////////////////////////////////////////
 
+    @Override
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("suspensionState", this.suspensionState);
         persistentState.put("category", this.category);
         return persistentState;
     }
 
+    @Override
     public String getKey() {
         return key;
     }
 
+    @Override
     public void setKey(String key) {
         this.key = key;
     }
@@ -206,10 +211,12 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
         this.description = description;
     }
 
+    @Override
     public String getDescription() {
         return description;
     }
 
+    @Override
     public String getDeploymentId() {
         return deploymentId;
     }
@@ -218,6 +225,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
         this.deploymentId = deploymentId;
     }
 
+    @Override
     public int getVersion() {
         return version;
     }
@@ -226,10 +234,12 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
         this.version = version;
     }
 
+    @Override
     public void setId(String id) {
         this.id = id;
     }
 
+    @Override
     public String getResourceName() {
         return resourceName;
     }
@@ -237,7 +247,24 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     public void setResourceName(String resourceName) {
         this.resourceName = resourceName;
     }
+    
+    // only valid in Flowable 6
+    @Override
+    public String getDerivedFrom() {
+        return null;
+    }
 
+    @Override
+    public String getDerivedFromRoot() {
+        return null;
+    }
+
+    @Override
+    public int getDerivedVersion() {
+        return 0;
+    }
+
+    @Override
     public String getTenantId() {
         return tenantId;
     }
@@ -278,6 +305,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
         this.variables = variables;
     }
 
+    @Override
     public String getCategory() {
         return category;
     }
@@ -286,6 +314,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
         this.category = category;
     }
 
+    @Override
     public String getDiagramResourceName() {
         return diagramResourceName;
     }
@@ -294,6 +323,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
         this.diagramResourceName = diagramResourceName;
     }
 
+    @Override
     public boolean hasStartFormKey() {
         return hasStartFormKey;
     }
@@ -314,6 +344,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
         return isGraphicalNotationDefined;
     }
 
+    @Override
     public boolean hasGraphicalNotation() {
         return isGraphicalNotationDefined;
     }
@@ -322,14 +353,17 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
         this.isGraphicalNotationDefined = isGraphicalNotationDefined;
     }
 
+    @Override
     public int getRevision() {
         return revision;
     }
 
+    @Override
     public void setRevision(int revision) {
         this.revision = revision;
     }
 
+    @Override
     public int getRevisionNext() {
         return revision + 1;
     }
@@ -342,6 +376,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
         this.suspensionState = suspensionState;
     }
 
+    @Override
     public boolean isSuspended() {
         return suspensionState == SuspensionState.SUSPENDED.getStateCode();
     }
@@ -362,6 +397,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
         candidateStarterGroupIdExpressions.add(groupId);
     }
 
+    @Override
     public String getEngineVersion() {
         return engineVersion;
     }

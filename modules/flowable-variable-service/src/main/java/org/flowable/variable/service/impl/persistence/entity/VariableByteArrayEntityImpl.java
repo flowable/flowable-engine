@@ -16,14 +16,13 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 
 /**
  * @author Tom Baeyens
  * @author Marcus Klimstra (CGI)
  * @author Joram Barrez
  */
-public class VariableByteArrayEntityImpl extends AbstractEntity implements VariableByteArrayEntity, Serializable {
+public class VariableByteArrayEntityImpl extends AbstractVariableServiceEntity implements VariableByteArrayEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -35,32 +34,39 @@ public class VariableByteArrayEntityImpl extends AbstractEntity implements Varia
 
     }
 
+    @Override
     public byte[] getBytes() {
         return bytes;
     }
 
+    @Override
     public Object getPersistentState() {
         return new PersistentState(name, bytes);
     }
 
     // getters and setters ////////////////////////////////////////////////////////
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public String getDeploymentId() {
         return deploymentId;
     }
 
+    @Override
     public void setDeploymentId(String deploymentId) {
         this.deploymentId = deploymentId;
     }
 
+    @Override
     public void setBytes(byte[] bytes) {
         this.bytes = bytes;
     }
@@ -82,6 +88,7 @@ public class VariableByteArrayEntityImpl extends AbstractEntity implements Varia
             this.bytes = bytes;
         }
 
+        @Override
         public boolean equals(Object obj) {
             if (obj instanceof PersistentState) {
                 PersistentState other = (PersistentState) obj;

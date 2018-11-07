@@ -12,7 +12,7 @@
  */
 package org.flowable.bpmn.converter.child;
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamReader;
@@ -21,7 +21,6 @@ import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 
 /**
@@ -29,10 +28,12 @@ import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
  */
 public class MultiInstanceParser extends BaseChildElementParser {
 
+    @Override
     public String getElementName() {
         return ELEMENT_MULTIINSTANCE;
     }
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
         if (!(parentElement instanceof Activity))
             return;
@@ -62,36 +63,23 @@ public class MultiInstanceParser extends BaseChildElementParser {
                     }
 
                 } else if (xtr.isStartElement() && ELEMENT_MULTIINSTANCE_CONDITION.equalsIgnoreCase(xtr.getLocalName())) {
-                	multiInstanceDef.setCompletionCondition(xtr.getElementText());
+                    multiInstanceDef.setCompletionCondition(xtr.getElementText());
 
                 } else if (xtr.isStartElement() && ELEMENT_EXTENSIONS.equalsIgnoreCase(xtr.getLocalName())) {
-                	// save all extension elements
-                	while (xtr.hasNext() && !(xtr.isEndElement() && ELEMENT_EXTENSIONS.equalsIgnoreCase(xtr.getLocalName()))) {
-                		xtr.next();
-                		if (xtr.isStartElement()) {
-                			ExtensionElement extensionElement = BpmnXMLUtil.parseExtensionElement(xtr);
-                			// advance to next child within extension elements
-                			multiInstanceDef.addExtensionElement(extensionElement);
-                			// collection is specified as a string value
-                            if (ELEMENT_MULTIINSTANCE_COLLECTION.equalsIgnoreCase(extensionElement.getName())) {
-                            	Map<String, List<ExtensionElement>> childElement = extensionElement.getChildElements();
-                            	if (childElement.containsKey(ELEMENT_MULTIINSTANCE_COLLECTION_STRING)) {
-                            		// it is a string value
-                                    multiInstanceDef.setCollectionString((childElement.get(ELEMENT_MULTIINSTANCE_COLLECTION_STRING).get(0)).getElementText());
-                            	} else if (childElement.containsKey(ELEMENT_MULTIINSTANCE_COLLECTION_EXPRESSION)) {
-                            		// it is an expression
-                                    multiInstanceDef.setInputDataItem((childElement.get(ELEMENT_MULTIINSTANCE_COLLECTION_EXPRESSION).get(0)).getElementText());
-                            	}
-                            }
-                		}
-                	}
+                    // parse extension elements
+                    // initialize collection element parser in case it exists
+                    Map<String, BaseChildElementParser> childParserMap = new HashMap<>();
+                    childParserMap.put(ELEMENT_MULTIINSTANCE_COLLECTION, new FlowableCollectionParser());
+                    BpmnXMLUtil.parseChildElements(ELEMENT_EXTENSIONS, multiInstanceDef, xtr, childParserMap, model);
+
                 } else if (xtr.isEndElement() && getElementName().equalsIgnoreCase(xtr.getLocalName())) {
-                	readyWithMultiInstance = true;
+                    readyWithMultiInstance = true;
                 }
             }
         } catch (Exception e) {
             LOGGER.warn("Error parsing multi instance definition", e);
         }
+
         ((Activity) parentElement).setLoopCharacteristics(multiInstanceDef);
     }
 }

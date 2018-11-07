@@ -17,12 +17,14 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class ReceiveTaskTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testWaitStateBehavior() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("receiveTask");

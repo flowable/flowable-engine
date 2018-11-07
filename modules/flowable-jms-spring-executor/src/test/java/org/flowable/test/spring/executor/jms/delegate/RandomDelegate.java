@@ -9,6 +9,7 @@ public class RandomDelegate implements JavaDelegate {
 
     private static Random random = new Random();
 
+    @Override
     public void execute(DelegateExecution delegateExecution) {
         Number number1 = (Number) delegateExecution.getVariable("input1");
         Number number2 = (Number) delegateExecution.getVariable("input2");

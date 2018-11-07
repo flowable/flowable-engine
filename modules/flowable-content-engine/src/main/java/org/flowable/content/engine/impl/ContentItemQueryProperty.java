@@ -16,7 +16,7 @@ package org.flowable.content.engine.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.common.engine.api.query.QueryProperty;
 
 /**
  * Contains the possible properties that can be used in a {@link ContentInstanceQuery}.
@@ -39,6 +39,7 @@ public class ContentItemQueryProperty implements QueryProperty {
         properties.put(name, this);
     }
 
+    @Override
     public String getName() {
         return name;
     }

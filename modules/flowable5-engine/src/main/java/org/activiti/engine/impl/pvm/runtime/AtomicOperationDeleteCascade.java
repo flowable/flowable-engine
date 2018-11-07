@@ -20,10 +20,12 @@ import java.util.List;
  */
 public class AtomicOperationDeleteCascade implements AtomicOperation {
 
+    @Override
     public boolean isAsync(InterpretableExecution execution) {
         return false;
     }
 
+    @Override
     public void execute(InterpretableExecution execution) {
         InterpretableExecution firstLeaf = findFirstLeaf(execution);
 

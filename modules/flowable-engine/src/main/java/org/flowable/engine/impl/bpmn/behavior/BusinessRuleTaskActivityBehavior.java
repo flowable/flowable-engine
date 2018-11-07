@@ -18,15 +18,15 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.drools.KnowledgeBase;
-import org.drools.runtime.StatefulKnowledgeSession;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.BusinessRuleTaskDelegate;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.impl.rules.RulesAgendaFilter;
 import org.flowable.engine.impl.rules.RulesHelper;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.kie.api.KieBase;
+import org.kie.api.runtime.KieSession;
 
 /**
  * Activity implementation of the BPMN 2.0 business rule task.
@@ -46,12 +46,13 @@ public class BusinessRuleTaskActivityBehavior extends TaskActivityBehavior imple
     public BusinessRuleTaskActivityBehavior() {
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
         ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(execution.getProcessDefinitionId());
         String deploymentId = processDefinition.getDeploymentId();
 
-        KnowledgeBase knowledgeBase = RulesHelper.findKnowledgeBaseByDeploymentId(deploymentId);
-        StatefulKnowledgeSession ksession = knowledgeBase.newStatefulKnowledgeSession();
+        KieBase knowledgeBase = RulesHelper.findKnowledgeBaseByDeploymentId(deploymentId);
+        KieSession ksession = knowledgeBase.newKieSession();
 
         if (variablesInputExpressions != null) {
             Iterator<Expression> itVariable = variablesInputExpressions.iterator();
@@ -75,7 +76,7 @@ public class BusinessRuleTaskActivityBehavior extends TaskActivityBehavior imple
             ksession.fireAllRules();
         }
 
-        Collection<Object> ruleOutputObjects = ksession.getObjects();
+        Collection<? extends Object> ruleOutputObjects = ksession.getObjects();
         if (ruleOutputObjects != null && !ruleOutputObjects.isEmpty()) {
             Collection<Object> outputVariables = new ArrayList<>();
             outputVariables.addAll(ruleOutputObjects);
@@ -85,18 +86,22 @@ public class BusinessRuleTaskActivityBehavior extends TaskActivityBehavior imple
         leave(execution);
     }
 
+    @Override
     public void addRuleVariableInputIdExpression(Expression inputId) {
         this.variablesInputExpressions.add(inputId);
     }
 
+    @Override
     public void addRuleIdExpression(Expression inputId) {
         this.rulesExpressions.add(inputId);
     }
 
+    @Override
     public void setExclude(boolean exclude) {
         this.exclude = exclude;
     }
 
+    @Override
     public void setResultVariable(String resultVariableName) {
         this.resultVariable = resultVariableName;
     }

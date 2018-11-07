@@ -15,10 +15,10 @@ package org.flowable.spring.executor.jms;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
-import org.flowable.engine.impl.asyncexecutor.AsyncRunnableExecutionExceptionHandler;
-import org.flowable.engine.impl.asyncexecutor.ExecuteAsyncRunnable;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.history.async.UnacquireAsyncHistoryJobExceptionHandler;
+import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.impl.asyncexecutor.AsyncRunnableExecutionExceptionHandler;
+import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnable;
+import org.flowable.job.service.impl.asyncexecutor.UnacquireAsyncHistoryJobExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,22 +26,21 @@ public class HistoryJobMessageListener implements javax.jms.MessageListener {
 
     private static final Logger logger = LoggerFactory.getLogger(HistoryJobMessageListener.class);
 
-    protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    protected JobServiceConfiguration jobServiceConfiguration;
     protected AsyncRunnableExecutionExceptionHandler exceptionHandler;
     
     public HistoryJobMessageListener() {
         this.exceptionHandler = new UnacquireAsyncHistoryJobExceptionHandler();
     }
 
+    @Override
     public void onMessage(final Message message) {
         try {
             if (message instanceof TextMessage) {
                 TextMessage textMessage = (TextMessage) message;
                 String jobId = textMessage.getText();
                 ExecuteAsyncRunnable executeAsyncRunnable = new ExecuteAsyncRunnable(jobId, 
-                        processEngineConfiguration, 
-                        processEngineConfiguration.getHistoryJobEntityManager(), 
-                        exceptionHandler);
+                                jobServiceConfiguration, jobServiceConfiguration.getHistoryJobEntityManager(), exceptionHandler);
                 executeAsyncRunnable.run();
             }
         } catch (Exception e) {
@@ -49,12 +48,12 @@ public class HistoryJobMessageListener implements javax.jms.MessageListener {
         }
     }
 
-    public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
-        return processEngineConfiguration;
+    public JobServiceConfiguration getJobServiceConfiguration() {
+        return jobServiceConfiguration;
     }
 
-    public void setProcessEngineConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        this.processEngineConfiguration = processEngineConfiguration;
+    public void setJobServiceConfiguration(JobServiceConfiguration jobServiceConfiguration) {
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
 }

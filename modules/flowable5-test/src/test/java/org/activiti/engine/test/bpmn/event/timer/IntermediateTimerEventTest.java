@@ -18,11 +18,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.runtime.TimerJobQuery;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
+import org.flowable.job.api.TimerJobQuery;
 
 public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
 
@@ -39,7 +38,7 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
 
         // After setting the clock to time '50minutes and 5 seconds', the second timer should fire
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((50 * 60 * 1000) + 5000)));
-        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(5000L, 200L);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(7000L, 200L);
 
         assertEquals(0, jobQuery.count());
         assertProcessEnded(pi.getProcessInstanceId());
@@ -52,9 +51,9 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
         processEngineConfiguration.getClock().setCurrentTime(testStartTime);
 
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("timerEventWithStartAndDuration");
-        List<Task> tasks = taskService.createTaskQuery().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertEquals(1, tasks.size());
-        Task task = tasks.get(0);
+        org.flowable.task.api.Task task = tasks.get(0);
         assertEquals("Task A", task.getName());
 
         TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());

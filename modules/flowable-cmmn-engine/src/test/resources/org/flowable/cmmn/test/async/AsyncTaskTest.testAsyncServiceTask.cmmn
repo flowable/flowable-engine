@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+  <case id="testAsyncServiceTask" name="testAsyncServiceTask" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="casePlanModel">
+      <planItem id="planItem1" name="Task before service task" definitionRef="sid-001F675B-E86D-4F6C-A70A-B14F866228E3"></planItem>
+      <planItem id="planItem2" name="Async service task" definitionRef="sid-3F947F0B-D6BE-4DF6-A7E6-920E5E2E78DC">
+        <entryCriterion id="sid-7CB7354C-BF7C-405B-828B-655C4940EB44" sentryRef="sentry1"></entryCriterion>
+      </planItem>
+      <planItem id="planItem3" name="Task after service task" definitionRef="sid-A1003ABB-CF0B-4377-BE7C-FABA753FF698">
+        <entryCriterion id="sid-6B62EEF5-7FB3-4F0E-B066-641487BF91D6" sentryRef="sentry2"></entryCriterion>
+      </planItem>
+      <sentry id="sentry1">
+        <planItemOnPart id="sentryOnPart1" sourceRef="planItem1">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <sentry id="sentry2">
+        <planItemOnPart id="sentryOnPart2" sourceRef="planItem1">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+        <planItemOnPart id="sentryOnPart3" sourceRef="planItem2">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <humanTask id="sid-001F675B-E86D-4F6C-A70A-B14F866228E3" name="Task before service task"></humanTask>
+      <task id="sid-3F947F0B-D6BE-4DF6-A7E6-920E5E2E78DC" name="Async service task" isBlocking="false" flowable:async="true" flowable:type="java" flowable:class="org.flowable.cmmn.test.delegate.TestJavaDelegate"></task>
+      <humanTask id="sid-A1003ABB-CF0B-4377-BE7C-FABA753FF698" name="Task after service task"></humanTask>
+    </casePlanModel>
+  </case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="CMMNDiagram_testAsyncServiceTask">
+      <cmmndi:CMMNShape id="CMMNShape_casePlanModel" cmmnElementRef="casePlanModel">
+        <dc:Bounds height="714.0" width="718.0" x="40.0" y="40.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+        <dc:Bounds height="80.0" width="100.0" x="165.0" y="210.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+        <dc:Bounds height="80.0" width="100.0" x="349.0" y="210.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_sid-7CB7354C-BF7C-405B-828B-655C4940EB44" cmmnElementRef="sid-7CB7354C-BF7C-405B-828B-655C4940EB44">
+        <dc:Bounds height="22.0" width="14.0" x="341.0201099556275" y="237.94886824650777"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem3" cmmnElementRef="planItem3">
+        <dc:Bounds height="80.0" width="100.0" x="510.0" y="345.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_sid-6B62EEF5-7FB3-4F0E-B066-641487BF91D6" cmmnElementRef="sid-6B62EEF5-7FB3-4F0E-B066-641487BF91D6">
+        <dc:Bounds height="22.0" width="14.0" x="502.0681234915329" y="375.1445365507521"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="CMMNEdge_sid-EA208EAC-92F0-4BAF-BA5B-066AE74932F5" cmmnElementRef="planItem1" targetCMMNElementRef="sid-7CB7354C-BF7C-405B-828B-655C4940EB44">
+        <di:waypoint x="265.0" y="249.6048974272225"></di:waypoint>
+        <di:waypoint x="341.05513388246544" y="249.00390584582456"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+      <cmmndi:CMMNEdge id="CMMNEdge_sid-93EAF1DF-9988-493F-A9F1-53B831C93E67" cmmnElementRef="planItem2" targetCMMNElementRef="sid-6B62EEF5-7FB3-4F0E-B066-641487BF91D6">
+        <di:waypoint x="399.0" y="290.0"></di:waypoint>
+        <di:waypoint x="399.0" y="386.1445365507521"></di:waypoint>
+        <di:waypoint x="502.0681234915329" y="386.1445365507521"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+      <cmmndi:CMMNEdge id="CMMNEdge_sid-E8609E90-D8EE-4DB6-A2A3-F84EBAF564A3" cmmnElementRef="planItem1" targetCMMNElementRef="sid-6B62EEF5-7FB3-4F0E-B066-641487BF91D6">
+        <di:waypoint x="215.0" y="290.0"></di:waypoint>
+        <di:waypoint x="215.0" y="386.1445365507521"></di:waypoint>
+        <di:waypoint x="502.0681234915329" y="386.1445365507521"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</definitions>

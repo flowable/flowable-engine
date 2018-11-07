@@ -16,11 +16,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.List;
-import java.util.Map;
-
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.flowable.bpmn.model.Process;
@@ -59,9 +55,9 @@ public class MultiInstanceTaskConverterTest extends AbstractConverterTest {
         BpmnModel bpmnModel = readXMLFile();
         BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
         validateModel(parsedModel);
-        deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "multiinstancemodel.bpmn";
     }
@@ -83,12 +79,9 @@ public class MultiInstanceTaskConverterTest extends AbstractConverterTest {
         UserTask task = (UserTask) flowElement;
         MultiInstanceLoopCharacteristics loopCharacteristics = task.getLoopCharacteristics();
         assertEquals("participant", loopCharacteristics.getElementVariable());
-
-        // verify collection extension element
-        Map<String, List<ExtensionElement>> extensions = loopCharacteristics.getExtensionElements();
-        assertEquals(1, extensions.size());
-        ExtensionElement extElement = (extensions.get(ELEMENT_MULTIINSTANCE_COLLECTION).get(0)).getChildElements().get(ELEMENT_MULTIINSTANCE_COLLECTION_STRING).get(0);
-        assertEquals(PARTICIPANT_VALUE, extElement.getElementText());
+        assertEquals(PARTICIPANT_VALUE, loopCharacteristics.getCollectionString().trim());
+        assertEquals("class", loopCharacteristics.getHandler().getImplementationType());
+        assertEquals("org.flowable.engine.test.bpmn.multiinstance.JSONCollectionHandler", loopCharacteristics.getHandler().getImplementation());
 
         // verify subprocess
         flowElement = main.getFlowElement("subprocess1");

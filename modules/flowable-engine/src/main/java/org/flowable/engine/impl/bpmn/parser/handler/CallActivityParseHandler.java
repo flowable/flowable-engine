@@ -21,10 +21,12 @@ import org.flowable.engine.impl.bpmn.parser.BpmnParse;
  */
 public class CallActivityParseHandler extends AbstractActivityBpmnParseHandler<CallActivity> {
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return CallActivity.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, CallActivity callActivity) {
         callActivity.setBehavior(bpmnParse.getActivityBehaviorFactory().createCallActivityBehavior(callActivity));
     }

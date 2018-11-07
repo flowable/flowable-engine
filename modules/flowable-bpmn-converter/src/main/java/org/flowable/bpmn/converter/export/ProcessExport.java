@@ -32,7 +32,8 @@ public class ProcessExport implements BpmnXMLConstants {
             new ExtensionAttribute(ATTRIBUTE_NAME),
             new ExtensionAttribute(ATTRIBUTE_PROCESS_EXECUTABLE),
             new ExtensionAttribute(ATTRIBUTE_PROCESS_CANDIDATE_USERS),
-            new ExtensionAttribute(ATTRIBUTE_PROCESS_CANDIDATE_GROUPS));
+            new ExtensionAttribute(ATTRIBUTE_PROCESS_CANDIDATE_GROUPS),
+            new ExtensionAttribute(ATTRIBUTE_PROCESS_EAGER_EXECUTION_FETCHING));
 
     @SuppressWarnings("unchecked")
     public static void writeProcess(Process process, XMLStreamWriter xtw) throws Exception {
@@ -52,6 +53,10 @@ public class ProcessExport implements BpmnXMLConstants {
 
         if (!process.getCandidateStarterGroups().isEmpty()) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_PROCESS_CANDIDATE_GROUPS, BpmnXMLUtil.convertToDelimitedString(process.getCandidateStarterGroups()));
+        }
+        
+        if (process.isEnableEagerExecutionTreeFetching()) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_PROCESS_EAGER_EXECUTION_FETCHING, "true");
         }
 
         // write custom attributes

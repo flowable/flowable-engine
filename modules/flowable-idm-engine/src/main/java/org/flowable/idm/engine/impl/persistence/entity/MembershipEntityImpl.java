@@ -18,7 +18,7 @@ import java.io.Serializable;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class MembershipEntityImpl extends AbstractEntityNoRevision implements MembershipEntity, Serializable {
+public class MembershipEntityImpl extends AbstractIdmEngineNoRevisionEntity implements MembershipEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -29,32 +29,39 @@ public class MembershipEntityImpl extends AbstractEntityNoRevision implements Me
 
     }
 
+    @Override
     public Object getPersistentState() {
         // membership is not updatable
         return MembershipEntityImpl.class;
     }
 
+    @Override
     public String getId() {
         // membership doesn't have an id, returning a fake one to make the internals work
         return userId + groupId;
     }
 
+    @Override
     public void setId(String id) {
         // membership doesn't have an id
     }
 
+    @Override
     public String getUserId() {
         return userId;
     }
 
+    @Override
     public void setUserId(String userId) {
         this.userId = userId;
     }
 
+    @Override
     public String getGroupId() {
         return groupId;
     }
 
+    @Override
     public void setGroupId(String groupId) {
         this.groupId = groupId;
     }

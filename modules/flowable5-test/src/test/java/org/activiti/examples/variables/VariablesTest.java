@@ -22,14 +22,13 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
-import org.flowable.variable.service.history.HistoricVariableInstance;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
-import org.flowable.variable.service.impl.types.ValueFields;
-import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.api.types.VariableType;
 
 /**
  * @author Tom Baeyens
@@ -177,7 +176,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertNotNull(newValue);
         assertEquals("a value", newValue);
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
     }
@@ -233,7 +232,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     public void testChangeTypeSerializable() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("variable-type-change-test");
         assertNotNull(processInstance);
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Activiti is awesome!", task.getName());
         SomeSerializable myVar = (SomeSerializable) runtimeService.getVariable(processInstance.getId(), "myVar");
         assertEquals("someValue", myVar.getValue());
@@ -311,7 +310,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     @Deployment
     public void testNullVariable() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskAssigneeProcess");
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         Map<String, String> variables = new HashMap<String, String>();
         variables.put("testProperty", "434");
@@ -334,7 +333,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         } catch (Exception e) {
             runtimeService.deleteProcessInstance(processInstance.getId(), "intentional exception in script task");
 
-            assertEquals("class org.flowable.engine.common.api.FlowableException", e.getClass().toString());
+            assertEquals("class org.flowable.common.engine.api.FlowableException", e.getClass().toString());
         }
 
         // No we put null property, This should be put into the variable. We do not expect exceptions
@@ -364,12 +363,12 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
 
         // Check UUID variable type query on task
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
         UUID randomUUID = UUID.randomUUID();
         taskService.setVariableLocal(task.getId(), "conversationId", randomUUID);
 
-        Task resultingTask = taskService.createTaskQuery().taskVariableValueEquals("conversationId", randomUUID).singleResult();
+        org.flowable.task.api.Task resultingTask = taskService.createTaskQuery().taskVariableValueEquals("conversationId", randomUUID).singleResult();
         assertNotNull(resultingTask);
         assertEquals(task.getId(), resultingTask.getId());
 

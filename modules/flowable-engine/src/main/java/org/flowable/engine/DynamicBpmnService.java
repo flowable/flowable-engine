@@ -16,6 +16,8 @@ package org.flowable.engine;
 import java.util.List;
 
 import org.flowable.engine.dynamic.DynamicProcessDefinitionSummary;
+import org.flowable.engine.impl.dynamic.DynamicEmbeddedSubProcessBuilder;
+import org.flowable.engine.impl.dynamic.DynamicUserTaskBuilder;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -25,6 +27,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Tijs Rademakers
  */
 public interface DynamicBpmnService {
+    
+    void injectUserTaskInProcessInstance(String processInstanceId, DynamicUserTaskBuilder dynamicUserTaskBuilder);
+
+    void injectParallelUserTask(String taskId, DynamicUserTaskBuilder dynamicUserTaskBuilder);
+    
+    void injectEmbeddedSubProcessInProcessInstance(String processInstanceId, DynamicEmbeddedSubProcessBuilder dynamicEmbeddedSubProcessBuilder);
+
+    void injectParallelEmbeddedSubProcess(String taskId, DynamicEmbeddedSubProcessBuilder dynamicEmbeddedSubProcessBuilder);
 
     ObjectNode getProcessDefinitionInfo(String processDefinitionId);
 

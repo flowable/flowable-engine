@@ -17,5 +17,6 @@ package org.flowable.bpmn.model;
  */
 public abstract class Artifact extends BaseElement {
 
+    @Override
     public abstract Artifact clone();
 }

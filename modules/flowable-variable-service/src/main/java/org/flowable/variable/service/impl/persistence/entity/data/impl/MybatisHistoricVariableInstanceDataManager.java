@@ -12,18 +12,20 @@
  */
 package org.flowable.variable.service.impl.persistence.entity.data.impl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.db.CachedEntityMatcher;
-import org.flowable.variable.service.VariableServiceConfiguration;
-import org.flowable.variable.service.history.HistoricVariableInstance;
+import org.flowable.common.engine.impl.db.AbstractDataManager;
+import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
-import org.flowable.variable.service.impl.persistence.entity.data.AbstractDataManager;
 import org.flowable.variable.service.impl.persistence.entity.data.HistoricVariableInstanceDataManager;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.HistoricVariableInstanceByProcInstMatcher;
+import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.HistoricVariableInstanceByScopeIdAndScopeTypeMatcher;
+import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.HistoricVariableInstanceBySubScopeIdAndScopeTypeMatcher;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.HistoricVariableInstanceByTaskIdMatcher;
 
 /**
@@ -31,14 +33,18 @@ import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematc
  */
 public class MybatisHistoricVariableInstanceDataManager extends AbstractDataManager<HistoricVariableInstanceEntity> implements HistoricVariableInstanceDataManager {
 
-    protected CachedEntityMatcher<HistoricVariableInstanceEntity> historicVariableInstanceByTaskIdMatcher = new HistoricVariableInstanceByTaskIdMatcher();
+    protected CachedEntityMatcher<HistoricVariableInstanceEntity> historicVariableInstanceByTaskIdMatcher 
+        = new HistoricVariableInstanceByTaskIdMatcher();
 
-    protected CachedEntityMatcher<HistoricVariableInstanceEntity> historicVariableInstanceByProcInstMatcher = new HistoricVariableInstanceByProcInstMatcher();
-
-    public MybatisHistoricVariableInstanceDataManager(VariableServiceConfiguration variableServiceConfiguration) {
-        super(variableServiceConfiguration);
-    }
-
+    protected CachedEntityMatcher<HistoricVariableInstanceEntity> historicVariableInstanceByProcInstMatcher 
+        = new HistoricVariableInstanceByProcInstMatcher();
+    
+    protected CachedEntityMatcher<HistoricVariableInstanceEntity> historicVariableInstanceByScopeIdAndScopeTypeMatcher 
+        = new HistoricVariableInstanceByScopeIdAndScopeTypeMatcher();
+    
+    protected CachedEntityMatcher<HistoricVariableInstanceEntity> historicVariableInstanceBySubScopeIdAndScopeTypeMatcher 
+        = new HistoricVariableInstanceBySubScopeIdAndScopeTypeMatcher();
+    
     @Override
     public Class<? extends HistoricVariableInstanceEntity> getManagedEntityClass() {
         return HistoricVariableInstanceEntityImpl.class;
@@ -78,6 +84,22 @@ public class MybatisHistoricVariableInstanceDataManager extends AbstractDataMana
     @Override
     public HistoricVariableInstanceEntity findHistoricVariableInstanceByVariableInstanceId(String variableInstanceId) {
         return (HistoricVariableInstanceEntity) getDbSqlSession().selectOne("selectHistoricVariableInstanceByVariableInstanceId", variableInstanceId);
+    }
+    
+    @Override
+    public List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByScopeIdAndScopeType(String scopeId, String scopeType) {
+        Map<String, String> params = new HashMap<>(2);
+        params.put("scopeId", scopeId);
+        params.put("scopeType", scopeType);
+        return getList("selectHistoricVariableInstanceByScopeIdAndScopeType", params, historicVariableInstanceByScopeIdAndScopeTypeMatcher, true);
+    }
+    
+    @Override
+    public List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesBySubScopeIdAndScopeType(String subScopeId, String scopeType) {
+        Map<String, String> params = new HashMap<>(2);
+        params.put("subScopeId", subScopeId);
+        params.put("scopeType", scopeType);
+        return getList("selectHistoricVariableInstanceByScopeIdAndScopeType", params, historicVariableInstanceByScopeIdAndScopeTypeMatcher, true);
     }
 
     @Override

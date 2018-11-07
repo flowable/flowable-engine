@@ -1,0 +1,1039 @@
+{
+    "GENERAL": {
+        "YES": "Oui",
+        "NO": "Non",
+        "ACTION": {
+            "LOGOUT": "Déconnexion",
+            "DISMISS-ALERT": "Cliquez pour retirer ce message",
+            "RETURN-TO-LIST": "Retourner à la liste",
+            "SHOW-RESULTS": "Montrer {{size}} résultats",
+            "REFRESH-LIST": "Rafraîchir la liste",
+            "SORT-BY": "Trier par {{sort}}",
+            "CLEAR-FILTERS": "Enelever les filtres",
+            "CANCEL-AND-CLOSE": "Annuler et fermer",
+            "CANCEL": "Annuler",
+            "NEXT": "Suivant",
+            "PREVIOUS": "Précédent",
+            "CLOSE": "Fermer",
+            "SHOWLICENSE": "Informations de licence"
+        },
+        "TITLE": {
+            "MAIN": "Activiti administrateur",
+            "ACTIONS": "Actions",
+            "FILTERS": "Filtres"
+        },
+        "MENU": {
+            "PROCESS-ENGINE": "Moteur de Processus",
+            "FORM-ENGINE": "Moteur de Formulaires",
+            "CONTENT-ENGINE": "Moteur de Contenu",
+            "DMN-ENGINE": "Moteur DMN ",
+            "DEPLOYMENTS": "Déploiements",
+            "DEFINITIONS": "Définitions",
+            "INSTANCES": "Instances",
+            "TASKS": "Tâches",
+            "JOBS": "Jobs",
+            "EVENT-SUBSCRIPTIONS": "Abonnements aux événements",
+            "CONFIGURATION": "Configuration",
+            "CONFIGURATION-ENGINE": "Moteur",
+            "DECISION-TABLES": "Tables de décision",
+            "CONTENT-ITEMS": "Contenus"
+        },
+        "RESULT-SIZES": {
+            "10": "10",
+            "25": "25",
+            "50": "50",
+            "100": "100",
+            "100000000": "tous"
+        }
+    },
+    "PROCESS-DEFINITION": {
+        "ID": "ID:",
+        "NAME": "Nom:",
+        "VERSION": "Version:",
+        "DESCRIPTION": "Description:",
+        "KEY": "Key:",
+        "CATEGORY": "Categorie:",
+        "SUSPENDED": "Suspendu:",
+        "DEPLOYMENT": "Déploiement:",
+        "TENANT": "Tenant:",
+        "START-FORM-DEFINED": "Formulaire initial défini:",
+        "GRAPHICAL-NOTATION-DEFINED": "Notation graphique définie:",
+        "PROCESS-INSTANCES-SIZE": "La définition possède {{total}} instances de processus en cours",
+        "PROCESS-INSTANCES-SHOWING": ", montrer {{size}} récemment démarrées",
+        "PROCESS-INSTANCES-EMPTY": "La définition ne possède pas d'instance en cours",
+        "JOBS-SIZE": "La définition a {{total}} jobs en cours",
+        "JOBS-EMPTY": "La définition n'a aucun job en cours",
+        "DECISION-TABLES-SIZE": "La définition possède {{total}} tables de décision.",
+        "DECISION-TABLES-EMPTY": "La définition n'a aucune table de décision.",
+        "FORM-DEFINITIONS-SIZE": "La définition a {{total}} définitions de formulaires.",
+        "FORM-DEFINITIONS-EMPTY": "La définition ne possède aucune définition de formulaire.",
+        "TITLE": {
+            "PROCESS-INSTANCES": "Instance de processus",
+            "JOBS": "Jobs",
+            "DECISION-TABLES": "Tables de décision",
+            "FORMS": "Définition de formulaire"
+        },
+        "ACTION": {
+            "EDIT-CATEGORY": "Editer les catégories",
+            "SHOW-ALL-JOBS": "Montrer tous les jobs",
+            "SHOW-ALL-PROCESSES": "Montrer tous les processus",
+            "SHOW-DIAGRAM": "Montrer le diagramme du processus"
+        },
+        "POPUP": {
+            "EDIT-CATEGORY": {
+                "TITLE": "Editer les catégories d'une définition",
+                "MESSAGE": "La catégorie initiale pour la définition est remplie à partir de l'attribut targetNameSpace dans le fichier XML BPMN 2.0, néanmoins il peut être modifiée après le déploiement.",
+                "CATEGORY": "Catégorie",
+                "CATEGORY-PLACEHOLDER": "Entrer une catégorie",
+                "CONFIRM": "Mettre à jour une catégorie"
+            },
+            "SHOW-PROCESS-MODEL": {
+                "TITLE": "Diagramme de processus"
+            }
+        }
+    },
+    "PROCESS-DEFINITIONS": {
+        "LIST-MESSAGE": "Montrer {{size}} résultats, sur un total de {{total}} définitions correspondantes.",
+        "LIST-MESSAGE-EMPTY": "Aucune définition de processus disponible.",
+        "FILTER": {
+            "NAME": "Nom (sensible à la casse)",
+            "KEY": "Key (sensible à la casse)",
+            "DEPLOYMENT-ID": "ID du déploiement ",
+            "TENANT-ID": "ID du Tenant",
+            "LATEST": "Dernière version",
+            "LATEST-HELP": "Montrer uniquement les dernières versions"
+        },
+        "TITLE": {
+            "MAIN": "Définitions de processus"
+        },
+        "SORT": {
+            "ID": "ID",
+            "NAME": "Nom",
+            "VERSION": "Version"
+        },
+        "HEADER": {
+            "ID": "ID",
+            "NAME": "Nom",
+            "VERSION": "Version",
+            "KEY": "Key",
+            "TENANT": "Tenant"
+        },
+        "ACTIONS": {
+            "UPLOAD-FROM-MODELER": "Importer depuis l'éditeur Flowable"
+        },
+        "POPUP": {
+            "UPLOAD-FROM-MODELER": {
+                "NAME": "Nom d'utilisateur",
+                "PASSWORD": "Mot de Passe",
+                "ERROR": "Nous n'avons pas été en mesure de contacter l'éditeur",
+                "UNAUTHORIZED": "Identifiants invalides",
+                "UPLOAD-DESCRIPTION": "Le modèle de processus va maintenant être récupéré et déployé sur le cluster Flowable actuellement actif. Sélectionnez un nom approprié pour le package de déploiement."
+            }
+        }
+    },
+    "PROCESS-INSTANCE": {
+        "ID": "ID:",
+        "NAME": "Nom:",
+        "DESCRIPTION": "Description:",
+        "BUSINESS-KEY": "Clé métier:",
+        "TENANT-ID": "Tenant:",
+        "STATUS": "Statut:",
+        "STATUS-ACTIVE": "Actif",
+        "STATUS-COMPLETED": "Terminé",
+        "ACTIVITY-ID-STARTED": "Identificateur de début d'activité:",
+        "ACTIVITY-ID-ENDED": "Terminé lors de l'activité:",
+        "DELETE-REASON": "Raison de suppression:",
+        "STARTED-BY": "Démarré par:",
+        "END-TIME": "Terminé le:",
+        "DURATION": "Durée:",
+        "SUPER-PROCESS-INSTANCE-ID": "Identificateur de l'instance du super processus:",
+        "TASKS-SIZE": "Cette instance de processus comporte {{total}} tâches.",
+        "TASKS-EMPTY": "Cette instance de processus n'a pas de tâches.",
+        "VARIABLES-SIZE": "Cette instance de processus possède {{total}} variables.",
+        "VARIABLES-EMPTY": "Cette instance de processus n'a pas de variables.",
+        "JOBS-SIZE": "Cette instance de processus a {{total}} jobs.",
+        "JOBS-EMPTY": "Cette instance de processus n'a pas de jobs.",
+        "SUBPROCESSES-SIZE": "Cette instance de processus comporte {{total}} sous-processus.",
+        "SUBPROCESSES-EMPTY": "Cette instance de processus n'a pas de sous-processus.",
+        "DECISION-TABLES-SIZE": "Cette instance de processus a {{total}} tables de décision.",
+        "DECISION-TABLES-EMPTY": "Cette instance de processus n'a pas de tables de décision.",
+        "FORM-INSTANCES-SIZE": "Cette instance de processus comporte {{total}} instances de formulaire",
+        "FORM-INSTANCES-EMPTY": "Cette instance de processus n'a pas d'instance de formulaire.",
+        "TITLE": {
+            "TASKS": "Tâches",
+            "VARIABLES": "Variables",
+            "JOBS": "Jobs",
+            "SUBPROCESSES": "Sous Processus",
+            "DECISION-TABLES": "Tables de décision",
+            "FORM-INSTANCES": "Formulaires"
+        },
+        "ACTION": {
+            "DELETE": "Supprimer une instance de processus",
+            "TERMINATE": "Terminer une instance de processus",
+            "SHOW-ALL-TASKS": "Montrer toutes les tâches",
+            "SHOW-ALL-JOBS": "Montrer tous les jobs",
+            "SHOW-ALL-SUBPROCESSES": "Montrer tous les sous-processus",
+            "SHOW-DIAGRAM": "Montrer le diagramme de processus",
+            "TITLE-VARIABLES": "Actions sur la variable sélectionnée",
+            "DELETE-VARIABLE": "Supprimer la variable",
+            "UPDATE-VALUE": "Mettre à jour la variable",
+            "ADD-VARIABLE": "Ajouter une variable"
+        },
+        "POPUP": {
+            "DELETE": {
+                "TITLE": "Supprimer une instance de processus",
+                "MESSAGE-DELETE": "Veuillez confirmer la suppression de l'instance de processus",
+                "MESSAGE-TERMINATE": "Êtes-vous sûr de vouloir terminer l'instance du processus",
+                "DELETE-REASON": "Raison de la suppression",
+                "DELETE-REASON-HELP": "Ajouter une motif de suppression (optionnel)",
+                "CONFIRM-DELETE": "Supprimer l'instance de processus",
+                "CONFIRM-TERMINATE": "Terminer l'instance de processus"
+            },
+            "SHOW-PROCESS-MODEL": {
+                "TITLE": "Diagramme de processus"
+            },
+            "CREATE-VARIABLE": {
+                "TITLE": "Créer une variable",
+                "NAME": "Nom de la variable",
+                "TYPE": "Type de variable",
+                "VALUE": "Valeur de la variable",
+                "CREATE": "Créer"
+            },
+            "UPDATE-VARIABLE": {
+                "TITLE": "Mettre à jour la variable '{{name}}'",
+                "NAME": "Nom de la variable",
+                "VALUE": "Valeur",
+                "CHECKED": "vrai",
+                "UNCHECKED": "faux",
+                "DATE-HELP": "format ISO-8601 (exemple : 2016-01-28T23:00:00Z)",
+                "ACTION-UPDATE": "Mettre à jour"
+            },
+            "DELETE-VARIABLE": {
+                "TITLE": "Supprimer la variable '{{name}}",
+                "MESSAGE": "Voulez vous confirmer la suppression de la variable?",
+                "DELETE": "Supprimer"
+            }
+        }
+    },
+    "PROCESS-INSTANCES": {
+        "TITLE": "Instances de Processus",
+        "LIST-MESSAGE": "Montrer {{size}} resultats, sur un total de {{total}} instances de processus correspondantes.",
+        "LIST-MESSAGE-EMPTY": "Aucune instance de processus disponible.",
+        "FILTER": {
+            "NAME": "Nom",
+            "PROCESS-DEFINITION": "Définition du processus",
+            "ALL-PROCESS-DEFINITIONS": "Toutes les définitions de processus",
+            "BUSINESS-KEY": "Clé métier",
+            "SUPER-PROCESS-INSTANCE-ID": "Super process instance ID",
+            "STARTED-BEFORE": "Démarré avant le",
+            "STARTED-AFTER": "Démarré après le",
+            "ENDED-BEFORE": "Terminé avant le",
+            "ENDED-AFTER": "Terminé après le",
+            "VARIABLE": "Variable",
+            "VARIABLE-NAME": "Nom de la variable",
+            "VARIABLE-VALUE": "Valeur de la variable",
+            "VARIABLE-BOOLEAN-VALUE": "Valeur booléenne: {{value}}",
+            "TENANT-ID": "Identifiant de Tenant"
+        },
+        "SORT": {
+            "ID": "ID",
+            "START-TIME": "Temps de départ"
+        },
+        "HEADER": {
+            "ID": "ID",
+            "NAME": "Nom",
+            "BUSINESS-KEY": "Clé métier",
+            "PROCESS-DEFINITION": "Définition de processus",
+            "CREATE-TIME": "Créé le",
+            "END-TIME": "Terminé le",
+            "STATUS": "Statut"
+        }
+    },
+    "TASK": {
+        "ID": "ID:",
+        "NAME": "Nom:",
+        "STATUS": "Statut:",
+        "STATUS-COMPLETED": "Terminé",
+        "STATUS-ACTIVE": "Actif",
+        "DESCRIPTION": "Description:",
+        "TASK-DEFINITION-KEY": "Clé de Définition:",
+        "FORM-KEY": "Clé de formulaire:",
+        "PRIORITY": "Priorité:",
+        "DELEGATION-STATE": "Etat de la délégation:",
+        "CATEGORY": "Catégorie:",
+        "TENANT-ID": "Tenant:",
+        "PARENT": "Tâche parente:",
+        "ASSIGNEE": "Personne assignée:",
+        "OWNER": "Propriétaire:",
+        "START-DATE": "Date de début:",
+        "DUE-DATE": "Date d'échéance:",
+        "END-DATE": "Date de fin:",
+        "DELETE-REASON": "Raison de la suppression:",
+        "PROCESS-INSTANCE": "Instance de processus",
+        "PROCESS-DEFINITION": "Définition du processus",
+        "EXECUTION-ID": "Identifiant d'éxecution:",
+        "SUBTASKS-MESSAGE": "Cette tâche posséde {{total}} sous-tâches, afficher {{size}}.",
+        "SUBTASKS-MESSAGE-EMPTY": "Cette tâche n'a pas de sous-tâche.",
+        "VARIABLES-MESSAGE": "Cette tâche posséde possède {{size}} variables.",
+        "VARIABLES-MESSAGE-EMPTY": "Cette tâche n'a pas de variables.",
+        "IDENTITY-LINKS-MESSAGE": "Cette tâche posséde {{size}} liens d'identité.",
+        "IDENTITY-LINKS-MESSAGE-EMPTY": "Cette tâche n'a pas de liens d'identité.",
+        "ACTION": {
+            "EDIT": "Editer la tâche",
+            "ASSIGN-CLAIM": "Assigner/Revendiquer une tâche",
+            "DELEGATE": "Déléguer la tâche",
+            "RESOLVE": "Résourdre la tâche",
+            "COMPLETE": "Terminer la tâche",
+            "DELETE": "Supprimer la tâche",
+            "SHOW-ALL-SUBTASKS": "Montrer toutes les sous-tâches",
+            "SHOW-SUBMITTED-FORM": "Montrer le formulaire"
+        },
+        "TITLE": {
+            "SUBTASKS": "Sous-tâches",
+            "IDENTITY-LINKS": "Liens d'identité",
+            "VARIABLES": "Variables"
+        },
+        "POPUP": {
+            "ASSIGN": {
+                "TITLE": "Assigner la tâche",
+                "MESSAGE": "Êtes-vous sûr de vouloir assigner cette tâche",
+                "NEW-ASSIGNEE": "Nouvelle personne assignée",
+                "NEW-ASSIGNEE-HELP": "Laisser le champs personne assignée vide si vous voulez assigner cette tâche à personne.",
+                "CONFIRM": "Assigner la tâche"
+            },
+            "COMPLETE": {
+                "TITLE": "Terminer la tâche",
+                "MESSAGE": "Êtes-vous sûr de vouloir terminer cette tâche",
+                "CONFIRM": "Terminer la tâche"
+            },
+            "DELEGATE": {
+                "TITLE": "Déléguer la tâche",
+                "MESSAGE": "Êtes-vous sûr de vouloir déléguer cette tâche",
+                "CONFIRM": "Déléguer la tâche",
+                "DELEGATE-TO": "Utilisateur délégué"
+            },
+            "RESOLVE": {
+                "TITLE": "Résoudre la tâche",
+                "MESSAGE": "Êtes-vous sûr de vouloir résoudre la tâche",
+                "CONFIRM": "Résoudre tâche"
+            },
+            "DELETE": {
+                "TITLE": "Supprimer la tâche",
+                "MESSAGE": "Êtes-vous sûr de vouloir supprimer la tâche",
+                "CONFIRM": "Supprimer la tâche"
+            },
+            "EDIT": {
+                "TITLE": "Modifier la tâche",
+                "CONFIRM": "Mettre à jour la tâche",
+                "NAME": "Nom",
+                "DESCRIPTION": "Description",
+                "PRIORITY": "Priorité",
+                "CATEGORY": "Catégorie",
+                "ASSIGNEE": "Personne assignée",
+                "OWNER": "Propriétaire",
+                "DUE-DATE": "Date d'échéance"
+            }
+        }
+    },
+    "TASKS": {
+        "TITLE": "Tâches",
+        "LIST-MESSAGE": "Montrer {{size}} resultats, sur un total de {{total}} tâches correspondantes.",
+        "LIST-MESSAGE-EMPTY": "Aucune tâches correspondates.",
+        "FILTER": {
+            "NAME": "Nom (sensible à la casse)",
+            "ASSIGNEE": "Personne assignée (sensible à la casse)",
+            "STATUS": "Statut",
+            "STATUS-ANY": "Aucun statut",
+            "STATUS-ACTIVE": "Tâches actives",
+            "STATUS-COMPLETE": "Tâches terminées",
+            "PROCESS-INSTANCE-ID": "Identifiant de l'instance du processus",
+            "TENANT-ID": "Identifiant du tenant",
+            "OWNER": "Propriétaire (sensible à la casse)",
+            "PARENT-TASK-ID": "Identifiant de la Tâche parent",
+            "CREATED-BEFORE": "Créé avant",
+            "CREATED-AFTER": "Créé après",
+            "ENDED-BEFORE": "Terminé avant",
+            "ENDED-AFTER": "Terminé après",
+            "DUE-BEFORE": "Echéance avant",
+            "DUE-AFTER": "Echéance après",
+            "TASK-VARIABLE": "Variable local de la tâche",
+            "PROCESS-VARIABLE": "Variable de processus",
+            "VARIABLE-NAME": "Nom de la variable",
+            "VARIABLE-VALUE": "Valeur de la variable",
+            "VARIABLE-BOOLEAN-VALUE": "Valeur booléenne: {{value}}"
+        },
+        "SORT": {
+            "NAME": "Nom",
+            "DUE-DATE": "Date d'échéance",
+            "START-TIME": "Temps de départ",
+            "END-TIME": "Tamps d'arrivée",
+            "PRIORITY": "Priorité"
+        },
+        "HEADER": {
+            "ID": "ID",
+            "NAME": "Nom",
+            "ASSIGNEE": "Personne assignée",
+            "OWNER": "Propriétaire",
+            "CREATE-TIME": "Créé le",
+            "END-TIME": "Terminé le",
+            "PRIORITY": "Priorité"
+        }
+    },
+    "DEPLOYMENTS": {
+        "TITLE": "Déploiements",
+        "LIST-MESSAGE": "Montrer {{size}} resultats,sur un total de {{total}} déploiements correspondants.",
+        "LIST-MESSAGE-EMPTY": "Aucun déploiements correspondants.",
+        "FILTER": {
+            "NAME": "Nom (sensible à la casse)",
+            "TENANTID": "Identifiant du tenant (sensible à la casse)"
+        },
+        "SORT": {
+            "ID": "ID",
+            "NAME": "Nom"
+        },
+        "HEADER": {
+            "ID": "ID",
+            "NAME": "Nom",
+            "DEPLOY-TIME": "Date de déploiement",
+            "CATEGORY": "Catégorie",
+            "TENANT": "Tenant"
+        },
+        "ACTION": {
+            "UPLOAD": "Télécharger un processus ou package",
+            "DELETE": "Supprimer le déploiement"
+        },
+        "POPUP": {
+            "UPLOAD": {
+                "DESCRIPTION": "Selectionner un fichier au format .bpmn, .bpmn20.xml afin de le déployer ou bien télécharger un fichier au format .zip or .bar contenant un ensemble de processesus.",
+                "DROPZONE": "ou déposer un fichier ici",
+                "NO-DROP": "Le dépôt de fichier n'est pas supporté par votre navigateur web",
+                "CANCEL-UPLOAD": "Annuler l'envoi",
+                "ERROR": "Impossible d'envoyer ce fichier"
+            },
+            "DELETE": {
+            	"CONFIRM-MESSAGE": "Supprimer le déploiement '{{name}}'?"
+            	}
+        }
+    },
+    "DEPLOYMENT": {
+        "ID": "ID:",
+        "NAME": "Nomo:",
+        "TIME": "Date de déploiement:",
+        "CATEGORY": "Catégorie:",
+        "TENANTID": "Identifiant du tenant:",
+        "DEFINITIONS-MESSAGE": "Ce déploiement a {{total}} définitions de processuss, afficher {{size}}.",
+        "DEFINITIONS-MESSAGE-EMPTY": "Ce déploiement n'a pas de définition du processuss.",
+        "TITLE": {
+            "DEFINITIONS": "Définition du processuss",
+            "RESOURCES": "Ressources"
+        },
+        "ACTION": {
+            "SHOW-ALL-DEFINITIONS": "Montrer toutes les définitions"
+        }
+    },
+    "JOB": {
+        "TITLE": {
+            "MAIN": "Job {{id}}",
+            "EXCEPTION": "Exception"
+        },
+        "ACTIONS": {
+            "EXECUTE": "Executer le job",
+            "MOVE": "Déplacer le job",
+            "DELETE": "Supprime le job"
+        },
+        "POPUP": {
+            "DELETE-JOB": {
+                "TITLE": "Supprimer le job '{{id}}'",
+                "MESSAGE": "Êtes-vous sûr de vouloir supprimer le job {{id}}?",
+                "CONFIRM": "Supprimer le job"
+            }
+        },
+        "ID": "ID:",
+        "EXECUTION-ID": "Execution ID:",
+        "PROCESS-INSTANCE": "Instance du processus:",
+        "PROCESS-DEFINITION": "Définition du processus:",
+        "DUEDATE": "Date d'échéance:",
+        "RETRIES-LEFT": "Tentatives restantes:",
+        "TENANT-ID": "Tenant:"
+    },
+    "JOBS": {
+        "TITLE": "Jobs",
+        "LIST-MESSAGE": "Montrer {{size}} resultats, sur un totle de {{total}} jobs correspondants.",
+        "LIST-MESSAGE-EMPTY": "Aucun jobs correspondants.",
+        "FILTER": {
+        	"JOBTYPE": {
+        		"LABEL": "Type de job ",
+        		"EXECUTABLE-JOB": "Jobs exécutables",
+        		"TIMER-JOB": "Jobs temporisés",
+        		"SUSPENDED-JOB": "Jobs suspendus",
+        		"DEADLETTER-JOB": "Jobs perdus"
+        	},
+            "PROCESS-DEFINITION": "Définition du processus",
+            "ALL-PROCESS-DEFINITIONS": "Toutes les définitions du processuss",
+            "PROCESS-INSTANCE-ID": "Identifiant de l'instance du processus ",
+            "TENANT-ID": "Identifiant du tenant",
+            "DUE-BEFORE": "Echéance avant",
+            "DUE-AFTER": "Echéance après",
+            "EXCEPTION": "Exception",
+            "EXCEPTION-HELP": "Montrer uniquement les jobs avec exception"
+        },
+        "SORT": {
+            "ID": "Job ID",
+            "DUE-DATE": "Date d'échéance",
+            "PROCESS-INSTANCE-ID": "Identifiant de l'instance du processus "
+        },
+        "HEADER": {
+            "ID": "ID",
+            "DUE-DATE": "Date d'échéance",
+            "PROCESS-DEFINITION": "Définition du processus",
+            "RETRIES": "Tentatives",
+            "EXCEPTION": "Exception"
+        }
+    },
+    "EVENT-SUBSCRIPTION": {
+        "TITLE": {
+            "MAIN": "Abonnements à l'évènement {{id}}"
+        },
+        "ACTIONS": {
+            "TRIGGER": "Évènement déclencheur"
+        },
+        "ID": "ID:",
+        "ACTIVITY-ID": "Identifiant de l'activité:",
+        "EXECUTION-ID": "Identifiant de l'exécution:",
+        "PROCESS-INSTANCE": "Instance du Processus:",
+        "PROCESS-DEFINITION": "Définition du processus:",
+        "CREATE-DATE": "Date de création:",
+        "EVENT-TYPE": "Type d'évènement:",
+        "EVENT-NAME": "Nom de l'évènement:",
+        "TENANT-ID": "Tenant:"
+    },
+    "EVENT-SUBSCRIPTIONS": {
+    	"TITLE": "Abonnements à l'évènement",
+        "LIST-MESSAGE": "Montrer {{size}} resultats, sur un total de {{total}} abonnements correspondants.",
+        "LIST-MESSAGE-EMPTY": "Aucun abonnements correspondants.",
+    	"FILTER": {
+            "PROCESS-DEFINITION": "Définition du processus",
+            "ALL-PROCESS-DEFINITIONS": "Toutes les définition du processuss",
+            "PROCESS-INSTANCE-ID": "Identifiant de l'instance du processus ",
+            "TENANT-ID": "Identifiant du tenant",
+            "CREATED-BEFORE": "Créé avant",
+            "CREATED-AFTER": "Créé après"
+        },
+        "SORT": {
+            "ID": "Identifiant de l'abonnement à l'évènement",
+            "CREATE-DATE": "Date de création",
+            "PROCESS-INSTANCE-ID": "Identifiant de l'instance du processus "
+        },
+    	"HEADER": {
+            "ID": "ID",
+            "CREATE-DATE": "Date de création",
+            "PROCESS-DEFINITION": "Définition du processus",
+            "EVENT-TYPE": "Type d'évènement",
+            "EVENT-NAME": "Nom de l'évènement"
+        }
+    },
+    "LOGIN": {
+        "TITLE": "Se connecter",
+        "USERNAME": "Nom d'utilisateur",
+        "USERNAME-PLACEHOLDER": "Entrer votre nom d'utilisateur",
+        "PASSWORD": "Mot de passe",
+        "PASSWORD-PLACEHOLDER": "Entrer votre mot de passe",
+        "ACTION": {
+            "CONFIRM": "Se connecter"
+        }
+    },
+    "USER": {
+        "POPUP": {
+            "CHANGE-PASSWORD": {
+                "TITLE": "Changer le mot de passe pour'{{login}}'",
+                "OLD-PASSWORD": "Ancien mot de passe",
+                "NEW-PASSWORD": "Nouveau mot de passe",
+                "CONFIRM": "Changer le mot de passe"
+            },
+            "DELETE": {
+                "TITLE": "Supprimer l'utilisateur {{login}}",
+                "MESSAGE": "Êtes-vous sûr de vouloir supprimer l'utilisateur '{{login}}'?",
+                "CONFIRM": "Supprimer l'utilisateur"
+            },
+            "EDIT": {
+                "TITLE": "Modifier l'utilisateur {{login}}",
+                "LOGIN": "Nom d'utilisateur",
+                "EMAIL": "E-mail",
+                "FIRSTNAME": "Prénom",
+                "LASTNAME": "Nom",
+                "CONFIRM": "Modifier l'utilisateur"
+            },
+            "NEW": {
+                "TITLE": "Créer un nouvel utilisateur",
+                "LOGIN": "Nom d'utilisateur",
+                "EMAIL": "E-mail",
+                "FIRSTNAME": "Prénom",
+                "LASTNAME": "Nom",
+                "PASSWORD": "Mot de passe",
+                "ADMIN": "Posséde droits administrateur",
+                "CONFIRM": "Créer l'utilisateur"
+            }
+        }
+    },
+    "USERS": {
+        "TITLE": "Utilisateurs",
+        "ACTION": {
+            "EDIT": "Modifier l'utilisateur",
+            "NEW": "Créer un nouvel utilisateur",
+            "DELETE": "Supprimer l'utilisateur",
+            "CHANGE-PASSWORD": "Modifier le mot de passe"
+        },
+        "HEADER": {
+            "LOGIN": "Nom d'utilisateur",
+            "FIRSTNAME": "Prénom",
+            "LASTNAME": "Nom",
+            "EMAIL": "E-mail",
+            "CLUSTER_USER": "Cluster d'utilisateur"
+        }
+    },
+    "LICENSE": {
+        "POPUP": {
+            "TITLE": "Information de Licence ",
+            "HOLDER": "Titulaire",
+            "SUBJECT": "Sujet",
+            "PRODUCTKEY": "Type de produit",
+            "GOODAFTERDATE": "Licence valide après",
+            "GOODBEFOREDATE": "Licence valide jusqu'au",
+            "NUMBER_OF_PROCESSES": "Nombre de processus actifs",
+            "NUMBER_OF_ADMINS": "Nombre d'administrateurs ",
+            "MULTI_TENANT": "Multi tenant",
+            "DEFAULT_TENANT": "Tenant par défaut"
+        }
+    },
+    "CLUSTER": {
+        "NAME": "Nom:",
+        "USER": "Nom d'utilisateur:",
+        "MASTER-MANDATORY": "La configuration maître obligatoire:",
+        "METRICS-SEND-INTERVAL": "Metric send interval:",
+        "ENDPOINT-HELP": "La configuration du endpoint (chaque cluster en a un seul uniquement) a besoin de pointer vers une installation de Flowable REST. Ce endpoint sera utilisé pour retrouver et gérer les informations utilisées dans les autres sections (par exemple Déploiements, Définition du processuss...) de cette application.",
+        "ENDPOINT-NAME": "Nom:",
+        "ENDPOINT-DESCRIPTION": "Description:",
+        "ENDPOINT-ADDRESS": "Adresse du serveur:",
+        "ENDPOINT-PORT": "Port serveur:",
+        "ENDPOINT-CONTEXT-ROOT": "Context racine:",
+        "ENDPOINT-REST-ROOT": "Racine REST:",
+        "ENDPOINT-USERNAME": "Nom d'utilisateur:",
+        "PROCESS-ENGINE-HELP": "Cette section permet de définir 'la configuration maître' pour le cluster. Toutes les instances du cluster utiliseront cette configuration lors du démarrage (si le jar de configuration du cluster est dans le classpath ou si les propriétés correspondantes sont définies). Si la configuration n'est pas définie, les instances utiliseront leurs fichiers de configuration locaux.",
+        "NO-MASTER-DEFINED": "Aucune configuration maître définie",
+        "ACTION": {
+            "SHOW-PASSWORD": "Afficher le mot de passe",
+            "EDIT-CLUSTER-CONFIG": "Modifier la configuration du cluster",
+            "CREATE-CLUSTER-CONFIG": "Créer un nouveau cluster",
+            "DELETE-CLUSTER-CONFIG": "Supprimer la configuration du cluster",
+            "GENERATE-JAR": "Générer le 'jar' de configuration du cluster",
+            "EDIT-ENDPOINT": "Modifier REST endpoint",
+            "CHECK-ENDPOINT": "Vérifier REST endpoint",
+            "SELECT-MASTER": "Choisir la configuration maître",
+            "ADD-CONFIGURATION": "Ajouter une configuration maître",
+            "EDIT-CONFIGURATION": "Modifier la configuration maître",
+            "DELETE-CONFIGURATION": "Supprimer la configuration maître"
+        },
+        "TITLE": {
+            "PROCESS-ENDPOINT": "Process API Endpoint configuration",
+            "DMN-ENDPOINT": "DMN API Endpoint configuration",
+            "FORM-ENDPOINT": "Form API Endpoint configuration",
+            "CONTENT-ENDPOINT": "Content API Endpoint configuration"
+        },
+        "POPUP": {
+            "EDIT-ENDPOINT": {
+                "ENDPOINT-NAME": "Nom",
+                "ENDPOINT-DESCRIPTION": "Description",
+                "ENDPOINT-ADDRESS": "Adresse Serveur",
+                "ENDPOINT-PORT": "Port serveur",
+                "ENDPOINT-CONTEXT-ROOT": "Context Racine",
+                "ENDPOINT-REST-ROOT": "Racine REST",
+                "ENDPOINT-USERNAME": "Nom d'utilisateur",
+                "ENDPOINT-PASSWORD": "Mot de Passe",
+                "ENDPOINT-PASSWORD-HELP": "Laisser vide pour garder le mot de passe courant",
+                "ENDPOINT-URL-PREVIEW": "URL aperçu",
+                "ACTION-CONFIRM": "Sauvegarder la configuration du endpoint",
+                "ERROR-401": "Erreur: identifiants invalides",
+                "ERROR-403": "Erreur: identifiants invalides or mauvaise URL",
+                "ERROR-404": "Erreur: URL non trouvée",
+                "ERROR-500": "Erreur: erreur serveur. Vérifier les logs serveur."
+            }
+        }
+    },
+    "APP-DEPLOYMENTS": {
+        "TITLE": "Déploiements d'Applications",
+        "LIST-MESSAGE": "Montrer {{size}} resultats, sur un total de {{total}} déploiements d'App.",
+        "LIST-MESSAGE-EMPTY": "Aucun déploiements correspondants.",
+        "FILTER": {
+            "NAME": "Nom",
+            "TENANTID": "Identifiant du tenant",
+            "LATEST": "Dernière version",
+            "LATEST-HELP": "Afficher uniquement les dernières versions"
+        },
+        "SORT": {
+            "ID": "ID",
+            "NAME": "Nom"
+        },
+        "HEADER": {
+            "ID": "ID",
+            "APP-DEFINITION-ID": "Identifiant de l'App",
+            "DEPLOYMENT-ID": "Identifiant du déploiement de processus",
+            "DMN-DEPLOYMENT-ID": "Identifiant du déploiement DMN",
+            "NAME": "Nom",
+            "DEPLOY-TIME": "Date du déploiement",
+            "DEPLOYED-BY": "Deployé par",
+            "TENANT": "Identifiant du Tenant"
+        },
+        "ACTION": {
+            "UPLOAD": "Envoyer et publier une App"
+        },
+        "POPUP": {
+            "UPLOAD": {
+                "DESCRIPTION": "Selectionner un fichier au format .zip à deployer.",
+                "WARNING": "Uploading a process is only possible to an Flowable UI instance.",
+                "DROPZONE": "ou déposer un fichier ici",
+                "NO-DROP": "Le dépôt de fichier n'est pas supporté par votre navigateur web",
+                "CANCEL-UPLOAD": "Annuler l'envoi",
+                "ERROR": "Impossible d'envoyer ce fichier"
+            }
+        }
+    },
+    "VARIABLES": {
+        "HEADER": {
+            "NAME": "Nom",
+            "TYPE": "Type",
+            "VALUE": "Valeur"
+        }
+    },
+    "IDENTITY-LINKS": {
+        "HEADER": {
+            "GROUP-ID": "Identifiant de groupe",
+            "TYPE": "Type",
+            "USER-ID": "Identifiant de l'utilisateur"
+        }
+    },
+    "ALERT": {
+        "GENERAL": {
+            "HTTP-ERROR": "Nous sommes dans l'impossibilité de retrouver les informations du serveur",
+            "AUTHENTICATION-ERROR": "Vous avez entré de mauvaises informations"
+        },
+        "ENGINE": {
+            "ENDPOINT-UPDATED": "Le Endpoint '{{name}}' a été mis à jour.",
+            "ENDPOINT-INVALID": "La configuration du Endpoint '{{name}}' est invalide.",
+            "ENDPOINT-VALID": "Endpoint valide, Moteur du endpoint: {{name}} - {{version}}"
+        },
+        "JOB": {
+            "DELETED": "Le Job '{{id}}' a été supprimé.",
+            "MOVED": "Le Job '{{id}}' a été déplacé.",
+            "EXECUTED": "Le Job '{{id}}' a été exécuté."
+        },
+        "EVENT-SUBSCRIPTION": {
+        	"TRIGGERED": "L'abonnement à l'événement '{{id}}' a été déclenché."
+        },
+        "PROCESS-INSTANCE": {
+            "DELETED": "L'instance de processus '{{id}}' a été supprimé.",
+            "TERMINATED": "L'instance de processus  '{{id}}' a été terminé."
+        },
+        "TASK": {
+            "DELETED": "La tâche '{{id}}' a été supprimée.",
+            "COMPLETED": "La tâche '{{id}}' a été terminé avec succès.",
+            "DELEGATED": "La tâche '{{id}}' a été délégué à l'utilisateur {{user}}.",
+            "RESOLVED": "La tâche '{{id}}' a été résolue",
+            "ASSIGNED": "La tâche '{{id}}' est maintenant assigné à {{user}}.",
+            "UNASSIGNED": "La tâche '{{id}}' is maintenant non-assigné.",
+            "UPDATED": "La tâche '{{id}}' a été mise à jour."
+        },
+        "USER": {
+            "DELETED": "L'utilisateur '{{login}}' a été supprimé.",
+            "UPDATED": "L'utilisateur '{{login}}' a été mise à jour.",
+            "CREATED": "L'utilisateur '{{login}}' a été créé.",
+            "PASSWORD-CHANGED": "Le mot de passe pour '{{login}}' a été modifié avec succès."
+        },
+        "PROCESS-DEFINITION": {
+            "CATEGORY-UPDATED": "La catégorie de la définition du processus Catégorie a été mis à jour"
+        },
+        "DEPLOYMENT": {
+        	"DELETED-DEPLOYMENT": "Déploiement supprimé '{{name}}'",
+        	"DELETE-ERROR": "Impossible de supprimer le déploiement. {{exception || ''}}",
+        	"DEPLOYMENT-SUCCESS": "Le déploiement a réussi"
+        },
+        "APP-DEPLOYMENT": {
+        	"DELETED-APP": "App supprimée '{{appDefinition.name}}'",
+        	"DELETE-ERROR": "Impossible de supprimer l'App. {{message || ''}}"
+        }
+    },
+    "DECISION-TABLE-DEPLOYMENTS": {
+        "TITLE": "Déploiements des tables de décision",
+        "LIST-MESSAGE": "Montrer {{size}} resultats, sur un total de {{total}} déploiements correspondants.",
+        "LIST-MESSAGE-EMPTY": "Aucun déploiements correspondants.",
+        "FILTER": {
+            "NAME": "Nom (sensible à la casse)",
+            "TENANTID": "Identifiant du tenant (sensible à la casse)"
+        },
+        "SORT": {
+            "ID": "ID",
+            "NAME": "Nom"
+        },
+        "HEADER": {
+            "ID": "ID",
+            "NAME": "Nom",
+            "DEPLOY-TIME": "Temps du déploiement",
+            "CATEGORY": "Catégorie",
+            "TENANT": "Tenant"
+        },
+        "ACTION": {
+            "DELETE": "Supprimer le déploiement"
+        }
+    },
+    "DECISION-TABLE-DEPLOYMENT": {
+        "ID": "ID:",
+        "NAME": "Nom:",
+        "TIME": "Date de déploiement:",
+        "CATEGORY": "Catégorie:",
+        "TENANTID": "Identifiant du tenant:",
+        "DECISION-TABLES-MESSAGE": "Ce déploiement comporte{{total}} tables de décision, afficher {{size}}.",
+        "DECISION-TABLES-MESSAGE-EMPTY": "Ce déploiement n'a pas de tables de décision.",
+        "PARENT-DEPLOYMENT-ID": "Identifiant du déploiement parent",
+        "TITLE": {
+            "DECISION-TABLES": "Tables de décisions",
+            "RESOURCES": "Ressources"
+        },
+        "ACTION": {
+            "SHOW-ALL-DEFINITIONS": "Afficher toutes les tables de décision "
+        }
+    },
+    "DECISION-TABLES": {
+        "TITLE": "Tables de décision",
+        "LIST-MESSAGE": "Montrer {{size}} resultats, sur un total de {{total}} tables de décisions correspondantes.",
+        "LIST-MESSAGE-EMPTY": "Aucune tables de décision correspondantes.",
+        "FILTER": {
+            "NAME": "Nom",
+            "KEY": "Clé",
+            "TENANTID": "Identifiant du tenant"
+        },
+        "SORT": {
+            "ID": "ID",
+            "NAME": "Nom"
+        },
+        "HEADER": {
+            "ID": "ID",
+            "NAME": "Nom",
+            "VERSION": "Version",
+            "KEY": "Clé",
+            "DEPLOY-TIME": "Temps du déploiement",
+            "TENANT-ID": "Tenant ID"
+        }
+    },
+    "DECISION-TABLE": {
+        "ID": "ID:",
+        "NAME": "Nom:",
+        "VERSION": "Version:",
+        "KEY": "Clé:",
+        "DEPLOYMENT-ID": "Identifiant du déploiement:",
+        "PARENT-DEPLOYMENT-ID": "Identifiant du déploiement parent:",
+        "RESOURCE-NAME": "Nom de la resource:",
+        "DESCRIPTION": "Description:",
+        "TENANT": "Tenant:",
+        "TITLE": {
+            "DECISION-AUDITS": "Audits de décision"
+        },
+        "DECISION-AUDITS-MESSAGE": "Cette table de décision posséde {{total}} audits, afficher {{size}}.",
+        "DECISION-AUDITS-MESSAGE-EMPTY": "Cette table de décision table n'a pas d'audits",
+        "ACTION": {
+            "EDIT-CATEGORY": "Modifier Catégorie",
+            "SHOW-ALL-JOBS": "Montrer tous les jobs",
+            "SHOW-ALL-PROCESSES": "Montrer tous les  processus",
+            "SHOW-DIAGRAM": "Afficher le diagramme de processus",
+            "SHOW-DECISION-TABLE": "Montrer la table de décision"
+        },
+        "POPUP": {
+            "TITLE": "Table de décision: ",
+            "KEY": "Clé: ",
+            "HIT-POLICY": "Hit Policy: ",
+            "HIT-POLICIES": {
+                "FIRST": "Premier (Single pass)",
+                "ANY": "Aucun (Single pass)"
+            }
+        }
+    },
+    "FORM-DEFINITIONS": {
+    	"TITLE": "Définitions de formulaires",
+        "LIST-MESSAGE": "Montrer {{size}} resultats, sur un total de {{total}} formulaires correspondants.",
+        "LIST-MESSAGE-EMPTY": "Aucune définition de formulaire correspondantes.",
+        "HEADER": {
+            "ID": "ID",
+            "NAME": "Nom",
+            "DEPLOYMENTID": "Identifiant du déploiement",
+            "TENANTID": "Identifiant du Tenant",
+            "KEY": "Clé",
+            "VERSION": "Version"
+        },
+        "FILTER": {
+            "NAME": "Nom",
+            "APPID": "Identifiant du déploiement de l'App",
+            "TENANTID": "Identifiant du tenant"
+        },
+        "SORT": {
+            "ID": "ID",
+            "NAME": "Nom"
+        }
+    },
+    "FORM-DEFINITION": {
+        "ID": "ID:",
+        "NAME": "Nom:",
+        "PARENT-DEPLOYMENT-ID": "Identifiant de déploiement parent:",
+        "DEPLOYMENT-ID": "Identifiant de déploiement:",
+        "DESCRIPTION": "Description:",
+        "TENANT": "Tenant:",
+        "MESSAGE-EMPTY": "(None)",
+        "TITLE": {
+            "FORM-INSTANCES": "Instances de formulaire"
+        },
+        "FORM-INSTANCES-MESSAGE": "Cette définition possède {{total}} instances de formulaires, afficher {{size}}.",
+        "FORM-INSTANCES-MESSAGE-EMPTY": "Cette définition n'a pas d'intance de formulaires",
+        "ACTION": {
+            "EDIT-CATEGORY": "Modifier la Catégorie",
+            "SHOW-ALL-JOBS": "Montrer tous les jobs",
+            "SHOW-ALL-PROCESSES": "Montrer tous les processus",
+            "SHOW-DIAGRAM": "Montrer le diagramme de processus",
+            "SHOW-FORM": "Afficher le formulaire"
+        },
+        "POPUP": {
+            "TITLE": "Formulaire: "
+        },
+        "FIELD-PREVIEW" : {
+        	"DISPLAY-REF": "Valeur affichée",
+        	"SELECT-FIELD": "(Aucun champ sélectionné)",
+        	"FIELD-VALUE": "Montrer la valeur du champ \"{{name}}\"",
+        	"UNKNOWN-TYPE": "Type de champ indéfini {{type}}",
+        	"TEXT-VALUE": "Texte",
+        	"MULTI-TEXT-VALUE": "Champ muli-lignes",
+        	"NUMBER-VALUE": "123",
+        	"DATE-VALUE": "Date",
+        	"DROPDOWN-VALUE": "Sélectionner ...",
+        	"UPLOAD-VALUE": "Télécharger ou import un contenu...",
+        	"RADIOS-OPTION1": "Option 1",
+        	"SELECT-PERSON": "Choisir une personne",
+        	"SELECT-GROUP": "Choisir un groupe"
+        	}
+    },
+    "FORM-DEPLOYMENTS": {
+        "TITLE": "Déploiements de formulaire ",
+        "LIST-MESSAGE": "Montrer {{size}} resultats, sur un total de {{total}} déploiements de formulaire correspondants.",
+        "LIST-MESSAGE-EMPTY": "Aucun déploiements de formulaire correspondant.",
+        "FILTER": {
+            "NAME": "Nom (sensible à la casse)",
+            "TENANTID": "Identifiant du tenant (sensible à la casse)"
+        },
+        "SORT": {
+            "ID": "ID",
+            "NAME": "Nom"
+        },
+        "HEADER": {
+            "ID": "ID",
+            "NAME": "Nom",
+            "DEPLOY-TIME": "Temps du déploiement",
+            "CATEGORY": "Catégorie",
+            "TENANT": "Tenant"
+        },
+        "ACTION": {
+            "DELETE": "Supprimer le déploiement"
+        }
+    },
+    "FORM-DEPLOYMENT": {
+        "ID": "ID:",
+        "NAME": "Nom:",
+        "TIME": "Date de déploiement:",
+        "CATEGORY": "Catégorie:",
+        "TENANTID": "Identifiant du tenant:",
+        "PARENT-DEPLOYMENT-ID": "Identifiant du déploiement parent",
+        "DEFINITIONS-MESSAGE": "Ce déploiement a {{total}} définitions de formulaire, afficher {{size}}.",
+        "DEFINITIONS-MESSAGE-EMPTY": "Ce déploiement n'a pas de définitions de formulaire.",
+        "TITLE": {
+            "FORM-DEFINITIONS": "Définitions de formulaire ",
+            "RESOURCES": "Ressources"
+        },
+        "ACTION": {
+            "SHOW-ALL-DEFINITIONS": "Montrer toutes les définitions de formulaire"
+        }
+    },
+    "FORM-INSTANCES": {
+        "TITLE": "Form instances",
+        "LIST-MESSAGE": "Montrer {{size}} resultats, sur un total de {{total}} instances de formulaires correspondantes",
+        "LIST-MESSAGE-EMPTY": "Aucune instances de formulaires correspondantes.",
+        "HEADER": {
+            "ID": "ID",
+            "PROCESS-INSTANCE-ID": "Identifiant de l'instance du processus ",
+            "TASK-ID": "Identifiant de tâche",
+            "SUBMITTED-ON": "Date de soumission",
+            "SUBMITTED-BY": "Soumis par",
+            "TENANT-ID": "Identifiant du tenant"
+        },
+        "FILTER": {
+            "NAME": "Nom",
+            "TENANTID": "Identifiant du tenant"
+        },
+        "SORT": {
+            "SUBMITTED-DATE": "Date de soumission"
+        }
+    },
+    "FORM-INSTANCE": {
+        "HEADER": {
+            "ID": "ID",
+            "TASK-ID": "Identifiant de Tâche",
+            "PROCESS-ID": "Identifiant de l'instance du processus ",
+            "SUBMITTED": "Date de soumission",
+            "SUBMITTED-BY": "Soumis par",
+            "FORM-DEFINITION-ID": "Identifiant de la définition de formulaire"
+        },
+        "FORM-FIELD-VALUES-MESSAGE": "Cette instance a {{total}} valeurs de champs, montrer {{size}}",
+        "FORM-FIELD-VALUES-MESSAGE-EMPTY": "Cette instance n'a pas de valeurs de champ",
+        "ACTION": {
+            "SHOW-FORM-INSTANCE": "Montrer l'instance de formulaire"
+        },
+        "TITLE": {
+            "FORM-FIELD-VALUES": "Valeurs du champs de formulaire"
+        },
+        "FORM-FIELD-VALUES": {
+            "ID": "Identifiant du champ de formulaire",
+            "NAME": "Nom du champ de formulaire",
+            "TYPE": "Type du champ de formulaire",
+            "VALUE": "Valeur du champs de formulaire"
+        }
+    },
+    "CONTENT-ITEMS": {
+        "TITLE": "Liste des contenus",
+        "LIST-MESSAGE": "Montrer {{size}} résultats, sur un total de {{total}} contenus correspondants.",
+        "LIST-MESSAGE-EMPTY": "Aucun contenus correspondants.",
+        "HEADER": {
+            "ID": "ID",
+            "NAME": "Nom",
+            "PROCESS-INSTANCE-ID": "Identifiant de l'instance du Processus",
+            "TASK-ID": "Identifiant de tâche",
+            "LAST-MODIFIED-ON": "Date de modification",
+            "LAST-MODIFIED-BY": "Modifié par",
+            "TENANT-ID": "Identifiant du Tenant"
+        },
+        "FILTER": {
+            "NAME": "Nom",
+            "TENANTID": "Identifiant du Tenant"
+        },
+        "SORT": {
+            "CREATED": "Date de création"
+        }
+    },
+    "CONTENT-ITEM": {
+        "HEADER": {
+            "ID": "ID",
+            "TASK-ID": "Identifiant de tâche",
+            "PROCESS-INSTANCE-ID": "Identifiant de l'instance du Processus",
+            "CREATED-ON": "Date de création",
+            "CREATED-BY": "Créé par",
+            "LAST-MODIFIED-ON": "Date de modification",
+            "LAST-MODIFIED-BY": "Modifié par",
+            "CONTENT-STORE-ID": "Identifiant du Content store"
+        },
+        "ACTION": {
+            "SHOW-CONTENT-ITEM": "Voir le contenu"
+        }
+    }
+}

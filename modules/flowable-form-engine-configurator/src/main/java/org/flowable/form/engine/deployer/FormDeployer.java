@@ -14,9 +14,9 @@ package org.flowable.form.engine.deployer;
 
 import java.util.Map;
 
-import org.flowable.engine.impl.persistence.deploy.Deployer;
-import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
-import org.flowable.engine.impl.persistence.entity.ResourceEntity;
+import org.flowable.common.engine.api.repository.EngineDeployment;
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.form.api.FormDeploymentBuilder;
 import org.flowable.form.api.FormRepositoryService;
@@ -26,12 +26,12 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Tijs Rademakers
  */
-public class FormDeployer implements Deployer {
+public class FormDeployer implements EngineDeployer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FormDeployer.class);
 
     @Override
-    public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings) {
+    public void deploy(EngineDeployment deployment, Map<String, Object> deploymentSettings) {
         if (!deployment.isNew())
             return;
 
@@ -39,13 +39,13 @@ public class FormDeployer implements Deployer {
 
         FormDeploymentBuilder formDeploymentBuilder = null;
 
-        Map<String, ResourceEntity> resources = deployment.getResources();
+        Map<String, EngineResource> resources = deployment.getResources();
         for (String resourceName : resources.keySet()) {
             if (resourceName.endsWith(".form")) {
                 LOGGER.info("FormDeployer: processing resource {}", resourceName);
                 if (formDeploymentBuilder == null) {
                     FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService();
-                    formDeploymentBuilder = formRepositoryService.createDeployment();
+                    formDeploymentBuilder = formRepositoryService.createDeployment().name(deployment.getName());
                 }
 
                 formDeploymentBuilder.addFormBytes(resourceName, resources.get(resourceName).getBytes());

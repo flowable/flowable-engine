@@ -66,6 +66,7 @@ public class RecorderExecutionListener implements ExecutionListener {
 
     }
 
+    @Override
     public void notify(DelegateExecution execution) {
         ExecutionEntity executionCasted = ((ExecutionEntity) execution);
 

@@ -7,7 +7,7 @@
  */
 
 import static org.flowable.engine.impl.scripting.GroovyStaticScriptEngine.*
-import org.flowable.engine.delegate.VariableScope
+import org.flowable.variable.api.delegate.VariableScope
 
 def typesOfVariables = COMPILE_OPTIONS.get()[VAR_TYPES]
 

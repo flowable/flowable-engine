@@ -14,8 +14,6 @@ package org.flowable.content.engine;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -29,9 +27,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
-import org.flowable.engine.common.EngineInfo;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.EngineInfo;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +47,7 @@ public abstract class ContentEngines {
     protected static List<EngineInfo> contentEngineInfos = new ArrayList<>();
 
     /**
-     * Initializes all dmn engines that can be found on the classpath for resources <code>flowable.content.cfg.xml</code> and for resources <code>flowable-dmn-context.xml</code> (Spring style
+     * Initializes all content engines that can be found on the classpath for resources <code>flowable.content.cfg.xml</code> and for resources <code>flowable-context.xml</code> (Spring style
      * configuration).
      */
     public static synchronized void init() {
@@ -120,17 +119,17 @@ public abstract class ContentEngines {
     }
 
     /**
-     * Unregisters the given dmn engine.
+     * Unregisters the given content engine.
      */
-    public static void unregister(ContentEngine formEngine) {
-        contentEngines.remove(formEngine.getName());
+    public static void unregister(ContentEngine contentEngine) {
+        contentEngines.remove(contentEngine.getName());
     }
 
     private static EngineInfo initContentEngineFromResource(URL resourceUrl) {
         EngineInfo contentEngineInfo = contentEngineInfosByResourceUrl.get(resourceUrl.toString());
-        // if there is an existing dmn engine info
+        // if there is an existing content engine info
         if (contentEngineInfo != null) {
-            // remove that dmn engine from the member fields
+            // remove that content engine from the member fields
             contentEngineInfos.remove(contentEngineInfo);
             if (contentEngineInfo.getException() == null) {
                 String contentEngineName = contentEngineInfo.getName();
@@ -143,7 +142,7 @@ public abstract class ContentEngines {
         String resourceUrlString = resourceUrl.toString();
         try {
             LOGGER.info("initializing content engine for resource {}", resourceUrl);
-            ContentEngine contentEngine = buildFormEngine(resourceUrl);
+            ContentEngine contentEngine = buildContentEngine(resourceUrl);
             String contentEngineName = contentEngine.getName();
             LOGGER.info("initialised content engine {}", contentEngineName);
             contentEngineInfo = new EngineInfo(contentEngineName, resourceUrlString, null);
@@ -152,31 +151,20 @@ public abstract class ContentEngines {
 
         } catch (Throwable e) {
             LOGGER.error("Exception while initializing content engine: {}", e.getMessage(), e);
-            contentEngineInfo = new EngineInfo(null, resourceUrlString, getExceptionString(e));
+            contentEngineInfo = new EngineInfo(null, resourceUrlString, ExceptionUtils.getStackTrace(e));
         }
         contentEngineInfosByResourceUrl.put(resourceUrlString, contentEngineInfo);
         contentEngineInfos.add(contentEngineInfo);
         return contentEngineInfo;
     }
 
-    private static String getExceptionString(Throwable e) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-        return sw.toString();
-    }
-
-    protected static ContentEngine buildFormEngine(URL resource) {
-        InputStream inputStream = null;
-        try {
-            inputStream = resource.openStream();
+    protected static ContentEngine buildContentEngine(URL resource) {
+        try (InputStream inputStream = resource.openStream()) {
             ContentEngineConfiguration contentEngineConfiguration = ContentEngineConfiguration.createContentEngineConfigurationFromInputStream(inputStream);
             return contentEngineConfiguration.buildContentEngine();
 
         } catch (IOException e) {
             throw new FlowableException("couldn't open resource stream: " + e.getMessage(), e);
-        } finally {
-            IOUtils.closeQuietly(inputStream);
         }
     }
 
@@ -186,7 +174,7 @@ public abstract class ContentEngines {
     }
 
     /**
-     * Get initialization results. Only info will we available for form engines which were added in the {@link ContentEngines#init()}. No
+     * Get initialization results. Only info will we available for content engines which were added in the {@link ContentEngines#init()}. No
      * {@link EngineInfo} is available for engines which were registered programmatically.
      */
     public static EngineInfo getContentEngineInfo(String contentEngineName) {

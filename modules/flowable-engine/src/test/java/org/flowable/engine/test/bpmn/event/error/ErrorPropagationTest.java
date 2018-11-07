@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.FlowableRule;
 import org.junit.Rule;
@@ -30,7 +29,7 @@ public class ErrorPropagationTest {
         ProcessInstance processInstance = flowableRule.getRuntimeService().startProcessInstanceByKey("catchError4");
         assertNotNull(processInstance);
 
-        final Task task = flowableRule.getTaskService().createTaskQuery().singleResult();
+        final org.flowable.task.api.Task task = flowableRule.getTaskService().createTaskQuery().singleResult();
 
         assertEquals("MyErrorTaskNested", task.getName());
     }

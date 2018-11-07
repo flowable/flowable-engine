@@ -24,7 +24,7 @@ import java.util.Map;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
-import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
+import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,7 +38,7 @@ public class HitPolicyAnyTest {
     public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void anyHitPolicy() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
@@ -56,7 +56,7 @@ public class HitPolicyAnyTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void anyHitPolicyViolated() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
@@ -71,11 +71,12 @@ public class HitPolicyAnyTest {
 
         assertEquals(0, result.getDecisionResult().size());
         assertTrue(result.isFailed());
+        assertNull(result.getValidationMessage());
         assertNotNull(result.getExceptionMessage());
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void anyHitPolicyNoValueViolated() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
@@ -90,11 +91,18 @@ public class HitPolicyAnyTest {
 
         assertEquals(0, result.getDecisionResult().size());
         assertTrue(result.isFailed());
+
         assertNotNull(result.getExceptionMessage());
+        assertNotNull(result.getRuleExecutions().get(1).getExceptionMessage());
+        assertNotNull(result.getRuleExecutions().get(3).getExceptionMessage());
+
+        assertNull(result.getValidationMessage());
+        assertNull(result.getRuleExecutions().get(1).getValidationMessage());
+        assertNull(result.getRuleExecutions().get(3).getValidationMessage());
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void anyHitPolicyViolatedStrictModeDisabled() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         dmnEngine.getDmnEngineConfiguration().setStrictMode(false);
@@ -114,7 +122,14 @@ public class HitPolicyAnyTest {
         assertEquals(10D, outputMap.get("outputVariable1"));
         assertEquals("result2", outputMap.get("outputVariable2"));
         assertFalse(result.isFailed());
+
         assertNull(result.getExceptionMessage());
+        assertNull(result.getRuleExecutions().get(1).getExceptionMessage());
+        assertNull(result.getRuleExecutions().get(3).getExceptionMessage());
+
+        assertNotNull(result.getValidationMessage());
+        assertNotNull(result.getRuleExecutions().get(1).getValidationMessage());
+        assertNotNull(result.getRuleExecutions().get(3).getValidationMessage());
 
         // re enable strict mode
         dmnEngine.getDmnEngineConfiguration().setStrictMode(true);

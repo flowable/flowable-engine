@@ -16,10 +16,10 @@ import java.util.Map;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultProducer;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.Flowable5Util;
@@ -64,6 +64,7 @@ public class FlowableProducer extends DefaultProducer {
         this.timeResolution = timeResolution;
     }
 
+    @Override
     public void process(Exchange exchange) throws Exception {
         if (shouldStartProcess()) {
             ProcessInstance pi = startProcess(exchange);
@@ -114,7 +115,7 @@ public class FlowableProducer extends DefaultProducer {
             try {
                 Thread.sleep(timeResolution);
             } catch (InterruptedException e) {
-                throw new FlowableException("error occurred while waiting for activity=" + activity + " for processInstanceId=" + processInstanceId);
+                throw new FlowableException("error occurred while waiting for activity=" + activity + " for processInstanceId=" + processInstanceId, e);
             }
             firstTime = false;
 
@@ -137,7 +138,8 @@ public class FlowableProducer extends DefaultProducer {
             }
         }
         if (execution == null) {
-            throw new FlowableException("Couldn't find activity " + activity + " for processId " + processInstanceId + " in defined timeout.");
+            throw new FlowableException("Couldn't find activity " + activity + " for processId " + processInstanceId +
+                    " in defined timeout of " + timeout + " ms.");
         }
 
         runtimeService.setVariables(execution.getId(), ExchangeUtils.prepareVariables(exchange, getFlowableEndpoint()));

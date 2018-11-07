@@ -13,16 +13,17 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import java.io.InputStream;
-import java.util.Collections;
-
-import javax.servlet.http.HttpServletResponse;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.apache.commons.io.IOUtils;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.image.ProcessDiagramGenerator;
@@ -30,17 +31,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletResponse;
+import java.io.InputStream;
+import java.util.Collections;
 
 /**
  * @author Frederik Heremans
@@ -61,7 +58,7 @@ public class ProcessInstanceDiagramResource extends BaseProcessInstanceResource 
             @ApiResponse(code = 400, message = "Indicates the requested process instance was not found but the process doesn’t contain any graphical information (BPMN:DI) and no diagram can be created."),
             @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
     })
-    @RequestMapping(value = "/runtime/process-instances/{processInstanceId}/diagram", method = RequestMethod.GET)
+    @GetMapping(value = "/runtime/process-instances/{processInstanceId}/diagram")
     public ResponseEntity<byte[]> getProcessInstanceDiagram(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletResponse response) {
         ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
 
@@ -72,7 +69,7 @@ public class ProcessInstanceDiagramResource extends BaseProcessInstanceResource 
             ProcessDiagramGenerator diagramGenerator = processEngineConfiguration.getProcessDiagramGenerator();
             InputStream resource = diagramGenerator.generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(processInstance.getId()), Collections.<String>emptyList(),
                     processEngineConfiguration.getActivityFontName(), processEngineConfiguration.getLabelFontName(),
-                    processEngineConfiguration.getAnnotationFontName(), processEngineConfiguration.getClassLoader(), 1.0);
+                    processEngineConfiguration.getAnnotationFontName(), processEngineConfiguration.getClassLoader(), 1.0,processEngineConfiguration.isDrawSequenceFlowNameWithNoLabelDI());
 
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.set("Content-Type", "image/png");

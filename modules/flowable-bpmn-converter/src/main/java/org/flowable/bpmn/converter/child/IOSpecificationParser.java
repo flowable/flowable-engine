@@ -28,10 +28,12 @@ import org.flowable.bpmn.model.Process;
  */
 public class IOSpecificationParser extends BaseChildElementParser {
 
+    @Override
     public String getElementName() {
         return ELEMENT_IOSPECIFICATION;
     }
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
 
         if (!(parentElement instanceof Activity) && !(parentElement instanceof Process))

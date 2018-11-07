@@ -15,7 +15,7 @@ package org.activiti.engine.impl.el;
 
 import java.lang.reflect.Method;
 
-import org.activiti.engine.impl.javax.el.FunctionMapper;
+import org.flowable.common.engine.impl.javax.el.FunctionMapper;
 
 /**
  * Default implementation of a {@link FunctionMapper}.
@@ -26,6 +26,7 @@ import org.activiti.engine.impl.javax.el.FunctionMapper;
  */
 public class ActivitiFunctionMapper extends FunctionMapper {
 
+    @Override
     public Method resolveFunction(String prefix, String localName) {
         return null;
     }

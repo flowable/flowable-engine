@@ -38,6 +38,7 @@ public class EventSubProcessConverterTest extends AbstractConverterTest {
         validateModel(bpmnModel);
     }
 
+    @Override
     protected String getResource() {
         return "test.eventsubprocessmodel.json";
     }

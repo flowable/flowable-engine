@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.engine.impl.bpmn.data.SimpleStructureDefinition;
 import org.flowable.engine.impl.bpmn.data.StructureDefinition;
 import org.junit.Before;
@@ -124,6 +124,7 @@ public class WSDLImporterTest {
     private List<WSOperation> sortOperations() {
         List<WSOperation> operations = new ArrayList<>(importer.getOperations().values());
         Collections.sort(operations, new Comparator<WSOperation>() {
+            @Override
             public int compare(WSOperation o1, WSOperation o2) {
                 return o1.getName().compareTo(o2.getName());
             }
@@ -134,6 +135,7 @@ public class WSDLImporterTest {
     private List<StructureDefinition> sortStructures() {
         List<StructureDefinition> structures = new ArrayList<>(importer.getStructures().values());
         Collections.sort(structures, new Comparator<StructureDefinition>() {
+            @Override
             public int compare(StructureDefinition o1, StructureDefinition o2) {
                 return o1.getId().compareTo(o2.getId());
             }

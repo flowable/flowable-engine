@@ -30,6 +30,7 @@ public class SetVariablesDelegate implements JavaDelegate {
     // activiti creates a single instance of the delegate
     protected int lastInt;
 
+    @Override
     public void execute(DelegateExecution execution) {
         Object nrOfCompletedInstances = execution.getVariable("nrOfCompletedInstances");
         variablesMap.put(nrOfCompletedInstances, lastInt);

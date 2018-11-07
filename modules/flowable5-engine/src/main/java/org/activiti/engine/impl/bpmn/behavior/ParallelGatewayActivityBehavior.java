@@ -47,6 +47,7 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ParallelGatewayActivityBehavior.class);
 
+    @Override
     public void execute(DelegateExecution execution) {
         ActivityExecution activityExecution = (ActivityExecution) execution;
         // Join

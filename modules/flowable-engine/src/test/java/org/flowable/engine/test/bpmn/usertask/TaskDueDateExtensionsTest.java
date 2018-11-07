@@ -19,13 +19,13 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.runtime.Clock;
-import org.flowable.engine.impl.calendar.BusinessCalendar;
+import org.flowable.common.engine.impl.calendar.BusinessCalendar;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.joda.time.Period;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Frederik Heremans
@@ -36,6 +36,7 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
         super("org/flowable/engine/test/bpmn/usertask/TaskDueDateExtensionsTest.flowable.cfg.xml");
     }
 
+    @Test
     @Deployment
     public void testDueDateExtension() throws Exception {
 
@@ -46,12 +47,13 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
         // Start process-instance, passing date that should be used as dueDate
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dueDateExtension", variables);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         assertNotNull(task.getDueDate());
         assertEquals(date, task.getDueDate());
     }
 
+    @Test
     @Deployment
     public void testDueDateStringExtension() throws Exception {
 
@@ -61,13 +63,14 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
         // Start process-instance, passing date that should be used as dueDate
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dueDateExtension", variables);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         assertNotNull(task.getDueDate());
         Date date = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").parse("06-07-1986 12:10:00");
         assertEquals(date, task.getDueDate());
     }
 
+    @Test
     @Deployment
     public void testRelativeDueDateStringExtension() throws Exception {
         Clock clock = processEngineConfiguration.getClock();
@@ -79,7 +82,7 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
         // that should be used to calculate dueDate
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dueDateExtension", variables);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         assertNotNull(task.getDueDate());
         Period period = new Period(task.getCreateTime().getTime(), task.getDueDate().getTime());
@@ -89,6 +92,7 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
         clock.reset();
     }
 
+    @Test
     @Deployment
     public void testRelativeDueDateStringWithCalendarNameExtension() throws Exception {
 
@@ -98,7 +102,7 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
         // Start process-instance, passing ISO8601 duration formatted String that should be used to calculate dueDate
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dueDateExtension", variables);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         assertNotNull(task.getDueDate());
         assertEquals(new Date(0), task.getDueDate());

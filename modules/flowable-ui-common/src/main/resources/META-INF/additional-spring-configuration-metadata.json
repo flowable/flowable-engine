@@ -1,0 +1,121 @@
+{
+  "properties": [
+    {
+      "name": "rest.authentication.mode",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.rest.app.authentication-mode"
+      }
+    },
+    {
+      "name": "file.upload.max.size",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot MultiPartAutoConfiguration instead.",
+        "replacement": "spring.servlet.multipart.max-file-size"
+      }
+    },
+    {
+      "name": "idm.admin.user",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Flowable IDM App auto-configuration instead.",
+        "replacement": "flowable.common.app.idm-admin.user"
+      }
+    },
+    {
+      "name": "idm.admin.password",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Flowable IDM App auto-configuration instead.",
+        "replacement": "flowable.common.app.idm-admin.password"
+      }
+    },
+    {
+      "name": "idm.app.redirect.url",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Flowable IDM App auto-configuration instead.",
+        "replacement": "flowable.common.app.idm-redirect-url"
+      }
+    },
+    {
+      "name": "idm.app.url",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Flowable IDM App auto-configuration instead.",
+        "replacement": "flowable.common.app.idm-url"
+      }
+    },
+    {
+      "name": "app.redirect.url.on.authsuccess",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Flowable IDM App auto-configuration instead.",
+        "replacement": "flowable.common.app.redirect-on-auth-success"
+      }
+    },
+    {
+      "name": "cache.login-tokens.max.size",
+      "type": "java.lang.Long",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Flowable IDM App auto-configuration instead.",
+        "replacement": "flowable.common.app.cache-login-tokens.max-size"
+      }
+    },
+    {
+      "name": "cache.login-tokens.max.age",
+      "type": "java.lang.Long",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Flowable IDM App auto-configuration instead.",
+        "replacement": "flowable.common.app.cache-login-tokens.max-age"
+      }
+    },
+    {
+      "name": "cache.login-users.max.size",
+      "type": "java.lang.Long",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Flowable IDM App auto-configuration instead.",
+        "replacement": "flowable.common.app.cache-login-users.max-size"
+      }
+    },
+    {
+      "name": "cache.login-users.max.age",
+      "type": "java.lang.Long",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Flowable IDM App auto-configuration instead.",
+        "replacement": "flowable.common.app.cache-login-users.max-age"
+      }
+    },
+    {
+      "name": "cache.users.max.size",
+      "type": "java.lang.Long",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Flowable IDM App auto-configuration instead.",
+        "replacement": "flowable.common.app.cache-users.max-size"
+      }
+    },
+    {
+      "name": "cache.users.max.age",
+      "type": "java.lang.Long",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Flowable IDM App auto-configuration instead.",
+        "replacement": "flowable.common.app.cache-users.max-age"
+      }
+    }
+  ]
+}

@@ -17,13 +17,45 @@
     	#{parentDeploymentId, jdbcType=VARCHAR} 
     )
   </insert>
+  
+  <insert id="bulkInsertDmnDeployment" parameterType="java.util.List">
+    insert into ${prefix}ACT_DMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_)
+    values
+    <foreach collection="list" item="deployment" index="index" separator=",">
+    (
+        #{deployment.id, jdbcType=VARCHAR}, 
+        #{deployment.name, jdbcType=VARCHAR}, 
+        #{deployment.category, jdbcType=VARCHAR}, 
+        #{deployment.tenantId, jdbcType=VARCHAR}, 
+        #{deployment.deploymentTime, jdbcType=TIMESTAMP},
+        #{deployment.parentDeploymentId, jdbcType=VARCHAR} 
+    )
+    </foreach>
+  </insert>
+  
+   <insert id="bulkInsertDmnDeployment" databaseId="oracle" parameterType="java.util.List">
+    INSERT ALL
+    <foreach collection="list" item="deployment" index="index">
+        INTO ${prefix}ACT_DMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_) VALUES
+        (
+            #{deployment.id, jdbcType=VARCHAR}, 
+            #{deployment.name, jdbcType=VARCHAR}, 
+            #{deployment.category, jdbcType=VARCHAR}, 
+            #{deployment.tenantId, jdbcType=VARCHAR}, 
+            #{deployment.deploymentTime, jdbcType=TIMESTAMP},
+            #{deployment.parentDeploymentId, jdbcType=VARCHAR} 
+        )
+    </foreach>
+    SELECT * FROM dual
+  </insert>
 
   <!-- DEPLOYMENT UPDATE -->
   
   <update id="updateDmnDeployment" parameterType="org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityImpl">
     update ${prefix}ACT_DMN_DEPLOYMENT set
       CATEGORY_ = #{category, jdbcType=VARCHAR},
-      TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+      TENANT_ID_ = #{tenantId, jdbcType=VARCHAR},
+      PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId, jdbcType=VARCHAR}
     where ID_ = #{id, jdbcType=VARCHAR}
   </update>
   
@@ -48,22 +80,19 @@
 
   <select id="selectDmnDeploymentsByQueryCriteria" parameterType="org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl" resultMap="deploymentResultMap">
   	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectDmnDeploymentsByQueryCriteriaSql"/>
     ${orderBy}
     <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
 
   <select id="selectDmnDeploymentCountByQueryCriteria" parameterType="org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    select count(RES.ID_)
     <include refid="selectDmnDeploymentsByQueryCriteriaSql"/>
   </select>
   
   <sql id="selectDmnDeploymentsByQueryCriteriaSql">  
     from ${prefix}ACT_DMN_DEPLOYMENT RES
-    <if test="decisionTableKey != null or decisionTableKeyLike != null">
-    	inner join ${prefix}ACT_DMN_DECISION_TABLE DECISIONTABLE on RES.ID_ = DECISIONTABLE.DEPLOYMENT_ID_
-    </if>
     <where>
       <if test="deploymentId != null">
         RES.ID_ = #{deploymentId}
@@ -95,32 +124,21 @@
       <if test="parentDeploymentIdLike != null">
         and RES.PARENT_DEPLOYMENT_ID_ like #{parentDeploymentIdLike}
       </if>
-      <if test="decisionTableKey != null">
-        and DECISIONTABLE.KEY_ = #{decisionTableKey}
-      </if>
-      <if test="decisionTableKeyLike != null">
-        and DECISIONTABLE.KEY_ like #{decisionTableKeyLike}
+      <if test="decisionTableKey != null || decisionTableKeyLike != null">
+        and exists(select 1 from ${prefix}ACT_DMN_DECISION_TABLE DECISIONTABLE where RES.ID_ = DECISIONTABLE.DEPLOYMENT_ID_ 
+        <if test="decisionTableKey != null">
+          and DECISIONTABLE.KEY_ = #{decisionTableKey}
+        </if>
+        <if test="decisionTableKeyLike != null">
+          and DECISIONTABLE.KEY_ like #{decisionTableKeyLike}
+        </if>
+        )
       </if>
     </where>
   </sql>
     
   <select id="selectDmnDeployment" parameterType="string" resultMap="deploymentResultMap">
     select * from ${prefix}ACT_DMN_DEPLOYMENT where ID_ = #{id, jdbcType=VARCHAR}
-  </select>
-
-  <!-- mysql specific -->
-  <select id="selectDmnDeploymentsByQueryCriteria" databaseId="mysql" parameterType="org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl" resultMap="deploymentResultMap">
-  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
-    <include refid="selectDmnDeploymentsByQueryCriteriaSql"/>
-   	${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
-  </select>
-  
-  <!-- mysql specific -->
-  <select id="selectDmnDeploymentCountByQueryCriteria" databaseId="mysql" parameterType="org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl" resultType="long">
-    select distinct count(RES.ID_)
-    <include refid="selectDmnDeploymentsByQueryCriteriaSql"/>
   </select>
 
   <select id="selectDmnDeploymentByNativeQuery" parameterType="java.util.Map" resultMap="deploymentResultMap">

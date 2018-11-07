@@ -28,6 +28,7 @@ import org.flowable.bpmn.model.SendTask;
  */
 public class SendTaskXMLConverter extends BaseBpmnXMLConverter {
 
+    @Override
     public Class<? extends BaseElement> getBpmnElementType() {
         return SendTask.class;
     }

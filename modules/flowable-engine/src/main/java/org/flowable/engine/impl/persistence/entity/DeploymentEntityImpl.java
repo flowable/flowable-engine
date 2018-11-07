@@ -20,15 +20,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class DeploymentEntityImpl extends AbstractEntityNoRevision implements DeploymentEntity, Serializable {
+public class DeploymentEntityImpl extends AbstractBpmnEngineNoRevisionEntity implements DeploymentEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -36,9 +36,12 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
     protected String category;
     protected String key;
     protected String tenantId = ProcessEngineConfiguration.NO_TENANT_ID;
-    protected Map<String, ResourceEntity> resources;
+    protected Map<String, EngineResource> resources;
     protected Date deploymentTime;
     protected boolean isNew;
+    protected String derivedFrom;
+    protected String derivedFromRoot;
+    protected String parentDeploymentId;
 
     // Backwards compatibility
     protected String engineVersion;
@@ -52,6 +55,7 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
 
     }
 
+    @Override
     public void addResource(ResourceEntity resource) {
         if (resources == null) {
             resources = new HashMap<>();
@@ -61,7 +65,8 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
 
     // lazy loading ///////////////////////////////////////////////////////////////
 
-    public Map<String, ResourceEntity> getResources() {
+    @Override
+    public Map<String, EngineResource> getResources() {
         if (resources == null && id != null) {
             List<ResourceEntity> resourcesList = CommandContextUtil.getResourceEntityManager().findResourcesByDeploymentId(id);
             resources = new HashMap<>();
@@ -72,16 +77,19 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
         return resources;
     }
 
+    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("category", this.category);
         persistentState.put("key", this.key);
         persistentState.put("tenantId", tenantId);
+        persistentState.put("parentDeploymentId", parentDeploymentId);
         return persistentState;
     }
 
     // Deployed artifacts manipulation ////////////////////////////////////////////
 
+    @Override
     public void addDeployedArtifact(Object deployedArtifact) {
         if (deployedArtifacts == null) {
             deployedArtifacts = new HashMap<>();
@@ -97,8 +105,12 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
         artifacts.add(deployedArtifact);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <T> List<T> getDeployedArtifacts(Class<T> clazz) {
+        if (deployedArtifacts == null) {
+            return null;
+        }
         for (Class<?> deployedArtifactsClass : deployedArtifacts.keySet()) {
             if (clazz.isAssignableFrom(deployedArtifactsClass)) {
                 return (List<T>) deployedArtifacts.get(deployedArtifactsClass);
@@ -109,64 +121,109 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
 
     // getters and setters ////////////////////////////////////////////////////////
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public String getCategory() {
         return category;
     }
 
+    @Override
     public void setCategory(String category) {
         this.category = category;
     }
 
+    @Override
     public String getKey() {
         return key;
     }
 
+    @Override
     public void setKey(String key) {
         this.key = key;
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
 
-    public void setResources(Map<String, ResourceEntity> resources) {
+    @Override
+    public void setResources(Map<String, EngineResource> resources) {
         this.resources = resources;
     }
 
+    @Override
     public Date getDeploymentTime() {
         return deploymentTime;
     }
 
+    @Override
     public void setDeploymentTime(Date deploymentTime) {
         this.deploymentTime = deploymentTime;
     }
 
+    @Override
     public boolean isNew() {
         return isNew;
     }
 
+    @Override
     public void setNew(boolean isNew) {
         this.isNew = isNew;
     }
 
+    @Override
     public String getEngineVersion() {
         return engineVersion;
     }
 
+    @Override
     public void setEngineVersion(String engineVersion) {
         this.engineVersion = engineVersion;
+    }
+    
+    @Override
+    public String getDerivedFrom() {
+        return derivedFrom;
+    }
+
+    @Override
+    public void setDerivedFrom(String derivedFrom) {
+        this.derivedFrom = derivedFrom;
+    }
+
+    @Override
+    public String getDerivedFromRoot() {
+        return derivedFromRoot;
+    }
+
+    @Override
+    public void setDerivedFromRoot(String derivedFromRoot) {
+        this.derivedFromRoot = derivedFromRoot;
+    }
+    
+    @Override
+    public String getParentDeploymentId() {
+        return parentDeploymentId;
+    }
+
+    @Override
+    public void setParentDeploymentId(String parentDeploymentId) {
+        this.parentDeploymentId = parentDeploymentId;
     }
 
     // common methods //////////////////////////////////////////////////////////

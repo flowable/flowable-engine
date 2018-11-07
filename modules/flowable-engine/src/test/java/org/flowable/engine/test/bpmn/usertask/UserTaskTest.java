@@ -17,24 +17,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class UserTaskTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testTaskPropertiesNotNull() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task.getId());
         assertEquals("my task", task.getName());
         assertEquals("Very important", task.getDescription());
@@ -51,24 +55,26 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testQuerySortingWithParameter() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstance.getId()).list().size());
     }
 
+    @Test
     @Deployment
     public void testCompleteAfterParallelGateway() throws InterruptedException {
         // related to https://activiti.atlassian.net/browse/ACT-1054
 
         // start the process
         runtimeService.startProcessInstanceByKey("ForkProcess");
-        List<Task> taskList = taskService.createTaskQuery().list();
+        List<org.flowable.task.api.Task> taskList = taskService.createTaskQuery().list();
         assertNotNull(taskList);
         assertEquals(2, taskList.size());
 
         // make sure user task exists
-        Task task = taskService.createTaskQuery().taskDefinitionKey("SimpleUser").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("SimpleUser").singleResult();
         assertNotNull(task);
 
         // attempt to complete the task and get PersistenceException pointing to
@@ -76,10 +82,11 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
     }
 
+    @Test
     @Deployment
     public void testTaskCategory() {
         runtimeService.startProcessInstanceByKey("testTaskCategory");
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
 
         // Test if the property set in the model is shown in the task
         String testCategory = "My Category";
@@ -119,12 +126,13 @@ public class UserTaskTest extends PluggableFlowableTestCase {
     }
 
     // See https://activiti.atlassian.net/browse/ACT-4041
+    @Test
     public void testTaskFormKeyWhenUsingIncludeVariables() {
         deployOneTaskTestProcess();
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
         // Set variables
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
         Map<String, Object> vars = new HashMap<>();
         for (int i = 0; i < 20; i++) {
@@ -142,6 +150,74 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         assertEquals(vars.size(), task.getProcessVariables().size());
 
         assertEquals("test123", task.getFormKey());
+    }
+    
+    @Test
+    @Deployment
+    public void testEmptyAssignmentExpression() {
+        Map<String, Object> variableMap = new HashMap<>();
+        variableMap.put("assignee", null);
+        variableMap.put("candidateUsers", null);
+        variableMap.put("candidateGroups", null);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variableMap);
+        assertNotNull(processInstance);
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(task);
+        assertNull(task.getAssignee());
+        List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(task.getId());
+        assertEquals(0, identityLinks.size());
+        
+        variableMap = new HashMap<>();
+        variableMap.put("assignee", "");
+        variableMap.put("candidateUsers", "");
+        variableMap.put("candidateGroups", "");
+        processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variableMap);
+        assertNotNull(processInstance);
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(task);
+        assertNull(task.getAssignee());
+        identityLinks = taskService.getIdentityLinksForTask(task.getId());
+        assertEquals(0, identityLinks.size());
+    }
+    
+    @Test
+    @Deployment
+    public void testNonStringProperties() {
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("taskName", 1);
+        vars.put("taskDescription", 2);
+        vars.put("taskCategory", 3);
+        vars.put("taskFormKey", 4);
+        vars.put("taskAssignee", 5);
+        vars.put("taskOwner", 6);
+        vars.put("taskCandidateGroups", 7);
+        vars.put("taskCandidateUsers", 8);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nonStringProperties", vars);
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("1", task.getName());
+        assertEquals("2", task.getDescription());
+        assertEquals("3", task.getCategory());
+        assertEquals("4", task.getFormKey());
+        assertEquals("5", task.getAssignee());
+        assertEquals("6", task.getOwner());
+        
+        List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(task.getId());
+        assertEquals(4, identityLinks.size());
+        int candidateIdentityLinkCount = 0;
+        for (IdentityLink identityLink : identityLinks) {
+            if (identityLink.getType().equals(IdentityLinkType.CANDIDATE)) {
+                candidateIdentityLinkCount++;
+                if (identityLink.getGroupId() != null) {
+                    assertEquals("7", identityLink.getGroupId());
+                } else {
+                    assertEquals("8", identityLink.getUserId());
+                }
+            }
+        }
+        assertEquals(2, candidateIdentityLinkCount);
     }
 
 }

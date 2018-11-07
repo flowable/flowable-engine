@@ -23,15 +23,14 @@ import java.util.Map.Entry;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.form.FormProperty;
 import org.flowable.engine.form.StartFormData;
 import org.flowable.engine.form.TaskFormData;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -108,7 +107,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
             fail("ActivitiException expected");
         } catch (FlowableObjectNotFoundException ae) {
             assertTextPresent("Task 'unexistingtask' not found", ae.getMessage());
-            assertEquals(Task.class, ae.getObjectClass());
+            assertEquals(org.flowable.task.api.Task.class, ae.getObjectClass());
         }
     }
 
@@ -139,7 +138,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
         assertEquals(expectedVariables, variables);
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         String taskId = task.getId();
         TaskFormData taskForm = formService.getTaskFormData(taskId);
         assertEquals(deploymentIdFromDeploymentAnnotation, taskForm.getDeploymentId());
@@ -408,7 +407,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
     public void testGetTaskFormKey() {
         String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
         runtimeService.startProcessInstanceById(processDefinitionId);
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
         String expectedFormKey = formService.getTaskFormData(task.getId()).getFormKey();
         String actualFormKey = formService.getTaskFormKey(task.getProcessDefinitionId(), task.getTaskDefinitionKey());
@@ -418,7 +417,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
     @Deployment
     public void testGetTaskFormKeyWithExpression() {
         runtimeService.startProcessInstanceByKey("FormsProcess", CollectionUtil.singletonMap("dynamicKey", "test"));
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
         assertEquals("test", formService.getTaskFormData(task.getId()).getFormKey());
     }
@@ -432,7 +431,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinition.getKey());
         assertNotNull(processInstance);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         Map<String, String> properties = new HashMap<String, String>();
@@ -454,7 +453,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinition.getKey());
         assertNotNull(processInstance);
 
-        Task task = null;
+        org.flowable.task.api.Task task = null;
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 

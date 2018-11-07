@@ -15,13 +15,11 @@ package org.flowable.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class ResourceEntityImpl extends AbstractEntityNoRevision implements ResourceEntity, Serializable {
+public class ResourceEntityImpl extends AbstractBpmnEngineNoRevisionEntity implements ResourceEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -34,34 +32,42 @@ public class ResourceEntityImpl extends AbstractEntityNoRevision implements Reso
 
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public byte[] getBytes() {
         return bytes;
     }
 
+    @Override
     public void setBytes(byte[] bytes) {
         this.bytes = bytes;
     }
 
+    @Override
     public String getDeploymentId() {
         return deploymentId;
     }
 
+    @Override
     public void setDeploymentId(String deploymentId) {
         this.deploymentId = deploymentId;
     }
 
+    @Override
     public Object getPersistentState() {
         return ResourceEntityImpl.class;
     }
 
+    @Override
     public void setGenerated(boolean generated) {
         this.generated = generated;
     }
@@ -69,6 +75,7 @@ public class ResourceEntityImpl extends AbstractEntityNoRevision implements Reso
     /**
      * Indicated whether or not the resource has been generated while deploying rather than being actual part of the deployment.
      */
+    @Override
     public boolean isGenerated() {
         return generated;
     }

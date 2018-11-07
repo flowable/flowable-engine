@@ -21,11 +21,11 @@ import org.flowable.bpmn.model.HasExecutionListeners;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Task;
 import org.flowable.bpmn.model.UserTask;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.cfg.TransactionContext;
-import org.flowable.engine.common.impl.cfg.TransactionListener;
-import org.flowable.engine.common.impl.cfg.TransactionState;
-import org.flowable.engine.common.impl.context.Context;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.cfg.TransactionContext;
+import org.flowable.common.engine.impl.cfg.TransactionListener;
+import org.flowable.common.engine.impl.cfg.TransactionState;
+import org.flowable.common.engine.impl.context.Context;
 import org.flowable.engine.delegate.BaseExecutionListener;
 import org.flowable.engine.delegate.BaseTaskListener;
 import org.flowable.engine.delegate.CustomPropertiesResolver;
@@ -36,9 +36,10 @@ import org.flowable.engine.delegate.TransactionDependentExecutionListener;
 import org.flowable.engine.delegate.TransactionDependentTaskListener;
 import org.flowable.engine.impl.bpmn.parser.factory.ListenerFactory;
 import org.flowable.engine.impl.delegate.invocation.TaskListenerInvocation;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.ExecutionHelper;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Joram Barrez
@@ -85,7 +86,9 @@ public class ListenerNotificationHelper {
         }
     }
 
-    protected void planTransactionDependentExecutionListener(ListenerFactory listenerFactory, DelegateExecution execution, TransactionDependentExecutionListener executionListener, FlowableListener listener) {
+    protected void planTransactionDependentExecutionListener(ListenerFactory listenerFactory, DelegateExecution execution, 
+                    TransactionDependentExecutionListener executionListener, FlowableListener listener) {
+        
         Map<String, Object> executionVariablesToUse = execution.getVariables();
         CustomPropertiesResolver customPropertiesResolver = createCustomPropertiesResolver(listener);
         Map<String, Object> customPropertiesMapToUse = invokeCustomPropertiesResolver(execution, customPropertiesResolver);
@@ -93,7 +96,8 @@ public class ListenerNotificationHelper {
         TransactionDependentExecutionListenerExecutionScope scope = new TransactionDependentExecutionListenerExecutionScope(
                 execution.getProcessInstanceId(), execution.getId(), execution.getCurrentFlowElement(), executionVariablesToUse, customPropertiesMapToUse);
 
-        addTransactionListener(listener, new ExecuteExecutionListenerTransactionListener(executionListener, scope));
+        addTransactionListener(listener, new ExecuteExecutionListenerTransactionListener(executionListener, scope, 
+                        CommandContextUtil.getProcessEngineConfiguration().getCommandExecutor()));
     }
 
     public void executeTaskListeners(TaskEntity taskEntity, String eventType) {
@@ -114,10 +118,11 @@ public class ListenerNotificationHelper {
                 BaseTaskListener taskListener = createTaskListener(listener);
 
                 if (listener.getOnTransaction() != null) {
-                    planTransactionDependentTaskListener(taskEntity.getExecution(), (TransactionDependentTaskListener) taskListener, listener);
+                    planTransactionDependentTaskListener(ExecutionHelper.getExecution(taskEntity.getExecutionId()), (TransactionDependentTaskListener) taskListener, listener);
                 } else {
                     taskEntity.setEventName(eventType);
-                    taskEntity.setCurrentFlowableListener(listener);
+                    taskEntity.setEventHandlerId(listener.getId());
+                    
                     try {
                         CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor()
                                 .handleInvocation(new TaskListenerInvocation((TaskListener) taskListener, taskEntity));
@@ -125,7 +130,6 @@ public class ListenerNotificationHelper {
                         throw new FlowableException("Exception while invoking TaskListener: " + e.getMessage(), e);
                     } finally {
                         taskEntity.setEventName(null);
-                        taskEntity.setCurrentFlowableListener(null);
                     }
                 }
             }
@@ -159,7 +163,8 @@ public class ListenerNotificationHelper {
 
         TransactionDependentTaskListenerExecutionScope scope = new TransactionDependentTaskListenerExecutionScope(
                 execution.getProcessInstanceId(), execution.getId(), (Task) execution.getCurrentFlowElement(), executionVariablesToUse, customPropertiesMapToUse);
-        addTransactionListener(listener, new ExecuteTaskListenerTransactionListener(taskListener, scope));
+        addTransactionListener(listener, new ExecuteTaskListenerTransactionListener(taskListener, scope,
+                        CommandContextUtil.getProcessEngineConfiguration().getCommandExecutor()));
     }
 
     protected CustomPropertiesResolver createCustomPropertiesResolver(FlowableListener listener) {

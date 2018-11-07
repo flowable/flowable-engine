@@ -35,6 +35,7 @@ public class FindActiveActivityIdsCmd implements Command<List<String>>, Serializ
         this.executionId = executionId;
     }
 
+    @Override
     public List<String> execute(CommandContext commandContext) {
         if (executionId == null) {
             throw new ActivitiIllegalArgumentException("executionId is null");

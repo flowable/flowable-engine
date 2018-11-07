@@ -1,0 +1,5 @@
+
+<div ng-controller="FlowablePlanItemDropdownCtrl">
+    <select ng-model="property.value" ng-options="planItem as planItem.name for planItem in planItems" ng-change="planItemChanged()">
+    </select>
+</div>

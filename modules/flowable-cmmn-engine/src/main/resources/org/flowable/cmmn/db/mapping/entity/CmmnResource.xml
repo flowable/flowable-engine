@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityImpl">
+  
+  <!-- RESOURCE INSERT -->
+
+  <insert id="insertCmmnResource" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityImpl">
+    insert into ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_, GENERATED_)
+    values (#{id, jdbcType=VARCHAR}, #{name, jdbcType=VARCHAR}, #{bytes, jdbcType=${blobType}}, #{deploymentId, jdbcType=VARCHAR}, #{generated, jdbcType=BOOLEAN})  
+  </insert>
+
+  <insert id="bulkInsertCmmnResource" parameterType="java.util.List">
+    INSERT INTO ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_, GENERATED_) VALUES 
+      <foreach collection="list" item="resource" index="index" separator=","> 
+        (#{resource.id, jdbcType=VARCHAR},
+         #{resource.name, jdbcType=VARCHAR},
+         #{resource.bytes, jdbcType=${blobType}},
+         #{resource.deploymentId, jdbcType=VARCHAR},
+         #{resource.generated, jdbcType=BOOLEAN})
+      </foreach>
+  </insert>
+
+  <insert id="bulkInsertCmmnResource" databaseId="oracle" parameterType="java.util.List">
+    INSERT ALL
+      <foreach collection="list" item="resource" index="index"> 
+        INTO ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_, GENERATED_) VALUES 
+        (#{resource.id, jdbcType=VARCHAR},
+         #{resource.name, jdbcType=VARCHAR},
+         #{resource.bytes, jdbcType=${blobType}},
+         #{resource.deploymentId, jdbcType=VARCHAR},
+         #{resource.generated, jdbcType=BOOLEAN})
+      </foreach>
+    SELECT * FROM dual
+  </insert>
+  
+  <!-- RESOURCE DELETE -->
+
+  <delete id="deleteCmmnResourcesByDeploymentId" parameterType="string">
+    delete from ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{id}
+  </delete>
+  
+  <!-- RESOURCE RESULTMAP -->
+
+  <resultMap id="cmmnResourceResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="name" column="NAME_" jdbcType="VARCHAR"/>
+    <result property="bytes" column="RESOURCE_BYTES_" jdbcType="${blobType}"/>
+    <result property="generated" column="GENERATED_" jdbcType="BOOLEAN"/>
+  </resultMap>
+  
+  <!-- RESOURCE SELECT -->
+
+  <select id="selectCmmnResourceNamesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultType="string">
+    select NAME_ from ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
+  </select>
+  
+  <select id="selectCmmnResourceByDeploymentIdAndResourceName" parameterType="map" resultMap="cmmnResourceResultMap">
+    select * from ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE 
+    where DEPLOYMENT_ID_ = #{deploymentId}
+          AND NAME_ = #{resourceName}
+  </select>
+
+  <select id="selectCmmnResourcesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="cmmnResourceResultMap">
+    select * from ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
+  </select>
+  
+  <update id="updateCmmnResource" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityImpl">
+    update ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE set RESOURCE_BYTES_ = #{bytes, jdbcType=${blobType}}
+    where ID_ = #{id, jdbcType=VARCHAR}
+  </update> 
+  
+</mapper>

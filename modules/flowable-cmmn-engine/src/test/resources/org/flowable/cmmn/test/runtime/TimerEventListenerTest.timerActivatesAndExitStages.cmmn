@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+  <case id="timerActivatesAndExitStages" name="timerActivatesAndExitStages" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="casePlanModel">
+      <planItem id="planItem8" name="Stage 1" definitionRef="sid-EB3F03CC-8970-4EBC-9C58-E346E8A62B56">
+        <entryCriterion id="sid-94D1C06A-3912-45E2-9318-C1E9AD06A77E" sentryRef="sentry3"></entryCriterion>
+      </planItem>
+      <planItem id="planItem9" name="A" definitionRef="sid-BF6DC06D-F0CF-472D-9AE1-552A2D93DFE4"></planItem>
+      <planItem id="planItem10" name="B" definitionRef="sid-88EDC05B-411A-4929-AE9B-19D3465EDB10"></planItem>
+      <sentry id="sentry3">
+        <planItemOnPart id="sentryOnPart3" sourceRef="planItem10">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <stage id="sid-EB3F03CC-8970-4EBC-9C58-E346E8A62B56" name="Stage 1">
+        <planItem id="planItem1" definitionRef="sid-A71D449F-E498-485C-999D-103EE5313FAE"></planItem>
+        <planItem id="planItem3" name="Stage 2" definitionRef="sid-519CE4B7-0001-4DF4-9231-835A50E85782">
+          <entryCriterion id="sid-F0194583-F97D-4C22-9997-2ADCC416B81B" sentryRef="sentry1"></entryCriterion>
+        </planItem>
+        <planItem id="planItem6" name="Stage 3" definitionRef="sid-1D12B0A8-B585-4DA5-81FB-FEC6F71BEB23">
+          <exitCriterion id="sid-5FEFFBFB-553A-42C1-8239-BCA1FE5D881D" sentryRef="sentry2"></exitCriterion>
+        </planItem>
+        <planItem id="planItem7" name="Stage 1 task" definitionRef="sid-C765C298-C072-4D7E-820B-CC08A9D9CEA0"></planItem>
+        <sentry id="sentry1">
+          <planItemOnPart id="sentryOnPart1" sourceRef="planItem1">
+            <standardEvent>occur</standardEvent>
+          </planItemOnPart>
+        </sentry>
+        <sentry id="sentry2">
+          <planItemOnPart id="sentryOnPart2" sourceRef="planItem1">
+            <standardEvent>occur</standardEvent>
+          </planItemOnPart>
+        </sentry>
+        <timerEventListener id="sid-A71D449F-E498-485C-999D-103EE5313FAE">
+          <timerExpression><![CDATA[PT10H]]></timerExpression>
+        </timerEventListener>
+        <stage id="sid-519CE4B7-0001-4DF4-9231-835A50E85782" name="Stage 2">
+          <planItem id="planItem2" name="Stage 2 task" definitionRef="sid-89212915-2F5E-4DA0-A3D1-5F15DC872F62"></planItem>
+          <humanTask id="sid-89212915-2F5E-4DA0-A3D1-5F15DC872F62" name="Stage 2 task"></humanTask>
+        </stage>
+        <stage id="sid-1D12B0A8-B585-4DA5-81FB-FEC6F71BEB23" name="Stage 3">
+          <planItem id="planItem4" name="Stage 3 task 1" definitionRef="sid-F1603638-C0CC-460B-9EE0-3A549C4FC426"></planItem>
+          <planItem id="planItem5" name="Stage 3 task 2" definitionRef="sid-C94D3E3B-8B31-4032-A148-3C2435D9C13B"></planItem>
+          <humanTask id="sid-F1603638-C0CC-460B-9EE0-3A549C4FC426" name="Stage 3 task 1"></humanTask>
+          <humanTask id="sid-C94D3E3B-8B31-4032-A148-3C2435D9C13B" name="Stage 3 task 2"></humanTask>
+        </stage>
+        <humanTask id="sid-C765C298-C072-4D7E-820B-CC08A9D9CEA0" name="Stage 1 task"></humanTask>
+      </stage>
+      <humanTask id="sid-BF6DC06D-F0CF-472D-9AE1-552A2D93DFE4" name="A"></humanTask>
+      <humanTask id="sid-88EDC05B-411A-4929-AE9B-19D3465EDB10" name="B"></humanTask>
+    </casePlanModel>
+  </case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="CMMNDiagram_timerActivatesAndExitStages">
+      <cmmndi:CMMNShape id="CMMNShape_casePlanModel" cmmnElementRef="casePlanModel">
+        <dc:Bounds height="724.0" width="1041.0" x="40.0" y="40.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem8" cmmnElementRef="planItem8">
+        <dc:Bounds height="500.0" width="934.0" x="90.0" y="229.5"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_sid-94D1C06A-3912-45E2-9318-C1E9AD06A77E" cmmnElementRef="sid-94D1C06A-3912-45E2-9318-C1E9AD06A77E">
+        <dc:Bounds height="22.0" width="14.0" x="694.7054538660428" y="217.820541644968"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+        <dc:Bounds height="31.0" width="31.0" x="480.0" y="300.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem3" cmmnElementRef="planItem3">
+        <dc:Bounds height="256.0" width="377.0" x="120.0" y="405.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_sid-F0194583-F97D-4C22-9997-2ADCC416B81B" cmmnElementRef="sid-F0194583-F97D-4C22-9997-2ADCC416B81B">
+        <dc:Bounds height="22.0" width="14.0" x="367.7062964978447" y="393.6616406349472"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+        <dc:Bounds height="80.0" width="100.0" x="189.5" y="468.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem6" cmmnElementRef="planItem6">
+        <dc:Bounds height="270.0" width="468.0" x="525.0" y="405.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_sid-5FEFFBFB-553A-42C1-8239-BCA1FE5D881D" cmmnElementRef="sid-5FEFFBFB-553A-42C1-8239-BCA1FE5D881D">
+        <dc:Bounds height="22.0" width="14.0" x="688.6880903962483" y="393.11102328950864"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem4" cmmnElementRef="planItem4">
+        <dc:Bounds height="80.0" width="100.0" x="570.0" y="480.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem5" cmmnElementRef="planItem5">
+        <dc:Bounds height="80.0" width="100.0" x="750.0" y="500.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem7" cmmnElementRef="planItem7">
+        <dc:Bounds height="80.0" width="100.0" x="786.5" y="273.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem9" cmmnElementRef="planItem9">
+        <dc:Bounds height="80.0" width="100.0" x="90.0" y="75.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem10" cmmnElementRef="planItem10">
+        <dc:Bounds height="80.0" width="100.0" x="306.5" y="82.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="CMMNEdge_sid-6DF49C2F-45B8-4E2B-B5F5-DB2AEC3BA8C3" cmmnElementRef="sid-5FEFFBFB-553A-42C1-8239-BCA1FE5D881D" targetCMMNElementRef="planItem1">
+        <di:waypoint x="690.9222590314264" y="400.6001868628003"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+      <cmmndi:CMMNEdge id="CMMNEdge_sid-2C284E72-1E74-4BD6-AE8C-128D073488A5" cmmnElementRef="sid-F0194583-F97D-4C22-9997-2ADCC416B81B" targetCMMNElementRef="planItem1">
+        <di:waypoint x="379.3591811439587" y="400.97331650741216"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+      <cmmndi:CMMNEdge id="CMMNEdge_sid-2B7D70DD-0A8D-432A-860C-74DDF1F34945" cmmnElementRef="sid-94D1C06A-3912-45E2-9318-C1E9AD06A77E" targetCMMNElementRef="planItem10">
+        <di:waypoint x="696.5408861728858" y="225.9362908770718"></di:waypoint>
+        <di:waypoint x="406.5" y="137.28291083564403"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</definitions>

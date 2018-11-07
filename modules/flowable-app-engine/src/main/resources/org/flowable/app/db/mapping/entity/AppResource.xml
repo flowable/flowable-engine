@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.flowable.app.engine.impl.persistence.entity.AppResourceEntityImpl">
+  
+  <!-- RESOURCE INSERT -->
+
+  <insert id="insertAppResource" parameterType="org.flowable.app.engine.impl.persistence.entity.AppResourceEntityImpl">
+    insert into ${prefix}ACT_APP_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_)
+    values (#{id, jdbcType=VARCHAR}, #{name, jdbcType=VARCHAR}, #{bytes, jdbcType=${blobType}}, #{deploymentId, jdbcType=VARCHAR})  
+  </insert>
+
+  <insert id="bulkInsertAppResource" parameterType="java.util.List">
+    INSERT INTO ${prefix}ACT_APP_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_) VALUES 
+      <foreach collection="list" item="resource" index="index" separator=","> 
+        (#{resource.id, jdbcType=VARCHAR},
+         #{resource.name, jdbcType=VARCHAR},
+         #{resource.bytes, jdbcType=${blobType}},
+         #{resource.deploymentId, jdbcType=VARCHAR})
+      </foreach>
+  </insert>
+
+  <insert id="bulkInsertAppResource" databaseId="oracle" parameterType="java.util.List">
+    INSERT ALL
+      <foreach collection="list" item="resource" index="index"> 
+        INTO ${prefix}ACT_APP_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_) VALUES 
+        (#{resource.id, jdbcType=VARCHAR},
+         #{resource.name, jdbcType=VARCHAR},
+         #{resource.bytes, jdbcType=${blobType}},
+         #{resource.deploymentId, jdbcType=VARCHAR})
+      </foreach>
+    SELECT * FROM dual
+  </insert>
+  
+  <!-- RESOURCE DELETE -->
+
+  <delete id="deleteAppResourcesByDeploymentId" parameterType="string">
+    delete from ${prefix}ACT_APP_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{id}
+  </delete>
+  
+  <!-- RESOURCE RESULTMAP -->
+
+  <resultMap id="appResourceResultMap" type="org.flowable.app.engine.impl.persistence.entity.AppResourceEntityImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="name" column="NAME_" jdbcType="VARCHAR"/>
+    <result property="bytes" column="RESOURCE_BYTES_" jdbcType="${blobType}"/>
+    <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
+  </resultMap>
+  
+  <!-- RESOURCE SELECT -->
+
+  <select id="selectAppResourceNamesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultType="string">
+    select NAME_ from ${prefix}ACT_APP_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
+  </select>
+  
+  <select id="selectAppResourceByDeploymentIdAndResourceName" parameterType="map" resultMap="appResourceResultMap">
+    select * from ${prefix}ACT_APP_DEPLOYMENT_RESOURCE 
+    where DEPLOYMENT_ID_ = #{deploymentId}
+          AND NAME_ = #{resourceName}
+  </select>
+
+  <select id="selectAppResourcesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="appResourceResultMap">
+    select * from ${prefix}ACT_APP_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
+  </select>
+  
+  <update id="updateAppResource" parameterType="org.flowable.app.engine.impl.persistence.entity.AppResourceEntityImpl">
+    update ${prefix}ACT_APP_DEPLOYMENT_RESOURCE set RESOURCE_BYTES_ = #{bytes, jdbcType=${blobType}}
+    where ID_ = #{id, jdbcType=VARCHAR}
+  </update> 
+  
+</mapper>

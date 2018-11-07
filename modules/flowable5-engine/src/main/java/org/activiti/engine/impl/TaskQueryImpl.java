@@ -26,9 +26,9 @@ import org.activiti.engine.impl.persistence.entity.SuspensionState;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.task.DelegationState;
 import org.flowable.idm.api.Group;
-import org.flowable.variable.service.impl.types.VariableTypes;
+import org.flowable.task.api.DelegationState;
+import org.flowable.variable.api.types.VariableTypes;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -109,7 +109,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String locale;
     protected boolean withLocalizationFallback;
     protected boolean orActive;
-    protected List<TaskQueryImpl> orQueryObjects = new ArrayList<TaskQueryImpl>();
+    protected List<TaskQueryImpl> orQueryObjects = new ArrayList<>();
     protected TaskQueryImpl currentOrQueryObject;
 
     public TaskQueryImpl() {
@@ -128,6 +128,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         this.databaseType = databaseType;
     }
 
+    @Override
     public TaskQueryImpl taskId(String taskId) {
         if (taskId == null) {
             throw new ActivitiIllegalArgumentException("Task id is null");
@@ -141,6 +142,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQueryImpl taskName(String name) {
         if (name == null) {
             throw new ActivitiIllegalArgumentException("Task name is null");
@@ -211,7 +213,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
 
         final int nameListSize = nameList.size();
-        final List<String> caseIgnoredNameList = new ArrayList<String>(nameListSize);
+        final List<String> caseIgnoredNameList = new ArrayList<>(nameListSize);
         for (String name : nameList) {
             caseIgnoredNameList.add(name.toLowerCase());
         }
@@ -224,6 +226,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQueryImpl taskNameLike(String nameLike) {
         if (nameLike == null) {
             throw new ActivitiIllegalArgumentException("Task namelike is null");
@@ -237,6 +240,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskNameLikeIgnoreCase(String nameLikeIgnoreCase) {
         if (nameLikeIgnoreCase == null) {
             throw new ActivitiIllegalArgumentException("Task nameLikeIgnoreCase is null");
@@ -250,6 +254,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQueryImpl taskDescription(String description) {
         if (description == null) {
             throw new ActivitiIllegalArgumentException("Description is null");
@@ -263,6 +268,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskDescriptionLike(String descriptionLike) {
         if (descriptionLike == null) {
             throw new ActivitiIllegalArgumentException("Task descriptionlike is null");
@@ -275,6 +281,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskDescriptionLikeIgnoreCase(String descriptionLikeIgnoreCase) {
         if (descriptionLikeIgnoreCase == null) {
             throw new ActivitiIllegalArgumentException("Task descriptionLikeIgnoreCase is null");
@@ -287,6 +294,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskPriority(Integer priority) {
         if (priority == null) {
             throw new ActivitiIllegalArgumentException("Priority is null");
@@ -299,6 +307,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskMinPriority(Integer minPriority) {
         if (minPriority == null) {
             throw new ActivitiIllegalArgumentException("Min Priority is null");
@@ -311,6 +320,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskMaxPriority(Integer maxPriority) {
         if (maxPriority == null) {
             throw new ActivitiIllegalArgumentException("Max Priority is null");
@@ -323,6 +333,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQueryImpl taskAssignee(String assignee) {
         if (assignee == null) {
             throw new ActivitiIllegalArgumentException("Assignee is null");
@@ -335,6 +346,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQueryImpl taskAssigneeLike(String assigneeLike) {
         if (assigneeLike == null) {
             throw new ActivitiIllegalArgumentException("AssigneeLike is null");
@@ -347,6 +359,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskAssigneeLikeIgnoreCase(String assigneeLikeIgnoreCase) {
         if (assigneeLikeIgnoreCase == null) {
             throw new ActivitiIllegalArgumentException("assigneeLikeIgnoreCase is null");
@@ -391,6 +404,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQueryImpl taskOwner(String owner) {
         if (owner == null) {
             throw new ActivitiIllegalArgumentException("Owner is null");
@@ -403,6 +417,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQueryImpl taskOwnerLike(String ownerLike) {
         if (ownerLike == null) {
             throw new ActivitiIllegalArgumentException("Owner is null");
@@ -415,6 +430,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskOwnerLikeIgnoreCase(String ownerLikeIgnoreCase) {
         if (ownerLikeIgnoreCase == null) {
             throw new ActivitiIllegalArgumentException("OwnerLikeIgnoreCase");
@@ -427,12 +443,16 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
-    /** @see #taskUnassigned */
+    /**
+     * @see #taskUnassigned
+     */
+    @Override
     @Deprecated
     public TaskQuery taskUnnassigned() {
         return taskUnassigned();
     }
 
+    @Override
     public TaskQuery taskUnassigned() {
         if (orActive) {
             currentOrQueryObject.unassigned = true;
@@ -442,6 +462,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskDelegationState(DelegationState delegationState) {
         if (orActive) {
             if (delegationState == null) {
@@ -459,6 +480,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQueryImpl taskCandidateUser(String candidateUser) {
         if (candidateUser == null) {
             throw new ActivitiIllegalArgumentException("Candidate user is null");
@@ -473,6 +495,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQueryImpl taskInvolvedUser(String involvedUser) {
         if (involvedUser == null) {
             throw new ActivitiIllegalArgumentException("Involved user is null");
@@ -485,6 +508,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQueryImpl taskCandidateGroup(String candidateGroup) {
         if (candidateGroup == null) {
             throw new ActivitiIllegalArgumentException("Candidate group is null");
@@ -522,6 +546,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskCandidateGroupIn(List<String> candidateGroups) {
         if (candidateGroups == null) {
             throw new ActivitiIllegalArgumentException("Candidate group list is null");
@@ -543,6 +568,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskTenantId(String tenantId) {
         if (tenantId == null) {
             throw new ActivitiIllegalArgumentException("task tenant id is null");
@@ -555,6 +581,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskTenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
             throw new ActivitiIllegalArgumentException("task tenant id is null");
@@ -567,6 +594,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskWithoutTenantId() {
         if (orActive) {
             currentOrQueryObject.withoutTenantId = true;
@@ -576,6 +604,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQueryImpl processInstanceId(String processInstanceId) {
         if (orActive) {
             currentOrQueryObject.processInstanceId = processInstanceId;
@@ -607,6 +636,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQueryImpl processInstanceBusinessKey(String processInstanceBusinessKey) {
         if (orActive) {
             currentOrQueryObject.processInstanceBusinessKey = processInstanceBusinessKey;
@@ -616,6 +646,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQueryImpl processInstanceBusinessKeyLike(String processInstanceBusinessKeyLike) {
         if (orActive) {
             currentOrQueryObject.processInstanceBusinessKeyLike = processInstanceBusinessKeyLike;
@@ -625,6 +656,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery processInstanceBusinessKeyLikeIgnoreCase(String processInstanceBusinessKeyLikeIgnoreCase) {
         if (orActive) {
             currentOrQueryObject.processInstanceBusinessKeyLikeIgnoreCase = processInstanceBusinessKeyLikeIgnoreCase.toLowerCase();
@@ -634,6 +666,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQueryImpl executionId(String executionId) {
         if (orActive) {
             currentOrQueryObject.executionId = executionId;
@@ -643,6 +676,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQueryImpl taskCreatedOn(Date createTime) {
         if (orActive) {
             currentOrQueryObject.createTime = createTime;
@@ -652,6 +686,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskCreatedBefore(Date before) {
         if (orActive) {
             currentOrQueryObject.createTimeBefore = before;
@@ -661,6 +696,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskCreatedAfter(Date after) {
         if (orActive) {
             currentOrQueryObject.createTimeAfter = after;
@@ -670,6 +706,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskCategory(String category) {
         if (orActive) {
             currentOrQueryObject.category = category;
@@ -679,6 +716,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskDefinitionKey(String key) {
         if (orActive) {
             currentOrQueryObject.key = key;
@@ -688,6 +726,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskDefinitionKeyLike(String keyLike) {
         if (orActive) {
             currentOrQueryObject.keyLike = keyLike;
@@ -697,6 +736,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskVariableValueEquals(String variableName, Object variableValue) {
         if (orActive) {
             currentOrQueryObject.variableValueEquals(variableName, variableValue);
@@ -706,6 +746,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskVariableValueEquals(Object variableValue) {
         if (orActive) {
             currentOrQueryObject.variableValueEquals(variableValue);
@@ -715,6 +756,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskVariableValueEqualsIgnoreCase(String name, String value) {
         if (orActive) {
             currentOrQueryObject.variableValueEqualsIgnoreCase(name, value);
@@ -724,6 +766,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskVariableValueNotEqualsIgnoreCase(String name, String value) {
         if (orActive) {
             currentOrQueryObject.variableValueNotEqualsIgnoreCase(name, value);
@@ -733,6 +776,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskVariableValueNotEquals(String variableName, Object variableValue) {
         if (orActive) {
             currentOrQueryObject.variableValueNotEquals(variableName, variableValue);
@@ -742,6 +786,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskVariableValueGreaterThan(String name, Object value) {
         if (orActive) {
             currentOrQueryObject.variableValueGreaterThan(name, value);
@@ -751,6 +796,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskVariableValueGreaterThanOrEqual(String name, Object value) {
         if (orActive) {
             currentOrQueryObject.variableValueGreaterThanOrEqual(name, value);
@@ -760,6 +806,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskVariableValueLessThan(String name, Object value) {
         if (orActive) {
             currentOrQueryObject.variableValueLessThan(name, value);
@@ -769,6 +816,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskVariableValueLessThanOrEqual(String name, Object value) {
         if (orActive) {
             currentOrQueryObject.variableValueLessThanOrEqual(name, value);
@@ -778,6 +826,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskVariableValueLike(String name, String value) {
         if (orActive) {
             currentOrQueryObject.variableValueLike(name, value);
@@ -787,6 +836,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskVariableValueLikeIgnoreCase(String name, String value) {
         if (orActive) {
             currentOrQueryObject.variableValueLikeIgnoreCase(name, value);
@@ -796,6 +846,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery processVariableValueEquals(String variableName, Object variableValue) {
         if (orActive) {
             currentOrQueryObject.variableValueEquals(variableName, variableValue, false);
@@ -805,6 +856,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery processVariableValueNotEquals(String variableName, Object variableValue) {
         if (orActive) {
             currentOrQueryObject.variableValueNotEquals(variableName, variableValue, false);
@@ -814,6 +866,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery processVariableValueEquals(Object variableValue) {
         if (orActive) {
             currentOrQueryObject.variableValueEquals(variableValue, false);
@@ -823,6 +876,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery processVariableValueEqualsIgnoreCase(String name, String value) {
         if (orActive) {
             currentOrQueryObject.variableValueEqualsIgnoreCase(name, value, false);
@@ -832,6 +886,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery processVariableValueNotEqualsIgnoreCase(String name, String value) {
         if (orActive) {
             currentOrQueryObject.variableValueNotEqualsIgnoreCase(name, value, false);
@@ -841,6 +896,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery processVariableValueGreaterThan(String name, Object value) {
         if (orActive) {
             currentOrQueryObject.variableValueGreaterThan(name, value, false);
@@ -850,6 +906,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery processVariableValueGreaterThanOrEqual(String name, Object value) {
         if (orActive) {
             currentOrQueryObject.variableValueGreaterThanOrEqual(name, value, false);
@@ -859,6 +916,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery processVariableValueLessThan(String name, Object value) {
         if (orActive) {
             currentOrQueryObject.variableValueLessThan(name, value, false);
@@ -868,6 +926,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery processVariableValueLessThanOrEqual(String name, Object value) {
         if (orActive) {
             currentOrQueryObject.variableValueLessThanOrEqual(name, value, false);
@@ -877,6 +936,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery processVariableValueLike(String name, String value) {
         if (orActive) {
             currentOrQueryObject.variableValueLike(name, value, false);
@@ -886,6 +946,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery processVariableValueLikeIgnoreCase(String name, String value) {
         if (orActive) {
             currentOrQueryObject.variableValueLikeIgnoreCase(name, value, false);
@@ -895,6 +956,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery processDefinitionKey(String processDefinitionKey) {
         if (orActive) {
             currentOrQueryObject.processDefinitionKey = processDefinitionKey;
@@ -904,6 +966,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery processDefinitionKeyLike(String processDefinitionKeyLike) {
         if (orActive) {
             currentOrQueryObject.processDefinitionKeyLike = processDefinitionKeyLike;
@@ -913,6 +976,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery processDefinitionKeyLikeIgnoreCase(String processDefinitionKeyLikeIgnoreCase) {
         if (orActive) {
             currentOrQueryObject.processDefinitionKeyLikeIgnoreCase = processDefinitionKeyLikeIgnoreCase.toLowerCase();
@@ -922,6 +986,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery processDefinitionKeyIn(List<String> processDefinitionKeys) {
         if (orActive) {
             this.currentOrQueryObject.processDefinitionKeys = processDefinitionKeys;
@@ -931,6 +996,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery processDefinitionId(String processDefinitionId) {
         if (orActive) {
             currentOrQueryObject.processDefinitionId = processDefinitionId;
@@ -940,6 +1006,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery processDefinitionName(String processDefinitionName) {
         if (orActive) {
             currentOrQueryObject.processDefinitionName = processDefinitionName;
@@ -949,6 +1016,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery processDefinitionNameLike(String processDefinitionNameLike) {
         if (orActive) {
             currentOrQueryObject.processDefinitionNameLike = processDefinitionNameLike;
@@ -1002,6 +1070,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery deploymentId(String deploymentId) {
         if (orActive) {
             currentOrQueryObject.deploymentId = deploymentId;
@@ -1011,6 +1080,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery deploymentIdIn(List<String> deploymentIds) {
         if (orActive) {
             currentOrQueryObject.deploymentIds = deploymentIds;
@@ -1020,6 +1090,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery dueDate(Date dueDate) {
         if (orActive) {
             currentOrQueryObject.dueDate = dueDate;
@@ -1036,6 +1107,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return dueDate(dueDate);
     }
 
+    @Override
     public TaskQuery dueBefore(Date dueBefore) {
         if (orActive) {
             currentOrQueryObject.dueBefore = dueBefore;
@@ -1052,6 +1124,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return dueBefore(dueDate);
     }
 
+    @Override
     public TaskQuery dueAfter(Date dueAfter) {
         if (orActive) {
             currentOrQueryObject.dueAfter = dueAfter;
@@ -1063,10 +1136,12 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery taskDueAfter(Date dueDate) {
         return dueAfter(dueDate);
     }
 
+    @Override
     public TaskQuery withoutDueDate() {
         if (orActive) {
             currentOrQueryObject.withoutDueDate = true;
@@ -1081,6 +1156,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return withoutDueDate();
     }
 
+    @Override
     public TaskQuery excludeSubtasks() {
         if (orActive) {
             currentOrQueryObject.excludeSubtasks = true;
@@ -1090,6 +1166,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery suspended() {
         if (orActive) {
             currentOrQueryObject.suspensionState = SuspensionState.SUSPENDED;
@@ -1099,6 +1176,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery active() {
         if (orActive) {
             currentOrQueryObject.suspensionState = SuspensionState.ACTIVE;
@@ -1108,26 +1186,31 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    @Override
     public TaskQuery locale(String locale) {
         this.locale = locale;
         return this;
     }
 
+    @Override
     public TaskQuery withLocalizationFallback() {
         withLocalizationFallback = true;
         return this;
     }
 
+    @Override
     public TaskQuery includeTaskLocalVariables() {
         this.includeTaskLocalVariables = true;
         return this;
     }
 
+    @Override
     public TaskQuery includeProcessVariables() {
         this.includeProcessVariables = true;
         return this;
     }
 
+    @Override
     public TaskQuery limitTaskVariables(Integer taskVariablesLimit) {
         this.taskVariablesLimit = taskVariablesLimit;
         return this;
@@ -1139,7 +1222,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public List<String> getCandidateGroups() {
         if (candidateGroup != null) {
-            List<String> candidateGroupList = new ArrayList<String>(1);
+            List<String> candidateGroupList = new ArrayList<>(1);
             candidateGroupList.add(candidateGroup);
             return candidateGroupList;
 
@@ -1158,13 +1241,14 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected List<String> getGroupsForCandidateUser(String candidateUser) {
         IdentityService identityService = Context.getProcessEngineConfiguration().getIdentityService();
         List<Group> groups = identityService.createGroupQuery().groupMember(candidateUser).list();
-        List<String> groupIds = new ArrayList<String>();
+        List<String> groupIds = new ArrayList<>();
         for (Group group : groups) {
             groupIds.add(group.getId());
         }
         return groupIds;
     }
 
+    @Override
     protected void ensureVariablesInitialized() {
         VariableTypes types = Context.getProcessEngineConfiguration().getVariableTypes();
         for (QueryVariableValue var : queryVariableValues) {
@@ -1204,26 +1288,32 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     // ordering ////////////////////////////////////////////////////////////////
 
+    @Override
     public TaskQuery orderByTaskId() {
         return orderBy(TaskQueryProperty.TASK_ID);
     }
 
+    @Override
     public TaskQuery orderByTaskName() {
         return orderBy(TaskQueryProperty.NAME);
     }
 
+    @Override
     public TaskQuery orderByTaskDescription() {
         return orderBy(TaskQueryProperty.DESCRIPTION);
     }
 
+    @Override
     public TaskQuery orderByTaskPriority() {
         return orderBy(TaskQueryProperty.PRIORITY);
     }
 
+    @Override
     public TaskQuery orderByProcessInstanceId() {
         return orderBy(TaskQueryProperty.PROCESS_INSTANCE_ID);
     }
 
+    @Override
     public TaskQuery orderByExecutionId() {
         return orderBy(TaskQueryProperty.EXECUTION_ID);
     }
@@ -1233,6 +1323,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return orderBy(TaskQueryProperty.PROCESS_DEFINITION_ID);
     }
 
+    @Override
     public TaskQuery orderByTaskAssignee() {
         return orderBy(TaskQueryProperty.ASSIGNEE);
     }
@@ -1242,10 +1333,12 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return orderBy(TaskQueryProperty.OWNER);
     }
 
+    @Override
     public TaskQuery orderByTaskCreateTime() {
         return orderBy(TaskQueryProperty.CREATE_TIME);
     }
 
+    @Override
     public TaskQuery orderByDueDate() {
         return orderBy(TaskQueryProperty.DUE_DATE);
     }
@@ -1260,6 +1353,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return orderBy(TaskQueryProperty.TASK_DEFINITION_KEY);
     }
 
+    @Override
     public TaskQuery orderByDueDateNullsFirst() {
         return orderBy(TaskQueryProperty.DUE_DATE, NullHandlingOnOrder.NULLS_FIRST);
     }
@@ -1284,6 +1378,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     // results ////////////////////////////////////////////////////////////////
 
+    @Override
     public List<Task> executeList(CommandContext commandContext, Page page) {
         ensureVariablesInitialized();
         checkQueryOk();
@@ -1303,6 +1398,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return tasks;
     }
 
+    @Override
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
         checkQueryOk();

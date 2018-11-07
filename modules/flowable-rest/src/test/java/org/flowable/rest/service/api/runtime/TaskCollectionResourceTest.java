@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.runtime;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -26,13 +28,14 @@ import org.apache.http.entity.StringEntity;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.DelegationState;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.flowable.task.api.DelegationState;
+import org.flowable.task.api.Task;
 import org.junit.Assert;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -47,6 +50,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test creating a task. POST runtime/tasks
      */
+    @Test
     public void testCreateTask() throws Exception {
         try {
             Task parentTask = taskService.newTask();
@@ -101,6 +105,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test creating a task. POST runtime/tasks
      */
+    @Test
     public void testCreateTaskNoBody() throws Exception {
         try {
             HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION));
@@ -119,6 +124,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a collection of tasks. GET runtime/tasks
      */
+    @Test
     @Deployment
     public void testGetTasks() throws Exception {
         try {
@@ -234,6 +240,10 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             // Candidate group filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateGroup=sales";
             assertResultsPresentInDataResponse(url, processTask.getId());
+            
+            // Candidate user with group filtering
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateUser=aSalesUser";
+            assertResultsPresentInDataResponse(url, processTask.getId());
 
             // Involved user filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?involvedUser=misspiggy";
@@ -242,6 +252,13 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             // Process instance filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?processInstanceId=" + processInstance.getId();
             assertResultsPresentInDataResponse(url, processTask.getId());
+            
+            // Process instance with children filtering
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?processInstanceIdWithChildren=" + processInstance.getId();
+            assertResultsPresentInDataResponse(url, processTask.getId());
+            
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?processInstanceIdWithChildren=nonexisting";
+            assertResultsPresentInDataResponse(url);
 
             // Execution filtering
             Execution taskExecution = runtimeService.createExecutionQuery().activityId("processTask").singleResult();

@@ -23,8 +23,10 @@ public class ExecuteDecisionInfo {
     protected String instanceId;
     protected String executionId;
     protected String activityId;
+    protected String scopeType;
     protected Map<String, Object> variables;
     protected String tenantId;
+    protected boolean fallbackToDefaultTenant;
     
     public String getDecisionKey() {
         return decisionKey;
@@ -68,6 +70,12 @@ public class ExecuteDecisionInfo {
     public void setActivityId(String activityId) {
         this.activityId = activityId;
     }
+    public String getScopeType() {
+        return scopeType;
+    }
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
     public Map<String, Object> getVariables() {
         return variables;
     }
@@ -79,5 +87,11 @@ public class ExecuteDecisionInfo {
     }
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
+    }
+    public boolean isFallbackToDefaultTenant() {
+        return fallbackToDefaultTenant;
+    }
+    public void setFallbackToDefaultTenant(boolean fallbackToDefaultTenant) {
+        this.fallbackToDefaultTenant = fallbackToDefaultTenant;
     }
 }

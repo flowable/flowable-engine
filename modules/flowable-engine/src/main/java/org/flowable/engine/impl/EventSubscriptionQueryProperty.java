@@ -13,7 +13,7 @@
 
 package org.flowable.engine.impl;
 
-import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.common.engine.api.query.QueryProperty;
 
 /**
  * @author Daniel Meyer
@@ -39,6 +39,7 @@ public class EventSubscriptionQueryProperty implements QueryProperty {
         this.propertyName = propertyName;
     }
 
+    @Override
     public String getName() {
         return propertyName;
     }

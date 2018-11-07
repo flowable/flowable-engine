@@ -1,0 +1,65 @@
+
+<div class="subheader" ng-if="model.caseModel">
+	<div class="fixed-container">
+		<div class="btn-group pull-right">
+			<button type="button" class="btn btn-default" ng-click="openEditor()" ng-if="model.caseModel.latestVersion">
+				<i class="glyphicon glyphicon-edit icon-and-label"></i> {{'CASE.ACTION.OPEN-IN-EDITOR' | translate}}
+			</button>
+			<button type="button" class="btn btn-default" ng-click="useAsNewVersion()" ng-if="!model.caseModel.latestVersion">
+				{{'CASE.ACTION.USE-AS-NEW-VERSION' | translate}}
+			</button>
+		</div>
+		<div class="btn-group pull-right">
+	        <a href="{{model.cmmnDownloadUrl}}" class="btn btn-default" title="{{'CASE.ACTION.EXPORT_CMMN' | translate}}">
+	            <i class="glyphicon glyphicon-save"></i>
+	        </a>
+		</div>
+		<div class="btn-group pull-right">
+			<button type="button" class="btn btn-default" ng-click="editCaseModel()" ng-disabled="!model.caseModel.latestVersion"
+				title="{{'CASE.ACTION.EDIT' | translate}}">
+				<i class="glyphicon glyphicon-pencil"></i>
+			</button>
+            <button type="button" class="btn btn-default" ng-click="duplicateCaseModel()" ng-disabled="!model.caseModel.latestVersion"
+                    title="{{'CASE.ACTION.DUPLICATE' | translate}}">
+                <i class="editor-icon editor-icon-copy"></i>
+            </button>
+			<button type="button" class="btn btn-default" ng-click="deleteCaseModel()" title="{{'CASE.ACTION.DELETE' | translate}}"
+				ng-disabled="!model.caseModel.latestVersion">
+				<i class="glyphicon glyphicon-trash"></i>
+			</button>
+		</div>		
+		<div class="pull-right">
+			<a ng-click="returnToList()" class="action">&larr; {{'GENERAL.ACTION.RETURN-TO-LIST' | translate}}</a>
+		</div>
+		<h2><span class="version">v{{model.caseModel.version}}</span>{{model.caseModel.name}}</h2>
+		<div class="clearfix">
+			<div class="col-xs-4 details">
+				<span><i class="glyphicon glyphicon-user"></i>{{'CASE.DETAILS.CREATED-BY' | translate:model.caseModel}}</span> 
+				<span><i class="glyphicon glyphicon-pencil"></i>{{'CASE.DETAILS.LAST-UPDATED-BY' | translate:model.caseModel}}</span>
+			</div>
+			<div class="col-xs-8 details clearfix">
+                <div class="related btn-group">
+                    <button id="toggle-history" type="button" class="btn btn-subtle" ng-click="toggleHistory($event)"
+                        title="{{'CASE.ACTION.EDIT' | translate}}">
+                        {{'CASE.DETAILS.HISTORY-TITLE' | translate}} <span class="counter" ng-show="model.versions.data.length">{{model.versions.data.length}}</span>
+                    </button>
+                </div>
+                <a ng-show="model.stencil" ng-click="goToStencil()" class="pull-right action">{{model.stencil.name}}</a>
+                <p ng-if="model.caseModel.description">
+                    {{model.caseModel.description}}
+                </p>
+                <p ng-if="!model.caseModel.description && model.caseModel.latestVersion" class="hint">
+                    <a ng-click="editCaseModel()" class="subtle-select">
+                        {{'CASE.DETAILS.NO-DESCRIPTION' | translate}} <i class="glyphicon glyphicon-pencil"></i>
+                    </a>
+                </p>
+            </div>
+		</div>
+	</div>
+</div>
+<div class="content center-pane" ng-if="model.caseModel" auto-height offset="40" >
+        
+	<div class="model-preview-wrapper" ng-if="model.caseModel.modelType && model.caseModel.modelType != 1">
+	   <div id="cmmnModel"></div>
+	</div>
+</div>

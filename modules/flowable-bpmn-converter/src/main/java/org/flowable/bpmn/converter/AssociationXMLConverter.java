@@ -27,6 +27,7 @@ import org.flowable.bpmn.model.BpmnModel;
  */
 public class AssociationXMLConverter extends BaseBpmnXMLConverter {
 
+    @Override
     public Class<? extends BaseElement> getBpmnElementType() {
         return Association.class;
     }

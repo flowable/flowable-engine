@@ -20,18 +20,20 @@ import java.util.GregorianCalendar;
 
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ServiceTask;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.calendar.DurationHelper;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.calendar.DurationHelper;
-import org.flowable.engine.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.job.service.JobService;
+import org.flowable.job.service.TimerJobService;
+import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,8 +54,12 @@ public class JobRetryCmd implements Command<Object> {
         this.exception = exception;
     }
 
+    @Override
     public Object execute(CommandContext commandContext) {
-        JobEntity job = CommandContextUtil.getJobEntityManager(commandContext).findById(jobId);
+        JobService jobService = CommandContextUtil.getJobService(commandContext);
+        TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);
+        
+        JobEntity job = jobService.findJobById(jobId);
         if (job == null) {
             return null;
         }
@@ -77,9 +83,9 @@ public class JobRetryCmd implements Command<Object> {
             LOGGER.debug("activity or FailedJobRetryTimerCycleValue is null in job {}. Only decrementing retries.", jobId);
 
             if (job.getRetries() <= 1) {
-                newJobEntity = CommandContextUtil.getJobManager(commandContext).moveJobToDeadLetterJob(job);
+                newJobEntity = jobService.moveJobToDeadLetterJob(job);
             } else {
-                newJobEntity = CommandContextUtil.getJobManager(commandContext).moveJobToTimerJob(job);
+                newJobEntity = timerJobService.moveJobToTimerJob(job);
             }
 
             newJobEntity.setRetries(job.getRetries() - 1);
@@ -101,9 +107,9 @@ public class JobRetryCmd implements Command<Object> {
                 }
 
                 if (jobRetries <= 1) {
-                    newJobEntity = CommandContextUtil.getJobManager(commandContext).moveJobToDeadLetterJob(job);
+                    newJobEntity = jobService.moveJobToDeadLetterJob(job);
                 } else {
-                    newJobEntity = CommandContextUtil.getJobManager(commandContext).moveJobToTimerJob(job);
+                    newJobEntity = timerJobService.moveJobToTimerJob(job);
                 }
 
                 newJobEntity.setDuedate(durationHelper.getDateAfter());

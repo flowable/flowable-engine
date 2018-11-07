@@ -28,15 +28,15 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.AbstractManager;
 import org.activiti.engine.task.Task;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.TaskListener;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 /**
  * @author Tom Baeyens
  */
 public class TaskEntityManager extends AbstractManager {
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void deleteTasksByProcessInstanceId(String processInstanceId, String deleteReason, boolean cascade) {
         List<TaskEntity> tasks = (List) getDbSqlSession()
                 .createTaskQuery()
@@ -210,7 +210,7 @@ public class TaskEntityManager extends AbstractManager {
     }
 
     public void updateTaskTenantIdForDeployment(String deploymentId, String newTenantId) {
-        HashMap<String, Object> params = new HashMap<String, Object>();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
         getDbSqlSession().update("updateTaskTenantIdForDeployment", params);

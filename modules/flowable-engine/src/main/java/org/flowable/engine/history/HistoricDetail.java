@@ -15,7 +15,7 @@ package org.flowable.engine.history;
 
 import java.util.Date;
 
-import org.flowable.engine.common.impl.history.HistoricData;
+import org.flowable.common.engine.api.history.HistoricData;
 
 /**
  * Base class for all kinds of information that is related to either a {@link HistoricProcessInstance} or a {@link HistoricActivityInstance}.
@@ -42,5 +42,6 @@ public interface HistoricDetail extends HistoricData {
     String getTaskId();
 
     /** The time when this detail occurred */
+    @Override
     Date getTime();
 }

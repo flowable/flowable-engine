@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="myCase">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+
+            <planItem id="httpPost" name="Task One" definitionRef="httpCmmnTask" />
+            <planItem id="planItem2" name="The Case" definitionRef="task">
+                <entryCriterion sentryRef="sentry1" />
+            </planItem>
+
+            <sentry id="sentry1">
+                <planItemOnPart sourceRef="httpPost">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <task id="httpCmmnTask" name="http" isBlocking="false" flowable:type="http">
+                <extensionElements>
+                    <flowable:field name="requestMethod">
+                        <flowable:string><![CDATA[POST]]></flowable:string>
+                    </flowable:field>
+                    <flowable:field name="requestUrl">
+                        <flowable:string><![CDATA[https://localhost:9799/api?code=201]]></flowable:string>
+                    </flowable:field>
+                    <flowable:field name="requestHeaders">
+                        <flowable:string><![CDATA[Content-Type: application/json]]></flowable:string>
+                    </flowable:field>
+                    <flowable:field name="requestBody">
+                        <flowable:string><![CDATA[{"test":"sample","result":true}]]></flowable:string>
+                    </flowable:field>
+                    <flowable:field name="saveRequestVariables">
+                        <flowable:string><![CDATA[true]]></flowable:string>
+                    </flowable:field>
+                    <flowable:field name="saveResponseParameters">
+                        <flowable:string><![CDATA[true]]></flowable:string>
+                    </flowable:field>
+                </extensionElements>
+            </task>
+
+            <task id="task" name="The Task" isBlocking="true" />
+
+        </casePlanModel>
+    </case>
+
+</definitions>

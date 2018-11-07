@@ -26,6 +26,7 @@ import org.flowable.dmn.model.DmnElement;
  */
 public class DecisionRuleXMLConverter extends BaseDmnXMLConverter {
 
+    @Override
     public Class<? extends DmnElement> getDmnElementType() {
         return DecisionRule.class;
     }

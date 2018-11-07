@@ -27,9 +27,9 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContextCloseListener;
 import org.activiti.engine.impl.jobexecutor.AsyncJobAddedNotification;
 import org.activiti.engine.impl.persistence.AbstractManager;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.engine.runtime.Job;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.job.api.Job;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 
 /**
  * @author Tom Baeyens
@@ -105,7 +105,7 @@ public class JobEntityManager extends AbstractManager {
 
     @SuppressWarnings("unchecked")
     public List<JobEntity> findExclusiveJobsToExecute(String processInstanceId) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("pid", processInstanceId);
         params.put("now", Context.getProcessEngineConfiguration().getClock().getCurrentTime());
         return getDbSqlSession().selectList("selectExclusiveJobsToExecute", params);
@@ -130,7 +130,7 @@ public class JobEntityManager extends AbstractManager {
 
     @SuppressWarnings("unchecked")
     public List<Job> findJobsByTypeAndProcessDefinitionKeyNoTenantId(String jobHandlerType, String processDefinitionKey) {
-        Map<String, String> params = new HashMap<String, String>(2);
+        Map<String, String> params = new HashMap<>(2);
         params.put("handlerType", jobHandlerType);
         params.put("processDefinitionKey", processDefinitionKey);
         return getDbSqlSession().selectList("selectJobByTypeAndProcessDefinitionKeyNoTenantId", params);
@@ -138,7 +138,7 @@ public class JobEntityManager extends AbstractManager {
 
     @SuppressWarnings("unchecked")
     public List<Job> findJobsByTypeAndProcessDefinitionKeyAndTenantId(String jobHandlerType, String processDefinitionKey, String tenantId) {
-        Map<String, String> params = new HashMap<String, String>(3);
+        Map<String, String> params = new HashMap<>(3);
         params.put("handlerType", jobHandlerType);
         params.put("processDefinitionKey", processDefinitionKey);
         params.put("tenantId", tenantId);
@@ -147,14 +147,14 @@ public class JobEntityManager extends AbstractManager {
 
     @SuppressWarnings("unchecked")
     public List<Job> findJobsByTypeAndProcessDefinitionId(String jobHandlerType, String processDefinitionId) {
-        Map<String, String> params = new HashMap<String, String>(2);
+        Map<String, String> params = new HashMap<>(2);
         params.put("handlerType", jobHandlerType);
         params.put("processDefinitionId", processDefinitionId);
         return getDbSqlSession().selectList("selectJobByTypeAndProcessDefinitionId", params);
     }
 
     public void unacquireJob(String jobId) {
-        Map<String, Object> params = new HashMap<String, Object>(2);
+        Map<String, Object> params = new HashMap<>(2);
         params.put("id", jobId);
         params.put("dueDate", new Date(getProcessEngineConfiguration().getClock().getCurrentTime().getTime()));
         getDbSqlSession().update("unacquireJob", params);
@@ -165,14 +165,14 @@ public class JobEntityManager extends AbstractManager {
     }
 
     public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
-        HashMap<String, Object> params = new HashMap<String, Object>();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
         getDbSqlSession().update("updateJobTenantIdForDeployment", params);
     }
 
     public int updateJobLockForAllJobs(String lockOwner, Date expirationTime) {
-        HashMap<String, Object> params = new HashMap<String, Object>();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("lockOwner", lockOwner);
         params.put("lockExpirationTime", expirationTime);
         params.put("dueDate", Context.getProcessEngineConfiguration().getClock().getCurrentTime());

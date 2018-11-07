@@ -12,6 +12,7 @@
  */
 package org.flowable.form.engine;
 
+import org.flowable.common.engine.impl.FlowableVersions;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
@@ -21,10 +22,10 @@ public interface FormEngine {
     /**
      * the version of the flowable form library
      */
-    public static String VERSION = "6.2.0.0";
+    public static String VERSION = FlowableVersions.CURRENT_VERSION;
 
     /**
-     * The name as specified in 'form-engine-name' in the flowable.form.cfg.xml configuration file. The default name for a process engine is 'default
+     * The name as specified in 'form-engine-name' in the flowable.form.cfg.xml configuration file. The default name for a form engine is 'default
      */
     String getName();
 

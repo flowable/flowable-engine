@@ -49,7 +49,9 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import org.flowable.bpmn.model.AssociationDirection;
+import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.GraphicInfo;
+import org.flowable.bpmn.model.Transaction;
 import org.flowable.image.exception.FlowableImageException;
 import org.flowable.image.util.ReflectUtil;
 import org.slf4j.Logger;
@@ -119,6 +121,7 @@ public class DefaultProcessDiagramCanvas {
     protected static BufferedImage MANUALTASK_IMAGE;
     protected static BufferedImage BUSINESS_RULE_TASK_IMAGE;
     protected static BufferedImage SHELL_TASK_IMAGE;
+    protected static BufferedImage DMN_TASK_IMAGE;
     protected static BufferedImage MULE_TASK_IMAGE;
     protected static BufferedImage CAMEL_TASK_IMAGE;
     protected static BufferedImage HTTP_TASK_IMAGE;
@@ -226,6 +229,7 @@ public class DefaultProcessDiagramCanvas {
             MANUALTASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/manualTask.png", customClassLoader));
             BUSINESS_RULE_TASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/businessRuleTask.png", customClassLoader));
             SHELL_TASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/shellTask.png", customClassLoader));
+            DMN_TASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/dmnTask.png", customClassLoader));
             CAMEL_TASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/camelTask.png", customClassLoader));
             MULE_TASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/muleTask.png", customClassLoader));
             HTTP_TASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/httpTask.png", customClassLoader));
@@ -780,8 +784,13 @@ public class DefaultProcessDiagramCanvas {
                         lastLine = lastLine.substring(0, lastLine.length() - 4) + "...";
                     }
                     layouts.add(new TextLayout(lastLine, g.getFont(), g.getFontRenderContext()));
+                } else {
+                    // at least, draw one line even if text does not fit in order to avoid empty box
+                    layouts.add(layout);
+                    currentHeight += height;
                 }
                 break;
+                
             } else {
                 layouts.add(layout);
                 lastLine = text.substring(previousPosition, measurer.getPosition());
@@ -849,6 +858,14 @@ public class DefaultProcessDiagramCanvas {
         drawTask(BUSINESS_RULE_TASK_IMAGE, name, graphicInfo, scaleFactor);
     }
 
+    public void drawShellTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
+        drawTask(SHELL_TASK_IMAGE, name, graphicInfo, scaleFactor);
+    }
+
+    public void drawDMNTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
+        drawTask(DMN_TASK_IMAGE, name, graphicInfo, scaleFactor);
+    }
+
     public void drawCamelTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
         drawTask(CAMEL_TASK_IMAGE, name, graphicInfo, scaleFactor);
     }
@@ -871,7 +888,7 @@ public class DefaultProcessDiagramCanvas {
             g.setStroke(EVENT_SUBPROCESS_STROKE);
             g.draw(rect);
             g.setStroke(originalStroke);
-        } else {
+        }else{
             Paint originalPaint = g.getPaint();
             g.setPaint(SUBPROCESS_BOX_COLOR);
             g.fill(rect);
@@ -879,6 +896,30 @@ public class DefaultProcessDiagramCanvas {
             g.draw(rect);
             g.setPaint(originalPaint);
         }
+        if (scaleFactor == 1.0 && name != null && !name.isEmpty()) {
+            String text = fitTextToWidth(name, (int) graphicInfo.getWidth());
+            g.drawString(text, (int) graphicInfo.getX() + 10, (int) graphicInfo.getY() + 15);
+        }
+    }
+    public void drawExpandedTransaction(String name, GraphicInfo graphicInfo, double scaleFactor) {
+        RoundRectangle2D rect = new RoundRectangle2D.Double(graphicInfo.getX(), graphicInfo.getY(),
+                graphicInfo.getWidth(), graphicInfo.getHeight(), 8, 8);
+        RoundRectangle2D outerRect = new RoundRectangle2D.Double(graphicInfo.getX()-3,
+                graphicInfo.getY()-3,
+                graphicInfo.getWidth()+6,
+                graphicInfo.getHeight()+6,
+                8,
+                8);
+        Paint originalPaint = g.getPaint();
+        g.setPaint(SUBPROCESS_BOX_COLOR);
+        g.fill(outerRect);
+        g.setPaint(SUBPROCESS_BORDER_COLOR);
+        g.draw(outerRect);
+        g.setPaint(SUBPROCESS_BOX_COLOR);
+        g.fill(rect);
+        g.setPaint(SUBPROCESS_BORDER_COLOR);
+        g.draw(rect);
+        g.setPaint(originalPaint);
 
         if (scaleFactor == 1.0 && name != null && !name.isEmpty()) {
             String text = fitTextToWidth(name, (int) graphicInfo.getWidth());

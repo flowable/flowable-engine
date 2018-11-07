@@ -23,10 +23,12 @@ import org.flowable.bpmn.model.Lane;
  */
 public class FlowNodeRefParser extends BaseChildElementParser {
 
+    @Override
     public String getElementName() {
         return ELEMENT_FLOWNODE_REF;
     }
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
         if (!(parentElement instanceof Lane))
             return;

@@ -15,9 +15,9 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Map;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -33,10 +33,17 @@ public class TriggerCmd extends NeedsActiveExecutionCmd<Object> {
 
     protected Map<String, Object> processVariables;
     protected Map<String, Object> transientVariables;
+    protected boolean async;
 
     public TriggerCmd(String executionId, Map<String, Object> processVariables) {
         super(executionId);
         this.processVariables = processVariables;
+    }
+
+    public TriggerCmd(String executionId, Map<String, Object> processVariables, boolean async) {
+        super(executionId);
+        this.processVariables = processVariables;
+        this.async = async;
     }
 
     public TriggerCmd(String executionId, Map<String, Object> processVariables, Map<String, Object> transientVariables) {
@@ -44,26 +51,33 @@ public class TriggerCmd extends NeedsActiveExecutionCmd<Object> {
         this.transientVariables = transientVariables;
     }
 
+    @Override
     protected Object execute(CommandContext commandContext, ExecutionEntity execution) {
         if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
             Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
             compatibilityHandler.trigger(executionId, processVariables, transientVariables);
             return null;
         }
-
+        
         if (processVariables != null) {
             execution.setVariables(processVariables);
         }
 
-        if (transientVariables != null) {
-            execution.setTransientVariables(transientVariables);
+        if (!async) {
+            if (transientVariables != null) {
+                execution.setTransientVariables(transientVariables);
+            }
+
+            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, execution.getCurrentActivityId(), null,
+                            null, execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId()));
+
+            CommandContextUtil.getAgenda(commandContext).planTriggerExecutionOperation(execution);
+            
+        } else {
+            CommandContextUtil.getAgenda(commandContext).planAsyncTriggerExecutionOperation(execution);
         }
 
-        CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, execution.getCurrentActivityId(), null,
-                        null, execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId()));
-
-        CommandContextUtil.getAgenda(commandContext).planTriggerExecutionOperation(execution);
         return null;
     }
 

@@ -38,6 +38,7 @@ public class DeleteCommentCmd implements Command<Void>, Serializable {
         this.commentId = commentId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         CommentEntityManager commentManager = commandContext.getCommentEntityManager();
 
@@ -51,7 +52,7 @@ public class DeleteCommentCmd implements Command<Void>, Serializable {
 
         } else {
             // Delete all comments on a task of process
-            ArrayList<Comment> comments = new ArrayList<Comment>();
+            ArrayList<Comment> comments = new ArrayList<>();
             if (processInstanceId != null) {
                 comments.addAll(commentManager.findCommentsByProcessInstanceId(processInstanceId));
             }

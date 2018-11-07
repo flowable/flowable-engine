@@ -32,9 +32,9 @@ import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
 import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.TerminateEventDefinition;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 /**
  * @author Martin Grofcik
@@ -66,6 +66,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
 
     }
 
+    @Override
     public void execute(DelegateExecution delegateExecution) {
         ActivityExecution execution = (ActivityExecution) delegateExecution;
         ActivityImpl terminateEndEventActivity = (ActivityImpl) execution.getActivity();
@@ -161,7 +162,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
             rootExecution = rootExecution.getParent() != null ? rootExecution.getParent() : rootExecution.getSuperExecution();
         }
 
-        return orderExecutionsRootToLeaf(rootExecution, new ArrayList<ExecutionEntity>());
+        return orderExecutionsRootToLeaf(rootExecution, new ArrayList<>());
     }
 
     protected List<ExecutionEntity> orderExecutionsRootToLeaf(ExecutionEntity rootExecution, List<ExecutionEntity> orderedExecutions) {
@@ -188,7 +189,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
             return;
         }
 
-        Map<String, HistoricActivityInstanceEntity> historicActivityInstancMap = new HashMap<String, HistoricActivityInstanceEntity>();
+        Map<String, HistoricActivityInstanceEntity> historicActivityInstancMap = new HashMap<>();
 
         List<HistoricActivityInstance> historicActivityInstances = new HistoricActivityInstanceQueryImpl(Context.getCommandContext())
                 .processInstanceId(processInstanceId)

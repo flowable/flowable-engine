@@ -45,50 +45,62 @@ import org.activiti.engine.runtime.TimerJobQuery;
  */
 public class ManagementServiceImpl extends ServiceImpl implements ManagementService {
 
+    @Override
     public Map<String, Long> getTableCount() {
         return commandExecutor.execute(new GetTableCountCmd());
     }
 
+    @Override
     public String getTableName(Class<?> activitiEntityClass) {
         return commandExecutor.execute(new GetTableNameCmd(activitiEntityClass));
     }
 
+    @Override
     public TableMetaData getTableMetaData(String tableName) {
         return commandExecutor.execute(new GetTableMetaDataCmd(tableName));
     }
 
+    @Override
     public void executeJob(String jobId) {
         commandExecutor.execute(new ExecuteJobsCmd(jobId));
     }
 
+    @Override
     public void deleteJob(String jobId) {
         commandExecutor.execute(new CancelJobCmd(jobId));
     }
 
+    @Override
     public void setJobRetries(String jobId, int retries) {
         commandExecutor.execute(new SetJobRetriesCmd(jobId, retries));
     }
 
+    @Override
     public TablePageQuery createTablePageQuery() {
         return new TablePageQueryImpl(commandExecutor);
     }
 
+    @Override
     public JobQuery createJobQuery() {
         return new JobQueryImpl(commandExecutor);
     }
 
+    @Override
     public TimerJobQuery createTimerJobQuery() {
         return new TimerJobQueryImpl(commandExecutor);
     }
 
+    @Override
     public String getJobExceptionStacktrace(String jobId) {
         return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId));
     }
 
+    @Override
     public Map<String, String> getProperties() {
         return commandExecutor.execute(new GetPropertiesCmd());
     }
 
+    @Override
     public <T> T executeCommand(Command<T> command) {
         if (command == null) {
             throw new ActivitiIllegalArgumentException("The command is null");
@@ -96,6 +108,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
         return commandExecutor.execute(command);
     }
 
+    @Override
     public <T> T executeCommand(CommandConfig config, Command<T> command) {
         if (config == null) {
             throw new ActivitiIllegalArgumentException("The config is null");
@@ -109,7 +122,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     @Override
     public <MapperType, ResultType> ResultType executeCustomSql(CustomSqlExecution<MapperType, ResultType> customSqlExecution) {
         Class<MapperType> mapperClass = customSqlExecution.getMapperClass();
-        return commandExecutor.execute(new ExecuteCustomSqlCmd<MapperType, ResultType>(mapperClass, customSqlExecution));
+        return commandExecutor.execute(new ExecuteCustomSqlCmd<>(mapperClass, customSqlExecution));
     }
 
     @Override

@@ -15,9 +15,9 @@ package org.activiti.engine.impl.bpmn.listener;
 
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.scripting.ScriptingEngines;
-import org.flowable.engine.delegate.DelegateTask;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * @author Rich Kroll
@@ -35,6 +35,7 @@ public class ScriptTaskListener implements TaskListener {
 
     protected boolean autoStoreVariables;
 
+    @Override
     public void notify(DelegateTask delegateTask) {
         if (script == null) {
             throw new IllegalArgumentException("The field 'script' should be set on the TaskListener");

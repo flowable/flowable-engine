@@ -32,10 +32,12 @@ public class ErrorEventDefinitionParseHandler extends AbstractBpmnParseHandler<E
 
     public static final String PROPERTYNAME_INITIAL = "initial";
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return ErrorEventDefinition.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, ErrorEventDefinition eventDefinition) {
 
         ErrorEventDefinition modelErrorEvent = eventDefinition;
@@ -79,7 +81,7 @@ public class ErrorEventDefinitionParseHandler extends AbstractBpmnParseHandler<E
     }
 
     public void createBoundaryErrorEventDefinition(ErrorEventDefinition errorEventDefinition, boolean interrupting,
-            ActivityImpl activity, ActivityImpl nestedErrorEventActivity) {
+                                                   ActivityImpl activity, ActivityImpl nestedErrorEventActivity) {
 
         nestedErrorEventActivity.setProperty("type", "boundaryError");
         ScopeImpl catchingScope = nestedErrorEventActivity.getParent();
@@ -96,7 +98,7 @@ public class ErrorEventDefinitionParseHandler extends AbstractBpmnParseHandler<E
     protected void addErrorEventDefinition(org.activiti.engine.impl.bpmn.parser.ErrorEventDefinition errorEventDefinition, ScopeImpl catchingScope) {
         List<org.activiti.engine.impl.bpmn.parser.ErrorEventDefinition> errorEventDefinitions = (List<org.activiti.engine.impl.bpmn.parser.ErrorEventDefinition>) catchingScope.getProperty(PROPERTYNAME_ERROR_EVENT_DEFINITIONS);
         if (errorEventDefinitions == null) {
-            errorEventDefinitions = new ArrayList<org.activiti.engine.impl.bpmn.parser.ErrorEventDefinition>();
+            errorEventDefinitions = new ArrayList<>();
             catchingScope.setProperty(PROPERTYNAME_ERROR_EVENT_DEFINITIONS, errorEventDefinitions);
         }
         errorEventDefinitions.add(errorEventDefinition);

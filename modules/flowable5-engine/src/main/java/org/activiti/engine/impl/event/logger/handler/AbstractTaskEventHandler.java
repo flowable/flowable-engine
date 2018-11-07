@@ -24,7 +24,7 @@ import org.activiti.engine.impl.persistence.entity.TaskEntity;
 public abstract class AbstractTaskEventHandler extends AbstractDatabaseEventLoggerEventHandler {
 
     protected Map<String, Object> handleCommonTaskFields(TaskEntity task) {
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<>();
         putInMapIfNotNull(data, Fields.ID, task.getId());
         putInMapIfNotNull(data, Fields.NAME, task.getName());
         putInMapIfNotNull(data, Fields.TASK_DEFINITION_KEY, task.getTaskDefinitionKey());

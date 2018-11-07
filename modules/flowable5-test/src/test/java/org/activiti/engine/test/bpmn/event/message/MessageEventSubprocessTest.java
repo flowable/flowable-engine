@@ -17,7 +17,6 @@ import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -52,7 +51,7 @@ public class MessageEventSubprocessTest extends PluggableFlowableTestCase {
         assertEquals(1, runtimeService.createExecutionQuery().count());
 
         // if we trigger the usertask, the process terminates and the event subscription is removed:
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("task", task.getTaskDefinitionKey());
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
@@ -86,7 +85,7 @@ public class MessageEventSubprocessTest extends PluggableFlowableTestCase {
         assertEquals(1, runtimeService.createExecutionQuery().count());
 
         // if we trigger the usertask, the process terminates and the event subscription is removed:
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("task", task.getTaskDefinitionKey());
         taskService.complete(task.getId());
         assertEquals(0, createEventSubscriptionQuery().count());

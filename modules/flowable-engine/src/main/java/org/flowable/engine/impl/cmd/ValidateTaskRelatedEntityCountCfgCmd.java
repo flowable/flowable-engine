@@ -12,8 +12,8 @@
  */
 package org.flowable.engine.impl.cmd;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.engine.impl.persistence.entity.PropertyEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -55,7 +55,7 @@ public class ValidateTaskRelatedEntityCountCfgCmd implements Command<Void> {
                     LOGGER.info("Configuration change: task related entity counting feature was enabled before, but now disabled. "
                             + "Updating all task entities.");
                 }
-                CommandContextUtil.getProcessEngineConfiguration(commandContext).getTaskDataManager().updateAllTaskRelatedEntityCountFlags(configProperty);
+                CommandContextUtil.getTaskService().updateAllTaskRelatedEntityCountFlags(configProperty);
             }
 
             // Update property

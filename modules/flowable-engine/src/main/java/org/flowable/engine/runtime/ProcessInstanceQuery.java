@@ -17,8 +17,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.flowable.common.engine.api.query.Query;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link ProcessInstance}s.
@@ -127,6 +127,11 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Select the process instances with which the user with the given id is involved.
      */
     ProcessInstanceQuery involvedUser(String userId);
+
+    /**
+     * Select the process instances with which the {@link org.flowable.idm.api.Group}s with the given ids are involved.
+     */
+    ProcessInstanceQuery involvedGroups(Set<String> groupIds);
 
     /**
      * Only select process instances which have a global variable with the given value. The type of variable is determined based on the value, using types configured in
@@ -243,6 +248,22 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      *            variable value, cannot be null. The string can include the wildcard character '%' to express like-strategy: starts with (string%), ends with (%string) or contains (%string%).
      */
     ProcessInstanceQuery variableValueLikeIgnoreCase(String name, String value);
+    
+    /**
+     * Only select process instances which have a variable with the given name.
+     * 
+     * @param name
+     *            cannot be null.
+     */
+    ProcessInstanceQuery variableExists(String name);
+    
+    /**
+     * Only select process instances which does not have a variable with the given name.
+     * 
+     * @param name
+     *            cannot be null.
+     */
+    ProcessInstanceQuery variableNotExists(String name);
 
     /**
      * Only select process instances which are suspended, either because the process instance itself is suspended or because the corresponding process definition is suspended
@@ -268,6 +289,16 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Only select process instances with a name like the given value, ignoring upper/lower case.
      */
     ProcessInstanceQuery processInstanceNameLikeIgnoreCase(String nameLikeIgnoreCase);
+    
+    /**
+     * Only select process instances with the given callback id. 
+     */
+    ProcessInstanceQuery processInstanceCallbackId(String callbackId);
+    
+    /**
+     * Only select process instances with the given callback type.
+     */
+    ProcessInstanceQuery processInstanceCallbackType(String callbackType);
 
     /**
      * Localize process name and description to specified locale.
@@ -334,6 +365,11 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Order by process definition id (needs to be followed by {@link #asc()} or {@link #desc()}).
      */
     ProcessInstanceQuery orderByProcessDefinitionId();
+
+    /**
+     * Order by start time (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    ProcessInstanceQuery orderByStartTime();
 
     /**
      * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).

@@ -14,12 +14,14 @@ package org.flowable.dmn.api;
 
 import java.util.Date;
 
+import org.flowable.common.engine.api.repository.EngineDeployment;
+
 /**
- * Represents a deployment that is already present in the process repository.
+ * Represents a deployment that is already present in the dmn repository.
  * 
- * A deployment is a container for resources such as process definitions, images, forms, etc.
+ * A deployment is a container for resources such as dmn definitions, images, forms, etc.
  * 
- * When a deployment is 'deployed' through the {@link org.flowable.engine.RuntimeService}, the Flowable engine will recognize certain of such resource types and act upon them (eg process definitions
+ * When a deployment is 'deployed' through the {@link org.flowable.engine.RuntimeService}, the Flowable engine will recognize certain of such resource types and act upon them (eg decision tables
  * will be parsed to an executable Java artifact).
  * 
  * To create a Deployment, use the {@link org.flowable.engine.repository.DeploymentBuilder}. A Deployment on itself is a <b>read-only</b> object and its content cannot be changed after deployment
@@ -28,16 +30,21 @@ import java.util.Date;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public interface DmnDeployment {
+public interface DmnDeployment extends EngineDeployment {
 
+    @Override
     String getId();
 
+    @Override
     String getName();
 
+    @Override
     Date getDeploymentTime();
 
+    @Override
     String getCategory();
 
+    @Override
     String getTenantId();
 
     String getParentDeploymentId();

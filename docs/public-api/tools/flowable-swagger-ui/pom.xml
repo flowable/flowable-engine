@@ -1,0 +1,78 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <name>Flowable - Swagger UI</name>
+  <artifactId>flowable-swagger-ui</artifactId>
+  <packaging>war</packaging>
+
+  <parent>
+    <groupId>org.flowable</groupId>
+    <artifactId>flowable-root</artifactId>
+    <relativePath>../../../../</relativePath>
+    <version>6.4.1-SNAPSHOT</version>
+  </parent>
+
+  <properties>
+    <oas.directory>../../references/swagger</oas.directory>
+  </properties>
+
+
+  <build>
+    <finalName>flowable-swagger-ui</finalName>
+    <plugins>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.5</version>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>src/main/webapp/specfile</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${oas.directory}</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.mortbay.jetty</groupId>
+        <artifactId>maven-jetty-plugin</artifactId>
+        <version>6.1.10</version>
+        <configuration>
+          <scanIntervalSeconds>10</scanIntervalSeconds>
+          <connectors>
+            <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+              <port>9090</port>
+              <maxIdleTime>60000</maxIdleTime>
+            </connector>
+          </connectors>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>import-ref</id>
+      <properties>
+        <oas.directory>../../references/swagger</oas.directory>
+      </properties>
+    </profile>
+    <profile>
+      <id>import-generator</id>
+      <properties>
+        <oas.directory>../oas-spec-generator/target/oas/v2</oas.directory>
+      </properties>
+    </profile>
+  </profiles>
+
+
+</project>

@@ -12,24 +12,28 @@
  */
 package org.flowable.engine.test.bpmn.gateway;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testDivergingExclusiveGateway() {
         for (int i = 1; i <= 3; i++) {
@@ -39,6 +43,7 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testSkipExpression() {
         for (int i = 1; i <= 3; i++) {
@@ -52,6 +57,7 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testMergingExclusiveGateway() {
         runtimeService.startProcessInstanceByKey("exclusiveGwMerging");
@@ -60,12 +66,14 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
 
     // If there are multiple outgoing seqFlow with valid conditions, the first
     // defined one should be chosen.
+    @Test
     @Deployment
     public void testMultipleValidConditions() {
         runtimeService.startProcessInstanceByKey("exclusiveGwMultipleValidConditions", CollectionUtil.singletonMap("input", 5));
         assertEquals("Task 2", taskService.createTaskQuery().singleResult().getName());
     }
 
+    @Test
     @Deployment
     public void testNoSequenceFlowSelected() {
         try {
@@ -79,6 +87,7 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
     /**
      * Test for bug ACT-10: whitespaces/newlines in expressions lead to exceptions
      */
+    @Test
     @Deployment
     public void testWhitespaceInExpression() {
         // Starting a process instance will lead to an exception if whitespace
@@ -86,6 +95,7 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("whiteSpaceInExpression", CollectionUtil.singletonMap("input", 1));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/gateway/ExclusiveGatewayTest.testDivergingExclusiveGateway.bpmn20.xml" })
     public void testUnknownVariableInExpression() {
         // Instead of 'input' we're starting a process instance with the name
@@ -98,15 +108,17 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testDecideBasedOnBeanProperty() {
         runtimeService.startProcessInstanceByKey("decisionBasedOnBeanProperty", CollectionUtil.singletonMap("order", new ExclusiveGatewayTestOrder(150)));
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
         assertEquals("Standard service", task.getName());
     }
 
+    @Test
     @Deployment
     public void testDecideBasedOnListOrArrayOfBeans() {
         List<ExclusiveGatewayTestOrder> orders = new ArrayList<>();
@@ -116,7 +128,7 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
 
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("decisionBasedOnListOrArrayOfBeans", CollectionUtil.singletonMap("orders", orders));
 
-        Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertNotNull(task);
         assertEquals("Gold Member service", task.getName());
 
@@ -130,15 +142,17 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
         assertEquals("Basic service", task.getName());
     }
 
+    @Test
     @Deployment
     public void testDecideBasedOnBeanMethod() {
         runtimeService.startProcessInstanceByKey("decisionBasedOnBeanMethod", CollectionUtil.singletonMap("order", new ExclusiveGatewayTestOrder(300)));
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
         assertEquals("Gold Member service", task.getName());
     }
 
+    @Test
     @Deployment
     public void testInvalidMethodExpression() {
         try {
@@ -149,12 +163,13 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testDefaultSequenceFlow() {
 
         // Input == 1 -> default is not selected
         String procId = runtimeService.startProcessInstanceByKey("exclusiveGwDefaultSequenceFlow", CollectionUtil.singletonMap("input", 1)).getId();
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Input is one", task.getName());
         runtimeService.deleteProcessInstance(procId, null);
 
@@ -163,6 +178,7 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
         assertEquals("Default input", task.getName());
     }
 
+    @Test
     public void testInvalidProcessDefinition() {
         String defaultFlowWithCondition = "<?xml version='1.0' encoding='UTF-8'?>"
                 + "<definitions id='definitions' xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:activiti='http://activiti.org/bpmn' targetNamespace='Examples'>"
@@ -175,11 +191,7 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
 
                 "    <userTask id='theTask1' name='Input is one' /> " + "    <userTask id='theTask2' name='Default input' /> " + "  </process>" + "</definitions>";
 
-        try {
-            repositoryService.createDeployment().addString("myprocess.bpmn20.xml", defaultFlowWithCondition).deploy();
-            fail();
-        } catch (Exception e) {
-        }
+        assertThatThrownBy(() -> repositoryService.createDeployment().addString("myprocess.bpmn20.xml", defaultFlowWithCondition).deploy());
 
         String noOutgoingFlow = "<?xml version='1.0' encoding='UTF-8'?>"
                 + "<definitions id='definitions' xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:activiti='http://activiti.org/bpmn' targetNamespace='Examples'>"
@@ -193,6 +205,7 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testAsyncExclusiveGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncExclusive", CollectionUtil.singletonMap("input", 1));
@@ -201,20 +214,23 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
         assertNotNull(job);
 
         managementService.executeJob(job.getId());
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("Input is one", task.getName());
     }
 
     // From https://github.com/Activiti/Activiti/issues/796
+    @Test
     @Deployment
     public void testExclusiveDirectlyToEnd() {
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("input", 1);
-        ProcessInstance startProcessInstanceByKey = runtimeService.startProcessInstanceByKey("exclusiveGateway", variables);
-        long count = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(startProcessInstanceByKey.getId()).unfinished()
-                .count();
-        assertEquals(0, count);
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("input", 1);
+            ProcessInstance startProcessInstanceByKey = runtimeService.startProcessInstanceByKey("exclusiveGateway", variables);
+            long count = historyService.createHistoricActivityInstanceQuery()
+                    .processInstanceId(startProcessInstanceByKey.getId()).unfinished()
+                    .count();
+            assertEquals(0, count);
+        }
     }
 
 }

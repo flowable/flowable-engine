@@ -38,6 +38,7 @@ public class ScriptTaskXMLConverter extends BaseBpmnXMLConverter {
         childParserMap.put(scriptTextParser.getElementName(), scriptTextParser);
     }
 
+    @Override
     public Class<? extends BaseElement> getBpmnElementType() {
         return ScriptTask.class;
     }

@@ -19,6 +19,8 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.ldap.LDAPGroupCache;
 import org.flowable.ldap.LDAPGroupCache.LDAPGroupCacheListener;
 import org.flowable.ldap.LDAPIdentityServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration("classpath:flowable-context-ldap-group-cache.xml")
@@ -26,9 +28,8 @@ public class LdapGroupCacheTest extends LDAPTestCase {
 
     protected TestLDAPGroupCacheListener cacheListener;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
 
         // Set test cache listener
         LDAPGroupCache ldapGroupCache = ((LDAPIdentityServiceImpl) 
@@ -40,6 +41,7 @@ public class LdapGroupCacheTest extends LDAPTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testLdapGroupCacheUsage() {
         runtimeService.startProcessInstanceByKey("testLdapGroupCache");
@@ -66,6 +68,7 @@ public class LdapGroupCacheTest extends LDAPTestCase {
         assertEquals("pepe", cacheListener.getLastCacheEviction());
     }
 
+    @Test
     public void testLdapGroupCacheExpiration() {
         assertEquals(0, taskService.createTaskQuery().taskCandidateUser("kermit").count());
         assertEquals("kermit", cacheListener.getLastCacheMiss());
@@ -101,18 +104,22 @@ public class LdapGroupCacheTest extends LDAPTestCase {
         protected String lastCacheEviction;
         protected String lastCacheExpiration;
 
+        @Override
         public void cacheMiss(String userId) {
             this.lastCacheMiss = userId;
         }
 
+        @Override
         public void cacheHit(String userId) {
             this.lastCacheHit = userId;
         }
 
+        @Override
         public void cacheExpired(String userId) {
             this.lastCacheExpiration = userId;
         }
 
+        @Override
         public void cacheEviction(String userId) {
             this.lastCacheEviction = userId;
         }

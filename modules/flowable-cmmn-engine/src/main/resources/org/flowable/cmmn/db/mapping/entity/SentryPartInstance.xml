@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityImpl">
+
+    <insert id="insertSentryPartInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityImpl">
+        insert into ${prefix}ACT_CMMN_RU_SENTRY_PART_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, PLAN_ITEM_INST_ID_, ON_PART_ID_, IF_PART_ID_, TIME_STAMP_)
+        values (
+            #{id ,jdbcType=VARCHAR},
+            1,
+            #{caseDefinitionId ,jdbcType=VARCHAR},
+            #{caseInstanceId ,jdbcType=VARCHAR},
+            #{planItemInstanceId ,jdbcType=VARCHAR},
+            #{onPartId ,jdbcType=VARCHAR},
+            #{ifPartId ,jdbcType=VARCHAR},
+            #{timeStamp ,jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+
+    <insert id="bulkInsertSentryPartInstance" parameterType="java.util.List">
+        insert into ${prefix}ACT_CMMN_RU_SENTRY_PART_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, PLAN_ITEM_INST_ID_, ON_PART_ID_, IF_PART_ID_, TIME_STAMP_)
+        values
+        <foreach collection="list" item="sentryPartInstance" index="index" separator=",">
+            (
+                #{sentryPartInstance.id ,jdbcType=VARCHAR},
+                1,
+                #{sentryPartInstance.caseDefinitionId ,jdbcType=VARCHAR},
+                #{sentryPartInstance.caseInstanceId ,jdbcType=VARCHAR},
+                #{sentryPartInstance.planItemInstanceId ,jdbcType=VARCHAR},
+                #{sentryPartInstance.onPartId ,jdbcType=VARCHAR},
+                #{sentryPartInstance.ifPartId ,jdbcType=VARCHAR},
+                #{sentryPartInstance.timeStamp,jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="bulkInsertSentryPartInstance" databaseId="oracle" parameterType="java.util.List">
+        INSERT ALL
+        <foreach collection="list" item="sentryPartInstance" index="index">
+            into ${prefix}ACT_CMMN_RU_SENTRY_PART_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, PLAN_ITEM_INST_ID_, ON_PART_ID_, IF_PART_ID_, TIME_STAMP_) VALUES
+            (
+                #{sentryPartInstance.id ,jdbcType=VARCHAR},
+                1,
+                #{sentryPartInstance.caseDefinitionId ,jdbcType=VARCHAR},
+                #{sentryPartInstance.caseInstanceId ,jdbcType=VARCHAR},
+                #{sentryPartInstance.planItemInstanceId ,jdbcType=VARCHAR},
+                #{sentryPartInstance.onPartId ,jdbcType=VARCHAR},
+                #{sentryPartInstance.ifPartId ,jdbcType=VARCHAR},
+                #{sentryPartInstance.timeStamp ,jdbcType=TIMESTAMP}
+            )
+        </foreach>
+        SELECT * FROM dual
+    </insert>
+
+    <update id="updateSentryPartInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityImpl">
+        update ${prefix}ACT_CMMN_RU_SENTRY_PART_INST
+        <set>
+            REV_ = #{revisionNext, jdbcType=INTEGER},
+            <if test="originalPersistentState.caseDefinitionId != caseDefinitionId">
+                CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.caseInstanceId != caseInstanceId">
+                CASE_INST_ID_ = #{caseInstanceId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.planItemInstanceId != planItemInstanceId">                
+                PLAN_ITEM_INST_ID_ = #{planItemInstanceId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.onPartId != onPartId">    
+                ON_PART_ID_ = #{onPartId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.ifPartId != ifPartId">
+                IF_PART_ID_ = #{ifPartId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.timeStamp != timeStamp">
+                TIME_STAMP_ = #{timeStamp, jdbcType=TIMESTAMP}
+            </if>
+        </set>
+        where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
+    </update>
+
+    <delete id="deleteSentryPartInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityImpl">
+        delete from ${prefix}ACT_CMMN_RU_SENTRY_PART_INST where ID_ = #{id} and REV_ = #{revision}
+    </delete>
+    
+     <delete id="deleteSentryPartInstancesByCaseInstanceId" parameterType="String">
+        delete from ${prefix}ACT_CMMN_RU_SENTRY_PART_INST where CASE_INST_ID_ = #{id}
+    </delete>
+    
+
+    <resultMap id="sentryPartInstanceResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityImpl">
+        <id property="id" column="ID_" jdbcType="VARCHAR" />
+        <result property="revision" column="REV_" jdbcType="INTEGER" />
+        <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
+        <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
+        <result property="planItemInstanceId" column="PLAN_ITEM_INST_ID_" jdbcType="VARCHAR" />
+        <result property="onPartId" column="ON_PART_ID_" jdbcType="VARCHAR" />
+        <result property="ifPartId" column="IF_PART_ID_" jdbcType="VARCHAR" />
+        <result property="timeStamp" column="TIME_STAMP_" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <select id="selectSentryPartInstance" parameterType="string" resultMap="sentryPartInstanceResultMap">
+        select * from ${prefix}ACT_CMMN_RU_SENTRY_PART_INST where ID_ = #{id, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectSentryPartInstanceByPlanItemInstanceId" parameterType="string" resultMap="sentryPartInstanceResultMap">
+        select * from ${prefix}ACT_CMMN_RU_SENTRY_PART_INST where PLAN_ITEM_INST_ID_ = #{parameter, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectSentryPartInstanceByCaseInstanceIdAndNullPlanItemInstanceId" parameterType="string" resultMap="sentryPartInstanceResultMap">
+        select * from ${prefix}ACT_CMMN_RU_SENTRY_PART_INST
+        where CASE_INST_ID_ = #{parameter, jdbcType=VARCHAR} and PLAN_ITEM_INST_ID_ is null
+    </select>
+
+    <select id="selectSentryPartInstanceByCaseInstanceId" parameterType="string" resultMap="sentryPartInstanceResultMap">
+        select * from ${prefix}ACT_CMMN_RU_SENTRY_PART_INST
+        where CASE_INST_ID_ = #{parameter, jdbcType=VARCHAR}
+    </select>
+
+</mapper>

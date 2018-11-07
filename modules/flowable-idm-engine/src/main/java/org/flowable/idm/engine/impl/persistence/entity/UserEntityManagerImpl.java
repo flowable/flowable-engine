@@ -16,7 +16,7 @@ package org.flowable.idm.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.idm.api.PasswordEncoder;
 import org.flowable.idm.api.PasswordSalt;
 import org.flowable.idm.api.Picture;
@@ -49,6 +49,7 @@ public class UserEntityManagerImpl extends AbstractEntityManager<UserEntity> imp
         return userDataManager.findById(entityId);
     }
 
+    @Override
     public User createNewUser(String userId) {
         UserEntity userEntity = create();
         userEntity.setId(userId);
@@ -56,10 +57,12 @@ public class UserEntityManagerImpl extends AbstractEntityManager<UserEntity> imp
         return userEntity;
     }
 
+    @Override
     public void updateUser(User updatedUser) {
         super.update((UserEntity) updatedUser);
     }
 
+    @Override
     public void delete(UserEntity userEntity) {
         super.delete(userEntity);
         deletePicture(userEntity);
@@ -73,6 +76,7 @@ public class UserEntityManagerImpl extends AbstractEntityManager<UserEntity> imp
         }
     }
 
+    @Override
     public void delete(String userId) {
         UserEntity user = findById(userId);
         if (user != null) {
@@ -85,18 +89,22 @@ public class UserEntityManagerImpl extends AbstractEntityManager<UserEntity> imp
         }
     }
 
+    @Override
     public List<User> findUserByQueryCriteria(UserQueryImpl query) {
         return userDataManager.findUserByQueryCriteria(query);
     }
 
+    @Override
     public long findUserCountByQueryCriteria(UserQueryImpl query) {
         return userDataManager.findUserCountByQueryCriteria(query);
     }
 
+    @Override
     public UserQuery createNewUserQuery() {
         return new UserQueryImpl(getCommandExecutor());
     }
 
+    @Override
     public Boolean checkPassword(String userId, String password, PasswordEncoder passwordEncoder, PasswordSalt salt) {
         User user = null;
 
@@ -104,13 +112,15 @@ public class UserEntityManagerImpl extends AbstractEntityManager<UserEntity> imp
             user = findById(userId);
         }
 
-        return (user != null) && (password != null) && (passwordEncoder.isMatches(password, user.getPassword(), salt));
+        return (user != null) && (password != null) && passwordEncoder.isMatches(password, user.getPassword(), salt);
     }
 
+    @Override
     public List<User> findUsersByNativeQuery(Map<String, Object> parameterMap) {
         return userDataManager.findUsersByNativeQuery(parameterMap);
     }
 
+    @Override
     public long findUserCountByNativeQuery(Map<String, Object> parameterMap) {
         return userDataManager.findUserCountByNativeQuery(parameterMap);
     }

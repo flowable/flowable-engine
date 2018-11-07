@@ -15,20 +15,25 @@ package org.flowable.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.TaskListener;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskInfo;
+import org.flowable.engine.impl.util.TaskHelper;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskInfo;
+import org.flowable.task.service.TaskService;
+import org.flowable.task.service.event.impl.FlowableTaskEventBuilder;
+import org.flowable.task.service.impl.persistence.CountingTaskEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Joram Barrez
@@ -43,6 +48,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
         this.task = (TaskEntity) task;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (task == null) {
             throw new FlowableIllegalArgumentException("task is null");
@@ -53,41 +59,99 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
             compatibilityHandler.saveTask(task);
             return null;
         }
+        
+        TaskService taskService = CommandContextUtil.getTaskService(commandContext);
 
         if (task.getRevision() == 0) {
-            CommandContextUtil.getTaskEntityManager(commandContext).insert(task, null, true);
+            TaskHelper.insertTask(task, null, true);
 
-            if (CommandContextUtil.getEventDispatcher().isEnabled()) {
-                CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
+            FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher(commandContext);
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
             }
+            
+            handleSubTaskCount(taskService, null);
 
         } else {
-            
+
             ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
 
-            TaskInfo originalTaskEntity = CommandContextUtil.getTaskEntityManager(commandContext).findById(task.getId());
+            TaskInfo originalTaskEntity = taskService.getTask(task.getId());
             
             if (originalTaskEntity == null && processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-                originalTaskEntity = CommandContextUtil.getHistoricTaskInstanceEntityManager(commandContext).findById(task.getId());
+                originalTaskEntity = CommandContextUtil.getHistoricTaskService().getHistoricTask(task.getId());
             }
-            
-            String originalAssignee = originalTaskEntity.getAssignee();
-            
-            CommandContextUtil.getHistoryManager(commandContext).recordTaskInfoChange(task);
-            
-            if (!StringUtils.equals(originalAssignee, task.getAssignee())) {
-                CommandContextUtil.getProcessEngineConfiguration(commandContext).getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_ASSIGNMENT);
-                
-                if (CommandContextUtil.getEventDispatcher().isEnabled()) {
-                    CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, task));
-                }
 
+            CommandContextUtil.getHistoryManager(commandContext).recordTaskInfoChange(task);
+            taskService.updateTask(task, true);
+
+            // Special care needed to detect the assignee task has changed
+            if (!StringUtils.equals(originalTaskEntity.getAssignee(), task.getAssignee())) {
+                handleAssigneeChange(commandContext, processEngineConfiguration);
             }
             
-            CommandContextUtil.getTaskEntityManager(commandContext).update(task);
+            // Special care needed to detect the parent task has changed
+            if (!StringUtils.equals(originalTaskEntity.getParentTaskId(), task.getParentTaskId())) {
+                handleSubTaskCount(taskService, originalTaskEntity);
+            }
+            
         }
 
         return null;
+    }
+
+    protected void handleAssigneeChange(CommandContext commandContext,
+            ProcessEngineConfigurationImpl processEngineConfiguration) {
+        processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_ASSIGNMENT);
+
+        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher(commandContext);
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, task));
+        }
+    }
+
+    protected void handleSubTaskCount(TaskService taskService, TaskInfo originalTaskEntity) {
+        if (CountingEntityUtil.isTaskRelatedEntityCountEnabled(task)) {
+            
+            // Parent task is set, none was set before or it's a new subtask
+            if (task.getParentTaskId() != null && (originalTaskEntity == null || originalTaskEntity.getParentTaskId() == null)) {
+                TaskEntity parentTaskEntity = taskService.getTask(task.getParentTaskId());
+                if (CountingEntityUtil.isTaskRelatedEntityCountEnabled(parentTaskEntity)) {
+                    CountingTaskEntity countingParentTaskEntity = (CountingTaskEntity) parentTaskEntity;
+                    countingParentTaskEntity.setSubTaskCount(countingParentTaskEntity.getSubTaskCount() + 1);
+                    parentTaskEntity.forceUpdate();
+                }
+                
+            // Parent task removed and was set before   
+            } else if (task.getParentTaskId() == null && originalTaskEntity != null && originalTaskEntity.getParentTaskId() != null) {
+                TaskEntity parentTaskEntity = taskService.getTask(originalTaskEntity.getParentTaskId());
+                if (CountingEntityUtil.isTaskRelatedEntityCountEnabled(parentTaskEntity)) {
+                    CountingTaskEntity countingParentTaskEntity = (CountingTaskEntity) parentTaskEntity;
+                    countingParentTaskEntity.setSubTaskCount(countingParentTaskEntity.getSubTaskCount() - 1);
+                    parentTaskEntity.forceUpdate();
+                }
+              
+            // Parent task was changed    
+            } else if (task.getParentTaskId() != null && originalTaskEntity.getParentTaskId() != null 
+                    && !task.getParentTaskId().equals(originalTaskEntity.getParentTaskId())) {
+                
+                TaskEntity originalParentTaskEntity = taskService.getTask(originalTaskEntity.getParentTaskId());
+                if (CountingEntityUtil.isTaskRelatedEntityCountEnabled(originalParentTaskEntity)) {
+                    CountingTaskEntity countingOriginalParentTaskEntity = (CountingTaskEntity) originalParentTaskEntity;
+                    countingOriginalParentTaskEntity.setSubTaskCount(countingOriginalParentTaskEntity.getSubTaskCount() - 1);
+                    originalParentTaskEntity.forceUpdate();
+                }
+                
+                TaskEntity parentTaskEntity = taskService.getTask(task.getParentTaskId());
+                if (CountingEntityUtil.isTaskRelatedEntityCountEnabled(parentTaskEntity)) {
+                    CountingTaskEntity countingParentTaskEntity = (CountingTaskEntity) parentTaskEntity;
+                    countingParentTaskEntity.setSubTaskCount(countingParentTaskEntity.getSubTaskCount() + 1);
+                    parentTaskEntity.forceUpdate();
+                }
+                
+            }
+            
+        }
     }
 
 }

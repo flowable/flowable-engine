@@ -14,32 +14,38 @@ package org.flowable.content.engine.impl;
 
 import java.util.Map;
 
+import org.flowable.common.engine.api.management.TableMetaData;
+import org.flowable.common.engine.api.management.TablePageQuery;
+import org.flowable.common.engine.impl.cmd.CustomSqlExecution;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.content.api.ContentManagementService;
+import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.impl.cmd.ExecuteCustomSqlCmd;
 import org.flowable.content.engine.impl.cmd.GetTableCountCmd;
 import org.flowable.content.engine.impl.cmd.GetTableMetaDataCmd;
 import org.flowable.content.engine.impl.cmd.GetTableNameCmd;
-import org.flowable.engine.common.api.management.TableMetaData;
-import org.flowable.engine.common.api.management.TablePageQuery;
-import org.flowable.engine.common.impl.cmd.CustomSqlExecution;
 
 /**
  * @author Tijs Rademakers
  */
-public class ContentManagementServiceImpl extends ServiceImpl implements ContentManagementService {
+public class ContentManagementServiceImpl extends CommonEngineServiceImpl<ContentEngineConfiguration> implements ContentManagementService {
 
+    @Override
     public Map<String, Long> getTableCount() {
         return commandExecutor.execute(new GetTableCountCmd());
     }
 
+    @Override
     public String getTableName(Class<?> entityClass) {
         return commandExecutor.execute(new GetTableNameCmd(entityClass));
     }
 
+    @Override
     public TableMetaData getTableMetaData(String tableName) {
         return commandExecutor.execute(new GetTableMetaDataCmd(tableName));
     }
 
+    @Override
     public TablePageQuery createTablePageQuery() {
         return new TablePageQueryImpl(commandExecutor);
     }

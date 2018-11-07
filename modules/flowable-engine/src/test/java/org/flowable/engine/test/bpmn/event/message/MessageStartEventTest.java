@@ -16,20 +16,21 @@ package org.flowable.engine.test.bpmn.event.message;
 import java.util.Calendar;
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.EventSubscriptionQuery;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
  */
 public class MessageStartEventTest extends PluggableFlowableTestCase {
 
+    @Test
     public void testDeploymentCreatesSubscriptions() {
         String deploymentId = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/message/MessageStartEventTest.testSingleMessageStartEvent.bpmn20.xml")
                 .deploy().getId();
@@ -41,6 +42,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
         repositoryService.deleteDeployment(deploymentId);
     }
 
+    @Test
     public void testSameMessageNameFails() {
         String deploymentId = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/message/MessageStartEventTest.testSingleMessageStartEvent.bpmn20.xml")
                 .deploy().getId();
@@ -56,6 +58,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     public void testSameMessageNameInSameProcessFails() {
         try {
             repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/message/testSameMessageNameInSameProcessFails.bpmn20.xml").deploy();
@@ -65,6 +68,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testUpdateProcessVersionCancelsSubscriptions() {
         String deploymentId = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/message/MessageStartEventTest.testSingleMessageStartEvent.bpmn20.xml")
                 .deploy().getId();
@@ -100,6 +104,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
         repositoryService.deleteDeployment(newDeploymentId);
     }
 
+    @Test
     @Deployment
     public void testSingleMessageStartEvent() {
 
@@ -109,7 +114,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
 
         assertFalse(processInstance.isEnded());
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
 
         taskService.complete(task.getId());
@@ -128,9 +133,24 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
+        
+        // start process instance again after clearing the process definition cache (force deployment)
+        
+        processEngineConfiguration.getProcessDefinitionCache().clear();
+        
+        processInstance = runtimeService.startProcessInstanceByMessage("newInvoiceMessage");
 
+        assertFalse(processInstance.isEnded());
+
+        task = taskService.createTaskQuery().singleResult();
+        assertNotNull(task);
+
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
     }
     
+    @Test
     @Deployment
     public void testBusinessKeySet() {
         ProcessInstance pi1 = runtimeService.startProcessInstanceByKey("start-by-message-1", "business-key-123");
@@ -147,6 +167,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
                 .getBusinessKey());
     }
 
+    @Test
     @Deployment
     public void testMessageStartEventAndNoneStartEvent() {
 
@@ -156,7 +177,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
 
         assertFalse(processInstance.isEnded());
 
-        Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterNoneStart").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterNoneStart").singleResult();
         assertNotNull(task);
 
         taskService.complete(task.getId());
@@ -178,6 +199,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testMultipleMessageStartEvents() {
 
@@ -187,7 +209,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
 
         assertFalse(processInstance.isEnded());
 
-        Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterMessageStart").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterMessageStart").singleResult();
         assertNotNull(task);
 
         taskService.complete(task.getId());
@@ -217,6 +239,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment
     public void testQueryMessageStartEvents() {
         assertEventSubscriptionQuery(runtimeService.createEventSubscriptionQuery(), 2);

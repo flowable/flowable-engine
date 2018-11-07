@@ -49,6 +49,7 @@ public class HistoricFormPropertyEntity extends HistoricDetailEntity implements 
         }
     }
 
+    @Override
     public String getPropertyId() {
         return propertyId;
     }
@@ -57,6 +58,7 @@ public class HistoricFormPropertyEntity extends HistoricDetailEntity implements 
         this.propertyId = propertyId;
     }
 
+    @Override
     public String getPropertyValue() {
         return propertyValue;
     }

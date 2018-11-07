@@ -14,16 +14,16 @@ package org.flowable.content.engine.configurator;
 
 import java.util.List;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.AbstractEngineConfigurator;
+import org.flowable.common.engine.impl.EngineDeployer;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.content.engine.ContentEngine;
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.impl.cfg.StandaloneContentEngineConfiguration;
 import org.flowable.content.engine.impl.db.EntityDependencyOrder;
-import org.flowable.engine.cfg.AbstractEngineConfigurator;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.persistence.deploy.Deployer;
 
 /**
  * @author Tijs Rademakers
@@ -39,7 +39,7 @@ public class ContentEngineConfigurator extends AbstractEngineConfigurator {
     }
     
     @Override
-    protected List<Deployer> getCustomDeployers() {
+    protected List<EngineDeployer> getCustomDeployers() {
         return null;
     }
     
@@ -49,14 +49,16 @@ public class ContentEngineConfigurator extends AbstractEngineConfigurator {
     }
 
     @Override
-    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    public void configure(AbstractEngineConfiguration engineConfiguration) {
         if (contentEngineConfiguration == null) {
             contentEngineConfiguration = new StandaloneContentEngineConfiguration();
         }
         
-        initialiseCommonProperties(processEngineConfiguration, contentEngineConfiguration, EngineConfigurationConstants.KEY_CONTENT_ENGINE_CONFIG);
+        initialiseCommonProperties(engineConfiguration, contentEngineConfiguration);
 
         initContentEngine();
+        
+        initServiceConfigurations(engineConfiguration, contentEngineConfiguration);
     }
     
     @Override

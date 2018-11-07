@@ -16,8 +16,8 @@ package org.flowable.variable.service.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.query.QueryProperty;
-import org.flowable.variable.service.history.HistoricVariableInstanceQuery;
+import org.flowable.common.engine.api.query.QueryProperty;
+import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
 
 /**
  * Contains the possible properties which can be used in a {@link HistoricVariableInstanceQuery}.
@@ -31,6 +31,7 @@ public class HistoricVariableInstanceQueryProperty implements QueryProperty {
     private static final Map<String, HistoricVariableInstanceQueryProperty> properties = new HashMap<>();
 
     public static final HistoricVariableInstanceQueryProperty PROCESS_INSTANCE_ID = new HistoricVariableInstanceQueryProperty("PROC_INST_ID_");
+    public static final HistoricVariableInstanceQueryProperty SCOPE_ID = new HistoricVariableInstanceQueryProperty("SCOPE_ID_");
     public static final HistoricVariableInstanceQueryProperty VARIABLE_NAME = new HistoricVariableInstanceQueryProperty("NAME_");
 
     private String name;
@@ -40,6 +41,7 @@ public class HistoricVariableInstanceQueryProperty implements QueryProperty {
         properties.put(name, this);
     }
 
+    @Override
     public String getName() {
         return name;
     }

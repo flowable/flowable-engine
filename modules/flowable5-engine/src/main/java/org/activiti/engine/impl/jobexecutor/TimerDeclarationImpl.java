@@ -22,10 +22,10 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.el.NoExecutionVariableScope;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.TimerJobEntity;
-import org.flowable.engine.delegate.Expression;
-import org.flowable.engine.delegate.VariableScope;
-import org.flowable.engine.impl.calendar.BusinessCalendar;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.engine.impl.jobexecutor.TimerDeclarationType;
+import org.flowable.variable.api.delegate.VariableScope;
 import org.joda.time.DateTime;
 
 /**

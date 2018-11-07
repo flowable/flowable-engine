@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" 
+    xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" 
+    xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI"
+    xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    targetNamespace="http://flowable.org/cmmn">
+
+    <case id="myCase">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+
+            <planItem id="planItem1" name="Task A" definitionRef="rootTask" />
+            <planItem id="planItem2" name="Stage A" definitionRef="stage1" />
+
+            <task id="rootTask" name="The Task" isBlocking="true" />
+
+            <stage id="stage1" name="Nested Stage">
+
+                <planItem id="planItem3" name="Task B" definitionRef="rootTask" />
+                <planItem id="planItem4" name="Task C" definitionRef="nestedTask" />
+                <planItem id="planItem5" name="Stage B" definitionRef="stage2">
+                    <entryCriterion sentryRef="stage2EntrySentry" />
+                    <exitCriterion sentryRef="stage2ExitSentry" />
+                </planItem>
+
+                <sentry id="stage2EntrySentry">
+                    <planItemOnPart sourceRef="planItem1">
+                        <standardEvent>complete</standardEvent>
+                    </planItemOnPart>
+                    <planItemOnPart sourceRef="planItem3">
+                        <standardEvent>complete</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+
+                <sentry id="stage2ExitSentry">
+                    <planItemOnPart sourceRef="planItem4">
+                        <standardEvent>complete</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+
+                <task id="nestedTask" name="Nested Task" isBlocking="true" />
+                <stage id="stage2" name="Nested Stage 2">
+
+                    <planItem id="planItem6" name="Task D" definitionRef="rootTask" />
+                    <planItem id="planItem7" name="Stage C" definitionRef="stage3" />
+
+                    <stage id="stage3" name="Nested Stage 3">
+
+                        <planItem id="planItem8" name="Task E" definitionRef="nestedTask2" />
+                        <task id="nestedTask2" name="The Task" isBlocking="true" />
+
+                    </stage>
+
+                </stage>
+
+            </stage>
+
+        </casePlanModel>
+    </case>
+
+</definitions>

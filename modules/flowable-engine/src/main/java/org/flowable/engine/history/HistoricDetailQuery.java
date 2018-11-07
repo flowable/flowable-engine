@@ -13,8 +13,9 @@
 
 package org.flowable.engine.history;
 
-import org.flowable.engine.common.api.query.Query;
+import org.flowable.common.engine.api.query.Query;
 import org.flowable.engine.runtime.Execution;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 /**
  * Programmatic querying for {@link HistoricDetail}s.

@@ -17,7 +17,7 @@ import java.io.InputStream;
 
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.impl.util.ReflectUtil;
-import org.flowable.engine.common.impl.util.io.StreamSource;
+import org.flowable.common.engine.impl.util.io.StreamSource;
 
 /**
  * @author Tom Baeyens
@@ -37,6 +37,7 @@ public class ResourceStreamSource implements StreamSource {
         this.classLoader = classLoader;
     }
 
+    @Override
     public InputStream getInputStream() {
         InputStream inputStream = null;
         if (classLoader == null) {
@@ -50,6 +51,7 @@ public class ResourceStreamSource implements StreamSource {
         return new BufferedInputStream(inputStream);
     }
 
+    @Override
     public String toString() {
         return "Resource[" + resource + "]";
     }

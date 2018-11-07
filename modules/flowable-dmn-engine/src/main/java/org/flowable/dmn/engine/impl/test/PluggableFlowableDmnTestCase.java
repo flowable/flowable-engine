@@ -13,10 +13,10 @@
 
 package org.flowable.dmn.engine.impl.test;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngines;
 import org.flowable.dmn.engine.impl.DmnEngineImpl;
-import org.flowable.engine.common.api.FlowableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +31,7 @@ public abstract class PluggableFlowableDmnTestCase extends AbstractFlowableDmnTe
 
     protected static DmnEngine cachedDmnEngine;
 
+    @Override
     protected void initializeDmnEngine() {
         if (cachedDmnEngine == null) {
             LOGGER.info("No cached dmn engine found for test. Retrieving the default engine.");

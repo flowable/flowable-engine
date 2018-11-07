@@ -13,10 +13,10 @@
 package org.activiti.standalone.validation;
 
 import org.flowable.bpmn.exceptions.XMLException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngines;
 import org.flowable.engine.RepositoryService;
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentProperties;

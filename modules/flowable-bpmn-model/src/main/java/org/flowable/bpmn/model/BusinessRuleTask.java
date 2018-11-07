@@ -66,6 +66,7 @@ public class BusinessRuleTask extends Task {
         this.className = className;
     }
 
+    @Override
     public BusinessRuleTask clone() {
         BusinessRuleTask clone = new BusinessRuleTask();
         clone.setValues(this);

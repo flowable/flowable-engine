@@ -10,7 +10,7 @@
     <groupId>org.flowable</groupId>
     <artifactId>flowable-root</artifactId>
     <relativePath>../..</relativePath>
-    <version>6.2.0-SNAPSHOT</version>
+    <version>6.4.1-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -88,8 +88,7 @@
   <dependencies>
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
-      <version>2.4.8</version>
+      <artifactId>groovy-jsr223</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -127,6 +126,21 @@
       <artifactId>junit</artifactId>
       <scope>provided</scope>
     </dependency>
+      <dependency>
+          <groupId>org.junit.jupiter</groupId>
+          <artifactId>junit-jupiter-api</artifactId>
+          <scope>test</scope>
+      </dependency>
+      <dependency>
+          <groupId>org.junit.jupiter</groupId>
+          <artifactId>junit-jupiter-engine</artifactId>
+          <scope>test</scope>
+      </dependency>
+      <dependency>
+          <groupId>org.junit.vintage</groupId>
+          <artifactId>junit-vintage-engine</artifactId>
+          <scope>test</scope>
+      </dependency>
   </dependencies>
 
   <profiles>

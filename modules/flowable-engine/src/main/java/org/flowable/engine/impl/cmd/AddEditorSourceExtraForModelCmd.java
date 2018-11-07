@@ -15,8 +15,8 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
@@ -34,6 +34,7 @@ public class AddEditorSourceExtraForModelCmd implements Command<Object>, Seriali
         this.bytes = bytes;
     }
 
+    @Override
     public Object execute(CommandContext commandContext) {
         CommandContextUtil.getModelEntityManager(commandContext).insertEditorSourceExtraForModel(modelId, bytes);
 

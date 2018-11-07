@@ -1,0 +1,329 @@
+{
+  "COMMON":{
+    "SELECT-FOLDER":"Selecione uma pasta..."
+  },
+  "GENERAL":{
+    "MAIN-TITLE":"Flowable - Minhas Tarefas",
+    "ERROR":{
+      "GENERIC":"Desculpe, ocorreu um erro...",
+      "UNKNOWN":"Desculpe, um erro ocorreu durante a execução da operação solicitada.",
+      "BAD_REQUEST":"Um erro ocorreu durante a execução da operação solicitada",
+      "NOT_FOUND":"O recurso que você está tentando acessar não existe",
+      "UNAUTHORIZED":"Você deve fazer login para executar a operação solicitada.",
+      "FORBIDDEN":"Você não está autorizado a executar a operação solicitada",
+      "INTERNAL_SERVER_ERROR":"Desculpe, um erro inesperado ocorreu durante a execução da operação solicitada."
+    },
+    "NAVIGATION":{
+      "TASKS":"Tarefas",
+      "PROCESSES":"Processos",
+      "DESIGN":"Desenho",
+      "CREATE":"+ Criar",
+      "LOGIN":"Entrar"
+    },
+    "TITLE":{
+      "ADD-COMMENT":"Criar comentário",
+      "INVOLVE-PEOPLE":"Selecione uma pessoa",
+      "RECENT-PEOPLE":"Pessoas recentes",
+      "MATCHING-PEOPLE":"Pessoas correspondentes",
+      "SELECT-GROUP":"Selecionar grupo",
+      "MATCHING-GROUPS":"Grupos correspondentes",
+      "FILTER":"Filtro",
+      "SELECT-DATE":"Selecione uma data"
+    },
+    "ACTION":{
+      "LOGOUT":"Sair",
+      "ADD-COMMENT":"Adicionar comentário",
+      "SAVE":"Salvar",
+      "CANCEL":"Cancelar",
+      "CLOSE":"Fechar",
+      "CONFIRM":"Confirmar",
+      "SHOW-MORE":"Mostrar mais..."
+    },
+    "MESSAGE":{
+      "SELECT-PEOPLE-HELP":"Use &uparrow; e &downarrow; para selecionar e pressione Enter para confirmar",
+      "SELECT-GROUP-HELP":"Use &uparrow; e &downarrow; para selecionar e pressione Enter para confirmar",
+      "SELECT-GROUP-SEARCH-PLACEHOLDER":"Buscar grupos",
+      "SELECT-GROUP-NO-MATCHING-RESULTS":"Use a caixa de pesquisa acima para encontrar grupos.",
+      "UPLOAD-CONTENT":"Selecione ou arraste e solte o arquivo",
+      "UPLOAD-CONTENT-NO-DROP":"Selecione o arquivo para carregar",
+      "DROPZONE":"Arraste e Solte o arquivo para enviá-lo",
+      "YES":"Sim",
+      "NO":"Não"
+    },
+    "TIME":{
+      "HOURS":"horas",
+      "MINUTES":"minutos",
+      "SECONDS":"segundos"
+    },
+    "ABOUT":{
+      "TYPE":"Tipo",
+      "LICENSED-TO":"Licenciado para",
+      "EXPIRES":"Expira em",
+      "COPYRIGHT":"&copyleft; Flowable. Todos os direitos reservados.",
+      "LEGAL":"Jurídica e licença"
+    }
+  },
+  "LOGIN":{
+    "TITLE":"Entrar",
+    "USERNAME":"Nome de Usuário",
+    "USERNAME-PLACEHOLDER":"Digite seu nome de usuário",
+    "PASSWORD":"Senha",
+    "PASSWORD-PLACEHOLDER":"Digite sua senha",
+    "ACTION":{
+      "CONFIRM":"Entrar"
+    }
+  },
+  "TASK":{
+    "SECTION":{
+      "PEOPLE":"Pessoas",
+      "CONTENT":"Conteúdo",
+      "COMMENTS":"Comentários",
+      "NOTES":"Anotações"
+    },
+    "FILTER":{
+      "CREATED-DESC":"Mais Recentes Primeiro",
+      "CREATED-ASC":"Mais antigos primeiro",
+      "DUE-DESC":"Vencimento até",
+      "DUE-ASC":"Que vence primeiro",
+      "TEXT":"Filtro",
+      "TEXT-PLACEHOLDER":"Pesquisar por nome de tarefa",
+      "TEXT-SUMMARY":"Filtrado por: {{text}}",
+      "PROCESS-DEFINITION":"Definição de processo",
+      "PROCESS-DEFINITION-PLACEHOLDER":"Seleccione a definição de processo...",
+      "STATE":"Status",
+      "STATE-OPEN":"Aberto",
+      "STATE-COMPLETED":"Concluído",
+      "ASSIGNMENT":"Atribuído",
+      "ASSIGNMENT-INVOLVED":"Tarefas em que estou envolvido",
+      "ASSIGNMENT-ASSIGNEE":"Tarefas em que estou atribuído",
+      "ASSIGNMENT-CANDIDATE":"Tarefas em que sou um dos candidatos",
+      "ASSIGNMENT-GROUP":"Tarefas atribuídas para o grupo \"{{name}}\"",
+      "RESET":"Redefinir filtros"
+    },
+    "ALERT":{
+      "COMMENT-ADDED":"Um comentário foi adicionado ao \"{{name}}\"",
+      "PERSON-INVOLVED":"{{firstName}} {{lastName}} agora está envolvido em \"{{taskName}}\"",
+      "PERSON-NO-LONGER-INVOLVED":"{{firstName}} {{lastName}} não está mais envolvido em \"{{taskName}}\"",
+      "CREATED":"A tarefa \"{{name}}\" foi criada",
+      "COMPLETED":"Tarefa concluída",
+      "SAVED":"Formulário de tarefa foi salvo",
+      "ASSIGNED":"Tarefa \"{{taskName}}\" foi atribuído para {{firstName}} {{lastName}}",
+      "RELATED-CONTENT-ADDED":"\"{{name}}\" foi adicionada à tarefa",
+      "RELATED-CONTENT-ADDED-LOADING":"\"{{name}}\" foi adicionado à tarefa. O conteúdo estará disponível uma vez que for obtida de fonte externa."
+    },
+    "ACTION":{
+      "COMPLETE-TASK-WITH-FORM":"Formulário completo",
+      "COMPLETE":"Completar",
+      "CLAIM":"Reivindicar",
+      "ASSIGN":"Atribuir",
+      "REASSIGN":"Reatribuir",
+      "CREATE":"+ Criar tarefa",
+      "CREATE-CONFIRM":"Criar",
+      "INVOLVE":"+ Envolver pessoas",
+      "ADD-COMMENT":"+ Adicionar comentário",
+      "ADD-COMMENT-CONFIRM":"Adicionar Comentário",
+      "ADD-CONTENT":"+ Adicionar conteúdo",
+      "CLEAR-DUEDATE":"Limpar data de vencimento",
+      "DUE-TODAY":"Vence hoje",
+      "CLEAR-DATE":"Limpar data",
+      "DATE-TODAY":"Data de hoje",
+      "AUDIT-LOG":"Log de auditoria"
+    },
+    "TITLE":{
+      "ASSIGN":"Selecione o responsável",
+      "ASSIGNEE":"Responsável",
+      "CONTENT":"Conteúdo relacionado",
+      "CREATE-NEW":"Nova tarefa",
+      "FORM":"Formulário",
+      "DETAILS":"Detalhes",
+      "ADD-RELATED-CONTENT":"Adicionar conteúdo relacionado",
+      "SELECT-DUEDATE":"Selecione a data de vencimento",
+      "SELECT-DATE":"Selecione a data",
+      "NO-CONTENT-ITEMS":"Não há itens de conteúdo",
+      "NO-PEOPLE-INVOLVED":"Não há pessoas envolvidas",
+      "NO-COMMENTS":"Nenhum comentário",
+      "COMMENT-COUNT":"comentário",
+      "COMMENTS-COUNT":"comentários",
+      "SHOW-DETAILS":"Mostrar detalhes",
+      "SHOW-FORM":"Mostrar formulário"
+    },
+    "FIELD":{
+      "NAME":"Nome",
+      "DESCRIPTION":"Descrição",
+      "ASSIGNEE":"Responsável",
+      "DUE":"Vencimento",
+      "PROCESS-INSTANCE":"Processo",
+      "ENDED":"Finalizado em",
+      "DURATION":"Duração"
+    },
+    "MESSAGE":{
+      "NO-NAME":"Tarefa sem nome",
+      "NO-ASSIGNEE":"Atribuído a ninguém",
+      "NO-DUEDATE":"Sem data de vencimento",
+      "DUE-ON":"Vencimento",
+      "CREATED-ON":"Criado em",
+      "ENDED-ON":"Concluído",
+      "REACHED-ON":"Alcançado",
+      "COMPLETED-BY":"Concluído por",
+      "NO-DESCRIPTION":"Esta tarefa não tem descrição",
+      "NO-RELATED-CONTENT":"Esta tarefa não tem nenhum conteúdo relacionado ainda...",
+      "NO-PEOPLE-INVOLVED":"Esta tarefa não tem pessoas envolvidas ainda...",
+      "NO-COMMENTS":"Esta tarefa não tem comentários ainda...",
+      "INVOLVE-PEOPLE-PLACEHOLDER":"+ Adicionar pessoa",
+      "CONTENT-UPLOADED-BY":"Adicionado por ",
+      "ASSIGNEE":"Atribuído a",
+      "NEW-COMMENT-PLACEHOLDER":"Entre com um comentário para adicionar a esta tarefa",
+      "COMMENT-HEADER":"Adicionado por {{createdBy | username}}, {{created | dateformat: \"fromNow\"}}",
+      "NO-FILTER":"Mostrando as suas tarefas, nenhum filtro aplicado",
+      "FILTERED":"Mostrando as suas tarefas, nenhum filtro aplicado",
+      "NO-TASKS":"Não há tarefas correspondentes encontradas...",
+      "DURATION":"Demorou {{duration}}",
+      "CLAIM-TASK-FIRST":"Para ver e preencher o formulário para esta tarefa, você precisa reivindicar esta tarefa primeiro. Você pode fazer isso pressionando o botão azul no canto superior direito da página.",
+      "NO-TASKS-HELP":"Bem, parece que não há tarefas para você! Para obter alguma iniciada, você pode:",
+      "NO-SUCH-TASK-HELP":"A tarefa que você está procurando não foi encontrada! Se você quiser, você pode em vez disso:",
+      "NO-SUCH-TASK-RETURN-TO-LIST":"Retornar à sua lista de tarefas",
+      "NO-TASKS-CREATE-TASK":"Criar uma tarefa para si mesmo ou atribuí-la a outra pessoa",
+      "NO-TASKS-CREATE-PROCESS":"Iniciar um novo processo e em seguida acompanhar o seu progresso"
+    },
+    "HELP":{
+      "DESCRIPTION":"Esta tarefa ainda não tem detalhada ainda. Você pode mudar isso, escolhendo uma destas ações:",
+      "COMPLETED-DESCRIPTION":"Esta tarefa concluída não tem nenhum detalhe.",
+      "DESCRIPTION-WITH-CLAIM":"Esta tarefa ainda não tem detalhe. Você pode mudar isso, escolhendo uma das seguintes ações. Além disso, para concluir esta tarefa você precisa primeiro reclamá-la pressionando o botão azul no canto superior direito da página.",
+      "ADD-PEOPLE":"Envolva outra pessoa e comece a colaborar",
+      "ADD-COMMENT":"Destaque os outros adicionando um comentário",
+      "ADD-CONTENT":"Adicione um documento e compartilhe o conhecimento"
+    }
+  },
+  "PROCESS":{
+    "ALERT":{
+      "COMMENT-ADDED":"O comentário foi adicionado",
+      "STARTED":"Um novo processo \"{{processDefinitionName}}\" foi iniciado",
+      "START-PROCESS-CONTENT-ADD-FAILED":"Falha ao adicionar {{noOfFiles}} arquivo(s) ao processo"
+    },
+    "TITLE":{
+      "DIAGRAM":"Diagrama de processo"
+    },
+    "FILTER":{
+      "CREATED-DESC":"Mais Recentes Primeiro",
+      "CREATED-ASC":"Mais antigos primeiro",
+      "ENDED-DESC":"Completados recentemente",
+      "ENDED-ASC":"Completados menos recentemente",
+      "STATE-SUMMARY":"Mostrando o processo {{state.title | translate}}",
+      "STATE":"Estado do processo",
+      "STATE-RUNNING":"em execução",
+      "STATE-COMPLETED":"concluído",
+      "STATE-ALL":"Todos"
+    },
+    "MESSAGE":{
+      "NO-DESCRIPTION":"Esta instância de processo não tem descrição",
+      "NO-FILTER":"Mostrando todas as instâncias do processo, nenhum filtro aplicado",
+      "NO-INSTANCES":"Não há instâncias de processo correspondente encontradas...",
+      "NO-INSTANCES-HELP":"Não há nenhum processo executando agora. Se seus processos foram concluídos, você pode encontrá-los usando o filtro para a lista de processos. Para iniciar algum novo você pode:",
+      "NO-INSTANCES-HELP-START":"Iniciar um novo processo e acompanhar o seu progresso",
+      "NO-TASKS":"Não há tarefas ativas no momento...",
+      "NO-COMPLETED-TASKS":"Não há tarefas concluídas ainda...",
+      "NO-BUSINESS-KEY":"Nenhum conjunto de chave de negócios",
+      "NO-ACTIVE-MILESTONES": "No active milestones",
+      "CATEGORY":"Categoria: {{processDefinitionCategory}}",
+      "NEW-COMMENT-PLACEHOLDER":"Entre com o comentário a adicionar a este processo",
+      "COMMENT-HEADER":"Adicionado por {{createdBy | username}}, {{created | dateformat: \"fromNow\"}}",
+      "SELECT-DEFINITION":"Selecione um processo para iniciar a partir da lista abaixo",
+      "NO-PROCESS-DEFINITIONS":"Você não pode iniciar um processo, pois não há definições de processos disponíveis",
+      "START-PROCESS":"Iniciar Processo",
+      "STARTED-BY":"Iniciado por",
+      "NO-PROCESS-DEFINITION-SELECTED-HELP":"Por favor, selecione uma definição do processo"
+    },
+    "ACTION":{
+      "CREATE":"+ Iniciar um processo",
+      "BACK-TO-LIST":"Voltar para instâncias de processo",
+      "SHOW-DIAGRAM":"Mostrar o diagrama",
+      "CANCEL":"Cancelar o processo",
+      "DELETE":"Excluir o processo",
+      "ADD-COMMENT":"+ Adicionar comentário",
+      "ADD-COMMENT-CONFIRM":"Adicionar comentário",
+      "AUDIT-LOG":"Log de auditoria"
+    },
+    "FIELD":{
+      "BUSINESS-KEY":"Chave de negócios",
+      "CATEGORY":"Categoria",
+      "PROCESS-DEFINITION":"Definição de processo",
+      "STARTED":"Iniciado",
+      "STARTED-BY":"Iniciado por",
+      "ENDED":"Finalizado em",
+      "NAME":"Nome de instância do processo",
+      "NAME-PLACEHOLDER":"Digite um nome opcional para o processo que esta sendo iniciado"
+    },
+    "SECTION":{
+      "ACTIVE-TASKS":"Tarefas ativas",
+      "START-FORM":"Formulário de início",
+      "COMPLETED-TASKS":"Tarefas concluídas",
+      "COMMENTS":"Comentários",
+      "CONTENT":"Conteúdo"
+    },
+    "POPUP":{
+      "CANCEL-TITLE":"Cancelar o processo?",
+      "CANCEL-DESCRIPTION":"Você tem certeza que deseja cancelar o processo {{name}}?",
+      "DELETE-TITLE":"Excluir o processo?",
+      "DELETE-DESCRIPTION":"Você tem certeza que deseja excluir o processo {{name}}? Todas as tarefas, conteúdo e comentários relacionados com este processo serão excluídos permanentemente."
+    }
+  },
+  "INVOLVE-PEOPLE":{
+    "NO-MATCHING-RESULTS":"Use a caixa de pesquisa acima para encontrar usuários",
+    "SEARCH-PLACEHOLDER":"Procurar usuário",
+    "BACK-TO-SEARCH":"Volta para pesquisa",
+    "ACTION-SELECT":"Selecionar"
+  },
+  "INTEGRATION":{
+    "ALERT":{
+      
+    }
+  },
+  "CONTENT":{
+    "SIMPLE-TYPE":{
+      "WORD":"Documento",
+      "EXCEL":"Planilha",
+      "PDF":"Documento PDF",
+      "IMAGE":"Imagem",
+      "FOLDER":"Pasta",
+      "CONTENT":"Conteúdo"
+    },
+    "MESSAGE":{
+      "NO-PREVIEW-AVAILABLE":"Sem visualização disponível",
+      "PREVIEW-PENDING":"Criar visualização...",
+      "CONTENT-PENDING":"Recebendo o conteúdo...",
+      "NOT-FOUND":"O conteúdo não pode ser encontrado",
+      "DELETE-CONFIRMATION":"Tem certeza que deseja excluir o {{name}}?",
+      "DROP":"Arrastar e Soltar ou ",
+      "SELECT":"Escolha um aquivo",
+      "DRAGOVER":"Arraste e Solte o arquivo para carrega-lo",
+      "EXTERNAL-ONLY":"Selecione a fonte de conteúdo"
+    },
+    "TITLE":{
+      "DELETE":"Excluir conteúdo",
+      "NOT-FOUND":"Arquivo não encontrado"
+    },
+    "ACTION":{
+      
+    }
+  },
+  "FORM":{
+    "ACTION":{
+      "SAVE":"Salvar"
+    },
+    "DEFAULT-OUTCOME":{
+      "COMPLETE":"Completar",
+      "START-PROCESS":"Iniciar processo"
+    },
+    "MESSAGE":{
+      "SELECT-PERSON":"Nenhuma pessoa selecionada...",
+      "SELECT-GROUP":"Nenhum grupo selecionado...",
+      "EMPTY":"(vazio)"
+    }
+  },
+  "APP-DEFINITION":{
+    "MESSAGE":{
+      "NOT-FOUND":"Nenhuma definição de aplicativo encontrado com a identificação requisitada",
+      "MISSING":"Flowable eatá executado no modo de integração, mas a definição de aplicativo necessário está faltando"
+    }
+  }
+}

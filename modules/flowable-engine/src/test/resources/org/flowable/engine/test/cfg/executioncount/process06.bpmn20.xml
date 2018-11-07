@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/bpmn"
+    xsi:schemaLocation="http://schema.omg.org/spec/BPMN/2.0 BPMN20.xsd" typeLanguage="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.flowable.org/bpmn2.0">
+
+    <process id="process06" flowable:isEagerExecutionFetching="true">
+        <startEvent id="theStart" />
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="passthrough1" />
+        <manualTask id="passthrough1" flowable:async="true" />
+        <sequenceFlow id="flow2" sourceRef="passthrough1" targetRef="theEnd" />
+        <endEvent id="theEnd" />
+    </process>
+
+</definitions>

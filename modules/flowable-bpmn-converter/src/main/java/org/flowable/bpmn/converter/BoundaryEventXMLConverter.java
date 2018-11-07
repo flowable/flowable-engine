@@ -28,6 +28,7 @@ import org.flowable.bpmn.model.EventDefinition;
  */
 public class BoundaryEventXMLConverter extends BaseBpmnXMLConverter {
 
+    @Override
     public Class<? extends BaseElement> getBpmnElementType() {
         return BoundaryEvent.class;
     }

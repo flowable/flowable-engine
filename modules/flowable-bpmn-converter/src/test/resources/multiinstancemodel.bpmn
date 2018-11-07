@@ -31,10 +31,9 @@
     <userTask id="userTask1" name="User task 1" flowable:async="true" flowable:exclusive="false">
       <multiInstanceLoopCharacteristics isSequential="false" flowable:elementVariable="participant">
         <extensionElements>
-          <flowable:collection>
-             <flowable:string>
-               <![CDATA[
-                 [
+          <flowable:collection flowable:class="org.flowable.engine.test.bpmn.multiinstance.JSONCollectionHandler">
+            <flowable:string>
+              <![CDATA[[
                    {
                      "principalType" : "User",
                      "role" : "PotentialOwner",
@@ -47,9 +46,8 @@
                      "principal" : "wfuser2",
                      "version" : 1
                    }
-                 ]
-                ]]>
-             </flowable:string>
+                 ]]]>
+            </flowable:string>
           </flowable:collection>
         </extensionElements>
       </multiInstanceLoopCharacteristics>

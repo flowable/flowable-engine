@@ -19,13 +19,13 @@ import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.FormInstanceQueryImpl;
 import org.flowable.form.engine.impl.persistence.entity.FormInstanceEntity;
 import org.flowable.form.engine.impl.persistence.entity.FormInstanceEntityImpl;
-import org.flowable.form.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.form.engine.impl.persistence.entity.data.AbstractFormDataManager;
 import org.flowable.form.engine.impl.persistence.entity.data.FormInstanceDataManager;
 
 /**
  * @author Tijs Rademakers
  */
-public class MybatisFormInstanceDataManager extends AbstractDataManager<FormInstanceEntity> implements FormInstanceDataManager {
+public class MybatisFormInstanceDataManager extends AbstractFormDataManager<FormInstanceEntity> implements FormInstanceDataManager {
 
     public MybatisFormInstanceDataManager(FormEngineConfiguration formEngineConfiguration) {
         super(formEngineConfiguration);

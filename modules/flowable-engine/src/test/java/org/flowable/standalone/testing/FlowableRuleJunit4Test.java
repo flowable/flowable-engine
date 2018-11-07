@@ -19,7 +19,6 @@ import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.test.JobTestHelper;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.FlowableRule;
 import org.junit.Rule;
@@ -44,7 +43,7 @@ public class FlowableRuleJunit4Test {
         runtimeService.startProcessInstanceByKey("ruleUsage");
 
         TaskService taskService = activitiRule.getTaskService();
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("My Task", task.getName());
 
         taskService.complete(task.getId());
@@ -64,7 +63,7 @@ public class FlowableRuleJunit4Test {
         // now there should be one job in the database:
         assertEquals(1, managementService.createJobQuery().count());
 
-        JobTestHelper.waitForJobExecutorToProcessAllJobs(activitiRule, 5000L, 500L);
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(activitiRule, 7000L, 500L);
 
         // the job is done
         assertEquals(0, managementService.createJobQuery().count());

@@ -12,8 +12,8 @@
  */
 package org.flowable.idm.engine.impl.persistence.entity;
 
-import org.flowable.engine.common.impl.db.HasRevision;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.db.HasRevision;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.idm.api.Group;
 
 /**
@@ -21,12 +21,16 @@ import org.flowable.idm.api.Group;
  */
 public interface GroupEntity extends Group, Entity, HasRevision {
 
+    @Override
     String getName();
 
+    @Override
     void setName(String name);
 
+    @Override
     String getType();
 
+    @Override
     void setType(String type);
 
 }

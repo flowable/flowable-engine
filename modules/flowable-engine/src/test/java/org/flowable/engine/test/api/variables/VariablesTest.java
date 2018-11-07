@@ -27,9 +27,11 @@ import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Testing various constructs with variables. Created to test the changes done in https://jira.codehaus.org/browse/ACT-1900.
@@ -40,9 +42,8 @@ public class VariablesTest extends PluggableFlowableTestCase {
 
     protected String processInstanceId;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
 
         repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/variables/VariablesTest.bpmn20.xml").deploy();
 
@@ -91,16 +92,16 @@ public class VariablesTest extends PluggableFlowableTestCase {
         return vars;
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
 
         for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
 
-        super.tearDown();
     }
 
+    @Test
     public void testGetVariables() {
 
         // Regular getVariables after process instance start
@@ -141,7 +142,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals(10, nrOfSerializable);
 
         // Trying the same after moving the process
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().taskName("Task 3").singleResult();
@@ -185,6 +186,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals(10, nrOfSerializable);
     }
 
+    @Test
     public void testGetVariablesLocal() {
 
         // Regular getVariables after process instance start
@@ -225,7 +227,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals(10, nrOfSerializable);
 
         // Trying the same after moving the process
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().taskName("Task 3").singleResult();
@@ -237,6 +239,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals(0, vars.size());
     }
 
+    @Test
     public void testGetVariable() {
 
         // This actually does a specific select. Before, this was not the case
@@ -247,10 +250,11 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals("stringVarValue-3", value);
     }
 
+    @Test
     public void testGetVariablesLocal2() {
 
         // Trying the same after moving the process
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().taskName("Task 3").singleResult();
@@ -345,6 +349,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     public void testGetVariablesWithCollectionThroughRuntimeService() {
 
         Map<String, Object> vars = runtimeService.getVariables(processInstanceId, Arrays.asList("intVar1", "intVar3", "intVar5", "intVar9"));
@@ -357,7 +362,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals(4, runtimeService.getVariablesLocal(processInstanceId, Arrays.asList("intVar1", "intVar3", "intVar5", "intVar9")).size());
 
         // Trying the same after moving the process
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().taskName("Task 3").singleResult();
@@ -368,6 +373,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @org.flowable.engine.test.Deployment
     public void testGetVariableAllVariableFetchingDefault() {
 
@@ -387,6 +393,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals("HELLO world", varValue);
     }
 
+    @Test
     @org.flowable.engine.test.Deployment
     public void testGetVariableAllVariableFetchingDisabled() {
 
@@ -401,6 +408,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals("HELLO world!", varValue);
     }
 
+    @Test
     @org.flowable.engine.test.Deployment
     public void testGetVariableInDelegateMixed() {
 
@@ -414,6 +422,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals("Hiya", (String) runtimeService.getVariable(processInstanceId, "testVar2"));
     }
 
+    @Test
     @org.flowable.engine.test.Deployment
     public void testGetVariableInDelegateMixed2() {
 
@@ -427,6 +436,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals("1234", (String) runtimeService.getVariable(processInstanceId, "testVar"));
     }
 
+    @Test
     @org.flowable.engine.test.Deployment
     public void testGetVariableInDelegateMixed3() {
 
@@ -447,9 +457,10 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.getVariable(processInstanceId, "testVar3"));
     }
 
+    @Test
     public void testTaskGetVariables() {
 
-        Task task = taskService.createTaskQuery().taskName("Task 1").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().taskName("Task 1").singleResult();
         Map<String, Object> vars = taskService.getVariables(task.getId());
         assertEquals(70, vars.size());
         int nrOfStrings = 0;
@@ -519,6 +530,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals("Override", taskService.getVariables(task.getId(), varNames).get("stringVar1"));
     }
 
+    @Test
     public void testLocalDateVariable() {
 
         Calendar todayCal = new GregorianCalendar();
@@ -553,6 +565,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals(processInstanceId, processInstance.getId());
     }
 
+    @Test
     public void testLocalDateTimeVariable() {
 
         Calendar todayCal = new GregorianCalendar();
@@ -611,6 +624,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
 
     // Test delegates
     public static class TestJavaDelegate1 implements JavaDelegate {
+        @Override
         public void execute(DelegateExecution execution) {
             String var = (String) execution.getVariable("testVar");
             execution.setVariable("testVar", var.toUpperCase());
@@ -618,6 +632,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     }
 
     public static class TestJavaDelegate2 implements JavaDelegate {
+        @Override
         public void execute(DelegateExecution execution) {
             String var = (String) execution.getVariable("testVar");
             execution.setVariable("testVar", var + " world");
@@ -625,6 +640,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     }
 
     public static class TestJavaDelegate3 implements JavaDelegate {
+        @Override
         public void execute(DelegateExecution execution) {
 
         }
@@ -633,6 +649,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     // ////////////////////////////////////////
 
     public static class TestJavaDelegate4 implements JavaDelegate {
+        @Override
         public void execute(DelegateExecution execution) {
             String var = (String) execution.getVariable("testVar", false);
             execution.setVariable("testVar", var.toUpperCase());
@@ -640,6 +657,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     }
 
     public static class TestJavaDelegate5 implements JavaDelegate {
+        @Override
         public void execute(DelegateExecution execution) {
             String var = (String) execution.getVariable("testVar", false);
             execution.setVariable("testVar", var + " world");
@@ -647,6 +665,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     }
 
     public static class TestJavaDelegate6 implements JavaDelegate {
+        @Override
         public void execute(DelegateExecution execution) {
             String var = (String) execution.getVariable("testVar", false);
             execution.setVariable("testVar", var + "!");
@@ -656,6 +675,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     // ////////////////////////////////////////
 
     public static class TestJavaDelegate7 implements JavaDelegate {
+        @Override
         public void execute(DelegateExecution execution) {
 
             // Setting variable through 'default' way of setting variable
@@ -665,6 +685,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     }
 
     public static class TestJavaDelegate8 implements JavaDelegate {
+        @Override
         public void execute(DelegateExecution execution) {
             String var = (String) execution.getVariable("testVar", false);
             execution.setVariable("testVar", var + " 1 2 3");
@@ -672,6 +693,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     }
 
     public static class TestJavaDelegate9 implements JavaDelegate {
+        @Override
         public void execute(DelegateExecution execution) {
             execution.setVariable("testVar2", "Hiya");
         }
@@ -680,6 +702,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     // ////////////////////////////////////////
 
     public static class TestJavaDelegate10 implements JavaDelegate {
+        @Override
         public void execute(DelegateExecution execution) {
             String testVar = (String) execution.getVariable("testVar", false);
             execution.setVariable("testVar", testVar + "2");
@@ -687,6 +710,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     }
 
     public static class TestJavaDelegate11 implements JavaDelegate {
+        @Override
         public void execute(DelegateExecution execution) {
             String testVar = (String) execution.getVariable("testVar", false);
             execution.setVariable("testVar", testVar + "3");
@@ -694,6 +718,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     }
 
     public static class TestJavaDelegate12 implements JavaDelegate {
+        @Override
         public void execute(DelegateExecution execution) {
             String testVar = (String) execution.getVariable("testVar");
             execution.setVariable("testVar", testVar + "4");
@@ -703,6 +728,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     // ////////////////////////////////////////
 
     public static class TestJavaDelegate13 implements JavaDelegate {
+        @Override
         public void execute(DelegateExecution execution) {
             Map<String, Object> vars = execution.getVariables(Arrays.asList("testVar1", "testVar2", "testVar3"), false);
 
@@ -719,6 +745,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     }
 
     public static class TestJavaDelegate14 implements JavaDelegate {
+        @Override
         public void execute(DelegateExecution execution) {
             String value = (String) execution.getVariable("testVar2");
             String localVarValue = (String) execution.getVariableLocal("localValue");
@@ -727,6 +754,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     }
 
     public static class TestJavaDelegate15 implements JavaDelegate {
+        @Override
         public void execute(DelegateExecution execution) {
             execution.removeVariable("testVar3");
         }

@@ -7,12 +7,21 @@
 	<parent>
 		<groupId>org.flowable</groupId>
     	<artifactId>flowable-ui-idm</artifactId>
-    	<version>6.2.0-SNAPSHOT</version>
+    	<version>6.4.1-SNAPSHOT</version>
 	</parent>
 	<packaging>jar</packaging>
 
 	<dependencies>
-	
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-actuator-autoconfigure</artifactId>
+            <optional>true</optional>
+        </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-ui-idm-logic</artifactId>
@@ -64,24 +73,12 @@
 
         <!-- COMMON dependencies -->
         <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.mchange</groupId>
-            <artifactId>c3p0</artifactId>
         </dependency>
 
         <!-- SPRING -->
@@ -132,22 +129,6 @@
         
 	</dependencies>
 
-	<!-- BUILD -->
-	<build>
-	
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>2.9</version>
-				<configuration>
-					<downloadSources>true</downloadSources>
-					<downloadJavadocs>true</downloadJavadocs>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-	
 	<profiles>
 		<profile>
 			<id>distro</id>

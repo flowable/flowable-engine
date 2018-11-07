@@ -40,8 +40,8 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 import org.flowable.bpmn.model.Import;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.engine.impl.bpmn.data.PrimitiveStructureDefinition;
 import org.flowable.engine.impl.bpmn.data.SimpleStructureDefinition;
 import org.flowable.engine.impl.bpmn.data.StructureDefinition;
@@ -78,10 +78,11 @@ public class CxfWSDLImporter implements XMLImporter {
         this.namespace = "";
     }
 
+    @Override
     public void importFrom(Import theImport, String sourceSystemId) {
         this.namespace = theImport.getNamespace() == null ? "" : theImport.getNamespace() + ":";
         try {
-            final URIResolver uriResolver = new URIResolver(sourceSystemId, theImport.getLocation());
+            final URIResolver uriResolver = this.createUriResolver(sourceSystemId, theImport);
             if (uriResolver.isResolved()) {
                 if (uriResolver.getURI() != null) {
                     this.importFrom(uriResolver.getURI().toString());
@@ -97,6 +98,10 @@ public class CxfWSDLImporter implements XMLImporter {
         } catch (final IOException e) {
             throw new UncheckedException(e);
         }
+    }
+
+    protected URIResolver createUriResolver(String sourceSystemId, Import theImport) throws IOException {
+        return new URIResolver(sourceSystemId, theImport.getLocation());
     }
 
     public void importFrom(String url) {
@@ -230,14 +235,17 @@ public class CxfWSDLImporter implements XMLImporter {
         return intermediateModel;
     }
 
+    @Override
     public Map<String, StructureDefinition> getStructures() {
         return this.structures;
     }
 
+    @Override
     public Map<String, WSService> getServices() {
         return this.wsServices;
     }
 
+    @Override
     public Map<String, WSOperation> getOperations() {
         return this.wsOperations;
     }

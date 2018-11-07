@@ -12,16 +12,13 @@
  */
 package org.flowable.cdi;
 
+import java.util.List;
+
 import org.flowable.cdi.impl.el.CdiResolver;
-import org.flowable.engine.common.impl.javax.el.ArrayELResolver;
-import org.flowable.engine.common.impl.javax.el.BeanELResolver;
-import org.flowable.engine.common.impl.javax.el.CompositeELResolver;
-import org.flowable.engine.common.impl.javax.el.ELResolver;
-import org.flowable.engine.common.impl.javax.el.ListELResolver;
-import org.flowable.engine.common.impl.javax.el.MapELResolver;
-import org.flowable.engine.delegate.VariableScope;
-import org.flowable.engine.impl.el.DefaultExpressionManager;
-import org.flowable.engine.impl.el.VariableScopeElResolver;
+import org.flowable.common.engine.impl.el.DefaultExpressionManager;
+import org.flowable.common.engine.impl.javax.el.ArrayELResolver;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
+import org.flowable.engine.impl.el.ProcessExpressionManager;
 
 /**
  * {@link DefaultExpressionManager} for resolving Cdi-managed beans.
@@ -36,20 +33,20 @@ import org.flowable.engine.impl.el.VariableScopeElResolver;
  * 
  * @author Daniel Meyer
  */
-public class CdiExpressionManager extends DefaultExpressionManager {
+public class CdiExpressionManager extends ProcessExpressionManager {
 
     @Override
-    protected ELResolver createElResolver(VariableScope variableScope) {
-        CompositeELResolver compositeElResolver = new CompositeELResolver();
-        compositeElResolver.add(new VariableScopeElResolver(variableScope));
-
-        compositeElResolver.add(new CdiResolver());
-
-        compositeElResolver.add(new ArrayELResolver());
-        compositeElResolver.add(new ListELResolver());
-        compositeElResolver.add(new MapELResolver());
-        compositeElResolver.add(new BeanELResolver());
-        return compositeElResolver;
+    protected void configureResolvers(List<ELResolver> elResolvers) {
+        int arrayElResolverIndex = -1;
+        for (int i=0; i<elResolvers.size(); i++) {
+            if (elResolvers.get(i) instanceof ArrayELResolver) {
+                arrayElResolverIndex = i;
+            }
+        }
+        
+        if (arrayElResolverIndex > 0) {
+            elResolvers.add(arrayElResolverIndex, new CdiResolver());
+        }
     }
 
 }

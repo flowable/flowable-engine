@@ -41,6 +41,7 @@ public class GetTaskVariablesCmd implements Command<Map<String, Object>>, Serial
         this.isLocal = isLocal;
     }
 
+    @Override
     public Map<String, Object> execute(CommandContext commandContext) {
         if (taskId == null) {
             throw new ActivitiIllegalArgumentException("taskId is null");

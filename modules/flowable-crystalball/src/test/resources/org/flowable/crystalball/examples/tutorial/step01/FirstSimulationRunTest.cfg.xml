@@ -15,7 +15,7 @@
     <property name="jdbcPassword" value=""/>
 
     <!-- Database configurations -->
-    <property name="databaseSchemaUpdate" value="true"/>
+    <property name="databaseSchemaUpdate" value="drop-create"/>
 
     <property name="beans">
       <map>
@@ -71,19 +71,25 @@
         process definitions in the repository.
         -->
         <property name="defaultCommandConfig">
-          <bean class="org.flowable.engine.common.impl.interceptor.CommandConfig">
+          <bean class="org.flowable.common.engine.impl.interceptor.CommandConfig">
+            <constructor-arg name="contextReusePossible" value="false"/>
+          </bean>
+        </property>
+
+        <property name="schemaCommandConfig">
+          <bean class="org.flowable.common.engine.impl.interceptor.CommandConfig">
             <constructor-arg name="contextReusePossible" value="false"/>
           </bean>
         </property>
 
         <!-- Database configurations -->
-        <property name="databaseSchemaUpdate" value="true"/>
+        <property name="databaseSchemaUpdate" value="drop-create"/>
 
       </bean>
     </constructor-arg>
   </bean>
 
-  <bean id="clock" class="org.flowable.engine.common.impl.util.DefaultClockImpl"/>
+  <bean id="clock" class="org.flowable.common.engine.impl.util.DefaultClockImpl"/>
 
   <!-- simulation run is driven by event calendar. -->
   <bean id="eventCalendar" class="org.flowable.crystalball.simulator.SimpleEventCalendarFactory">

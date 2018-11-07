@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.BusinessRuleTask;
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.CancelEventDefinition;
@@ -48,7 +49,7 @@ import org.flowable.bpmn.model.ThrowEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.Transaction;
 import org.flowable.bpmn.model.UserTask;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.AdhocSubProcessActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryCancelEventActivityBehavior;
@@ -113,6 +114,7 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
 
     protected boolean allServiceTasksNoOp;
     protected Map<String, String> mockedClassDelegatesMapping = new HashMap<>();
+    protected Map<String, String> mockedClassTaskIdDelegatesMapping = new HashMap<>();
     protected Set<String> noOpServiceTaskIds = new HashSet<>();
     protected Set<String> noOpServiceTaskClassNames = new HashSet<>();
 
@@ -168,6 +170,8 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
 
             return new ClassDelegate(mockedClassDelegatesMapping.get(serviceTask.getImplementation()), createFieldDeclarations(serviceTask.getFieldExtensions()));
 
+        } else if (serviceTask.getId() != null && mockedClassTaskIdDelegatesMapping.containsKey(serviceTask.getId())) {
+            return new ClassDelegate(mockedClassTaskIdDelegatesMapping.get(serviceTask.getId()), createFieldDeclarations(serviceTask.getFieldExtensions()));
         }
 
         return wrappedActivityBehaviorFactory.createClassDelegateServiceTask(serviceTask);
@@ -190,13 +194,13 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     }
 
     @Override
-    public WebServiceActivityBehavior createWebServiceActivityBehavior(ServiceTask serviceTask) {
-        return wrappedActivityBehaviorFactory.createWebServiceActivityBehavior(serviceTask);
+    public WebServiceActivityBehavior createWebServiceActivityBehavior(ServiceTask serviceTask, BpmnModel bpmnModel) {
+        return wrappedActivityBehaviorFactory.createWebServiceActivityBehavior(serviceTask, bpmnModel);
     }
 
     @Override
-    public WebServiceActivityBehavior createWebServiceActivityBehavior(SendTask sendTask) {
-        return wrappedActivityBehaviorFactory.createWebServiceActivityBehavior(sendTask);
+    public WebServiceActivityBehavior createWebServiceActivityBehavior(SendTask sendTask, BpmnModel bpmnModel) {
+        return wrappedActivityBehaviorFactory.createWebServiceActivityBehavior(sendTask, bpmnModel);
     }
 
     @Override
@@ -431,6 +435,14 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
 
     public void addClassDelegateMock(String originalClassFqn, String mockedClassFqn) {
         mockedClassDelegatesMapping.put(originalClassFqn, mockedClassFqn);
+    }
+
+    public void addClassDelegateMockByTaskId(String serviceTaskId, Class<?> mockedClass) {
+        addClassDelegateMockByTaskId(serviceTaskId, mockedClass.getName());
+    }
+
+    public void addClassDelegateMockByTaskId(String serviceTaskId, String mockedClassFqn) {
+        mockedClassTaskIdDelegatesMapping.put(serviceTaskId, mockedClassFqn);
     }
 
     public void addNoOpServiceTaskById(String id) {

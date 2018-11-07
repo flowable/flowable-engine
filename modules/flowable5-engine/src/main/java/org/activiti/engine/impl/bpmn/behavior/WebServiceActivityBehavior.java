@@ -28,7 +28,7 @@ import org.flowable.engine.impl.bpmn.webservice.Operation;
 
 /**
  * An activity behavior that allows calling Web services
- * 
+ *
  * @author Esteban Robles Luna
  * @author Falko Menge
  * @author Joram Barrez
@@ -46,8 +46,8 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
     protected List<AbstractDataAssociation> dataOutputAssociations;
 
     public WebServiceActivityBehavior() {
-        this.dataInputAssociations = new ArrayList<AbstractDataAssociation>();
-        this.dataOutputAssociations = new ArrayList<AbstractDataAssociation>();
+        this.dataInputAssociations = new ArrayList<>();
+        this.dataOutputAssociations = new ArrayList<>();
     }
 
     public void addDataInputAssociation(AbstractDataAssociation dataAssociation) {

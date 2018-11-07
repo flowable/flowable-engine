@@ -23,7 +23,7 @@ import java.util.Map;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
-import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
+import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,7 +37,7 @@ public class HitPolicyCollectTest {
     public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void collectHitPolicyNoAggregator() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
@@ -55,7 +55,7 @@ public class HitPolicyCollectTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void collectHitPolicyNoAggregatorCompound() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
@@ -79,7 +79,7 @@ public class HitPolicyCollectTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void collectHitPolicyWithAggregatorMultipleOutputs() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
@@ -96,7 +96,7 @@ public class HitPolicyCollectTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void collectHitPolicyWithAggregatorWrongOutputType() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
@@ -113,7 +113,7 @@ public class HitPolicyCollectTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void collectHitPolicySUM() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
@@ -129,7 +129,7 @@ public class HitPolicyCollectTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void collectHitPolicyMIN() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
@@ -145,7 +145,7 @@ public class HitPolicyCollectTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void collectHitPolicyMAX() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
@@ -161,7 +161,7 @@ public class HitPolicyCollectTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void collectHitPolicyCOUNT() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
@@ -177,7 +177,7 @@ public class HitPolicyCollectTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void collectHitPolicyCOUNTNoResults() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 

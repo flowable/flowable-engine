@@ -15,13 +15,10 @@ package org.flowable.rest.service.api.management;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.flowable.engine.ManagementService;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.runtime.Job;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.job.api.Job;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -37,22 +34,16 @@ import io.swagger.annotations.Authorization;
  */
 @RestController
 @Api(tags = { "Jobs" }, description = "Manage Jobs", authorizations = { @Authorization(value = "basicAuth") })
-public class JobExceptionStacktraceResource {
-
-    @Autowired
-    protected ManagementService managementService;
+public class JobExceptionStacktraceResource extends JobBaseResource {
 
     @ApiOperation(value = "Get the exception stacktrace for a job", tags = { "Jobs" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the requested job was not found and the stacktrace has been returned. The response contains the raw stacktrace and always has a Content-type of text/plain."),
-            @ApiResponse(code = 404, message = "Indicates the requested job was not found or the job doesn’t have an exception stacktrace. Status-description contains additional information about the error.")
+            @ApiResponse(code = 404, message = "Indicates the requested job was not found or the job does not have an exception stacktrace. Status-description contains additional information about the error.")
     })
-    @RequestMapping(value = "/management/jobs/{jobId}/exception-stacktrace", method = RequestMethod.GET)
+    @GetMapping("/management/jobs/{jobId}/exception-stacktrace")
     public String getJobStacktrace(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
-        Job job = managementService.createJobQuery().jobId(jobId).singleResult();
-        if (job == null) {
-            throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
-        }
+        Job job = getJobById(jobId);
 
         String stackTrace = managementService.getJobExceptionStacktrace(job.getId());
 
@@ -67,14 +58,11 @@ public class JobExceptionStacktraceResource {
     @ApiOperation(value = "Get the exception stacktrace for a timer job", tags = { "Jobs" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the requested job was not found and the stacktrace has been returned. The response contains the raw stacktrace and always has a Content-type of text/plain."),
-            @ApiResponse(code = 404, message = "Indicates the requested job was not found or the job doesn’t have an exception stacktrace. Status-description contains additional information about the error.")
+            @ApiResponse(code = 404, message = "Indicates the requested job was not found or the job does not have an exception stacktrace. Status-description contains additional information about the error.")
     })
-    @RequestMapping(value = "/management/timer-jobs/{jobId}/exception-stacktrace", method = RequestMethod.GET)
+    @GetMapping("/management/timer-jobs/{jobId}/exception-stacktrace")
     public String getTimerJobStacktrace(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
-        Job job = managementService.createTimerJobQuery().jobId(jobId).singleResult();
-        if (job == null) {
-            throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
-        }
+        Job job = getTimerJobById(jobId);
 
         String stackTrace = managementService.getTimerJobExceptionStacktrace(job.getId());
 
@@ -89,14 +77,11 @@ public class JobExceptionStacktraceResource {
     @ApiOperation(value = "Get the exception stacktrace for a suspended job", tags = { "Jobs" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the requested job was not found and the stacktrace has been returned. The response contains the raw stacktrace and always has a Content-type of text/plain."),
-            @ApiResponse(code = 404, message = "Indicates the requested job was not found or the job doesn’t have an exception stacktrace. Status-description contains additional information about the error.")
+            @ApiResponse(code = 404, message = "Indicates the requested job was not found or the job does not have an exception stacktrace. Status-description contains additional information about the error.")
     })
-    @RequestMapping(value = "/management/suspended-jobs/{jobId}/exception-stacktrace", method = RequestMethod.GET)
+    @GetMapping("/management/suspended-jobs/{jobId}/exception-stacktrace")
     public String getSuspendedJobStacktrace(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
-        Job job = managementService.createSuspendedJobQuery().jobId(jobId).singleResult();
-        if (job == null) {
-            throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
-        }
+        Job job = getSuspendedJobById(jobId);
 
         String stackTrace = managementService.getSuspendedJobExceptionStacktrace(job.getId());
 
@@ -111,14 +96,11 @@ public class JobExceptionStacktraceResource {
     @ApiOperation(value = "Get the exception stacktrace for a deadletter job", tags = { "Jobs" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the requested job was not found and the stacktrace has been returned. The response contains the raw stacktrace and always has a Content-type of text/plain."),
-            @ApiResponse(code = 404, message = "Indicates the requested job was not found or the job doesn’t have an exception stacktrace. Status-description contains additional information about the error.")
+            @ApiResponse(code = 404, message = "Indicates the requested job was not found or the job does not have an exception stacktrace. Status-description contains additional information about the error.")
     })
-    @RequestMapping(value = "/management/deadletter-jobs/{jobId}/exception-stacktrace", method = RequestMethod.GET)
+    @GetMapping("/management/deadletter-jobs/{jobId}/exception-stacktrace")
     public String getDeadLetterJobStacktrace(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
-        Job job = managementService.createDeadLetterJobQuery().jobId(jobId).singleResult();
-        if (job == null) {
-            throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
-        }
+        Job job = getDeadLetterJobById(jobId);
 
         String stackTrace = managementService.getDeadLetterJobExceptionStacktrace(job.getId());
 

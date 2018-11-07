@@ -12,7 +12,7 @@
  */
 package org.flowable.idm.engine.impl;
 
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.IdmManagementService;
 import org.flowable.idm.engine.IdmEngine;
@@ -41,8 +41,8 @@ public class IdmEngineImpl implements IdmEngine {
         this.managementService = engineConfiguration.getIdmManagementService();
         this.commandExecutor = engineConfiguration.getCommandExecutor();
 
-        if (engineConfiguration.isUsingRelationalDatabase() && engineConfiguration.getDatabaseSchemaUpdate() != null) {
-            commandExecutor.execute(engineConfiguration.getSchemaCommandConfig(), new SchemaOperationsIdmEngineBuild());
+        if (engineConfiguration.getSchemaManagementCmd() != null) {
+            engineConfiguration.getCommandExecutor().execute(engineConfiguration.getSchemaCommandConfig(), engineConfiguration.getSchemaManagementCmd());
         }
 
         if (name == null) {
@@ -54,6 +54,7 @@ public class IdmEngineImpl implements IdmEngine {
         IdmEngines.registerIdmEngine(this);
     }
 
+    @Override
     public void close() {
         IdmEngines.unregister(this);
     }
@@ -61,18 +62,22 @@ public class IdmEngineImpl implements IdmEngine {
     // getters and setters
     // //////////////////////////////////////////////////////
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public IdmIdentityService getIdmIdentityService() {
         return identityService;
     }
 
+    @Override
     public IdmManagementService getIdmManagementService() {
         return managementService;
     }
 
+    @Override
     public IdmEngineConfiguration getIdmEngineConfiguration() {
         return engineConfiguration;
     }

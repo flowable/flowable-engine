@@ -17,10 +17,11 @@ import java.io.InputStream;
 
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.engine.common.impl.util.io.InputStreamSource;
-import org.flowable.engine.common.impl.util.io.StreamSource;
+import org.flowable.common.engine.impl.util.io.InputStreamSource;
+import org.flowable.common.engine.impl.util.io.StreamSource;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
+import org.junit.jupiter.api.Test;
 
 public class ChineseConverterTest extends ResourceFlowableTestCase {
 
@@ -28,6 +29,7 @@ public class ChineseConverterTest extends ResourceFlowableTestCase {
         super("org/flowable/standalone/parsing/encoding.flowable.cfg.xml");
     }
 
+    @Test
     public void testConvertXMLToModel() throws Exception {
         BpmnModel bpmnModel = readXMLFile();
         bpmnModel = exportAndReadXMLFile(bpmnModel);

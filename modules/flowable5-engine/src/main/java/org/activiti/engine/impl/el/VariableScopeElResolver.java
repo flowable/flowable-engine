@@ -16,11 +16,11 @@ import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
 import org.activiti.engine.impl.identity.Authentication;
-import org.activiti.engine.impl.javax.el.ELContext;
-import org.activiti.engine.impl.javax.el.ELResolver;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
-import org.flowable.engine.delegate.VariableScope;
+import org.flowable.common.engine.impl.javax.el.ELContext;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * Implementation of an {@link ELResolver} that resolves expressions with the process variables of a given {@link VariableScope} as context. <br>
@@ -41,6 +41,7 @@ public class VariableScopeElResolver extends ELResolver {
         this.variableScope = variableScope;
     }
 
+    @Override
     public Object getValue(ELContext context, Object base, Object property) {
 
         if (base == null) {
@@ -70,6 +71,7 @@ public class VariableScopeElResolver extends ELResolver {
         return null;
     }
 
+    @Override
     public boolean isReadOnly(ELContext context, Object base, Object property) {
         if (base == null) {
             String variable = (String) property;
@@ -78,6 +80,7 @@ public class VariableScopeElResolver extends ELResolver {
         return true;
     }
 
+    @Override
     public void setValue(ELContext context, Object base, Object property, Object value) {
         if (base == null) {
             String variable = (String) property;
@@ -87,14 +90,17 @@ public class VariableScopeElResolver extends ELResolver {
         }
     }
 
+    @Override
     public Class<?> getCommonPropertyType(ELContext arg0, Object arg1) {
         return Object.class;
     }
 
+    @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext arg0, Object arg1) {
         return null;
     }
 
+    @Override
     public Class<?> getType(ELContext arg0, Object arg1, Object arg2) {
         return Object.class;
     }

@@ -25,6 +25,7 @@ import org.flowable.bpmn.model.ThrowEvent;
  */
 public class ThrowEventXMLConverter extends BaseBpmnXMLConverter {
 
+    @Override
     public Class<? extends BaseElement> getBpmnElementType() {
         return ThrowEvent.class;
     }

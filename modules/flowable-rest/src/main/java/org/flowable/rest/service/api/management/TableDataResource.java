@@ -13,19 +13,20 @@
 
 package org.flowable.rest.service.api.management;
 
+import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.management.TablePage;
+import org.flowable.common.engine.api.management.TablePageQuery;
+import org.flowable.common.rest.api.DataResponse;
 import org.flowable.engine.ManagementService;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.management.TablePage;
-import org.flowable.engine.common.api.management.TablePageQuery;
-import org.flowable.rest.api.DataResponse;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -52,6 +53,9 @@ public class TableDataResource {
 
     @Autowired
     protected ManagementService managementService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get row data for a single table", tags = { "Database tables" })
     @ApiImplicitParams({
@@ -64,8 +68,12 @@ public class TableDataResource {
             @ApiResponse(code = 200, message = "Indicates the table exists and the table row data is returned"),
             @ApiResponse(code = 404, message = "Indicates the requested table does not exist.")
     })
-    @RequestMapping(value = "/management/tables/{tableName}/data", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getTableData(@ApiParam(name = "tableName") @PathVariable String tableName, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
+    @GetMapping(value = "/management/tables/{tableName}/data", produces = "application/json")
+    public DataResponse<List<Map<String, Object>>> getTableData(@ApiParam(name = "tableName") @PathVariable String tableName, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessTableInfo();
+        }
+        
         // Check if table exists before continuing
         if (managementService.getTableMetaData(tableName) == null) {
             throw new FlowableObjectNotFoundException("Could not find a table with name '" + tableName + "'.", String.class);

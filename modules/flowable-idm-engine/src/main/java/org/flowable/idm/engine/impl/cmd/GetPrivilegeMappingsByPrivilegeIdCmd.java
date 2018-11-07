@@ -16,9 +16,9 @@ package org.flowable.idm.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.idm.api.PrivilegeMapping;
 import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
@@ -38,6 +38,7 @@ public class GetPrivilegeMappingsByPrivilegeIdCmd implements Command<List<Privil
         this.privilegeId = privilegeId;
     }
 
+    @Override
     public List<PrivilegeMapping> execute(CommandContext commandContext) {
         return CommandContextUtil.getPrivilegeMappingEntityManager(commandContext).getPrivilegeMappingsByPrivilegeId(privilegeId);
     }

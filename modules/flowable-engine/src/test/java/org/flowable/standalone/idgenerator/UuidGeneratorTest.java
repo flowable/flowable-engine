@@ -18,8 +18,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -30,6 +30,7 @@ public class UuidGeneratorTest extends ResourceFlowableTestCase {
         super("org/flowable/standalone/idgenerator/uuidgenerator.test.flowable.cfg.xml");
     }
 
+    @Test
     @Deployment
     public void testUuidGeneratorUsage() {
 
@@ -38,6 +39,7 @@ public class UuidGeneratorTest extends ResourceFlowableTestCase {
         // Start processes
         for (int i = 0; i < 50; i++) {
             executorService.execute(new Runnable() {
+                @Override
                 public void run() {
                     try {
                         runtimeService.startProcessInstanceByKey("simpleProcess");
@@ -52,12 +54,13 @@ public class UuidGeneratorTest extends ResourceFlowableTestCase {
         // Complete tasks
         executorService.execute(new Runnable() {
 
+            @Override
             public void run() {
                 boolean tasksFound = true;
                 while (tasksFound) {
 
-                    List<Task> tasks = taskService.createTaskQuery().list();
-                    for (Task task : tasks) {
+                    List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
+                    for (org.flowable.task.api.Task task : tasks) {
                         taskService.complete(task.getId());
                     }
 

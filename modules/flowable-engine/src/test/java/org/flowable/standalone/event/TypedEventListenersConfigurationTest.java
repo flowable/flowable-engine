@@ -12,11 +12,12 @@
  */
 package org.flowable.standalone.event;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.delegate.event.impl.FlowableEventImpl;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.engine.delegate.event.impl.FlowableProcessEventImpl;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.test.api.event.TestFlowableEventListener;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test to verify event-listeners, which are configured in the cfg.xml, are notified.
@@ -29,6 +30,7 @@ public class TypedEventListenersConfigurationTest extends ResourceFlowableTestCa
         super("org/flowable/standalone/event/flowable-typed-eventlistener.cfg.xml");
     }
 
+    @Test
     public void testEventListenerConfiguration() {
         // Fetch the listener to check received events
         TestFlowableEventListener listener = (TestFlowableEventListener) processEngineConfiguration.getBeans().get("eventListener");
@@ -38,7 +40,7 @@ public class TypedEventListenersConfigurationTest extends ResourceFlowableTestCa
         listener.clearEventsReceived();
 
         // Dispatch a custom event
-        FlowableEvent event = new FlowableEventImpl(FlowableEngineEventType.CUSTOM);
+        FlowableEvent event = new FlowableProcessEventImpl(FlowableEngineEventType.CUSTOM);
         processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
 
         assertEquals(1, listener.getEventsReceived().size());
@@ -46,9 +48,9 @@ public class TypedEventListenersConfigurationTest extends ResourceFlowableTestCa
         listener.clearEventsReceived();
 
         // Dispatch another event the listener is registered for
-        event = new FlowableEventImpl(FlowableEngineEventType.ENTITY_DELETED);
+        event = new FlowableProcessEventImpl(FlowableEngineEventType.ENTITY_DELETED);
         processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
-        event = new FlowableEventImpl(FlowableEngineEventType.ENTITY_UPDATED);
+        event = new FlowableProcessEventImpl(FlowableEngineEventType.ENTITY_UPDATED);
         processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
 
         assertEquals(2, listener.getEventsReceived().size());
@@ -57,7 +59,7 @@ public class TypedEventListenersConfigurationTest extends ResourceFlowableTestCa
         listener.clearEventsReceived();
 
         // Dispatch an event that is NOT part of the types configured
-        event = new FlowableEventImpl(FlowableEngineEventType.ENTITY_CREATED);
+        event = new FlowableProcessEventImpl(FlowableEngineEventType.ENTITY_CREATED);
         processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
         assertTrue(listener.getEventsReceived().isEmpty());
     }

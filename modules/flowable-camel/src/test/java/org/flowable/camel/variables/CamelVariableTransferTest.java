@@ -22,9 +22,13 @@ import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
+import org.flowable.task.api.Task;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -32,6 +36,7 @@ import org.springframework.test.context.ContextConfiguration;
  * 
  * @author Saeid Mirzaei
  */
+@Tag("camel")
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
 public class CamelVariableTransferTest extends SpringFlowableTestCase {
     @Autowired
@@ -42,6 +47,7 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
 
     protected MockEndpoint service1;
 
+    @BeforeEach
     public void setUp() throws Exception {
         camelContext.addRoutes(new RouteBuilder() {
 
@@ -94,6 +100,7 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
         });
     }
 
+    @AfterEach
     public void tearDown() throws Exception {
         List<Route> routes = camelContext.getRoutes();
         for (Route r : routes) {
@@ -103,6 +110,7 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
     }
 
     // check that at least all properties are passed from camel to activiti when copyVariablesFromProperties=true is simply true
+    @Test
     @Deployment
     public void testCamelPropertiesAll() throws Exception {
         ProducerTemplate tpl = camelContext.createProducerTemplate();
@@ -121,6 +129,7 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
     }
 
     // check that body will be copied into variables even if copyVariablesFromProperties=true
+    @Test
     @Deployment(resources = { "org/flowable/camel/variables/CamelVariableTransferTest.testCamelPropertiesAll.bpmn20.xml" })
     public void testCamelPropertiesAndBody() throws Exception {
         ProducerTemplate tpl = camelContext.createProducerTemplate();
@@ -140,6 +149,7 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
         assertEquals("sampleBody", variables.get("camelBody"));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/camel/variables/CamelVariableTransferTest.testCamelPropertiesAll.bpmn20.xml" })
     public void testCamelPropertiesFiltered() throws Exception {
         ProducerTemplate tpl = camelContext.createProducerTemplate();
@@ -157,6 +167,7 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
         assertNull(variables.get("property3"));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/camel/variables/CamelVariableTransferTest.testCamelPropertiesAll.bpmn20.xml" })
     public void testCamelPropertiesNone() throws Exception {
         ProducerTemplate tpl = camelContext.createProducerTemplate();
@@ -174,6 +185,7 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
         assertNull(variables.get("property3"));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/camel/variables/CamelVariableTransferTest.testCamelPropertiesAll.bpmn20.xml" })
     public void testCamelHeadersAll() throws Exception {
         ProducerTemplate tpl = camelContext.createProducerTemplate();
@@ -191,6 +203,7 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
         assertEquals("sampleValueForProperty3", variables.get("property3"));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/camel/variables/CamelVariableTransferTest.testCamelPropertiesAll.bpmn20.xml" })
     public void testCamelHeadersFiltered() throws Exception {
         ProducerTemplate tpl = camelContext.createProducerTemplate();
@@ -208,6 +221,7 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
         assertNull(variables.get("property3"));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/camel/variables/CamelVariableTransferTest.testCamelPropertiesAll.bpmn20.xml" })
     public void testCamelHeadersNone() throws Exception {
         ProducerTemplate tpl = camelContext.createProducerTemplate();

@@ -36,7 +36,7 @@ public class ProcessDefinitionEntityManager extends AbstractManager {
     }
 
     public ProcessDefinitionEntity findLatestProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId) {
-        Map<String, Object> params = new HashMap<String, Object>(2);
+        Map<String, Object> params = new HashMap<>(2);
         params.put("processDefinitionKey", processDefinitionKey);
         params.put("tenantId", tenantId);
         return (ProcessDefinitionEntity) getDbSqlSession().selectOne("selectLatestProcessDefinitionByKeyAndTenantId", params);
@@ -72,14 +72,14 @@ public class ProcessDefinitionEntityManager extends AbstractManager {
     }
 
     public ProcessDefinitionEntity findProcessDefinitionByDeploymentAndKey(String deploymentId, String processDefinitionKey) {
-        Map<String, Object> parameters = new HashMap<String, Object>();
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("deploymentId", deploymentId);
         parameters.put("processDefinitionKey", processDefinitionKey);
         return (ProcessDefinitionEntity) getDbSqlSession().selectOne("selectProcessDefinitionByDeploymentAndKey", parameters);
     }
 
     public ProcessDefinitionEntity findProcessDefinitionByDeploymentAndKeyAndTenantId(String deploymentId, String processDefinitionKey, String tenantId) {
-        Map<String, Object> parameters = new HashMap<String, Object>();
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("deploymentId", deploymentId);
         parameters.put("processDefinitionKey", processDefinitionKey);
         parameters.put("tenantId", tenantId);
@@ -113,7 +113,7 @@ public class ProcessDefinitionEntityManager extends AbstractManager {
     }
 
     public void updateProcessDefinitionTenantIdForDeployment(String deploymentId, String newTenantId) {
-        HashMap<String, Object> params = new HashMap<String, Object>();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
         getDbSqlSession().update("updateProcessDefinitionTenantIdForDeploymentId", params);

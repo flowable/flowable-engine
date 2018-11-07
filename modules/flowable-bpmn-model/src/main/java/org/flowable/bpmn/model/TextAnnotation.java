@@ -36,6 +36,7 @@ public class TextAnnotation extends Artifact {
         this.textFormat = textFormat;
     }
 
+    @Override
     public TextAnnotation clone() {
         TextAnnotation clone = new TextAnnotation();
         clone.setValues(this);

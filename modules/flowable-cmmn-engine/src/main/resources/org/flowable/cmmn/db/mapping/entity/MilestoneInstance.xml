@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityImpl">
+
+    <insert id="insertMilestoneInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityImpl">
+        insert into ${prefix}ACT_CMMN_RU_MIL_INST (ID_, NAME_, TIME_STAMP_, CASE_INST_ID_, CASE_DEF_ID_, ELEMENT_ID_, TENANT_ID_)
+        values (
+            #{id ,jdbcType=VARCHAR},
+            #{name ,jdbcType=VARCHAR},
+            #{timeStamp ,jdbcType=TIMESTAMP},
+            #{caseInstanceId ,jdbcType=VARCHAR},
+            #{caseDefinitionId ,jdbcType=VARCHAR},
+            #{elementId, jdbcType=VARCHAR},
+            #{tenantId, jdbcType=VARCHAR}
+        )
+
+    </insert>
+
+    <insert id="bulkInsertMilestoneInstance" parameterType="java.util.List">
+        insert into ${prefix}ACT_CMMN_RU_MIL_INST (ID_, NAME_, TIME_STAMP_, CASE_INST_ID_, CASE_DEF_ID_, ELEMENT_ID_, TENANT_ID_)
+        values
+        <foreach collection="list" item="milestone" index="index" separator=",">
+            (
+                #{milestone.id ,jdbcType=VARCHAR},
+                #{milestone.name ,jdbcType=VARCHAR},
+                #{milestone.timeStamp ,jdbcType=TIMESTAMP},
+                #{milestone.caseInstanceId ,jdbcType=VARCHAR},
+                #{milestone.caseDefinitionId ,jdbcType=VARCHAR},
+                #{milestone.elementId, jdbcType=VARCHAR},
+                #{milestone.tenantId, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="bulkInsertMilestoneInstance" databaseId="oracle" parameterType="java.util.List">
+        INSERT ALL
+        <foreach collection="list" item="milestone" index="index">
+            into ${prefix}ACT_CMMN_RU_MIL_INST (ID_, NAME_, TIME_STAMP_, CASE_INST_ID_, CASE_DEF_ID_, ELEMENT_ID_, TENANT_ID_) VALUES
+            (
+                #{milestone.id ,jdbcType=VARCHAR},
+                #{milestone.name ,jdbcType=VARCHAR},
+                #{milestone.timeStamp ,jdbcType=TIMESTAMP},
+                #{milestone.caseInstanceId ,jdbcType=VARCHAR},
+                #{milestone.caseDefinitionId ,jdbcType=VARCHAR},
+                #{milestone.elementId, jdbcType=VARCHAR},
+                #{milestone.tenantId, jdbcType=VARCHAR}
+            )
+        </foreach>
+        SELECT * FROM dual
+    </insert>
+
+    <update id="updateMilestoneInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityImpl">
+        update ${prefix}ACT_CMMN_RU_MIL_INST set NAME_ = #{name, jdbcType=VARCHAR} where ID_ = #{id, jdbcType=VARCHAR}
+    </update>
+
+    <delete id="deleteMilestoneInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityImpl">
+        delete from ${prefix}ACT_CMMN_RU_MIL_INST where ID_ = #{id}
+    </delete>
+
+    <delete id="deleteMilestoneInstanceByCaseInstanceId" parameterType="string">
+        delete from ${prefix}ACT_CMMN_RU_MIL_INST where CASE_INST_ID_ = #{value}
+    </delete>
+
+    <resultMap id="mileStoneInstanceResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityImpl">
+        <id property="id" column="ID_" jdbcType="VARCHAR" />
+        <result property="name" column="NAME_" jdbcType="VARCHAR" />
+        <result property="timeStamp" column="TIME_STAMP_" jdbcType="TIMESTAMP" />
+        <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
+        <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
+        <result property="elementId" column="ELEMENT_ID_" jdbcType="VARCHAR" />
+        <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <select id="selectMilestone" parameterType="string" resultMap="mileStoneInstanceResultMap">
+        select * from ${prefix}ACT_CMMN_RU_MIL_INST where ID_ = #{id, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectMilestoneInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.MilestoneInstanceQueryImpl" resultMap="mileStoneInstanceResultMap">
+        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+        select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <include refid="selectMilestoneInstancesByQueryCriteriaSql" />
+        ${orderBy}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    </select>
+
+    <select id="selectMilestoneInstanceCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.MilestoneInstanceQueryImpl" resultType="long">
+        select count(RES.ID_)
+        <include refid="selectMilestoneInstancesByQueryCriteriaSql" />
+    </select>
+
+    <sql id="selectMilestoneInstancesByQueryCriteriaSql">
+        from ${prefix}ACT_CMMN_RU_MIL_INST RES
+        <where>
+            <if test="name != null">
+                RES.NAME_ = #{name}
+            </if>
+            <if test="caseInstanceId != null">
+                and RES.CASE_INST_ID_ = #{caseInstanceId}
+            </if>
+            <if test="caseDefinitionId != null">
+                and RES.CASE_DEF_ID_ = #{caseDefinitionId}
+            </if>
+            <if test="reachedBefore != null">
+                and RES.TIME_STAMP_ &lt;= #{reachedBefore}
+            </if>
+            <if test="reachedAfter != null">
+                and RES.TIME_STAMP_ &gt;= #{reachedAfter}
+            </if>
+            <if test="tenantId != null">
+                and RES.TENANT_ID_ = #{tenantId}
+            </if>
+            <if test="tenantIdLike != null">
+                and RES.TENANT_ID_ like #{tenantIdLike}
+            </if>
+            <if test="withoutTenantId">
+                and (RES.TENANT_ID_ is null or RES.TENANT_ID_ = '')
+            </if>
+        </where>
+    </sql>
+
+</mapper>

@@ -22,19 +22,20 @@ import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.history.HistoricDetailQuery;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.history.HistoricTaskInstanceQuery;
 import org.flowable.engine.history.NativeHistoricActivityInstanceQuery;
 import org.flowable.engine.history.NativeHistoricDetailQuery;
 import org.flowable.engine.history.NativeHistoricProcessInstanceQuery;
-import org.flowable.engine.history.NativeHistoricTaskInstanceQuery;
 import org.flowable.engine.history.ProcessInstanceHistoryLog;
 import org.flowable.engine.history.ProcessInstanceHistoryLogQuery;
-import org.flowable.identitylink.service.IdentityLink;
-import org.flowable.identitylink.service.history.HistoricIdentityLink;
-import org.flowable.variable.service.history.HistoricVariableInstance;
-import org.flowable.variable.service.history.HistoricVariableInstanceQuery;
-import org.flowable.variable.service.history.NativeHistoricVariableInstanceQuery;
+import org.flowable.entitylink.api.history.HistoricEntityLink;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskInstanceQuery;
+import org.flowable.task.service.history.NativeHistoricTaskInstanceQuery;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
+import org.flowable.variable.api.history.NativeHistoricVariableInstanceQuery;
 
 /**
  * Service exposing information about ongoing and past process instances. This is different from the runtime information in the sense that this runtime information only contains the actual runtime
@@ -65,7 +66,7 @@ public interface HistoryService {
     HistoricDetailQuery createHistoricDetailQuery();
 
     /**
-     * Returns a new {@link org.flowable.engine.common.api.query.NativeQuery} for process definitions.
+     * Returns a new {@link org.flowable.common.engine.api.query.NativeQuery} for process definitions.
      */
     NativeHistoricDetailQuery createNativeHistoricDetailQuery();
 
@@ -75,7 +76,7 @@ public interface HistoryService {
     HistoricVariableInstanceQuery createHistoricVariableInstanceQuery();
 
     /**
-     * Returns a new {@link org.flowable.engine.common.api.query.NativeQuery} for process definitions.
+     * Returns a new {@link org.flowable.common.engine.api.query.NativeQuery} for process definitions.
      */
     NativeHistoricVariableInstanceQuery createNativeHistoricVariableInstanceQuery();
 
@@ -116,6 +117,11 @@ public interface HistoryService {
      * certain process instance, even if the instance is completed as opposed to {@link IdentityLink}s which only exist for active instances.
      */
     List<HistoricIdentityLink> getHistoricIdentityLinksForProcessInstance(String processInstanceId);
+    
+    /**
+     * Retrieves the {@link HistoricEntityLink}s associated with the given process instance.
+     */
+    List<HistoricEntityLink> getHistoricEntityLinkChildrenForProcessInstance(String processInstanceId);
 
     /**
      * Allows to retrieve the {@link ProcessInstanceHistoryLog} for one process instance.

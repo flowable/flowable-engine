@@ -66,11 +66,11 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.bpmn.model.ValuedDataObject;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.delegate.Expression;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.api.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,19 +86,20 @@ public class BpmnDeployer implements Deployer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BpmnDeployer.class);
 
-    public static final String[] BPMN_RESOURCE_SUFFIXES = new String[] { "bpmn20.xml", "bpmn" };
-    public static final String[] DIAGRAM_SUFFIXES = new String[] { "png", "jpg", "gif", "svg" };
+    public static final String[] BPMN_RESOURCE_SUFFIXES = new String[]{"bpmn20.xml", "bpmn"};
+    public static final String[] DIAGRAM_SUFFIXES = new String[]{"png", "jpg", "gif", "svg"};
 
     protected ExpressionManager expressionManager;
     protected BpmnParser bpmnParser;
     protected IdGenerator idGenerator;
 
+    @Override
     public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings) {
         LOGGER.debug("Processing deployment {}", deployment.getName());
 
-        List<ProcessDefinitionEntity> processDefinitions = new ArrayList<ProcessDefinitionEntity>();
+        List<ProcessDefinitionEntity> processDefinitions = new ArrayList<>();
         Map<String, ResourceEntity> resources = deployment.getResources();
-        Map<String, BpmnModel> bpmnModelMap = new HashMap<String, BpmnModel>();
+        Map<String, BpmnModel> bpmnModelMap = new HashMap<>();
 
         final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
         for (String resourceName : resources.keySet()) {
@@ -155,7 +156,7 @@ public class BpmnDeployer implements Deployer {
                             try {
                                 byte[] diagramBytes = IoUtil.readInputStream(processEngineConfiguration.getProcessDiagramGenerator().generateDiagram(bpmnParse.getBpmnModel(), "png", processEngineConfiguration.getActivityFontName(),
                                         processEngineConfiguration.getLabelFontName(), processEngineConfiguration.getAnnotationFontName(),
-                                        processEngineConfiguration.getClassLoader()), null);
+                                        processEngineConfiguration.getClassLoader(),processEngineConfiguration.isDrawSequenceFlowNameWithNoLabelDI()), null);
                                 diagramResourceName = getProcessImageResourceName(resourceName, processDefinition.getKey(), "png");
                                 createResource(diagramResourceName, diagramBytes, deployment);
 
@@ -174,7 +175,7 @@ public class BpmnDeployer implements Deployer {
         }
 
         // check if there are process definitions with the same process key to prevent database unique index violation
-        List<String> keyList = new ArrayList<String>();
+        List<String> keyList = new ArrayList<>();
         for (ProcessDefinitionEntity processDefinition : processDefinitions) {
             if (keyList.contains(processDefinition.getKey())) {
                 throw new ActivitiException("The deployment contains process definitions with the same key '" + processDefinition.getKey() + "' (process id attribute), this is not allowed");
@@ -186,7 +187,7 @@ public class BpmnDeployer implements Deployer {
         ProcessDefinitionEntityManager processDefinitionManager = commandContext.getProcessDefinitionEntityManager();
         DbSqlSession dbSqlSession = commandContext.getSession(DbSqlSession.class);
         for (ProcessDefinitionEntity processDefinition : processDefinitions) {
-            List<TimerJobEntity> timers = new ArrayList<TimerJobEntity>();
+            List<TimerJobEntity> timers = new ArrayList<>();
             if (deployment.isNew()) {
                 int processDefinitionVersion;
 
@@ -273,7 +274,7 @@ public class BpmnDeployer implements Deployer {
     }
 
     protected void addProcessDefinitionToCache(ProcessDefinitionEntity processDefinition, Map<String, BpmnModel> bpmnModelMap,
-            ProcessEngineConfigurationImpl processEngineConfiguration, CommandContext commandContext) {
+                                               ProcessEngineConfigurationImpl processEngineConfiguration, CommandContext commandContext) {
 
         // Add to cache
         DeploymentManager deploymentManager = processEngineConfiguration.getDeploymentManager();
@@ -285,7 +286,7 @@ public class BpmnDeployer implements Deployer {
     }
 
     protected void addDefinitionInfoToCache(ProcessDefinitionEntity processDefinition,
-            ProcessEngineConfigurationImpl processEngineConfiguration, CommandContext commandContext) {
+                                            ProcessEngineConfigurationImpl processEngineConfiguration, CommandContext commandContext) {
 
         if (!processEngineConfiguration.isEnableProcessDefinitionInfoCache()) {
             return;
@@ -303,7 +304,7 @@ public class BpmnDeployer implements Deployer {
                 try {
                     infoNode = (ObjectNode) objectMapper.readTree(infoBytes);
                 } catch (Exception e) {
-                    throw new ActivitiException("Error deserializing json info for process definition " + processDefinition.getId());
+                    throw new ActivitiException("Error deserializing json info for process definition " + processDefinition.getId(), e);
                 }
             }
         }
@@ -393,7 +394,7 @@ public class BpmnDeployer implements Deployer {
         List<EventSubscriptionDeclaration> eventDefinitions = (List<EventSubscriptionDeclaration>) processDefinition.getProperty(BpmnParse.PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION);
         if (eventDefinitions != null) {
 
-            Set<String> messageNames = new HashSet<String>();
+            Set<String> messageNames = new HashSet<>();
             for (EventSubscriptionDeclaration eventDefinition : eventDefinitions) {
                 if (eventDefinition.getEventType().equals("message") && eventDefinition.isStartEvent()) {
 
@@ -673,15 +674,15 @@ public class BpmnDeployer implements Deployer {
 
     /**
      * Returns the default name of the image resource for a certain process.
-     * 
+     * <p>
      * It will first look for an image resource which matches the process specifically, before resorting to an image resource which matches the BPMN 2.0 xml file resource.
-     * 
+     * <p>
      * Example: if the deployment contains a BPMN 2.0 xml resource called 'abc.bpmn20.xml' containing only one process with key 'myProcess', then this method will look for an image resources called
      * 'abc.myProcess.png' (or .jpg, or .gif, etc.) or 'abc.png' if the previous one wasn't found.
-     * 
+     * <p>
      * Example 2: if the deployment contains a BPMN 2.0 xml resource called 'abc.bpmn20.xml' containing three processes (with keys a, b and c), then this method will first look for an image resource
      * called 'abc.a.png' before looking for 'abc.png' (likewise for b and c). Note that if abc.a.png, abc.b.png and abc.c.png don't exist, all processes will have the same image: abc.png.
-     * 
+     *
      * @return null if no matching image resource is found.
      */
     protected String getDiagramResourceForProcess(String bpmnFileResource, String processKey, Map<String, ResourceEntity> resources) {

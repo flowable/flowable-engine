@@ -32,6 +32,7 @@ public class DefaultFlowable5SpringCompatibilityHandler extends DefaultFlowable5
         return processEngineFactory;
     }
 
+    @Override
     public Object getCamelContextObject(String camelContextValue) {
         SpringProcessEngineConfiguration springConfiguration = (SpringProcessEngineConfiguration) getProcessEngine().getProcessEngineConfiguration();
         if (StringUtils.isEmpty(camelContextValue)) {

@@ -33,6 +33,7 @@ public class FlowableIdmMembershipEventImpl extends FlowableIdmEventImpl impleme
         this.userId = userId;
     }
 
+    @Override
     public String getUserId() {
         return userId;
     }
@@ -41,6 +42,7 @@ public class FlowableIdmMembershipEventImpl extends FlowableIdmEventImpl impleme
         this.groupId = groupId;
     }
 
+    @Override
     public String getGroupId() {
         return groupId;
     }

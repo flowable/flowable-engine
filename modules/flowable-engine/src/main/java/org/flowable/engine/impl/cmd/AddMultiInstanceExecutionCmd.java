@@ -19,9 +19,9 @@ import java.util.Map;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -48,6 +48,7 @@ public class AddMultiInstanceExecutionCmd implements Command<Execution>, Seriali
         this.executionVariables = executionVariables;
     }
 
+    @Override
     public Execution execute(CommandContext commandContext) {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
         
@@ -80,7 +81,7 @@ public class AddMultiInstanceExecutionCmd implements Command<Execution>, Seriali
             miExecution.setScope(false);
             
             childExecution.setCurrentFlowElement(miActivityElement);
-            CommandContextUtil.getAgenda().planContinueMultiInstanceOperation(childExecution, currentNumberOfInstances);
+            CommandContextUtil.getAgenda().planContinueMultiInstanceOperation(childExecution, miExecution, currentNumberOfInstances);
         }
         
         return childExecution;

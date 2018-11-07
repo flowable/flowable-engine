@@ -30,6 +30,7 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
         this.userId = userId;
     }
 
+    @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
 
         if (userId != null) {

@@ -36,6 +36,7 @@ public class ProcessDefinitionResponse {
     private boolean suspended;
     private boolean startFormDefined;
 
+    @ApiModelProperty(example = "oneTaskProcess:1:4")
     public String getId() {
         return id;
     }
@@ -44,6 +45,7 @@ public class ProcessDefinitionResponse {
         this.id = id;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/repository/process-definitions/oneTaskProcess%3A1%3A4")
     public String getUrl() {
         return url;
     }
@@ -52,6 +54,7 @@ public class ProcessDefinitionResponse {
         this.url = url;
     }
 
+    @ApiModelProperty(example = "oneTaskProcess")
     public String getKey() {
         return key;
     }
@@ -60,6 +63,7 @@ public class ProcessDefinitionResponse {
         this.key = key;
     }
 
+    @ApiModelProperty(example = "1")
     public int getVersion() {
         return version;
     }
@@ -68,6 +72,7 @@ public class ProcessDefinitionResponse {
         this.version = version;
     }
 
+    @ApiModelProperty(example = "The One Task Process")
     public String getName() {
         return name;
     }
@@ -76,6 +81,7 @@ public class ProcessDefinitionResponse {
         this.name = name;
     }
 
+    @ApiModelProperty(example = "null")
     public String getTenantId() {
         return tenantId;
     }
@@ -84,6 +90,7 @@ public class ProcessDefinitionResponse {
         this.tenantId = tenantId;
     }
 
+    @ApiModelProperty(example = "2")
     public String getDeploymentId() {
         return deploymentId;
     }
@@ -92,6 +99,7 @@ public class ProcessDefinitionResponse {
         this.deploymentId = deploymentId;
     }
 
+    @ApiModelProperty(example = "http://localhost:8081/repository/deployments/2")
     public String getDeploymentUrl() {
         return deploymentUrl;
     }
@@ -100,6 +108,7 @@ public class ProcessDefinitionResponse {
         this.deploymentUrl = deploymentUrl;
     }
 
+    @ApiModelProperty(example = "Examples")
     public String getCategory() {
         return category;
     }
@@ -112,11 +121,12 @@ public class ProcessDefinitionResponse {
         this.resource = resource;
     }
 
-    @ApiModelProperty(value = "Contains the actual deployed BPMN 2.0 xml.")
+    @ApiModelProperty(example = "http://localhost:8182/repository/deployments/2/resources/testProcess.xml", value = "Contains the actual deployed BPMN 2.0 xml.")
     public String getResource() {
         return resource;
     }
 
+    @ApiModelProperty(example = "This is a process for testing purposes")
     public String getDescription() {
         return description;
     }
@@ -129,7 +139,7 @@ public class ProcessDefinitionResponse {
         this.diagramResource = diagramResource;
     }
 
-    @ApiModelProperty(value = "Contains a graphical representation of the process, null when no diagram is available.")
+    @ApiModelProperty(example = "http://localhost:8182/repository/deployments/2/resources/testProcess.png", value = "Contains a graphical representation of the process, null when no diagram is available.")
     public String getDiagramResource() {
         return diagramResource;
     }

@@ -64,14 +64,16 @@ public abstract class AbstractBpmnParseHandler<T extends BaseElement> implements
 
     public static final String PROPERTYNAME_TIMER_DECLARATION = "timerDeclarations";
 
+    @Override
     public Set<Class<? extends BaseElement>> getHandledTypes() {
-        Set<Class<? extends BaseElement>> types = new HashSet<Class<? extends BaseElement>>();
+        Set<Class<? extends BaseElement>> types = new HashSet<>();
         types.add(getHandledType());
         return types;
     }
 
     protected abstract Class<? extends BaseElement> getHandledType();
 
+    @Override
     @SuppressWarnings("unchecked")
     public void parse(BpmnParse bpmnParse, BaseElement element) {
         T baseElement = (T) element;
@@ -141,7 +143,7 @@ public abstract class AbstractBpmnParseHandler<T extends BaseElement> implements
     protected void addEventSubscriptionDeclaration(BpmnParse bpmnParse, EventSubscriptionDeclaration subscription, EventDefinition parsedEventDefinition, ScopeImpl scope) {
         List<EventSubscriptionDeclaration> eventDefinitions = (List<EventSubscriptionDeclaration>) scope.getProperty(PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION);
         if (eventDefinitions == null) {
-            eventDefinitions = new ArrayList<EventSubscriptionDeclaration>();
+            eventDefinitions = new ArrayList<>();
             scope.setProperty(PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION, eventDefinitions);
         } else {
             // if this is a message event, validate that it is the only one with the provided name for this scope
@@ -151,7 +153,7 @@ public abstract class AbstractBpmnParseHandler<T extends BaseElement> implements
                             && eventDefinition.getEventName().equals(subscription.getEventName())
                             && eventDefinition.isStartEvent() == subscription.isStartEvent()) {
 
-                        LOGGER.warn("Cannot have more than one message event subscription with name '{}' for scope '{}'", subscription.getEventName(), scope                                .getId());
+                        LOGGER.warn("Cannot have more than one message event subscription with name '{}' for scope '{}'", subscription.getEventName(), scope.getId());
                     }
                 }
             }
@@ -241,7 +243,7 @@ public abstract class AbstractBpmnParseHandler<T extends BaseElement> implements
     }
 
     protected Map<String, Object> processDataObjects(BpmnParse bpmnParse, Collection<ValuedDataObject> dataObjects, ScopeImpl scope) {
-        Map<String, Object> variablesMap = new HashMap<String, Object>();
+        Map<String, Object> variablesMap = new HashMap<>();
         // convert data objects to process variables
         if (dataObjects != null) {
             for (ValuedDataObject dataObject : dataObjects) {

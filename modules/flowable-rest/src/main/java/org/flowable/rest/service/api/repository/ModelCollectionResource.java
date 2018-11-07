@@ -13,21 +13,23 @@
 
 package org.flowable.rest.service.api.repository;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.common.engine.api.query.QueryProperty;
+import org.flowable.common.rest.api.DataResponse;
 import org.flowable.engine.impl.ModelQueryProperty;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
-import org.flowable.rest.api.DataResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -60,7 +62,7 @@ public class ModelCollectionResource extends BaseModelResource {
         allowedSortProperties.put("tenantId", ModelQueryProperty.MODEL_TENANT_ID);
     }
 
-    @ApiOperation(value = "Get a list of models", tags = { "Models" })
+    @ApiOperation(value = "List models", nickname= "listModels", tags = { "Models" })
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "category", dataType = "string", value = "Only return models with the given category.", paramType = "query"),
@@ -82,8 +84,8 @@ public class ModelCollectionResource extends BaseModelResource {
             @ApiResponse(code = 200, message = "Indicates request was successful and the models are returned"),
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format. The status-message contains additional information.")
     })
-    @RequestMapping(value = "/repository/models", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getModels(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    @GetMapping(value = "/repository/models", produces = "application/json")
+    public DataResponse<ModelResponse> getModels(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         ModelQuery modelQuery = repositoryService.createModelQuery();
 
         if (allRequestParams.containsKey("id")) {
@@ -139,15 +141,20 @@ public class ModelCollectionResource extends BaseModelResource {
                 modelQuery.modelWithoutTenantId();
             }
         }
-        return new ModelsPaginateList(restResponseFactory).paginateList(allRequestParams, modelQuery, "id", allowedSortProperties);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessModelInfoWithQuery(modelQuery);
+        }
+        
+        return paginateList(allRequestParams, modelQuery, "id", allowedSortProperties, restResponseFactory::createModelResponseList);
     }
 
     @ApiOperation(value = "Create a model", tags = {
             "Models" }, notes = "All request values are optional. For example, you can only include the name attribute in the request body JSON-object, only setting the name of the model, leaving all other fields null.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates the model was created.")
+            @ApiResponse(code = 201, message = "Indicates the model was created.")
     })
-    @RequestMapping(value = "/repository/models", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/repository/models", produces = "application/json")
     public ModelResponse createModel(@RequestBody ModelRequest modelRequest, HttpServletRequest request, HttpServletResponse response) {
         Model model = repositoryService.newModel();
         model.setCategory(modelRequest.getCategory());
@@ -157,6 +164,10 @@ public class ModelCollectionResource extends BaseModelResource {
         model.setName(modelRequest.getName());
         model.setVersion(modelRequest.getVersion());
         model.setTenantId(modelRequest.getTenantId());
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.createModel(model, modelRequest);
+        }
 
         repositoryService.saveModel(model);
         response.setStatus(HttpStatus.CREATED.value());

@@ -13,8 +13,10 @@
 
 package org.flowable.variable.service.impl.types;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.context.Context;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.api.types.VariableType;
 
 /**
  * Variable type capable of storing reference to JPA-entities. Only JPA-Entities which are configured by annotations are supported. Use of compound primary keys is not supported.
@@ -33,14 +35,17 @@ public class JPAEntityVariableType implements VariableType, CacheableVariable {
         mappings = new JPAEntityMappings();
     }
 
+    @Override
     public String getTypeName() {
         return TYPE_NAME;
     }
 
+    @Override
     public boolean isCachable() {
         return forceCacheable;
     }
 
+    @Override
     public boolean isAbleToStore(Object value) {
         if (value == null) {
             return true;
@@ -48,6 +53,7 @@ public class JPAEntityVariableType implements VariableType, CacheableVariable {
         return mappings.isJPAEntity(value);
     }
 
+    @Override
     public void setValue(Object value, ValueFields valueFields) {
         EntityManagerSession entityManagerSession = Context.getCommandContext().getSession(EntityManagerSession.class);
         if (entityManagerSession == null) {
@@ -72,6 +78,7 @@ public class JPAEntityVariableType implements VariableType, CacheableVariable {
         }
     }
 
+    @Override
     public Object getValue(ValueFields valueFields) {
         if (valueFields.getTextValue() != null && valueFields.getTextValue2() != null) {
             return mappings.getJPAEntity(valueFields.getTextValue(), valueFields.getTextValue2());
@@ -82,6 +89,7 @@ public class JPAEntityVariableType implements VariableType, CacheableVariable {
     /**
      * Force the value to be cacheable.
      */
+    @Override
     public void setForceCacheable(boolean forceCachedValue) {
         this.forceCacheable = forceCachedValue;
     }

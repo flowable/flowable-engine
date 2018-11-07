@@ -14,6 +14,7 @@
 package org.flowable.rest.service.api.identity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * @author Frederik Heremans
@@ -27,6 +28,7 @@ public class UserInfoRequest {
         this.key = key;
     }
 
+    @ApiModelProperty(example = "jobTitle")
     public String getKey() {
         return key;
     }
@@ -36,6 +38,7 @@ public class UserInfoRequest {
         this.value = value;
     }
 
+    @ApiModelProperty(example = "Muppet")
     public String getValue() {
         return value;
     }

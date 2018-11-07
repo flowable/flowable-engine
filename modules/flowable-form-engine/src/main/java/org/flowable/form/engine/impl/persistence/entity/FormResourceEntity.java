@@ -13,7 +13,7 @@
 
 package org.flowable.form.engine.impl.persistence.entity;
 
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 
 /**
  * @author Tijs Rademakers
@@ -32,6 +32,7 @@ public interface FormResourceEntity extends Entity {
 
     void setDeploymentId(String deploymentId);
 
+    @Override
     Object getPersistentState();
 
 }

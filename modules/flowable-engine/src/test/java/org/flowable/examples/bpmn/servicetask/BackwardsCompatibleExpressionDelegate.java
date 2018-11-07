@@ -13,8 +13,8 @@
 
 package org.flowable.examples.bpmn.servicetask;
 
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.JavaDelegate;
 
 /**
@@ -24,6 +24,7 @@ public class BackwardsCompatibleExpressionDelegate implements JavaDelegate {
 
     private Expression expression;
 
+    @Override
     public void execute(DelegateExecution execution) {
         Object result = expression.getValue(execution);
         execution.setVariable("result", result);

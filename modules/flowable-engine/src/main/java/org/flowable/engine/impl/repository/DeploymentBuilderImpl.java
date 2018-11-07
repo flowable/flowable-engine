@@ -23,10 +23,10 @@ import java.util.zip.ZipInputStream;
 
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.util.IoUtil;
-import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.util.IoUtil;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.engine.impl.RepositoryServiceImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;
@@ -60,6 +60,7 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
         this.resourceEntityManager = CommandContextUtil.getProcessEngineConfiguration().getResourceEntityManager();
     }
 
+    @Override
     public DeploymentBuilder addInputStream(String resourceName, InputStream inputStream) {
         if (inputStream == null) {
             throw new FlowableIllegalArgumentException("inputStream for resource '" + resourceName + "' is null");
@@ -72,6 +73,7 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
         return this;
     }
 
+    @Override
     public DeploymentBuilder addClasspathResource(String resource) {
         InputStream inputStream = ReflectUtil.getResourceAsStream(resource);
         if (inputStream == null) {
@@ -80,6 +82,7 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
         return addInputStream(resource, inputStream);
     }
 
+    @Override
     public DeploymentBuilder addString(String resourceName, String text) {
         if (text == null) {
             throw new FlowableIllegalArgumentException("text is null");
@@ -95,6 +98,7 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
         return this;
     }
 
+    @Override
     public DeploymentBuilder addBytes(String resourceName, byte[] bytes) {
         if (bytes == null) {
             throw new FlowableIllegalArgumentException("bytes is null");
@@ -107,6 +111,7 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
         return this;
     }
 
+    @Override
     public DeploymentBuilder addZipInputStream(ZipInputStream zipInputStream) {
         try {
             ZipEntry entry = zipInputStream.getNextEntry();
@@ -127,6 +132,7 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
         return this;
     }
 
+    @Override
     public DeploymentBuilder addBpmnModel(String resourceName, BpmnModel bpmnModel) {
         BpmnXMLConverter bpmnXMLConverter = new BpmnXMLConverter();
         try {
@@ -138,41 +144,55 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
         return this;
     }
 
+    @Override
     public DeploymentBuilder name(String name) {
         deployment.setName(name);
         return this;
     }
 
+    @Override
     public DeploymentBuilder category(String category) {
         deployment.setCategory(category);
         return this;
     }
 
+    @Override
     public DeploymentBuilder key(String key) {
         deployment.setKey(key);
         return this;
     }
+    
+    @Override
+    public DeploymentBuilder parentDeploymentId(String parentDeploymentId) {
+        deployment.setParentDeploymentId(parentDeploymentId);
+        return this;
+    }
 
+    @Override
     public DeploymentBuilder disableBpmnValidation() {
         this.isProcessValidationEnabled = false;
         return this;
     }
 
+    @Override
     public DeploymentBuilder disableSchemaValidation() {
         this.isBpmn20XsdValidationEnabled = false;
         return this;
     }
 
+    @Override
     public DeploymentBuilder tenantId(String tenantId) {
         deployment.setTenantId(tenantId);
         return this;
     }
 
+    @Override
     public DeploymentBuilder enableDuplicateFiltering() {
         this.isDuplicateFilterEnabled = true;
         return this;
     }
 
+    @Override
     public DeploymentBuilder activateProcessDefinitionsOn(Date date) {
         this.processDefinitionsActivationDate = date;
         return this;
@@ -184,6 +204,7 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
         return this;
     }
 
+    @Override
     public Deployment deploy() {
         return repositoryService.deploy(this);
     }

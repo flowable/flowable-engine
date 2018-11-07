@@ -37,6 +37,7 @@ public class Activator implements BundleActivator {
 
     private List<Runnable> callbacks = new ArrayList<>();
 
+    @Override
     public void start(BundleContext context) throws Exception {
         callbacks.add(new Service(context, URLStreamHandlerService.class.getName(), new BpmnURLHandler(), props("url.handler.protocol", "bpmn")));
         callbacks.add(new Service(context, URLStreamHandlerService.class.getName(), new BarURLHandler(), props("url.handler.protocol", "bar")));
@@ -50,6 +51,7 @@ public class Activator implements BundleActivator {
         callbacks.add(new Tracker(new Extender(context)));
     }
 
+    @Override
     public void stop(BundleContext context) throws Exception {
         for (Runnable r : callbacks) {
             r.run();
@@ -77,6 +79,7 @@ public class Activator implements BundleActivator {
             this.registration = context.registerService(clazz, service, props);
         }
 
+        @Override
         public void run() {
             registration.unregister();
         }
@@ -91,6 +94,7 @@ public class Activator implements BundleActivator {
             this.extender.open();
         }
 
+        @Override
         public void run() {
             extender.close();
         }

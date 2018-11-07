@@ -15,9 +15,9 @@ package org.activiti.engine.test.api.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.variable.service.event.FlowableVariableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
+import org.flowable.variable.api.event.FlowableVariableEvent;
 
 public class TestVariableEventListener implements FlowableEventListener {
 
@@ -47,4 +47,13 @@ public class TestVariableEventListener implements FlowableEventListener {
         return true;
     }
 
+    @Override
+    public boolean isFireOnTransactionLifecycleEvent() {
+        return false;
+    }
+
+    @Override
+    public String getOnTransaction() {
+        return null;
+    }
 }

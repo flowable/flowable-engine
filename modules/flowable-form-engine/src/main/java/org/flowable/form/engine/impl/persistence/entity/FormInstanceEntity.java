@@ -14,7 +14,7 @@ package org.flowable.form.engine.impl.persistence.entity;
 
 import java.util.Date;
 
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.form.api.FormInstance;
 
 /**
@@ -30,6 +30,12 @@ public interface FormInstanceEntity extends FormInstance, Entity {
     void setProcessInstanceId(String processInstanceId);
 
     void setProcessDefinitionId(String processDefinitionId);
+    
+    void setScopeId(String scopeId);
+    
+    void setScopeType(String scopeType);
+    
+    void setScopeDefinitionId(String scopeDefinitionId);
 
     void setSubmittedDate(Date submittedDate);
 

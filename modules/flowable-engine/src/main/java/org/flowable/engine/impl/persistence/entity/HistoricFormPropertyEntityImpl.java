@@ -28,18 +28,22 @@ public class HistoricFormPropertyEntityImpl extends HistoricDetailEntityImpl imp
         this.detailType = "FormProperty";
     }
 
+    @Override
     public String getPropertyId() {
         return propertyId;
     }
 
+    @Override
     public void setPropertyId(String propertyId) {
         this.propertyId = propertyId;
     }
 
+    @Override
     public String getPropertyValue() {
         return propertyValue;
     }
 
+    @Override
     public void setPropertyValue(String propertyValue) {
         this.propertyValue = propertyValue;
     }

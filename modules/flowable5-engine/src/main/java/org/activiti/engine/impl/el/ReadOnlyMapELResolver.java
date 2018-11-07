@@ -18,8 +18,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.javax.el.ELContext;
-import org.activiti.engine.impl.javax.el.ELResolver;
+import org.flowable.common.engine.impl.javax.el.ELContext;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
 
 /**
  * An {@link ELResolver} that exposed object values in the map, under the name of the entry's key. The values in the map are only returned when requested property has no 'base', meaning it's a
@@ -35,6 +35,7 @@ public class ReadOnlyMapELResolver extends ELResolver {
         this.wrappedMap = map;
     }
 
+    @Override
     public Object getValue(ELContext context, Object base, Object property) {
         if (base == null) {
             if (wrappedMap.containsKey(property)) {
@@ -45,10 +46,12 @@ public class ReadOnlyMapELResolver extends ELResolver {
         return null;
     }
 
+    @Override
     public boolean isReadOnly(ELContext context, Object base, Object property) {
         return true;
     }
 
+    @Override
     public void setValue(ELContext context, Object base, Object property, Object value) {
         if (base == null) {
             if (wrappedMap.containsKey(property)) {
@@ -57,14 +60,17 @@ public class ReadOnlyMapELResolver extends ELResolver {
         }
     }
 
+    @Override
     public Class<?> getCommonPropertyType(ELContext context, Object arg) {
         return Object.class;
     }
 
+    @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object arg) {
         return null;
     }
 
+    @Override
     public Class<?> getType(ELContext context, Object arg1, Object arg2) {
         return Object.class;
     }

@@ -26,10 +26,12 @@ import org.flowable.bpmn.model.TimerEventDefinition;
  */
 public class TimerEventDefinitionParser extends BaseChildElementParser {
 
+    @Override
     public String getElementName() {
         return ELEMENT_EVENT_TIMERDEFINITION;
     }
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
         if (!(parentElement instanceof Event))
             return;

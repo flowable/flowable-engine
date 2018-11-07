@@ -12,9 +12,9 @@
  */
 package org.flowable.dmn.engine.impl.deployer;
 
+import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
-import org.flowable.dmn.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;

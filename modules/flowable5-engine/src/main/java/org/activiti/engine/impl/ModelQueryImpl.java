@@ -55,11 +55,13 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         super(commandExecutor);
     }
 
+    @Override
     public ModelQueryImpl modelId(String modelId) {
         this.id = modelId;
         return this;
     }
 
+    @Override
     public ModelQueryImpl modelCategory(String category) {
         if (category == null) {
             throw new ActivitiIllegalArgumentException("category is null");
@@ -68,6 +70,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return this;
     }
 
+    @Override
     public ModelQueryImpl modelCategoryLike(String categoryLike) {
         if (categoryLike == null) {
             throw new ActivitiIllegalArgumentException("categoryLike is null");
@@ -76,6 +79,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return this;
     }
 
+    @Override
     public ModelQueryImpl modelCategoryNotEquals(String categoryNotEquals) {
         if (categoryNotEquals == null) {
             throw new ActivitiIllegalArgumentException("categoryNotEquals is null");
@@ -84,6 +88,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return this;
     }
 
+    @Override
     public ModelQueryImpl modelName(String name) {
         if (name == null) {
             throw new ActivitiIllegalArgumentException("name is null");
@@ -92,6 +97,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return this;
     }
 
+    @Override
     public ModelQueryImpl modelNameLike(String nameLike) {
         if (nameLike == null) {
             throw new ActivitiIllegalArgumentException("nameLike is null");
@@ -100,6 +106,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return this;
     }
 
+    @Override
     public ModelQuery modelKey(String key) {
         if (key == null) {
             throw new ActivitiIllegalArgumentException("key is null");
@@ -108,6 +115,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return this;
     }
 
+    @Override
     public ModelQueryImpl modelVersion(Integer version) {
         if (version == null) {
             throw new ActivitiIllegalArgumentException("version is null");
@@ -118,11 +126,13 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return this;
     }
 
+    @Override
     public ModelQuery latestVersion() {
         this.latest = true;
         return this;
     }
 
+    @Override
     public ModelQuery deploymentId(String deploymentId) {
         if (deploymentId == null) {
             throw new ActivitiIllegalArgumentException("DeploymentId is null");
@@ -131,6 +141,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return this;
     }
 
+    @Override
     public ModelQuery notDeployed() {
         if (deployed) {
             throw new ActivitiIllegalArgumentException("Invalid usage: cannot use deployed() and notDeployed() in the same query");
@@ -139,6 +150,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return this;
     }
 
+    @Override
     public ModelQuery deployed() {
         if (notDeployed) {
             throw new ActivitiIllegalArgumentException("Invalid usage: cannot use deployed() and notDeployed() in the same query");
@@ -147,6 +159,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return this;
     }
 
+    @Override
     public ModelQuery modelTenantId(String tenantId) {
         if (tenantId == null) {
             throw new ActivitiIllegalArgumentException("Model tenant id is null");
@@ -155,6 +168,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return this;
     }
 
+    @Override
     public ModelQuery modelTenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
             throw new ActivitiIllegalArgumentException("Model tenant id is null");
@@ -163,6 +177,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return this;
     }
 
+    @Override
     public ModelQuery modelWithoutTenantId() {
         this.withoutTenantId = true;
         return this;
@@ -170,40 +185,49 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
 
     // sorting ////////////////////////////////////////////
 
+    @Override
     public ModelQuery orderByModelCategory() {
         return orderBy(ModelQueryProperty.MODEL_CATEGORY);
     }
 
+    @Override
     public ModelQuery orderByModelId() {
         return orderBy(ModelQueryProperty.MODEL_ID);
     }
 
+    @Override
     public ModelQuery orderByModelKey() {
         return orderBy(ModelQueryProperty.MODEL_KEY);
     }
 
+    @Override
     public ModelQuery orderByModelVersion() {
         return orderBy(ModelQueryProperty.MODEL_VERSION);
     }
 
+    @Override
     public ModelQuery orderByModelName() {
         return orderBy(ModelQueryProperty.MODEL_NAME);
     }
 
+    @Override
     public ModelQuery orderByCreateTime() {
         return orderBy(ModelQueryProperty.MODEL_CREATE_TIME);
     }
 
+    @Override
     public ModelQuery orderByLastUpdateTime() {
         return orderBy(ModelQueryProperty.MODEL_LAST_UPDATE_TIME);
     }
 
+    @Override
     public ModelQuery orderByTenantId() {
         return orderBy(ModelQueryProperty.MODEL_TENANT_ID);
     }
 
     // results ////////////////////////////////////////////
 
+    @Override
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
         return commandContext
@@ -211,6 +235,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
                 .findModelCountByQueryCriteria(this);
     }
 
+    @Override
     public List<Model> executeList(CommandContext commandContext, Page page) {
         checkQueryOk();
         return commandContext

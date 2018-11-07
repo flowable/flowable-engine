@@ -34,7 +34,7 @@ import org.activiti.engine.impl.persistence.entity.SuspensionState.SuspensionSta
 import org.activiti.engine.impl.persistence.entity.TimerJobEntity;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.api.Job;
 
 /**
  * @author Daniel Meyer
@@ -50,7 +50,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
     protected String tenantId;
 
     public AbstractSetProcessDefinitionStateCmd(ProcessDefinitionEntity processDefinitionEntity,
-            boolean includeProcessInstances, Date executionDate, String tenantId) {
+                                                boolean includeProcessInstances, Date executionDate, String tenantId) {
         this.processDefinitionEntity = processDefinitionEntity;
         this.includeProcessInstances = includeProcessInstances;
         this.executionDate = executionDate;
@@ -58,7 +58,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
     }
 
     public AbstractSetProcessDefinitionStateCmd(String processDefinitionId, String processDefinitionKey,
-            boolean includeProcessInstances, Date executionDate, String tenantId) {
+                                                boolean includeProcessInstances, Date executionDate, String tenantId) {
         this.processDefinitionId = processDefinitionId;
         this.processDefinitionKey = processDefinitionKey;
         this.includeProcessInstances = includeProcessInstances;
@@ -66,6 +66,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
         this.tenantId = tenantId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
 
         List<ProcessDefinitionEntity> processDefinitions = findProcessDefinition(commandContext);
@@ -92,7 +93,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
             throw new ActivitiIllegalArgumentException("Process definition id or key cannot be null");
         }
 
-        List<ProcessDefinitionEntity> processDefinitionEntities = new ArrayList<ProcessDefinitionEntity>();
+        List<ProcessDefinitionEntity> processDefinitionEntities = new ArrayList<>();
         ProcessDefinitionEntityManager processDefinitionManager = commandContext.getProcessDefinitionEntityManager();
 
         if (processDefinitionId != null) {
@@ -178,7 +179,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
     }
 
     protected List<ProcessInstance> fetchProcessInstancesPage(CommandContext commandContext,
-            ProcessDefinition processDefinition, int currentPageStartIndex) {
+                                                              ProcessDefinition processDefinition, int currentPageStartIndex) {
 
         if (SuspensionState.ACTIVE.equals(getProcessDefinitionSuspensionState())) {
             return new ProcessInstanceQueryImpl(commandContext)

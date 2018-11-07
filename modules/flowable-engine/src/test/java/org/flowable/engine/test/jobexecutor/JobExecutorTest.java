@@ -19,29 +19,34 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.engine.impl.asyncexecutor.JobManager;
-import org.flowable.engine.impl.persistence.entity.TimerJobEntityManager;
-import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.impl.asyncexecutor.JobManager;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
  */
 public class JobExecutorTest extends JobExecutorTestCase {
 
+    @Test
     public void testBasicJobExecutorOperation() throws Exception {
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
         commandExecutor.execute(new Command<Void>() {
+            @Override
             public Void execute(CommandContext commandContext) {
-                JobManager jobManager = CommandContextUtil.getJobManager(commandContext);
+                JobServiceConfiguration jobServiceConfiguration = (JobServiceConfiguration) processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
+                JobManager jobManager = jobServiceConfiguration.getJobManager();
                 jobManager.execute(createTweetMessage("message-one"));
                 jobManager.execute(createTweetMessage("message-two"));
                 jobManager.execute(createTweetMessage("message-three"));
                 jobManager.execute(createTweetMessage("message-four"));
 
-                TimerJobEntityManager timerJobManager = CommandContextUtil.getTimerJobEntityManager(commandContext);
+                TimerJobEntityManager timerJobManager = jobServiceConfiguration.getTimerJobEntityManager();
                 timerJobManager.insert(createTweetTimer("timer-one", new Date()));
                 timerJobManager.insert(createTweetTimer("timer-one", new Date()));
                 timerJobManager.insert(createTweetTimer("timer-two", new Date()));

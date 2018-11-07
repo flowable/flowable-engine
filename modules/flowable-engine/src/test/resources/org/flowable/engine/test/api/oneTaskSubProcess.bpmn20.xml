@@ -1,39 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn" targetNamespace="Examples">
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="Examples">
 
-  <process id="startSimpleSubProcess">
+    <process id="startSimpleSubProcess">
 
-    <startEvent id="theStart" />
+        <startEvent id="theStart"/>
 
-    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="taskBefore" />
-    
-    <userTask id="taskBefore" name="Task before sub process" />
-    
-    <sequenceFlow id="flow2" sourceRef="taskBefore" targetRef="subProcess" />
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="taskBefore"/>
 
-    <subProcess id="subProcess">
+        <userTask id="taskBefore" name="Task before sub process"/>
 
-      <startEvent id="theSubProcessStart" />
+        <sequenceFlow id="flow2" sourceRef="taskBefore" targetRef="subProcess"/>
 
-      <sequenceFlow id="subflow1" sourceRef="theSubProcessStart" targetRef="subtask" />
+        <subProcess id="subProcess">
+            <dataObject itemSubjectRef="xsd:string" name="name" id="ID_91ee51f3-481d-439c-a62d-8b382a1cf7a1">
+                <extensionElements>
+                    <flowable:value>John</flowable:value>
+                </extensionElements>
+            </dataObject>
 
-      <userTask id="subtask" name="Task in subprocess" />
+            <startEvent id="theSubProcessStart"/>
 
-      <sequenceFlow id="subflow2" sourceRef="subtask" targetRef="theSubProcessEnd" />
+            <sequenceFlow id="subflow1" sourceRef="theSubProcessStart" targetRef="subTask"/>
 
-      <endEvent id="theSubProcessEnd" />
+            <userTask id="subTask" name="Task in subProcess"/>
 
-    </subProcess>
+            <sequenceFlow id="subflow2" sourceRef="subTask" targetRef="theSubProcessEnd"/>
 
-    <sequenceFlow id="flow3" sourceRef="subProcess" targetRef="taskAfter" />
-    
-    <userTask id="taskAfter" name="Task after sub process" />
-    
-    <sequenceFlow id="flow4" sourceRef="taskAfter" targetRef="theEnd" />
+            <endEvent id="theSubProcessEnd"/>
 
-    <endEvent id="theEnd" />
+        </subProcess>
 
-  </process>
+        <sequenceFlow id="flow3" sourceRef="subProcess" targetRef="taskAfter"/>
+
+        <userTask id="taskAfter" name="Task after sub process"/>
+
+        <sequenceFlow id="flow4" sourceRef="taskAfter" targetRef="theEnd"/>
+
+        <endEvent id="theEnd"/>
+
+    </process>
 
 </definitions>

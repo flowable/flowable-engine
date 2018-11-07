@@ -13,29 +13,16 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 
 /**
  * @author Tom Baeyens
  */
-public interface ResourceEntity extends Entity {
+public interface ResourceEntity extends Entity, EngineResource {
 
-    String getName();
-
-    void setName(String name);
-
-    byte[] getBytes();
-
-    void setBytes(byte[] bytes);
-
-    String getDeploymentId();
-
-    void setDeploymentId(String deploymentId);
-
+    @Override
     Object getPersistentState();
 
     void setGenerated(boolean generated);
-
-    boolean isGenerated();
-
 }

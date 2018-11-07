@@ -15,11 +15,12 @@ package org.flowable.engine.impl.app;
 
 import java.util.Map;
 
+import org.flowable.common.engine.api.repository.EngineDeployment;
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.persistence.deploy.Deployer;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
-import org.flowable.engine.impl.persistence.entity.ResourceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,23 +28,25 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Tijs Rademakers
  */
-public class AppDeployer implements Deployer {
+public class AppDeployer implements EngineDeployer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppDeployer.class);
 
-    public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings) {
+    @Override
+    public void deploy(EngineDeployment deployment, Map<String, Object> deploymentSettings) {
         LOGGER.debug("Processing app deployment {}", deployment.getName());
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         DeploymentManager deploymentManager = processEngineConfiguration.getDeploymentManager();
 
         Object appResourceObject = null;
-        Map<String, ResourceEntity> resources = deployment.getResources();
+        DeploymentEntity deploymentEntity = (DeploymentEntity) deployment;
+        Map<String, EngineResource> resources = deploymentEntity.getResources();
         for (String resourceName : resources.keySet()) {
             if (resourceName.endsWith(".app")) {
                 LOGGER.info("Processing app resource {}", resourceName);
 
-                ResourceEntity resourceEntity = resources.get(resourceName);
+                EngineResource resourceEntity = resources.get(resourceName);
                 byte[] resourceBytes = resourceEntity.getBytes();
                 appResourceObject = processEngineConfiguration.getAppResourceConverter().convertAppResourceToModel(resourceBytes);
             }

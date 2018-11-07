@@ -21,8 +21,8 @@ import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.db.BulkDeleteable;
 import org.activiti.engine.impl.db.PersistentObject;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.identitylink.api.IdentityLink;
 
 /**
  * @author Joram Barrez
@@ -51,8 +51,9 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, BulkDelet
 
     protected ProcessDefinitionEntity processDef;
 
+    @Override
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("id", this.id);
         persistentState.put("type", this.type);
 
@@ -104,14 +105,17 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, BulkDelet
         return groupId != null;
     }
 
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public void setId(String id) {
         this.id = id;
     }
 
+    @Override
     public String getType() {
         return type;
     }
@@ -120,6 +124,7 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, BulkDelet
         this.type = type;
     }
 
+    @Override
     public String getUserId() {
         return userId;
     }
@@ -131,6 +136,7 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, BulkDelet
         this.userId = userId;
     }
 
+    @Override
     public String getGroupId() {
         return groupId;
     }
@@ -142,6 +148,7 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, BulkDelet
         this.groupId = groupId;
     }
 
+    @Override
     public String getTaskId() {
         return taskId;
     }
@@ -150,6 +157,7 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, BulkDelet
         this.taskId = taskId;
     }
 
+    @Override
     public String getProcessInstanceId() {
         return processInstanceId;
     }
@@ -214,6 +222,21 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, BulkDelet
     @Override
     public String getProcessDefinitionId() {
         return this.processDefId;
+    }
+    
+    @Override
+    public String getScopeId() {
+        return null;
+    }
+
+    @Override
+    public String getScopeType() {
+        return null;
+    }
+
+    @Override
+    public String getScopeDefinitionId() {
+        return null;
     }
 
     @Override

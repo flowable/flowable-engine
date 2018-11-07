@@ -38,10 +38,12 @@ public class JtaTransactionContext implements TransactionContext {
         this.transactionManager = transactionManager;
     }
 
+    @Override
     public void commit() {
         // managed transaction, ignore
     }
 
+    @Override
     public void rollback() {
         // managed transaction, mark rollback-only if not done so already.
         try {
@@ -51,9 +53,9 @@ public class JtaTransactionContext implements TransactionContext {
                 transaction.setRollbackOnly();
             }
         } catch (IllegalStateException e) {
-            throw new ActivitiException("Unexpected IllegalStateException while marking transaction rollback only");
+            throw new ActivitiException("Unexpected IllegalStateException while marking transaction rollback only", e);
         } catch (SystemException e) {
-            throw new ActivitiException("SystemException while marking transaction rollback only");
+            throw new ActivitiException("SystemException while marking transaction rollback only", e);
         }
     }
 
@@ -65,6 +67,7 @@ public class JtaTransactionContext implements TransactionContext {
         }
     }
 
+    @Override
     public void addTransactionListener(TransactionState transactionState, final TransactionListener transactionListener) {
         Transaction transaction = getTransaction();
         CommandContext commandContext = Context.getCommandContext();
@@ -91,6 +94,7 @@ public class JtaTransactionContext implements TransactionContext {
             this.commandContext = commandContext;
         }
 
+        @Override
         public void beforeCompletion() {
             if (TransactionState.COMMITTING == transactionState
                     || TransactionState.ROLLINGBACK == transactionState) {
@@ -98,6 +102,7 @@ public class JtaTransactionContext implements TransactionContext {
             }
         }
 
+        @Override
         public void afterCompletion(int status) {
             if (Status.STATUS_ROLLEDBACK == status && TransactionState.ROLLED_BACK == transactionState) {
                 transactionListener.execute(commandContext);

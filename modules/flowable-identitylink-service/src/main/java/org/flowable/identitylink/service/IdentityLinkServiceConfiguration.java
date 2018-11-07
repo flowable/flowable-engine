@@ -12,10 +12,9 @@
  */
 package org.flowable.identitylink.service;
 
-import org.flowable.engine.common.AbstractServiceConfiguration;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.AbstractServiceConfiguration;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.identitylink.service.impl.HistoricIdentityLinkServiceImpl;
-import org.flowable.identitylink.service.impl.ServiceImpl;
 import org.flowable.identitylink.service.impl.IdentityLinkServiceImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManager;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManagerImpl;
@@ -52,6 +51,9 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
     
     protected IdentityLinkEntityManager identityLinkEntityManager;
     protected HistoricIdentityLinkEntityManager historicIdentityLinkEntityManager;
+
+    /** IdentityLink event handler */
+    protected IdentityLinkEventHandler identityLinkEventHandler;
     
     protected HistoryLevel historyLevel;
     
@@ -61,11 +63,11 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
     // /////////////////////////////////////////////////////////////////////
 
     public void init() {
-        initServices();
         initDataManagers();
         initEntityManagers();
     }
     
+    @Override
     public boolean isHistoryLevelAtLeast(HistoryLevel level) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Current history level: {}, level required: {}", historyLevel, level);
@@ -74,6 +76,7 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
         return historyLevel.isAtLeast(level);
     }
 
+    @Override
     public boolean isHistoryEnabled() {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Current history level: {}", historyLevel);
@@ -81,29 +84,15 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
         return historyLevel != HistoryLevel.NONE;
     }
 
-    // services
-    // /////////////////////////////////////////////////////////////////
-
-    protected void initServices() {
-        initService(identityLinkService);
-        initService(historicIdentityLinkService);
-    }
-
-    protected void initService(Object service) {
-        if (service instanceof ServiceImpl) {
-            ((ServiceImpl) service).setCommandExecutor(commandExecutor);
-        }
-    }
-
     // Data managers
     ///////////////////////////////////////////////////////////
 
     public void initDataManagers() {
         if (identityLinkDataManager == null) {
-            identityLinkDataManager = new MybatisIdentityLinkDataManager(this);
+            identityLinkDataManager = new MybatisIdentityLinkDataManager();
         }
         if (historicIdentityLinkDataManager == null) {
-            historicIdentityLinkDataManager = new MybatisHistoricIdentityLinkDataManager(this);
+            historicIdentityLinkDataManager = new MybatisHistoricIdentityLinkDataManager();
         }
     }
 
@@ -177,21 +166,34 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
         return this;
     }
     
+    @Override
     public HistoryLevel getHistoryLevel() {
         return historyLevel;
     }
     
+    @Override
     public IdentityLinkServiceConfiguration setHistoryLevel(HistoryLevel historyLevel) {
         this.historyLevel = historyLevel;
         return this;
     }
     
+    @Override
     public ObjectMapper getObjectMapper() {
         return objectMapper;
     }
 
+    @Override
     public IdentityLinkServiceConfiguration setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
+        return this;
+    }
+
+    public IdentityLinkEventHandler getIdentityLinkEventHandler() {
+        return identityLinkEventHandler;
+    }
+
+    public IdentityLinkServiceConfiguration setIdentityLinkEventHandler(IdentityLinkEventHandler identityLinkEventHandler) {
+        this.identityLinkEventHandler = identityLinkEventHandler;
         return this;
     }
 }

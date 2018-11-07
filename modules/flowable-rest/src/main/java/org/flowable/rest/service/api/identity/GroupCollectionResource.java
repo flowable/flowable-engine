@@ -13,26 +13,29 @@
 
 package org.flowable.rest.service.api.identity;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.QueryProperty;
+import org.flowable.common.rest.api.DataResponse;
+import org.flowable.common.rest.exception.FlowableConflictException;
 import org.flowable.engine.IdentityService;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.GroupQueryProperty;
-import org.flowable.rest.api.DataResponse;
-import org.flowable.rest.exception.FlowableConflictException;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -65,8 +68,11 @@ public class GroupCollectionResource {
 
     @Autowired
     protected IdentityService identityService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "Get a list of groups", tags = { "Groups" }, produces = "application/json")
+    @ApiOperation(value = "List groups", nickname="listGroups", tags = { "Groups" }, produces = "application/json")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return group with the given id", paramType = "query"),
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return groups with the given name", paramType = "query"),
@@ -79,8 +85,8 @@ public class GroupCollectionResource {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the requested groups were returned.")
     })
-    @RequestMapping(value = "/identity/groups", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getGroups(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    @GetMapping(value = "/identity/groups", produces = "application/json")
+    public DataResponse<GroupResponse> getGroups(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         GroupQuery query = identityService.createGroupQuery();
 
         if (allRequestParams.containsKey("id")) {
@@ -98,8 +104,12 @@ public class GroupCollectionResource {
         if (allRequestParams.containsKey("member")) {
             query.groupMember(allRequestParams.get("member"));
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessGroupInfoWithQuery(query);
+        }
 
-        return new GroupPaginateList(restResponseFactory).paginateList(allRequestParams, query, "id", properties);
+        return paginateList(allRequestParams, query, "id", properties, restResponseFactory::createGroupResponseList);
     }
 
     @ApiOperation(value = "Create a group", tags = { "Groups" })
@@ -107,10 +117,14 @@ public class GroupCollectionResource {
             @ApiResponse(code = 201, message = "Indicates the group was created."),
             @ApiResponse(code = 400, message = "Indicates the id of the group was missing.")
     })
-    @RequestMapping(value = "/identity/groups", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/identity/groups", produces = "application/json")
     public GroupResponse createGroup(@RequestBody GroupRequest groupRequest, HttpServletRequest httpRequest, HttpServletResponse response) {
         if (groupRequest.getId() == null) {
             throw new FlowableIllegalArgumentException("Id cannot be null.");
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.createGroup(groupRequest);
         }
 
         // Check if a user with the given ID already exists so we return a CONFLICT

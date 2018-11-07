@@ -13,24 +13,27 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.query.QueryProperty;
+import org.flowable.common.rest.api.DataResponse;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.query.QueryProperty;
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.impl.TaskQueryProperty;
-import org.flowable.engine.task.DelegationState;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskQuery;
-import org.flowable.rest.api.DataResponse;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
 import org.flowable.rest.service.api.engine.variable.QueryVariable.QueryVariableOperation;
+import org.flowable.task.api.DelegationState;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskQuery;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.service.impl.TaskQueryProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -62,6 +65,9 @@ public class TaskBaseResource {
 
     @Autowired
     protected HistoryService historyService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     protected DelegationState getDelegationState(String delegationState) {
         DelegationState state = null;
@@ -118,7 +124,7 @@ public class TaskBaseResource {
         }
     }
 
-    protected DataResponse getTasksFromQueryRequest(TaskQueryRequest request, Map<String, String> requestParams) {
+    protected DataResponse<TaskResponse> getTasksFromQueryRequest(TaskQueryRequest request, Map<String, String> requestParams) {
 
         TaskQuery taskQuery = taskService.createTaskQuery();
 
@@ -179,6 +185,9 @@ public class TaskBaseResource {
         }
         if (request.getProcessInstanceId() != null) {
             taskQuery.processInstanceId(request.getProcessInstanceId());
+        }
+        if (request.getProcessInstanceIdWithChildren() != null) {
+            taskQuery.processInstanceIdWithChildren(request.getProcessInstanceIdWithChildren());
         }
         if (request.getProcessInstanceBusinessKey() != null) {
             taskQuery.processInstanceBusinessKey(request.getProcessInstanceBusinessKey());
@@ -271,6 +280,18 @@ public class TaskBaseResource {
         if (request.getProcessInstanceVariables() != null) {
             addProcessvariables(taskQuery, request.getProcessInstanceVariables());
         }
+        
+        if (request.getScopeDefinitionId() != null) {
+            taskQuery.scopeDefinitionId(request.getScopeDefinitionId());
+        }
+        
+        if (request.getScopeId() != null) {
+            taskQuery.scopeId(request.getScopeId());
+        }
+        
+        if (request.getScopeType() != null) {
+            taskQuery.scopeType(request.getScopeType());
+        }
 
         if (request.getTenantId() != null) {
             taskQuery.taskTenantId(request.getTenantId());
@@ -291,8 +312,12 @@ public class TaskBaseResource {
         if (request.getCategory() != null) {
             taskQuery.taskCategory(request.getCategory());
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessTaskInfoWithQuery(taskQuery, request);
+        }
 
-        return new TaskPaginateList(restResponseFactory).paginateList(requestParams, request, taskQuery, "id", properties);
+        return paginateList(requestParams, request, taskQuery, "id", properties, restResponseFactory::createTaskResponseList);
     }
 
     protected void addTaskvariables(TaskQuery taskQuery, List<QueryVariable> variables) {
@@ -459,6 +484,11 @@ public class TaskBaseResource {
         if (task == null) {
             throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessTaskInfoById(task);
+        }
+        
         return task;
     }
 
@@ -470,6 +500,11 @@ public class TaskBaseResource {
         if (task == null) {
             throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoryTaskInfoById(task);
+        }
+        
         return task;
     }
 }

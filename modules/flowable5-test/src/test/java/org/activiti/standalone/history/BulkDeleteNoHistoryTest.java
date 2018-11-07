@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 public class BulkDeleteNoHistoryTest extends ResourceFlowableTestCase {
@@ -38,7 +37,7 @@ public class BulkDeleteNoHistoryTest extends ResourceFlowableTestCase {
         }
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                 .singleResult();
         assertNotNull(task);
 

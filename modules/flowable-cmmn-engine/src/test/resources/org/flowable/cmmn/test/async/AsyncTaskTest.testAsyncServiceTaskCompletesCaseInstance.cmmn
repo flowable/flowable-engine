@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+  <case id="testAsyncServiceTaskCompletesCaseInstance" name="testAsyncServiceTaskCompletesCaseInstance" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="casePlanModel">
+      <planItem id="planItem1" name="A" definitionRef="sid-E07CEDF9-9002-42EB-AE82-CA2C08236945"></planItem>
+      <planItem id="planItem2" name="B" definitionRef="sid-6F22E04F-7C29-4DAC-A82A-EEB699674299"></planItem>
+      <humanTask id="sid-E07CEDF9-9002-42EB-AE82-CA2C08236945" name="A"></humanTask>
+      <task id="sid-6F22E04F-7C29-4DAC-A82A-EEB699674299" name="B" isBlocking="false" flowable:async="true" flowable:type="java" flowable:class="org.flowable.cmmn.test.delegate.TestJavaDelegate"></task>
+    </casePlanModel>
+  </case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="CMMNDiagram_testAsyncServiceTaskCompletesCaseInstance">
+      <cmmndi:CMMNShape id="CMMNShape_casePlanModel" cmmnElementRef="casePlanModel">
+        <dc:Bounds height="714.0" width="718.0" x="40.0" y="40.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+        <dc:Bounds height="80.0" width="100.0" x="165.0" y="225.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+        <dc:Bounds height="80.0" width="100.0" x="449.5" y="220.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="CMMNEdge_sid-808314C3-6C08-45EE-8669-B213C816CA38" cmmnElementRef="sid-308DA0BE-D248-487A-8EAD-A194271FD82A" targetCMMNElementRef="sid-E07CEDF9-9002-42EB-AE82-CA2C08236945">
+        <di:waypoint x="442.36515702615145" y="264.0314534169505"></di:waypoint>
+        <di:waypoint x="265.0" y="264.78700637430165"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</definitions>

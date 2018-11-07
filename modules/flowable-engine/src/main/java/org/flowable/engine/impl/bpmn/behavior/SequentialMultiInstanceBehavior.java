@@ -14,8 +14,8 @@ package org.flowable.engine.impl.bpmn.behavior;
 
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.SubProcess;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
@@ -38,6 +38,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
     /**
      * Handles the sequential case of spawning the instances. Will only create one instance, since at most one instance can be active.
      */
+    @Override
     protected int createInstances(DelegateExecution multiInstanceRootExecution) {
 
         int nrOfInstances = resolveNrOfInstances(multiInstanceRootExecution);
@@ -59,7 +60,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
         logLoopDetails(multiInstanceRootExecution, "initialized", 0, 0, 1, nrOfInstances);
 
         if (nrOfInstances > 0) {
-            executeOriginalBehavior(execution, 0);
+            executeOriginalBehavior(execution, (ExecutionEntity) multiInstanceRootExecution, 0);
         }
 
         return nrOfInstances;
@@ -69,6 +70,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
      * Called when the wrapped {@link ActivityBehavior} calls the {@link AbstractBpmnActivityBehavior#leave(DelegateExecution)} method. Handles the completion of one instance, and executes the logic
      * for the sequential behavior.
      */
+    @Override
     public void leave(DelegateExecution execution) {
         DelegateExecution multiInstanceRootExecution = getMultiInstanceRootExecution(execution);
         int loopCounter = getLoopVariable(execution, getCollectionElementIndexVariable()) + 1;
@@ -81,11 +83,16 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
 
         callActivityEndListeners(execution);
 
-        // executeCompensationBoundaryEvents(execution.getCurrentFlowElement(), execution);
+        boolean completeConditionSatisfied = completionConditionSatisfied(multiInstanceRootExecution);
+        if (loopCounter >= nrOfInstances || completeConditionSatisfied) {
+            if(completeConditionSatisfied) {
+                sendCompletedWithConditionEvent(multiInstanceRootExecution);
+            }
+            else {
+                sendCompletedEvent(multiInstanceRootExecution);
+            }
 
-        if (loopCounter >= nrOfInstances || completionConditionSatisfied(multiInstanceRootExecution)) {
             super.leave(execution);
-
         } else {
             continueSequentialMultiInstance(execution, loopCounter, (ExecutionEntity) multiInstanceRootExecution);
         }
@@ -99,10 +106,10 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
                 ExecutionEntity executionToContinue = executionEntityManager.createChildExecution(multiInstanceRootExecution);
                 executionToContinue.setCurrentFlowElement(execution.getCurrentFlowElement());
                 executionToContinue.setScope(true);
-                executeOriginalBehavior(executionToContinue, loopCounter);
+                executeOriginalBehavior(executionToContinue, multiInstanceRootExecution, loopCounter);
             } else {
                 CommandContextUtil.getHistoryManager().recordActivityEnd((ExecutionEntity) execution, null);
-                executeOriginalBehavior(execution, loopCounter);
+                executeOriginalBehavior(execution, multiInstanceRootExecution, loopCounter);
             }
 
         } catch (BpmnError error) {

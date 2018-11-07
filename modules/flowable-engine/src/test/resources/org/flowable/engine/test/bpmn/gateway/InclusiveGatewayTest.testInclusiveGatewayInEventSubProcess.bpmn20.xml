@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
+
+    <message id="test" name="test"></message>
+    <process id="b92d819d-481f-4001-834e-cbdfa6ee0fad" name="testInsideEventSubProcessBugProcess" isExecutable="true">
+        <startEvent id="sid-BB429B30-D1B2-42EC-961C-757EF2CDED60"></startEvent>
+        <userTask id="sid-902CFFB5-41A3-42C0-8FDB-01989321FC28" name="My initial task" flowable:candidateGroups="admin"></userTask>
+        <sequenceFlow id="sid-2B6DD690-BBCB-4171-8036-5F5DE0EF5203" sourceRef="sid-BB429B30-D1B2-42EC-961C-757EF2CDED60" targetRef="sid-902CFFB5-41A3-42C0-8FDB-01989321FC28"></sequenceFlow>
+        <endEvent id="sid-74359125-08BE-431B-80CD-3BF4E5319A12"></endEvent>
+        <sequenceFlow id="sid-5B582BE8-68AE-4D6E-BA3E-A677E32BC66B" sourceRef="sid-902CFFB5-41A3-42C0-8FDB-01989321FC28" targetRef="sid-74359125-08BE-431B-80CD-3BF4E5319A12"></sequenceFlow>
+        <subProcess id="sid-DD31A8B5-70AE-449B-8695-34A05C534B2B" name="subProcess" triggeredByEvent="true">
+            <startEvent id="sid-1C121AA8-87A7-4C31-ACD8-C06E3E9C2EAD" isInterrupting="false">
+                <messageEventDefinition messageRef="test"></messageEventDefinition>
+            </startEvent>
+            <inclusiveGateway id="sid-063D15E8-403B-447F-8D72-E605F86E464A"></inclusiveGateway>
+            <endEvent id="sid-492C047C-E4D7-4AEF-9BFB-E021060EB41B"></endEvent>
+            <inclusiveGateway id="sid-A42DF850-8D0A-4270-BE47-85A706BAC71D"></inclusiveGateway>
+            <userTask id="sid-731EFDCD-442B-4150-B180-5428D7302FC3" name="test" flowable:candidateGroups="admin"></userTask>
+            <userTask id="sid-E8BE4027-1EAE-4ABF-8A66-F007B72AB3DB" name="test2" flowable:assignee="admin" flowable:candidateGroups="admin" />
+            <sequenceFlow id="sid-EACFC7D1-2F28-4ABA-861D-FA884C2C2DB9" sourceRef="sid-1C121AA8-87A7-4C31-ACD8-C06E3E9C2EAD" targetRef="sid-063D15E8-403B-447F-8D72-E605F86E464A"></sequenceFlow>
+            <sequenceFlow id="sid-8F280C95-1770-4734-933A-5B9C3BFBDA3F" sourceRef="sid-731EFDCD-442B-4150-B180-5428D7302FC3" targetRef="sid-A42DF850-8D0A-4270-BE47-85A706BAC71D"></sequenceFlow>
+            <sequenceFlow id="sid-BE6C05DF-219C-43CF-BEE3-62339EAD1F86" sourceRef="sid-E8BE4027-1EAE-4ABF-8A66-F007B72AB3DB" targetRef="sid-A42DF850-8D0A-4270-BE47-85A706BAC71D"></sequenceFlow>
+            <sequenceFlow id="sid-9129C3C3-E0E9-4D1B-946B-64BE196CCE19" sourceRef="sid-A42DF850-8D0A-4270-BE47-85A706BAC71D" targetRef="sid-492C047C-E4D7-4AEF-9BFB-E021060EB41B"></sequenceFlow>
+            <sequenceFlow id="sid-977D5F51-5BE8-41F2-9123-F0E2E25BE7E2" sourceRef="sid-063D15E8-403B-447F-8D72-E605F86E464A" targetRef="sid-731EFDCD-442B-4150-B180-5428D7302FC3">
+                <conditionExpression xsi:type="tFormalExpression"><![CDATA[${test2}]]></conditionExpression>
+            </sequenceFlow>
+            <sequenceFlow id="sid-620428D7-8894-4569-8E18-C89123B0DDB6" sourceRef="sid-063D15E8-403B-447F-8D72-E605F86E464A" targetRef="sid-E8BE4027-1EAE-4ABF-8A66-F007B72AB3DB">
+                <conditionExpression xsi:type="tFormalExpression"><![CDATA[${test}]]></conditionExpression>
+            </sequenceFlow>
+        </subProcess>
+    </process>
+</definitions>

@@ -32,44 +32,80 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     protected String messageName;
     protected String processInstanceName;
     protected String businessKey;
+    protected String callbackId;
+    protected String callbackType;
     protected String tenantId;
+    protected String overrideDefinitionTenantId;
+    protected String predefinedProcessInstanceId;
     protected Map<String, Object> variables;
     protected Map<String, Object> transientVariables;
+    protected boolean fallbackToDefaultTenant;
 
     public ProcessInstanceBuilderImpl(RuntimeServiceImpl runtimeService) {
         this.runtimeService = runtimeService;
     }
 
+    @Override
     public ProcessInstanceBuilder processDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
         return this;
     }
 
+    @Override
     public ProcessInstanceBuilder processDefinitionKey(String processDefinitionKey) {
         this.processDefinitionKey = processDefinitionKey;
         return this;
     }
 
+    @Override
     public ProcessInstanceBuilder messageName(String messageName) {
         this.messageName = messageName;
         return this;
     }
 
+    @Override
     public ProcessInstanceBuilder name(String processInstanceName) {
         this.processInstanceName = processInstanceName;
         return this;
     }
 
+    @Override
     public ProcessInstanceBuilder businessKey(String businessKey) {
         this.businessKey = businessKey;
         return this;
     }
+    
+    @Override
+    public ProcessInstanceBuilder callbackId(String callbackId) {
+        this.callbackId = callbackId;
+        return this;
+    }
+    
+    @Override
+    public ProcessInstanceBuilder callbackType(String callbackType) {
+        this.callbackType = callbackType;
+        return this;
+    }
 
+    @Override
     public ProcessInstanceBuilder tenantId(String tenantId) {
         this.tenantId = tenantId;
         return this;
     }
+    
+    @Override
+    public ProcessInstanceBuilder overrideProcessDefinitionTenantId(String tenantId) {
+        this.overrideDefinitionTenantId = tenantId;
+        return this;
+    }
 
+    @Override
+    public ProcessInstanceBuilder predefineProcessInstanceId(String processInstanceId) {
+        this.predefinedProcessInstanceId = processInstanceId;
+        return this;
+    }
+
+    @Override
     public ProcessInstanceBuilder variables(Map<String, Object> variables) {
         if (this.variables == null) {
             this.variables = new HashMap<>();
@@ -82,6 +118,7 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
         return this;
     }
 
+    @Override
     public ProcessInstanceBuilder variable(String variableName, Object value) {
         if (this.variables == null) {
             this.variables = new HashMap<>();
@@ -90,6 +127,7 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
         return this;
     }
 
+    @Override
     public ProcessInstanceBuilder transientVariables(Map<String, Object> transientVariables) {
         if (this.transientVariables == null) {
             this.transientVariables = new HashMap<>();
@@ -102,6 +140,7 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
         return this;
     }
 
+    @Override
     public ProcessInstanceBuilder transientVariable(String variableName, Object value) {
         if (this.transientVariables == null) {
             this.transientVariables = new HashMap<>();
@@ -110,8 +149,20 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
         return this;
     }
 
+    @Override
+    public ProcessInstanceBuilder fallbackToDefaultTenant() {
+        this.fallbackToDefaultTenant = true;
+        return this;
+    }
+
+    @Override
     public ProcessInstance start() {
         return runtimeService.startProcessInstance(this);
+    }
+
+    @Override
+    public ProcessInstance startAsync() {
+        return runtimeService.startProcessInstanceAsync(this);
     }
 
     public String getProcessDefinitionId() {
@@ -133,9 +184,25 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     public String getBusinessKey() {
         return businessKey;
     }
+    
+    public String getCallbackId() {
+        return callbackId;
+    }
+
+    public String getCallbackType() {
+        return callbackType;
+    }
 
     public String getTenantId() {
         return tenantId;
+    }
+
+    public String getOverrideDefinitionTenantId() {
+        return overrideDefinitionTenantId;
+    }
+
+    public String getPredefinedProcessInstanceId() {
+        return predefinedProcessInstanceId;
     }
 
     public Map<String, Object> getVariables() {
@@ -144,6 +211,10 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
 
     public Map<String, Object> getTransientVariables() {
         return transientVariables;
+    }
+
+    public boolean isFallbackToDefaultTenant() {
+        return fallbackToDefaultTenant;
     }
 
 }

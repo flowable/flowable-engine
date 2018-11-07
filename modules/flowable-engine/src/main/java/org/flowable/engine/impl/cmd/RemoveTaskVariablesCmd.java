@@ -14,10 +14,10 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Collection;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.util.Flowable5Util;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author roman.smirnov
@@ -36,6 +36,7 @@ public class RemoveTaskVariablesCmd extends NeedsActiveTaskCmd<Void> {
         this.isLocal = isLocal;
     }
 
+    @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
 
         if (task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {

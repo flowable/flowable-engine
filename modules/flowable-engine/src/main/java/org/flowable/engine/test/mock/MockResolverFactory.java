@@ -12,10 +12,10 @@
  */
 package org.flowable.engine.test.mock;
 
-import org.flowable.engine.delegate.VariableScope;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.scripting.Resolver;
-import org.flowable.engine.impl.scripting.ResolverFactory;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.scripting.Resolver;
+import org.flowable.common.engine.impl.scripting.ResolverFactory;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * This is a bridge resolver, making available any objects registered through {@link org.flowable.engine.test.mock.Mocks#register} inside scripts supported by process execution. <br>
@@ -30,14 +30,13 @@ import org.flowable.engine.impl.scripting.ResolverFactory;
  * <br>
  * &lt;bean id=&quot;processEngineConfiguration&quot;<br>
  * class=&quot;org.flowable.engine.impl.cfg. StandaloneInMemProcessEngineConfiguration&quot;&gt;<br>
- * &lt;property name=&quot;jobExecutorActivate&quot; value=&quot;false&quot; /&gt;<br>
  * &lt;property name=&quot;expressionManager&quot;&gt;<br>
  * &lt;bean class=&quot;org.flowable.engine.test.mock.MockExpressionManager&quot; /&gt;<br>
  * &lt;/property&gt;<br>
  * &lt;property name=&quot;resolverFactories&quot;&gt;<br>
  * &lt;list&gt;<br>
- * &lt;bean class=&quot;org.flowable.engine.impl.scripting.VariableScopeResolverFactory &quot; /&gt;<br>
- * &lt;bean class=&quot;org.flowable.engine.impl.scripting.BeansResolverFactory&quot; /&gt;<br>
+ * &lt;bean class=&quot;org.flowable.common.engine.impl.scripting.VariableScopeResolverFactory &quot; /&gt;<br>
+ * &lt;bean class=&quot;org.flowable.common.engine.impl.scripting.BeansResolverFactory&quot; /&gt;<br>
  * &lt;bean class=&quot;com.deenero.activiti.MockResolverFactory&quot; /&gt;<br>
  * &lt;/list&gt;<br>
  * &lt;/property&gt;<br>
@@ -52,7 +51,7 @@ import org.flowable.engine.impl.scripting.ResolverFactory;
  */
 public class MockResolverFactory implements ResolverFactory {
     @Override
-    public Resolver createResolver(ProcessEngineConfigurationImpl processEngineConfiguration, VariableScope variableScope) {
+    public Resolver createResolver(AbstractEngineConfiguration engineConfiguration, VariableScope variableScope) {
         return new Resolver() {
 
             @Override

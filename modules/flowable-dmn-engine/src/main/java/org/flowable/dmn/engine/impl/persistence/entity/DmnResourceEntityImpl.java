@@ -15,12 +15,10 @@ package org.flowable.dmn.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
-
 /**
  * @author Tijs Rademakers
  */
-public class DmnResourceEntityImpl extends AbstractEntityNoRevision implements DmnResourceEntity, Serializable {
+public class DmnResourceEntityImpl extends AbstractDmnEngineNoRevisionEntity implements DmnResourceEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -32,32 +30,44 @@ public class DmnResourceEntityImpl extends AbstractEntityNoRevision implements D
 
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public byte[] getBytes() {
         return bytes;
     }
 
+    @Override
     public void setBytes(byte[] bytes) {
         this.bytes = bytes;
     }
 
+    @Override
     public String getDeploymentId() {
         return deploymentId;
     }
 
+    @Override
     public void setDeploymentId(String deploymentId) {
         this.deploymentId = deploymentId;
     }
 
+    @Override
     public Object getPersistentState() {
         return DmnResourceEntityImpl.class;
+    }
+    
+    @Override
+    public boolean isGenerated() {
+        return false;
     }
 
     // common methods //////////////////////////////////////////////////////////

@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.form;
 
+import io.swagger.annotations.ApiModelProperty;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +31,7 @@ public class FormDataResponse {
     protected String taskUrl;
     protected List<RestFormProperty> formProperties = new ArrayList<>();
 
+    @ApiModelProperty(example = "null")
     public String getFormKey() {
         return formKey;
     }
@@ -37,6 +40,7 @@ public class FormDataResponse {
         this.formKey = formKey;
     }
 
+    @ApiModelProperty(example = "2")
     public String getDeploymentId() {
         return deploymentId;
     }
@@ -45,6 +49,7 @@ public class FormDataResponse {
         this.deploymentId = deploymentId;
     }
 
+    @ApiModelProperty(example = "3")
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
@@ -53,6 +58,7 @@ public class FormDataResponse {
         this.processDefinitionId = processDefinitionId;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/repository/process-definition/3")
     public String getProcessDefinitionUrl() {
         return processDefinitionUrl;
     }
@@ -61,6 +67,7 @@ public class FormDataResponse {
         this.processDefinitionUrl = processDefinitionUrl;
     }
 
+    @ApiModelProperty(example = "6")
     public String getTaskId() {
         return taskId;
     }
@@ -69,6 +76,7 @@ public class FormDataResponse {
         this.taskId = taskId;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/runtime/task/6")
     public String getTaskUrl() {
         return taskUrl;
     }

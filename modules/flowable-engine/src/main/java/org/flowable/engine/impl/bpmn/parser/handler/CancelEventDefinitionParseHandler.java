@@ -23,10 +23,12 @@ import org.flowable.engine.impl.bpmn.parser.BpmnParse;
  */
 public class CancelEventDefinitionParseHandler extends AbstractBpmnParseHandler<CancelEventDefinition> {
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return CancelEventDefinition.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, CancelEventDefinition cancelEventDefinition) {
         if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent) {
             BoundaryEvent boundaryEvent = (BoundaryEvent) bpmnParse.getCurrentFlowElement();

@@ -19,11 +19,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.dmn.model.BuiltinAggregator;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionRule;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DecisionTableOrientation;
 import org.flowable.dmn.model.DmnDefinition;
+import org.flowable.dmn.model.DmnElement;
+import org.flowable.dmn.model.DmnExtensionElement;
 import org.flowable.dmn.model.HitPolicy;
 import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.LiteralExpression;
@@ -79,6 +82,10 @@ public class DmnJsonConverter {
             decisionTable.setHitPolicy(HitPolicy.FIRST);
         }
 
+        if (modelNode.has("collectOperator")) {
+            decisionTable.setAggregation(BuiltinAggregator.get(DmnJsonConverterUtil.getValueAsString("collectOperator", modelNode)));
+        }
+
         // default orientation
         decisionTable.setPreferredOrientation(DecisionTableOrientation.RULE_AS_ROW);
 
@@ -103,6 +110,10 @@ public class DmnJsonConverter {
         modelNode.put("description", definition.getDescription());
         modelNode.put("hitIndicator", decisionTable.getHitPolicy().name());
 
+        if (decisionTable.getAggregation() != null) {
+            modelNode.put("collectOperator", decisionTable.getAggregation().name());
+        }
+
         // input expressions
         ArrayNode inputExpressionsNode = objectMapper.createArrayNode();
 
@@ -113,7 +124,7 @@ public class DmnJsonConverter {
             ObjectNode inputExpressionNode = objectMapper.createObjectNode();
             inputExpressionNode.put("id", inputExpression.getId());
             inputExpressionNode.put("type", inputExpression.getTypeRef());
-            inputExpressionNode.put("label", inputExpression.getLabel());
+            inputExpressionNode.put("label", clause.getLabel());
             inputExpressionNode.put("variableId", inputExpression.getText());
 
             inputExpressionsNode.add(inputExpressionNode);
@@ -146,7 +157,51 @@ public class DmnJsonConverter {
             for (RuleInputClauseContainer ruleClauseContainer : rule.getInputEntries()) {
                 InputClause inputClause = ruleClauseContainer.getInputClause();
                 UnaryTests inputEntry = ruleClauseContainer.getInputEntry();
-                ruleNode.put(inputClause.getInputExpression().getId(), inputEntry.getText());
+
+                String inputExpressionId = inputClause.getInputExpression().getId();
+                String operatorId = inputExpressionId + "_operator";
+                String expressionId = inputExpressionId + "_expression";
+                String expressionText = inputEntry.getText();
+                String operatorValue = null;
+                String expressionValue = null;
+
+
+                if (inputEntry.getExtensionElements() != null && !inputEntry.getExtensionElements().isEmpty()) {
+                    if (inputEntry.getExtensionElements().containsKey("operator")) {
+                        operatorValue = inputEntry.getExtensionElements().get("operator").get(0).getElementText();
+                    }
+                    if (inputEntry.getExtensionElements().containsKey("expression")) {
+                        expressionValue = inputEntry.getExtensionElements().get("expression").get(0).getElementText();
+                    }
+                } else {
+                    if (StringUtils.isNotEmpty(expressionText)) {
+                        if (expressionText.startsWith("${") || expressionText.startsWith("#{")) {
+                            expressionValue = expressionText;
+                        } else {
+                            if (expressionText.indexOf(' ') != -1) {
+                                operatorValue = expressionText.substring(0, expressionText.indexOf(' '));
+                                expressionValue = expressionText.substring(expressionText.indexOf(' ') + 1);
+                            } else { // no prefixed operator
+                                expressionValue = expressionText;
+                            }
+
+                            // remove outer escape quotes
+                            if (expressionValue.startsWith("\"") && expressionValue.endsWith("\"")) {
+                                expressionValue = expressionValue.substring(1, expressionValue.length() - 1);
+                            }
+
+                            // if build in date function
+                            if (expressionValue.startsWith("fn_date(")) {
+                                expressionValue = expressionValue.substring(9, expressionValue.lastIndexOf('\''));
+                            } else if (expressionValue.startsWith("date:toDate(")) {
+                                expressionValue = expressionValue.substring(13, expressionValue.lastIndexOf('\''));
+                            }
+                        }
+                    }
+                }
+
+                ruleNode.put(operatorId, operatorValue);
+                ruleNode.put(expressionId, expressionValue);
             }
 
             for (RuleOutputClauseContainer ruleClauseContainer : rule.getOutputEntries()) {
@@ -193,7 +248,7 @@ public class DmnJsonConverter {
             }
         }
     }
-    
+
     protected void processInputExpressions(JsonNode modelNode, Map<String, InputClause> ruleInputContainerMap, DecisionTable decisionTable) {
         // input expressions
         JsonNode inputExpressions = modelNode.get("inputExpressions");
@@ -236,10 +291,10 @@ public class DmnJsonConverter {
             }
         }
     }
-    
-    protected void processOutputExpressions(JsonNode modelNode, Map<String, OutputClause> ruleOutputContainerMap, 
-                    List<String> complexExpressionIds, DecisionTable decisionTable) {
-        
+
+    protected void processOutputExpressions(JsonNode modelNode, Map<String, OutputClause> ruleOutputContainerMap,
+                                            List<String> complexExpressionIds, DecisionTable decisionTable) {
+
         // output expressions
         JsonNode outputExpressions = modelNode.get("outputExpressions");
 
@@ -283,9 +338,9 @@ public class DmnJsonConverter {
             }
         }
     }
-    
-    protected void processRules(JsonNode modelNode, Map<String, InputClause> ruleInputContainerMap, Map<String, OutputClause> ruleOutputContainerMap, 
-                    List<String> complexExpressionIds, DecisionTable decisionTable) {
+
+    protected void processRules(JsonNode modelNode, Map<String, InputClause> ruleInputContainerMap, Map<String, OutputClause> ruleOutputContainerMap,
+                                List<String> complexExpressionIds, DecisionTable decisionTable) {
         // rules
         JsonNode rules = modelNode.get("rules");
 
@@ -322,39 +377,68 @@ public class DmnJsonConverter {
                         expressionValue = expressionValueNode.asText();
                     }
 
-                    // don't add operator if it's ==
-                    StringBuilder stringBuilder = new StringBuilder();
-                    if (StringUtils.isNotEmpty(operatorValue)) {
-                        if (!"==".equals(operatorValue)) {
+                    // if expression is dash value or custom expression skip composition
+                    if ("-".equals(expressionValue) || expressionValue.startsWith("${") || expressionValue.startsWith("#{")) {
+                        inputEntry.setText(expressionValue);
+                    } else if (DmnJsonConverterUtil.isCollectionOperator(operatorValue) && StringUtils.isNotEmpty(expressionValue)) {
+
+                        String inputExpressionVariable = ruleInputClauseContainer.getInputClause().getInputExpression().getText();
+
+                        String formattedCollectionExpression;
+                        if ("collection".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())) {
+                            formattedCollectionExpression = DmnJsonConverterUtil.formatCollectionExpression(operatorValue, inputExpressionVariable, expressionValue);
+                        } else {
+                            formattedCollectionExpression = DmnJsonConverterUtil.formatCollectionExpression(operatorValue, expressionValue, inputExpressionVariable);
+                        }
+
+                        inputEntry.setText(formattedCollectionExpression);
+
+                        // extensions
+                        addExtensionElement("operator", operatorValue, inputEntry);
+                        addExtensionElement("expression", expressionValue, inputEntry);
+
+
+                    } else if ("collection".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
+                        && StringUtils.isNotEmpty(expressionValue)) {
+
+                        String inputExpressionVariable = ruleInputClauseContainer.getInputClause().getInputExpression().getText();
+                        String formattedCollectionExpression = DmnJsonConverterUtil.formatCollectionExpression(operatorValue, inputExpressionVariable, expressionValue);
+
+                        inputEntry.setText(formattedCollectionExpression);
+
+                        // extensions
+                        addExtensionElement("operator", operatorValue, inputEntry);
+                        addExtensionElement("expression", expressionValue, inputEntry);
+                    } else {
+                        StringBuilder stringBuilder = new StringBuilder();
+                        if (StringUtils.isNotEmpty(operatorValue)) {
                             stringBuilder = new StringBuilder(operatorValue);
                             stringBuilder.append(" ");
                         }
+
+                        // add quotes for string
+                        if ("string".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
+                            && !expressionValue.startsWith("\"")
+                            && !expressionValue.endsWith("\"")) { // add quotes for string (with no surrounding quotes)
+
+                            stringBuilder.append("\"");
+                            stringBuilder.append(expressionValue);
+                            stringBuilder.append("\"");
+                        } else if ("date".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
+                            && StringUtils.isNotEmpty(expressionValue)) {
+
+                            // wrap in built in toDate function
+                            stringBuilder.append("date:toDate('");
+                            stringBuilder.append(expressionValue);
+                            stringBuilder.append("')");
+                        } else {
+                            stringBuilder.append(expressionValue);
+                        }
+                        inputEntry.setText(stringBuilder.toString());
                     }
 
-                    // add quotes for string
-                    if ("string".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
-                        && !"-".equals(expressionValue)) {
-                        
-                        stringBuilder.append("\"");
-                        stringBuilder.append(expressionValue);
-                        stringBuilder.append("\"");
-                        
-                    } else if ("date".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
-                        && !"-".equals(expressionValue) && StringUtils.isNotEmpty(expressionValue)){
-                        
-                        // wrap in built in toDate function
-                        stringBuilder.append("date:toDate('");
-                        stringBuilder.append(expressionValue);
-                        stringBuilder.append("')");
-                        
-                    } else {
-                        stringBuilder.append(expressionValue);
-                    }
-
-                    inputEntry.setText(stringBuilder.toString());
                     ruleInputClauseContainer.setInputEntry(inputEntry);
                     rule.addInputEntry(ruleInputClauseContainer);
-
                 }
                 for (String id : ruleOutputContainerMap.keySet()) {
                     RuleOutputClauseContainer ruleOutputClauseContainer = new RuleOutputClauseContainer();
@@ -372,10 +456,12 @@ public class DmnJsonConverter {
                             expressionValue = expressionValueNode.asText();
                         }
 
-                        if (complexExpressionIds.contains(id)) {
+                        if (complexExpressionIds.contains(id) || expressionValue.startsWith("${") || expressionValue.startsWith("#{")) {
                             outputEntry.setText(expressionValue);
                         } else {
-                            if ("string".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())) { // add quotes for string
+                            if ("string".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())
+                                && !expressionValue.startsWith("\"")
+                                && !expressionValue.endsWith("\"")) { // add quotes for string (with no surrounding quotes)
                                 outputEntry.setText("\"" + expressionValue + "\"");
                             } else if ("date".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())
                                 && StringUtils.isNotEmpty(expressionValue)) { // wrap in built in toDate function
@@ -396,5 +482,15 @@ public class DmnJsonConverter {
                 decisionTable.addRule(rule);
             }
         }
+    }
+
+    protected void addExtensionElement(String name, String value, DmnElement element) {
+        DmnExtensionElement extensionElement = new DmnExtensionElement();
+        extensionElement.setNamespace(MODEL_NAMESPACE);
+        extensionElement.setNamespacePrefix("flowable");
+        extensionElement.setName(name);
+        extensionElement.setElementText(value);
+
+        element.addExtensionElement(extensionElement);
     }
 }

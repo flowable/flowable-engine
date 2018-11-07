@@ -15,12 +15,12 @@ package org.flowable.dmn.engine.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.AbstractNativeQuery;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.NativeDmnDeploymentQuery;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.engine.common.impl.query.AbstractNativeQuery;
 
 public class NativeDmnDeploymentQueryImpl extends AbstractNativeQuery<NativeDmnDeploymentQuery, DmnDeployment> implements NativeDmnDeploymentQuery {
 
@@ -36,10 +36,12 @@ public class NativeDmnDeploymentQueryImpl extends AbstractNativeQuery<NativeDmnD
 
     // results ////////////////////////////////////////////////////////////////
 
+    @Override
     public List<DmnDeployment> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getDeploymentEntityManager(commandContext).findDeploymentsByNativeQuery(parameterMap);
     }
 
+    @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getDeploymentEntityManager(commandContext).findDeploymentCountByNativeQuery(parameterMap);
     }

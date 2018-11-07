@@ -33,7 +33,7 @@ public class ProcessInstanceStartedEventHandler extends AbstractDatabaseEventLog
         FlowableEntityWithVariablesEvent eventWithVariables = (FlowableEntityWithVariablesEvent) event;
         ExecutionEntity processInstanceEntity = (ExecutionEntity) eventWithVariables.getEntity();
 
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<>();
         putInMapIfNotNull(data, Fields.ID, processInstanceEntity.getId());
         putInMapIfNotNull(data, Fields.BUSINESS_KEY, processInstanceEntity.getBusinessKey());
         putInMapIfNotNull(data, Fields.PROCESS_DEFINITION_ID, processInstanceEntity.getProcessDefinitionId());
@@ -41,7 +41,7 @@ public class ProcessInstanceStartedEventHandler extends AbstractDatabaseEventLog
         putInMapIfNotNull(data, Fields.CREATE_TIME, timeStamp);
 
         if (eventWithVariables.getVariables() != null && !eventWithVariables.getVariables().isEmpty()) {
-            Map<String, Object> variableMap = new HashMap<String, Object>();
+            Map<String, Object> variableMap = new HashMap<>();
             for (Object variableName : eventWithVariables.getVariables().keySet()) {
                 putInMapIfNotNull(variableMap, (String) variableName, eventWithVariables.getVariables().get(variableName));
             }

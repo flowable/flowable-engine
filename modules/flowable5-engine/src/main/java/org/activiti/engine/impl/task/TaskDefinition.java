@@ -21,12 +21,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.activiti.engine.impl.form.TaskFormHandler;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.TaskListener;
 
 /**
  * Container for task definition information gathered at parsing time.
- * 
+ *
  * @author Joram Barrez
  */
 public class TaskDefinition implements Serializable {
@@ -40,14 +40,14 @@ public class TaskDefinition implements Serializable {
     protected Expression ownerExpression;
     protected Expression descriptionExpression;
     protected Expression assigneeExpression;
-    protected Set<Expression> candidateUserIdExpressions = new HashSet<Expression>();
-    protected Set<Expression> candidateGroupIdExpressions = new HashSet<Expression>();
+    protected Set<Expression> candidateUserIdExpressions = new HashSet<>();
+    protected Set<Expression> candidateGroupIdExpressions = new HashSet<>();
     protected Expression dueDateExpression;
     protected Expression businessCalendarNameExpression;
     protected Expression priorityExpression;
     protected Expression categoryExpression;
-    protected Map<String, Set<Expression>> customUserIdentityLinkExpressions = new HashMap<String, Set<Expression>>();
-    protected Map<String, Set<Expression>> customGroupIdentityLinkExpressions = new HashMap<String, Set<Expression>>();
+    protected Map<String, Set<Expression>> customUserIdentityLinkExpressions = new HashMap<>();
+    protected Map<String, Set<Expression>> customGroupIdentityLinkExpressions = new HashMap<>();
     protected Expression skipExpression;
 
     // form fields
@@ -55,7 +55,7 @@ public class TaskDefinition implements Serializable {
     protected Expression formKeyExpression;
 
     // task listeners
-    protected Map<String, List<TaskListener>> taskListeners = new HashMap<String, List<TaskListener>>();
+    protected Map<String, List<TaskListener>> taskListeners = new HashMap<>();
 
     public TaskDefinition(TaskFormHandler taskFormHandler) {
         this.taskFormHandler = taskFormHandler;
@@ -215,7 +215,7 @@ public class TaskDefinition implements Serializable {
         } else {
             List<TaskListener> taskEventListeners = taskListeners.get(eventName);
             if (taskEventListeners == null) {
-                taskEventListeners = new ArrayList<TaskListener>();
+                taskEventListeners = new ArrayList<>();
                 taskListeners.put(eventName, taskEventListeners);
             }
             taskEventListeners.add(taskListener);

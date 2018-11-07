@@ -1,0 +1,218 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>Flowable - Rest API Asciidoc Generator</name>
+    <artifactId>flowable-rest-asciidoc</artifactId>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-root</artifactId>
+        <relativePath>../../../../</relativePath>
+        <version>6.4.1-SNAPSHOT</version>
+    </parent>
+
+
+    <properties>
+        <oas.directory>../../references/swagger</oas.directory>
+
+        <swagger2markup.version>1.3.1</swagger2markup.version>
+        <swagger2markup.plugin.version>1.3.3</swagger2markup.plugin.version>
+        <swagger2markup.extension.version>1.3.1</swagger2markup.extension.version>
+
+        <swagger.input>${project.build.directory}/specfile/</swagger.input>
+        <generated.asciidoc.directory>${project.build.directory}/asciidoc</generated.asciidoc.directory>
+        <process.target.folder>${generated.asciidoc.directory}/process</process.target.folder>
+        <decision.target.folder>${generated.asciidoc.directory}/decision</decision.target.folder>
+        <form.target.folder>${generated.asciidoc.directory}/form</form.target.folder>
+        <content.target.folder>${generated.asciidoc.directory}/content</content.target.folder>
+
+
+    </properties>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jcenter-snapshots</id>
+            <name>jcenter</name>
+            <url>http://oss.jfrog.org/artifactory/oss-snapshot-local/</url>
+        </pluginRepository>
+        <pluginRepository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>jcenter-releases</id>
+            <name>jcenter</name>
+            <url>http://jcenter.bintray.com</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+
+    <build>
+        <finalName>flowable-swagger-ui</finalName>
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.5</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/specfile</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${oas.directory}</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>io.github.swagger2markup</groupId>
+                <artifactId>swagger2markup-maven-plugin</artifactId>
+                <version>${swagger2markup.plugin.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>io.github.swagger2markup</groupId>
+                        <artifactId>swagger2markup-import-files-ext</artifactId>
+                        <version>${swagger2markup.extension.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>io.github.swagger2markup</groupId>
+                        <artifactId>swagger2markup</artifactId>
+                        <version>${swagger2markup.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <config>
+                        <swagger2markup.markupLanguage>ASCIIDOC</swagger2markup.markupLanguage>
+                        <swagger2markup.pathsGroupedBy>TAGS</swagger2markup.pathsGroupedBy>
+                        <swagger2markup.generatedExamplesEnabled>true</swagger2markup.generatedExamplesEnabled>
+                        <swagger2markup.pathSecuritySectionEnabled>false</swagger2markup.pathSecuritySectionEnabled>
+                        <swagger2markup.pathsDocument>rest-paths</swagger2markup.pathsDocument>
+                        <swagger2markup.definitionsDocument>rest-definitions</swagger2markup.definitionsDocument>
+                        <swagger2markup.operationOrderBy>AS_IS</swagger2markup.operationOrderBy>
+                        <swagger2markup.definitionOrderBy>AS_IS</swagger2markup.definitionOrderBy>
+                    </config>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>form</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>convertSwagger2markup</goal>
+                        </goals>
+                        <configuration>
+                            <swaggerInput>${swagger.input}/form/flowable-swagger-form.yaml</swaggerInput>
+                            <outputDir>${form.target.folder}</outputDir>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>content</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>convertSwagger2markup</goal>
+                        </goals>
+                        <configuration>
+                            <swaggerInput>${swagger.input}/content/flowable-swagger-content.yaml</swaggerInput>
+                            <outputDir>${content.target.folder}</outputDir>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>decision</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>convertSwagger2markup</goal>
+                        </goals>
+                        <configuration>
+                            <swaggerInput>${swagger.input}/decision/flowable-swagger-decision.yaml</swaggerInput>
+                            <outputDir>${decision.target.folder}</outputDir>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>process</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>convertSwagger2markup</goal>
+                        </goals>
+                        <configuration>
+                            <swaggerInput>${swagger.input}/process/flowable-swagger-process.yaml</swaggerInput>
+                            <outputDir>${process.target.folder}</outputDir>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <id>default-cli</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <concat destfile="${form.target.folder}/ch07-REST.adoc" force="yes">
+                                    <fileset dir="${form.target.folder}">
+                                        <include name="rest-paths.adoc"/>
+                                    </fileset>
+                                    <fileset dir="${form.target.folder}">
+                                        <include name="rest-definitions.adoc"/>
+                                    </fileset>
+                                </concat>
+                                <concat destfile="${decision.target.folder}/ch07-REST.adoc" force="yes">
+                                    <fileset dir="${decision.target.folder}">
+                                        <include name="rest-paths.adoc"/>
+                                    </fileset>
+                                    <fileset dir="${decision.target.folder}">
+                                        <include name="rest-definitions.adoc"/>
+                                    </fileset>
+                                </concat>
+                                <concat destfile="${content.target.folder}/ch07-REST.adoc" force="yes">
+                                    <fileset dir="${content.target.folder}">
+                                        <include name="rest-paths.adoc"/>
+                                    </fileset>
+                                    <fileset dir="${content.target.folder}">
+                                        <include name="rest-definitions.adoc"/>
+                                    </fileset>
+                                </concat>
+                                <concat destfile="${process.target.folder}/ch14-REST.adoc" force="yes">
+                                    <fileset dir="${process.target.folder}">
+                                        <include name="rest-paths.adoc"/>
+                                    </fileset>
+                                    <fileset dir="${process.target.folder}">
+                                        <include name="rest-definitions.adoc"/>
+                                    </fileset>
+                                </concat>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>import-ref</id>
+            <properties>
+                <oas.directory>../../references/swagger</oas.directory>
+            </properties>
+        </profile>
+        <profile>
+            <id>import-generator</id>
+            <properties>
+                <oas.directory>../oas-spec-generator/target/oas/v2</oas.directory>
+            </properties>
+        </profile>
+    </profiles>
+
+
+</project>

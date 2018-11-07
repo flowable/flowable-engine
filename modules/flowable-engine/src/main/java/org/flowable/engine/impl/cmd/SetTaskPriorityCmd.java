@@ -12,11 +12,11 @@
  */
 package org.flowable.engine.impl.cmd;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Joram Barrez
@@ -32,6 +32,7 @@ public class SetTaskPriorityCmd extends NeedsActiveTaskCmd<Void> {
         this.priority = priority;
     }
 
+    @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
         if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
             Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
@@ -41,7 +42,7 @@ public class SetTaskPriorityCmd extends NeedsActiveTaskCmd<Void> {
 
         task.setPriority(priority);
         CommandContextUtil.getHistoryManager(commandContext).recordTaskInfoChange(task);
-        CommandContextUtil.getTaskEntityManager(commandContext).update(task);
+        CommandContextUtil.getTaskService().updateTask(task, true);
         return null;
     }
 

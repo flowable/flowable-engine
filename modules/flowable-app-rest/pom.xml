@@ -8,32 +8,20 @@
 
   <parent>
     <groupId>org.flowable</groupId>
-    <artifactId>flowable-root</artifactId>
-    <relativePath>../..</relativePath>
-    <version>6.2.0-SNAPSHOT</version>
+    <artifactId>flowable-spring-boot</artifactId>
+    <relativePath>../flowable-spring-boot/pom.xml</relativePath>
+    <version>6.4.1-SNAPSHOT</version>
   </parent>
 
   <properties>
-    <swagger.host>localhost:8080</swagger.host>
+    <!--<swagger.host>localhost:8080</swagger.host>-->
     <swagger.generated.directory>target/generated-swagger</swagger.generated.directory>
   </properties>
 
   <build>
     <finalName>flowable-rest</finalName>
+
     <plugins>
-      <plugin>
-        <groupId>org.zeroturnaround</groupId>
-        <artifactId>jrebel-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>generate-rebel-xml</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
 	    <groupId>org.apache.tomcat.maven</groupId>
         <artifactId>tomcat7-maven-plugin</artifactId>
@@ -52,13 +40,22 @@
         <configuration>
           <filesets>
             <fileset>
-              <directory>src/main/webapp/docs/specfile</directory>
+              <directory>src/main/resources/static/docs/specfile</directory>.
               <includes>
                 <include>**</include>
               </includes>
               <followSymlinks>false</followSymlinks>
             </fileset>
           </filesets>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <excludeArtifactIds>
+            spring-boot-configuration-processor
+          </excludeArtifactIds>
         </configuration>
       </plugin>
     </plugins>
@@ -73,29 +70,10 @@
             <lifecycleMappingMetadata>
               <pluginExecutions>
                 <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>
-                      org.zeroturnaround
-                    </groupId>
-                    <artifactId>
-                      jrebel-maven-plugin
-                    </artifactId>
-                    <versionRange>
-                      [1.0.7,)
-                    </versionRange>
-                    <goals>
-                      <goal>generate</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore></ignore>
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
                 	<pluginExecutionFilter>
                 		<groupId>com.github.kongchen</groupId>
                 		<artifactId>swagger-maven-plugin</artifactId>
-                		<versionRange>[3.1.4,)</versionRange>
+                		<versionRange>[3.1.5,)</versionRange>
                 		<goals>
                 			<goal>generate</goal>
                 		</goals>
@@ -150,7 +128,7 @@
           <plugin>
             <groupId>com.github.kongchen</groupId>
             <artifactId>swagger-maven-plugin</artifactId>
-            <version>3.1.4</version>
+            <version>3.1.6</version>
             <configuration>
               <apiSources>
                 <apiSource>
@@ -186,7 +164,45 @@
                   <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
                   <outputFormats>json,yaml</outputFormats>
                   <swaggerFileName>flowable</swaggerFileName>
-                  <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/process</swaggerDirectory>
+                  <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/process</swaggerDirectory>
+                </apiSource>
+                <!-- ++++++++++ -->
+                <!-- IDM -->
+                <!-- ++++++++++ -->
+                <apiSource>
+                  <springmvc>true</springmvc>
+                  <locations>
+                    <location>org.flowable.idm.rest.service.api</location>
+                  </locations>
+                  <schemes>
+                    <scheme>http</scheme>
+                    <scheme>https</scheme>
+                  </schemes>
+                  <host>${swagger.host}</host>
+                  <basePath>/flowable-rest/idm-api</basePath>
+                  <info>
+                    <title>Flowable IDM REST API</title>
+                    <version>v1</version>
+                    <contact>
+                      <email></email>
+                      <name>Flowable</name>
+                      <url>http://www.flowable.org/</url>
+                    </contact>
+                    <license>
+                      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+                      <name>Apache 2.0</name>
+                    </license>
+                  </info>
+                  <securityDefinitions>
+                    <securityDefinition>
+                      <name>basicAuth</name>
+                      <type>basic</type>
+                    </securityDefinition>
+                  </securityDefinitions>
+                  <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
+                  <outputFormats>json,yaml</outputFormats>
+                  <swaggerFileName>flowable</swaggerFileName>
+                  <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/idm</swaggerDirectory>
                 </apiSource>
                 <!-- ++++++++++ -->
                 <!-- DMN -->
@@ -194,7 +210,7 @@
                 <apiSource>
                   <springmvc>true</springmvc>
                   <locations>
-                    <location>org.flowable.rest.dmn.service.api</location>
+                    <location>org.flowable.dmn.rest.service.api</location>
                   </locations>
                   <schemes>
                     <scheme>http</scheme>
@@ -224,7 +240,7 @@
                   <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
                   <outputFormats>json,yaml</outputFormats>
                   <swaggerFileName>flowable</swaggerFileName>
-                  <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/dmn</swaggerDirectory>
+                  <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/dmn</swaggerDirectory>
                 </apiSource>
                 <!-- ++++++++++ -->
                 <!-- FORM -->
@@ -232,7 +248,7 @@
                 <apiSource>
                   <springmvc>true</springmvc>
                   <locations>
-                    <location>org.flowable.rest.form.service.api</location>
+                    <location>org.flowable.form.rest.service.api</location>
                   </locations>
                   <schemes>
                     <scheme>http</scheme>
@@ -262,7 +278,7 @@
                   <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
                   <outputFormats>json,yaml</outputFormats>
                   <swaggerFileName>flowable</swaggerFileName>
-                  <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/form</swaggerDirectory>
+                  <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/form</swaggerDirectory>
                 </apiSource>
                 <!-- ++++++++++ -->
                 <!-- CONTENT -->
@@ -270,7 +286,7 @@
                 <apiSource>
                   <springmvc>true</springmvc>
                   <locations>
-                    <location>org.flowable.rest.content.service.api</location>
+                    <location>org.flowable.content.rest.service.api</location>
                   </locations>
                   <schemes>
                     <scheme>http</scheme>
@@ -300,13 +316,89 @@
                   <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
                   <outputFormats>json,yaml</outputFormats>
                   <swaggerFileName>flowable</swaggerFileName>
-                  <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/content</swaggerDirectory>
+                  <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/content</swaggerDirectory>
+                </apiSource>
+                <!-- ++++++++++ -->
+                <!-- APP -->
+                <!-- ++++++++++ -->
+                <apiSource>
+                  <springmvc>true</springmvc>
+                  <locations>
+                    <location>org.flowable.app.rest.service.api</location>
+                  </locations>
+                  <schemes>
+                    <scheme>http</scheme>
+                    <scheme>https</scheme>
+                  </schemes>
+                  <host>${swagger.host}</host>
+                  <basePath>/flowable-rest/app-api</basePath>
+                  <info>
+                    <title>Flowable APP REST API</title>
+                    <version>v1</version>
+                    <contact>
+                      <email></email>
+                      <name>Flowable</name>
+                      <url>http://www.flowable.org/</url>
+                    </contact>
+                    <license>
+                      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+                      <name>Apache 2.0</name>
+                    </license>
+                  </info>
+                  <securityDefinitions>
+                    <securityDefinition>
+                      <name>basicAuth</name>
+                      <type>basic</type>
+                    </securityDefinition>
+                  </securityDefinitions>
+                  <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
+                  <outputFormats>json,yaml</outputFormats>
+                  <swaggerFileName>flowable</swaggerFileName>
+                  <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/app</swaggerDirectory>
+                </apiSource>
+                <!-- ++++++++++ -->
+                <!-- CMMN -->
+                <!-- ++++++++++ -->
+                <apiSource>
+                  <springmvc>true</springmvc>
+                  <locations>
+                    <location>org.flowable.cmmn.rest.service.api</location>
+                  </locations>
+                  <schemes>
+                    <scheme>http</scheme>
+                    <scheme>https</scheme>
+                  </schemes>
+                  <host>${swagger.host}</host>
+                  <basePath>/flowable-rest/cmmn-api</basePath>
+                  <info>
+                    <title>Flowable CMMN REST API</title>
+                    <version>v1</version>
+                    <contact>
+                      <email></email>
+                      <name>Flowable</name>
+                      <url>http://www.flowable.org/</url>
+                    </contact>
+                    <license>
+                      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+                      <name>Apache 2.0</name>
+                    </license>
+                  </info>
+                  <securityDefinitions>
+                    <securityDefinition>
+                      <name>basicAuth</name>
+                      <type>basic</type>
+                    </securityDefinition>
+                  </securityDefinitions>
+                  <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
+                  <outputFormats>json,yaml</outputFormats>
+                  <swaggerFileName>flowable</swaggerFileName>
+                  <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/cmmn</swaggerDirectory>
                 </apiSource>
               </apiSources>
             </configuration>
             <executions>
               <execution>
-                <phase>compile</phase>
+                <phase>generate-resources</phase>
                 <goals>
                   <goal>generate</goal>
                 </goals>
@@ -345,12 +437,12 @@
       </build>
     </profile>
     <profile>
-      <id>mysql</id>
+      <id>postgresql</id>
       <dependencies>
         <dependency>
-          <groupId>mysql</groupId>
-          <artifactId>mysql-connector-java</artifactId>
-          <scope>compile</scope>
+          <groupId>org.postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+          <scope>runtime</scope>
         </dependency>
       </dependencies>
       <build>
@@ -363,10 +455,10 @@
               <port>8080</port>
               <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
               <systemProperties>
-                <datasource.driver>com.mysql.jdbc.Driver</datasource.driver>
-                <datasource.url>jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8</datasource.url>
-                <datasource.username>flowable</datasource.username>
-                <datasource.password>flowable</datasource.password>
+                <spring.datasource.driver-class-name>org.postgresql.Driver</spring.datasource.driver-class-name>
+                <spring.datasource.url>jdbc:postgresql://localhost:5432/flowable</spring.datasource.url>
+                <spring.datasource.username>flowable</spring.datasource.username>
+                <spring.datasource.password>flowable</spring.datasource.password>
                 <com.sun.management.jmxremote.port>4000</com.sun.management.jmxremote.port>
               </systemProperties>
             </configuration>
@@ -375,7 +467,34 @@
       </build>
     </profile>
     <profile>
-      <id>buildDockerImage</id>
+      <id>mysql</id>
+      <dependencies>
+        <dependency>
+          <groupId>mysql</groupId>
+          <artifactId>mysql-connector-java</artifactId>
+          <scope>compile</scope>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <configuration>
+              <arguments>
+                <argument>--spring.datasource.driver-class-name=com.mysql.jdbc.Driver</argument>
+                <argument>--spring.datasource.url=jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8</argument>
+                <argument>--spring.datasource.username=flowable</argument>
+                <argument>--spring.datasource.password=flowable</argument>
+              </arguments>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <!-- docker image build and push -->
+    <profile>
+      <id>docker</id>
       <dependencies>
         <dependency>
           <groupId>org.postgresql</groupId>
@@ -386,101 +505,80 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.apache.tomcat.maven</groupId>
-            <artifactId>tomcat7-maven-plugin</artifactId>
-            <version>2.1</version>
+            <artifactId>maven-deploy-plugin</artifactId>
             <configuration>
-              <path>/</path>
-              <finalName>${project.build.finalName}.jar</finalName>
+              <skip>true</skip>
             </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
             <executions>
               <execution>
-                <id>tomcat-run</id>
+                <id>docker-resources</id>
+                <phase>validate</phase>
                 <goals>
-                  <goal>exec-war-only</goal>
+                  <goal>copy-resources</goal>
                 </goals>
-                <phase>package</phase>
                 <configuration>
-                  <path>/flowable-rest</path>
+                  <outputDirectory>target/</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>src/main/docker/</directory>
+                      <filtering>false</filtering>
+                      <excludes>
+                        <exclude>**/*.yml</exclude>
+                      </excludes>
+                    </resource>
+                  </resources>
                 </configuration>
               </execution>
             </executions>
           </plugin>
           <plugin>
             <groupId>com.spotify</groupId>
-            <artifactId>docker-maven-plugin</artifactId>
-            <version>0.4.13</version>
-            <configuration>
-              <imageName>flowable/${project.build.finalName}</imageName>
-              <baseImage>flowable/java8_server</baseImage>
-              <entryPoint>["java", "-jar", "/${project.build.finalName}.jar", "-httpPort=8080", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]</entryPoint>
-              <forceTags>true</forceTags>
-              <imageTags>
-                <imageTag>${project.version}</imageTag>
-                <imageTag>latest</imageTag>
-              </imageTags>
-              <resources>
-                <resource>
-                  <targetPath>/</targetPath>
-                  <directory>${project.build.directory}</directory>
-                  <include>${project.build.finalName}.jar</include>
-                </resource>
-                <resource>
-                <targetPath>/</targetPath>
-                  <directory>${project.basedir}/src/main/docker</directory>
-                  <include>wait-for-something.sh</include>
-                </resource>
-              </resources>
-            </configuration>
+            <artifactId>dockerfile-maven-plugin</artifactId>
             <executions>
               <execution>
-                <id>build-image</id>
+                <id>build</id>
                 <phase>package</phase>
                 <goals>
                   <goal>build</goal>
                 </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>pushDockerImage</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.spotify</groupId>
-            <artifactId>docker-maven-plugin</artifactId>
-            <version>0.4.13</version>
-            <executions>
-              <execution>
-                <id>tag-image-version</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>tag</goal>
-                </goals>
                 <configuration>
-                  <image>flowable/${project.build.finalName}</image>
-                  <newName>docker.io/flowable/${project.build.finalName}:${project.version}</newName>
-                  <serverId>docker-hub</serverId>
-                  <pushImage>true</pushImage>
+                  <tag>latest</tag>
                 </configuration>
               </execution>
               <execution>
-                <id>tag-image-latest</id>
-                <phase>package</phase>
+                <id>push-latest</id>
+                <phase>deploy</phase>
                 <goals>
-                  <goal>tag</goal>
+                  <goal>push</goal>
                 </goals>
                 <configuration>
-                  <image>flowable/${project.build.finalName}</image>
-                  <newName>docker.io/flowable/${project.build.finalName}:latest</newName>
-                  <serverId>docker-hub</serverId>
-                  <pushImage>true</pushImage>
+                  <tag>latest</tag>
+                </configuration>
+              </execution>
+              <execution>
+                <id>push-version</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>tag</goal>
+                  <goal>push</goal>
+                </goals>
+                <configuration>
+                  <tag>${project.version}</tag>
                 </configuration>
               </execution>
             </executions>
+            <configuration>
+              <repository>flowable/flowable-rest</repository>
+              <buildArgs>
+                <WAR_FILE>${project.build.finalName}.war</WAR_FILE>
+              </buildArgs>
+              <contextDirectory>${project.build.directory}</contextDirectory>
+              <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
+            </configuration>
           </plugin>
         </plugins>
       </build>
@@ -490,43 +588,31 @@
   <dependencies>
     <dependency>
       <groupId>org.flowable</groupId>
-      <artifactId>flowable-engine</artifactId>
+      <artifactId>flowable-spring-boot-starter-rest</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.flowable</groupId>
-      <artifactId>flowable-spring</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.hibernate.validator</groupId>
+          <artifactId>hibernate-validator</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.flowable</groupId>
-      <artifactId>flowable-rest</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-tomcat</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-properties-migrator</artifactId>
     </dependency>
     <dependency>
       <groupId>org.flowable</groupId>
       <artifactId>flowable-json-converter</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.flowable</groupId>
-      <artifactId>flowable-dmn-rest</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.flowable</groupId>
-      <artifactId>flowable-dmn-spring-configurator</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.flowable</groupId>
-      <artifactId>flowable-form-rest</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.flowable</groupId>
-      <artifactId>flowable-form-spring-configurator</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.flowable</groupId>
-      <artifactId>flowable-content-rest</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.flowable</groupId>
-      <artifactId>flowable-content-spring-configurator</artifactId>
     </dependency>
     <dependency>
       <groupId>org.flowable</groupId>
@@ -536,21 +622,47 @@
       <groupId>org.flowable</groupId>
       <artifactId>flowable-http</artifactId>
     </dependency>
-    
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-devtools</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-crypto</artifactId>
+    </dependency>
+
     <!-- LOGGING -->
     <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-log4j12</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-log4j2</artifactId>
     </dependency>
+
+    <!-- Actuator -->
     <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>jcl-over-slf4j</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
@@ -558,17 +670,19 @@
     <dependency>
       <groupId>com.zaxxer</groupId>
       <artifactId>HikariCP</artifactId>
-      <version>2.4.6</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
+      <artifactId>groovy-jsr223</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <version>3.1.0</version>
-      <scope>provided</scope>
+        <groupId>javax.xml.bind</groupId> <!-- Needed for swagger doc generation -->
+        <artifactId>jaxb-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

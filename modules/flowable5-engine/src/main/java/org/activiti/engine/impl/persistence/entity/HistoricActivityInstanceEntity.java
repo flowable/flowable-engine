@@ -42,8 +42,9 @@ public class HistoricActivityInstanceEntity extends HistoricScopeInstanceEntity 
 
     }
 
+    @Override
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("endTime", endTime);
         persistentState.put("durationInMillis", durationInMillis);
         persistentState.put("deleteReason", deleteReason);
@@ -54,6 +55,7 @@ public class HistoricActivityInstanceEntity extends HistoricScopeInstanceEntity 
 
     // getters and setters //////////////////////////////////////////////////////
 
+    @Override
     public String getActivityId() {
         return activityId;
     }
@@ -62,6 +64,7 @@ public class HistoricActivityInstanceEntity extends HistoricScopeInstanceEntity 
         this.activityId = activityId;
     }
 
+    @Override
     public String getActivityName() {
         return activityName;
     }
@@ -70,6 +73,7 @@ public class HistoricActivityInstanceEntity extends HistoricScopeInstanceEntity 
         this.activityName = activityName;
     }
 
+    @Override
     public String getActivityType() {
         return activityType;
     }
@@ -78,6 +82,7 @@ public class HistoricActivityInstanceEntity extends HistoricScopeInstanceEntity 
         this.activityType = activityType;
     }
 
+    @Override
     public String getExecutionId() {
         return executionId;
     }
@@ -86,6 +91,7 @@ public class HistoricActivityInstanceEntity extends HistoricScopeInstanceEntity 
         this.executionId = executionId;
     }
 
+    @Override
     public String getAssignee() {
         return assignee;
     }
@@ -94,6 +100,7 @@ public class HistoricActivityInstanceEntity extends HistoricScopeInstanceEntity 
         this.assignee = assignee;
     }
 
+    @Override
     public String getTaskId() {
         return taskId;
     }
@@ -102,6 +109,7 @@ public class HistoricActivityInstanceEntity extends HistoricScopeInstanceEntity 
         this.taskId = taskId;
     }
 
+    @Override
     public String getCalledProcessInstanceId() {
         return calledProcessInstanceId;
     }
@@ -110,6 +118,7 @@ public class HistoricActivityInstanceEntity extends HistoricScopeInstanceEntity 
         this.calledProcessInstanceId = calledProcessInstanceId;
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
@@ -118,6 +127,7 @@ public class HistoricActivityInstanceEntity extends HistoricScopeInstanceEntity 
         this.tenantId = tenantId;
     }
 
+    @Override
     public Date getTime() {
         return getStartTime();
     }

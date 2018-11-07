@@ -14,11 +14,10 @@ package org.activiti.engine.test.api.event;
 
 import org.activiti.engine.impl.bpmn.helper.ErrorThrowingEventListener;
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -41,7 +40,7 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
             assertNotNull(processInstance);
 
             // Fetch the task and assign it. Should cause error-event to be dispatched
-            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                     .taskDefinitionKey("userTask")
                     .singleResult();
             assertNotNull(task);
@@ -64,7 +63,7 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
 
         // Fetch the task and assign it. Should cause error-event to be dispatched
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                 .taskDefinitionKey("userTask")
                 .singleResult();
         assertNotNull(task);
@@ -91,7 +90,7 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
             assertNotNull(processInstance);
 
             // Fetch the task and assign it. Should cause error-event to be dispatched
-            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                     .taskDefinitionKey("userTask")
                     .singleResult();
             assertNotNull(task);
@@ -131,7 +130,7 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
 
         // Fetch the task and assign it. Should cause error-event to be dispatched
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                 .taskDefinitionKey("userTask")
                 .singleResult();
         assertNotNull(task);

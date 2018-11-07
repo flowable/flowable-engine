@@ -14,14 +14,14 @@
 package org.flowable.camel.impl;
 
 import org.flowable.camel.FlowableEndpoint;
-import org.flowable.camel.CamelBehavior;
+import org.flowable.camel.SpringCamelBehavior;
 
 /**
  * This implementation of the CamelBehavior abstract class works just like CamelBehaviour does; it copies variables into Camel as properties.
  * 
  * @author Ryan Johnston (@rjfsu), Tijs Rademakers, Saeid Mirzaei
  */
-public class CamelBehaviorDefaultImpl extends CamelBehavior {
+public class CamelBehaviorDefaultImpl extends SpringCamelBehavior {
 
     private static final long serialVersionUID = 003L;
 

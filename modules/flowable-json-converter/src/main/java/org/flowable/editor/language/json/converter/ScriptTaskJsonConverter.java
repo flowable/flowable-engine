@@ -40,20 +40,25 @@ public class ScriptTaskJsonConverter extends BaseBpmnJsonConverter {
         convertersToJsonMap.put(ScriptTask.class, ScriptTaskJsonConverter.class);
     }
 
+    @Override
     protected String getStencilId(BaseElement baseElement) {
         return STENCIL_TASK_SCRIPT;
     }
 
+    @Override
     protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
         ScriptTask scriptTask = (ScriptTask) baseElement;
         propertiesNode.put(PROPERTY_SCRIPT_FORMAT, scriptTask.getScriptFormat());
         propertiesNode.put(PROPERTY_SCRIPT_TEXT, scriptTask.getScript());
+        propertiesNode.put(PROPERTY_SCRIPT_AUTO_STORE_VARIABLES, scriptTask.isAutoStoreVariables());
     }
 
+    @Override
     protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
         ScriptTask task = new ScriptTask();
         task.setScriptFormat(getPropertyValueAsString(PROPERTY_SCRIPT_FORMAT, elementNode));
         task.setScript(getPropertyValueAsString(PROPERTY_SCRIPT_TEXT, elementNode));
+        task.setAutoStoreVariables(getPropertyValueAsBoolean(PROPERTY_SCRIPT_AUTO_STORE_VARIABLES, elementNode));
         return task;
     }
 }

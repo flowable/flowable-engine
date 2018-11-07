@@ -26,13 +26,16 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.flowable.task.api.Task;
+import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for REST-operation related to the historic process instance query resource.
@@ -44,6 +47,7 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
     /**
      * Test querying historic process instance based on variables. GET history/historic-process-instances
      */
+    @Test
     @Deployment
     public void testQueryProcessInstances() throws Exception {
         Calendar startTime = Calendar.getInstance();
@@ -101,6 +105,7 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
         assertEquals(processInstance3.getId(), dataNode.get(2).get("id").asText());
     }
 
+    @Override
     protected void assertResultsPresentInDataResponse(String url, String... expectedResourceIds) throws JsonProcessingException, IOException {
         int numberOfResultsExpected = expectedResourceIds.length;
 

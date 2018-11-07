@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+  <settings>
+    <setting name="lazyLoadingEnabled" value="false" />
+  </settings>
+   <typeAliases>
+    <typeAlias type="org.flowable.variable.service.impl.persistence.VariableByteArrayRefTypeHandler" alias="VariableByteArrayRefTypeHandler"/>
+     <typeAlias type="org.flowable.job.service.impl.persistence.JobByteArrayRefTypeHandler" alias="JobByteArrayRefTypeHandler"/>
+  </typeAliases>
+  <typeHandlers>
+    <typeHandler handler="VariableByteArrayRefTypeHandler" 
+                 javaType="org.flowable.variable.service.impl.persistence.entity.VariableByteArrayRef"
+                 jdbcType="VARCHAR"/>
+    <typeHandler handler="JobByteArrayRefTypeHandler" 
+                 javaType="org.flowable.job.service.impl.persistence.entity.JobByteArrayRef"
+                 jdbcType="VARCHAR"/>                 
+  </typeHandlers>
+  <mappers>
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/TableData.xml" />
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/CmmnDeployment.xml" />
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/CmmnResource.xml" />
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/CaseDefinition.xml" />
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/CaseInstance.xml" />
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/PlanItemInstance.xml" />
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/SentryPartInstance.xml"/>
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/MilestoneInstance.xml" />
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/HistoricCaseInstance.xml"/>
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/HistoricMilestoneInstance.xml" />
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/HistoricPlanItemInstance.xml" />
+    
+    <!-- Variable support -->
+    <mapper resource="org/flowable/variable/service/db/mapping/common.xml" />
+    <mapper resource="org/flowable/variable/service/db/mapping/entity/ByteArray.xml" />
+    <mapper resource="org/flowable/variable/service/db/mapping/entity/VariableInstance.xml" />
+    <mapper resource="org/flowable/variable/service/db/mapping/entity/HistoricVariableInstance.xml" />
+    
+    <!-- Identity link support -->
+    <mapper resource="org/flowable/identitylink/service/db/mapping/entity/IdentityLink.xml" />
+    <mapper resource="org/flowable/identitylink/service/db/mapping/entity/HistoricIdentityLink.xml" />
+    
+    <!-- Entity link support -->
+    <mapper resource="org/flowable/entitylink/service/db/mapping/entity/EntityLink.xml" />
+    <mapper resource="org/flowable/entitylink/service/db/mapping/entity/HistoricEntityLink.xml" />
+    
+    <!-- Task support -->
+    <mapper resource="org/flowable/task/service/db/mapping/common.xml" />
+    <mapper resource="org/flowable/task/service/db/mapping/entity/Task.xml" />
+    <mapper resource="org/flowable/task/service/db/mapping/entity/HistoricTaskInstance.xml" />
+    
+    <!-- Job Support -->
+    <mapper resource="org/flowable/job/service/db/mapping/entity/ByteArray.xml" />
+    <mapper resource="org/flowable/job/service/db/mapping/entity/DeadLetterJob.xml" />
+    <mapper resource="org/flowable/job/service/db/mapping/entity/HistoryJob.xml" />
+    <mapper resource="org/flowable/job/service/db/mapping/entity/Job.xml" />
+    <mapper resource="org/flowable/job/service/db/mapping/entity/SuspendedJob.xml" />
+    <mapper resource="org/flowable/job/service/db/mapping/entity/TimerJob.xml" />
+    
+  </mappers>
+</configuration>

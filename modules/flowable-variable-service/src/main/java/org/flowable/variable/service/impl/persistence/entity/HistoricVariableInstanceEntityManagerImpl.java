@@ -17,10 +17,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.VariableServiceConfiguration;
-import org.flowable.variable.service.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.data.HistoricVariableInstanceDataManager;
 
@@ -43,7 +43,7 @@ public class HistoricVariableInstanceEntityManagerImpl extends AbstractEntityMan
     }
 
     @Override
-    public HistoricVariableInstanceEntity copyAndInsert(VariableInstanceEntity variableInstance) {
+    public HistoricVariableInstanceEntity createAndInsert(VariableInstanceEntity variableInstance) {
         HistoricVariableInstanceEntity historicVariableInstance = historicVariableInstanceDataManager.create();
         historicVariableInstance.setId(variableInstance.getId());
         historicVariableInstance.setProcessInstanceId(variableInstance.getProcessInstanceId());
@@ -52,6 +52,9 @@ public class HistoricVariableInstanceEntityManagerImpl extends AbstractEntityMan
         historicVariableInstance.setRevision(variableInstance.getRevision());
         historicVariableInstance.setName(variableInstance.getName());
         historicVariableInstance.setVariableType(variableInstance.getType());
+        historicVariableInstance.setScopeId(variableInstance.getScopeId());
+        historicVariableInstance.setSubScopeId(variableInstance.getSubScopeId());
+        historicVariableInstance.setScopeType(variableInstance.getScopeType());
 
         copyVariableValue(historicVariableInstance, variableInstance);
 
@@ -111,6 +114,16 @@ public class HistoricVariableInstanceEntityManagerImpl extends AbstractEntityMan
     @Override
     public HistoricVariableInstanceEntity findHistoricVariableInstanceByVariableInstanceId(String variableInstanceId) {
         return historicVariableInstanceDataManager.findHistoricVariableInstanceByVariableInstanceId(variableInstanceId);
+    }
+    
+    @Override
+    public List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByScopeIdAndScopeType(String scopeId, String scopeType) {
+        return historicVariableInstanceDataManager.findHistoricalVariableInstancesByScopeIdAndScopeType(scopeId, scopeType);
+    }
+    
+    @Override
+    public List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesBySubScopeIdAndScopeType(String subScopeId, String scopeType) {
+        return historicVariableInstanceDataManager.findHistoricalVariableInstancesBySubScopeIdAndScopeType(subScopeId, scopeType);
     }
 
     @Override

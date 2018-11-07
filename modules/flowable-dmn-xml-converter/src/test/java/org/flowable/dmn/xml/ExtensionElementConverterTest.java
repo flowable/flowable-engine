@@ -59,6 +59,7 @@ public class ExtensionElementConverterTest extends AbstractConverterTest {
         validateModel(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "extensionElements.dmn";
     }
@@ -120,11 +121,20 @@ public class ExtensionElementConverterTest extends AbstractConverterTest {
         }
 
         List<InputClause> inputClauses = decisionTable.getInputs();
-        assertEquals(3, inputClauses.size());
+        assertEquals(4, inputClauses.size());
 
         List<OutputClause> outputClauses = decisionTable.getOutputs();
         assertEquals(1, outputClauses.size());
 
+        /*
+         * Verify input entry extension elements
+         */
+        assertEquals("NONE OF", decisionTable.getRules().get(0).getInputEntries().get(3).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
+        assertEquals("20, 13", decisionTable.getRules().get(0).getInputEntries().get(3).getInputEntry().getExtensionElements().get("expression").get(0).getElementText());
+        assertEquals("ANY OF", decisionTable.getRules().get(1).getInputEntries().get(3).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
+        assertEquals("\"20\", \"13\"", decisionTable.getRules().get(1).getInputEntries().get(3).getInputEntry().getExtensionElements().get("expression").get(0).getElementText());
+        assertEquals("ALL OF", decisionTable.getRules().get(2).getInputEntries().get(3).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
+        assertEquals("20", decisionTable.getRules().get(2).getInputEntries().get(3).getInputEntry().getExtensionElements().get("expression").get(0).getElementText());
     }
 
     protected Map<String, String> getAttributes(DmnElement bObj) {

@@ -14,73 +14,99 @@ package org.flowable.variable.service.impl;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.persistence.cache.EntityCache;
+import org.flowable.common.engine.impl.service.CommonServiceImpl;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.HistoricVariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;
-import org.flowable.variable.service.history.HistoricVariableInstance;
-import org.flowable.variable.service.history.HistoricVariableInstanceQuery;
-import org.flowable.variable.service.history.NativeHistoricVariableInstanceQuery;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityManager;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class HistoricVariableServiceImpl extends ServiceImpl implements HistoricVariableService {
-
-    public HistoricVariableServiceImpl() {
-
-    }
+public class HistoricVariableServiceImpl extends CommonServiceImpl<VariableServiceConfiguration> implements HistoricVariableService {
 
     public HistoricVariableServiceImpl(VariableServiceConfiguration variableServiceConfiguration) {
         super(variableServiceConfiguration);
     }
     
+    @Override
     public HistoricVariableInstanceEntity getHistoricVariableInstance(String id) {
         return getHistoricVariableInstanceEntityManager().findById(id);
     }
     
-    public HistoricVariableInstanceQuery createHistoricVariableInstanceQuery() {
-        return new HistoricVariableInstanceQueryImpl(commandExecutor);
-    }
-
-    public NativeHistoricVariableInstanceQuery createNativeHistoricVariableInstanceQuery() {
-        return new NativeHistoricVariableInstanceQueryImpl(commandExecutor);
-    }
-    
+    @Override
     public List<HistoricVariableInstance> findHistoricVariableInstancesByQueryCriteria(HistoricVariableInstanceQueryImpl query) {
         return getHistoricVariableInstanceEntityManager().findHistoricVariableInstancesByQueryCriteria(query);
     }
     
+    @Override
     public HistoricVariableInstanceEntity createHistoricVariableInstance() {
         return getHistoricVariableInstanceEntityManager().create();
     }
     
+    @Override
     public void insertHistoricVariableInstance(HistoricVariableInstanceEntity variable) {
         getHistoricVariableInstanceEntityManager().insert(variable);
     }
     
-    public HistoricVariableInstanceEntity copyAndInsert(VariableInstanceEntity variable) {
-        return getHistoricVariableInstanceEntityManager().copyAndInsert(variable);
+    @Override
+    public HistoricVariableInstanceEntity createAndInsert(VariableInstanceEntity variable) {
+        return getHistoricVariableInstanceEntityManager().createAndInsert(variable);
     }
     
-    public void copyVariableValue(HistoricVariableInstanceEntity historicVariable, VariableInstanceEntity variable) {
-        getHistoricVariableInstanceEntityManager().copyVariableValue(historicVariable, variable);
+    @Override
+    public void recordVariableUpdate(VariableInstanceEntity variableInstanceEntity) {
+        HistoricVariableInstanceEntity historicVariable = getEntityCache().findInCache(HistoricVariableInstanceEntity.class, variableInstanceEntity.getId());
+        HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager = getHistoricVariableInstanceEntityManager();
+        if (historicVariable == null) {
+            historicVariable = historicVariableInstanceEntityManager.findById(variableInstanceEntity.getId());
+        }
+
+        if (historicVariable != null) {
+            historicVariableInstanceEntityManager.copyVariableValue(historicVariable, variableInstanceEntity);
+        } else {
+            historicVariableInstanceEntityManager.createAndInsert(variableInstanceEntity);
+        }
     }
     
-    public void deleteHistoricVariableInstance(String id) {
-        getHistoricVariableInstanceEntityManager().delete(id);
+    @Override
+    public void recordVariableRemoved(VariableInstanceEntity variableInstanceEntity) {
+        HistoricVariableInstanceEntity historicProcessVariable = getEntityCache().findInCache(HistoricVariableInstanceEntity.class, variableInstanceEntity.getId());
+        HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager = getHistoricVariableInstanceEntityManager();
+        if (historicProcessVariable == null) {
+            historicProcessVariable = historicVariableInstanceEntityManager.findById(variableInstanceEntity.getId());
+        }
+
+        if (historicProcessVariable != null) {
+            getHistoricVariableInstanceEntityManager().delete(historicProcessVariable);
+        }
     }
     
+    protected EntityCache getEntityCache() {
+        return Context.getCommandContext().getSession(EntityCache.class);
+    }
+    
+    @Override
     public void deleteHistoricVariableInstance(HistoricVariableInstanceEntity historicVariable) {
         getHistoricVariableInstanceEntityManager().delete(historicVariable);
     }
     
+    @Override
     public void deleteHistoricVariableInstancesByProcessInstanceId(String processInstanceId) {
         getHistoricVariableInstanceEntityManager().deleteHistoricVariableInstanceByProcessInstanceId(processInstanceId);
     }
 
+    @Override
     public void deleteHistoricVariableInstancesByTaskId(String taskId) {
         getHistoricVariableInstanceEntityManager().deleteHistoricVariableInstancesByTaskId(taskId);
+    }
+
+    public HistoricVariableInstanceEntityManager getHistoricVariableInstanceEntityManager() {
+        return configuration.getHistoricVariableInstanceEntityManager();
     }
 }

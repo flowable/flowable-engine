@@ -12,7 +12,9 @@
  */
 package org.flowable.engine.impl.history.async.json.transformer;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
+
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
@@ -23,7 +25,7 @@ public abstract class AbstractNeedsTaskHistoryJsonTransformer extends AbstractHi
     @Override
     public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
         String taskId = getStringFromJson(historicalData, HistoryJsonConstants.ID);
-        return CommandContextUtil.getHistoricTaskInstanceEntityManager(commandContext).findById(taskId) != null;
+        return CommandContextUtil.getHistoricTaskService().getHistoricTask(taskId) != null;
     }
 
 }

@@ -13,8 +13,8 @@
 
 package org.flowable.engine.impl.event;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -27,6 +27,7 @@ public class MessageEventHandler extends AbstractEventHandler {
 
     public static final String EVENT_HANDLER_TYPE = "message";
 
+    @Override
     public String getEventHandlerType() {
         return EVENT_HANDLER_TYPE;
     }

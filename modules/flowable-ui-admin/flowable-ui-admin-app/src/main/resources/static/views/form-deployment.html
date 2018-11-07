@@ -1,0 +1,72 @@
+<div class="container" id="detail-container">
+	<div class="row">
+		<div class="col-md-9">
+			<div class="component" ng-show="formDeployment">
+				<div class="title">
+					<div class="pull-right">
+						<a ng-click="returnToList()" class="action">&larr; {{'GENERAL.ACTION.RETURN-TO-LIST' | translate}}</a>
+					</div>
+					<h2>{{formDeployment.name || formDeployment.id}}</h2>
+				</div>
+
+				<div class="property-wrapper">
+					<table>
+						<tr class="property">
+							<td class="property-name" translate="FORM-DEPLOYMENT.ID"></td>
+							<td>{{formDeployment.id}}</td>
+							<td class="property-name" translate="FORM-DEPLOYMENT.NAME"></td>
+							<td>{{formDeployment.name | empty}}</td>
+						</tr>
+						<tr class="property">
+							<td class="property-name" translate="FORM-DEPLOYMENT.TIME"></td>
+							<td>{{formDeployment.deploymentTime | dateformat}}</td>
+							<td class="property-name" translate="FORM-DEPLOYMENT.CATEGORY"></td>
+							<td>{{formDeployment.category | empty}}</td>
+						</tr>
+						<tr class="property">
+                            <td class="property-name" translate="FORM-DEPLOYMENT.TENANTID"></td>
+                            <td>{{formDeployment.tenantId | empty}}</td>
+                            <td ng-if="formDeployment.parentDeploymentId" class="property-name" translate="FORM-DEPLOYMENT.PARENT-DEPLOYMENT-ID"></td>
+                            <td ng-if="formDeployment.parentDeploymentId"><a ng-href="#/app-deployment/{{formDeployment.parentDeploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{formDeployment.parentDeploymentId}}</a></td>
+                        </tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	    <div class="col-md-3">
+			<div class="component tip-left">
+				<div class="title">
+					<h2 translate="GENERAL.TITLE.ACTIONS"></h2>
+				</div>
+				<ul class="list-group">
+					  <li>
+					    <button type="button" class="btn btn-sm btn-default btn-danger" ng-click="deleteDeployment()">
+							<i class="glyphicon glyphicon-remove"></i><span translate="FORM-DEPLOYMENTS.ACTION.DELETE"></span>
+					    </button>
+					  </li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-9">
+			<div class="component">
+				<div class="title">
+					<div class="pull-right">
+						<a ng-click="showAllFormDefinitions()" class="action"><i class="glyphicon glyphicon-zoom-in"></i> {{'DEPLOYMENT.ACTION.SHOW-ALL-DEFINITIONS' | translate}}</a>
+					</div>
+					<h2 translate="FORM-DEPLOYMENT.TITLE.FORM-DEFINITIONS"></h2>
+				</div>
+				<div class="grid-wrapper grid-wrapper-compact" ng-if="formDefinitions">
+					<div class="grid-message" ng-if="formDefinitions.size > 0">
+	                       <span>{{'FORM-DEPLOYMENT.DEFINITIONS-MESSAGE' | translate:formDefinitions}}</span>
+	                   </div>
+	                    <div class="grid-message" ng-if="formDefinitions.size == 0">
+	                       <span>{{'FORM-DEPLOYMENT.DEFINITIONS-MESSAGE-EMPTY' | translate}}</span>
+	                   </div>
+					<div ng-grid="gridFormDefinitions" class="gridStyle" ng-if="gridFormDefinitions && formDefinitions.data" ng-show="formDefinitions.size > 0"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

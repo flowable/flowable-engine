@@ -28,14 +28,17 @@ import javax.xml.stream.XMLStreamReader;
  */
 public class FormPropertyParser extends BaseChildElementParser {
 
+    @Override
     public String getElementName() {
         return ELEMENT_FORMPROPERTY;
     }
 
+    @Override
     public boolean accepts(BaseElement element) {
         return ((element instanceof UserTask) || (element instanceof StartEvent));
     }
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
 
         if (!accepts(parentElement))

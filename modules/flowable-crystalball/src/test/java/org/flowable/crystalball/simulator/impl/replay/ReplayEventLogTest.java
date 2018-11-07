@@ -29,10 +29,10 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.el.NoExecutionVariableScope;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
-import org.flowable.variable.service.history.HistoricVariableInstance;
+import org.flowable.task.api.Task;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 import org.junit.Test;
 
 /**
@@ -66,13 +66,13 @@ public class ReplayEventLogTest {
         HistoryService historyService = processEngine.getHistoryService();
 
         // record events
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put(TEST_VARIABLE, TEST_VALUE);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(USERTASK_PROCESS, BUSINESS_KEY, variables);
 
         Task task = taskService.createTaskQuery().taskDefinitionKey("userTask").singleResult();
         TimeUnit.MILLISECONDS.sleep(50);
-        variables = new HashMap<String, Object>();
+        variables = new HashMap<>();
         variables.put(TASK_TEST_VARIABLE, TASK_TEST_VALUE);
         taskService.complete(task.getId(), variables);
 
@@ -140,14 +140,14 @@ public class ReplayEventLogTest {
     }
 
     private static List<Function<EventLogEntry, SimulationEvent>> getTransformers() {
-        List<Function<EventLogEntry, SimulationEvent>> transformers = new ArrayList<Function<EventLogEntry, SimulationEvent>>();
+        List<Function<EventLogEntry, SimulationEvent>> transformers = new ArrayList<>();
         transformers.add(new EventLogProcessInstanceCreateTransformer(PROCESS_INSTANCE_START_EVENT_TYPE, PROCESS_DEFINITION_ID_KEY, BUSINESS_KEY, VARIABLES_KEY));
         transformers.add(new EventLogUserTaskCompleteTransformer(USER_TASK_COMPLETED_EVENT_TYPE));
         return transformers;
     }
 
     public static Map<String, SimulationEventHandler> getReplayHandlers(String processInstanceId) {
-        Map<String, SimulationEventHandler> handlers = new HashMap<String, SimulationEventHandler>();
+        Map<String, SimulationEventHandler> handlers = new HashMap<>();
         handlers.put(PROCESS_INSTANCE_START_EVENT_TYPE, new StartReplayLogEventHandler(processInstanceId, PROCESS_DEFINITION_ID_KEY, BUSINESS_KEY, VARIABLES_KEY));
         handlers.put(USER_TASK_COMPLETED_EVENT_TYPE, new ReplayUserTaskCompleteEventHandler());
         return handlers;

@@ -17,8 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskQuery;
+import org.flowable.task.api.TaskQuery;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for cub-tasks querying
@@ -30,6 +32,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
 
     private List<String> taskIds;
 
+    @BeforeEach
     public void setUp() throws Exception {
 
         identityService.saveUser(identityService.newUser("kermit"));
@@ -44,6 +47,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
         taskIds = generateTestSubTasks();
     }
 
+    @AfterEach
     public void tearDown() throws Exception {
         identityService.deleteGroup("accountancy");
         identityService.deleteGroup("management");
@@ -55,6 +59,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
     /**
      * test for task inclusion/exclusion (no other filters, no sort)
      */
+    @Test
     public void testQueryExcludeSubtasks() throws Exception {
         // query all tasks, including subtasks
         TaskQuery query = taskService.createTaskQuery();
@@ -69,6 +74,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
     /**
      * test for task inclusion/exclusion (no other filters, no sort)
      */
+    @Test
     public void testQueryWithPagination() throws Exception {
         // query all tasks, including subtasks
         TaskQuery query = taskService.createTaskQuery();
@@ -83,6 +89,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
     /**
      * test for task inclusion/exclusion (no other filters, order by task assignee )
      */
+    @Test
     public void testQueryExcludeSubtasksSorted() throws Exception {
         // query all tasks, including subtasks
         TaskQuery query = taskService.createTaskQuery().orderByTaskAssignee().asc();
@@ -97,6 +104,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
     /**
      * test for task inclusion/exclusion when additional filter is specified (like assignee), no order.
      */
+    @Test
     public void testQueryByAssigneeExcludeSubtasks() throws Exception {
         // gonzo has 2 root tasks and 3+2 subtasks assigned
         // include subtasks
@@ -124,6 +132,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
     /**
      * test for task inclusion/exclusion when additional filter is specified (like assignee), no order.
      */
+    @Test
     public void testQueryByAssigneeExcludeSubtasksPaginated() throws Exception {
         // gonzo has 2 root tasks and 3+2 subtasks assigned
         // include subtasks
@@ -151,6 +160,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
     /**
      * test for task inclusion/exclusion when additional filter is specified (like assignee), ordered.
      */
+    @Test
     public void testQueryByAssigneeExcludeSubtasksOrdered() throws Exception {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
 
@@ -184,6 +194,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
     /**
      * test for task inclusion/exclusion when additional filter is specified (like assignee), ordered.
      */
+    @Test
     public void testQueryByAssigneeExcludeSubtasksOrderedAndPaginated() throws Exception {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
 
@@ -231,7 +242,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
         // 1 parent task for kermit
         processEngineConfiguration.getClock().setCurrentTime(sdf.parse("01/01/2008 01:01:01.000"));
-        Task rootTask1 = taskService.newTask();
+        org.flowable.task.api.Task rootTask1 = taskService.newTask();
         rootTask1.setName("rootTestTask");
         rootTask1.setDescription("rootTestTask description");
         taskService.saveTask(rootTask1);
@@ -240,7 +251,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
         // 2 sub-tasks for the task above
         processEngineConfiguration.getClock().setCurrentTime(sdf.parse("01/01/2009 01:01:01.000"));
         for (int i = 1; i <= 2; i++) {
-            Task subtask = taskService.newTask();
+            org.flowable.task.api.Task subtask = taskService.newTask();
             subtask.setName("kermitSubTask" + i);
             subtask.setParentTaskId(rootTask1.getId());
             subtask.setDescription("description for kermit sub-task" + i);
@@ -252,7 +263,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
         // 2 parent tasks for gonzo
         // first parent task for gonzo
         processEngineConfiguration.getClock().setCurrentTime(sdf.parse("01/02/2008 02:02:02.000"));
-        Task rootTask2 = taskService.newTask();
+        org.flowable.task.api.Task rootTask2 = taskService.newTask();
         rootTask2.setName("gonzoRootTask1");
         rootTask2.setDescription("gonzo Root task1 description");
         taskService.saveTask(rootTask2);
@@ -260,7 +271,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
         ids.add(rootTask2.getId());
         // second parent task for gonzo
         processEngineConfiguration.getClock().setCurrentTime(sdf.parse("05/02/2008 02:02:02.000"));
-        Task rootTask3 = taskService.newTask();
+        org.flowable.task.api.Task rootTask3 = taskService.newTask();
         rootTask3.setName("gonzoRootTask2");
         rootTask3.setDescription("gonzo Root task2 description");
         taskService.saveTask(rootTask3);
@@ -269,7 +280,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
         // 3 sub-tasks for the first parent task
         processEngineConfiguration.getClock().setCurrentTime(sdf.parse("01/01/2009 01:01:01.000"));
         for (int i = 1; i <= 3; i++) {
-            Task subtask = taskService.newTask();
+            org.flowable.task.api.Task subtask = taskService.newTask();
             subtask.setName("gonzoSubTask1_" + i);
             subtask.setParentTaskId(rootTask2.getId());
             subtask.setDescription("description for gonzo sub-task1_" + i);
@@ -280,7 +291,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
         // 2 sub-tasks for the second parent task
         processEngineConfiguration.getClock().setCurrentTime(sdf.parse("02/01/2009 01:01:01.000"));
         for (int i = 1; i <= 2; i++) {
-            Task subtask = taskService.newTask();
+            org.flowable.task.api.Task subtask = taskService.newTask();
             subtask.setName("gonzoSubTask2_" + i);
             subtask.setParentTaskId(rootTask3.getId());
             subtask.setDescription("description for gonzo sub-task2_" + i);

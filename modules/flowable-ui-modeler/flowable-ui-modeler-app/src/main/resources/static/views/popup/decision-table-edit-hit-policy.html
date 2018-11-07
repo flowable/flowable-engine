@@ -1,0 +1,63 @@
+<div class="modal" ng-controller="DecisionTableHitPolicyEditorCtrl">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form name="inputExpressionForm">
+                <div class="modal-header"><h2>Select Decision Table Hit Policy</h2>
+                </div>
+                <div class="modal-body">
+
+                    <!--Column name start-->
+                    <div class="clearfix form-group">
+                        <div class="col-xs-4">
+                            <label>Hit Policy</label>
+                        </div>
+                        <div ng-if="!model.readOnly"  class="col-xs-8">
+                            <select class="form-control" name="hitPolicy" id="hitPolicy" ng-model="popup.currentHitPolicy">
+                                <option ng-selected="{{option.id == popup.currentHitPolicy}}"
+                                        ng-repeat="option in popup.availableHitPolicies" value="{{option.id}}">
+                                    {{option.label | translate}}
+                                </option>
+                            </select>
+                        </div>
+                        <div ng-if="model.readOnly"  class="col-xs-8">
+                            <div>{{popup.currentHitPolicy}}</div>
+                        </div>
+                        <div class="col-xs-12"><br/></div>
+                        <div ng-if="popup.currentHitPolicy === 'COLLECT'" class="col-xs-4">
+                            <label>Collect operator</label>
+                        </div>
+                        <div ng-if="popup.currentHitPolicy === 'COLLECT' && !model.readOnly"  class="col-xs-8">
+                            <select class="form-control" name="collectOperator" id="collectOperator" ng-model="popup.currentCollectOperator">
+                                <option value="" selected="selected">None</option>
+                                <option ng-selected="{{option.id == popup.currentCollectOperator}}"
+                                        ng-repeat="option in popup.availableCollectOperators" value="{{option.id}}">
+                                    {{option.label | translate}}
+                                </option>
+                            </select>
+                        </div>
+                        <div ng-if="popup.currentHitPolicy === 'COLLECT' && model.readOnly"  class="col-xs-8">
+                            <div>{{popup.currentCollectOperator}}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-sm btn-default" ng-click="cancel()">
+                            {{'GENERAL.ACTION.CANCEL' | translate}}
+                        </button>
+                        <button ng-if="!model.readOnly" type="button" class="btn btn-sm btn-default" ng-click="save()"
+                                ng-disabled="!inputExpressionForm.$valid || readOnly">
+                            {{'GENERAL.ACTION.SAVE' | translate}}
+                        </button>
+                    </div>
+                    <div class="loading pull-right" ng-show="model.loading">
+                        <div class="l1"></div>
+                        <div class="l2"></div>
+                        <div class="l2"></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

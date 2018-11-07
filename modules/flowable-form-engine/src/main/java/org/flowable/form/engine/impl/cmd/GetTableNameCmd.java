@@ -2,9 +2,9 @@ package org.flowable.form.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.form.engine.impl.util.CommandContextUtil;
 
 public class GetTableNameCmd implements Command<String>, Serializable {
@@ -17,6 +17,7 @@ public class GetTableNameCmd implements Command<String>, Serializable {
         this.entityClass = entityClass;
     }
 
+    @Override
     public String execute(CommandContext commandContext) {
         if (entityClass == null) {
             throw new FlowableIllegalArgumentException("entityClass is null");

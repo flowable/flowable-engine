@@ -16,7 +16,7 @@ package org.flowable.rest.service.api.history;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.rest.api.PaginateRequest;
+import org.flowable.common.rest.api.PaginateRequest;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -29,6 +29,7 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
 
     private String taskId;
     private String processInstanceId;
+    private String processInstanceIdWithChildren;
     private String processBusinessKey;
     private String processBusinessKeyLike;
     private String processDefinitionId;
@@ -71,6 +72,9 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
     private Boolean includeProcessVariables;
     private List<QueryVariable> taskVariables;
     private List<QueryVariable> processVariables;
+    private String scopeDefinitionId;
+    private String scopeId;
+    private String scopeType;
     private String tenantId;
     private String tenantIdLike;
     private Boolean withoutTenantId;
@@ -90,6 +94,14 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
 
     public void setProcessInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
+    }
+
+    public String getProcessInstanceIdWithChildren() {
+        return processInstanceIdWithChildren;
+    }
+
+    public void setProcessInstanceIdWithChildren(String processInstanceIdWithChildren) {
+        this.processInstanceIdWithChildren = processInstanceIdWithChildren;
     }
 
     public String getProcessBusinessKey() {
@@ -428,6 +440,30 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
 
     public void setProcessVariables(List<QueryVariable> processVariables) {
         this.processVariables = processVariables;
+    }
+
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
+    }
+
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
+    }
+
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
     }
 
     public String getTenantId() {

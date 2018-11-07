@@ -18,15 +18,17 @@ import java.util.concurrent.Callable;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.runtime.TimerJobQuery;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.TimerJobQuery;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class JobExecutorExceptionsTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml" })
     public void testQueryByExceptionWithRealJobExecutor() {
         TimerJobQuery query = managementService.createTimerJobQuery().withException();
@@ -39,7 +41,8 @@ public class JobExecutorExceptionsTest extends PluggableFlowableTestCase {
 
         // The execution is waiting in the first usertask. This contains a
         // boundary timer event which we will execute manual for testing purposes.
-        JobTestHelper.waitForJobExecutorOnCondition(processEngineConfiguration, 5000L, 100L, new Callable<Boolean>() {
+        JobTestHelper.waitForJobExecutorOnCondition(processEngineConfiguration, 7000L, 100L, new Callable<Boolean>() {
+            @Override
             public Boolean call() throws Exception {
                 return managementService.createTimerJobQuery().withException().count() == 1;
             }

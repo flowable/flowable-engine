@@ -13,17 +13,13 @@
 
 package org.flowable.spring;
 
-import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.engine.runtime.JobInfo;
-
 /**
  * <p>
  * Strategy for handling jobs that were acquired but cannot be executed at this point (queue-size exceeded).
  * </p>
  * 
  * @author Tijs Rademakers
+ * @deprecated use {@link org.flowable.spring.job.service.SpringRejectedJobsHandler}
  */
-public interface SpringRejectedJobsHandler {
-
-    public void jobRejected(AsyncExecutor asyncExecutor, JobInfo job);
+public interface SpringRejectedJobsHandler extends org.flowable.spring.job.service.SpringRejectedJobsHandler {
 }

@@ -3,9 +3,31 @@ language: java
 dist: trusty
 sudo: required
 
-jdk:
-  - oraclejdk8
-  - openjdk7
+matrix:
+  include:
+  - jdk: oraclejdk8
+  - name: "Flowable 5 tests"
+    jdk: oraclejdk8
+    install: true
+    script:
+      cd scripts && ./run-flowable5-tests.sh
+  - jdk: oraclejdk9
+  - jdk: openjdk10
+    # For some reason pulling from sonatype_snapshots does not work for openjdk10 and we have to manually symlink
+    # See https://github.com/travis-ci/travis-ci/issues/9368#issuecomment-405070163
+    before_install:
+    - rm "${JAVA_HOME}/lib/security/cacerts"
+    - ln -s /etc/ssl/certs/java/cacerts "${JAVA_HOME}/lib/security/cacerts"
+  - jdk: openjdk11
+  - jdk: openjdk-ea
+    branches:
+      only:
+      - master
+    if: TRAVIS_PULL_REQUEST != false
+  allow_failures:
+  - jdk: openjdk11
+  - jdk: openjdk-ea
+  - name: "Flowable 5 tests"
 
 cache:
   directories:
@@ -17,10 +39,7 @@ notifications:
     on_start: never     # options: [always|never|change] default: always
 
 before_script:
-  - echo MAVEN_OPTS=\"-Xmx2048m -Xms1024m -XX:MaxPermSize=512m -Djava.awt.headless=true\" > ~/.mavenrc
+  - echo MAVEN_OPTS=\"-Xmx2048m -Xms1024m -Djava.awt.headless=true\" > ~/.mavenrc
 
 script:
-  mvn test -PerrorLogging
-
-after_failure:
-  - cat /home/travis/build/flowable/flowable-engine/modules/*/target/surefire-reports/*.txt
+  mvn test -Pdistro,errorLogging -DskipTests=false -B

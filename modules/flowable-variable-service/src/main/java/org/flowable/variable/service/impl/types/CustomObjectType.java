@@ -12,6 +12,9 @@
  */
 package org.flowable.variable.service.impl.types;
 
+import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.api.types.VariableType;
+
 /**
  * Custom object type
  * 
@@ -27,14 +30,17 @@ public class CustomObjectType implements VariableType {
         this.typeName = typeName;
     }
 
+    @Override
     public String getTypeName() {
         return this.typeName;
     }
 
+    @Override
     public Object getValue(ValueFields valueFields) {
         return valueFields.getCachedValue();
     }
 
+    @Override
     public boolean isAbleToStore(Object value) {
         if (value == null) {
             return true;
@@ -42,10 +48,12 @@ public class CustomObjectType implements VariableType {
         return this.theClass.isAssignableFrom(value.getClass());
     }
 
+    @Override
     public boolean isCachable() {
         return true;
     }
 
+    @Override
     public void setValue(Object value, ValueFields valueFields) {
         valueFields.setCachedValue(value);
     }

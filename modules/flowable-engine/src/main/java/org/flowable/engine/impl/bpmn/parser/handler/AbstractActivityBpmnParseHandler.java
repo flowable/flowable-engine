@@ -17,10 +17,10 @@ import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
-import org.flowable.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
@@ -42,14 +42,7 @@ public abstract class AbstractActivityBpmnParseHandler<T extends FlowNode> exten
         MultiInstanceLoopCharacteristics loopCharacteristics = modelActivity.getLoopCharacteristics();
 
         // Activity Behavior
-        MultiInstanceActivityBehavior miActivityBehavior = null;
-
-        if (loopCharacteristics.isSequential()) {
-            miActivityBehavior = bpmnParse.getActivityBehaviorFactory().createSequentialMultiInstanceBehavior(modelActivity, (AbstractBpmnActivityBehavior) modelActivity.getBehavior());
-        } else {
-            miActivityBehavior = bpmnParse.getActivityBehaviorFactory().createParallelMultiInstanceBehavior(modelActivity, (AbstractBpmnActivityBehavior) modelActivity.getBehavior());
-        }
-
+        MultiInstanceActivityBehavior miActivityBehavior = createMultiInstanceActivityBehavior(modelActivity, loopCharacteristics, bpmnParse);
         modelActivity.setBehavior(miActivityBehavior);
 
         ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager();
@@ -64,25 +57,42 @@ public abstract class AbstractActivityBpmnParseHandler<T extends FlowNode> exten
             miActivityBehavior.setCompletionCondition(loopCharacteristics.getCompletionCondition());
         }
 
-        // activiti:collection
+        // flowable:collection
         if (StringUtils.isNotEmpty(loopCharacteristics.getInputDataItem())) {
             miActivityBehavior.setCollectionExpression(expressionManager.createExpression(loopCharacteristics.getInputDataItem()));
         }
 
-        // activiti:collectionString
+        // flowable:collectionString
         if (StringUtils.isNotEmpty(loopCharacteristics.getCollectionString())) {
             miActivityBehavior.setCollectionString(loopCharacteristics.getCollectionString());
         }
 
-        // activiti:elementVariable
+        // flowable:elementVariable
         if (StringUtils.isNotEmpty(loopCharacteristics.getElementVariable())) {
             miActivityBehavior.setCollectionElementVariable(loopCharacteristics.getElementVariable());
         }
 
-        // activiti:elementIndexVariable
+        // flowable:elementIndexVariable
         if (StringUtils.isNotEmpty(loopCharacteristics.getElementIndexVariable())) {
             miActivityBehavior.setCollectionElementIndexVariable(loopCharacteristics.getElementIndexVariable());
         }
 
+        // flowable:collectionParser
+        if (loopCharacteristics.getHandler() != null) {
+            miActivityBehavior.setHandler(loopCharacteristics.getHandler().clone());
+        }
+    }
+    
+    protected MultiInstanceActivityBehavior createMultiInstanceActivityBehavior(Activity modelActivity, MultiInstanceLoopCharacteristics loopCharacteristics, BpmnParse bpmnParse) {
+        MultiInstanceActivityBehavior miActivityBehavior = null;
+
+        AbstractBpmnActivityBehavior modelActivityBehavior = (AbstractBpmnActivityBehavior) modelActivity.getBehavior();
+        if (loopCharacteristics.isSequential()) {
+            miActivityBehavior = bpmnParse.getActivityBehaviorFactory().createSequentialMultiInstanceBehavior(modelActivity, modelActivityBehavior);
+        } else {
+            miActivityBehavior = bpmnParse.getActivityBehaviorFactory().createParallelMultiInstanceBehavior(modelActivity, modelActivityBehavior);
+        }
+        
+        return miActivityBehavior;
     }
 }

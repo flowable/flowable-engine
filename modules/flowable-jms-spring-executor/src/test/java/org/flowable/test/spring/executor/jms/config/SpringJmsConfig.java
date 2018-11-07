@@ -17,8 +17,11 @@ import javax.sql.DataSource;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.executor.jms.JobMessageListener;
 import org.flowable.spring.executor.jms.MessageBasedJobManager;
@@ -113,7 +116,9 @@ public class SpringJmsConfig {
     @Bean
     public JobMessageListener jobMessageListener() {
         JobMessageListener jobMessageListener = new JobMessageListener();
-        jobMessageListener.setProcessEngineConfiguration(processEngineConfiguration());
+        ProcessEngineConfiguration processEngineConfiguration = processEngineConfiguration();
+        JobServiceConfiguration jobServiceConfiguration = (JobServiceConfiguration) processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
+        jobMessageListener.setJobServiceConfiguration(jobServiceConfiguration);
         return jobMessageListener;
     }
 

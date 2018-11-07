@@ -20,10 +20,10 @@ import org.flowable.idm.api.PrivilegeMapping;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeMappingEntity;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeMappingEntityImpl;
-import org.flowable.idm.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.idm.engine.impl.persistence.entity.data.AbstractIdmDataManager;
 import org.flowable.idm.engine.impl.persistence.entity.data.PrivilegeMappingDataManager;
 
-public class MybatisPrivilegeMappingDataManager extends AbstractDataManager<PrivilegeMappingEntity> implements PrivilegeMappingDataManager {
+public class MybatisPrivilegeMappingDataManager extends AbstractIdmDataManager<PrivilegeMappingEntity> implements PrivilegeMappingDataManager {
 
     public MybatisPrivilegeMappingDataManager(IdmEngineConfiguration idmEngineConfiguration) {
         super(idmEngineConfiguration);
@@ -41,7 +41,7 @@ public class MybatisPrivilegeMappingDataManager extends AbstractDataManager<Priv
 
     @Override
     public void deleteByPrivilegeId(String privilegeId) {
-        getDbSqlSession().delete("deleteByPrivilegeId", privilegeId);
+        getDbSqlSession().delete("deleteByPrivilegeId", privilegeId, getManagedEntityClass());
     }
 
     @Override
@@ -49,7 +49,7 @@ public class MybatisPrivilegeMappingDataManager extends AbstractDataManager<Priv
         Map<String, String> params = new HashMap<>();
         params.put("privilegeId", privilegeId);
         params.put("userId", userId);
-        getDbSqlSession().delete("deleteByPrivilegeIdAndUserId", params);
+        getDbSqlSession().delete("deleteByPrivilegeIdAndUserId", params, getManagedEntityClass());
     }
 
     @Override
@@ -57,7 +57,7 @@ public class MybatisPrivilegeMappingDataManager extends AbstractDataManager<Priv
         Map<String, String> params = new HashMap<>();
         params.put("privilegeId", privilegeId);
         params.put("groupId", groupId);
-        getDbSqlSession().delete("deleteByPrivilegeIdAndGroupId", params);
+        getDbSqlSession().delete("deleteByPrivilegeIdAndGroupId", params, getManagedEntityClass());
     }
     
     @Override

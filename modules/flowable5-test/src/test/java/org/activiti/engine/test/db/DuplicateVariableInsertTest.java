@@ -26,7 +26,6 @@ import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 
 public class DuplicateVariableInsertTest extends PluggableFlowableTestCase {
 
@@ -92,7 +91,7 @@ public class DuplicateVariableInsertTest extends PluggableFlowableTestCase {
     public void testDuplicateVariableInsertOnTask() throws Exception {
         String processDefinitionId = deployOneTaskTestProcess();
         final ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinitionId);
-        final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        final org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         final CyclicBarrier startBarrier = new CyclicBarrier(2);
         final CyclicBarrier endBarrier = new CyclicBarrier(2);

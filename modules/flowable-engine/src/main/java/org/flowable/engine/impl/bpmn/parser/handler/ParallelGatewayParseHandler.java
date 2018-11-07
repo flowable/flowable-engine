@@ -21,10 +21,12 @@ import org.flowable.engine.impl.bpmn.parser.BpmnParse;
  */
 public class ParallelGatewayParseHandler extends AbstractActivityBpmnParseHandler<ParallelGateway> {
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return ParallelGateway.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, ParallelGateway gateway) {
         gateway.setBehavior(bpmnParse.getActivityBehaviorFactory().createParallelGatewayActivityBehavior(gateway));
     }

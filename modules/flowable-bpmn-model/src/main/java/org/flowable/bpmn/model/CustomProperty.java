@@ -45,6 +45,7 @@ public class CustomProperty extends BaseElement {
         this.complexValue = complexValue;
     }
 
+    @Override
     public CustomProperty clone() {
         CustomProperty clone = new CustomProperty();
         clone.setValues(this);

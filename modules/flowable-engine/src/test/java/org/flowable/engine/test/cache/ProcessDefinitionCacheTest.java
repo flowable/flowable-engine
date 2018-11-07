@@ -27,7 +27,7 @@ import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.flowable.engine.impl.test.AbstractTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test cases for testing functionality when the process engine is rebooted.
@@ -38,6 +38,7 @@ public class ProcessDefinitionCacheTest extends AbstractTestCase {
 
     // Test for a bug: when the process engine is rebooted the cache is cleaned and the deployed process definition is
     // removed from the process cache. This led to problems because the id wasn't fetched from the DB after a redeploy.
+    @Test
     public void testStartProcessInstanceByIdAfterReboot() {
 
         // In case this test is run in a test suite, previous engines might have been initialized and cached. First we close the
@@ -81,7 +82,7 @@ public class ProcessDefinitionCacheTest extends AbstractTestCase {
 
         // Complete the task. That will end the process instance
         TaskService taskService = processEngine.getTaskService();
-        Task task = taskService.createTaskQuery().list().get(0);
+        org.flowable.task.api.Task task = taskService.createTaskQuery().list().get(0);
         taskService.complete(task.getId());
 
         // Check if the process instance has really ended. This means that the
@@ -101,6 +102,7 @@ public class ProcessDefinitionCacheTest extends AbstractTestCase {
         schemaProcessEngine.close();
     }
 
+    @Test
     public void testDeployRevisedProcessAfterDeleteOnOtherProcessEngine() {
 
         // Setup both process engines
@@ -123,7 +125,7 @@ public class ProcessDefinitionCacheTest extends AbstractTestCase {
         // Start process instance on second engine
         String processDefinitionId = repositoryService2.createProcessDefinitionQuery().singleResult().getId();
         runtimeService2.startProcessInstanceById(processDefinitionId);
-        Task task = taskService2.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService2.createTaskQuery().singleResult();
         assertEquals("original task", task.getName());
 
         // Delete the deployment on second process engine

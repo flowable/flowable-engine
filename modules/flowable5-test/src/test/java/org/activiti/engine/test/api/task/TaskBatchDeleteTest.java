@@ -14,7 +14,6 @@ package org.activiti.engine.test.api.task;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 public class TaskBatchDeleteTest extends PluggableFlowableTestCase {
@@ -30,9 +29,9 @@ public class TaskBatchDeleteTest extends PluggableFlowableTestCase {
         assertFalse(processInstance.isEnded());
 
         // Get first task and finish. This should destroy the scope and trigger some deletes, including:
-        // Task 1, Identity link pointing to task 1, Task 2
+        // org.flowable.task.service.Task 1, Identity link pointing to task 1, org.flowable.task.service.Task 2
         // The task deletes shouldn't be batched in this case, keeping the related entity delete order
-        Task firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        org.flowable.task.api.Task firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                 .taskDefinitionKey("taskOne").singleResult();
         assertNotNull(firstTask);
 
@@ -53,12 +52,12 @@ public class TaskBatchDeleteTest extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
         assertFalse(processInstance.isEnded());
 
-        Task lastTask = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        org.flowable.task.api.Task lastTask = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                 .taskDefinitionKey("multiInstance").listPage(4, 1).get(0);
 
         taskService.addCandidateGroup(lastTask.getId(), "sales");
 
-        Task firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        org.flowable.task.api.Task firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                 .taskDefinitionKey("multiInstance").listPage(0, 1).get(0);
         assertNotNull(firstTask);
 

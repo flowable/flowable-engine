@@ -49,18 +49,22 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
         super(processEngineConfiguration);
     }
 
+    @Override
     public HistoricProcessInstanceQuery createHistoricProcessInstanceQuery() {
         return new HistoricProcessInstanceQueryImpl(commandExecutor);
     }
 
+    @Override
     public HistoricActivityInstanceQuery createHistoricActivityInstanceQuery() {
         return new HistoricActivityInstanceQueryImpl(commandExecutor);
     }
 
+    @Override
     public HistoricTaskInstanceQuery createHistoricTaskInstanceQuery() {
         return new HistoricTaskInstanceQueryImpl(commandExecutor, processEngineConfiguration.getDatabaseType());
     }
 
+    @Override
     public HistoricDetailQuery createHistoricDetailQuery() {
         return new HistoricDetailQueryImpl(commandExecutor);
     }
@@ -70,6 +74,7 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
         return new NativeHistoricDetailQueryImpl(commandExecutor);
     }
 
+    @Override
     public HistoricVariableInstanceQuery createHistoricVariableInstanceQuery() {
         return new HistoricVariableInstanceQueryImpl(commandExecutor);
     }
@@ -79,22 +84,27 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
         return new NativeHistoricVariableInstanceQueryImpl(commandExecutor);
     }
 
+    @Override
     public void deleteHistoricTaskInstance(String taskId) {
         commandExecutor.execute(new DeleteHistoricTaskInstanceCmd(taskId));
     }
 
+    @Override
     public void deleteHistoricProcessInstance(String processInstanceId) {
         commandExecutor.execute(new DeleteHistoricProcessInstanceCmd(processInstanceId));
     }
 
+    @Override
     public NativeHistoricProcessInstanceQuery createNativeHistoricProcessInstanceQuery() {
         return new NativeHistoricProcessInstanceQueryImpl(commandExecutor);
     }
 
+    @Override
     public NativeHistoricTaskInstanceQuery createNativeHistoricTaskInstanceQuery() {
         return new NativeHistoricTaskInstanceQueryImpl(commandExecutor);
     }
 
+    @Override
     public NativeHistoricActivityInstanceQuery createNativeHistoricActivityInstanceQuery() {
         return new NativeHistoricActivityInstanceQueryImpl(commandExecutor);
     }

@@ -16,8 +16,8 @@ import java.util.Date;
 
 import org.flowable.cdi.BusinessProcessEvent;
 import org.flowable.cdi.BusinessProcessEventType;
-import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * 

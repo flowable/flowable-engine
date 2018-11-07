@@ -21,7 +21,7 @@ import java.util.Map;
 import org.activiti.engine.impl.pvm.PvmActivity;
 import org.activiti.engine.impl.pvm.PvmException;
 import org.activiti.engine.impl.pvm.PvmTransition;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 
 /**
@@ -30,10 +30,10 @@ import org.flowable.engine.impl.delegate.ActivityBehavior;
 public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds {
 
     private static final long serialVersionUID = 1L;
-    protected List<TransitionImpl> outgoingTransitions = new ArrayList<TransitionImpl>();
-    protected Map<String, TransitionImpl> namedOutgoingTransitions = new HashMap<String, TransitionImpl>();
+    protected List<TransitionImpl> outgoingTransitions = new ArrayList<>();
+    protected Map<String, TransitionImpl> namedOutgoingTransitions = new HashMap<>();
     protected Map<String, Object> variables;
-    protected List<TransitionImpl> incomingTransitions = new ArrayList<TransitionImpl>();
+    protected List<TransitionImpl> incomingTransitions = new ArrayList<>();
     protected ActivityBehavior activityBehavior;
     protected ScopeImpl parent;
     protected boolean isScope;
@@ -82,10 +82,12 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
         return transition;
     }
 
+    @Override
     public TransitionImpl findOutgoingTransition(String transitionId) {
         return namedOutgoingTransitions.get(transitionId);
     }
 
+    @Override
     public String toString() {
         return "Activity(" + id + ")";
     }
@@ -113,6 +115,7 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
 
     // getters and setters //////////////////////////////////////////////////////
 
+    @Override
     @SuppressWarnings("unchecked")
     public List<PvmTransition> getOutgoingTransitions() {
         return (List) outgoingTransitions;
@@ -126,10 +129,12 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
         this.activityBehavior = activityBehavior;
     }
 
+    @Override
     public ScopeImpl getParent() {
         return parent;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public List<PvmTransition> getIncomingTransitions() {
         return (List) incomingTransitions;
@@ -151,38 +156,47 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
         this.isScope = isScope;
     }
 
+    @Override
     public int getX() {
         return x;
     }
 
+    @Override
     public void setX(int x) {
         this.x = x;
     }
 
+    @Override
     public int getY() {
         return y;
     }
 
+    @Override
     public void setY(int y) {
         this.y = y;
     }
 
+    @Override
     public int getWidth() {
         return width;
     }
 
+    @Override
     public void setWidth(int width) {
         this.width = width;
     }
 
+    @Override
     public int getHeight() {
         return height;
     }
 
+    @Override
     public void setHeight(int height) {
         this.height = height;
     }
 
+    @Override
     public boolean isAsync() {
         return isAsync;
     }
@@ -191,6 +205,7 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
         this.isAsync = isAsync;
     }
 
+    @Override
     public boolean isExclusive() {
         return isExclusive;
     }

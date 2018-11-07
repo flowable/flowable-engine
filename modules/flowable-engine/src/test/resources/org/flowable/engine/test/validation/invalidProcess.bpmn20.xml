@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+			 xmlns:flowable="http://flowable.org/bpmn"
 	xmlns:activiti="http://activiti.org/bpmn" targetNamespace="Examples">
 
 	<!-- Signals -->
@@ -67,6 +68,14 @@
 		</serviceTask>
 		<sequenceFlow id="flow2"
 			sourceRef="serviceTaskWithWrongResultVariableUsage" targetRef="userTask1" />
+
+		<!-- Service task with wrong usage of variable name and use local scope
+			(use local scope is ignored when result variable name is missing) -->
+		<serviceTask id="serviceTaskWithUseLocalScopeAndMissingResultVariableUsage"
+					 name="serviceTaskWithUseLocalScopeAndMissingResultVariableUsage"
+					 flowable:expression="#{true}"
+					 flowable:useLocalScopeForResultVariable ="true">
+		</serviceTask>
 
 		<!-- Service task without any implementation (class, expression, etc.) -->
 		<serviceTask id="serviceTask2" name="myService"></serviceTask>

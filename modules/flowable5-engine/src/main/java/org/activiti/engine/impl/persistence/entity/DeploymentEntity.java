@@ -51,7 +51,7 @@ public class DeploymentEntity implements Serializable, Deployment, PersistentObj
 
     public void addResource(ResourceEntity resource) {
         if (resources == null) {
-            resources = new HashMap<String, ResourceEntity>();
+            resources = new HashMap<>();
         }
         resources.put(resource.getName(), resource);
     }
@@ -63,7 +63,7 @@ public class DeploymentEntity implements Serializable, Deployment, PersistentObj
                     .getCommandContext()
                     .getResourceEntityManager()
                     .findResourcesByDeploymentId(id);
-            resources = new HashMap<String, ResourceEntity>();
+            resources = new HashMap<>();
             for (ResourceEntity resource : resourcesList) {
                 resources.put(resource.getName(), resource);
             }
@@ -71,8 +71,9 @@ public class DeploymentEntity implements Serializable, Deployment, PersistentObj
         return resources;
     }
 
+    @Override
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("category", this.category);
         persistentState.put("tenantId", tenantId);
         return persistentState;
@@ -81,13 +82,13 @@ public class DeploymentEntity implements Serializable, Deployment, PersistentObj
     // Deployed artifacts manipulation //////////////////////////////////////////
     public void addDeployedArtifact(Object deployedArtifact) {
         if (deployedArtifacts == null) {
-            deployedArtifacts = new HashMap<Class<?>, List<Object>>();
+            deployedArtifacts = new HashMap<>();
         }
 
         Class<?> clazz = deployedArtifact.getClass();
         List<Object> artifacts = deployedArtifacts.get(clazz);
         if (artifacts == null) {
-            artifacts = new ArrayList<Object>();
+            artifacts = new ArrayList<>();
             deployedArtifacts.put(clazz, artifacts);
         }
 
@@ -101,14 +102,17 @@ public class DeploymentEntity implements Serializable, Deployment, PersistentObj
 
     // getters and setters //////////////////////////////////////////////////////
 
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public void setId(String id) {
         this.id = id;
     }
 
+    @Override
     public String getName() {
         return name;
     }
@@ -117,6 +121,7 @@ public class DeploymentEntity implements Serializable, Deployment, PersistentObj
         this.name = name;
     }
 
+    @Override
     public String getCategory() {
         return category;
     }
@@ -125,6 +130,7 @@ public class DeploymentEntity implements Serializable, Deployment, PersistentObj
         this.category = category;
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
@@ -137,6 +143,7 @@ public class DeploymentEntity implements Serializable, Deployment, PersistentObj
         this.resources = resources;
     }
 
+    @Override
     public Date getDeploymentTime() {
         return deploymentTime;
     }

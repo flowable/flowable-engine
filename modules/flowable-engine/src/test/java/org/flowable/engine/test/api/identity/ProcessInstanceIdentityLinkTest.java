@@ -14,8 +14,8 @@ package org.flowable.engine.test.api.identity;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -26,13 +26,14 @@ public class ProcessInstanceIdentityLinkTest extends PluggableFlowableTestCase {
     // https://jira.codehaus.org/browse/ACT-1591
     // (Referential integrity constraint violation on PROC_INST and
     // IDENTITY_LINK)
+    @Test
     @Deployment
     public void testSetAuthenticatedUserAndCompleteLastTask() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("identityLinktest");
 
         // There are two tasks
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
         identityService.setAuthenticatedUserId("kermit");
@@ -48,6 +49,7 @@ public class ProcessInstanceIdentityLinkTest extends PluggableFlowableTestCase {
     // https://jira.codehaus.org/browse/ACT-1591
     // (Referential integrity constraint violation on PROC_INST and
     // IDENTITY_LINK)
+    @Test
     @Deployment
     public void testSetAuthenticatedUserWithNoWaitStates() {
         identityService.setAuthenticatedUserId("kermit");

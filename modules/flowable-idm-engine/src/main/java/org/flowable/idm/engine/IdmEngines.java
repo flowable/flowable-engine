@@ -14,8 +14,6 @@ package org.flowable.idm.engine;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -28,10 +26,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.flowable.engine.common.EngineInfo;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.util.IoUtil;
-import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.EngineInfo;
+import org.flowable.common.engine.impl.util.IoUtil;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +70,7 @@ public abstract class IdmEngines {
             while (resources.hasMoreElements()) {
                 configUrls.add(resources.nextElement());
             }
-            for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext();) {
+            for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext(); ) {
                 URL resource = iterator.next();
                 LOGGER.info("Initializing idm engine using configuration '{}'", resource.toString());
                 initIdmEngineFromResource(resource);
@@ -98,8 +97,8 @@ public abstract class IdmEngines {
     protected static void initIdmEngineFromSpringResource(URL resource) {
         try {
             Class<?> springConfigurationHelperClass = ReflectUtil.loadClass("org.flowable.idm.spring.SpringIdmConfigurationHelper");
-            Method method = springConfigurationHelperClass.getDeclaredMethod("buildIdmEngine", new Class<?>[] { URL.class });
-            IdmEngine idmEngine = (IdmEngine) method.invoke(null, new Object[] { resource });
+            Method method = springConfigurationHelperClass.getDeclaredMethod("buildIdmEngine", new Class<?>[]{URL.class});
+            IdmEngine idmEngine = (IdmEngine) method.invoke(null, new Object[]{resource});
 
             String idmEngineName = idmEngine.getName();
             EngineInfo idmEngineInfo = new EngineInfo(idmEngineName, resource.toString(), null);
@@ -150,18 +149,11 @@ public abstract class IdmEngines {
             idmEngineInfosByName.put(idmEngineName, idmEngineInfo);
         } catch (Throwable e) {
             LOGGER.error("Exception while initializing idm engine: {}", e.getMessage(), e);
-            idmEngineInfo = new EngineInfo(null, resourceUrlString, getExceptionString(e));
+            idmEngineInfo = new EngineInfo(null, resourceUrlString, ExceptionUtils.getStackTrace(e));
         }
         idmEngineInfosByResourceUrl.put(resourceUrlString, idmEngineInfo);
         idmEngineInfos.add(idmEngineInfo);
         return idmEngineInfo;
-    }
-
-    private static String getExceptionString(Throwable e) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-        return sw.toString();
     }
 
     protected static IdmEngine buildIdmEngine(URL resource) {
@@ -178,7 +170,9 @@ public abstract class IdmEngines {
         }
     }
 
-    /** Get initialization results. */
+    /**
+     * Get initialization results.
+     */
     public static List<EngineInfo> getIdmEngineInfos() {
         return idmEngineInfos;
     }
@@ -197,9 +191,8 @@ public abstract class IdmEngines {
 
     /**
      * obtain a idm engine by name.
-     * 
-     * @param idmEngineName
-     *            is the name of the idm engine or null for the default idm engine.
+     *
+     * @param idmEngineName is the name of the idm engine or null for the default idm engine.
      */
     public static IdmEngine getIdmEngine(String idmEngineName) {
         if (!isInitialized()) {

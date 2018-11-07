@@ -4,17 +4,14 @@
              version="1.0"
         >
     <persistence-unit name="flowable-jpa-pu">
-        <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
         <class>org.flowable.spring.test.jpa.LoanRequest</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
         <properties>
-            <property name="openjpa.Log" value="DefaultLevel=WARN, Tool=INFO"/>
-            <property name="openjpa.LockTimeout " value="30000"/>
-            <property name="openjpa.jdbc.SynchronizeMappings"
-                      value="buildSchema(SchemaAction='add,deleteTableContents')"/>
+            <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
         </properties>
 
     </persistence-unit>

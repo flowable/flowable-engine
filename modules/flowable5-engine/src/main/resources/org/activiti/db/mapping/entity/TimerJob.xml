@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
@@ -18,6 +18,7 @@
 		<result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
 		<result property="retries" column="RETRIES_" jdbcType="INTEGER" />
 		<result property="exceptionByteArrayRef" column="EXCEPTION_STACK_ID_" typeHandler="ByteArrayRefTypeHandler" />
+		<result property="customValuesByteArrayRef" column="CUSTOM_VALUES_ID_" typeHandler="ByteArrayRefTypeHandler" />
 		<result property="exceptionMessage" column="EXCEPTION_MSG_" jdbcType="VARCHAR" />
 		<result property="jobHandlerType" column="HANDLER_TYPE_" jdbcType="VARCHAR" />
 		<result property="jobHandlerConfiguration" column="HANDLER_CFG_" jdbcType="VARCHAR" />
@@ -96,7 +97,7 @@
 		</where>
 	</sql>
 
-	<select id="selectTimerJobsToDueDate" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+	<select id="selectTimerJobsToDueDate" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
 		select *
 		from ${prefix}ACT_RU_TIMER_JOB
 		where DUEDATE_ is null or DUEDATE_ &lt;= #{parameter, jdbcType=TIMESTAMP};
@@ -115,6 +116,7 @@
 		PROC_DEF_ID_,
 		RETRIES_,
 		EXCEPTION_STACK_ID_,
+		CUSTOM_VALUES_ID_,
 		EXCEPTION_MSG_,
 		DUEDATE_,
 		REPEAT_,
@@ -130,6 +132,7 @@
 		#{processDefinitionId, jdbcType=VARCHAR},
 		#{retries, jdbcType=INTEGER},
 		#{exceptionByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
+		#{customValuesByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
 		#{exceptionMessage, jdbcType=VARCHAR},
 		#{duedate, jdbcType=TIMESTAMP},
 		#{repeat, jdbcType=VARCHAR},
@@ -138,25 +141,26 @@
 		#{tenantId, jdbcType=VARCHAR}
 		)
 	</insert>
-	
+
 	<insert id="bulkInsertTimerJob" parameterType="java.util.List">
     INSERT INTO ${prefix}ACT_RU_TIMER_JOB (
-            ID_, 
+            ID_,
             REV_,
             TYPE_,
             EXCLUSIVE_,
-            EXECUTION_ID_, 
+            EXECUTION_ID_,
             PROCESS_INSTANCE_ID_,
             PROC_DEF_ID_,
-            RETRIES_, 
+            RETRIES_,
             EXCEPTION_STACK_ID_,
+            CUSTOM_VALUES_ID_,
             EXCEPTION_MSG_,
             DUEDATE_,
             REPEAT_,
             HANDLER_TYPE_,
             HANDLER_CFG_,
-            TENANT_ID_) VALUES 
-    <foreach collection="list" item="job" index="index" separator=","> 
+            TENANT_ID_) VALUES
+    <foreach collection="list" item="job" index="index" separator=",">
         (#{job.id, jdbcType=VARCHAR},
          #{job.revision, jdbcType=INTEGER},
          #{job.jobType, jdbcType=VARCHAR},
@@ -166,6 +170,7 @@
          #{job.processDefinitionId, jdbcType=VARCHAR},
          #{job.retries, jdbcType=INTEGER},
          #{job.exceptionByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
+         #{job.customValuesByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
          #{job.exceptionMessage, jdbcType=VARCHAR},
          #{job.duedate, jdbcType=TIMESTAMP},
          #{job.repeat, jdbcType=VARCHAR},
@@ -176,24 +181,25 @@
   </insert>
 
   <insert id="bulkInsertTimerJob_oracle" parameterType="java.util.List">
-    INSERT ALL 
-    <foreach collection="list" item="job" index="index"> 
+    INSERT ALL
+    <foreach collection="list" item="job" index="index">
       INTO ${prefix}ACT_RU_TIMER_JOB (
-              ID_, 
+              ID_,
               REV_,
               TYPE_,
               EXCLUSIVE_,
-              EXECUTION_ID_, 
+              EXECUTION_ID_,
               PROCESS_INSTANCE_ID_,
               PROC_DEF_ID_,
-              RETRIES_, 
+              RETRIES_,
               EXCEPTION_STACK_ID_,
+              CUSTOM_VALUES_ID_,
               EXCEPTION_MSG_,
               DUEDATE_,
               REPEAT_,
               HANDLER_TYPE_,
               HANDLER_CFG_,
-              TENANT_ID_) VALUES 
+              TENANT_ID_) VALUES
           (#{job.id, jdbcType=VARCHAR},
            #{job.revision, jdbcType=INTEGER},
            #{job.jobType, jdbcType=VARCHAR},
@@ -203,6 +209,7 @@
            #{job.processDefinitionId, jdbcType=VARCHAR},
            #{job.retries, jdbcType=INTEGER},
            #{job.exceptionByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
+           #{job.customValuesByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
            #{job.exceptionMessage, jdbcType=VARCHAR},
            #{job.duedate, jdbcType=TIMESTAMP},
            #{job.repeat, jdbcType=VARCHAR},
@@ -220,32 +227,33 @@
 			RETRIES_ = #{retries, jdbcType=INTEGER},
 			DUEDATE_ = #{duedate, jdbcType=TIMESTAMP},
 			EXCEPTION_STACK_ID_ = #{exceptionByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
+			CUSTOM_VALUES_ID_ = #{customValuesByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
 			EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR}
 		</set>
 		where ID_= #{id, jdbcType=VARCHAR}
 		and REV_ = #{revision, jdbcType=INTEGER}
 	</update>
 
-	<select id="selectTimerJobByTypeAndProcessDefinitionId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+	<select id="selectTimerJobByTypeAndProcessDefinitionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
 		select J.*
 		from ${prefix}ACT_RU_TIMER_JOB J
 		where J.HANDLER_TYPE_ = #{parameter.handlerType}
 		and J.PROC_DEF_ID_ = #{parameter.processDefinitionId}
 	</select>
-	
-	<select id="selectTimerJobsByProcessInstanceId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+
+	<select id="selectTimerJobsByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
 		select *
 		from ${prefix}ACT_RU_TIMER_JOB J
 		where J.PROCESS_INSTANCE_ID_ = #{parameter}
 	</select>
 
-	<select id="selectTimerJobsByExecutionId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+	<select id="selectTimerJobsByExecutionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
 		select *
 		from ${prefix}ACT_RU_TIMER_JOB J
 		where J.EXECUTION_ID_ = #{parameter}
 	</select>
 
-	<select id="selectTimerJobByTypeAndProcessDefinitionKeyNoTenantId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+	<select id="selectTimerJobByTypeAndProcessDefinitionKeyNoTenantId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
 		select J.*
 		from ${prefix}ACT_RU_TIMER_JOB J
 		inner join ${prefix}ACT_RE_PROCDEF P on J.PROC_DEF_ID_ = P.ID_
@@ -254,7 +262,7 @@
 		and (P.TENANT_ID_ = '' or P.TENANT_ID_ is null)
 	</select>
 
-	<select id="selectTimerJobByTypeAndProcessDefinitionKeyAndTenantId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+	<select id="selectTimerJobByTypeAndProcessDefinitionKeyAndTenantId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
 		select J.*
 		from ${prefix}ACT_RU_TIMER_JOB J
 		inner join ${prefix}ACT_RE_PROCDEF P on J.PROC_DEF_ID_ = P.ID_
@@ -289,7 +297,7 @@
 		)
 	</update>
 
-	<!-- See http://stackoverflow.com/questions/4429319/you-cant-specify-target-table-for-update-in-from-clause 
+	<!-- See http://stackoverflow.com/questions/4429319/you-cant-specify-target-table-for-update-in-from-clause
 		Tested this on MySQL 5.6: does NOT use a temporary table (so good, performance) -->
 	<update id="updateTimerJobTenantIdForDeployment_mysql" parameterType="java.util.Map">
 		update ${prefix}ACT_RU_TIMER_JOB set
@@ -304,7 +312,7 @@
 				inner join ${prefix}ACT_RE_PROCDEF P on J.PROC_DEF_ID_ = P.ID_
 				inner join ${prefix}ACT_RE_DEPLOYMENT D on P.DEPLOYMENT_ID_ = D.ID_
 				where D.ID_ = #{deploymentId, jdbcType=VARCHAR}
-	
+
 			) AS tempTask
 		)
 	</update>

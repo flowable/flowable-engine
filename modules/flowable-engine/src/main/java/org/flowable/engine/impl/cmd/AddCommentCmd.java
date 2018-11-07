@@ -13,21 +13,21 @@
 
 package org.flowable.engine.impl.cmd;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
-import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Event;
-import org.flowable.engine.task.Task;
+import org.flowable.task.api.Task;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Tom Baeyens
@@ -52,12 +52,13 @@ public class AddCommentCmd implements Command<Comment> {
         this.message = message;
     }
 
+    @Override
     public Comment execute(CommandContext commandContext) {
 
         TaskEntity task = null;
         // Validate task
         if (taskId != null) {
-            task = CommandContextUtil.getTaskEntityManager(commandContext).findById(taskId);
+            task = CommandContextUtil.getTaskService().getTask(taskId);
 
             if (task == null) {
                 throw new FlowableObjectNotFoundException("Cannot find task with id " + taskId, Task.class);

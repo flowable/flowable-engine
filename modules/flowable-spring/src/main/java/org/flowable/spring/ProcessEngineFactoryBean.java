@@ -13,8 +13,8 @@
 
 package org.flowable.spring;
 
+import org.flowable.common.engine.impl.cfg.SpringBeanFactoryProxyMap;
 import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.common.impl.cfg.SpringBeanFactoryProxyMap;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
@@ -36,16 +36,19 @@ public class ProcessEngineFactoryBean implements FactoryBean<ProcessEngine>, Dis
     protected ApplicationContext applicationContext;
     protected ProcessEngine processEngine;
 
+    @Override
     public void destroy() throws Exception {
         if (processEngine != null) {
             processEngine.close();
         }
     }
 
+    @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
 
+    @Override
     public ProcessEngine getObject() throws Exception {
         configureExpressionManager();
         configureExternallyManagedTransactions();
@@ -74,10 +77,12 @@ public class ProcessEngineFactoryBean implements FactoryBean<ProcessEngine>, Dis
         }
     }
 
+    @Override
     public Class<ProcessEngine> getObjectType() {
         return ProcessEngine.class;
     }
 
+    @Override
     public boolean isSingleton() {
         return true;
     }

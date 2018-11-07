@@ -14,8 +14,6 @@ package org.activiti.engine;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -31,6 +29,7 @@ import java.util.Set;
 import org.activiti.engine.impl.ProcessEngineInfoImpl;
 import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.engine.impl.util.ReflectUtil;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * <br>
  * The {@link #init()} method will try to build one {@link ProcessEngine} for each flowable.cfg.xml file found on the classpath. If you have more then one, make sure you specify different
  * process.engine.name values.
- * 
+ *
  * @author Tom Baeyens
  * @author Joram Barrez
  */
@@ -57,10 +56,10 @@ public abstract class ProcessEngines {
     public static final String NAME_DEFAULT = "default";
 
     protected static boolean isInitialized;
-    protected static Map<String, ProcessEngine> processEngines = new HashMap<String, ProcessEngine>();
-    protected static Map<String, ProcessEngineInfo> processEngineInfosByName = new HashMap<String, ProcessEngineInfo>();
-    protected static Map<String, ProcessEngineInfo> processEngineInfosByResourceUrl = new HashMap<String, ProcessEngineInfo>();
-    protected static List<ProcessEngineInfo> processEngineInfos = new ArrayList<ProcessEngineInfo>();
+    protected static Map<String, ProcessEngine> processEngines = new HashMap<>();
+    protected static Map<String, ProcessEngineInfo> processEngineInfosByName = new HashMap<>();
+    protected static Map<String, ProcessEngineInfo> processEngineInfosByResourceUrl = new HashMap<>();
+    protected static List<ProcessEngineInfo> processEngineInfos = new ArrayList<>();
 
     /**
      * Initializes all process engines that can be found on the classpath for resources <code>flowable.cfg.xml</code> (plain Activiti style configuration) and for resources
@@ -70,7 +69,7 @@ public abstract class ProcessEngines {
         if (!isInitialized()) {
             if (processEngines == null) {
                 // Create new map to store process-engines if current map is null
-                processEngines = new HashMap<String, ProcessEngine>();
+                processEngines = new HashMap<>();
             }
             ClassLoader classLoader = ReflectUtil.getClassLoader();
             Enumeration<URL> resources = null;
@@ -81,11 +80,11 @@ public abstract class ProcessEngines {
             }
 
             // Remove duplicated configuration URL's using set. Some classloaders may return identical URL's twice, causing duplicate startups
-            Set<URL> configUrls = new HashSet<URL>();
+            Set<URL> configUrls = new HashSet<>();
             while (resources.hasMoreElements()) {
                 configUrls.add(resources.nextElement());
             }
-            for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext();) {
+            for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext(); ) {
                 URL resource = iterator.next();
                 LOGGER.info("Initializing process engine using configuration '{}'", resource.toString());
                 initProcessEngineFromResource(resource);
@@ -111,8 +110,8 @@ public abstract class ProcessEngines {
     protected static void initProcessEngineFromSpringResource(URL resource) {
         try {
             Class<?> springConfigurationHelperClass = ReflectUtil.loadClass("org.activiti.spring.SpringConfigurationHelper");
-            Method method = springConfigurationHelperClass.getDeclaredMethod("buildProcessEngine", new Class<?>[] { URL.class });
-            ProcessEngine processEngine = (ProcessEngine) method.invoke(null, new Object[] { resource });
+            Method method = springConfigurationHelperClass.getDeclaredMethod("buildProcessEngine", new Class<?>[]{URL.class});
+            ProcessEngine processEngine = (ProcessEngine) method.invoke(null, new Object[]{resource});
 
             String processEngineName = processEngine.getName();
             ProcessEngineInfo processEngineInfo = new ProcessEngineInfoImpl(processEngineName, resource.toString(), null);
@@ -164,18 +163,11 @@ public abstract class ProcessEngines {
             processEngineInfosByName.put(processEngineName, processEngineInfo);
         } catch (Throwable e) {
             LOGGER.error("Exception while initializing process engine: {}", e.getMessage(), e);
-            processEngineInfo = new ProcessEngineInfoImpl(null, resourceUrlString, getExceptionString(e));
+            processEngineInfo = new ProcessEngineInfoImpl(null, resourceUrlString, ExceptionUtils.getStackTrace(e));
         }
         processEngineInfosByResourceUrl.put(resourceUrlString, processEngineInfo);
         processEngineInfos.add(processEngineInfo);
         return processEngineInfo;
-    }
-
-    private static String getExceptionString(Throwable e) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-        return sw.toString();
     }
 
     private static ProcessEngine buildProcessEngine(URL resource) {
@@ -192,7 +184,9 @@ public abstract class ProcessEngines {
         }
     }
 
-    /** Get initialization results. */
+    /**
+     * Get initialization results.
+     */
     public static List<ProcessEngineInfo> getProcessEngineInfos() {
         return processEngineInfos;
     }
@@ -211,9 +205,8 @@ public abstract class ProcessEngines {
 
     /**
      * obtain a process engine by name.
-     * 
-     * @param processEngineName
-     *            is the name of the process engine or null for the default process engine.
+     *
+     * @param processEngineName is the name of the process engine or null for the default process engine.
      */
     public static ProcessEngine getProcessEngine(String processEngineName) {
         if (!isInitialized()) {
@@ -241,11 +234,13 @@ public abstract class ProcessEngines {
         return processEngines;
     }
 
-    /** closes all process engines. This method should be called when the server shuts down. */
+    /**
+     * closes all process engines. This method should be called when the server shuts down.
+     */
     public static synchronized void destroy() {
         if (isInitialized()) {
-            Map<String, ProcessEngine> engines = new HashMap<String, ProcessEngine>(processEngines);
-            processEngines = new HashMap<String, ProcessEngine>();
+            Map<String, ProcessEngine> engines = new HashMap<>(processEngines);
+            processEngines = new HashMap<>();
 
             for (String processEngineName : engines.keySet()) {
                 ProcessEngine processEngine = engines.get(processEngineName);

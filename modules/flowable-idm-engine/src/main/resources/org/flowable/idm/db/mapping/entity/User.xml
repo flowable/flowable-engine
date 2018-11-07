@@ -1,44 +1,50 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
 
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
-  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="org.flowable.idm.engine.impl.persistence.entity.UserEntityImpl">
 
   <!-- USER INSERT -->
 
   <insert id="insertUser" parameterType="org.flowable.idm.engine.impl.persistence.entity.UserEntityImpl">
-    insert into ${prefix}ACT_ID_USER (ID_, REV_, FIRST_, LAST_, EMAIL_, PWD_)
+    insert into ${prefix}ACT_ID_USER (ID_, REV_, FIRST_, LAST_, DISPLAY_NAME_, EMAIL_, TENANT_ID_, PWD_)
     values (
       #{id ,jdbcType=VARCHAR},
       1,
       #{firstName ,jdbcType=VARCHAR},
       #{lastName ,jdbcType=VARCHAR},
+      #{displayName ,jdbcType=VARCHAR},
       #{email ,jdbcType=VARCHAR},
+      #{tenantId ,jdbcType=VARCHAR},
       #{password ,jdbcType=VARCHAR}
     )
   </insert>
 
   <insert id="bulkInsertUser" parameterType="java.util.List">
-    INSERT INTO ${prefix}ACT_ID_USER (ID_, REV_, FIRST_, LAST_, EMAIL_, PWD_) VALUES 
+    INSERT INTO ${prefix}ACT_ID_USER (ID_, REV_, FIRST_, LAST_, DISPLAY_NAME_, EMAIL_, TENANT_ID_, PWD_) VALUES
       <foreach collection="list" item="user" index="index" separator=",">
         (#{user.id ,jdbcType=VARCHAR},
          1,
          #{user.firstName ,jdbcType=VARCHAR},
          #{user.lastName ,jdbcType=VARCHAR},
+         #{user.displayName ,jdbcType=VARCHAR},
          #{user.email ,jdbcType=VARCHAR},
+         #{user.tenantId ,jdbcType=VARCHAR},
          #{user.password ,jdbcType=VARCHAR})
       </foreach>
   </insert>
 
   <insert id="bulkInsertUser" databaseId="oracle" parameterType="java.util.List">
-    INSERT ALL 
+    INSERT ALL
       <foreach collection="list" item="user" index="index">
-        INTO ${prefix}ACT_ID_USER (ID_, REV_, FIRST_, LAST_, EMAIL_, PWD_) VALUES 
+        INTO ${prefix}ACT_ID_USER (ID_, REV_, FIRST_, LAST_, DISPLAY_NAME_, EMAIL_, TENANT_ID_, PWD_) VALUES
         (#{user.id ,jdbcType=VARCHAR},
          1,
          #{user.firstName ,jdbcType=VARCHAR},
          #{user.lastName ,jdbcType=VARCHAR},
+         #{user.displayName ,jdbcType=VARCHAR},
          #{user.email ,jdbcType=VARCHAR},
+         #{user.tenantId ,jdbcType=VARCHAR},
          #{user.password ,jdbcType=VARCHAR})
       </foreach>
     SELECT * FROM dual
@@ -49,15 +55,29 @@
   <update id="updateUser" parameterType="org.flowable.idm.engine.impl.persistence.entity.UserEntityImpl">
     update ${prefix}ACT_ID_USER set
       REV_ = #{revisionNext ,jdbcType=INTEGER},
-      FIRST_ = #{firstName ,jdbcType=VARCHAR},
-      LAST_ = #{lastName ,jdbcType=VARCHAR},
-      EMAIL_ = #{email ,jdbcType=VARCHAR},
-      PWD_ = #{password ,jdbcType=VARCHAR},
+      <if test="originalPersistentState.firstName != firstName">
+        FIRST_ = #{firstName, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.lastName != lastName">
+        LAST_ = #{lastName ,jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.displayName != displayName">
+        DISPLAY_NAME_ = #{displayName ,jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.email != email">
+        EMAIL_ = #{email ,jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.tenantId != tenantId">
+        TENANT_ID_ = #{tenantId ,jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.password != password">
+        PWD_ = #{password ,jdbcType=VARCHAR},
+      </if>
       PICTURE_ID_ = #{pictureByteArrayRef ,typeHandler=IdmByteArrayRefTypeHandler}
     where ID_ = #{id}
       and REV_ = #{revision}
   </update>
-  
+
   <!-- USER DELETE -->
 
   <delete id="deleteUser" parameterType="org.flowable.idm.engine.impl.persistence.entity.UserEntityImpl">
@@ -71,17 +91,19 @@
     <result property="revision" column="REV_" jdbcType="INTEGER" />
     <result property="firstName" column="FIRST_" jdbcType="VARCHAR" />
     <result property="lastName" column="LAST_" jdbcType="VARCHAR" />
+    <result property="displayName" column="DISPLAY_NAME_" jdbcType="VARCHAR" />
     <result property="email" column="EMAIL_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="password" column="PWD_" jdbcType="VARCHAR" />
     <result property="pictureByteArrayRef" column="PICTURE_ID_" typeHandler="IdmByteArrayRefTypeHandler" />
   </resultMap>
-  
+
   <!-- USER SELECT -->
 
   <select id="selectUser" parameterType="string" resultMap="userResultMap">
     select * from ${prefix}ACT_ID_USER where ID_ = #{id,jdbcType=VARCHAR}
   </select>
-    
+
   <select id="selectUserByQueryCriteria" parameterType="org.flowable.idm.engine.impl.UserQueryImpl" resultMap="userResultMap">
   	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
     select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
@@ -89,25 +111,21 @@
     ${orderBy}
     <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
-  
+
   <select id="selectUserCountByQueryCriteria" parameterType="org.flowable.idm.engine.impl.UserQueryImpl" resultType="long">
     select count(RES.ID_)
     <include refid="selectUserByQueryCriteriaSql" />
   </select>
-  
+
   <sql id="selectUserByQueryCriteriaSql">
-    from ${prefix}ACT_ID_USER RES 
-    <if test="groupId != null">
-      inner join ${prefix}ACT_ID_MEMBERSHIP M on RES.ID_ = M.USER_ID_
-      inner join ${prefix}ACT_ID_GROUP G on M.GROUP_ID_ = G.ID_
-    </if>
+    from ${prefix}ACT_ID_USER RES
     <where>
       <if test="id != null">
         RES.ID_ = #{id}
       </if>
       <if test="ids != null &amp;&amp; ids.size() &gt; 0">
         and RES.ID_ IN
-        <foreach item="id" index="index" collection="ids" 
+        <foreach item="id" index="index" collection="ids"
                  open="(" separator="," close=")">
           #{id}
         </foreach>
@@ -139,21 +157,30 @@
       <if test="fullNameLikeIgnoreCase != null">
         and (lower(CONCAT(CONCAT(RES.FIRST_ , ' '), RES.LAST_)) like #{fullNameLikeIgnoreCase}${wildcardEscapeClause})
       </if>
+      <if test="displayName != null">
+        and RES.DISPLAY_NAME_ = #{displayName}
+      </if>
+      <if test="displayNameLike != null">
+        and RES.DISPLAY_NAME_ like #{displayNameLike}${wildcardEscapeClause}
+      </if>
+      <if test="displayNameLikeIgnoreCase != null">
+        and lower(RES.DISPLAY_NAME_) like #{displayNameLikeIgnoreCase}${wildcardEscapeClause}
+      </if>
       <if test="email != null">
         and RES.EMAIL_ = #{email}
       </if>
       <if test="emailLike != null">
         and RES.EMAIL_ like #{emailLike}${wildcardEscapeClause}
       </if>
+      <if test="tenantId != null">
+        and RES.TENANT_ID_ = #{tenantId}
+      </if>
       <if test="groupId != null">
-        and G.ID_ = #{groupId}
+        and exists(select 1 from ${prefix}ACT_ID_MEMBERSHIP M where M.USER_ID_ = RES.ID_ and M.GROUP_ID_ = #{groupId})
       </if>
       <if test="groupIds != null &amp;&amp; groupIds.size() &gt; 0">
-        and G.ID_ IN
-        <foreach item="groupId" index="index" collection="groupIds" 
-                 open="(" separator="," close=")">
-          #{groupId}
-        </foreach>
+        and exists(select 1 from ${prefix}ACT_ID_MEMBERSHIP M where M.USER_ID_ = RES.ID_ and M.GROUP_ID_ in  
+            <foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">#{groupId}</foreach>)
       </if>
     </where>
   </sql>
@@ -165,7 +192,7 @@
   <select id="selectUserCountByNativeQuery" parameterType="java.util.Map" resultType="long">
     ${sql}
   </select>
-  
+
   <select id="selectUsersWithPrivilegeId" parameterType="string" resultMap="userResultMap">
     select RES.* from ${prefix}ACT_ID_USER RES
     inner join ${prefix}ACT_ID_PRIV_MAPPING MAPPING on MAPPING.USER_ID_ = RES.ID_
@@ -173,5 +200,5 @@
     where PRIV.ID_ = #{parameter}
     order by RES.LAST_
   </select>
-  
+
 </mapper>

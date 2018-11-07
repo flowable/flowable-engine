@@ -12,9 +12,9 @@
  */
 package org.flowable.variable.service.impl.types;
 
-import org.flowable.engine.common.impl.db.DbSqlSession;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandContextCloseListener;
+import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContextCloseListener;
 
 /**
  * A {@link CommandContextCloseListener} that holds one {@link DeserializedObject} instance that is added by the {@link SerializableType}.
@@ -35,18 +35,22 @@ public class VerifyDeserializedObjectCommandContextCloseListener implements Comm
         this.deserializedObject = deserializedObject;
     }
 
+    @Override
     public void closing(CommandContext commandContext) {
         deserializedObject.verifyIfBytesOfSerializedObjectChanged();
     }
 
+    @Override
     public void closed(CommandContext commandContext) {
 
     }
 
+    @Override
     public void afterSessionsFlush(CommandContext commandContext) {
 
     }
 
+    @Override
     public void closeFailure(CommandContext commandContext) {
 
     }

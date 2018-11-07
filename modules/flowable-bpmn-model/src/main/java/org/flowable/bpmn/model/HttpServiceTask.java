@@ -36,6 +36,7 @@ public class HttpServiceTask extends ServiceTask {
         this.httpResponseHandler = httpResponseHandler;
     }
 
+    @Override
     public HttpServiceTask clone() {
         HttpServiceTask clone = new HttpServiceTask();
         clone.setValues(this);

@@ -16,7 +16,7 @@ package org.activiti.engine.impl.event;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 
 /**
  * @author Daniel Meyer
@@ -25,6 +25,7 @@ public class MessageEventHandler extends AbstractEventHandler {
 
     public static final String EVENT_HANDLER_TYPE = "message";
 
+    @Override
     public String getEventHandlerType() {
         return EVENT_HANDLER_TYPE;
     }

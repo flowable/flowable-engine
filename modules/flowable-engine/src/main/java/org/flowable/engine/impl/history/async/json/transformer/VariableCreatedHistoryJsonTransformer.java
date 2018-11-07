@@ -12,26 +12,34 @@
  */
 package org.flowable.engine.impl.history.async.json.transformer;
 
-import java.util.Date;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDateFromJson;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDoubleFromJson;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getIntegerFromJson;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getLongFromJson;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
 
-import org.apache.commons.codec.binary.Base64;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.HistoricVariableService;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
-import org.flowable.variable.service.impl.types.VariableType;
-import org.flowable.variable.service.impl.types.VariableTypes;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class VariableCreatedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
     @Override
-    public String getType() {
-        return HistoryJsonConstants.TYPE_VARIABLE_CREATED;
+    public List<String> getTypes() {
+        return Collections.singletonList(HistoryJsonConstants.TYPE_VARIABLE_CREATED);
     }
 
     @Override
@@ -62,7 +70,7 @@ public class VariableCreatedHistoryJsonTransformer extends AbstractHistoryJsonTr
         
         String variableBytes = getStringFromJson(historicalData, HistoryJsonConstants.VARIABLE_BYTES_VALUE);
         if (StringUtils.isNotEmpty(variableBytes)) {
-            historicVariableInstanceEntity.setBytes(Base64.decodeBase64(variableBytes));
+            historicVariableInstanceEntity.setBytes(Base64.getDecoder().decode(variableBytes));
         }
         
         Date time = getDateFromJson(historicalData, HistoryJsonConstants.CREATE_TIME);

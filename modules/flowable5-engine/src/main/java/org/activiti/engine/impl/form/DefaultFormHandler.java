@@ -23,7 +23,7 @@ import org.activiti.engine.impl.el.ExpressionManager;
 import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.form.AbstractFormType;
 import org.flowable.engine.form.FormProperty;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -35,8 +35,9 @@ public class DefaultFormHandler implements FormHandler {
 
     protected Expression formKey;
     protected String deploymentId;
-    protected List<FormPropertyHandler> formPropertyHandlers = new ArrayList<FormPropertyHandler>();
+    protected List<FormPropertyHandler> formPropertyHandlers = new ArrayList<>();
 
+    @Override
     public void parseConfiguration(List<org.flowable.bpmn.model.FormProperty> formProperties, String formKey, DeploymentEntity deployment, ProcessDefinition processDefinition) {
         this.deploymentId = deployment.getId();
 
@@ -79,7 +80,7 @@ public class DefaultFormHandler implements FormHandler {
     }
 
     protected void initializeFormProperties(FormDataImpl formData, ExecutionEntity execution) {
-        List<FormProperty> formProperties = new ArrayList<FormProperty>();
+        List<FormProperty> formProperties = new ArrayList<>();
         for (FormPropertyHandler formPropertyHandler : formPropertyHandlers) {
             if (formPropertyHandler.isReadable()) {
                 FormProperty formProperty = formPropertyHandler.createFormProperty(execution);
@@ -89,8 +90,9 @@ public class DefaultFormHandler implements FormHandler {
         formData.setFormProperties(formProperties);
     }
 
+    @Override
     public void submitFormProperties(Map<String, String> properties, ExecutionEntity execution) {
-        Map<String, String> propertiesCopy = new HashMap<String, String>(properties);
+        Map<String, String> propertiesCopy = new HashMap<>(properties);
         for (FormPropertyHandler formPropertyHandler : formPropertyHandlers) {
             // submitFormProperty will remove all the keys which it takes care of
             formPropertyHandler.submitFormProperty(execution, propertiesCopy);

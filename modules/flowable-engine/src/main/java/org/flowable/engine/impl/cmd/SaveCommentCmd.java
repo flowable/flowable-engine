@@ -15,9 +15,9 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.CommentEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -34,6 +34,7 @@ public class SaveCommentCmd implements Command<Void>, Serializable {
         this.comment = comment;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (comment == null) {
             throw new FlowableIllegalArgumentException("comment is null");

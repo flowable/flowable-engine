@@ -17,7 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.flowable.variable.service.event.FlowableVariableEvent;
+import org.flowable.variable.api.event.FlowableVariableEvent;
+import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.DateType;
 import org.flowable.variable.service.impl.types.DoubleType;
@@ -28,7 +29,6 @@ import org.flowable.variable.service.impl.types.SerializableType;
 import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
-import org.flowable.variable.service.impl.types.VariableType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

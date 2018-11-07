@@ -15,8 +15,8 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.Model;
 
@@ -27,6 +27,7 @@ public class CreateModelCmd implements Command<Model>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public Model execute(CommandContext commandContext) {
         return CommandContextUtil.getModelEntityManager(commandContext).create();
     }

@@ -13,14 +13,18 @@
 
 package org.flowable.rest.api.runtime;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.flowable.engine.task.Task;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.flowable.task.api.Task;
+import org.junit.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test for all REST-operations related to sub tasks.
@@ -32,6 +36,7 @@ public class TaskSubTaskCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting all sub tasks. GET runtime/tasks/{taskId}/subtasks
      */
+    @Test
     public void testGetSubTasks() throws Exception {
 
         Task parentTask = taskService.newTask();

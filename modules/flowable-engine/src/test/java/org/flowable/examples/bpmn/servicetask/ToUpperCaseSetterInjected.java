@@ -12,8 +12,8 @@
  */
 package org.flowable.examples.bpmn.servicetask;
 
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.JavaDelegate;
 
 /**
@@ -24,6 +24,7 @@ public class ToUpperCaseSetterInjected implements JavaDelegate {
     private Expression text;
     private boolean setterInvoked;
 
+    @Override
     public void execute(DelegateExecution execution) {
 
         if (!setterInvoked) {

@@ -12,8 +12,8 @@
  */
 package org.activiti.engine.impl.persistence.entity;
 
-import org.flowable.engine.delegate.VariableScope;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
+import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
  * A dummy implementation of {@link VariableInstance}, used for storing transient variables on a {@link VariableScope}, as the {@link VariableScope} works with instances of {@link VariableInstance}
@@ -111,62 +111,17 @@ public class TransientVariableInstance implements VariableInstance {
     }
 
     @Override
-    public boolean isInserted() {
-        return false;
-    }
-
-    @Override
-    public void setInserted(boolean inserted) {
-
-    }
-
-    @Override
-    public boolean isUpdated() {
-        return false;
-    }
-
-    @Override
-    public void setUpdated(boolean updated) {
-
-    }
-
-    @Override
-    public boolean isDeleted() {
-        return false;
-    }
-
-    @Override
-    public void setDeleted(boolean deleted) {
-
-    }
-
-    @Override
-    public Object getPersistentState() {
-        return null;
-    }
-
-    @Override
-    public void setRevision(int revision) {
-
-    }
-
-    @Override
-    public int getRevision() {
-        return 0;
-    }
-
-    @Override
-    public int getRevisionNext() {
-        return 0;
-    }
-
-    @Override
     public void setName(String name) {
 
     }
 
     @Override
     public void setProcessInstanceId(String processInstanceId) {
+
+    }
+    
+    @Override
+    public void setProcessDefinitionId(String processDefinitionId) {
 
     }
 
@@ -199,6 +154,11 @@ public class TransientVariableInstance implements VariableInstance {
     public String getProcessInstanceId() {
         return null;
     }
+    
+    @Override
+    public String getProcessDefinitionId() {
+        return null;
+    }
 
     @Override
     public String getTaskId() {
@@ -215,13 +175,36 @@ public class TransientVariableInstance implements VariableInstance {
         return null;
     }
 
+    // non-supported (v6)
+
     @Override
-    public Object getOriginalPersistentState() {
+    public String getScopeId() {
+        return null;
+    }
+    
+    @Override
+    public String getSubScopeId() {
         return null;
     }
 
     @Override
-    public void setOriginalPersistentState(Object persistentState) {
+    public String getScopeType() {
+        return null;
+    }
+
+    @Override
+    public void setScopeId(String scopeId) {
         
     }
+    
+    @Override
+    public void setSubScopeId(String subScopeId) {
+        
+    }
+
+    @Override
+    public void setScopeType(String scopeType) {
+        
+    }
+    
 }

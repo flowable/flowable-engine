@@ -42,6 +42,7 @@ public class DataSpec extends BaseElement {
         this.isCollection = isCollection;
     }
 
+    @Override
     public DataSpec clone() {
         DataSpec clone = new DataSpec();
         clone.setValues(this);

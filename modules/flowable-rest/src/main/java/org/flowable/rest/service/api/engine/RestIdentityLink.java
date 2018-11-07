@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.engine;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * @author Frederik Heremans
  */
@@ -23,6 +25,7 @@ public class RestIdentityLink {
     private String group;
     private String type;
 
+    @ApiModelProperty(example = "")
     public String getUrl() {
         return url;
     }
@@ -31,6 +34,7 @@ public class RestIdentityLink {
         this.url = url;
     }
 
+    @ApiModelProperty(example = "kermit")
     public String getUser() {
         return user;
     }
@@ -39,6 +43,7 @@ public class RestIdentityLink {
         this.user = user;
     }
 
+    @ApiModelProperty(example = "sales")
     public String getGroup() {
         return group;
     }
@@ -47,6 +52,7 @@ public class RestIdentityLink {
         this.group = group;
     }
 
+    @ApiModelProperty(example ="candidate")
     public String getType() {
         return type;
     }

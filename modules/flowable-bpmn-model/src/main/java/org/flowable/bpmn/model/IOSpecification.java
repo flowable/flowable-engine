@@ -54,6 +54,7 @@ public class IOSpecification extends BaseElement {
         this.dataOutputRefs = dataOutputRefs;
     }
 
+    @Override
     public IOSpecification clone() {
         IOSpecification clone = new IOSpecification();
         clone.setValues(this);

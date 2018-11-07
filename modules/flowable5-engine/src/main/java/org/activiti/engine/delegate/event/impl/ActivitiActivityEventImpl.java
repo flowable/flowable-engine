@@ -12,8 +12,8 @@
  */
 package org.activiti.engine.delegate.event.impl;
 
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 /**
  * Implementation of an {@link FlowableActivityEvent}.
@@ -41,6 +41,7 @@ public class ActivitiActivityEventImpl extends ActivitiEventImpl implements Flow
         this.activityId = activityId;
     }
 
+    @Override
     public String getActivityName() {
         return activityName;
     }

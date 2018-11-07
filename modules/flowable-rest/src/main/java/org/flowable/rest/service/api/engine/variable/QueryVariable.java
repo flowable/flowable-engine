@@ -13,7 +13,7 @@
 
 package org.flowable.rest.service.api.engine.variable;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

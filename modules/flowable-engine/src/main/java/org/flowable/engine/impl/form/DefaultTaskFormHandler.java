@@ -14,24 +14,33 @@
 package org.flowable.engine.impl.form;
 
 import org.flowable.engine.form.TaskFormData;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Tom Baeyens
  */
 public class DefaultTaskFormHandler extends DefaultFormHandler implements TaskFormHandler {
 
+    @Override
     public TaskFormData createTaskForm(TaskEntity task) {
         TaskFormDataImpl taskFormData = new TaskFormDataImpl();
+        
+        ExecutionEntity executionEntity = null;
+        if (task.getExecutionId() != null) {
+            executionEntity = CommandContextUtil.getExecutionEntityManager().findById(task.getExecutionId());
+        }
+        
         if (formKey != null) {
-            Object formValue = formKey.getValue(task.getExecution());
+            Object formValue = formKey.getValue(executionEntity);
             if (formValue != null) {
                 taskFormData.setFormKey(formValue.toString());
             }
         }
         taskFormData.setDeploymentId(deploymentId);
         taskFormData.setTask(task);
-        initializeFormProperties(taskFormData, task.getExecution());
+        initializeFormProperties(taskFormData, executionEntity);
         return taskFormData;
     }
 }

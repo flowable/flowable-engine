@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+  <case id="testOneRequiredHumanTaskInStage" name="testOneRequiredHumanTask" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="casePlanModel">
+      <planItem id="planItem3" name="The Stage" definitionRef="sid-17705AF8-4146-42B7-B3BF-8C444CB1291B"></planItem>
+      <planItem id="planItem4" name="Other task" definitionRef="sid-6FADCDFD-9F35-4A72-9387-F7FE4B9196E8"></planItem>
+      <stage id="sid-17705AF8-4146-42B7-B3BF-8C444CB1291B" name="The Stage" autoComplete="true">
+        <planItem id="planItem1" name="Required task" definitionRef="sid-1E0DFB07-A127-485B-9EEF-80021D62E97D">
+          <entryCriterion id="sid-3FE93E64-1B4C-43F9-AE64-81A9800D5309" sentryRef="sentry1"></entryCriterion>
+        </planItem>
+        <planItem id="planItem2" name="Non-required task" definitionRef="sid-DFDDEFD6-306E-4616-81BE-19402F5BCF05">
+          <entryCriterion id="sid-600B7C68-48BB-42BE-9D95-2451EC64FBBE" sentryRef="sentry2"></entryCriterion>
+        </planItem>
+        <sentry id="sentry1">
+          <ifPart>
+            <condition><![CDATA[${caseInstance.getVariable('required') != null && required}]]></condition>
+          </ifPart>
+        </sentry>
+        <sentry id="sentry2">
+          <ifPart>
+            <condition><![CDATA[${caseInstance.getVariable('nonRequired') != null && nonRequired}]]></condition>
+          </ifPart>
+        </sentry>
+        <humanTask id="sid-1E0DFB07-A127-485B-9EEF-80021D62E97D" name="Required task"></humanTask>
+        <humanTask id="sid-DFDDEFD6-306E-4616-81BE-19402F5BCF05" name="Non-required task"></humanTask>
+      </stage>
+      <humanTask id="sid-6FADCDFD-9F35-4A72-9387-F7FE4B9196E8" name="Other task"></humanTask>
+    </casePlanModel>
+  </case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="CMMNDiagram_testOneRequiredHumanTaskInStage">
+      <cmmndi:CMMNShape id="CMMNShape_casePlanModel" cmmnElementRef="casePlanModel">
+        <dc:Bounds height="714.0" width="718.0" x="40.0" y="40.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem3" cmmnElementRef="planItem3">
+        <dc:Bounds height="304.0" width="551.0" x="105.0" y="85.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+        <dc:Bounds height="80.0" width="100.0" x="165.0" y="225.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_sid-3FE93E64-1B4C-43F9-AE64-81A9800D5309" cmmnElementRef="sid-3FE93E64-1B4C-43F9-AE64-81A9800D5309">
+        <dc:Bounds height="22.0" width="14.0" x="157.50985146657914" y="246.85997899527382"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+        <dc:Bounds height="80.0" width="100.0" x="465.0" y="150.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_sid-600B7C68-48BB-42BE-9D95-2451EC64FBBE" cmmnElementRef="sid-600B7C68-48BB-42BE-9D95-2451EC64FBBE">
+        <dc:Bounds height="22.0" width="14.0" x="457.88405431243234" y="183.4547507277838"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem4" cmmnElementRef="planItem4">
+        <dc:Bounds height="80.0" width="100.0" x="259.5" y="438.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</definitions>

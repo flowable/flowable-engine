@@ -21,10 +21,12 @@ import org.flowable.engine.impl.bpmn.parser.BpmnParse;
  */
 public class ManualTaskParseHandler extends AbstractActivityBpmnParseHandler<ManualTask> {
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return ManualTask.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, ManualTask manualTask) {
         manualTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createManualTaskActivityBehavior(manualTask));
     }

@@ -25,16 +25,15 @@ import org.activiti.engine.delegate.event.impl.ActivitiProcessCancelledEventImpl
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableCancelledEvent;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
-import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -228,12 +227,12 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
     }
 
     /**
-     * Test Start->User Task process on PROCESS_COMPLETED event
+     * Test Start->User org.flowable.task.service.Task process on PROCESS_COMPLETED event
      */
     @Deployment(resources = { "org/activiti/engine/test/api/event/ProcessInstanceEventsTest.noEndProcess.bpmn20.xml" })
     public void testProcessCompleted_NoEnd() throws Exception {
         ProcessInstance noEndProcess = this.runtimeService.startProcessInstanceByKey("noEndProcess");
-        Task task = taskService.createTaskQuery().processInstanceId(noEndProcess.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(noEndProcess.getId()).singleResult();
         taskService.complete(task.getId());
 
         assertEquals("ActivitiEventType.PROCESS_COMPLETED was expected 1 time.", 1, listener.filterEvents(FlowableEngineEventType.PROCESS_COMPLETED).size());
@@ -334,7 +333,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertNotNull(processInstance);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
         List<FlowableEvent> processCancelledEvents = listener.filterEvents(FlowableEngineEventType.PROCESS_CANCELLED);
@@ -349,7 +348,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertNotNull(processInstance);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
         List<FlowableEvent> processTerminatedEvents = listener.filterEvents(FlowableEngineEventType.PROCESS_CANCELLED);
@@ -363,7 +362,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         long executionEntities = runtimeService.createExecutionQuery().processInstanceId(pi.getId()).count();
         assertEquals(3, executionEntities);
 
-        Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preTerminateTask").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preTerminateTask").singleResult();
         taskService.complete(task.getId());
 
         List<FlowableEvent> processTerminatedEvents = listener.filterEvents(FlowableEngineEventType.PROCESS_CANCELLED);
@@ -393,7 +392,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         long executionEntities = runtimeService.createExecutionQuery().count();
         assertEquals(1, executionEntities);
 
-        Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preNormalEnd").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preNormalEnd").singleResult();
         taskService.complete(task.getId());
 
         assertProcessEnded(pi.getId());
@@ -415,7 +414,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateParentProcess");
 
         // should terminate the called process and continue the parent
-        Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preTerminateEnd").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preTerminateEnd").singleResult();
         taskService.complete(task.getId());
 
         assertProcessEnded(pi.getId());
@@ -445,7 +444,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
     public void testProcessCompletedEvents_callActivityErrorEndEvent() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("catchErrorOnCallActivity");
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Task in subprocess", task.getName());
         List<ProcessInstance> subProcesses = runtimeService.createProcessInstanceQuery().superProcessInstanceId(pi.getId()).list();
         assertEquals(1, subProcesses.size());
@@ -545,6 +544,16 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
                 }
             }
             return filteredEvents;
+        }
+
+        @Override
+        public boolean isFireOnTransactionLifecycleEvent() {
+            return false;
+        }
+
+        @Override
+        public String getOnTransaction() {
+            return null;
         }
 
     }

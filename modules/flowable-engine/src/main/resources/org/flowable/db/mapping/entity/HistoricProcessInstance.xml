@@ -36,7 +36,9 @@
         SUPER_PROCESS_INSTANCE_ID_,
         DELETE_REASON_,
         TENANT_ID_,
-        NAME_
+        NAME_,
+        CALLBACK_ID_,
+        CALLBACK_TYPE_
       ) values (
         #{id ,jdbcType=VARCHAR},
         1,
@@ -52,7 +54,9 @@
         #{superProcessInstanceId, jdbcType=VARCHAR},
         #{deleteReason, jdbcType=VARCHAR},
         #{tenantId, jdbcType=VARCHAR},
-        #{name, jdbcType=VARCHAR}
+        #{name, jdbcType=VARCHAR},
+        #{callbackId, jdbcType=VARCHAR},
+        #{callbackType, jdbcType=VARCHAR}
       )
   </insert>
   
@@ -72,10 +76,13 @@
         SUPER_PROCESS_INSTANCE_ID_,
         DELETE_REASON_,
         TENANT_ID_,
-        NAME_
+        NAME_,
+        CALLBACK_ID_,
+        CALLBACK_TYPE_
       ) values 
         <foreach collection="list" item="historicProcessInstance" index="index" separator=",">
-          (#{historicProcessInstance.id ,jdbcType=VARCHAR},
+          (
+           #{historicProcessInstance.id ,jdbcType=VARCHAR},
            1,
            #{historicProcessInstance.processInstanceId, jdbcType=VARCHAR},
            #{historicProcessInstance.businessKey, jdbcType=VARCHAR},
@@ -89,7 +96,10 @@
            #{historicProcessInstance.superProcessInstanceId, jdbcType=VARCHAR},
            #{historicProcessInstance.deleteReason, jdbcType=VARCHAR},
            #{historicProcessInstance.tenantId, jdbcType=VARCHAR},
-           #{historicProcessInstance.name, jdbcType=VARCHAR})
+           #{historicProcessInstance.name, jdbcType=VARCHAR},
+           #{historicProcessInstance.callbackId, jdbcType=VARCHAR},
+           #{historicProcessInstance.callbackType, jdbcType=VARCHAR}
+          )
          </foreach>
   </insert>
   
@@ -111,9 +121,12 @@
             SUPER_PROCESS_INSTANCE_ID_,
             DELETE_REASON_,
             TENANT_ID_,
-            NAME_
+            NAME_,
+            CALLBACK_ID_,
+            CALLBACK_TYPE_
           ) VALUES 
-              (#{historicProcessInstance.id ,jdbcType=VARCHAR},
+              (
+               #{historicProcessInstance.id ,jdbcType=VARCHAR},
                1,
                #{historicProcessInstance.processInstanceId, jdbcType=VARCHAR},
                #{historicProcessInstance.businessKey, jdbcType=VARCHAR},
@@ -127,7 +140,10 @@
                #{historicProcessInstance.superProcessInstanceId, jdbcType=VARCHAR},
                #{historicProcessInstance.deleteReason, jdbcType=VARCHAR},
                #{historicProcessInstance.tenantId, jdbcType=VARCHAR},
-               #{historicProcessInstance.name, jdbcType=VARCHAR})
+               #{historicProcessInstance.name, jdbcType=VARCHAR},
+               #{historicProcessInstance.callbackId, jdbcType=VARCHAR},
+               #{historicProcessInstance.callbackType, jdbcType=VARCHAR}
+              )
        </foreach>
     SELECT * FROM dual
   </insert>
@@ -160,8 +176,14 @@
 	      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR},
 	    </if>
 	    <if test="originalPersistentState.name != name">
-	      NAME_ = #{name, jdbcType=VARCHAR}
+	      NAME_ = #{name, jdbcType=VARCHAR},
 	    </if>
+        <if test="originalPersistentState.callbackId != callbackId">
+          CALLBACK_ID_ = #{callbackId, jdbcType=VARCHAR},
+        </if> 
+        <if test="originalPersistentState.callbackType != callbackType">
+          CALLBACK_TYPE_ = #{callbackType, jdbcType=VARCHAR}
+        </if>    
       </set>
     where ID_ = #{id}
     and REV_ = #{revision, jdbcType=INTEGER}
@@ -202,6 +224,8 @@
     <result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
+    <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
   </resultMap>
   
   <resultMap id="historicProcessInstanceAndVariablesResultMap" type="org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl">
@@ -224,10 +248,12 @@
     <result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
+    <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
     <collection property="queryVariables" column="EXECUTION_ID_" javaType="ArrayList" ofType="org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl">
       <id property="id" column="VAR_ID_"/>
       <result property="name" column="VAR_NAME_" javaType="String" jdbcType="VARCHAR" />
-      <result property="variableType" column="VAR_TYPE_" javaType="org.flowable.variable.service.impl.types.VariableType" jdbcType="VARCHAR" />
+      <result property="variableType" column="VAR_TYPE_" javaType="org.flowable.variable.api.types.VariableType" jdbcType="VARCHAR" />
       <result property="revision" column="VAR_REV_" jdbcType="INTEGER" />
       <result property="processInstanceId" column="VAR_PROC_INST_ID_" jdbcType="VARCHAR" />
       <result property="executionId" column="VAR_EXECUTION_ID_" jdbcType="VARCHAR" />
@@ -246,13 +272,13 @@
     select * from ${prefix}ACT_HI_PROCINST where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </select>
 
-  <select id="selectHistoricProcessInstanceIdsByProcessDefinitionId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultType="string">
+  <select id="selectHistoricProcessInstanceIdsByProcessDefinitionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultType="string">
     select ID_
     from ${prefix}ACT_HI_PROCINST 
     where PROC_DEF_ID_ = #{parameter}
   </select>
   
-    <select id="selectHistoricProcessInstanceIdsBySuperProcessInstanceId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historicProcessInstanceResultMap">
+    <select id="selectHistoricProcessInstanceIdsBySuperProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicProcessInstanceResultMap">
     select *
     from ${prefix}ACT_HI_PROCINST 
     where SUPER_PROCESS_INSTANCE_ID_ = #{parameter}
@@ -383,7 +409,9 @@
   
   <sql id="commonSelectHistoricProcessInstancesByQueryCriteriaSql">
     <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
-      inner join ${prefix}ACT_HI_VARINST  A${index} on RES.PROC_INST_ID_ = A${index}.PROC_INST_ID_
+      <if test="!queryVariableValue.operator.equals('EXISTS') &amp;&amp; !queryVariableValue.operator.equals('NOT_EXISTS')">
+        inner join ${prefix}ACT_HI_VARINST  A${index} on RES.PROC_INST_ID_ = A${index}.PROC_INST_ID_
+      </if>
     </foreach>
     <foreach collection="orQueryObjects" index="orIndex" item="orQueryObject">
       <if test="orQueryObject.processKeyNotIn != null || orQueryObject.processDefinitionKey != null || orQueryObject.processDefinitionCategory != null || orQueryObject.processDefinitionName != null || orQueryObject.processDefinitionVersion != null || (orQueryObject.processDefinitionKeyIn != null &amp;&amp; orQueryObject.processDefinitionKeyIn.size() &gt; 0)">
@@ -393,7 +421,9 @@
         left outer join ${prefix}ACT_RE_PROCDEF DEPLOY_P_OR${orIndex} ON RES.PROC_DEF_ID_ = DEPLOY_P_OR${orIndex}.ID_
       </if>
       <if test="orQueryObject.queryVariableValues != null &amp;&amp; orQueryObject.queryVariableValues.size() &gt; 0">
-        left outer join ${prefix}ACT_HI_VARINST A_OR${orIndex} on RES.PROC_INST_ID_ = A_OR${orIndex}.PROC_INST_ID_
+        <if test="orQueryObject.hasValueComparisonQueryVariables()">
+            left outer join ${prefix}ACT_HI_VARINST A_OR${orIndex} on RES.PROC_INST_ID_ = A_OR${orIndex}.PROC_INST_ID_
+        </if>
       </if>
     </foreach>
     <if test="withJobException">
@@ -478,7 +508,15 @@
           exists(select LINK.USER_ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where USER_ID_ = #{involvedUser} and LINK.PROC_INST_ID_ = RES.ID_)
         )
       </if>
-      <if test="startedBy != null">
+        <if test="involvedGroups != null">
+            and EXISTS(
+            select ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.PROC_INST_ID_ = RES.ID_ and LINK.GROUP_ID_ in
+            <foreach item="involvedGroup" index="index" collection="involvedGroups" open="(" separator="," close=")">
+                #{involvedGroup}
+            </foreach>
+            )
+        </if>
+        <if test="startedBy != null">
         and RES.START_USER_ID_ = #{startedBy}
       </if>
       <if test="superProcessInstanceId != null">
@@ -506,67 +544,77 @@
         and lower(RES.NAME_) like #{nameLikeIgnoreCase}${wildcardEscapeClause}
       </if>
       <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
-        <if test="queryVariableValue.name != null">
-          <!-- Match-all variable-names when name is null -->
-          and A${index}.NAME_= #{queryVariableValue.name}
-        </if>
-        <if test="!queryVariableValue.type.equals('null')">
-        <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
-          and A${index}.VAR_TYPE_ = #{queryVariableValue.type}
-        </if>
-        <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
-          <choose>
-            <when test="queryVariableValue.operator.equals('EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">
-              and lower(A${index}.TEXT_)
+        <choose>
+            <when test="queryVariableValue.operator.equals('EXISTS')">
+              and EXISTS (select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVariableValue.name} and RES.PROC_INST_ID_ = PROC_INST_ID_)
+            </when>
+            <when test="queryVariableValue.operator.equals('NOT_EXISTS')">
+              and NOT EXISTS (select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVariableValue.name} and RES.PROC_INST_ID_ = PROC_INST_ID_)
             </when>
             <otherwise>
-              and A${index}.TEXT_
+                <if test="queryVariableValue.name != null">
+                  <!-- Match-all variable-names when name is null -->
+                  and A${index}.NAME_= #{queryVariableValue.name}
+                </if>
+                <if test="!queryVariableValue.type.equals('null')">
+                <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
+                  and A${index}.VAR_TYPE_ = #{queryVariableValue.type}
+                </if>
+                <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+                  <choose>
+                    <when test="queryVariableValue.operator.equals('EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">
+                      and lower(A${index}.TEXT_)
+                    </when>
+                    <otherwise>
+                      and A${index}.TEXT_
+                    </otherwise>
+                  </choose>
+                  <choose>
+                    <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">LIKE</when>
+                    <otherwise><include refid="executionVariableOperator" /></otherwise>
+                  </choose>
+                  #{queryVariableValue.textValue}
+                  <choose>
+        			<when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
+        		  </choose>
+                </if>
+                <if test="queryVariableValue.textValue2 != null">
+                and A${index}.TEXT2_
+                <choose>
+                  <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
+                  <otherwise><include refid="executionVariableOperator" /></otherwise>
+                </choose>
+                  #{queryVariableValue.textValue2}
+                  <choose>
+        			<when test="queryVariableValue.operator.equals('LIKE')">${wildcardEscapeClause}</when>
+        		  </choose>
+                </if>
+                <if test="queryVariableValue.longValue != null">
+                    and A${index}.LONG_
+                    <include refid="executionVariableOperator" />
+                    #{queryVariableValue.longValue}
+                </if>
+                <if test="queryVariableValue.doubleValue != null">
+                    and A${index}.DOUBLE_
+                    <include refid="executionVariableOperator" />
+                    #{queryVariableValue.doubleValue}
+                </if>
+                <!-- Null variable type -->
+                <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+                  <choose>
+                    <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
+                        and (A${index}.TEXT_ is not null or A${index}.TEXT2_ is not null or A${index}.LONG_ is not null or A${index}.DOUBLE_ is not null or A${index}.BYTEARRAY_ID_ is not null)
+                    </when>
+                    <otherwise>
+                        and A${index}.TEXT_ is null and A${index}.TEXT2_ is null and A${index}.LONG_ is null and A${index}.DOUBLE_ is null and A${index}.BYTEARRAY_ID_ is null
+                    </otherwise>
+                  </choose>
+                </if>
             </otherwise>
-          </choose>
-          <choose>
-            <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">LIKE</when>
-            <otherwise><include refid="executionVariableOperator" /></otherwise>
-          </choose>
-          #{queryVariableValue.textValue}
-          <choose>
-			<when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
-		  </choose>
-        </if>
-        <if test="queryVariableValue.textValue2 != null">
-        and A${index}.TEXT2_
-        <choose>
-          <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
-          <otherwise><include refid="executionVariableOperator" /></otherwise>
         </choose>
-          #{queryVariableValue.textValue2}
-          <choose>
-			<when test="queryVariableValue.operator.equals('LIKE')">${wildcardEscapeClause}</when>
-		  </choose>
-        </if>
-        <if test="queryVariableValue.longValue != null">
-        and A${index}.LONG_
-        <include refid="executionVariableOperator" />
-        #{queryVariableValue.longValue}
-        </if>
-        <if test="queryVariableValue.doubleValue != null">
-        and A${index}.DOUBLE_
-        <include refid="executionVariableOperator" />
-        #{queryVariableValue.doubleValue}
-        </if>
-        <!-- Null variable type -->
-        <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
-          <choose>
-          <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
-            and (A${index}.TEXT_ is not null or A${index}.TEXT2_ is not null or A${index}.LONG_ is not null or A${index}.DOUBLE_ is not null or A${index}.BYTEARRAY_ID_ is not null)
-          </when>
-          <otherwise>
-            and A${index}.TEXT_ is null and A${index}.TEXT2_ is null and A${index}.LONG_ is null and A${index}.DOUBLE_ is null and A${index}.BYTEARRAY_ID_ is null
-          </otherwise>
-        </choose>
-        </if>
       </foreach>
       <foreach item="orQueryObject" index="orIndex" collection="orQueryObjects">
-        and 
+        and
         <trim prefix="(" prefixOverrides="OR" suffix=")">
           <if test="orQueryObject.processInstanceId != null">
             RES.PROC_INST_ID_ = #{orQueryObject.processInstanceId}
@@ -649,6 +697,14 @@
               exists(select LINK.USER_ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where USER_ID_ = #{orQueryObject.involvedUser} and LINK.PROC_INST_ID_ = RES.ID_)
             )
           </if>
+            <if test="orQueryObject.involvedGroups != null">
+              or EXISTS(
+                    select ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.PROC_INST_ID_ = RES.ID_ and LINK.GROUP_ID_ in
+                    <foreach item="involvedGroup" index="index" collection="orQueryObject.involvedGroups" open="(" separator="," close=")">
+                        #{involvedGroup}
+                    </foreach>
+              )
+            </if>
           <if test="orQueryObject.startedBy != null">
             or RES.START_USER_ID_ = #{orQueryObject.startedBy}
           </if>
@@ -679,64 +735,74 @@
           <foreach collection="orQueryObject.queryVariableValues" index="index" item="queryVariableValue">
             or
             <trim prefix="(" prefixOverrides="AND" suffix=")">
-              <if test="queryVariableValue.name != null">
-                <!-- Match-all variable-names when name is null -->
-                and A_OR${orIndex}.NAME_= #{queryVariableValue.name}
-              </if>
-              <if test="!queryVariableValue.type.equals('null')">
-              <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
-                and A_OR${orIndex}.VAR_TYPE_ = #{queryVariableValue.type}
-              </if>
-              <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
-                <choose>
-                  <when test="queryVariableValue.operator.equals('EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">
-                    and lower(A_OR${orIndex}.TEXT_)
-                  </when>
-                  <otherwise>
-                    and A_OR${orIndex}.TEXT_
-                  </otherwise>
-                </choose>
-                <choose>
-                  <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">LIKE</when>
-                  <otherwise><include refid="executionVariableOperator" /></otherwise>
-                </choose>
-                #{queryVariableValue.textValue}
-                <choose>
-				  <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
-				</choose>
-              </if>
-              <if test="queryVariableValue.textValue2 != null">
-                and A_OR${orIndex}.TEXT2_
-                <choose>
-                  <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
-                  <otherwise><include refid="executionVariableOperator" /></otherwise>
-                </choose>
-                #{queryVariableValue.textValue2}
-                <choose>
-				  <when test="queryVariableValue.operator.equals('LIKE')">${wildcardEscapeClause}</when>
-				</choose>
-              </if>
-              <if test="queryVariableValue.longValue != null">
-                and A_OR${orIndex}.LONG_
-                <include refid="executionVariableOperator" />
-                #{queryVariableValue.longValue}
-              </if>
-              <if test="queryVariableValue.doubleValue != null">
-                and A_OR${orIndex}.DOUBLE_
-                <include refid="executionVariableOperator" />
-                #{queryVariableValue.doubleValue}
-              </if>
-              <!-- Null variable type -->
-              <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
-                <choose>
-                  <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
-                    and (A_OR${orIndex}.TEXT_ is not null or A_OR${orIndex}.TEXT2_ is not null or A_OR${orIndex}.LONG_ is not null or A_OR${orIndex}.DOUBLE_ is not null or A_OR${orIndex}.BYTEARRAY_ID_ is not null)
-                  </when>
-                  <otherwise>
-                    and A_OR${orIndex}.TEXT_ is null and A_OR${orIndex}.TEXT2_ is null and A_OR${orIndex}.LONG_ is null and A_OR${orIndex}.DOUBLE_ is null and A_OR${orIndex}.BYTEARRAY_ID_ is null
-                  </otherwise>
-                </choose>
-              </if>
+              <choose>
+                <when test="queryVariableValue.operator.equals('EXISTS')">
+                    and EXISTS (select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVariableValue.name} and RES.PROC_INST_ID_ = PROC_INST_ID_)
+                </when>
+                <when test="queryVariableValue.operator.equals('NOT_EXISTS')">
+                    and NOT EXISTS (select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVariableValue.name} and RES.PROC_INST_ID_ = PROC_INST_ID_)
+                </when>
+                <otherwise>
+                  <if test="queryVariableValue.name != null">
+                    <!-- Match-all variable-names when name is null -->
+                    and A_OR${orIndex}.NAME_= #{queryVariableValue.name}
+                  </if>
+                  <if test="!queryVariableValue.type.equals('null')">
+                  <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
+                    and A_OR${orIndex}.VAR_TYPE_ = #{queryVariableValue.type}
+                  </if>
+                  <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+                    <choose>
+                      <when test="queryVariableValue.operator.equals('EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">
+                        and lower(A_OR${orIndex}.TEXT_)
+                      </when>
+                      <otherwise>
+                        and A_OR${orIndex}.TEXT_
+                      </otherwise>
+                    </choose>
+                    <choose>
+                      <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">LIKE</when>
+                      <otherwise><include refid="executionVariableOperator" /></otherwise>
+                    </choose>
+                    #{queryVariableValue.textValue}
+                    <choose>
+    				  <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
+    				</choose>
+                  </if>
+                  <if test="queryVariableValue.textValue2 != null">
+                    and A_OR${orIndex}.TEXT2_
+                    <choose>
+                      <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
+                      <otherwise><include refid="executionVariableOperator" /></otherwise>
+                    </choose>
+                    #{queryVariableValue.textValue2}
+                    <choose>
+    				  <when test="queryVariableValue.operator.equals('LIKE')">${wildcardEscapeClause}</when>
+    				</choose>
+                  </if>
+                  <if test="queryVariableValue.longValue != null">
+                    and A_OR${orIndex}.LONG_
+                    <include refid="executionVariableOperator" />
+                    #{queryVariableValue.longValue}
+                  </if>
+                  <if test="queryVariableValue.doubleValue != null">
+                    and A_OR${orIndex}.DOUBLE_
+                    <include refid="executionVariableOperator" />
+                    #{queryVariableValue.doubleValue}
+                  </if>
+                  <!-- Null variable type -->
+                  <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+                    <choose>
+                      <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
+                        and (A_OR${orIndex}.TEXT_ is not null or A_OR${orIndex}.TEXT2_ is not null or A_OR${orIndex}.LONG_ is not null or A_OR${orIndex}.DOUBLE_ is not null or A_OR${orIndex}.BYTEARRAY_ID_ is not null)
+                      </when>
+                      <otherwise>
+                        and A_OR${orIndex}.TEXT_ is null and A_OR${orIndex}.TEXT2_ is null and A_OR${orIndex}.LONG_ is null and A_OR${orIndex}.DOUBLE_ is null and A_OR${orIndex}.BYTEARRAY_ID_ is null
+                      </otherwise>
+                    </choose>
+                  </if>
+                </otherwise>
+              </choose>
             </trim>
           </foreach>
         </trim>

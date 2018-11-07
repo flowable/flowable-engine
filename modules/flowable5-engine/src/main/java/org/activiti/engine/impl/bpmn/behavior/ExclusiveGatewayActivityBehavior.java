@@ -20,7 +20,7 @@ import org.activiti.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.activiti.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +62,7 @@ public class ExclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
                 if ((condition == null && (defaultSequenceFlow == null || !defaultSequenceFlow.equals(seqFlow.getId())))
                         || (condition != null && condition.evaluate(seqFlow.getId(), execution))) {
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Sequence flow '{}'selected as outgoing sequence flow.", seqFlow.getId());
+                        LOGGER.debug("Sequence flow '{}' selected as outgoing sequence flow.", seqFlow.getId());
                     }
                     outgoingSeqFlow = seqFlow;
                 }

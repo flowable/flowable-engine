@@ -16,7 +16,7 @@ package org.flowable.idm.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.event.FlowableIdmEventType;
@@ -43,6 +43,7 @@ public class GroupEntityManagerImpl extends AbstractEntityManager<GroupEntity> i
         return groupDataManager;
     }
 
+    @Override
     public Group createNewGroup(String groupId) {
         GroupEntity groupEntity = groupDataManager.create();
         groupEntity.setId(groupId);
@@ -65,26 +66,32 @@ public class GroupEntityManagerImpl extends AbstractEntityManager<GroupEntity> i
         }
     }
 
+    @Override
     public GroupQuery createNewGroupQuery() {
         return new GroupQueryImpl(getCommandExecutor());
     }
 
+    @Override
     public List<Group> findGroupByQueryCriteria(GroupQueryImpl query) {
         return groupDataManager.findGroupByQueryCriteria(query);
     }
 
+    @Override
     public long findGroupCountByQueryCriteria(GroupQueryImpl query) {
         return groupDataManager.findGroupCountByQueryCriteria(query);
     }
 
+    @Override
     public List<Group> findGroupsByUser(String userId) {
         return groupDataManager.findGroupsByUser(userId);
     }
 
+    @Override
     public List<Group> findGroupsByNativeQuery(Map<String, Object> parameterMap) {
         return groupDataManager.findGroupsByNativeQuery(parameterMap);
     }
 
+    @Override
     public long findGroupCountByNativeQuery(Map<String, Object> parameterMap) {
         return groupDataManager.findGroupCountByNativeQuery(parameterMap);
     }

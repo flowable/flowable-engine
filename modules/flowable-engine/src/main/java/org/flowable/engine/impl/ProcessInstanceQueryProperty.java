@@ -16,7 +16,7 @@ package org.flowable.engine.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 
 /**
@@ -33,6 +33,7 @@ public class ProcessInstanceQueryProperty implements QueryProperty {
     public static final ProcessInstanceQueryProperty PROCESS_INSTANCE_ID = new ProcessInstanceQueryProperty("RES.ID_");
     public static final ProcessInstanceQueryProperty PROCESS_DEFINITION_KEY = new ProcessInstanceQueryProperty("ProcessDefinitionKey");
     public static final ProcessInstanceQueryProperty PROCESS_DEFINITION_ID = new ProcessInstanceQueryProperty("ProcessDefinitionId");
+    public static final ProcessInstanceQueryProperty PROCESS_START_TIME = new ProcessInstanceQueryProperty("RES.START_TIME_");
     public static final ProcessInstanceQueryProperty TENANT_ID = new ProcessInstanceQueryProperty("RES.TENANT_ID_");
 
     private String name;
@@ -42,6 +43,7 @@ public class ProcessInstanceQueryProperty implements QueryProperty {
         properties.put(name, this);
     }
 
+    @Override
     public String getName() {
         return name;
     }

@@ -25,6 +25,7 @@ import org.flowable.bpmn.model.ManualTask;
  */
 public class ManualTaskXMLConverter extends BaseBpmnXMLConverter {
 
+    @Override
     public Class<? extends BaseElement> getBpmnElementType() {
         return ManualTask.class;
     }

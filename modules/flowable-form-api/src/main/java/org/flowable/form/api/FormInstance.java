@@ -15,12 +15,7 @@ package org.flowable.form.api;
 import java.util.Date;
 
 /**
- * An object structure representing an executable process composed of activities and transitions.
- * 
- * Business processes are often created with graphical editors that store the process definition in certain file format. These files can be added to a {@link Deployment} artifact, such as for example
- * a Business Archive (.bar) file.
- * 
- * At deploy time, the engine will then parse the process definition files to an executable instance of this class, that can be used to start a {@link ProcessInstance}.
+ * An object structure representing a submitted form.
  * 
  * @author Tijs Rademakers
  * @author Joram Barez
@@ -31,33 +26,63 @@ public interface FormInstance {
     String getId();
 
     /**
-     * category name which is derived from the targetNamespace attribute in the definitions element
+     * Reference to the form definition of this form instance
      */
     String getFormDefinitionId();
 
-    /** label used for display purposes */
+    /**
+     * Reference to the task for which the form instance was created
+     */
     String getTaskId();
 
-    /** unique name for all versions this process definitions */
+    /**
+     * Reference to the process instance for which the form instance was created
+     */
     String getProcessInstanceId();
 
-    /** description of this process **/
+    /**
+     * Reference to the process definition for which the form instance was created
+     */
     String getProcessDefinitionId();
+    
+    /**
+     * Reference to the scope instance for which the form instance was created
+     */
+    String getScopeId();
+    
+    /**
+     * Type of the scope instance for which the form instance was created
+     */
+    String getScopeType();
+    
+    /**
+     * Reference to the scope instance definition for which the form instance was created
+     */
+    String getScopeDefinitionId();
 
-    /** version of this process definition */
+    /**
+     * Submitted date for the form instance
+     */
     Date getSubmittedDate();
 
     /**
-     * name of {@link RepositoryService#getResourceAsStream(String, String) the resource} of this process definition.
+     * Reference to the user that submitted the form instance
      */
     String getSubmittedBy();
 
-    /** The deployment in which this process definition is contained. */
+    /**
+     * Reference to the JSON document id that contains the submitted form values
+     */
     String getFormValuesId();
 
-    /** The tenant identifier of this process definition */
+    /** 
+     * The tenant identifier of this form instance
+     */
     String getTenantId();
 
+    /** 
+     * The JSON document that contains the submitted form values
+     */
     byte[] getFormValueBytes();
 
 }

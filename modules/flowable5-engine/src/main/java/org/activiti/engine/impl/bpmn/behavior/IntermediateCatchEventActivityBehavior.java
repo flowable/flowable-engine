@@ -17,6 +17,7 @@ import org.flowable.engine.delegate.DelegateExecution;
 
 public class IntermediateCatchEventActivityBehavior extends AbstractBpmnActivityBehavior {
 
+    @Override
     public void execute(DelegateExecution execution) {
         // Do nothing: waitstate behavior
     }

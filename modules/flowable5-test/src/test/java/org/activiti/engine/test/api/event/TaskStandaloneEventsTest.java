@@ -13,12 +13,11 @@
 package org.activiti.engine.test.api.event;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
-import org.flowable.engine.impl.delegate.event.FlowableEngineEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 
 /**
  * Test case for all {@link FlowableEvent}s related to tasks.
@@ -34,7 +33,7 @@ public class TaskStandaloneEventsTest extends PluggableFlowableTestCase {
      */
     public void testStandaloneTaskEvents() throws Exception {
 
-        Task task = null;
+        org.flowable.task.api.Task task = null;
         try {
             task = taskService.newTask();
             task.setCategory("123");
@@ -45,8 +44,8 @@ public class TaskStandaloneEventsTest extends PluggableFlowableTestCase {
 
             FlowableEngineEntityEvent event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
             assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
-            assertTrue(event.getEntity() instanceof Task);
-            Task taskFromEvent = (Task) event.getEntity();
+            assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+            org.flowable.task.api.Task taskFromEvent = (org.flowable.task.api.Task) event.getEntity();
             assertEquals(task.getId(), taskFromEvent.getId());
             assertNull(event.getProcessDefinitionId());
             assertNull(event.getProcessInstanceId());
@@ -64,8 +63,8 @@ public class TaskStandaloneEventsTest extends PluggableFlowableTestCase {
             assertEquals(1, listener.getEventsReceived().size());
             event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
             assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
-            assertTrue(event.getEntity() instanceof Task);
-            taskFromEvent = (Task) event.getEntity();
+            assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+            taskFromEvent = (org.flowable.task.api.Task) event.getEntity();
             assertEquals(task.getId(), taskFromEvent.getId());
             assertEquals("owner", taskFromEvent.getOwner());
             assertNull(event.getProcessDefinitionId());
@@ -77,22 +76,24 @@ public class TaskStandaloneEventsTest extends PluggableFlowableTestCase {
             taskService.setAssignee(task.getId(), "kermit");
             assertEquals(2, listener.getEventsReceived().size());
             event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
+            assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
+            assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+            taskFromEvent = (org.flowable.task.api.Task) event.getEntity();
+            assertEquals(task.getId(), taskFromEvent.getId());
+            assertNull(event.getProcessDefinitionId());
+            assertNull(event.getProcessInstanceId());
+            assertNull(event.getExecutionId());
+            
+            event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
             assertEquals(FlowableEngineEventType.TASK_ASSIGNED, event.getType());
-            assertTrue(event.getEntity() instanceof Task);
-            taskFromEvent = (Task) event.getEntity();
+            assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+            taskFromEvent = (org.flowable.task.api.Task) event.getEntity();
             assertEquals(task.getId(), taskFromEvent.getId());
             assertEquals("kermit", taskFromEvent.getAssignee());
             assertNull(event.getProcessDefinitionId());
             assertNull(event.getProcessInstanceId());
             assertNull(event.getExecutionId());
-            event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
-            assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
-            assertTrue(event.getEntity() instanceof Task);
-            taskFromEvent = (Task) event.getEntity();
-            assertEquals(task.getId(), taskFromEvent.getId());
-            assertNull(event.getProcessDefinitionId());
-            assertNull(event.getProcessInstanceId());
-            assertNull(event.getExecutionId());
+            
             listener.clearEventsReceived();
 
             // Complete task
@@ -100,8 +101,8 @@ public class TaskStandaloneEventsTest extends PluggableFlowableTestCase {
             assertEquals(2, listener.getEventsReceived().size());
             event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
             assertEquals(FlowableEngineEventType.TASK_COMPLETED, event.getType());
-            assertTrue(event.getEntity() instanceof Task);
-            taskFromEvent = (Task) event.getEntity();
+            assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+            taskFromEvent = (org.flowable.task.api.Task) event.getEntity();
             assertEquals(task.getId(), taskFromEvent.getId());
             assertNull(event.getProcessDefinitionId());
             assertNull(event.getProcessInstanceId());
@@ -109,8 +110,8 @@ public class TaskStandaloneEventsTest extends PluggableFlowableTestCase {
 
             event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
             assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
-            assertTrue(event.getEntity() instanceof Task);
-            taskFromEvent = (Task) event.getEntity();
+            assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+            taskFromEvent = (org.flowable.task.api.Task) event.getEntity();
             assertEquals(task.getId(), taskFromEvent.getId());
             assertNull(event.getProcessDefinitionId());
             assertNull(event.getProcessInstanceId());
@@ -138,7 +139,7 @@ public class TaskStandaloneEventsTest extends PluggableFlowableTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        listener = new TestFlowable6EntityEventListener(Task.class);
+        listener = new TestFlowable6EntityEventListener(org.flowable.task.api.Task.class);
         processEngineConfiguration.getEventDispatcher().addEventListener(listener);
     }
 

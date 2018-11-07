@@ -12,7 +12,7 @@
  */
 package org.activiti.engine.impl.delegate;
 
-import org.activiti.engine.impl.javax.el.ValueExpression;
+import org.flowable.common.engine.impl.javax.el.ValueExpression;
 
 /**
  * Baseclass responsible for handling invocations of Expressions
@@ -27,6 +27,7 @@ public abstract class ExpressionInvocation extends DelegateInvocation {
         this.valueExpression = valueExpression;
     }
 
+    @Override
     public Object getTarget() {
         return valueExpression;
     }

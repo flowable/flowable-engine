@@ -43,6 +43,7 @@ public class ValuedDataObjectXMLConverter extends BaseBpmnXMLConverter {
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     protected boolean didWriteExtensionStartElement;
 
+    @Override
     public Class<? extends BaseElement> getBpmnElementType() {
         return ValuedDataObject.class;
     }

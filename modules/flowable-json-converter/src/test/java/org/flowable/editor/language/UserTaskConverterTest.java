@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,6 +44,7 @@ public class UserTaskConverterTest extends AbstractConverterTest {
         validateModel(bpmnModel);
     }
 
+    @Override
     protected String getResource() {
         return "test.usertaskmodel.json";
     }
@@ -60,6 +61,7 @@ public class UserTaskConverterTest extends AbstractConverterTest {
         assertEquals("40", userTask.getPriority());
         assertEquals("2012-11-01", userTask.getDueDate());
         assertEquals("defaultCategory", userTask.getCategory());
+        assertEquals("${skipExpression}", userTask.getSkipExpression());
 
         assertEquals("kermit", userTask.getAssignee());
         assertEquals(2, userTask.getCandidateUsers().size());

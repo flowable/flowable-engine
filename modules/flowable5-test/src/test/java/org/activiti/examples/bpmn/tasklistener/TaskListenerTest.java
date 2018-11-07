@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -27,14 +26,14 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/activiti/examples/bpmn/tasklistener/TaskListenerTest.bpmn20.xml" })
     public void testTaskCreateListener() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenerProcess");
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Schedule meeting", task.getName());
         assertEquals("TaskCreateListener is listening!", task.getDescription());
 
         // Manually cleanup the process instance. If we don't do this, the following actions will occur:
         // 1. The cleanup rule will delete the process
         // 2. The process deletion will fire a DELETE event to the TaskAllEventsListener
-        // 3. The TaskAllEventsListener will set a variable on the Task
+        // 3. The TaskAllEventsListener will set a variable on the org.flowable.task.service.Task
         // 4. Setting that variable will result in an entry in the ACT_HI_DETAIL table
         // 5. The AbstractActivitiTestCase will fail the test because the DB is not clean
         // By triggering the DELETE event from within the test, we ensure that all of the records
@@ -45,7 +44,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/activiti/examples/bpmn/tasklistener/TaskListenerTest.bpmn20.xml" })
     public void testTaskAssignmentListener() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenerProcess");
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("TaskCreateListener is listening!", task.getDescription());
 
         // Set assignee and check if event is received
@@ -56,7 +55,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
         // Manually cleanup the process instance. If we don't do this, the following actions will occur:
         // 1. The cleanup rule will delete the process
         // 2. The process deletion will fire a DELETE event to the TaskAllEventsListener
-        // 3. The TaskAllEventsListener will set a variable on the Task
+        // 3. The TaskAllEventsListener will set a variable on the org.flowable.task.service.Task
         // 4. Setting that variable will result in an entry in the ACT_HI_DETAIL table
         // 5. The AbstractActivitiTestCase will fail the test because the DB is not clean
         // By triggering the DELETE event from within the test, we ensure that all of the records
@@ -70,7 +69,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/activiti/examples/bpmn/tasklistener/TaskListenerTest.bpmn20.xml" })
     public void testTaskAssignmentListenerNotCalledWhenAssigneeNotUpdated() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenerProcess");
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("TaskCreateListener is listening!", task.getDescription());
 
         // Set assignee and check if event is received
@@ -118,7 +117,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.getVariable(processInstance.getId(), "expressionValue"));
 
         // Completing first task will change the description
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         assertEquals("Hello from The Process", runtimeService.getVariable(processInstance.getId(), "greeting"));
@@ -131,7 +130,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.getVariable(processInstance.getId(), "greeting2"));
 
         // Completing first task will change the description
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         assertEquals("Write meeting notes", runtimeService.getVariable(processInstance.getId(), "greeting2"));
@@ -140,7 +139,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/activiti/examples/bpmn/tasklistener/TaskListenerTest.bpmn20.xml" })
     public void testAllEventsTaskListener() {
         runtimeService.startProcessInstanceByKey("taskListenerProcess");
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
 
         // Set assignee and complete task
         taskService.setAssignee(task.getId(), "kermit");
@@ -156,11 +155,11 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
         TaskDeleteListener.clear();
         runtimeService.startProcessInstanceByKey("executionListenersOnDelete");
 
-        List<Task> tasks = taskService.createTaskQuery().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertNotNull(tasks);
         assertEquals(1, tasks.size());
 
-        Task task = taskService.createTaskQuery().taskName("User Task 1").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().taskName("User Task 1").singleResult();
         assertNotNull(task);
 
         assertEquals(0, TaskDeleteListener.getCurrentMessages().size());
@@ -185,11 +184,11 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
         TaskDeleteListener.clear();
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("executionListenersOnDelete");
 
-        List<Task> tasks = taskService.createTaskQuery().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertNotNull(tasks);
         assertEquals(1, tasks.size());
 
-        Task task = taskService.createTaskQuery().taskName("User Task 1").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().taskName("User Task 1").singleResult();
         assertNotNull(task);
 
         assertEquals(0, TaskDeleteListener.getCurrentMessages().size());

@@ -12,9 +12,14 @@ package org.activiti.engine.impl.jobexecutor;
  * limitations under the License.
  */
 
-import org.activiti.engine.impl.util.json.JSONException;
-import org.activiti.engine.impl.util.json.JSONObject;
-import org.flowable.engine.delegate.Expression;
+import java.io.IOException;
+
+import org.activiti.engine.impl.context.Context;
+import org.flowable.common.engine.api.delegate.Expression;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class TimerEventHandler {
 
@@ -24,7 +29,7 @@ public class TimerEventHandler {
     public static final String PROPERTYNAME_CALENDAR_NAME_EXPRESSION = "calendarName";
 
     public static String createConfiguration(String id, Expression endDate, Expression calendarName) {
-        JSONObject cfgJson = new JSONObject();
+        ObjectNode cfgJson = createObjectNode();
         cfgJson.put(PROPERTYNAME_TIMER_ACTIVITY_ID, id);
         if (endDate != null) {
             cfgJson.put(PROPERTYNAME_END_DATE_EXPRESSION, endDate.getExpressionText());
@@ -37,42 +42,55 @@ public class TimerEventHandler {
 
     public String setActivityIdToConfiguration(String jobHandlerConfiguration, String activityId) {
         try {
-            JSONObject cfgJson = new JSONObject(jobHandlerConfiguration);
+            ObjectNode cfgJson = readJsonValueAsObjectNode(jobHandlerConfiguration);
             cfgJson.put(PROPERTYNAME_TIMER_ACTIVITY_ID, activityId);
             return cfgJson.toString();
-        } catch (JSONException ex) {
+        } catch (IOException ex) {
             return jobHandlerConfiguration;
         }
     }
 
     public static String getActivityIdFromConfiguration(String jobHandlerConfiguration) {
         try {
-            JSONObject cfgJson = new JSONObject(jobHandlerConfiguration);
-            return cfgJson.get(PROPERTYNAME_TIMER_ACTIVITY_ID).toString();
-        } catch (JSONException ex) {
+            JsonNode cfgJson = readJsonValue(jobHandlerConfiguration);
+            JsonNode activityIdNode = cfgJson.get(PROPERTYNAME_TIMER_ACTIVITY_ID);
+            if (activityIdNode != null) {
+                return activityIdNode.asText();
+            } else {
+                return jobHandlerConfiguration;
+            }
+            
+        } catch (IOException ex) {
             return jobHandlerConfiguration;
         }
     }
 
     public static String geCalendarNameFromConfiguration(String jobHandlerConfiguration) {
         try {
-            JSONObject cfgJson = new JSONObject(jobHandlerConfiguration);
-            return cfgJson.get(PROPERTYNAME_CALENDAR_NAME_EXPRESSION).toString();
-        } catch (JSONException ex) {
+            JsonNode cfgJson = readJsonValue(jobHandlerConfiguration);
+            JsonNode calendarNameNode = cfgJson.get(PROPERTYNAME_CALENDAR_NAME_EXPRESSION);
+            if (calendarNameNode != null) {
+                return calendarNameNode.asText();
+            } else {
+                return "";
+            }
+            
+        } catch (IOException ex) {
             // calendar name is not specified
             return "";
         }
     }
 
     public String setEndDateToConfiguration(String jobHandlerConfiguration, String endDate) {
-        JSONObject cfgJson = null;
+        ObjectNode cfgJson = null;
         try {
-            cfgJson = new JSONObject(jobHandlerConfiguration);
-        } catch (JSONException ex) {
+            cfgJson = readJsonValueAsObjectNode(jobHandlerConfiguration);
+        } catch (IOException ex) {
             // create the json config
-            cfgJson = new JSONObject();
+            cfgJson = createObjectNode();
             cfgJson.put(PROPERTYNAME_TIMER_ACTIVITY_ID, jobHandlerConfiguration);
         }
+        
         if (endDate != null) {
             cfgJson.put(PROPERTYNAME_END_DATE_EXPRESSION, endDate);
         }
@@ -82,28 +100,42 @@ public class TimerEventHandler {
 
     public static String getEndDateFromConfiguration(String jobHandlerConfiguration) {
         try {
-            JSONObject cfgJson = new JSONObject(jobHandlerConfiguration);
-            return cfgJson.get(PROPERTYNAME_END_DATE_EXPRESSION).toString();
-        } catch (JSONException ex) {
+            JsonNode cfgJson = readJsonValue(jobHandlerConfiguration);
+            JsonNode endDateNode = cfgJson.get(PROPERTYNAME_END_DATE_EXPRESSION);
+            if (endDateNode != null) {
+                return endDateNode.asText();
+            } else {
+                return null;
+            }
+            
+        } catch (IOException ex) {
             return null;
         }
     }
 
-    public String setProcessDefinitionKeyToConfiguration(String jobHandlerConfiguration, String activityId) {
+    public String setProcessDefinitionKeyToConfiguration(String jobHandlerConfiguration, String processDefinitionKey) {
+        ObjectNode cfgJson = null;
         try {
-            JSONObject cfgJson = new JSONObject(jobHandlerConfiguration);
-            cfgJson.put(PROPERTYNAME_PROCESS_DEFINITION_KEY, activityId);
+            cfgJson = readJsonValueAsObjectNode(jobHandlerConfiguration);
+            cfgJson.put(PROPERTYNAME_PROCESS_DEFINITION_KEY, processDefinitionKey);
             return cfgJson.toString();
-        } catch (JSONException ex) {
+            
+        } catch (IOException ex) {
             return jobHandlerConfiguration;
         }
     }
 
     public String getProcessDefinitionKeyFromConfiguration(String jobHandlerConfiguration) {
         try {
-            JSONObject cfgJson = new JSONObject(jobHandlerConfiguration);
-            return cfgJson.get(PROPERTYNAME_PROCESS_DEFINITION_KEY).toString();
-        } catch (JSONException ex) {
+            JsonNode cfgJson = readJsonValue(jobHandlerConfiguration);
+            JsonNode keyNode = cfgJson.get(PROPERTYNAME_PROCESS_DEFINITION_KEY);
+            if (keyNode != null) {
+                return keyNode.asText();
+            } else {
+                return null;
+            }
+            
+        } catch (IOException ex) {
             return null;
         }
     }
@@ -114,15 +146,32 @@ public class TimerEventHandler {
      */
     public static boolean hasRealActivityId(String jobHandlerConfiguration) {
         try {
-            JSONObject cfgJson = new JSONObject(jobHandlerConfiguration);
-            Object processDefinitionKey = cfgJson.get(PROPERTYNAME_PROCESS_DEFINITION_KEY);
-            if (processDefinitionKey != null) {
-                return processDefinitionKey.toString().length() > 0;
+            JsonNode cfgJson = readJsonValue(jobHandlerConfiguration);
+            JsonNode keyNode = cfgJson.get(PROPERTYNAME_PROCESS_DEFINITION_KEY);
+            if (keyNode != null) {
+                return keyNode.asText().length() > 0;
+            } else {
+                return false;
             }
-        } catch (JSONException ex) {
+            
+        } catch (IOException ex) {
             return false;
         }
-        return false;
     }
 
+    protected static ObjectNode createObjectNode() {
+        return Context.getProcessEngineConfiguration().getObjectMapper().createObjectNode();
+    }
+    
+    protected static ObjectNode readJsonValueAsObjectNode(String config) throws IOException {
+        return (ObjectNode) readJsonValue(config);
+    }
+    
+    protected static JsonNode readJsonValue(String config) throws IOException {
+        if (Context.getCommandContext() != null) {
+            return Context.getProcessEngineConfiguration().getObjectMapper().readTree(config);
+        } else {
+            return new ObjectMapper().readTree(config);
+        }
+    }
 }

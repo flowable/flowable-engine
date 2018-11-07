@@ -21,14 +21,14 @@ import org.activiti.engine.query.QueryProperty;
 
 /**
  * Contains the possible properties which can be used in a {@link HistoricDetailQuery}.
- * 
+ *
  * @author Tom Baeyens
  */
 public class HistoricDetailQueryProperty implements QueryProperty {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Map<String, HistoricDetailQueryProperty> properties = new HashMap<String, HistoricDetailQueryProperty>();
+    private static final Map<String, HistoricDetailQueryProperty> properties = new HashMap<>();
 
     public static final HistoricDetailQueryProperty PROCESS_INSTANCE_ID = new HistoricDetailQueryProperty("PROC_INST_ID_");
     public static final HistoricDetailQueryProperty VARIABLE_NAME = new HistoricDetailQueryProperty("NAME_");
@@ -43,6 +43,7 @@ public class HistoricDetailQueryProperty implements QueryProperty {
         properties.put(name, this);
     }
 
+    @Override
     public String getName() {
         return name;
     }

@@ -23,10 +23,12 @@ public class LongStringType extends SerializableType {
         this.minLength = minLength;
     }
 
+    @Override
     public String getTypeName() {
         return "longString";
     }
 
+    @Override
     public boolean isAbleToStore(Object value) {
         if (value == null) {
             return false;

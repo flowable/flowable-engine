@@ -16,20 +16,21 @@ package org.flowable.rest.service.api.repository;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.repository.Model;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -43,16 +44,16 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Models" }, description = "Manage Models", authorizations = { @Authorization(value = "basicAuth") })
 public class ModelSourceExtraResource extends BaseModelSourceResource {
 
-    @RequestMapping(value = "/repository/models/{modelId}/source-extra", method = RequestMethod.GET)
+    @ApiOperation(value = "Get the extra editor source for a model", tags = { "Models" }, nickname = "getExtraEditorSource",
+            notes = "Response body contains the model’s raw editor source. The response’s content-type is set to application/octet-stream, regardless of the content of the source.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the model was found and source is returned."),
             @ApiResponse(code = 404, message = "Indicates the requested model was not found.")
     })
-    @ApiOperation(value = "Get the extra editor source for a model", tags = {
-            "Models" }, notes = "Response body contains the model’s raw editor source. The response’s content-type is set to application/octet-stream, regardless of the content of the source.")
-    @ResponseBody
-    protected byte[] getModelBytes(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletResponse response) {
-        byte[] editorSource = repositoryService.getModelEditorSourceExtra(modelId);
+    @GetMapping("/repository/models/{modelId}/source-extra")
+    public byte[] getModelBytes(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletResponse response) {
+        Model model = getModelFromRequest(modelId);
+        byte[] editorSource = repositoryService.getModelEditorSourceExtra(model.getId());
         if (editorSource == null) {
             throw new FlowableObjectNotFoundException("Model with id '" + modelId + "' does not have extra source available.", String.class);
         }
@@ -60,36 +61,37 @@ public class ModelSourceExtraResource extends BaseModelSourceResource {
         return editorSource;
     }
 
-    @ApiOperation(value = "Set the extra editor source for a model", tags = {
-            "Models" }, consumes = "multipart/form-data", notes = "Response body contains the model’s raw editor source. The response’s content-type is set to application/octet-stream, regardless of the content of the source.")
+    @ApiOperation(value = "Set the extra editor source for a model", tags = { "Models" }, nickname = "setExtraEditorSource", consumes = "multipart/form-data",
+            notes = "Response body contains the model’s raw editor source. The response’s content-type is set to application/octet-stream, regardless of the content of the source.")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "file", dataType = "file", paramType = "form", required = true)
+    })
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates the model was found and the extra source has been updated."),
+            @ApiResponse(code = 204, message = "Indicates the model was found and the extra source has been updated."),
             @ApiResponse(code = 404, message = "Indicates the requested model was not found.")
     })
-    @RequestMapping(value = "/repository/models/{modelId}/source-extra", method = RequestMethod.PUT)
-    protected void setModelSource(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletRequest request, HttpServletResponse response) {
+    @PutMapping(value = "/repository/models/{modelId}/source-extra", consumes = "multipart/form-data")
+    public void setModelSource(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletRequest request, HttpServletResponse response) {
         Model model = getModelFromRequest(modelId);
-        if (model != null) {
-            try {
+        try {
 
-                if (!(request instanceof MultipartHttpServletRequest)) {
-                    throw new FlowableIllegalArgumentException("Multipart request is required");
-                }
-
-                MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
-
-                if (multipartRequest.getFileMap().size() == 0) {
-                    throw new FlowableIllegalArgumentException("Multipart request with file content is required");
-                }
-
-                MultipartFile file = multipartRequest.getFileMap().values().iterator().next();
-
-                repositoryService.addModelEditorSourceExtra(model.getId(), file.getBytes());
-                response.setStatus(HttpStatus.NO_CONTENT.value());
-
-            } catch (Exception e) {
-                throw new FlowableException("Error adding model editor source extra", e);
+            if (!(request instanceof MultipartHttpServletRequest)) {
+                throw new FlowableIllegalArgumentException("Multipart request is required");
             }
+
+            MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+
+            if (multipartRequest.getFileMap().size() == 0) {
+                throw new FlowableIllegalArgumentException("Multipart request with file content is required");
+            }
+
+            MultipartFile file = multipartRequest.getFileMap().values().iterator().next();
+
+            repositoryService.addModelEditorSourceExtra(model.getId(), file.getBytes());
+            response.setStatus(HttpStatus.NO_CONTENT.value());
+
+        } catch (Exception e) {
+            throw new FlowableException("Error adding model editor source extra", e);
         }
     }
 

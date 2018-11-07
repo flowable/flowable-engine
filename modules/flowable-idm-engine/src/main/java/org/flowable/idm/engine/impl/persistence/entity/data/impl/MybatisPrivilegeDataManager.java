@@ -20,13 +20,13 @@ import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.PrivilegeQueryImpl;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntity;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntityImpl;
-import org.flowable.idm.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.idm.engine.impl.persistence.entity.data.AbstractIdmDataManager;
 import org.flowable.idm.engine.impl.persistence.entity.data.PrivilegeDataManager;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisPrivilegeDataManager extends AbstractDataManager<PrivilegeEntity> implements PrivilegeDataManager {
+public class MybatisPrivilegeDataManager extends AbstractIdmDataManager<PrivilegeEntity> implements PrivilegeDataManager {
 
     public MybatisPrivilegeDataManager(IdmEngineConfiguration idmEngineConfiguration) {
         super(idmEngineConfiguration);

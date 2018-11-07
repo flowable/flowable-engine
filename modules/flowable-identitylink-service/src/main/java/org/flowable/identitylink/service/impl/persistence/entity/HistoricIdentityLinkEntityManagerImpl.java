@@ -15,7 +15,7 @@ package org.flowable.identitylink.service.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.persistence.entity.data.HistoricIdentityLinkDataManager;
 
@@ -33,6 +33,13 @@ public class HistoricIdentityLinkEntityManagerImpl extends AbstractEntityManager
     }
 
     @Override
+    public HistoricIdentityLinkEntity create() {
+        HistoricIdentityLinkEntity identityLinkEntity = super.create();
+        identityLinkEntity.setCreateTime(identityLinkServiceConfiguration.getClock().getCurrentTime());
+        return identityLinkEntity;
+    }
+
+    @Override
     protected DataManager<HistoricIdentityLinkEntity> getDataManager() {
         return historicIdentityLinkDataManager;
     }
@@ -46,6 +53,11 @@ public class HistoricIdentityLinkEntityManagerImpl extends AbstractEntityManager
     public List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByProcessInstanceId(String processInstanceId) {
         return historicIdentityLinkDataManager.findHistoricIdentityLinksByProcessInstanceId(processInstanceId);
     }
+    
+    @Override
+    public List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType) {
+        return historicIdentityLinkDataManager.findHistoricIdentityLinksByScopeIdAndScopeType(scopeId, scopeType);
+    }
 
     @Override
     public void deleteHistoricIdentityLinksByTaskId(String taskId) {
@@ -56,15 +68,23 @@ public class HistoricIdentityLinkEntityManagerImpl extends AbstractEntityManager
     }
 
     @Override
-    public void deleteHistoricIdentityLinksByProcInstance(final String processInstanceId) {
-
+    public void deleteHistoricIdentityLinksByProcInstance(String processInstanceId) {
         List<HistoricIdentityLinkEntity> identityLinks = historicIdentityLinkDataManager
                 .findHistoricIdentityLinksByProcessInstanceId(processInstanceId);
 
         for (HistoricIdentityLinkEntity identityLink : identityLinks) {
             delete(identityLink);
         }
-
+    }
+    
+    @Override
+    public void deleteHistoricIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType) {
+        historicIdentityLinkDataManager.deleteHistoricIdentityLinksByScopeIdAndType(scopeId, scopeType);
+    }
+    
+    @Override
+    public void deleteHistoricIdentityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType) {
+        historicIdentityLinkDataManager.deleteHistoricIdentityLinksByScopeDefinitionIdAndType(scopeDefinitionId, scopeType);
     }
 
     public HistoricIdentityLinkDataManager getHistoricIdentityLinkDataManager() {

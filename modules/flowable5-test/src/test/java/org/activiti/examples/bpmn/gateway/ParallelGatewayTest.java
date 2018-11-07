@@ -17,9 +17,8 @@ import java.util.List;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskQuery;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.TaskQuery;
 
 /**
  * @author Joram Barrez
@@ -36,12 +35,12 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
                 .orderByTaskName()
                 .asc();
 
-        List<Task> tasks = query.list();
+        List<org.flowable.task.api.Task> tasks = query.list();
         assertEquals(2, tasks.size());
         // the tasks are ordered by name (see above)
-        Task task1 = tasks.get(0);
+        org.flowable.task.api.Task task1 = tasks.get(0);
         assertEquals("Receive Payment", task1.getName());
-        Task task2 = tasks.get(1);
+        org.flowable.task.api.Task task2 = tasks.get(1);
         assertEquals("Ship Order", task2.getName());
 
         // Completing both tasks will join the concurrent executions
@@ -62,12 +61,12 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
                 .orderByTaskName()
                 .asc();
 
-        List<Task> tasks = query.list();
+        List<org.flowable.task.api.Task> tasks = query.list();
         assertEquals(3, tasks.size());
         // the tasks are ordered by name (see above)
-        Task task1 = tasks.get(0);
+        org.flowable.task.api.Task task1 = tasks.get(0);
         assertEquals("Task 1", task1.getName());
-        Task task2 = tasks.get(1);
+        org.flowable.task.api.Task task2 = tasks.get(1);
         assertEquals("Task 2", task2.getName());
 
         // Completing the first task should *not* trigger the join
@@ -77,10 +76,10 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
         taskService.complete(task2.getId());
 
         tasks = query.list();
-        Task task3 = tasks.get(0);
+        org.flowable.task.api.Task task3 = tasks.get(0);
         assertEquals(2, tasks.size());
         assertEquals("Task 3", task3.getName());
-        Task task4 = tasks.get(1);
+        org.flowable.task.api.Task task4 = tasks.get(1);
         assertEquals("Task 4", task4.getName());
 
         // Completing the remaining tasks should trigger the second join and end the process

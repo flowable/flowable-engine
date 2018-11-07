@@ -39,8 +39,7 @@ import java.lang.annotation.RetentionPolicy;
  *     "org/example/decisionOne.dmn",
  *     "org/example/decisionTwo.dmn"})
  *   public void testForADeploymentWithASingleResource() {
- *     // a deployment will be available in the engine repository
- *     // containing the three resources
+ *     // a deployment will be available in the engine repository the resources
  *   }
  * </pre>
  * 

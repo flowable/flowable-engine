@@ -28,7 +28,7 @@ public class ActivitySignaledEventHandler extends AbstractDatabaseEventLoggerEve
     public EventLogEntryEntity generateEventLogEntry(CommandContext commandContext) {
         FlowableSignalEvent signalEvent = (FlowableSignalEvent) event;
 
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<>();
         putInMapIfNotNull(data, Fields.ACTIVITY_ID, signalEvent.getActivityId());
         putInMapIfNotNull(data, Fields.ACTIVITY_NAME, signalEvent.getActivityName());
         putInMapIfNotNull(data, Fields.PROCESS_DEFINITION_ID, signalEvent.getProcessDefinitionId());

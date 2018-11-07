@@ -19,16 +19,18 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.task.Task;
-import org.flowable.rest.exception.FlowableForbiddenException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableForbiddenException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
+import org.flowable.task.api.Task;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,7 +56,7 @@ public class TaskResource extends TaskBaseResource {
             @ApiResponse(code = 200, message = "Indicates the task was found and returned."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
     })
-    @RequestMapping(value = "/runtime/tasks/{taskId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/runtime/tasks/{taskId}", produces = "application/json")
     public TaskResponse getTask(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
         return restResponseFactory.createTaskResponse(getTaskFromRequest(taskId));
     }
@@ -66,7 +68,7 @@ public class TaskResource extends TaskBaseResource {
             @ApiResponse(code = 404, message = "Indicates the requested task was not found."),
             @ApiResponse(code = 409, message = "Indicates the requested task was updated simultaneously.")
     })
-    @RequestMapping(value = "/runtime/tasks/{taskId}", method = RequestMethod.PUT, produces = "application/json")
+    @PutMapping(value = "/runtime/tasks/{taskId}", produces = "application/json")
     public TaskResponse updateTask(@ApiParam(name = "taskId") @PathVariable String taskId, @RequestBody TaskRequest taskRequest, HttpServletRequest request) {
 
         if (taskRequest == null) {
@@ -87,33 +89,15 @@ public class TaskResource extends TaskBaseResource {
         return restResponseFactory.createTaskResponse(task);
     }
 
-    @ApiOperation(value = "Tasks actions", tags = { "Tasks" }, notes = "## Complete a task - Request Body\n\n"
-            + " ```JSON\n" + "{\n" + "  \"action\" : \"complete\",\n" + "  \"variables\" : []\n" + "} ```"
-            + "Completes the task. Optional variable array can be passed in using the variables property. More information about the variable format can be found in the REST variables section. Note that the variable-scope that is supplied is ignored and the variables are set on the parent-scope unless a variable exists in a local scope, which is overridden in this case. This is the same behavior as the TaskService.completeTask(taskId, variables) invocation.\n"
-            + "\n"
-            + "Note that also a transientVariables property is accepted as part of this json, that follows the same structure as the variables property."
-            + "\n\n\n"
-            + "## Claim a task - Request Body \n\n"
-            + " ```JSON\n" + "{\n" + "  \"action\" : \"claim\",\n" + "  \"assignee\" : \"userWhoClaims\"\n" + "} ```"
-            + "\n\n\n"
-            + "Claims the task by the given assignee. If the assignee is null, the task is assigned to no-one, claimable again."
-            + "\n\n\n"
-            + "## Delegate a task - Request Body \n\n"
-            + " ```JSON\n" + "{\n" + "  \"action\" : \"delegate\",\n" + "  \"assignee\" : \"userToDelegateTo\"\n" + "} ```"
-            + "\n\n\n"
-            + "Delegates the task to the given assignee. The assignee is required."
-            + "\n\n\n"
-            + "## Suspend a process instance\n\n"
-            + " ```JSON\n" + "{\n" + "  \"action\" : \"resolve\"\n" + "} ```"
-            + "\n\n\n"
-            + "Resolves the task delegation. The task is assigned back to the task owner (if any).")
+    @ApiOperation(value = "Tasks actions", tags = { "Tasks" },
+            notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the action was executed."),
             @ApiResponse(code = 400, message = "When the body contains an invalid value or when the assignee is missing when the action requires it."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found."),
             @ApiResponse(code = 409, message = "Indicates the action cannot be performed due to a conflict. Either the task was updates simultaneously or the task was claimed by another user, in case of the claim action.")
     })
-    @RequestMapping(value = "/runtime/tasks/{taskId}", method = RequestMethod.POST)
+    @PostMapping(value = "/runtime/tasks/{taskId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void executeTaskAction(@ApiParam(name = "taskId") @PathVariable String taskId, @RequestBody TaskActionRequest actionRequest) {
         if (actionRequest == null) {
@@ -121,6 +105,10 @@ public class TaskResource extends TaskBaseResource {
         }
 
         Task task = getTaskFromRequest(taskId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.executeTaskAction(task, actionRequest);
+        }
 
         if (TaskActionRequest.ACTION_COMPLETE.equals(actionRequest.getAction())) {
             completeTask(task, actionRequest);
@@ -149,7 +137,7 @@ public class TaskResource extends TaskBaseResource {
             @ApiResponse(code = 403, message = "Indicates the requested task cannot be deleted because it’s part of a workflow."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
     })
-    @RequestMapping(value = "/runtime/tasks/{taskId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/runtime/tasks/{taskId}")
     public void deleteTask(@ApiParam(name = "taskId") @PathVariable String taskId, @ApiParam(hidden = true) @RequestParam(value = "cascadeHistory", required = false) Boolean cascadeHistory,
             @ApiParam(hidden = true) @RequestParam(value = "deleteReason", required = false) String deleteReason, HttpServletResponse response) {
 

@@ -31,6 +31,7 @@ public class GetDeploymentProcessDefinitionCmd implements Command<ProcessDefinit
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public ProcessDefinition execute(CommandContext commandContext) {
         return commandContext
                 .getProcessEngineConfiguration()

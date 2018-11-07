@@ -16,10 +16,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskInfo;
-import org.flowable.engine.task.TaskInfoQueryWrapper;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.task.api.TaskInfo;
+import org.flowable.task.api.TaskInfoQueryWrapper;
 
 /**
  * @author Joram Barrez
@@ -27,7 +26,7 @@ import org.flowable.engine.task.TaskInfoQueryWrapper;
 public class TaskInfoQueryTest extends PluggableFlowableTestCase {
 
     protected void tearDown() throws Exception {
-        for (Task task : taskService.createTaskQuery().list()) {
+        for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
             taskService.deleteTask(task.getId(), true);
         }
     }
@@ -68,8 +67,8 @@ public class TaskInfoQueryTest extends PluggableFlowableTestCase {
         }
     }
 
-    private Task createTask(String name, Date dueDate) {
-        Task task = taskService.newTask();
+    private org.flowable.task.api.Task createTask(String name, Date dueDate) {
+        org.flowable.task.api.Task task = taskService.newTask();
         task.setName(name);
         task.setDueDate(dueDate);
         taskService.saveTask(task);

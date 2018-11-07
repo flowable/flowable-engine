@@ -45,6 +45,7 @@ public class Message extends BaseElement {
         this.itemRef = itemRef;
     }
 
+    @Override
     public Message clone() {
         Message clone = new Message();
         clone.setValues(this);

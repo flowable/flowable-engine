@@ -48,6 +48,7 @@ public class CurrentActivityExecutionListener implements ExecutionListener {
         }
     }
 
+    @Override
     public void notify(DelegateExecution execution) {
         org.flowable.bpmn.model.Process process = ProcessDefinitionUtil.getProcess(execution.getProcessDefinitionId());
         String activityId = execution.getCurrentActivityId();

@@ -16,14 +16,13 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 
 /**
  * @author Tijs Rademakers
  * @author Marcus Klimstra (CGI)
  * @author Joram Barrez
  */
-public class IdmByteArrayEntityImpl extends AbstractEntity implements IdmByteArrayEntity, Serializable {
+public class IdmByteArrayEntityImpl extends AbstractIdmEngineEntity implements IdmByteArrayEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -34,24 +33,29 @@ public class IdmByteArrayEntityImpl extends AbstractEntity implements IdmByteArr
 
     }
 
+    @Override
     public byte[] getBytes() {
         return bytes;
     }
 
+    @Override
     public Object getPersistentState() {
         return new PersistentState(name, bytes);
     }
 
     // getters and setters ////////////////////////////////////////////////////////
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public void setBytes(byte[] bytes) {
         this.bytes = bytes;
     }
@@ -73,6 +77,7 @@ public class IdmByteArrayEntityImpl extends AbstractEntity implements IdmByteArr
             this.bytes = bytes;
         }
 
+        @Override
         public boolean equals(Object obj) {
             if (obj instanceof PersistentState) {
                 PersistentState other = (PersistentState) obj;

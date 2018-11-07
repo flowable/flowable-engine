@@ -37,6 +37,7 @@ public class DeploymentResourceResponse {
         }
     }
 
+    @ApiModelProperty(example = "diagrams/my-process.bpmn20.xml")
     public String getId() {
         return id;
     }
@@ -49,6 +50,7 @@ public class DeploymentResourceResponse {
         this.url = url;
     }
 
+    @ApiModelProperty(value = "For a single resource contains the actual URL to use for retrieving the binary resource", example = "http://localhost:8081/flowable-rest/service/repository/deployments/10/resources/diagrams%2Fmy-process.bpmn20.xml")
     public String getUrl() {
         return url;
     }
@@ -57,6 +59,7 @@ public class DeploymentResourceResponse {
         this.contentUrl = contentUrl;
     }
 
+    @ApiModelProperty(example = "http://localhost:8081/flowable-rest/service/repository/deployments/10/resourcedata/diagrams%2Fmy-process.bpmn20.xml")
     public String getContentUrl() {
         return contentUrl;
     }
@@ -65,7 +68,7 @@ public class DeploymentResourceResponse {
         this.mediaType = mimeType;
     }
 
-    @ApiModelProperty(value = "Contains the media-type the resource has. This is resolved using a (pluggable) MediaTypeResolver and contains, by default, a limited number of mime-type mappings.")
+    @ApiModelProperty(example = "text/xml", value = "Contains the media-type the resource has. This is resolved using a (pluggable) MediaTypeResolver and contains, by default, a limited number of mime-type mappings.")
     public String getMediaType() {
         return mediaType;
     }
@@ -74,7 +77,7 @@ public class DeploymentResourceResponse {
         this.type = type;
     }
 
-    @ApiModelProperty(value = "Type of resource", allowableValues = "resource,processDefinition,processImage")
+    @ApiModelProperty(example = "processDefinition", value = "Type of resource", allowableValues = "resource,processDefinition,processImage")
     public String getType() {
         return type;
     }

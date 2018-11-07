@@ -13,9 +13,9 @@
 package org.flowable.standalone.parsing;
 
 import org.flowable.bpmn.model.FlowableListener;
-import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.bpmn.parser.factory.DefaultListenerFactory;
+import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * @author Joram Barrez
@@ -25,6 +25,7 @@ public class CustomListenerFactory extends DefaultListenerFactory {
     @Override
     public TaskListener createExpressionTaskListener(FlowableListener activitiListener) {
         return new TaskListener() {
+            @Override
             public void notify(DelegateTask delegateTask) {
                 CustomListenerFactoryTest.COUNTER.addAndGet(100);
             }

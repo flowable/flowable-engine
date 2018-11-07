@@ -14,15 +14,16 @@ package org.flowable.dmn.engine.impl.cmd;
 
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecisionTable;
-import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.ExecuteDecisionBuilderImpl;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.Decision;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+
 /**
  * @author Tijs Rademakers
  * @author Yvo Swillens
@@ -49,18 +50,25 @@ public class ExecuteDecisionWithAuditTrailCmd extends AbstractExecuteDecisionCmd
         executeDecisionInfo.setTenantId(tenantId);
     }
 
+    @Override
     public DecisionExecutionAuditContainer execute(CommandContext commandContext) {
-        if (getDecisionKey() == null) {
+        if (executeDecisionInfo.getDecisionKey() == null) {
             throw new FlowableIllegalArgumentException("decisionKey is null");
         }
 
-        DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
-        DmnDecisionTable decisionTable = resolveDecisionTable(dmnEngineConfiguration.getDeploymentManager());
-        Decision decision = resolveDecision(dmnEngineConfiguration.getDeploymentManager(), decisionTable);
+        Decision decision = null;
+        try {
+            DmnDecisionTable decisionTable = resolveDecisionTable();
+            decision = resolveDecision(decisionTable);
+            
+        } catch (FlowableException e) {
+            DecisionExecutionAuditContainer container = new DecisionExecutionAuditContainer();
+            container.setFailed();
+            container.setExceptionMessage(e.getMessage());
+            return container;
+        }
 
-        DecisionExecutionAuditContainer executionResult = dmnEngineConfiguration.getRuleEngineExecutor().execute(decision, executeDecisionInfo);
-
-        return executionResult;
+        return CommandContextUtil.getDmnEngineConfiguration().getRuleEngineExecutor().execute(decision, executeDecisionInfo);
     }
 
 }

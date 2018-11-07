@@ -17,6 +17,8 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -30,6 +32,7 @@ public class SubProcess extends Activity implements FlowElementsContainer {
     protected List<Artifact> artifactList = new ArrayList<>();
     protected List<ValuedDataObject> dataObjects = new ArrayList<>();
 
+    @Override
     public FlowElement getFlowElement(String id) {
         FlowElement foundElement = null;
         if (StringUtils.isNotEmpty(id)) {
@@ -38,16 +41,19 @@ public class SubProcess extends Activity implements FlowElementsContainer {
         return foundElement;
     }
 
+    @Override
     public Collection<FlowElement> getFlowElements() {
         return flowElementList;
     }
 
+    @Override
     public void addFlowElement(FlowElement element) {
         flowElementList.add(element);
         element.setParentContainer(this);
         addFlowElementToMap(element);
     }
 
+    @Override
     public void addFlowElementToMap(FlowElement element) {
         if (element != null && StringUtils.isNotEmpty(element.getId())) {
             flowElementMap.put(element.getId(), element);
@@ -57,6 +63,7 @@ public class SubProcess extends Activity implements FlowElementsContainer {
         }
     }
 
+    @Override
     public void removeFlowElement(String elementId) {
         FlowElement element = getFlowElement(elementId);
         if (element != null) {
@@ -68,12 +75,14 @@ public class SubProcess extends Activity implements FlowElementsContainer {
         }
     }
 
+    @Override
     public void removeFlowElementFromMap(String elementId) {
         if (StringUtils.isNotEmpty(elementId)) {
             flowElementMap.remove(elementId);
         }
     }
 
+    @Override
     public Map<String, FlowElement> getFlowElementMap() {
         return flowElementMap;
     }
@@ -86,6 +95,21 @@ public class SubProcess extends Activity implements FlowElementsContainer {
         return flowElementMap.containsKey(id);
     }
 
+    public <T extends FlowElement> T findFirstSubFlowElementInFlowMapOfType(Class<T> clazz) {
+        Optional<FlowElement> first = flowElementMap.values().stream()
+            .filter(subFlowElement -> clazz.isInstance(subFlowElement))
+            .findFirst();
+        return (T) first.orElse(null);
+    }
+
+    public <T extends FlowElement> List<T> findAllSubFlowElementInFlowMapOfType(Class<T> clazz) {
+        return flowElementMap.values().stream()
+            .filter(clazz::isInstance)
+            .map(subFlowElement -> (T) subFlowElement)
+            .collect(Collectors.toList());
+    }
+
+    @Override
     public Artifact getArtifact(String id) {
         Artifact foundArtifact = null;
         for (Artifact artifact : artifactList) {
@@ -97,14 +121,17 @@ public class SubProcess extends Activity implements FlowElementsContainer {
         return foundArtifact;
     }
 
+    @Override
     public Collection<Artifact> getArtifacts() {
         return artifactList;
     }
 
+    @Override
     public void addArtifact(Artifact artifact) {
         artifactList.add(artifact);
     }
 
+    @Override
     public void removeArtifact(String artifactId) {
         Artifact artifact = getArtifact(artifactId);
         if (artifact != null) {
@@ -112,6 +139,7 @@ public class SubProcess extends Activity implements FlowElementsContainer {
         }
     }
 
+    @Override
     public SubProcess clone() {
         SubProcess clone = new SubProcess();
         clone.setValues(this);
@@ -154,12 +182,12 @@ public class SubProcess extends Activity implements FlowElementsContainer {
 
         flowElementList.clear();
         for (FlowElement flowElement : otherElement.getFlowElements()) {
-            addFlowElement(flowElement);
+            addFlowElement(flowElement.clone());
         }
 
         artifactList.clear();
         for (Artifact artifact : otherElement.getArtifacts()) {
-            addArtifact(artifact);
+            addArtifact(artifact.clone());
         }
     }
 

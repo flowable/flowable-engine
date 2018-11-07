@@ -22,12 +22,14 @@ public class NativeProcessInstanceQueryImpl extends AbstractNativeQuery<NativePr
 
     // results ////////////////////////////////////////////////////////////////
 
+    @Override
     public List<ProcessInstance> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults) {
         return commandContext
                 .getExecutionEntityManager()
                 .findProcessInstanceByNativeQuery(parameterMap, firstResult, maxResults);
     }
 
+    @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
         return commandContext
                 .getExecutionEntityManager()

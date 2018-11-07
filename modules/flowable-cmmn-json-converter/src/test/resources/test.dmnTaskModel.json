@@ -1,0 +1,83 @@
+{
+  "modelId": "f489c940-cf60-11e7-83a1-d0bf9c184429",
+  "bounds": {
+    "lowerRight": {
+      "x": 1200,
+      "y": 1050
+    },
+    "upperLeft": {
+      "x": 0,
+      "y": 0
+    }
+  },
+  "properties": {
+    "case_id": "dmnExportCase",
+    "name": "dmnExportCase",
+    "documentation": "",
+    "case_initiatorvariablename": "",
+    "case_author": "",
+    "case_version": "",
+    "case_namespace": "http://www.flowable.org/casedef"
+  },
+  "childShapes": [
+    {
+      "resourceId": "casePlanModel",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": ""
+      },
+      "stencil": {
+        "id": "CasePlanModel"
+      },
+      "childShapes": [
+        {
+          "resourceId": "sid-F4BCA0C7-8737-4279-B50F-59272C7C65A2",
+          "properties": {
+            "overrideid": "",
+            "name": "dmnTask",
+            "documentation": "dmnTaskDocumentation",
+            "decisiontaskdecisiontablereference": "dmnTableReference",
+            "decisiontaskthrowerroronnohits": false,
+            "decisiontaskfallbacktodefaulttenant": true
+          },
+          "stencil": {
+            "id": "DecisionTask"
+          },
+          "childShapes": [],
+          "outgoing": [],
+          "bounds": {
+            "lowerRight": {
+              "x": 351.72728155467115,
+              "y": 189.00000216744158
+            },
+            "upperLeft": {
+              "x": 251.72728155467115,
+              "y": 109.00000216744158
+            }
+          },
+          "dockers": []
+        }
+      ],
+      "outgoing": [],
+      "bounds": {
+        "lowerRight": {
+          "x": 758,
+          "y": 754
+        },
+        "upperLeft": {
+          "x": 40,
+          "y": 40
+        }
+      },
+      "dockers": []
+    }
+  ],
+  "stencil": {
+    "id": "CMMNDiagram"
+  },
+  "stencilset": {
+    "namespace": "http://b3mn.org/stencilset/cmmn1.1#",
+    "url": "../editor/stencilsets/cmmn1.1/cmmn1.1.json"
+  }
+}

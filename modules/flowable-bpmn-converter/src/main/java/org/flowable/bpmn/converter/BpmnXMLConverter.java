@@ -91,7 +91,7 @@ import org.flowable.bpmn.model.StringDataObject;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.TextAnnotation;
 import org.flowable.bpmn.model.Transaction;
-import org.flowable.engine.common.api.io.InputStreamProvider;
+import org.flowable.common.engine.api.io.InputStreamProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;

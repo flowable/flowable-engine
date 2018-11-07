@@ -24,10 +24,12 @@ import org.flowable.engine.impl.bpmn.parser.handler.AbstractBpmnParseHandler;
  */
 public class TestBPMNParseHandler extends AbstractBpmnParseHandler<Process> {
 
+    @Override
     protected Class<? extends BaseElement> getHandledType() {
         return Process.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, Process process) {
         // Change the key of all deployed process-definitions
         process.setId(bpmnParse.getCurrentProcessDefinition().getKey() + "-modified");

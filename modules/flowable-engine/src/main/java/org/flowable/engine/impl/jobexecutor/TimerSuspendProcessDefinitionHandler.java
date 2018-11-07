@@ -12,11 +12,15 @@
  */
 package org.flowable.engine.impl.jobexecutor;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.SuspendProcessDefinitionCmd;
-import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
-import org.flowable.engine.impl.util.json.JSONObject;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.variable.api.delegate.VariableScope;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author Joram Barrez
@@ -25,14 +29,24 @@ public class TimerSuspendProcessDefinitionHandler extends TimerChangeProcessDefi
 
     public static final String TYPE = "suspend-processdefinition";
 
+    @Override
     public String getType() {
         return TYPE;
     }
 
-    public void execute(JobEntity job, String configuration, ExecutionEntity execution, CommandContext commandContext) {
-        JSONObject cfgJson = new JSONObject(configuration);
+    @Override
+    public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        
+        boolean suspendProcessInstances = false;
+        try {
+            JsonNode configNode = processEngineConfiguration.getObjectMapper().readTree(configuration);
+            suspendProcessInstances = getIncludeProcessInstances(configNode);
+        } catch (Exception e) {
+            throw new FlowableException("Error reading json value " + configuration, e);
+        }
+
         String processDefinitionId = job.getProcessDefinitionId();
-        boolean suspendProcessInstances = getIncludeProcessInstances(cfgJson);
 
         SuspendProcessDefinitionCmd suspendProcessDefinitionCmd = new SuspendProcessDefinitionCmd(processDefinitionId, null, suspendProcessInstances, null, job.getTenantId());
         suspendProcessDefinitionCmd.execute(commandContext);

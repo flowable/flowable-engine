@@ -47,6 +47,7 @@ public class SetProcessInstanceBusinessKeyCmd implements Command<Void>, Serializ
         this.businessKey = businessKey;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         ExecutionEntityManager executionManager = commandContext.getExecutionEntityManager();
         ExecutionEntity processInstance = executionManager.findExecutionById(processInstanceId);

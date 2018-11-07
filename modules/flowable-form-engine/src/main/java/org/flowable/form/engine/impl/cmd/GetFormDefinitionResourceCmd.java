@@ -16,9 +16,9 @@ package org.flowable.form.engine.impl.cmd;
 import java.io.InputStream;
 import java.io.Serializable;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
 import org.flowable.form.engine.impl.util.CommandContextUtil;
 
@@ -39,6 +39,7 @@ public class GetFormDefinitionResourceCmd implements Command<InputStream>, Seria
         this.formDefinitionId = formDefinitionId;
     }
 
+    @Override
     public InputStream execute(CommandContext commandContext) {
         FormDefinitionEntity formDefinition = CommandContextUtil.getFormEngineConfiguration().getDeploymentManager()
                 .findDeployedFormDefinitionById(formDefinitionId);

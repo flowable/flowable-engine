@@ -23,13 +23,14 @@ import org.activiti.engine.impl.db.PersistentObject;
 import org.activiti.engine.impl.persistence.AbstractManager;
 import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Event;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 
 /**
  * @author Tom Baeyens
  */
 public class CommentEntityManager extends AbstractManager {
 
+    @Override
     public void delete(PersistentObject persistentObject) {
         checkHistoryEnabled();
         super.delete(persistentObject);
@@ -50,6 +51,7 @@ public class CommentEntityManager extends AbstractManager {
         }
     }
 
+    @Override
     public void insert(PersistentObject persistentObject) {
         checkHistoryEnabled();
         super.insert(persistentObject);
@@ -81,7 +83,7 @@ public class CommentEntityManager extends AbstractManager {
     @SuppressWarnings("unchecked")
     public List<Comment> findCommentsByTaskIdAndType(String taskId, String type) {
         checkHistoryEnabled();
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("taskId", taskId);
         params.put("type", type);
         return getDbSqlSession().selectListWithRawParameter("selectCommentsByTaskIdAndType", params, 0, Integer.MAX_VALUE);
@@ -123,7 +125,7 @@ public class CommentEntityManager extends AbstractManager {
 
     public List<Comment> findCommentsByProcessInstanceId(String processInstanceId, String type) {
         checkHistoryEnabled();
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("processInstanceId", processInstanceId);
         params.put("type", type);
         return getDbSqlSession().selectListWithRawParameter("selectCommentsByProcessInstanceIdAndType", params, 0, Integer.MAX_VALUE);

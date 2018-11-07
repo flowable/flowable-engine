@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn"
+             xsi:schemaLocation="http://www.omg.org/spec/CMMN/20151109/MODEL https://www.omg.org/spec/CMMN/20151109/CMMN11.xsd"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="completionNeutralTestCase">
+        <casePlanModel id="myCompletionNeutralTestPlanModel" name="My completion neutral test plan model">
+
+            <planItem id="planItemForTask" name="Completion Neutral task" definitionRef="taskOne"/>
+            <planItem id="planItemForMilestone" name="Completion Neutral milestone" definitionRef="milestoneOne"/>
+            <planItem id="planItemForListener" name="Completion Neutral event listener" definitionRef="eventListenerOne"/>
+            <planItem id="planItemForStage" name="Completion Neutral stage" definitionRef="stageOne"/>
+
+            <task id="taskOne" name="A completion neutral task">
+                <defaultControl>
+                    <extensionElements>
+                        <flowable:completionNeutralRule>
+                            <condition><![CDATA[${taskOne}]]></condition>
+                        </flowable:completionNeutralRule>
+                    </extensionElements>
+                </defaultControl>
+            </task>
+
+            <milestone id="milestoneOne" name="A completion neutral milestone">
+                <defaultControl>
+                    <extensionElements>
+                        <flowable:completionNeutralRule>
+                            <condition><![CDATA[${milestoneOne}]]></condition>
+                        </flowable:completionNeutralRule>
+                    </extensionElements>
+                </defaultControl>
+            </milestone>
+
+            <timerEventListener id="eventListenerOne" name="A completion neutral event listener">
+                <defaultControl>
+                    <extensionElements>
+                        <flowable:completionNeutralRule>
+                            <condition><![CDATA[${eventListenerOne}]]></condition>
+                        </flowable:completionNeutralRule>
+                    </extensionElements>
+                </defaultControl>
+            </timerEventListener>
+
+            <stage id="stageOne" name="A completion neutral stage">
+                <defaultControl>
+                    <extensionElements>
+                        <flowable:completionNeutralRule>
+                            <condition><![CDATA[${stageOne}]]></condition>
+                        </flowable:completionNeutralRule>
+                    </extensionElements>
+                </defaultControl>
+
+                <planItem id="withoutCondition" name="Completion Neutral without condition" definitionRef="taskTwo"/>
+                <task id="taskTwo">
+                    <extensionElements>
+                        <flowable:taskTest>hello</flowable:taskTest>
+                    </extensionElements>
+                    <defaultControl>
+                        <extensionElements>
+                            <flowable:completionNeutralRule/>
+                        </extensionElements>
+                        <requiredRule/>
+                    </defaultControl>
+                </task>
+            </stage>
+        </casePlanModel>
+    </case>
+
+</definitions>

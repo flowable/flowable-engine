@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.io.IOUtils;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
@@ -27,7 +28,6 @@ import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntityManager;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.xml.converter.DmnXMLConverter;
-import org.flowable.engine.common.api.FlowableException;
 
 /**
  * @author Tijs Rademakers
@@ -51,6 +51,7 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
         this.resourceEntityManager = dmnEngineConfiguration.getResourceEntityManager();
     }
 
+    @Override
     public DmnDeploymentBuilder addInputStream(String resourceName, InputStream inputStream) {
         if (inputStream == null) {
             throw new FlowableException("inputStream for resource '" + resourceName + "' is null");
@@ -60,7 +61,7 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
         try {
             bytes = IOUtils.toByteArray(inputStream);
         } catch (Exception e) {
-            throw new FlowableException("could not get byte array from resource '" + resourceName + "'");
+            throw new FlowableException("could not get byte array from resource '" + resourceName + "'", e);
         }
 
         if (bytes == null) {
@@ -74,6 +75,7 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
         return this;
     }
 
+    @Override
     public DmnDeploymentBuilder addClasspathResource(String resource) {
         InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resource);
         if (inputStream == null) {
@@ -82,6 +84,7 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
         return addInputStream(resource, inputStream);
     }
 
+    @Override
     public DmnDeploymentBuilder addString(String resourceName, String text) {
         if (text == null) {
             throw new FlowableException("text is null");
@@ -92,12 +95,13 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
         try {
             resource.setBytes(text.getBytes(DEFAULT_ENCODING));
         } catch (UnsupportedEncodingException e) {
-            throw new FlowableException("Unable to get process bytes.", e);
+            throw new FlowableException("Unable to get decision table bytes.", e);
         }
         deployment.addResource(resource);
         return this;
     }
 
+    @Override
     public DmnDeploymentBuilder addDmnBytes(String resourceName, byte[] dmnBytes) {
         if (dmnBytes == null) {
             throw new FlowableException("dmn bytes is null");
@@ -110,6 +114,7 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
         return this;
     }
 
+    @Override
     public DmnDeploymentBuilder addDmnModel(String resourceName, DmnDefinition dmnDefinition) {
         DmnXMLConverter dmnXMLConverter = new DmnXMLConverter();
         try {
@@ -121,36 +126,43 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
         return this;
     }
 
+    @Override
     public DmnDeploymentBuilder name(String name) {
         deployment.setName(name);
         return this;
     }
 
+    @Override
     public DmnDeploymentBuilder category(String category) {
         deployment.setCategory(category);
         return this;
     }
 
+    @Override
     public DmnDeploymentBuilder disableSchemaValidation() {
         this.isDmn20XsdValidationEnabled = false;
         return this;
     }
 
+    @Override
     public DmnDeploymentBuilder tenantId(String tenantId) {
         deployment.setTenantId(tenantId);
         return this;
     }
 
+    @Override
     public DmnDeploymentBuilder parentDeploymentId(String parentDeploymentId) {
         deployment.setParentDeploymentId(parentDeploymentId);
         return this;
     }
 
+    @Override
     public DmnDeploymentBuilder enableDuplicateFiltering() {
         isDuplicateFilterEnabled = true;
         return this;
     }
 
+    @Override
     public DmnDeployment deploy() {
         return repositoryService.deploy(this);
     }

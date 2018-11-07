@@ -20,12 +20,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.ibatis.exceptions.PersistenceException;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.impl.identity.Authentication;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +39,7 @@ public class ConcurrentEngineUsageTest extends PluggableFlowableTestCase {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConcurrentEngineUsageTest.class);
     private static final int MAX_RETRIES = 5;
 
+    @Test
     @Deployment
     public void testConcurrentUsage() throws Exception {
 
@@ -47,7 +48,7 @@ public class ConcurrentEngineUsageTest extends PluggableFlowableTestCase {
             int numberOfProcessesPerThread = 5;
             int totalNumberOfTasks = 2 * numberOfThreads * numberOfProcessesPerThread;
 
-            ThreadPoolExecutor executor = new ThreadPoolExecutor(10, 10, 1000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(numberOfThreads));
+            ThreadPoolExecutor executor = new ThreadPoolExecutor(10, 10, 1000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(numberOfThreads));
 
             for (int i = 0; i < numberOfThreads; i++) {
                 executor.execute(new ConcurrentProcessRunnerRunnable(numberOfProcessesPerThread, "kermit" + i));
@@ -152,7 +153,7 @@ public class ConcurrentEngineUsageTest extends PluggableFlowableTestCase {
                     numberOfProcesses = numberOfProcesses - 1;
                 } else {
                     // Finish a task
-                    List<Task> taskToComplete = taskService.createTaskQuery().taskAssignee(drivingUser).listPage(0, 1);
+                    List<org.flowable.task.api.Task> taskToComplete = taskService.createTaskQuery().taskAssignee(drivingUser).listPage(0, 1);
                     tasksAvailable = !taskToComplete.isEmpty();
                     if (tasksAvailable) {
                         retryFinishTask(taskToComplete.get(0).getId());

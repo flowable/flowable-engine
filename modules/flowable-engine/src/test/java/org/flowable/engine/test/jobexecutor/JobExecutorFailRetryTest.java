@@ -14,6 +14,7 @@ package org.flowable.engine.test.jobexecutor;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Saeid Mirzaei
@@ -21,6 +22,7 @@ import org.flowable.engine.test.Deployment;
 
 public class JobExecutorFailRetryTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testFailedServiceTask() {
 

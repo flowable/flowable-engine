@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 
 import javax.inject.Qualifier;
 
-import org.flowable.engine.task.Task;
+import org.flowable.task.api.Task;
 
 /**
  * Qualifier annotation for injecting the current taskId.

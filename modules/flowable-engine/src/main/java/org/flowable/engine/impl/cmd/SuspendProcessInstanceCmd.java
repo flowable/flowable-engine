@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.impl.cmd;
 
-import org.flowable.engine.impl.persistence.entity.SuspensionState;
+import org.flowable.common.engine.impl.db.SuspensionState;
 
 /**
  * 

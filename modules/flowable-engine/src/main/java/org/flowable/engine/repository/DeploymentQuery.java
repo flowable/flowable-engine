@@ -15,8 +15,8 @@ package org.flowable.engine.repository;
 
 import java.util.List;
 
+import org.flowable.common.engine.api.query.Query;
 import org.flowable.engine.RepositoryService;
-import org.flowable.engine.common.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link Deployment}s.
@@ -99,8 +99,30 @@ public interface DeploymentQuery extends Query<DeploymentQuery, Deployment> {
      * Only select deployment that have the given engine version.
      */
     DeploymentQuery deploymentEngineVersion(String engineVersion);
+    
+    /**
+     * Only select deployments that are derived from the given deployment.
+     */
+    DeploymentQuery deploymentDerivedFrom(String deploymentId);
+    
+    /**
+     * Only select deployments that have the given parent deployment id.
+     */
+    DeploymentQuery parentDeploymentId(String parentDeploymentId);
+    
+    /**
+     * Only select deployments that have a parent deployment id like the given value.
+     */
+    DeploymentQuery parentDeploymentIdLike(String parentDeploymentIdLike);
+    
+    /**
+     * Only select deployments with a parent deployment id that is the same as one of the given deployment identifiers.
+     */
+    DeploymentQuery parentDeploymentIds(List<String> parentDeploymentIds);
 
-    /** Only select deployments with the given process definition key. */
+    /**
+     * Only select deployments with the given process definition key. 
+     */
     DeploymentQuery processDefinitionKey(String key);
 
     /**

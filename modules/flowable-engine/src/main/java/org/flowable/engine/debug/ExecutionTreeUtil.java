@@ -19,7 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
@@ -74,7 +74,7 @@ public class ExecutionTreeUtil {
 
             if (parentId != null) {
                 if (!parentMapping.containsKey(parentId)) {
-                    parentMapping.put(parentId, new ArrayList<ExecutionEntity>());
+                    parentMapping.put(parentId, new ArrayList<>());
                 }
                 parentMapping.get(parentId).add(executionEntity);
             } else if (executionEntity.getSuperExecutionId() == null) {
@@ -99,7 +99,7 @@ public class ExecutionTreeUtil {
 
             if (parentId != null) {
                 if (!parentMapping.containsKey(parentId)) {
-                    parentMapping.put(parentId, new ArrayList<ExecutionEntity>());
+                    parentMapping.put(parentId, new ArrayList<>());
                 }
                 parentMapping.get(parentId).add(executionEntity);
             } else {

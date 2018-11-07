@@ -13,6 +13,11 @@
 
 package org.flowable.rest.service.api.repository;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipInputStream;
@@ -21,20 +26,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.QueryProperty;
+import org.flowable.common.rest.api.DataResponse;
 import org.flowable.engine.RepositoryService;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.engine.impl.DeploymentQueryProperty;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.repository.DeploymentQuery;
-import org.flowable.rest.api.DataResponse;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -73,23 +79,28 @@ public class DeploymentCollectionResource {
 
     @Autowired
     protected RepositoryService repositoryService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "List of Deployments", tags = { "Deployment" })
+    @ApiOperation(value = "List Deployments", tags = { "Deployment" }, nickname="listDeployments")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return deployments with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return deployments with a name like the given name.", paramType = "query"),
             @ApiImplicitParam(name = "category", dataType = "string", value = "Only return deployments with the given category.", paramType = "query"),
             @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return deployments which don’t have the given category.", paramType = "query"),
+            @ApiImplicitParam(name = "parentDeploymentId", dataType = "string", value = "Only return deployments with the given parent deployment id.", paramType = "query"),
+            @ApiImplicitParam(name = "parentDeploymentIdLike", dataType = "string", value = "Only return deployments with a parent deployment id like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return deployments with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return deployments with a tenantId like the given value.", paramType = "query"),
-            @ApiImplicitParam(name = "withoutTenantId", dataType = "string", value = "If true, only returns deployments without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
+            @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns deployments without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,name,deployTime,tenantId", paramType = "query"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the request was successful."),
     })
-    @RequestMapping(value = "/repository/deployments", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getDeployments(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    @GetMapping(value = "/repository/deployments", produces = "application/json")
+    public DataResponse<DeploymentResponse> getDeployments(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
 
         // Apply filters
@@ -105,6 +116,12 @@ public class DeploymentCollectionResource {
         if (allRequestParams.containsKey("categoryNotEquals")) {
             deploymentQuery.deploymentCategoryNotEquals(allRequestParams.get("categoryNotEquals"));
         }
+        if (allRequestParams.containsKey("parentDeploymentId")) {
+            deploymentQuery.parentDeploymentId(allRequestParams.get("parentDeploymentId"));
+        }
+        if (allRequestParams.containsKey("parentDeploymentIdLike")) {
+            deploymentQuery.parentDeploymentIdLike(allRequestParams.get("parentDeploymentIdLike"));
+        }
         if (allRequestParams.containsKey("tenantId")) {
             deploymentQuery.deploymentTenantId(allRequestParams.get("tenantId"));
         }
@@ -117,9 +134,12 @@ public class DeploymentCollectionResource {
                 deploymentQuery.deploymentWithoutTenantId();
             }
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDeploymentsWithQuery(deploymentQuery);
+        }
 
-        DataResponse response = new DeploymentsPaginateList(restResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
-        return response;
+        return paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties, restResponseFactory::createDeploymentResponseList);
     }
 
     @ApiOperation(value = "Create a new deployment", tags = {
@@ -127,13 +147,14 @@ public class DeploymentCollectionResource {
                     + "\n"
                     + "An additional parameter (form-field) can be passed in the request body with name tenantId. The value of this field will be used as the id of the tenant this deployment is done in.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates the deployment was created."),
+            @ApiResponse(code = 201, message = "Indicates the deployment was created."),
             @ApiResponse(code = 400, message = "Indicates there was no content present in the request body or the content mime-type is not supported for deployment. The status-description contains additional information.")
     })
+
     @ApiImplicitParams({
-        @ApiImplicitParam(name="file", paramType = "form", dataType = "java.io.File")
+            @ApiImplicitParam(name = "file", dataType = "file", paramType = "form", required = true)
     })
-    @RequestMapping(value = "/repository/deployments", method = RequestMethod.POST, produces = "application/json", consumes = "multipart/form-data")
+    @PostMapping(value = "/repository/deployments", produces = "application/json", consumes = "multipart/form-data")
     public DeploymentResponse uploadDeployment(@ApiParam(name = "deploymentKey") @RequestParam(value = "deploymentKey", required = false) String deploymentKey,
             @ApiParam(name = "deploymentName") @RequestParam(value = "deploymentName", required = false) String deploymentName,
             @ApiParam(name = "tenantId") @RequestParam(value = "tenantId", required = false) String tenantId,
@@ -142,6 +163,13 @@ public class DeploymentCollectionResource {
         if (!(request instanceof MultipartHttpServletRequest)) {
             throw new FlowableIllegalArgumentException("Multipart request is required");
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.executeNewDeploymentForTenantId(tenantId);
+        }
+
+        String queryString = request.getQueryString();
+        Map<String, String> decodedQueryStrings = splitQueryString(queryString);
 
         MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
 
@@ -167,7 +195,7 @@ public class DeploymentCollectionResource {
                 throw new FlowableIllegalArgumentException("File must be of type .bpmn20.xml, .bpmn, .bar or .zip");
             }
 
-            if (StringUtils.isEmpty(deploymentName)) {
+            if (!decodedQueryStrings.containsKey("deploymentName") || StringUtils.isEmpty(decodedQueryStrings.get("deploymentName"))) {
                 String fileNameWithoutExtension = fileName.split("\\.")[0];
 
                 if (StringUtils.isNotEmpty(fileNameWithoutExtension)) {
@@ -176,11 +204,11 @@ public class DeploymentCollectionResource {
 
                 deploymentBuilder.name(fileName);
             } else {
-                deploymentBuilder.name(deploymentName);
+                deploymentBuilder.name(decodedQueryStrings.get("deploymentName"));
             }
 
-            if (deploymentKey != null) {
-                deploymentBuilder.key(deploymentKey);
+            if (decodedQueryStrings.containsKey("deploymentKey") && StringUtils.isNotEmpty(decodedQueryStrings.get("deploymentKey"))) {
+                deploymentBuilder.key(decodedQueryStrings.get("deploymentKey"));
             }
 
             if (tenantId != null) {
@@ -199,5 +227,27 @@ public class DeploymentCollectionResource {
             }
             throw new FlowableException(e.getMessage(), e);
         }
+    }
+
+    public Map<String, String> splitQueryString(String queryString) {
+        if (StringUtils.isEmpty(queryString)) {
+            return Collections.emptyMap();
+        }
+        Map<String, String> queryMap = new HashMap<>();
+        for (String param : queryString.split("&")) {
+            queryMap.put(StringUtils.substringBefore(param, "="), decode(StringUtils.substringAfter(param, "=")));
+        }
+        return queryMap;
+    }
+
+    protected String decode(String string) {
+        if (string != null) {
+            try {
+                return URLDecoder.decode(string, "UTF-8");
+            } catch (UnsupportedEncodingException uee) {
+                throw new IllegalStateException("JVM does not support UTF-8 encoding.", uee);
+            }
+        }
+        return null;
     }
 }

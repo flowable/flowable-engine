@@ -12,8 +12,9 @@
  */
 package org.activiti.examples.bpmn.tasklistener;
 
-import org.flowable.engine.delegate.DelegateTask;
+import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * @author Joram Barrez
@@ -21,7 +22,7 @@ import org.flowable.engine.delegate.TaskListener;
 public class CandidateGroupAssignment implements TaskListener {
 
     public void notify(DelegateTask delegateTask) {
-        delegateTask.addCandidateGroup("management");
+        ((TaskEntity) delegateTask).addCandidateGroup("management");
     }
 
 }

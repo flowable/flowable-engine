@@ -21,18 +21,18 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.query.Query;
-import org.flowable.variable.service.impl.types.VariableTypes;
+import org.flowable.variable.api.types.VariableTypes;
 
 /**
  * Abstract query class that adds methods to query for variable values.
- * 
+ *
  * @author Frederik Heremans
  */
 public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extends AbstractQuery<T, U> {
 
     private static final long serialVersionUID = 1L;
 
-    protected List<QueryVariableValue> queryVariableValues = new ArrayList<QueryVariableValue>();
+    protected List<QueryVariableValue> queryVariableValues = new ArrayList<>();
 
     public AbstractVariableQueryImpl() {
     }
@@ -174,14 +174,14 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
         if (value == null || isBoolean(value)) {
             // Null-values and booleans can only be used in EQUALS and NOT_EQUALS
             switch (operator) {
-            case GREATER_THAN:
-                throw new ActivitiIllegalArgumentException("Booleans and null cannot be used in 'greater than' condition");
-            case LESS_THAN:
-                throw new ActivitiIllegalArgumentException("Booleans and null cannot be used in 'less than' condition");
-            case GREATER_THAN_OR_EQUAL:
-                throw new ActivitiIllegalArgumentException("Booleans and null cannot be used in 'greater than or equal' condition");
-            case LESS_THAN_OR_EQUAL:
-                throw new ActivitiIllegalArgumentException("Booleans and null cannot be used in 'less than or equal' condition");
+                case GREATER_THAN:
+                    throw new ActivitiIllegalArgumentException("Booleans and null cannot be used in 'greater than' condition");
+                case LESS_THAN:
+                    throw new ActivitiIllegalArgumentException("Booleans and null cannot be used in 'less than' condition");
+                case GREATER_THAN_OR_EQUAL:
+                    throw new ActivitiIllegalArgumentException("Booleans and null cannot be used in 'greater than or equal' condition");
+                case LESS_THAN_OR_EQUAL:
+                    throw new ActivitiIllegalArgumentException("Booleans and null cannot be used in 'less than or equal' condition");
             }
 
             if (operator == QueryOperator.EQUALS_IGNORE_CASE && !(value instanceof String)) {

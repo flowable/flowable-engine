@@ -32,6 +32,7 @@ public class GetProcessInstanceAttachmentsCmd implements Command<List<Attachment
         this.processInstanceId = taskId;
     }
 
+    @Override
     public List<Attachment> execute(CommandContext commandContext) {
         return commandContext
                 .getAttachmentEntityManager()

@@ -16,14 +16,21 @@ package org.flowable.engine.impl;
 import java.util.List;
 
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.DynamicBpmnService;
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.dynamic.DynamicProcessDefinitionSummary;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.GetBpmnModelCmd;
 import org.flowable.engine.impl.cmd.GetProcessDefinitionInfoCmd;
+import org.flowable.engine.impl.cmd.InjectEmbeddedSubProcessInProcessInstanceCmd;
+import org.flowable.engine.impl.cmd.InjectParallelEmbeddedSubProcessCmd;
+import org.flowable.engine.impl.cmd.InjectParallelUserTaskCmd;
+import org.flowable.engine.impl.cmd.InjectUserTaskInProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.SaveProcessDefinitionInfoCmd;
+import org.flowable.engine.impl.dynamic.DynamicEmbeddedSubProcessBuilder;
+import org.flowable.engine.impl.dynamic.DynamicUserTaskBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,157 +40,205 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Tijs Rademakers
  */
-public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnService, DynamicBpmnConstants {
+public class DynamicBpmnServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfigurationImpl> implements DynamicBpmnService, DynamicBpmnConstants {
 
     public DynamicBpmnServiceImpl(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);
     }
+    
+    @Override
+    public void injectUserTaskInProcessInstance(String processInstanceId, DynamicUserTaskBuilder dynamicUserTaskBuilder) {
+        commandExecutor.execute(new InjectUserTaskInProcessInstanceCmd(processInstanceId, dynamicUserTaskBuilder));
+    }
 
+    @Override
+    public void injectParallelUserTask(String taskId, DynamicUserTaskBuilder dynamicUserTaskBuilder) {
+        commandExecutor.execute(new InjectParallelUserTaskCmd(taskId, dynamicUserTaskBuilder));
+    }
+    
+    @Override
+    public void injectEmbeddedSubProcessInProcessInstance(String processInstanceId, DynamicEmbeddedSubProcessBuilder dynamicEmbeddedSubProcessBuilder) {
+        commandExecutor.execute(new InjectEmbeddedSubProcessInProcessInstanceCmd(processInstanceId, dynamicEmbeddedSubProcessBuilder));
+    }
+
+    @Override
+    public void injectParallelEmbeddedSubProcess(String taskId, DynamicEmbeddedSubProcessBuilder dynamicEmbeddedSubProcessBuilder) {
+        commandExecutor.execute(new InjectParallelEmbeddedSubProcessCmd(taskId, dynamicEmbeddedSubProcessBuilder));
+    }
+
+    @Override
     public ObjectNode getProcessDefinitionInfo(String processDefinitionId) {
         return commandExecutor.execute(new GetProcessDefinitionInfoCmd(processDefinitionId));
     }
 
+    @Override
     public void saveProcessDefinitionInfo(String processDefinitionId, ObjectNode infoNode) {
         commandExecutor.execute(new SaveProcessDefinitionInfoCmd(processDefinitionId, infoNode));
     }
 
+    @Override
     public ObjectNode changeServiceTaskClassName(String id, String className) {
-        ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
         changeServiceTaskClassName(id, className, infoNode);
         return infoNode;
     }
 
+    @Override
     public void changeServiceTaskClassName(String id, String className, ObjectNode infoNode) {
         setElementProperty(id, SERVICE_TASK_CLASS_NAME, className, infoNode);
     }
 
+    @Override
     public ObjectNode changeServiceTaskExpression(String id, String expression) {
-        ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
         changeServiceTaskExpression(id, expression, infoNode);
         return infoNode;
     }
 
+    @Override
     public void changeServiceTaskExpression(String id, String expression, ObjectNode infoNode) {
         setElementProperty(id, SERVICE_TASK_EXPRESSION, expression, infoNode);
     }
 
+    @Override
     public ObjectNode changeServiceTaskDelegateExpression(String id, String expression) {
-        ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
         changeServiceTaskDelegateExpression(id, expression, infoNode);
         return infoNode;
     }
 
+    @Override
     public void changeServiceTaskDelegateExpression(String id, String expression, ObjectNode infoNode) {
         setElementProperty(id, SERVICE_TASK_DELEGATE_EXPRESSION, expression, infoNode);
     }
 
+    @Override
     public ObjectNode changeScriptTaskScript(String id, String script) {
-        ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
         changeScriptTaskScript(id, script, infoNode);
         return infoNode;
     }
 
+    @Override
     public void changeScriptTaskScript(String id, String script, ObjectNode infoNode) {
         setElementProperty(id, SCRIPT_TASK_SCRIPT, script, infoNode);
     }
 
+    @Override
     public ObjectNode changeUserTaskName(String id, String name) {
-        ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
         changeUserTaskName(id, name, infoNode);
         return infoNode;
     }
 
+    @Override
     public void changeUserTaskName(String id, String name, ObjectNode infoNode) {
         setElementProperty(id, USER_TASK_NAME, name, infoNode);
     }
 
+    @Override
     public ObjectNode changeUserTaskDescription(String id, String description) {
-        ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
         changeUserTaskDescription(id, description, infoNode);
         return infoNode;
     }
 
+    @Override
     public void changeUserTaskDescription(String id, String description, ObjectNode infoNode) {
         setElementProperty(id, USER_TASK_DESCRIPTION, description, infoNode);
     }
 
+    @Override
     public ObjectNode changeUserTaskDueDate(String id, String dueDate) {
-        ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
         changeUserTaskDueDate(id, dueDate, infoNode);
         return infoNode;
     }
 
+    @Override
     public void changeUserTaskDueDate(String id, String dueDate, ObjectNode infoNode) {
         setElementProperty(id, USER_TASK_DUEDATE, dueDate, infoNode);
     }
 
+    @Override
     public ObjectNode changeUserTaskPriority(String id, String priority) {
-        ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
         changeUserTaskPriority(id, priority, infoNode);
         return infoNode;
     }
 
+    @Override
     public void changeUserTaskPriority(String id, String priority, ObjectNode infoNode) {
         setElementProperty(id, USER_TASK_PRIORITY, priority, infoNode);
     }
 
+    @Override
     public ObjectNode changeUserTaskCategory(String id, String category) {
-        ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
         changeUserTaskCategory(id, category, infoNode);
         return infoNode;
     }
 
+    @Override
     public void changeUserTaskCategory(String id, String category, ObjectNode infoNode) {
         setElementProperty(id, USER_TASK_CATEGORY, category, infoNode);
     }
 
+    @Override
     public ObjectNode changeUserTaskFormKey(String id, String formKey) {
-        ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
         changeUserTaskFormKey(id, formKey, infoNode);
         return infoNode;
     }
 
+    @Override
     public void changeUserTaskFormKey(String id, String formKey, ObjectNode infoNode) {
         setElementProperty(id, USER_TASK_FORM_KEY, formKey, infoNode);
     }
 
+    @Override
     public ObjectNode changeUserTaskAssignee(String id, String assignee) {
-        ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
         changeUserTaskAssignee(id, assignee, infoNode);
         return infoNode;
     }
 
+    @Override
     public void changeUserTaskAssignee(String id, String assignee, ObjectNode infoNode) {
         setElementProperty(id, USER_TASK_ASSIGNEE, assignee, infoNode);
     }
 
+    @Override
     public ObjectNode changeUserTaskOwner(String id, String owner) {
-        ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
         changeUserTaskOwner(id, owner, infoNode);
         return infoNode;
     }
 
+    @Override
     public void changeUserTaskOwner(String id, String owner, ObjectNode infoNode) {
         setElementProperty(id, USER_TASK_OWNER, owner, infoNode);
     }
 
+    @Override
     public ObjectNode changeUserTaskCandidateUser(String id, String candidateUser, boolean overwriteOtherChangedEntries) {
-        ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
         changeUserTaskCandidateUser(id, candidateUser, overwriteOtherChangedEntries, infoNode);
         return infoNode;
     }
 
+    @Override
     public void changeUserTaskCandidateUser(String id, String candidateUser, boolean overwriteOtherChangedEntries, ObjectNode infoNode) {
         ArrayNode valuesNode = null;
         if (overwriteOtherChangedEntries) {
-            valuesNode = processEngineConfiguration.getObjectMapper().createArrayNode();
+            valuesNode = configuration.getObjectMapper().createArrayNode();
         } else {
             if (doesElementPropertyExist(id, USER_TASK_CANDIDATE_USERS, infoNode)) {
                 valuesNode = (ArrayNode) infoNode.get(BPMN_NODE).get(id).get(USER_TASK_CANDIDATE_USERS);
             }
 
             if (valuesNode == null || valuesNode.isNull()) {
-                valuesNode = processEngineConfiguration.getObjectMapper().createArrayNode();
+                valuesNode = configuration.getObjectMapper().createArrayNode();
             }
         }
 
@@ -191,23 +246,25 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
         setElementProperty(id, USER_TASK_CANDIDATE_USERS, valuesNode, infoNode);
     }
 
+    @Override
     public ObjectNode changeUserTaskCandidateGroup(String id, String candidateGroup, boolean overwriteOtherChangedEntries) {
-        ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
         changeUserTaskCandidateGroup(id, candidateGroup, overwriteOtherChangedEntries, infoNode);
         return infoNode;
     }
 
+    @Override
     public void changeUserTaskCandidateGroup(String id, String candidateGroup, boolean overwriteOtherChangedEntries, ObjectNode infoNode) {
         ArrayNode valuesNode = null;
         if (overwriteOtherChangedEntries) {
-            valuesNode = processEngineConfiguration.getObjectMapper().createArrayNode();
+            valuesNode = configuration.getObjectMapper().createArrayNode();
         } else {
             if (doesElementPropertyExist(id, USER_TASK_CANDIDATE_GROUPS, infoNode)) {
                 valuesNode = (ArrayNode) infoNode.get(BPMN_NODE).get(id).get(USER_TASK_CANDIDATE_GROUPS);
             }
 
             if (valuesNode == null || valuesNode.isNull()) {
-                valuesNode = processEngineConfiguration.getObjectMapper().createArrayNode();
+                valuesNode = configuration.getObjectMapper().createArrayNode();
             }
         }
 
@@ -217,14 +274,14 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
 
     @Override
     public ObjectNode changeUserTaskCandidateUsers(String id, List<String> candidateUsers) {
-        ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
         changeUserTaskCandidateUsers(id, candidateUsers, infoNode);
         return infoNode;
     }
 
     @Override
     public void changeUserTaskCandidateUsers(String id, List<String> candidateUsers, ObjectNode infoNode) {
-        ArrayNode candidateUsersNode = processEngineConfiguration.getObjectMapper().createArrayNode();
+        ArrayNode candidateUsersNode = configuration.getObjectMapper().createArrayNode();
         for (String candidateUser : candidateUsers) {
             candidateUsersNode.add(candidateUser);
         }
@@ -233,14 +290,14 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
 
     @Override
     public ObjectNode changeUserTaskCandidateGroups(String id, List<String> candidateGroups) {
-        ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
         changeUserTaskCandidateGroups(id, candidateGroups, infoNode);
         return infoNode;
     }
 
     @Override
     public void changeUserTaskCandidateGroups(String id, List<String> candidateGroups, ObjectNode infoNode) {
-        ArrayNode candidateGroupsNode = processEngineConfiguration.getObjectMapper().createArrayNode();
+        ArrayNode candidateGroupsNode = configuration.getObjectMapper().createArrayNode();
         for (String candidateGroup : candidateGroups) {
             candidateGroupsNode.add(candidateGroup);
         }
@@ -249,7 +306,7 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
     
     @Override
     public ObjectNode changeMultiInstanceCompletionCondition(String id, String completionCondition) {
-        ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
         changeMultiInstanceCompletionCondition(id, completionCondition, infoNode);
         return infoNode;
     }
@@ -261,7 +318,7 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
 
     @Override
     public ObjectNode changeDmnTaskDecisionTableKey(String id, String decisionTableKey) {
-        ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
         changeDmnTaskDecisionTableKey(id, decisionTableKey, infoNode);
         return infoNode;
     }
@@ -271,16 +328,19 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
         setElementProperty(id, DMN_TASK_DECISION_TABLE_KEY, decisionTableKey, infoNode);
     }
 
+    @Override
     public ObjectNode changeSequenceFlowCondition(String id, String condition) {
-        ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
         changeSequenceFlowCondition(id, condition, infoNode);
         return infoNode;
     }
 
+    @Override
     public void changeSequenceFlowCondition(String id, String condition, ObjectNode infoNode) {
         setElementProperty(id, SEQUENCE_FLOW_CONDITION, condition, infoNode);
     }
 
+    @Override
     public ObjectNode getBpmnElementProperties(String id, ObjectNode infoNode) {
         ObjectNode propertiesNode = null;
         ObjectNode bpmnNode = getBpmnNode(infoNode);
@@ -290,26 +350,31 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
         return propertiesNode;
     }
 
+    @Override
     public ObjectNode changeLocalizationName(String language, String id, String value) {
-        ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
         changeLocalizationName(language, id, value, infoNode);
         return infoNode;
     }
 
+    @Override
     public void changeLocalizationName(String language, String id, String value, ObjectNode infoNode) {
         setLocalizationProperty(language, id, LOCALIZATION_NAME, value, infoNode);
     }
 
+    @Override
     public ObjectNode changeLocalizationDescription(String language, String id, String value) {
-        ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
         changeLocalizationDescription(language, id, value, infoNode);
         return infoNode;
     }
 
+    @Override
     public void changeLocalizationDescription(String language, String id, String value, ObjectNode infoNode) {
         setLocalizationProperty(language, id, LOCALIZATION_DESCRIPTION, value, infoNode);
     }
 
+    @Override
     public ObjectNode getLocalizationElementProperties(String language, String id, ObjectNode infoNode) {
         ObjectNode propertiesNode = null;
         ObjectNode localizationNode = getLocalizationNode(infoNode);
@@ -344,7 +409,7 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
     @Override
     public DynamicProcessDefinitionSummary getDynamicProcessDefinitionSummary(String processDefinitionId) {
         ObjectNode infoNode = getProcessDefinitionInfo(processDefinitionId);
-        ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
+        ObjectMapper objectMapper = configuration.getObjectMapper();
         BpmnModel bpmnModel = commandExecutor.execute(new GetBpmnModelCmd(processDefinitionId));
 
         // aggressive exception. this method should not be called if the process definition does not exists.
@@ -354,7 +419,7 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
 
         // to avoid redundant null checks we create an new node
         if (infoNode == null) {
-            infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+            infoNode = configuration.getObjectMapper().createObjectNode();
             createOrGetBpmnNode(infoNode);
         }
 

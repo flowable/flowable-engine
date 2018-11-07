@@ -2,13 +2,8 @@
   <decision id="decision1" name="Full Decision">
     <decisionTable id="decisionTable" hitPolicy="FIRST">
       <input>
-        <inputExpression id="inputExpression1" typeRef="double">
+        <inputExpression id="inputExpression1" typeRef="number">
           <text>inputVariable1</text>
-        </inputExpression>
-      </input>
-      <input>
-        <inputExpression id="inputExpression22" typeRef="string">
-          <text>inputVariable2</text>
         </inputExpression>
       </input>
       <output id="output1" label="Output 1" name="outputVariable1" typeRef="string"></output>
@@ -16,22 +11,16 @@
         <inputEntry id="inputEntry1">
           <text>== 1</text>
         </inputEntry>
-        <inputEntry id="inputEntry2">
-          <text>== 'test1'</text>
-        </inputEntry>
         <outputEntry id="outputEntry1">
-          <text>== 'result1'</text>
+          <text>'result1'</text>
         </outputEntry>
       </rule>
       <rule>
         <inputEntry id="inputEntry3">
-          <text>!= 1</text>
-        </inputEntry>
-        <inputEntry id="inputEntry4">
-          <text>== 'test2'</text>
+          <text><![CDATA[> 2]]></text>
         </inputEntry>
         <outputEntry id="outputEntry2">
-          <text>== 'result2'</text>
+          <text>'result2'</text>
         </outputEntry>
       </rule>
     </decisionTable>

@@ -12,8 +12,7 @@
  */
 package org.flowable.engine.delegate.event;
 
-import org.flowable.engine.impl.delegate.event.FlowableEngineEvent;
-
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEvent;
 /**
  * @author martin.grofcik
  */

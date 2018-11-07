@@ -17,20 +17,22 @@ import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableWrongDbException;
+import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableWrongDbException;
-import org.flowable.engine.common.impl.db.DbSqlSession;
-import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.test.AbstractTestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
  */
 public class ProcessEngineInitializationTest extends AbstractTestCase {
 
+    @Test
     public void testNoTables() {
         try {
             ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("org/flowable/standalone/initialization/notables.flowable.cfg.xml").buildProcessEngine();
@@ -41,13 +43,13 @@ public class ProcessEngineInitializationTest extends AbstractTestCase {
         }
     }
 
+    @Test
     public void testVersionMismatch() {
         // first create the schema
         ProcessEngineImpl processEngine = (ProcessEngineImpl) ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("org/flowable/standalone/initialization/notables.flowable.cfg.xml")
                 .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP).buildProcessEngine();
 
-        // then update the version to something that is different to the library
-        // version
+        // then update the version to something that is different to the library version
         DbSqlSessionFactory dbSqlSessionFactory = (DbSqlSessionFactory) processEngine.getProcessEngineConfiguration().getSessionFactories().get(DbSqlSession.class);
         SqlSessionFactory sqlSessionFactory = dbSqlSessionFactory.getSqlSessionFactory();
         SqlSession sqlSession = sqlSessionFactory.openSession();

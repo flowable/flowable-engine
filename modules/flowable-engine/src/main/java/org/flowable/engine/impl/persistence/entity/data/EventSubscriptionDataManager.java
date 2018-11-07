@@ -14,7 +14,7 @@ package org.flowable.engine.impl.persistence.entity.data;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -62,5 +62,7 @@ public interface EventSubscriptionDataManager extends DataManager<EventSubscript
     void updateEventSubscriptionTenantId(String oldTenantId, String newTenantId);
 
     void deleteEventSubscriptionsForProcessDefinition(String processDefinitionId);
+    
+    void deleteEventSubscriptionsByExecutionId(String executionId);
 
 }

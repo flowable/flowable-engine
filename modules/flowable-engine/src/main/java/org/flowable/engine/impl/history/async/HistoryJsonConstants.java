@@ -12,14 +12,47 @@
  */
 package org.flowable.engine.impl.history.async;
 
+import java.util.Arrays;
+import java.util.List;
+
 public interface HistoryJsonConstants {
     
+    String JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY = "async-history"; // Backwards compatibility: process engine used this first before the handler was reused
+    
+    String JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED = "async-history-zipped"; // Backwards compatibility: process engine used this first before the handler was reused
+    
     String TYPE = "type";
+    
+    List<String> ORDERED_TYPES = Arrays.asList(
+            HistoryJsonConstants.TYPE_PROCESS_INSTANCE_START,
+            HistoryJsonConstants.TYPE_PROCESS_INSTANCE_PROPERTY_CHANGED,
+            HistoryJsonConstants.TYPE_ACTIVITY_START,
+            HistoryJsonConstants.TYPE_ACTIVITY_END,
+            HistoryJsonConstants.TYPE_ACTIVITY_FULL,
+            HistoryJsonConstants.TYPE_TASK_CREATED,
+            HistoryJsonConstants.TYPE_TASK_ASSIGNEE_CHANGED,
+            HistoryJsonConstants.TYPE_TASK_OWNER_CHANGED,
+            HistoryJsonConstants.TYPE_TASK_PROPERTY_CHANGED,
+            HistoryJsonConstants.TYPE_TASK_ENDED,
+            HistoryJsonConstants.TYPE_VARIABLE_CREATED,
+            HistoryJsonConstants.TYPE_VARIABLE_UPDATED,
+            HistoryJsonConstants.TYPE_VARIABLE_REMOVED,
+            HistoryJsonConstants.TYPE_HISTORIC_DETAIL_VARIABLE_UPDATE,
+            HistoryJsonConstants.TYPE_FORM_PROPERTIES_SUBMITTED,
+            HistoryJsonConstants.TYPE_SET_PROCESS_DEFINITION,
+            HistoryJsonConstants.TYPE_SUBPROCESS_INSTANCE_START,
+            HistoryJsonConstants.TYPE_IDENTITY_LINK_CREATED,
+            HistoryJsonConstants.TYPE_IDENTITY_LINK_DELETED,
+            HistoryJsonConstants.TYPE_PROCESS_INSTANCE_DELETED_BY_PROCDEF_ID,
+            HistoryJsonConstants.TYPE_PROCESS_INSTANCE_DELETED,
+            HistoryJsonConstants.TYPE_PROCESS_INSTANCE_END
+    );
     
     String TYPE_PROCESS_INSTANCE_START = "process-instance-start";
     String TYPE_SUBPROCESS_INSTANCE_START = "subprocess-instance-start";
     String TYPE_PROCESS_INSTANCE_PROPERTY_CHANGED = "process-instance-property-changed";
     String TYPE_SET_PROCESS_DEFINITION = "set-process-definition";
+    String TYPE_UPDATE_PROCESS_DEFINITION_CASCADE = "update-process-definition-cascade";
     String TYPE_ACTIVITY_START = "activity-start";
     String TYPE_ACTIVITY_END = "activity-end";
     String TYPE_ACTIVITY_FULL = "activity-full";
@@ -27,6 +60,8 @@ public interface HistoryJsonConstants {
     String TYPE_HISTORIC_DETAIL_VARIABLE_UPDATE = "historic-detail-variable-update";
     String TYPE_IDENTITY_LINK_CREATED = "identitylink-created";
     String TYPE_IDENTITY_LINK_DELETED = "identitylink-deleted";
+    String TYPE_ENTITY_LINK_CREATED = "entitylink-created";
+    String TYPE_ENTITY_LINK_DELETED = "entitylink-deleted";
     String TYPE_TASK_CREATED = "task-created";
     String TYPE_TASK_ASSIGNEE_CHANGED = "task-assignee-changed";
     String TYPE_TASK_OWNER_CHANGED = "task-owner-changed";
@@ -42,7 +77,7 @@ public interface HistoryJsonConstants {
     String DATA = "data";
 
     String ID = "id";
-
+    
     String NAME = "name";
 
     String DESCRIPTION = "description";
@@ -70,7 +105,15 @@ public interface HistoryJsonConstants {
     String PROCESS_DEFINITION_NAME = "processDefinitionName";
 
     String PROCESS_DEFINITION_VERSION = "processDefinitionVersion";
+    
+    String PROCESS_DEFINITION_CATEGORY = "processDefinitionCategory";
 
+    String PROCESS_DEFINITIN_DERIVED_FROM = "processDefinitionDerivedFrom";
+    
+    String PROCESS_DEFINITIN_DERIVED_FROM_ROOT = "processDefinitionDerivedFromRoot";
+    
+    String PROCESS_DEFINITIN_DERIVED_VERSION = "processDefinitionDerivedVersion";
+    
     String DEPLOYMENT_ID = "deploymentId";
 
     String START_TIME = "startTime";
@@ -106,8 +149,12 @@ public interface HistoryJsonConstants {
     String OWNER = "owner";
     
     String IDENTITY_LINK_TYPE = "identityLinkType";
+    
+    String ENTITY_LINK_TYPE = "entityLinkType";
 
     String TASK_DEFINITION_KEY = "taskDefinitionKey";
+    
+    String TASK_DEFINITION_ID = "taskDefinitionId";
 
     String FORM_KEY = "formKey";
 
@@ -138,6 +185,22 @@ public interface HistoryJsonConstants {
     String GROUP_ID = "groupId";
 
     String TENANT_ID = "tenantId";
+    
+    String CALLBACK_ID = "callbackId";
+    
+    String CALLBACK_TYPE = "callbackType";
+    
+    String SCOPE_ID = "scopeId";
+    
+    String SCOPE_TYPE = "scopeType";
+    
+    String SCOPE_DEFINITION_ID = "scopeDefinitionId";
+    
+    String REF_SCOPE_ID = "referenceScopeId";
+    
+    String REF_SCOPE_TYPE = "referenceScopeType";
+    
+    String REF_SCOPE_DEFINITION_ID = "referenceScopeDefinitionId";
 
     String TIMESTAMP = "__timeStamp"; // Two underscores to avoid clashes with other fields
     

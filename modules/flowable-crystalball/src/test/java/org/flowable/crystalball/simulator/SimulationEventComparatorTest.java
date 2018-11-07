@@ -12,11 +12,11 @@
  */
 package org.flowable.crystalball.simulator;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Comparator;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 /**
  * @author martin.grofcik

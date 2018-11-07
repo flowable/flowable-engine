@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableListener;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * Execution used in {@link JavaDelegate}s and {@link ExecutionListener}s.

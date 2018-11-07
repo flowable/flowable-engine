@@ -12,16 +12,17 @@
  */
 package org.flowable.dmn.engine.impl.util;
 
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.TableDataManager;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.db.DbSqlSession;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 
 public class CommandContextUtil {
     
@@ -81,7 +82,15 @@ public class CommandContextUtil {
     }
     
     public static HistoricDecisionExecutionEntityManager getHistoricDecisionExecutionEntityManager(CommandContext commandContext) {
-        return getDmnEngineConfiguration().getHistoricDecisionExecutionEntityManager();
+        return getDmnEngineConfiguration(commandContext).getHistoricDecisionExecutionEntityManager();
+    }
+    
+    public static DmnRepositoryService getDmnRepositoryService() {
+        return getDmnRepositoryService(getCommandContext());
+    }
+    
+    public static DmnRepositoryService getDmnRepositoryService(CommandContext commandContext) {
+        return getDmnEngineConfiguration(commandContext).getDmnRepositoryService();
     }
     
     public static CommandContext getCommandContext() {

@@ -22,10 +22,10 @@ import java.util.UUID;
 
 import javax.persistence.EntityManager;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 
 /**
  * @author Frederik Heremans
@@ -44,8 +44,7 @@ public class JPAEntityMappings {
     public boolean isJPAEntity(Object value) {
         if (value != null) {
             // EntityMetaData will be added for all classes, even those who are
-            // not
-            // JPA-entities to prevent unneeded annotation scanning
+            // not JPA-entities to prevent unneeded annotation scanning
             return getEntityMetaData(value.getClass()).isJPAEntity();
         }
         return false;
@@ -54,8 +53,7 @@ public class JPAEntityMappings {
     public EntityMetaData getEntityMetaData(Class<?> clazz) {
         EntityMetaData metaData = classMetaDatamap.get(clazz.getName());
         if (metaData == null) {
-            // Class not present in meta-data map, create metaData for it and
-            // add
+            // Class not present in meta-data map, create metaData for it and add
             metaData = scanClass(clazz);
             classMetaDatamap.put(clazz.getName(), metaData);
         }

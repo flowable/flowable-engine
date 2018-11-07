@@ -20,7 +20,7 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.IdentityLinkEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.task.IdentityLinkType;
-import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.api.IdentityLink;
 
 /**
  * @author Joram Barrez
@@ -35,6 +35,7 @@ public class GetIdentityLinksForTaskCmd implements Command<List<IdentityLink>>, 
         this.taskId = taskId;
     }
 
+    @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<IdentityLink> execute(CommandContext commandContext) {
         TaskEntity task = commandContext

@@ -19,7 +19,6 @@ import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -46,7 +45,7 @@ public class MessageIntermediateEventTest extends PluggableFlowableTestCase {
 
         runtimeService.messageEventReceived(messageName, execution.getId());
 
-        Task task = taskService.createTaskQuery()
+        org.flowable.task.api.Task task = taskService.createTaskQuery()
                 .singleResult();
         assertNotNull(task);
         taskService.complete(task.getId());
@@ -74,7 +73,7 @@ public class MessageIntermediateEventTest extends PluggableFlowableTestCase {
 
         runtimeService.messageEventReceived(messageName, executions.get(0).getId());
 
-        Task task = taskService.createTaskQuery()
+        org.flowable.task.api.Task task = taskService.createTaskQuery()
                 .singleResult();
         assertNull(task);
 

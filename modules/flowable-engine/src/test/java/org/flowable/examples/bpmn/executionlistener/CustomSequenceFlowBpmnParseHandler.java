@@ -27,6 +27,7 @@ import org.flowable.engine.impl.bpmn.parser.handler.SequenceFlowParseHandler;
  */
 public class CustomSequenceFlowBpmnParseHandler extends SequenceFlowParseHandler {
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, SequenceFlow flow) {
 
         // Do the regular stuff

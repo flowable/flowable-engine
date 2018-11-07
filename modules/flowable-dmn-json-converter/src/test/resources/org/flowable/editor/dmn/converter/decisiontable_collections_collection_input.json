@@ -1,0 +1,107 @@
+{
+  "id": "8dd36898-4c56-11e7-9d73-a26608126000",
+  "modelVersion": "2",
+  "name": "Dates134",
+  "key": "Dates134",
+  "hitIndicator": "FIRST",
+  "inputExpressions": [
+    {
+      "id": "1",
+      "variableId": "collection1",
+      "variableType": null,
+      "type": "collection",
+      "label": "Collection One",
+      "entries": [],
+      "newVariable": false,
+      "complexExpression": false
+    }
+  ],
+  "outputExpressions": [
+    {
+      "id": "2",
+      "variableId": "output1",
+      "variableType": null,
+      "type": "string",
+      "label": "Output One",
+      "entries": [],
+      "newVariable": false
+    }
+  ],
+  "rules": [
+    {
+      "1_operator": "NONE OF",
+      "1_expression": "\"testValue\"",
+      "2": "result 1"
+    },
+    {
+      "1_operator": "ALL OF",
+      "1_expression": "\"testValue\"",
+      "2": "result 1"
+    },
+    {
+      "1_operator": "ALL OF",
+      "1_expression": "testVar1, testVar2",
+      "2": "result 1"
+    },
+    {
+      "1_operator": "ALL OF",
+      "1_expression": "\"testValue1\", \"testValue2\"",
+      "2": "result 1"
+    },
+    {
+      "1_operator": "ALL OF",
+      "1_expression": "10, 20",
+      "2": "result 1"
+    },
+    {
+      "1_operator": "ALL OF",
+      "1_expression": "10",
+      "2": "result 1"
+    },
+    {
+      "1_operator": "ALL OF",
+      "1_expression": "-",
+      "2": "result 2"
+    },
+    {
+      "1_operator": "NONE OF",
+      "1_expression": "\"testValue\"",
+      "2": "result 2"
+    },
+    {
+      "1_operator": "NONE OF",
+      "1_expression": "-",
+      "2": "result 2"
+    },
+    {
+      "1_operator": "ANY OF",
+      "1_expression": "\"testValue\"",
+      "2": "result 2"
+    },
+    {
+      "1_operator": "ANY OF",
+      "1_expression": "-",
+      "2": "result 2"
+    },
+    {
+      "1_operator": "==",
+      "1_expression": "\"testValue\"",
+      "2": "result 3"
+    },
+    {
+      "1_operator": "==",
+      "1_expression": "testCollection",
+      "2": "result 3"
+    },
+    {
+      "1_operator": "!=",
+      "1_expression": "\"testValue\"",
+      "2": "result 4"
+    },
+    {
+      "1_operator": "ALL OF",
+      "1_expression": "\"test,Value1\", \"test,Value2\"",
+      "2": "result 4"
+    }
+  ]
+}

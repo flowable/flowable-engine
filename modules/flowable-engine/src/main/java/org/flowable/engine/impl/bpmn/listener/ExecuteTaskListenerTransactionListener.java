@@ -12,15 +12,14 @@
  */
 package org.flowable.engine.impl.bpmn.listener;
 
-import org.flowable.engine.common.impl.cfg.TransactionListener;
-import org.flowable.engine.common.impl.cfg.TransactionPropagation;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.cfg.TransactionListener;
+import org.flowable.common.engine.impl.cfg.TransactionPropagation;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.TransactionDependentTaskListener;
-import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * A {@link TransactionListener} that invokes an {@link ExecutionListener}.
@@ -31,18 +30,20 @@ public class ExecuteTaskListenerTransactionListener implements TransactionListen
 
     protected TransactionDependentTaskListener listener;
     protected TransactionDependentTaskListenerExecutionScope scope;
+    protected CommandExecutor commandExecutor;
 
     public ExecuteTaskListenerTransactionListener(TransactionDependentTaskListener listener,
-            TransactionDependentTaskListenerExecutionScope scope) {
+            TransactionDependentTaskListenerExecutionScope scope, CommandExecutor commandExecutor) {
         this.listener = listener;
         this.scope = scope;
+        this.commandExecutor = commandExecutor;
     }
 
     @Override
     public void execute(CommandContext commandContext) {
-        CommandExecutor commandExecutor = CommandContextUtil.getProcessEngineConfiguration(commandContext).getCommandExecutor();
         CommandConfig commandConfig = new CommandConfig(false, TransactionPropagation.REQUIRES_NEW);
         commandExecutor.execute(commandConfig, new Command<Void>() {
+            @Override
             public Void execute(CommandContext commandContext) {
                 listener.notify(scope.getProcessInstanceId(), scope.getExecutionId(), scope.getTask(),
                         scope.getExecutionVariables(), scope.getCustomPropertiesMap());

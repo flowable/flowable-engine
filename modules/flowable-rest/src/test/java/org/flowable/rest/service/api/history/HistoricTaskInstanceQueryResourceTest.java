@@ -13,6 +13,9 @@
 
 package org.flowable.rest.service.api.history;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,10 +30,11 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.flowable.task.api.Task;
+import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -50,6 +54,7 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
     /**
      * Test querying historic task instance. POST query/historic-task-instances
      */
+    @Test
     @Deployment
     public void testQueryTaskInstances() throws Exception {
         HashMap<String, Object> processVariables = new HashMap<>();
@@ -150,6 +155,14 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         requestNode = objectMapper.createObjectNode();
         requestNode.put("processInstanceId", processInstance2.getId());
         assertResultsPresentInPostDataResponse(url, requestNode, 1, task2.getId());
+        
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("processInstanceIdWithChildren", processInstance.getId());
+        assertResultsPresentInPostDataResponse(url, requestNode, 2, task.getId());
+        
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("processInstanceIdWithChildren", "nonexisting");
+        assertResultsPresentInPostDataResponse(url, requestNode, 0);
 
         requestNode = objectMapper.createObjectNode();
         requestNode.put("taskAssignee", "kermit");

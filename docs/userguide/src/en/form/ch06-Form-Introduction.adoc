@@ -1,0 +1,63 @@
+[[formIntroduction]]
+
+== Form Introduction
+
+[[whatIsFormDefinition]]
+
+
+=== What is a form definition?
+
+For the BPMN engine, we adhere to the BPMN specification and for the DMN engine we use the DMN specification. For start and task forms there's no Oasis specification that can be used. Therefore, we have defined a JSON-based form definition structure that we use as an output format for the Flowable Form Editor and is used to render start and task forms in the Flowable Task application.
+
+
+[[formDefining]]
+
+
+=== Defining a form
+
+Create a new JSON file using your favourite text or JSON editor and give it a name. Make sure that the file *ends with .form*, as otherwise the Form engine won't pick up the file for deployment.
+
+The form definition JSON starts with a _key_, _name_ and _description_. The _key_ property is used by the Form engine to identify the form definition across the whole Form engine. The versioning system is also based on the _key_ property being identical for form definitions that have the same origin. The second part is the array of fields that defines the form fields of the form definition. Optionally, there's a third part that defines the form outcomes.
+
+[source,json,linenums]
+----
+{
+    "key": "form1",
+    "name": "My first form",
+    "fields": [
+        {
+            "id": "input1",
+            "name": "Input1",
+            "type": "text",
+            "required": false,
+            "placeholder": "empty"
+        }
+    ],
+    "outcomes": [
+        {
+            "id": "null",
+            "name": "Accept"
+        },
+        {
+            "id": "null",
+            "name": "Reject"
+        }
+    ]
+}
+----
+
+Each form field has an _id_, _name_ and _type_ property. The _id_ should be unique within the same form definition and is used as the variable name when a form is completed by a user. In this small example, an _input1_ process variable is created with the value of the text field the user has filled in.  The outcomes are also mapped to a variable based on the form's identifier, in the format of "+form_<form-identifier>_outcome"+.  For the example above, the selected outcome will be set for a variable named "+form_form1_outcome+".  In an expression, you can test if the outcome was 'Accept' using +${form_form1_outcome == "Accept"}+.
+
+The following form field types are supported:
+
+* text: rendered as a text field
+* multi-line-text: rendered as a text area field
+* integer: rendered as a text field, but only allows numeric values
+* boolean: rendered as a checkbox field
+* date: rendered as a date field
+* dropdown: rendered as a select field with the option values configured in the field definition
+* radio-buttons: rendered as a radio field with the option values configured in the field definition
+* people: rendered as a select field where a person from the Identity user table can be selected
+* functional-group: rendered as a select field where a group from the Identity group table can be selected
+* upload: rendered as an upload field
+* expression: rendered as a label and allows you to use JUEL expressions to use variables and/or other dynamic values in the label text

@@ -1,0 +1,39 @@
+drop index ACT_IDX_HI_PRO_INST_END;
+drop index ACT_IDX_HI_PRO_I_BUSKEY;
+drop index ACT_IDX_HI_ACT_INST_START;
+drop index ACT_IDX_HI_ACT_INST_END;
+drop index ACT_IDX_HI_DETAIL_PROC_INST;
+drop index ACT_IDX_HI_DETAIL_ACT_INST;
+drop index ACT_IDX_HI_DETAIL_TIME;
+drop index ACT_IDX_HI_DETAIL_NAME;
+drop index ACT_IDX_HI_DETAIL_TASK_ID;
+drop index ACT_IDX_HI_PROCVAR_PROC_INST;
+drop index ACT_IDX_HI_PROCVAR_TASK_ID;
+drop index ACT_IDX_HI_PROCVAR_EXE;
+drop index ACT_IDX_HI_ACT_INST_PROCINST;
+drop index ACT_IDX_HI_IDENT_LNK_TASK;
+drop index ACT_IDX_HI_IDENT_LNK_PROCINST;
+drop index ACT_IDX_HI_TASK_INST_PROCINST;
+
+drop table ACT_HI_PROCINST;
+drop table ACT_HI_ACTINST;
+drop table ACT_HI_DETAIL;
+drop table ACT_HI_COMMENT;
+drop table ACT_HI_ATTACHMENT;
+
+drop index ACT_IDX_HI_PROCVAR_NAME_TYPE;
+drop index ACT_IDX_HI_VAR_SCOPE_ID_TYPE;
+drop index ACT_IDX_HI_VAR_SUB_ID_TYPE;
+
+drop table ACT_HI_VARINST;
+
+drop index ACT_IDX_HI_TASK_SCOPE;
+drop index ACT_IDX_HI_TASK_SUB_SCOPE;
+drop index ACT_IDX_HI_TASK_SCOPE_DEF;
+
+drop table ACT_HI_TASKINST;
+drop index ACT_IDX_HI_IDENT_LNK_USER;
+drop index ACT_IDX_HI_IDENT_LNK_SCOPE;
+drop index ACT_IDX_HI_IDENT_LNK_SCOPE_DEF;
+
+drop table ACT_HI_IDENTITYLINK;

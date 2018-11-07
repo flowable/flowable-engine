@@ -15,8 +15,8 @@ package org.flowable.idm.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
@@ -33,6 +33,7 @@ public class DeleteUserInfoCmd implements Command<Object>, Serializable {
         this.key = key;
     }
 
+    @Override
     public String execute(CommandContext commandContext) {
         CommandContextUtil.getIdentityInfoEntityManager(commandContext).deleteUserInfoByUserIdAndKey(userId, key);
         return null;

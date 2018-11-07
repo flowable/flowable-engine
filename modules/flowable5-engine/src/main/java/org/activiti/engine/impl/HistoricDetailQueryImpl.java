@@ -52,16 +52,19 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
         super(commandExecutor);
     }
 
+    @Override
     public HistoricDetailQueryImpl id(String id) {
         this.id = id;
         return this;
     }
 
+    @Override
     public HistoricDetailQueryImpl processInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
         return this;
     }
 
+    @Override
     public HistoricDetailQueryImpl executionId(String executionId) {
         this.executionId = executionId;
         return this;
@@ -72,31 +75,37 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
         return this;
     }
 
+    @Override
     public HistoricDetailQueryImpl activityInstanceId(String activityInstanceId) {
         this.activityInstanceId = activityInstanceId;
         return this;
     }
 
+    @Override
     public HistoricDetailQueryImpl taskId(String taskId) {
         this.taskId = taskId;
         return this;
     }
 
+    @Override
     public HistoricDetailQueryImpl formProperties() {
         this.type = "FormProperty";
         return this;
     }
 
+    @Override
     public HistoricDetailQueryImpl variableUpdates() {
         this.type = "VariableUpdate";
         return this;
     }
 
+    @Override
     public HistoricDetailQueryImpl excludeTaskDetails() {
         this.excludeTaskRelated = true;
         return this;
     }
 
+    @Override
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
         return commandContext
@@ -104,6 +113,7 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
                 .findHistoricDetailCountByQueryCriteria(this);
     }
 
+    @Override
     public List<HistoricDetail> executeList(CommandContext commandContext, Page page) {
         checkQueryOk();
         List<HistoricDetail> historicDetails = commandContext
@@ -139,31 +149,37 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
 
     // order by /////////////////////////////////////////////////////////////////
 
+    @Override
     public HistoricDetailQueryImpl orderByProcessInstanceId() {
         orderBy(HistoricDetailQueryProperty.PROCESS_INSTANCE_ID);
         return this;
     }
 
+    @Override
     public HistoricDetailQueryImpl orderByTime() {
         orderBy(HistoricDetailQueryProperty.TIME);
         return this;
     }
 
+    @Override
     public HistoricDetailQueryImpl orderByVariableName() {
         orderBy(HistoricDetailQueryProperty.VARIABLE_NAME);
         return this;
     }
 
+    @Override
     public HistoricDetailQueryImpl orderByFormPropertyId() {
         orderBy(HistoricDetailQueryProperty.VARIABLE_NAME);
         return this;
     }
 
+    @Override
     public HistoricDetailQueryImpl orderByVariableRevision() {
         orderBy(HistoricDetailQueryProperty.VARIABLE_REVISION);
         return this;
     }
 
+    @Override
     public HistoricDetailQueryImpl orderByVariableType() {
         orderBy(HistoricDetailQueryProperty.VARIABLE_TYPE);
         return this;

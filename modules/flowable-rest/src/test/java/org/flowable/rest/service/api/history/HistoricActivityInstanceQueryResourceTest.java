@@ -25,14 +25,17 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.flowable.task.api.Task;
+import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for REST-operation related to the historic activity instance query resource.
@@ -44,6 +47,7 @@ public class HistoricActivityInstanceQueryResourceTest extends BaseSpringRestTes
     /**
      * Test querying historic activity instance. POST query/historic-activity-instances
      */
+    @Test
     @Deployment
     public void testQueryActivityInstances() throws Exception {
         HashMap<String, Object> processVariables = new HashMap<>();

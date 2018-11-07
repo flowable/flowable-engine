@@ -17,27 +17,28 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.db.SuspensionState;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
-import org.flowable.engine.impl.jobexecutor.JobHandler;
 import org.flowable.engine.impl.jobexecutor.TimerChangeProcessDefinitionSuspensionStateJobHandler;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
-import org.flowable.engine.impl.persistence.entity.SuspensionState;
-import org.flowable.engine.impl.persistence.entity.SuspensionState.SuspensionStateUtil;
-import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
+import org.flowable.engine.impl.persistence.entity.SuspensionStateUtil;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.job.service.JobHandler;
+import org.flowable.job.service.TimerJobService;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 
 /**
  * @author Daniel Meyer
@@ -67,6 +68,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
         this.tenantId = tenantId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
 
         List<ProcessDefinitionEntity> processDefinitions = findProcessDefinition(commandContext);
@@ -150,7 +152,8 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
             if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext))
                 continue;
 
-            TimerJobEntity timer = CommandContextUtil.getTimerJobEntityManager(commandContext).create();
+            TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);
+            TimerJobEntity timer = timerJobService.createTimerJob();
             timer.setJobType(JobEntity.JOB_TYPE_TIMER);
             timer.setProcessDefinitionId(processDefinition.getId());
 
@@ -162,7 +165,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
             timer.setDuedate(executionDate);
             timer.setJobHandlerType(getDelayedExecutionJobHandlerType());
             timer.setJobHandlerConfiguration(TimerChangeProcessDefinitionSuspensionStateJobHandler.createJobHandlerConfiguration(includeProcessInstances));
-            CommandContextUtil.getJobManager(commandContext).scheduleTimerJob(timer);
+            timerJobService.scheduleTimerJob(timer);
         }
     }
 

@@ -24,7 +24,7 @@ import java.util.Map;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
-import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
+import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,7 +38,7 @@ public class HitPolicyPriorityTest {
     public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void priorityHitPolicy() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
@@ -54,7 +54,7 @@ public class HitPolicyPriorityTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void priorityHitPolicyCompound() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
@@ -71,7 +71,7 @@ public class HitPolicyPriorityTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void priorityHitPolicyCompoundFirstOutputValues() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
@@ -88,7 +88,7 @@ public class HitPolicyPriorityTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void priorityHitPolicyCompoundSecondOutputValues() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
@@ -105,7 +105,7 @@ public class HitPolicyPriorityTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void priorityHitPolicyCompoundNoOutputValues() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
@@ -122,10 +122,11 @@ public class HitPolicyPriorityTest {
         assertEquals(0, result.getDecisionResult().size());
         assertTrue(result.isFailed());
         assertNotNull(result.getExceptionMessage());
+        assertNull(result.getValidationMessage());
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void priorityHitPolicyCompoundNoOutputValuesStrictModeDisabled() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         dmnEngine.getDmnEngineConfiguration().setStrictMode(false);
@@ -145,13 +146,14 @@ public class HitPolicyPriorityTest {
 
         assertFalse(result.isFailed());
         assertNull(result.getExceptionMessage());
+        assertNotNull(result.getValidationMessage());
 
         dmnEngine.getDmnEngineConfiguration().setStrictMode(true);
     }
 
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void priorityHitPolicyTypeConversion() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 

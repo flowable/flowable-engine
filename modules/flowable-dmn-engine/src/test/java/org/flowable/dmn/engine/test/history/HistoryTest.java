@@ -14,7 +14,7 @@ package org.flowable.dmn.engine.test.history;
 
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.engine.impl.test.PluggableFlowableDmnTestCase;
-import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
+import org.flowable.dmn.engine.test.DmnDeployment;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public class HistoryTest extends PluggableFlowableDmnTestCase {
 
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void testFirstHitPolicy() throws Exception {
         ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")
@@ -77,7 +77,7 @@ public class HistoryTest extends PluggableFlowableDmnTestCase {
         assertTrue(ruleExecutions.get("2").get("valid").asBoolean());
     }
     
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void testOutputOrderHitPolicy() throws Exception {
         ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")
@@ -138,7 +138,7 @@ public class HistoryTest extends PluggableFlowableDmnTestCase {
         assertTrue(ruleExecutions.get("3").get("valid").asBoolean());
     }
     
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void testPriorityHitPolicy() throws Exception {
         ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")

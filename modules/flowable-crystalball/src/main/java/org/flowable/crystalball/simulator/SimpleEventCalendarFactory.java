@@ -12,12 +12,12 @@
  */
 package org.flowable.crystalball.simulator;
 
-import org.flowable.engine.common.runtime.ClockReader;
-import org.springframework.beans.factory.FactoryBean;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+
+import org.flowable.common.engine.impl.runtime.ClockReader;
+import org.springframework.beans.factory.FactoryBean;
 
 /**
  * @author martin.grofcik

@@ -18,14 +18,13 @@ import java.util.Date;
 import java.util.HashMap;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
-import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.variable.api.types.VariableType;
 
 /**
  * @author Christian Lipphardt (camunda)
  * @author Joram Barrez
  */
-public class HistoricVariableInstanceEntityImpl extends AbstractEntity implements HistoricVariableInstanceEntity, Serializable {
+public class HistoricVariableInstanceEntityImpl extends AbstractVariableServiceEntity implements HistoricVariableInstanceEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -35,6 +34,9 @@ public class HistoricVariableInstanceEntityImpl extends AbstractEntity implement
     protected String processInstanceId;
     protected String executionId;
     protected String taskId;
+    protected String scopeId;
+    protected String subScopeId;
+    protected String scopeType;
 
     protected Date createTime;
     protected Date lastUpdatedTime;
@@ -56,6 +58,9 @@ public class HistoricVariableInstanceEntityImpl extends AbstractEntity implement
         HashMap<String, Object> persistentState = new HashMap<>();
 
         persistentState.put("name", name);
+        persistentState.put("scopeId", scopeId);
+        persistentState.put("subScopeId", subScopeId);
+        persistentState.put("scopeType", scopeType);
         persistentState.put("textValue", textValue);
         persistentState.put("textValue2", textValue2);
         persistentState.put("doubleValue", doubleValue);
@@ -236,6 +241,36 @@ public class HistoricVariableInstanceEntityImpl extends AbstractEntity implement
     @Override
     public void setExecutionId(String executionId) {
         this.executionId = executionId;
+    }
+    
+    @Override
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    @Override
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+    
+    @Override
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+    
+    @Override
+    public void setSubScopeId(String subScopeId) {
+        this.subScopeId = subScopeId;
+    }
+
+    @Override
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    @Override
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
     }
 
     @Override

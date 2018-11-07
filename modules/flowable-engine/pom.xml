@@ -1,39 +1,39 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<name>Flowable - Engine</name>
-	<artifactId>flowable-engine</artifactId>
+    <name>Flowable - Engine</name>
+    <artifactId>flowable-engine</artifactId>
 
-	<parent>
-		<groupId>org.flowable</groupId>
-		<artifactId>flowable-root</artifactId>
-		<relativePath>../..</relativePath>
-		<version>6.2.0-SNAPSHOT</version>
-	</parent>
+    <parent>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-root</artifactId>
+        <relativePath>../..</relativePath>
+        <version>6.4.1-SNAPSHOT</version>
+    </parent>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.flowable</groupId>
-			<artifactId>flowable-bpmn-converter</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.flowable</groupId>
-			<artifactId>flowable-process-validation</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.flowable</groupId>
-			<artifactId>flowable-image-generator</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.flowable</groupId>
-			<artifactId>flowable-engine-common-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.flowable</groupId>
-			<artifactId>flowable-engine-common</artifactId>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-bpmn-converter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-process-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-image-generator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-engine-common-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-engine-common</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-variable-service</artifactId>
@@ -42,484 +42,379 @@
             <groupId>org.flowable</groupId>
             <artifactId>flowable-identitylink-service</artifactId>
         </dependency>
-		<dependency>
-			<groupId>org.flowable</groupId>
-			<artifactId>flowable-idm-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.flowable</groupId>
-			<artifactId>flowable-idm-engine</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.flowable</groupId>
-			<artifactId>flowable-dmn-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.flowable</groupId>
-			<artifactId>flowable-form-model</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.flowable</groupId>
-			<artifactId>flowable-form-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.flowable</groupId>
-			<artifactId>flowable-content-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-email</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-codec</groupId>
-		    <artifactId>commons-codec</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.mybatis</groupId>
-			<artifactId>mybatis</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-beans</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
-			<artifactId>groovy-all</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.drools</groupId>
-			<artifactId>drools-core</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.drools</groupId>
-			<artifactId>drools-compiler</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.persistence</groupId>
-			<artifactId>persistence-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.geronimo.specs</groupId>
-			<artifactId>geronimo-jta_1.1_spec</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.enterprise.concurrent</groupId>
-			<artifactId>javax.enterprise.concurrent-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.openjpa</groupId>
-			<artifactId>openjpa</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.subethamail</groupId>
-			<artifactId>subethasmtp-wiser</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jtds</groupId>
-			<artifactId>jtds</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.uuid</groupId>
-			<artifactId>java-uuid-generator</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<!-- required for DiagramQueryTest -->
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>joda-time</groupId>
-			<artifactId>joda-time</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jcl-over-slf4j</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.googlecode.catch-exception</groupId>
-			<artifactId>catch-exception</artifactId>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-entitylink-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-task-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-job-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-idm-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-idm-engine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-idm-engine-configurator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-cmmn-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-dmn-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-form-model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-form-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-content-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-email</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-jsr223</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-compiler</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <!-- no official JPA 2.1 Jar was ever published, so we have to use a vendor implementation :( -->
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.1-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jta_1.1_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.enterprise.concurrent</groupId>
+            <artifactId>javax.enterprise.concurrent-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.subethamail</groupId>
+            <artifactId>subethasmtp-wiser</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.jtds</groupId>
+            <artifactId>jtds</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.uuid</groupId>
+            <artifactId>java-uuid-generator</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
-		<!-- Required for testing JTA -->
-		<dependency>
-			<groupId>org.codehaus.btm</groupId>
-			<artifactId>btm</artifactId>
-			<version>2.1.3</version>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <!-- required for DiagramQueryTest -->
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-	</dependencies>
+        <!-- Required for testing JTA -->
+        <dependency>
+            <groupId>org.codehaus.btm</groupId>
+            <artifactId>btm</artifactId>
+            <version>2.1.3</version>
+            <scope>test</scope>
+        </dependency>
 
-	<properties>
-		<flowable.artifact>
-			org.flowable.engine
-		</flowable.artifact>
-		<flowable.osgi.export.additional>
-			org.flowable.db.mapping.entity
-		</flowable.osgi.export.additional>
-		<flowable.osgi.import.additional>
-			junit*;resolution:=optional,
-			org.junit*;resolution:=optional,
-			com.sun*;resolution:=optional,
-			javax.activation*;resolution:=optional,
-			javax.persistence*;resolution:=optional,
-			org.apache.commons.mail*;resolution:=optional,
-			org.apache.xerces*;resolution:=optional,
-			org.flowable.camel;resolution:=optional,
-			org.flowable.camel.impl;resolution:=optional,
-			org.springframework*;resolution:=optional,
-			org.drools*;resolution:=optional,
-			com.fasterxml*;resolution:=optional,
-			javax.transaction;resolution:=optional,
-			javax.enterprise.concurrent;resolution:=optional,
-		</flowable.osgi.import.additional>
-	</properties>
+    </dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>**/*TestCase.java</exclude>
-						<exclude>**/RepeatingServiceTaskTest.java</exclude>
-					</excludes>
-					<runOrder>alphabetical</runOrder>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
-					</archive>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>cleanVersions</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>bundle-manifest</id>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>manifest</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-		<pluginManagement>
-			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.apache.felix</groupId>
-										<artifactId>
-											maven-bundle-plugin
-										</artifactId>
-										<versionRange>
-											[2.1.0,)
-										</versionRange>
-										<goals>
-											<goal>cleanVersions</goal>
-											<goal>manifest</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
+    <properties>
+        <flowable.artifact>
+            org.flowable.engine
+        </flowable.artifact>
+        <flowable.osgi.export.additional>
+            org.flowable.db.mapping.entity
+        </flowable.osgi.export.additional>
+        <flowable.osgi.import.additional>
+            junit*;resolution:=optional,
+            org.junit*;resolution:=optional,
+            com.sun*;resolution:=optional,
+            javax.activation*;resolution:=optional,
+            javax.persistence*;resolution:=optional,
+            org.apache.commons.mail*;resolution:=optional,
+            org.apache.xerces*;resolution:=optional,
+            org.flowable.camel;resolution:=optional,
+            org.flowable.camel.impl;resolution:=optional,
+            org.springframework*;resolution:=optional,
+            org.drools*;resolution:=optional,
+            org.kie*;resolution:=optional,
+            com.fasterxml*;resolution:=optional,
+            javax.transaction;resolution:=optional,
+            javax.enterprise.concurrent;resolution:=optional,
+        </flowable.osgi.import.additional>
+        <exclude.tests>nothing-to-exclude</exclude.tests>
+        <exclude.tests2>nothing-to-exclude</exclude.tests2>
+    </properties>
 
-	<profiles>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/*TestCase.java</exclude>
+                        <exclude>**/RepeatingServiceTaskTest.java</exclude>
+                        <exclude>${exclude.tests}</exclude>
+                        <exclude>${exclude.tests2}</exclude>
+                    </excludes>
+                    <runOrder>alphabetical</runOrder>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>cleanVersions</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>bundle-manifest</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>manifest</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse 
+                    m2e settings only. It has no influence on the Maven build itself. -->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.felix</groupId>
+                                        <artifactId>
+                                            maven-bundle-plugin
+                                        </artifactId>
+                                        <versionRange>
+                                            [2.1.0,)
+                                        </versionRange>
+                                        <goals>
+                                            <goal>cleanVersions</goal>
+                                            <goal>manifest</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
-		<profile>
-			<id>checkspring</id>
-			<properties>
-				<skipTests>true</skipTests>
-			</properties>
-		</profile>
+    <profiles>
 
-		<profile>
-			<id>create-test-jar</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-jar-plugin</artifactId>
-						<version>2.2</version>
-						<executions>
-							<execution>
-								<goals>
-									<goal>test-jar</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>upgradeDatabase</id>
-			<activation>
-				<property>
-					<name>upgradeDatabase</name>
-				</property>
-			</activation>
-			<properties>
-				<skipTests>true</skipTests>
-			</properties>
-		</profile>
-		<profile>
-			<id>distro</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<version>2.1.1</version>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<phase>package</phase>
-								<goals>
-									<goal>jar-no-fork</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
+        <profile>
+            <id>checkspring</id>
+            <properties>
+                <skipTests>true</skipTests>
+            </properties>
+        </profile>
 
-		<!-- database qa profile -->
-		<profile>
-			<id>database</id>
-			<activation>
-				<property>
-					<name>database</name>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<!-- only worked with this version, there might be a bug with antrun 
-							see http://jira.codehaus.org/browse/MANTRUN-109 -->
-						<version>1.4</version>
-						<executions>
-							<execution>
-								<id>database-test-create-schema</id>
-								<phase>process-test-classes</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo message="updating flowable configuration to db ${database}" />
-										<copy file="${basedir}/../../qa/db/flowable.cfg.xml"
-											todir="target/test-classes" overwrite="true">
-											<filterset
-												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${database}.properties" />
-										</copy>
-									</tasks>
-								</configuration>
-							</execution>
-							<execution>
-								<id>database-test-drop-schema</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo message="dropping schema in ${database}" />
-										<java classname="org.flowable.engine.impl.db.DbSchemaDrop"
-											classpathref="maven.test.classpath" />
-									</tasks>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<profile>
-			<id>databasewithschema</id>
-			<activation>
-				<property>
-					<name>databasewithschema</name>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<!-- only worked with this version, there might be a bug with antrun 
-							see http://jira.codehaus.org/browse/MANTRUN-109 -->
-						<version>1.4</version>
-						<executions>
-							<execution>
-								<id>database-test-create-schema</id>
-								<phase>process-test-classes</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo
-											message="updating flowable configuration to db ${databasewithschema}" />
-										<copy file="${basedir}/../../qa/db/schema/flowable.cfg.xml"
-											todir="target/test-classes" overwrite="true">
-											<filterset
-												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasewithschema}.properties" />
-										</copy>
-									</tasks>
-								</configuration>
-							</execution>
-							<execution>
-								<id>database-test-drop-schema</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo message="dropping schema in ${databasewithschema}" />
-										<java classname="org.flowable.engine.impl.db.DbSchemaDrop"
-											classpathref="maven.test.classpath" />
-									</tasks>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<profile>
-			<id>databasemssql</id>
-			<activation>
-				<property>
-					<name>databasemssql</name>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<!-- only worked with this version, there might be a bug with antrun 
-							see http://jira.codehaus.org/browse/MANTRUN-109 -->
-						<version>1.4</version>
-						<executions>
-							<execution>
-								<id>database-test-create-schema</id>
-								<phase>process-test-classes</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo message="updating flowable configuration to db ${databasemssql}" />
-										<copy file="${basedir}/../../qa/db/mssql/flowable.cfg.xml"
-											todir="target/test-classes" overwrite="true">
-											<filterset
-												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasemssql}.properties" />
-										</copy>
-									</tasks>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		
-		<profile>
-            <id>databaseasynchistory</id>
+        <profile>
+            <id>create-test-jar</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <version>2.2</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>test-jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>upgradeDatabase</id>
             <activation>
                 <property>
-                    <name>databaseasynchistory</name>
+                    <name>upgradeDatabase</name>
+                </property>
+            </activation>
+            <properties>
+                <skipTests>true</skipTests>
+            </properties>
+        </profile>
+        <profile>
+            <id>distro</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.1.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- database qa profile -->
+        <profile>
+            <id>database</id>
+            <activation>
+                <property>
+                    <name>database</name>
                 </property>
             </activation>
             <build>
                 <plugins>
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be a bug with antrun 
-                            see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        <!-- only worked with this version, there might be 
+                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
                         <version>1.4</version>
                         <executions>
                             <execution>
@@ -530,9 +425,170 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <echo message="updating flowable configuration to db ${databaseasynchistory}" />
-                                        <copy file="${basedir}/../../qa/asynchistory/flowable.cfg.xml"
-                                            todir="target/test-classes" overwrite="true">
+                                        <echo
+                                            message="updating flowable configuration to db ${database}" />
+                                        <copy
+                                            file="${basedir}/../../qa/db/flowable.cfg.xml"
+                                            todir="target/test-classes"
+                                            overwrite="true">
+                                            <filterset
+                                                filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${database}.properties" />
+                                        </copy>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>database-test-drop-schema</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="dropping schema in ${database}" />
+                                        <java
+                                            classname="org.flowable.engine.impl.db.DbSchemaDrop"
+                                            classpathref="maven.test.classpath" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>databasewithschema</id>
+            <activation>
+                <property>
+                    <name>databasewithschema</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <!-- only worked with this version, there might be 
+                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>database-test-create-schema</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="updating flowable configuration to db ${databasewithschema}" />
+                                        <copy
+                                            file="${basedir}/../../qa/db/schema/flowable.cfg.xml"
+                                            todir="target/test-classes"
+                                            overwrite="true">
+                                            <filterset
+                                                filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasewithschema}.properties" />
+                                        </copy>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>database-test-drop-schema</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="dropping schema in ${databasewithschema}" />
+                                        <java
+                                            classname="org.flowable.engine.impl.db.DbSchemaDrop"
+                                            classpathref="maven.test.classpath" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>databasemssql</id>
+            <activation>
+                <property>
+                    <name>databasemssql</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <!-- only worked with this version, there might be 
+                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>database-test-create-schema</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="updating flowable configuration to db ${databasemssql}" />
+                                        <copy
+                                            file="${basedir}/../../qa/db/mssql/flowable.cfg.xml"
+                                            todir="target/test-classes"
+                                            overwrite="true">
+                                            <filterset
+                                                filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasemssql}.properties" />
+                                        </copy>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>databaseasynchistory</id>
+            <activation>
+                <property>
+                    <name>databaseasynchistory</name>
+                </property>
+            </activation>
+            <properties>
+                <exclude.tests>**/ProcessInstanceMigration*Test.java</exclude.tests>
+                <exclude.tests2>**/ChangeState*Test.java</exclude.tests2>
+            </properties>
+            <!-- <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>database-test-create-schema</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="updating flowable configuration to db ${databaseasynchistory}" />
+                                        <copy
+                                            file="${basedir}/../../qa/asynchistory/flowable.cfg.xml"
+                                            todir="target/test-classes"
+                                            overwrite="true">
                                             <filterset
                                                 filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databaseasynchistory}.properties" />
                                         </copy>
@@ -547,8 +603,10 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <echo message="dropping schema in ${databaseasynchistory}" />
-                                        <java classname="org.flowable.engine.impl.db.DbSchemaDrop"
+                                        <echo
+                                            message="dropping schema in ${databaseasynchistory}" />
+                                        <java
+                                            classname="org.flowable.engine.impl.db.DbSchemaDrop"
                                             classpathref="maven.test.classpath" />
                                     </tasks>
                                 </configuration>
@@ -556,7 +614,7 @@
                         </executions>
                     </plugin>
                 </plugins>
-            </build>
+            </build> -->
         </profile>
 
         <profile>
@@ -566,12 +624,16 @@
                     <name>databasewithschemaasynchistory</name>
                 </property>
             </activation>
+            <properties>
+                <exclude.tests>**/ProcessInstanceMigration*Test.java</exclude.tests>
+                <exclude.tests2>**/ChangeState*Test.java</exclude.tests2>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be a bug with antrun 
-                            see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        <!-- only worked with this version, there might be 
+                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
                         <version>1.4</version>
                         <executions>
                             <execution>
@@ -584,8 +646,10 @@
                                     <tasks>
                                         <echo
                                             message="updating flowable configuration to db ${databasewithschemaasynchistory}" />
-                                        <copy file="${basedir}/../../qa/asynchistory/schema/flowable.cfg.xml"
-                                            todir="target/test-classes" overwrite="true">
+                                        <copy
+                                            file="${basedir}/../../qa/asynchistory/schema/flowable.cfg.xml"
+                                            todir="target/test-classes"
+                                            overwrite="true">
                                             <filterset
                                                 filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasewithschemaasynchistory}.properties" />
                                         </copy>
@@ -600,8 +664,10 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <echo message="dropping schema in ${databasewithschemaasynchistory}" />
-                                        <java classname="org.flowable.engine.impl.db.DbSchemaDrop"
+                                        <echo
+                                            message="dropping schema in ${databasewithschemaasynchistory}" />
+                                        <java
+                                            classname="org.flowable.engine.impl.db.DbSchemaDrop"
                                             classpathref="maven.test.classpath" />
                                     </tasks>
                                 </configuration>
@@ -619,12 +685,16 @@
                     <name>databasemssqlasynchistory</name>
                 </property>
             </activation>
+            <properties>
+                <exclude.tests>**/ProcessInstanceMigration*Test.java</exclude.tests>
+                <exclude.tests2>**/ChangeState*Test.java</exclude.tests2>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be a bug with antrun 
-                            see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        <!-- only worked with this version, there might be 
+                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
                         <version>1.4</version>
                         <executions>
                             <execution>
@@ -635,9 +705,12 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <echo message="updating flowable configuration to db ${databasemssqlasynchistory}" />
-                                        <copy file="${basedir}/../../qa/asynchistory/mssql/flowable.cfg.xml"
-                                            todir="target/test-classes" overwrite="true">
+                                        <echo
+                                            message="updating flowable configuration to db ${databasemssqlasynchistory}" />
+                                        <copy
+                                            file="${basedir}/../../qa/asynchistory/mssql/flowable.cfg.xml"
+                                            todir="target/test-classes"
+                                            overwrite="true">
                                             <filterset
                                                 filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasemssqlasynchistory}.properties" />
                                         </copy>
@@ -650,595 +723,642 @@
             </build>
         </profile>
 
-		<!-- Config qa profile -->
-		<profile>
-			<id>configSpring</id>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<!-- only worked with this version, there might be a bug with antrun 
-							see http://jira.codehaus.org/browse/MANTRUN-109 -->
-						<version>1.4</version>
-						<executions>
-							<execution>
-								<id>configExecution</id>
-								<phase>process-test-classes</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo
-											message="updating flowable configuration config to db ${database}" />
-										<copy
-											file="${basedir}/../../qa/spring/${database}/flowable.cfg.xml"
-											todir="target/test-classes" overwrite="true">
-											<filterset
-												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${database}.properties" />
-										</copy>
-									</tasks>
-								</configuration>
-							</execution>
-							<execution>
-								<id>database-test-drop-schema</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo message="dropping schema in ${database}" />
-										<java classname="org.flowable.engine.impl.db.DbSchemaDrop"
-											classpathref="maven.test.classpath" />
-									</tasks>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<excludes>
-								<exclude>**/*TestCase.java</exclude>
+        <!-- Config qa profile -->
+        <profile>
+            <id>configSpring</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <!-- only worked with this version, there might be 
+                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>configExecution</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="updating flowable configuration config to db ${database}" />
+                                        <copy
+                                            file="${basedir}/../../qa/spring/${database}/flowable.cfg.xml"
+                                            todir="target/test-classes"
+                                            overwrite="true">
+                                            <filterset
+                                                filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${database}.properties" />
+                                        </copy>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>database-test-drop-schema</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="dropping schema in ${database}" />
+                                        <java
+                                            classname="org.flowable.engine.impl.db.DbSchemaDrop"
+                                            classpathref="maven.test.classpath" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/*TestCase.java</exclude>
 
-								<!-- Disabling tests that run exclusively using standalone config -->
-								<exclude>**/ProcessDiagramRetrievalTest.java</exclude>
-								<exclude>org/flowable/standalone/**</exclude>
-							</excludes>
-							<runOrder>alphabetical</runOrder>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-			<dependencies>
-				<dependency>
-					<groupId>org.flowable</groupId>
-					<artifactId>flowable-spring</artifactId>
-					<scope>test</scope>
-				</dependency>
-			</dependencies>
-		</profile>
+                                <!-- Disabling tests that run exclusively 
+                                    using standalone config -->
+                                <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
+                                <exclude>org/flowable/standalone/**</exclude>
+                            </excludes>
+                            <runOrder>alphabetical</runOrder>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>org.flowable</groupId>
+                    <artifactId>flowable-spring</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
 
-		<profile>
-			<id>configJta</id>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<!-- only worked with this version, there might be a bug with antrun 
-							see http://jira.codehaus.org/browse/MANTRUN-109 -->
-						<version>1.4</version>
-						<executions>
-							<execution>
-								<id>configExecution</id>
-								<phase>process-test-classes</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo
-											message="Copying jta enabled Flowable configuration file to target/test-classes" />
-										<echo
-											message="Updating flowable configuration config to db ${database}" />
-										<copy file="${basedir}/../../qa/jta/${database}/flowable.cfg.xml"
-											todir="target/test-classes" overwrite="true">
-											<filterset
-												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${database}.properties" />
-										</copy>
-									</tasks>
-								</configuration>
-							</execution>
-							<execution>
-								<id>database-test-drop-schema</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo message="dropping schema in ${database}" />
-										<java classname="org.flowable.engine.impl.db.DbSchemaDrop"
-											classpathref="maven.test.classpath" />
-									</tasks>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<excludes>
-								<exclude>**/*TestCase.java</exclude>
+        <profile>
+            <id>configJta</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <!-- only worked with this version, there might be 
+                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>configExecution</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="Copying jta enabled Flowable configuration file to target/test-classes" />
+                                        <echo
+                                            message="Updating flowable configuration config to db ${database}" />
+                                        <copy
+                                            file="${basedir}/../../qa/jta/${database}/flowable.cfg.xml"
+                                            todir="target/test-classes"
+                                            overwrite="true">
+                                            <filterset
+                                                filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${database}.properties" />
+                                        </copy>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>database-test-drop-schema</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="dropping schema in ${database}" />
+                                        <java
+                                            classname="org.flowable.engine.impl.db.DbSchemaDrop"
+                                            classpathref="maven.test.classpath" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/*TestCase.java</exclude>
 
-								<!-- Disabling tests that run exclusively using standalone config -->
-								<exclude>**/ProcessDiagramRetrievalTest.java</exclude>
-								<exclude>org/flowable/standalone/**</exclude>
-							</excludes>
-							<runOrder>alphabetical</runOrder>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-			<dependencies>
-				<dependency>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-jdk14</artifactId>
-					<version>1.7.6</version>
-					<scope>test</scope>
-				</dependency>
-			</dependencies>
-		</profile>
+                                <!-- Disabling tests that run exclusively 
+                                    using standalone config -->
+                                <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
+                                <exclude>org/flowable/standalone/**</exclude>
+                            </excludes>
+                            <runOrder>alphabetical</runOrder>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-jdk14</artifactId>
+                    <version>1.7.6</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
 
-		<!-- check history full -->
-		<profile>
-			<id>cfghistoryfull</id>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.4</version>
-						<executions>
-							<execution>
-								<id>database-test-create-schema</id>
-								<phase>process-test-classes</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo
-											message="updating flowable configuration to qa/cfg/historyfull.flowable.cfg.xml" />
-										<copy file="${basedir}/../../qa/cfg/historyfull.flowable.cfg.xml"
-											tofile="target/test-classes/flowable.cfg.xml" overwrite="true" />
-									</tasks>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<excludes>
-								<exclude>**/*TestCase.java</exclude>
-								<exclude>**/CompetingJobAcquisitionTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-234 -->
-								<exclude>**/WSDLImporterTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-315 -->
-								<exclude>**/JobExecutorTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-427 -->
-								<exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
-								<exclude>**/RepeatingServiceTaskTest.java</exclude>
-								<exclude>org/flowable/standalone/**</exclude>
-							</excludes>
-							<runOrder>alphabetical</runOrder>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
+        <!-- check history full -->
+        <profile>
+            <id>cfghistoryfull</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>database-test-create-schema</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="updating flowable configuration to qa/cfg/historyfull.flowable.cfg.xml" />
+                                        <copy
+                                            file="${basedir}/../../qa/cfg/historyfull.flowable.cfg.xml"
+                                            tofile="target/test-classes/flowable.cfg.xml"
+                                            overwrite="true" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/*TestCase.java</exclude>
+                                <exclude>**/CompetingJobAcquisitionTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-234 -->
+                                <exclude>**/WSDLImporterTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-315 -->
+                                <exclude>**/JobExecutorTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-427 -->
+                                <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
+                                <exclude>**/RepeatingServiceTaskTest.java</exclude>
+                                <exclude>org/flowable/standalone/**</exclude>
+                            </excludes>
+                            <runOrder>alphabetical</runOrder>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
-		<profile>
-			<id>databasehistoryfull</id>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<!-- only worked with this version, there might be a bug with antrun 
-							see http://jira.codehaus.org/browse/MANTRUN-109 -->
-						<version>1.4</version>
-						<executions>
-							<execution>
-								<id>database-test-create-schema</id>
-								<phase>process-test-classes</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo
-											message="updating flowable configuration to db ${database}, using FULL history" />
-										<copy file="${basedir}/../../qa/db/historyfull.flowable.cfg.xml"
-											todir="target/test-classes" overwrite="true">
-											<filterset
-												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${database}.properties" />
-										</copy>
-										<rename src="target/test-classes/historyfull.flowable.cfg.xml"
-											dest="target/test-classes/flowable.cfg.xml" />
-									</tasks>
-								</configuration>
-							</execution>
-							<execution>
-								<id>database-test-drop-schema-before</id>
-								<phase>process-test-classes</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo message="dropping schema in ${database}" />
-										<java classname="org.flowable.engine.impl.db.DbSchemaDrop"
-											classpathref="maven.test.classpath" />
-									</tasks>
-								</configuration>
-							</execution>
-							<execution>
-								<id>database-test-drop-schema-after</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo message="dropping schema in ${database}" />
-										<java classname="org.flowable.engine.impl.db.DbSchemaDrop"
-											classpathref="maven.test.classpath" />
-									</tasks>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
+        <profile>
+            <id>databasehistoryfull</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <!-- only worked with this version, there might be 
+                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>database-test-create-schema</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="updating flowable configuration to db ${database}, using FULL history" />
+                                        <copy
+                                            file="${basedir}/../../qa/db/historyfull.flowable.cfg.xml"
+                                            todir="target/test-classes"
+                                            overwrite="true">
+                                            <filterset
+                                                filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${database}.properties" />
+                                        </copy>
+                                        <rename
+                                            src="target/test-classes/historyfull.flowable.cfg.xml"
+                                            dest="target/test-classes/flowable.cfg.xml" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>database-test-drop-schema-before</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="dropping schema in ${database}" />
+                                        <java
+                                            classname="org.flowable.engine.impl.db.DbSchemaDrop"
+                                            classpathref="maven.test.classpath" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>database-test-drop-schema-after</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="dropping schema in ${database}" />
+                                        <java
+                                            classname="org.flowable.engine.impl.db.DbSchemaDrop"
+                                            classpathref="maven.test.classpath" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
-		<!-- Same as databasehistoryfull, but for databases that need a schema 
-			in the config -->
-		<profile>
-			<id>databasehistoryfullwithschema</id>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<!-- only worked with this version, there might be a bug with antrun 
-							see http://jira.codehaus.org/browse/MANTRUN-109 -->
-						<version>1.4</version>
-						<executions>
-							<execution>
-								<id>database-test-create-schema</id>
-								<phase>process-test-classes</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo
-											message="updating flowable configuration to db ${database}, using FULL history" />
-										<copy
-											file="${basedir}/../../qa/db/historyfull-with-schema.flowable.cfg.xml"
-											todir="target/test-classes" overwrite="true">
-											<filterset
-												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasewithschema}.properties" />
-										</copy>
-										<rename
-											src="target/test-classes/historyfull-with-schema.flowable.cfg.xml"
-											dest="target/test-classes/flowable.cfg.xml" />
-									</tasks>
-								</configuration>
-							</execution>
-							<execution>
-								<id>database-test-drop-schema-before</id>
-								<phase>process-test-classes</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo message="dropping schema in ${databasewithschema}" />
-										<java classname="org.flowable.engine.impl.db.DbSchemaDrop"
-											classpathref="maven.test.classpath" />
-									</tasks>
-								</configuration>
-							</execution>
-							<execution>
-								<id>database-test-drop-schema-after</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo message="dropping schema in ${databasewithschema}" />
-										<java classname="org.flowable.engine.impl.db.DbSchemaDrop"
-											classpathref="maven.test.classpath" />
-									</tasks>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
+        <!-- Same as databasehistoryfull, but for databases that need a schema in the config -->
+        <profile>
+            <id>databasehistoryfullwithschema</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <!-- only worked with this version, there might be 
+                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>database-test-create-schema</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="updating flowable configuration to db ${database}, using FULL history" />
+                                        <copy
+                                            file="${basedir}/../../qa/db/historyfull-with-schema.flowable.cfg.xml"
+                                            todir="target/test-classes"
+                                            overwrite="true">
+                                            <filterset
+                                                filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasewithschema}.properties" />
+                                        </copy>
+                                        <rename
+                                            src="target/test-classes/historyfull-with-schema.flowable.cfg.xml"
+                                            dest="target/test-classes/flowable.cfg.xml" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>database-test-drop-schema-before</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="dropping schema in ${databasewithschema}" />
+                                        <java
+                                            classname="org.flowable.engine.impl.db.DbSchemaDrop"
+                                            classpathref="maven.test.classpath" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>database-test-drop-schema-after</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="dropping schema in ${databasewithschema}" />
+                                        <java
+                                            classname="org.flowable.engine.impl.db.DbSchemaDrop"
+                                            classpathref="maven.test.classpath" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
-		<!-- check history full -->
-		<profile>
-			<id>cfghistoryaudit</id>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.4</version>
-						<executions>
-							<execution>
-								<id>database-test-create-schema</id>
-								<phase>process-test-classes</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo
-											message="updating flowable configuration to qa/cfg/historyaudit.flowable.cfg.xml" />
-										<copy file="${basedir}/../../qa/cfg/historyaudit.flowable.cfg.xml"
-											tofile="target/test-classes/flowable.cfg.xml" overwrite="true" />
-									</tasks>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<excludes>
-								<exclude>**/*TestCase.java</exclude>
-								<exclude>**/CompetingJobAcquisitionTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-234 -->
-								<exclude>**/WSDLImporterTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-315 -->
-								<exclude>**/JobExecutorTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-427 -->
-								<exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
-								<exclude>**/RepeatingServiceTaskTest.java</exclude>
-								<exclude>org/flowable/standalone/**</exclude>
-							</excludes>
-							<runOrder>alphabetical</runOrder>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
+        <!-- check history full -->
+        <profile>
+            <id>cfghistoryaudit</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>database-test-create-schema</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="updating flowable configuration to qa/cfg/historyaudit.flowable.cfg.xml" />
+                                        <copy
+                                            file="${basedir}/../../qa/cfg/historyaudit.flowable.cfg.xml"
+                                            tofile="target/test-classes/flowable.cfg.xml"
+                                            overwrite="true" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/*TestCase.java</exclude>
+                                <exclude>**/CompetingJobAcquisitionTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-234 -->
+                                <exclude>**/WSDLImporterTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-315 -->
+                                <exclude>**/JobExecutorTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-427 -->
+                                <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
+                                <exclude>**/RepeatingServiceTaskTest.java</exclude>
+                                <exclude>org/flowable/standalone/**</exclude>
+                            </excludes>
+                            <runOrder>alphabetical</runOrder>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
-		<!-- check history none -->
-		<profile>
-			<id>cfghistorynone</id>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.4</version>
-						<executions>
-							<execution>
-								<id>database-test-create-schema</id>
-								<phase>process-test-classes</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo
-											message="updating flowable configuration to qa/cfg/historynone.flowable.cfg.xml" />
-										<copy file="${basedir}/../../qa/cfg/historynone.flowable.cfg.xml"
-											tofile="target/test-classes/flowable.cfg.xml" overwrite="true" />
-									</tasks>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<excludes>
-								<exclude>**/*TestCase.java</exclude>
-								<exclude>**/CompetingJobAcquisitionTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-234 -->
-								<exclude>**/WSDLImporterTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-315 -->
-								<exclude>**/JobExecutorTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-427 -->
-								<exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
-								<exclude>**/Historic*InstanceTest.java</exclude>
-								<exclude>**/HistoryServiceTest.java</exclude>
-								<exclude>**/RepeatingServiceTaskTest.java</exclude>
-								<exclude>**/ProcessInstanceLogQueryTest.java</exclude>
-								<exclude>org/flowable/standalone/**</exclude>
-								<exclude>**/HistoricProcessInstanceQueryVersionTest.java</exclude>
-								<exclude>**/NonCascadeDeleteTest.java</exclude>
-								<exclude>**/HistoricProcessInstanceQueryAndWithExceptionTest.java</exclude>
-								<exclude>**/HistoricJPAVariableTest.java</exclude>
-								<exclude>**/VerifyDatabaseOperationsTest.java</exclude>
-							</excludes>
-							<runOrder>alphabetical</runOrder>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		
-		<profile>
-			<id>cfghistoryasync</id>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.4</version>
-						<executions>
-							<execution>
-								<id>database-test-create-schema</id>
-								<phase>process-test-classes</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo
-											message="updating flowable configuration to qa/cfg/historyasync.flowable.cfg.xml" />
-										<copy file="${basedir}/../../qa/cfg/historyasync.flowable.cfg.xml"
-											tofile="target/test-classes/flowable.cfg.xml" overwrite="true" />
-									</tasks>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<excludes>
-								<exclude>**/*TestCase.java</exclude>
-								<exclude>**/CompetingJobAcquisitionTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-234 -->
-								<exclude>**/WSDLImporterTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-315 -->
-								<exclude>**/JobExecutorTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-427 -->
-								<exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
-								<exclude>**/RepeatingServiceTaskTest.java</exclude>
-								<exclude>org/flowable/standalone/**</exclude>
-							</excludes>
-							<runOrder>alphabetical</runOrder>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
+        <!-- check history none -->
+        <profile>
+            <id>cfghistorynone</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>database-test-create-schema</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="updating flowable configuration to qa/cfg/historynone.flowable.cfg.xml" />
+                                        <copy
+                                            file="${basedir}/../../qa/cfg/historynone.flowable.cfg.xml"
+                                            tofile="target/test-classes/flowable.cfg.xml"
+                                            overwrite="true" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/*TestCase.java</exclude>
+                                <exclude>**/CompetingJobAcquisitionTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-234 -->
+                                <exclude>**/WSDLImporterTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-315 -->
+                                <exclude>**/JobExecutorTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-427 -->
+                                <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
+                                <exclude>**/Historic*InstanceTest.java</exclude>
+                                <exclude>**/HistoryServiceTest.java</exclude>
+                                <exclude>**/HistoryLevelServiceTest.java</exclude>
+                                <exclude>**/RepeatingServiceTaskTest.java</exclude>
+                                <exclude>**/ProcessInstanceLogQueryTest.java</exclude>
+                                <exclude>org/flowable/standalone/**</exclude>
+                                <exclude>**/HistoricProcessInstanceQueryVersionTest.java</exclude>
+                                <exclude>**/NonCascadeDeleteTest.java</exclude>
+                                <exclude>**/HistoricProcessInstanceQueryAndWithExceptionTest.java</exclude>
+                                <exclude>**/HistoricJPAVariableTest.java</exclude>
+                                <exclude>**/VerifyDatabaseOperationsTest.java</exclude>
+                            </excludes>
+                            <runOrder>alphabetical</runOrder>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
-		<profile>
-			<id>testSchemaMetaData</id>
-			<activation>
-				<property>
-					<name>metadatabase</name>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<includes>
-								<include>**/JdbcMetaDataTest.java</include>
-							</includes>
-							<excludes />
-							<runOrder>alphabetical</runOrder>
-						</configuration>
-					</plugin>
-					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.4</version>
-						<executions>
-							<execution>
-								<id>database-test-create-schema</id>
-								<phase>process-test-classes</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo message="creating db schema in ${metadatabase}" />
-										<ant antfile="${basedir}/../../qa/db/build.xml" target="create.db.schema">
-											<property name="test_classpath" refid="maven.test.classpath" />
-											<property name="database" value="${metadatabase}" />
-										</ant>
-										<echo message="updating flowable cfg to ${metadatabase}" />
-										<ant antfile="${basedir}/../../qa/db/build.xml" target="create.cfg">
-											<property name="database" value="${metadatabase}" />
-										</ant>
-									</tasks>
-								</configuration>
-							</execution>
-							<execution>
-								<id>database-test-drop-schema</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo message="dropping schema in ${metadatabase}" />
-										<ant antfile="${basedir}/../../qa/db/build.xml" target="drop.db.schema"
-											inheritAll="false">
-											<property name="test_classpath" refid="maven.test.classpath" />
-											<property name="database" value="${metadatabase}" />
-										</ant>
-									</tasks>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		
-		<!--  check with optimization flags set -->
-    <profile>
-      <id>cfgOptimizations</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.4</version>
-            <executions>
-              <execution>
-                <id>database-test-create-schema</id>
-                <phase>process-test-classes</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <tasks>
-                    <echo message="updating flowable configuration to qa/cfg/optimizations.flowable.cfg.xml" />
-                    <copy file="${basedir}/../../qa/cfg/optimizations.flowable.cfg.xml" tofile="target/test-classes/flowable.cfg.xml" overwrite="true" />
-                  </tasks>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
+        <profile>
+            <id>cfghistoryasync</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>database-test-create-schema</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="updating flowable configuration to qa/cfg/historyasync.flowable.cfg.xml" />
+                                        <copy
+                                            file="${basedir}/../../qa/cfg/historyasync.flowable.cfg.xml"
+                                            tofile="target/test-classes/flowable.cfg.xml"
+                                            overwrite="true" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/*TestCase.java</exclude>
+                                <exclude>**/CompetingJobAcquisitionTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-234 -->
+                                <exclude>**/WSDLImporterTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-315 -->
+                                <exclude>**/JobExecutorTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-427 -->
+                                <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
+                                <exclude>**/RepeatingServiceTaskTest.java</exclude>
+                                <exclude>org/flowable/standalone/**</exclude>
+                            </excludes>
+                            <runOrder>alphabetical</runOrder>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
-		<profile>
-			<id>oracle</id>
-			<activation>
-				<property>
-					<name>database</name>
-					<value>oracle</value>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>com.oracle.jdbc</groupId>
-					<artifactId>ojdbc7</artifactId>
-					<scope>test</scope>
-				</dependency>
-			</dependencies>
-		</profile>
+        <profile>
+            <id>testSchemaMetaData</id>
+            <activation>
+                <property>
+                    <name>metadatabase</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <includes>
+                                <include>**/JdbcMetaDataTest.java</include>
+                            </includes>
+                            <excludes />
+                            <runOrder>alphabetical</runOrder>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>database-test-create-schema</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="creating db schema in ${metadatabase}" />
+                                        <ant
+                                            antfile="${basedir}/../../qa/db/build.xml"
+                                            target="create.db.schema">
+                                            <property name="test_classpath"
+                                                refid="maven.test.classpath" />
+                                            <property name="database"
+                                                value="${metadatabase}" />
+                                        </ant>
+                                        <echo
+                                            message="updating flowable cfg to ${metadatabase}" />
+                                        <ant
+                                            antfile="${basedir}/../../qa/db/build.xml"
+                                            target="create.cfg">
+                                            <property name="database"
+                                                value="${metadatabase}" />
+                                        </ant>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>database-test-drop-schema</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="dropping schema in ${metadatabase}" />
+                                        <ant
+                                            antfile="${basedir}/../../qa/db/build.xml"
+                                            target="drop.db.schema"
+                                            inheritAll="false">
+                                            <property name="test_classpath"
+                                                refid="maven.test.classpath" />
+                                            <property name="database"
+                                                value="${metadatabase}" />
+                                        </ant>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
-		<profile>
-			<id>oraclewithschema</id>
-			<activation>
-				<property>
-					<name>databasewithschema</name>
-					<value>oracle</value>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>com.oracle.jdbc</groupId>
-					<artifactId>ojdbc7</artifactId>
-					<scope>test</scope>
-				</dependency>
-			</dependencies>
-		</profile>
-		
-		<profile>
+        <!-- check with optimization flags set -->
+        <profile>
+            <id>cfgOptimizations</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>database-test-create-schema</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="updating flowable configuration to qa/cfg/optimizations.flowable.cfg.xml" />
+                                        <copy
+                                            file="${basedir}/../../qa/cfg/optimizations.flowable.cfg.xml"
+                                            tofile="target/test-classes/flowable.cfg.xml"
+                                            overwrite="true" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>oracle</id>
+            <activation>
+                <property>
+                    <name>database</name>
+                    <value>oracle</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle.jdbc</groupId>
+                    <artifactId>ojdbc7</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>oraclewithschema</id>
+            <activation>
+                <property>
+                    <name>databasewithschema</name>
+                    <value>oracle</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle.jdbc</groupId>
+                    <artifactId>ojdbc7</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
             <id>oraclewithschemaasynchistory</id>
             <activation>
                 <property>
@@ -1255,24 +1375,24 @@
             </dependencies>
         </profile>
 
-		<profile>
-			<id>db2</id>
-			<activation>
-				<property>
-					<name>database</name>
-					<value>db2</value>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>com.ibm.db2.jcc</groupId>
-					<artifactId>db2jcc4</artifactId>
-					<scope>test</scope>
-				</dependency>
-			</dependencies>
-		</profile>
-		
-		<profile>
+        <profile>
+            <id>db2</id>
+            <activation>
+                <property>
+                    <name>database</name>
+                    <value>db2</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.ibm.db2.jcc</groupId>
+                    <artifactId>db2jcc4</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
             <id>db2asynchistory</id>
             <activation>
                 <property>
@@ -1289,58 +1409,58 @@
             </dependencies>
         </profile>
 
-		<profile>
-			<id>mssql</id>
-			<activation>
-				<property>
-					<name>databasemssql</name>
-					<value>mssql</value>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>net.sourceforge.jtds</groupId>
-					<artifactId>jtds</artifactId>
-					<scope>test</scope>
-				</dependency>
-			</dependencies>
-		</profile>
+        <profile>
+            <id>mssql</id>
+            <activation>
+                <property>
+                    <name>databasemssql</name>
+                    <value>mssql</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>net.sourceforge.jtds</groupId>
+                    <artifactId>jtds</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
 
-		<profile>
-			<id>mysql</id>
-			<activation>
-				<property>
-					<name>database</name>
-					<value>mysql</value>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>mysql</groupId>
-					<artifactId>mysql-connector-java</artifactId>
-					<scope>test</scope>
-				</dependency>
-			</dependencies>
-		</profile>
+        <profile>
+            <id>mysql</id>
+            <activation>
+                <property>
+                    <name>database</name>
+                    <value>mysql</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
 
-		<profile>
-			<id>hsql</id>
-			<activation>
-				<property>
-					<name>database</name>
-					<value>hsql</value>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>org.hsqldb</groupId>
-					<artifactId>hsqldb</artifactId>
-					<scope>test</scope>
-				</dependency>
-			</dependencies>
-		</profile>
-		
-		<profile>
+        <profile>
+            <id>hsql</id>
+            <activation>
+                <property>
+                    <name>database</name>
+                    <value>hsql</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hsqldb</groupId>
+                    <artifactId>hsqldb</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
             <id>hsqlasynchistory</id>
             <activation>
                 <property>
@@ -1356,15 +1476,15 @@
                 </dependency>
             </dependencies>
         </profile>
-        
+
         <profile>
             <id>errorLogging</id>
             <build>
                 <plugins>
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be a bug with antrun 
-                            see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        <!-- only worked with this version, there might be 
+                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
                         <version>1.4</version>
                         <executions>
                             <execution>
@@ -1375,8 +1495,12 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <echo message="updating log4j configuration to error logging" />
-                                        <copy file="${basedir}/../../qa/logging/log4j.properties" todir="target/test-classes" overwrite="true" />
+                                        <echo
+                                            message="updating log4j configuration to error logging" />
+                                        <copy
+                                            file="${basedir}/../../qa/logging/log4j.properties"
+                                            todir="target/test-classes"
+                                            overwrite="true" />
                                     </tasks>
                                 </configuration>
                             </execution>
@@ -1385,6 +1509,44 @@
                 </plugins>
             </build>
         </profile>
-	</profiles>
+        
+        <profile>
+            <id>mongodb</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.flowable</groupId>
+                    <artifactId>flowable-mongodb</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>change config</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="updating flowable configuration to mongodb.flowable.cfg.xml" />
+                                        <copy
+                                            file="${basedir}/../../qa/mongodb/mongodb.flowable.cfg.xml"
+                                            tofile="target/test-classes/flowable.cfg.xml"
+                                            overwrite="true" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

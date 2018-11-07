@@ -1,0 +1,9 @@
+{
+  "groupId":"org.flowable.client.kotlin",
+  "artifactId":"flowable-kotlin-client-content",
+  "artifactVersion":"0.0.1",
+  "packageName":"org.flowable.client.kotlin.content",
+  "invokerPackage":"org.flowable.client.kotlin.content",
+  "modelPackage":"org.flowable.client.kotlin.content.model",
+  "apiPackage":"org.flowable.client.kotlin.content.api"
+}

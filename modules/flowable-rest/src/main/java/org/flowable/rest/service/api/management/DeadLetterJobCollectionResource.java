@@ -13,19 +13,21 @@
 
 package org.flowable.rest.service.api.management;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.rest.api.DataResponse;
+import org.flowable.common.rest.api.RequestUtil;
 import org.flowable.engine.ManagementService;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.runtime.DeadLetterJobQuery;
-import org.flowable.rest.api.DataResponse;
-import org.flowable.rest.api.RequestUtil;
+import org.flowable.job.api.DeadLetterJobQuery;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -50,8 +52,11 @@ public class DeadLetterJobCollectionResource {
 
     @Autowired
     protected ManagementService managementService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "Get a list of deadletter jobs", tags = { "Jobs" }, nickname = "listDeadLetterJobs")
+    @ApiOperation(value = "List deadletter jobs", tags = { "Jobs" }, nickname = "listDeadLetterJobs")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return job with the given id", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "Only return jobs part of a process with the given id", paramType = "query"),
@@ -62,8 +67,8 @@ public class DeadLetterJobCollectionResource {
             @ApiImplicitParam(name = "timersOnly", dataType = "boolean", value = "If true, only return jobs which are timers. If false, this parameter is ignored. Cannot be used together with 'messagesOnly'.", paramType = "query"),
             @ApiImplicitParam(name = "messagesOnly", dataType = "boolean", value = "If true, only return jobs which are messages. If false, this parameter is ignored. Cannot be used together with 'timersOnly'", paramType = "query"),
             @ApiImplicitParam(name = "withException", dataType = "boolean", value = "If true, only return jobs for which an exception occurred while executing it. If false, this parameter is ignored.", paramType = "query"),
-            @ApiImplicitParam(name = "dueBefore", dataType = "string", value = "Only return jobs which are due to be executed before the given date. Jobs without duedate are never returned using this parameter.", paramType = "query"),
-            @ApiImplicitParam(name = "dueAfter", dataType = "string", value = "Only return jobs which are due to be executed after the given date. Jobs without duedate are never returned using this parameter.", paramType = "query"),
+            @ApiImplicitParam(name = "dueBefore", dataType = "string", format="date-time", value = "Only return jobs which are due to be executed before the given date. Jobs without duedate are never returned using this parameter.", paramType = "query"),
+            @ApiImplicitParam(name = "dueAfter", dataType = "string", format="date-time", value = "Only return jobs which are due to be executed after the given date. Jobs without duedate are never returned using this parameter.", paramType = "query"),
             @ApiImplicitParam(name = "exceptionMessage", dataType = "string", value = "Only return jobs with the given exception message", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return jobs with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return jobs with a tenantId like the given value.", paramType = "query"),
@@ -76,8 +81,8 @@ public class DeadLetterJobCollectionResource {
             @ApiResponse(code = 200, message = "Indicates the requested jobs were returned."),
             @ApiResponse(code = 400, message = "Indicates an illegal value has been used in a url query parameter or the both 'messagesOnly' and 'timersOnly' are used as parameters. Status description contains additional details about the error.")
     })
-    @RequestMapping(value = "/management/deadletter-jobs", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getJobs(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    @GetMapping(value = "/management/deadletter-jobs", produces = "application/json")
+    public DataResponse<JobResponse> getJobs(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         DeadLetterJobQuery query = managementService.createDeadLetterJobQuery();
 
         if (allRequestParams.containsKey("id")) {
@@ -133,7 +138,11 @@ public class DeadLetterJobCollectionResource {
                 query.jobWithoutTenantId();
             }
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDeadLetterJobInfoWithQuery(query);
+        }
 
-        return new JobPaginateList(restResponseFactory).paginateList(allRequestParams, query, "id", JobQueryProperties.PROPERTIES);
+        return paginateList(allRequestParams, query, "id", JobQueryProperties.PROPERTIES, restResponseFactory::createJobResponseList);
     }
 }

@@ -12,9 +12,10 @@
  */
 package org.flowable.spring.test.taskassignment;
 
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -23,12 +24,14 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration("classpath:org/flowable/spring/test/taskassignment/taskassignment-context.xml")
 public class CustomTaskAssignmentTest extends SpringFlowableTestCase {
 
+    @Test
     @Deployment
     public void testSetAssigneeThroughSpringService() {
         runtimeService.startProcessInstanceByKey("assigneeThroughSpringService", CollectionUtil.singletonMap("emp", "fozzie"));
         assertEquals(1, taskService.createTaskQuery().taskAssignee("Kermit The Frog").count());
     }
 
+    @Test
     @Deployment
     public void testSetCandidateUsersThroughSpringService() {
         runtimeService.startProcessInstanceByKey("candidateUsersThroughSpringService", CollectionUtil.singletonMap("emp", "fozzie"));
@@ -38,6 +41,7 @@ public class CustomTaskAssignmentTest extends SpringFlowableTestCase {
         assertEquals(0, taskService.createTaskQuery().taskCandidateUser("mispiggy").count());
     }
 
+    @Test
     @Deployment
     public void testSetCandidateGroupsThroughSpringService() {
         runtimeService.startProcessInstanceByKey("candidateUsersThroughSpringService", CollectionUtil.singletonMap("emp", "fozzie"));

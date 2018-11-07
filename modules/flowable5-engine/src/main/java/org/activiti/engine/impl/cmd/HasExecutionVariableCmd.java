@@ -37,6 +37,7 @@ public class HasExecutionVariableCmd implements Command<Boolean>, Serializable {
         this.isLocal = isLocal;
     }
 
+    @Override
     public Boolean execute(CommandContext commandContext) {
         if (executionId == null) {
             throw new ActivitiIllegalArgumentException("executionId is null");

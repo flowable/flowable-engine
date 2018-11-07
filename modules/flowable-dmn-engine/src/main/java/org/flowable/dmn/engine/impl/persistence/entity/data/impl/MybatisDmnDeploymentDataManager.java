@@ -20,14 +20,14 @@ import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityImpl;
-import org.flowable.dmn.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.dmn.engine.impl.persistence.entity.data.AbstractDmnDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.DmnDeploymentDataManager;
 
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class MybatisDmnDeploymentDataManager extends AbstractDataManager<DmnDeploymentEntity> implements DmnDeploymentDataManager {
+public class MybatisDmnDeploymentDataManager extends AbstractDmnDataManager<DmnDeploymentEntity> implements DmnDeploymentDataManager {
 
     public MybatisDmnDeploymentDataManager(DmnEngineConfiguration dmnEngineConfiguration) {
         super(dmnEngineConfiguration);

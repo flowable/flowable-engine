@@ -45,14 +45,17 @@ public class WSOperation implements OperationImplementation {
         this.service = service;
     }
 
+    @Override
     public String getId() {
         return this.id;
     }
 
+    @Override
     public String getName() {
         return this.name;
     }
 
+    @Override
     public MessageInstance sendFor(MessageInstance message, Operation operation, ConcurrentMap<QName, URL> overridenEndpointAddresses) throws Exception {
         Object[] arguments = this.getArguments(message);
         Object[] results = this.safeSend(arguments, overridenEndpointAddresses);

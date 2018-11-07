@@ -17,10 +17,10 @@ import java.util.Map;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
+import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.flowable.engine.impl.persistence.entity.ResourceEntity;
 
 /**
  * An intermediate representation of a DeploymentEntity which keeps track of all of the entity's ProcessDefinitionEntities and resources, and BPMN parses, models, and processes associated with each
@@ -35,12 +35,12 @@ public class ParsedDeployment {
 
     protected List<ProcessDefinitionEntity> processDefinitions;
     protected Map<ProcessDefinitionEntity, BpmnParse> mapProcessDefinitionsToParses;
-    protected Map<ProcessDefinitionEntity, ResourceEntity> mapProcessDefinitionsToResources;
+    protected Map<ProcessDefinitionEntity, EngineResource> mapProcessDefinitionsToResources;
 
     public ParsedDeployment(
             DeploymentEntity entity, List<ProcessDefinitionEntity> processDefinitions,
             Map<ProcessDefinitionEntity, BpmnParse> mapProcessDefinitionsToParses,
-            Map<ProcessDefinitionEntity, ResourceEntity> mapProcessDefinitionsToResources) {
+            Map<ProcessDefinitionEntity, EngineResource> mapProcessDefinitionsToResources) {
         this.deploymentEntity = entity;
         this.processDefinitions = processDefinitions;
         this.mapProcessDefinitionsToParses = mapProcessDefinitionsToParses;
@@ -55,7 +55,7 @@ public class ParsedDeployment {
         return processDefinitions;
     }
 
-    public ResourceEntity getResourceForProcessDefinition(ProcessDefinitionEntity processDefinition) {
+    public EngineResource getResourceForProcessDefinition(ProcessDefinitionEntity processDefinition) {
         return mapProcessDefinitionsToResources.get(processDefinition);
     }
 

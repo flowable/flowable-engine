@@ -13,32 +13,29 @@
 
 package org.flowable.rest.service.api.history;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.flowable.engine.HistoryService;
-import org.flowable.identitylink.service.history.HistoricIdentityLink;
-import org.flowable.rest.service.api.RestResponseFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import org.flowable.engine.HistoryService;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.rest.service.api.RestResponseFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History" }, description = "Manage History", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History Task" }, description = "Manage History Task Instances", authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricTaskInstanceIdentityLinkCollectionResource {
 
     @Autowired
@@ -47,11 +44,11 @@ public class HistoricTaskInstanceIdentityLinkCollectionResource {
     @Autowired
     protected HistoryService historyService;
 
-    @ApiOperation(value = "Get the identity links of a historic task instance", tags = { "History" }, notes = "")
+    @ApiOperation(value = "List identity links of a historic task instance", nickname ="listHistoricTaskInstanceIdentityLinks", tags = { "History Task" }, notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the identity links are returned", response = HistoricIdentityLinkResponse.class, responseContainer = "List"),
             @ApiResponse(code = 404, message = "Indicates the task instance could not be found.") })
-    @RequestMapping(value = "/history/historic-task-instances/{taskId}/identitylinks", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/history/historic-task-instances/{taskId}/identitylinks", produces = "application/json")
     public List<HistoricIdentityLinkResponse> getTaskIdentityLinks(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
         List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForTask(taskId);
 

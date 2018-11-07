@@ -28,13 +28,13 @@ import javax.inject.Scope;
 
 import org.flowable.cdi.FlowableCdiException;
 import org.flowable.cdi.impl.util.ProgrammaticBeanLookup;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.context.Context;
 import org.flowable.engine.RuntimeService;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.impl.context.ExecutionContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.task.Task;
+import org.flowable.task.api.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -228,6 +228,7 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
         return null;
     }
 
+    @Override
     public Task getTask() {
         if (Context.getCommandContext() != null) {
             throw new FlowableCdiException("Cannot work with tasks in an active command.");
@@ -235,6 +236,7 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
         return getScopedAssociation().getTask();
     }
 
+    @Override
     public void setTask(Task task) {
         if (Context.getCommandContext() != null) {
             throw new FlowableCdiException("Cannot work with tasks in an active command.");

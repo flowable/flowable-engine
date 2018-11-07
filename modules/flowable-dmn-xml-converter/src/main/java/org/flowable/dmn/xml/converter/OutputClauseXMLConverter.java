@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public class OutputClauseXMLConverter extends BaseDmnXMLConverter {
 
+    @Override
     public Class<? extends DmnElement> getDmnElementType() {
         return InputClause.class;
     }

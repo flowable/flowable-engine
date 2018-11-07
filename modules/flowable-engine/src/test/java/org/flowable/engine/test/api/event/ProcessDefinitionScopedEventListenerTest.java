@@ -15,11 +15,13 @@ package org.flowable.engine.test.api.event;
 import java.util.Map;
 
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.engine.common.impl.event.FlowableEventSupport;
+import org.flowable.common.engine.impl.event.FlowableEventSupport;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.engine.test.DeploymentId;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test for event-listeners that are registered on a process-definition scope, rather than on the global engine-wide scope.
@@ -34,8 +36,9 @@ public class ProcessDefinitionScopedEventListenerTest extends PluggableFlowableT
     /**
      * Test to verify listeners on a process-definition are only called for events related to that definition.
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml", "org/flowable/engine/test/api/event/simpleProcess.bpmn20.xml" })
-    public void testProcessDefinitionScopedListener() throws Exception {
+    public void testProcessDefinitionScopedListener(@DeploymentId String deploymentIdFromDeploymentAnnotation) throws Exception {
         ProcessDefinition firstDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deploymentIdFromDeploymentAnnotation).processDefinitionKey("oneTaskProcess").singleResult();
         assertNotNull(firstDefinition);
 

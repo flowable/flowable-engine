@@ -14,21 +14,23 @@ package org.flowable.engine.impl.agenda;
 
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
+import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.logging.LogMDC;
+import org.flowable.job.service.JobService;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,10 +44,12 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ContinueMultiInstanceOperation.class);
     
+    protected ExecutionEntity multiInstanceRootExecution;
     protected int loopCounter;
 
-    public ContinueMultiInstanceOperation(CommandContext commandContext, ExecutionEntity execution, int loopCounter) {
+    public ContinueMultiInstanceOperation(CommandContext commandContext, ExecutionEntity execution, ExecutionEntity multiInstanceRootExecution, int loopCounter) {
         super(commandContext, execution);
+        this.multiInstanceRootExecution = multiInstanceRootExecution;
         this.loopCounter = loopCounter;
     }
 
@@ -102,8 +106,23 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
     }
 
     protected void executeAsynchronous(FlowNode flowNode) {
-        JobEntity job = CommandContextUtil.getJobManager(commandContext).createAsyncJob(execution, flowNode.isExclusive());
-        CommandContextUtil.getJobManager(commandContext).scheduleAsyncJob(job);
+        JobService jobService = CommandContextUtil.getJobService(commandContext);
+        
+        JobEntity job = jobService.createJob();
+        job.setExecutionId(execution.getId());
+        job.setProcessInstanceId(execution.getProcessInstanceId());
+        job.setProcessDefinitionId(execution.getProcessDefinitionId());
+        job.setJobHandlerType(AsyncContinuationJobHandler.TYPE);
+
+        // Inherit tenant id (if applicable)
+        if (execution.getTenantId() != null) {
+            job.setTenantId(execution.getTenantId());
+        }
+        
+        execution.getJobs().add(job);
+        
+        jobService.createAsyncJob(job, flowNode.isExclusive());
+        jobService.scheduleAsyncJob(job);
     }
     
     protected ActivityBehavior setLoopCounterVariable(FlowNode flowNode) {
@@ -113,7 +132,11 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
         }
         MultiInstanceActivityBehavior multiInstanceActivityBehavior = (MultiInstanceActivityBehavior) activityBehavior;
         String elementIndexVariable = multiInstanceActivityBehavior.getCollectionElementIndexVariable();
-        execution.setVariableLocal(elementIndexVariable, loopCounter);
+        if (!flowNode.isAsynchronous()) {
+            execution.setVariableLocal(elementIndexVariable, loopCounter);
+        } else {
+            multiInstanceRootExecution.setVariableLocal(elementIndexVariable, loopCounter);
+        }
         return activityBehavior;
     }
     

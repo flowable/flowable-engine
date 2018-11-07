@@ -40,9 +40,9 @@ public class UserTaskConverterTest extends AbstractConverterTest {
         BpmnModel bpmnModel = readXMLFile();
         BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
         validateModel(parsedModel);
-        deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "usertaskmodel.bpmn";
     }

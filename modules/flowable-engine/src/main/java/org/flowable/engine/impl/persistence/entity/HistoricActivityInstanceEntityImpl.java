@@ -41,6 +41,7 @@ public class HistoricActivityInstanceEntityImpl extends HistoricScopeInstanceEnt
 
     }
 
+    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("endTime", endTime);
@@ -50,75 +51,94 @@ public class HistoricActivityInstanceEntityImpl extends HistoricScopeInstanceEnt
         persistentState.put("taskId", taskId);
         persistentState.put("assignee", assignee);
         persistentState.put("calledProcessInstanceId", calledProcessInstanceId);
+        persistentState.put("activityId", activityId);
+        persistentState.put("activityName", activityName);
         return persistentState;
     }
 
     // getters and setters //////////////////////////////////////////////////////
 
+    @Override
     public String getActivityId() {
         return activityId;
     }
 
+    @Override
     public void setActivityId(String activityId) {
         this.activityId = activityId;
     }
 
+    @Override
     public String getActivityName() {
         return activityName;
     }
 
+    @Override
     public void setActivityName(String activityName) {
         this.activityName = activityName;
     }
 
+    @Override
     public String getActivityType() {
         return activityType;
     }
 
+    @Override
     public void setActivityType(String activityType) {
         this.activityType = activityType;
     }
 
+    @Override
     public String getExecutionId() {
         return executionId;
     }
 
+    @Override
     public void setExecutionId(String executionId) {
         this.executionId = executionId;
     }
 
+    @Override
     public String getAssignee() {
         return assignee;
     }
 
+    @Override
     public void setAssignee(String assignee) {
         this.assignee = assignee;
     }
 
+    @Override
     public String getTaskId() {
         return taskId;
     }
 
+    @Override
     public void setTaskId(String taskId) {
         this.taskId = taskId;
     }
 
+    @Override
     public String getCalledProcessInstanceId() {
         return calledProcessInstanceId;
     }
 
+    @Override
     public void setCalledProcessInstanceId(String calledProcessInstanceId) {
         this.calledProcessInstanceId = calledProcessInstanceId;
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
 
+    @Override
     public Date getTime() {
         return getStartTime();
     }

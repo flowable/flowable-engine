@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             targetNamespace="Examples">
+
+    <process id="startParallelProcess">
+
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="taskBefore"/>
+
+        <userTask id="taskBefore" name="Task before sub process"/>
+        <sequenceFlow id="flow2" sourceRef="taskBefore" targetRef="subProcess"/>
+
+        <subProcess id="subProcess">
+            <startEvent id="subProcessStart"/>
+
+            <sequenceFlow id="subflow1" sourceRef="subProcessStart" targetRef="parallelFork"/>
+
+            <parallelGateway id="parallelFork"/>
+
+            <sequenceFlow id="flow3" sourceRef="parallelFork" targetRef="oddFlowTask1"/>
+            <userTask id="oddFlowTask1"/>
+            <sequenceFlow id="flow4" sourceRef="oddFlowTask1" targetRef="oddFlowTask3"/>
+            <userTask id="oddFlowTask3"/>
+
+            <sequenceFlow id="flow5" sourceRef="parallelFork" targetRef="evenFlowTask2"/>
+            <userTask id="evenFlowTask2"/>
+            <sequenceFlow id="flow6" sourceRef="evenFlowTask2" targetRef="evenFlowTask4"/>
+            <userTask id="evenFlowTask4"/>
+
+            <sequenceFlow id="flow7" sourceRef="oddFlowTask3" targetRef="parallelJoin"/>
+            <sequenceFlow id="flow8" sourceRef="evenFlowTask4" targetRef="parallelJoin"/>
+
+            <parallelGateway id="parallelJoin"/>
+
+            <sequenceFlow id="subflow2" sourceRef="parallelJoin" targetRef="subProcessEnd"/>
+
+            <endEvent id="subProcessEnd"/>
+
+        </subProcess>
+
+        <sequenceFlow id="flow9" sourceRef="subProcess" targetRef="taskAfter"/>
+        <userTask id="taskAfter" name="Task after sub process"/>
+
+        <sequenceFlow id="flow10" sourceRef="taskAfter" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

@@ -36,7 +36,7 @@ public class TaskCompletedEventHandler extends AbstractTaskEventHandler {
         putInMapIfNotNull(data, Fields.DURATION, duration);
 
         if (eventWithVariables.getVariables() != null && !eventWithVariables.getVariables().isEmpty()) {
-            Map<String, Object> variableMap = new HashMap<String, Object>();
+            Map<String, Object> variableMap = new HashMap<>();
             for (Object variableName : eventWithVariables.getVariables().keySet()) {
                 putInMapIfNotNull(variableMap, (String) variableName, eventWithVariables.getVariables().get(variableName));
             }

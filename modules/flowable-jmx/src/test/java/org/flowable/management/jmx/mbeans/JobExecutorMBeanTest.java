@@ -29,7 +29,7 @@ import javax.management.ObjectName;
 import javax.management.modelmbean.ModelMBean;
 
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.management.jmx.DefaultManagementMBeanAssembler;
 import org.flowable.management.jmx.ManagementMBeanAssembler;
 import org.junit.Before;

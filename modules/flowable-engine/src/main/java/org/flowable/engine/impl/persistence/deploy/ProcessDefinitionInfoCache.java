@@ -17,11 +17,11 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -46,7 +46,7 @@ public class ProcessDefinitionInfoCache {
     /** Cache with no limit */
     public ProcessDefinitionInfoCache(CommandExecutor commandExecutor) {
         this.commandExecutor = commandExecutor;
-        this.cache = Collections.synchronizedMap(new HashMap<String, ProcessDefinitionInfoCacheObject>());
+        this.cache = Collections.synchronizedMap(new HashMap<>());
     }
 
     /** Cache which has a hard limit: no more elements will be cached than the limit. */
@@ -58,6 +58,7 @@ public class ProcessDefinitionInfoCache {
             // true will keep the 'access-order', which is needed to have a real LRU cache
             private static final long serialVersionUID = 1L;
 
+            @Override
             protected boolean removeEldestEntry(Map.Entry<String, ProcessDefinitionInfoCacheObject> eldest) {
                 boolean removeEldest = size() > limit;
                 if (removeEldest) {

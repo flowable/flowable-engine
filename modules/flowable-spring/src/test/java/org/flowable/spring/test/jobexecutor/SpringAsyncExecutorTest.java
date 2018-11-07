@@ -14,27 +14,26 @@ package org.flowable.spring.test.jobexecutor;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.test.CleanTest;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
-import org.flowable.spring.impl.test.CleanTestExecutionListener;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author Pablo Ganga
  * @author Joram Barrez
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@TestExecutionListeners(CleanTestExecutionListener.class)
+@CleanTest
+// We need to use per class as the test uses auto deployments. If they are deleted then the other tests will fail
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ContextConfiguration("classpath:org/flowable/spring/test/components/SpringjobExecutorTest-context.xml")
 public class SpringAsyncExecutorTest extends SpringFlowableTestCase {
 

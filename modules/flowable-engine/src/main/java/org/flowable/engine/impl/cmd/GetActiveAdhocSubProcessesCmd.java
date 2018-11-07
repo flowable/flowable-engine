@@ -18,8 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.bpmn.model.AdhocSubProcess;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Execution;
@@ -36,6 +36,7 @@ public class GetActiveAdhocSubProcessesCmd implements Command<List<Execution>>, 
         this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public List<Execution> execute(CommandContext commandContext) {
         List<Execution> adhocExecutions = new ArrayList<>();
         List<ExecutionEntity> executions = CommandContextUtil.getExecutionEntityManager(commandContext).findChildExecutionsByProcessInstanceId(processInstanceId);

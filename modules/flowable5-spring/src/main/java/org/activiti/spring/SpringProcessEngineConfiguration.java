@@ -50,7 +50,7 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
     protected String deploymentMode = "default";
     protected ApplicationContext applicationContext;
     protected Integer transactionSynchronizationAdapterOrder;
-    private Collection<AutoDeploymentStrategy> deploymentStrategies = new ArrayList<AutoDeploymentStrategy>();
+    private Collection<AutoDeploymentStrategy> deploymentStrategies = new ArrayList<>();
 
     public SpringProcessEngineConfiguration() {
         this.transactionsExternallyManaged = true;
@@ -163,9 +163,8 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
     /**
      * Gets the {@link AutoDeploymentStrategy} for the provided mode. This method may be overridden to implement custom deployment strategies if required, but implementors should take care not to
      * return <code>null</code>.
-     * 
-     * @param mode
-     *            the mode to get the strategy for
+     *
+     * @param mode the mode to get the strategy for
      * @return the deployment strategy to use for the mode. Never <code>null</code>
      */
     protected AutoDeploymentStrategy getAutoDeploymentStrategy(final String mode) {

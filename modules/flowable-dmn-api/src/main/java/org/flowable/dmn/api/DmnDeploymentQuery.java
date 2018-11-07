@@ -13,7 +13,7 @@
 
 package org.flowable.dmn.api;
 
-import org.flowable.engine.common.api.query.Query;
+import org.flowable.common.engine.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link DmnDeployment}s.
@@ -82,11 +82,11 @@ public interface DmnDeploymentQuery extends Query<DmnDeploymentQuery, DmnDeploym
      */
     DmnDeploymentQuery parentDeploymentIdLike(String parentDeploymentIdLike);
 
-    /** Only select deployments with the given process definition key. */
+    /** Only select deployments with the given decision table key. */
     DmnDeploymentQuery decisionTableKey(String key);
 
     /**
-     * Only select deployments with a process definition key like the given string.
+     * Only select deployments with a decision table key like the given string.
      */
     DmnDeploymentQuery decisionTableKeyLike(String keyLike);
 

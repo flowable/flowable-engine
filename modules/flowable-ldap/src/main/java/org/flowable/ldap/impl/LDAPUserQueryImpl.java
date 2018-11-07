@@ -21,7 +21,7 @@ import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.idm.api.User;
 import org.flowable.idm.engine.impl.UserQueryImpl;
 import org.flowable.idm.engine.impl.persistence.entity.UserEntity;
@@ -91,6 +91,7 @@ public class LDAPUserQueryImpl extends UserQueryImpl {
         LDAPTemplate ldapTemplate = new LDAPTemplate(ldapConfigurator);
         return ldapTemplate.execute(new LDAPCallBack<UserEntity>() {
 
+            @Override
             public UserEntity executeInContext(InitialDirContext initialDirContext) {
                 try {
 
@@ -108,7 +109,7 @@ public class LDAPUserQueryImpl extends UserQueryImpl {
                     return user;
 
                 } catch (NamingException ne) {
-                    LOGGER.debug("Could not find user {} : {}", userId, ne.getMessage(), ne);
+                    LOGGER.error("Could not find user {} : {}", userId, ne.getMessage(), ne);
                     return null;
                 }
             }
@@ -120,6 +121,7 @@ public class LDAPUserQueryImpl extends UserQueryImpl {
         LDAPTemplate ldapTemplate = new LDAPTemplate(ldapConfigurator);
         return ldapTemplate.execute(new LDAPCallBack<List<User>>() {
 
+            @Override
             public List<User> executeInContext(InitialDirContext initialDirContext) {
                 List<User> result = new ArrayList<>();
                 try {

@@ -23,6 +23,7 @@ public class BooleanFormType extends AbstractFormType {
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public String getName() {
         return "boolean";
     }
@@ -31,6 +32,7 @@ public class BooleanFormType extends AbstractFormType {
         return "plain/text";
     }
 
+    @Override
     public Object convertFormValueToModelValue(String propertyValue) {
         if (propertyValue == null || "".equals(propertyValue)) {
             return null;
@@ -38,6 +40,7 @@ public class BooleanFormType extends AbstractFormType {
         return Boolean.valueOf(propertyValue);
     }
 
+    @Override
     public String convertModelValueToFormValue(Object modelValue) {
 
         if (modelValue == null) {

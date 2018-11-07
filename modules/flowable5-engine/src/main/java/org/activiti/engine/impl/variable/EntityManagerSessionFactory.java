@@ -18,6 +18,7 @@ import javax.persistence.EntityManagerFactory;
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.impl.interceptor.Session;
 import org.activiti.engine.impl.interceptor.SessionFactory;
+import org.flowable.variable.service.impl.types.EntityManagerSession;
 
 /**
  * @author Frederik Heremans
@@ -41,10 +42,12 @@ public class EntityManagerSessionFactory implements SessionFactory {
         this.closeEntityManager = closeEntityManager;
     }
 
+    @Override
     public Class<?> getSessionType() {
         return EntityManagerSession.class;
     }
 
+    @Override
     public Session openSession() {
         return new EntityManagerSessionImpl(entityManagerFactory, handleTransactions, closeEntityManager);
     }

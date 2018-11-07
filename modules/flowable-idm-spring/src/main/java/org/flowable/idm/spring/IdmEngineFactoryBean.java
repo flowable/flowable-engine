@@ -13,6 +13,7 @@
 
 package org.flowable.idm.spring;
 
+import org.flowable.common.engine.impl.cfg.SpringBeanFactoryProxyMap;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.springframework.beans.BeansException;
@@ -34,18 +35,25 @@ public class IdmEngineFactoryBean implements FactoryBean<IdmEngine>, DisposableB
     protected ApplicationContext applicationContext;
     protected IdmEngine idmEngine;
 
+    @Override
     public void destroy() throws Exception {
         if (idmEngine != null) {
             idmEngine.close();
         }
     }
 
+    @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
 
+    @Override
     public IdmEngine getObject() throws Exception {
         configureExternallyManagedTransactions();
+        
+        if (idmEngineConfiguration.getBeans() == null) {
+            idmEngineConfiguration.setBeans(new SpringBeanFactoryProxyMap(applicationContext));
+        }
 
         this.idmEngine = idmEngineConfiguration.buildIdmEngine();
         return this.idmEngine;
@@ -60,10 +68,12 @@ public class IdmEngineFactoryBean implements FactoryBean<IdmEngine>, DisposableB
         }
     }
 
+    @Override
     public Class<IdmEngine> getObjectType() {
         return IdmEngine.class;
     }
 
+    @Override
     public boolean isSingleton() {
         return true;
     }

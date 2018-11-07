@@ -23,10 +23,12 @@ import org.flowable.engine.impl.bpmn.parser.BpmnParse;
  */
 public class ErrorEventDefinitionParseHandler extends AbstractBpmnParseHandler<ErrorEventDefinition> {
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return ErrorEventDefinition.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, ErrorEventDefinition eventDefinition) {
         if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent) {
             BoundaryEvent boundaryEvent = (BoundaryEvent) bpmnParse.getCurrentFlowElement();

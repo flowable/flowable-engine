@@ -18,22 +18,24 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.ManagementService;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
+import org.flowable.task.api.Task;
+import org.flowable.task.service.delegate.DelegateTask;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -50,7 +52,7 @@ public class SpringIdmTransactionsTest extends SpringFlowableTestCase {
     @Autowired
     protected PlatformTransactionManager transactionManager;
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
 
         List<Group> allGroups = identityService.createGroupQuery().list();
@@ -69,9 +71,9 @@ public class SpringIdmTransactionsTest extends SpringFlowableTestCase {
             identityService.deleteUser(user.getId());
         }
 
-        super.tearDown();
     }
 
+    @Test
     @Deployment
     public void testCommitOnNoException() {
 
@@ -86,6 +88,7 @@ public class SpringIdmTransactionsTest extends SpringFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testTransactionRolledBackOnException() {
 
@@ -113,6 +116,7 @@ public class SpringIdmTransactionsTest extends SpringFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testMultipleIdmCallsInDelegate() {
         runtimeService.startProcessInstanceByKey("multipleServiceInvocations");
@@ -128,6 +132,7 @@ public class SpringIdmTransactionsTest extends SpringFlowableTestCase {
     }
 
     // From https://github.com/flowable/flowable-engine/issues/26
+    @Test
     public void testCreateMemberships() {
         Group group = identityService.newGroup("group");
         User tom = identityService.newUser("tom");
@@ -152,6 +157,7 @@ public class SpringIdmTransactionsTest extends SpringFlowableTestCase {
         assertThat(identityService.createGroupQuery().groupMember(mat.getId()).singleResult(), is(notNullValue()));
     }
 
+    @Test
     public void testCreateMembershipsWithinTransaction() {
         final Group group = identityService.newGroup("group");
         final User tom = identityService.newUser("tom");
@@ -182,6 +188,7 @@ public class SpringIdmTransactionsTest extends SpringFlowableTestCase {
         assertThat(identityService.createGroupQuery().groupMember(mat.getId()).singleResult(), is(notNullValue()));
     }
 
+    @Test
     @Deployment
     public void testCreateMembershipsInTaskListener() {
 

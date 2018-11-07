@@ -28,14 +28,14 @@ import org.apache.ibatis.session.SqlSessionFactory;
  */
 public class DbSqlSessionFactory implements SessionFactory {
 
-    protected static final Map<String, Map<String, String>> databaseSpecificStatements = new HashMap<String, Map<String, String>>();
+    protected static final Map<String, Map<String, String>> databaseSpecificStatements = new HashMap<>();
 
-    public static final Map<String, String> databaseSpecificLimitBeforeStatements = new HashMap<String, String>();
-    public static final Map<String, String> databaseSpecificLimitAfterStatements = new HashMap<String, String>();
-    public static final Map<String, String> databaseSpecificLimitBetweenStatements = new HashMap<String, String>();
-    public static final Map<String, String> databaseSpecificOrderByStatements = new HashMap<String, String>();
-    public static final Map<String, String> databaseOuterJoinLimitBetweenStatements = new HashMap<String, String>();
-    public static final Map<String, String> databaseSpecificLimitBeforeNativeQueryStatements = new HashMap<String, String>();
+    public static final Map<String, String> databaseSpecificLimitBeforeStatements = new HashMap<>();
+    public static final Map<String, String> databaseSpecificLimitAfterStatements = new HashMap<>();
+    public static final Map<String, String> databaseSpecificLimitBetweenStatements = new HashMap<>();
+    public static final Map<String, String> databaseSpecificOrderByStatements = new HashMap<>();
+    public static final Map<String, String> databaseOuterJoinLimitBetweenStatements = new HashMap<>();
+    public static final Map<String, String> databaseSpecificLimitBeforeNativeQueryStatements = new HashMap<>();
 
     static {
 
@@ -207,19 +207,21 @@ public class DbSqlSessionFactory implements SessionFactory {
     protected SqlSessionFactory sqlSessionFactory;
     protected IdGenerator idGenerator;
     protected Map<String, String> statementMappings;
-    protected Map<Class<?>, String> insertStatements = new ConcurrentHashMap<Class<?>, String>();
-    protected Map<Class<?>, String> bulkInsertStatements = new ConcurrentHashMap<Class<?>, String>();
-    protected Map<Class<?>, String> updateStatements = new ConcurrentHashMap<Class<?>, String>();
-    protected Map<Class<?>, String> deleteStatements = new ConcurrentHashMap<Class<?>, String>();
-    protected Map<Class<?>, String> bulkDeleteStatements = new ConcurrentHashMap<Class<?>, String>();
-    protected Map<Class<?>, String> selectStatements = new ConcurrentHashMap<Class<?>, String>();
+    protected Map<Class<?>, String> insertStatements = new ConcurrentHashMap<>();
+    protected Map<Class<?>, String> bulkInsertStatements = new ConcurrentHashMap<>();
+    protected Map<Class<?>, String> updateStatements = new ConcurrentHashMap<>();
+    protected Map<Class<?>, String> deleteStatements = new ConcurrentHashMap<>();
+    protected Map<Class<?>, String> bulkDeleteStatements = new ConcurrentHashMap<>();
+    protected Map<Class<?>, String> selectStatements = new ConcurrentHashMap<>();
     protected boolean isDbHistoryUsed = true;
     protected int maxNrOfStatementsInBulkInsert = 100;
 
+    @Override
     public Class<?> getSessionType() {
         return DbSqlSession.class;
     }
 
+    @Override
     public Session openSession() {
         return new DbSqlSession(this);
     }
@@ -270,7 +272,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     protected static void addDatabaseSpecificStatement(String databaseType, String activitiStatement, String ibatisStatement) {
         Map<String, String> specificStatements = databaseSpecificStatements.get(databaseType);
         if (specificStatements == null) {
-            specificStatements = new HashMap<String, String>();
+            specificStatements = new HashMap<>();
             databaseSpecificStatements.put(databaseType, specificStatements);
         }
         specificStatements.put(activitiStatement, ibatisStatement);
@@ -299,7 +301,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     }
 
     protected void initBulkInsertEnabledMap(String databaseType) {
-        bulkInsertableMap = new HashMap<Class<? extends PersistentObject>, Boolean>();
+        bulkInsertableMap = new HashMap<>();
 
         for (Class<? extends PersistentObject> clazz : EntityDependencyOrder.INSERT_ORDER) {
             bulkInsertableMap.put(clazz, Boolean.TRUE);

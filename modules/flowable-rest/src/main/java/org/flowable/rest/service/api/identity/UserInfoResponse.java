@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.identity;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * @author Frederik Heremans
  */
@@ -20,6 +22,7 @@ public class UserInfoResponse extends UserInfoRequest {
 
     protected String url;
 
+    @ApiModelProperty(example = "http://localhost:8080/flowable-rest/service/identity/users/kermit/info/jobTitle")
     public String getUrl() {
         return url;
     }

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="caseWithOneMilestone">
+        <casePlanModel id="myCasePlanModel">
+            <planItem id="milestonePlanItem1" definitionRef="milestone1" />
+            <planItem id="activateMilestoneEvent" definitionRef="event1"/>
+            <milestone id="milestone1" name="xyzMilestone"/>
+            <userEventListener id="event1"/>
+        </casePlanModel>
+    </case>
+
+</definitions>

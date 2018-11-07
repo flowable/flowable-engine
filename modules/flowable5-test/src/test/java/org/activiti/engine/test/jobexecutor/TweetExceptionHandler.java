@@ -12,10 +12,10 @@
  */
 package org.activiti.engine.test.jobexecutor;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.jobexecutor.JobHandler;
-import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.job.service.JobHandler;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.variable.api.delegate.VariableScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ public class TweetExceptionHandler implements JobHandler {
         return "tweet-exception";
     }
 
-    public void execute(JobEntity job, String configuration, ExecutionEntity execution, CommandContext commandContext) {
+    public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
         if (exceptionsRemaining > 0) {
             exceptionsRemaining--;
             throw new RuntimeException("exception remaining: " + exceptionsRemaining);

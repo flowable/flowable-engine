@@ -17,13 +17,12 @@ package org.flowable.engine.impl.persistence.entity;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Christian Stettler
  */
-public abstract class HistoricScopeInstanceEntityImpl extends AbstractEntity implements HistoricScopeInstanceEntity, Serializable {
+public abstract class HistoricScopeInstanceEntityImpl extends AbstractBpmnEngineEntity implements HistoricScopeInstanceEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -34,6 +33,7 @@ public abstract class HistoricScopeInstanceEntityImpl extends AbstractEntity imp
     protected Long durationInMillis;
     protected String deleteReason;
 
+    @Override
     public void markEnded(String deleteReason) {
         if (this.endTime == null) {
             this.deleteReason = deleteReason;
@@ -46,50 +46,62 @@ public abstract class HistoricScopeInstanceEntityImpl extends AbstractEntity imp
 
     // getters and setters ////////////////////////////////////////////////////////
 
+    @Override
     public String getProcessInstanceId() {
         return processInstanceId;
     }
 
+    @Override
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
 
+    @Override
     public Date getStartTime() {
         return startTime;
     }
 
+    @Override
     public Date getEndTime() {
         return endTime;
     }
 
+    @Override
     public Long getDurationInMillis() {
         return durationInMillis;
     }
 
+    @Override
     public void setProcessInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public void setProcessDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
 
+    @Override
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
 
+    @Override
     public void setDurationInMillis(Long durationInMillis) {
         this.durationInMillis = durationInMillis;
     }
 
+    @Override
     public String getDeleteReason() {
         return deleteReason;
     }
 
+    @Override
     public void setDeleteReason(String deleteReason) {
         this.deleteReason = deleteReason;
     }

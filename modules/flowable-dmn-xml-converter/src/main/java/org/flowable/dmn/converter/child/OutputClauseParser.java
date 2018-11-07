@@ -24,10 +24,12 @@ import org.flowable.dmn.model.OutputClause;
  */
 public class OutputClauseParser extends BaseChildElementParser {
 
+    @Override
     public String getElementName() {
         return ELEMENT_OUTPUT_CLAUSE;
     }
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, DecisionTable decisionTable) throws Exception {
         if (!(parentElement instanceof DecisionTable))
             return;

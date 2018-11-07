@@ -31,8 +31,10 @@ import org.activiti.engine.impl.persistence.AbstractManager;
  */
 public class EventSubscriptionEntityManager extends AbstractManager {
 
-    /** keep track of subscriptions created in the current command */
-    protected List<SignalEventSubscriptionEntity> createdSignalSubscriptions = new ArrayList<SignalEventSubscriptionEntity>();
+    /**
+     * keep track of subscriptions created in the current command
+     */
+    protected List<SignalEventSubscriptionEntity> createdSignalSubscriptions = new ArrayList<>();
 
     public void insert(EventSubscriptionEntity persistentObject) {
         super.insert(persistentObject);
@@ -72,7 +74,7 @@ public class EventSubscriptionEntityManager extends AbstractManager {
         final String query = "selectSignalEventSubscriptionsByEventName";
 
         Set<SignalEventSubscriptionEntity> selectList = null;
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("eventName", eventName);
         if (tenantId != null && !tenantId.equals(ProcessEngineConfiguration.NO_TENANT_ID)) {
             params.put("tenantId", tenantId);
@@ -88,13 +90,13 @@ public class EventSubscriptionEntityManager extends AbstractManager {
             }
         }
 
-        return new ArrayList<SignalEventSubscriptionEntity>(selectList);
+        return new ArrayList<>(selectList);
     }
 
     @SuppressWarnings("unchecked")
     public List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByProcessInstanceAndEventName(String processInstanceId, String eventName) {
         final String query = "selectSignalEventSubscriptionsByProcessInstanceAndEventName";
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("processInstanceId", processInstanceId);
         params.put("eventName", eventName);
         Set<SignalEventSubscriptionEntity> selectList = new HashSet<SignalEventSubscriptionEntity>(getDbSqlSession().selectList(query, params));
@@ -106,7 +108,7 @@ public class EventSubscriptionEntityManager extends AbstractManager {
             }
         }
 
-        return new ArrayList<SignalEventSubscriptionEntity>(selectList);
+        return new ArrayList<>(selectList);
     }
 
     @SuppressWarnings("unchecked")
@@ -121,13 +123,13 @@ public class EventSubscriptionEntityManager extends AbstractManager {
             }
         }
 
-        return new ArrayList<SignalEventSubscriptionEntity>(selectList);
+        return new ArrayList<>(selectList);
     }
 
     @SuppressWarnings("unchecked")
     public List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByNameAndExecution(String name, String executionId) {
         final String query = "selectSignalEventSubscriptionsByNameAndExecution";
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("executionId", executionId);
         params.put("eventName", name);
         Set<SignalEventSubscriptionEntity> selectList = new HashSet<SignalEventSubscriptionEntity>(getDbSqlSession().selectList(query, params));
@@ -140,12 +142,12 @@ public class EventSubscriptionEntityManager extends AbstractManager {
             }
         }
 
-        return new ArrayList<SignalEventSubscriptionEntity>(selectList);
+        return new ArrayList<>(selectList);
     }
 
     public List<EventSubscriptionEntity> findEventSubscriptionsByExecutionAndType(String executionId, String type) {
         final String query = "selectEventSubscriptionsByExecutionAndType";
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("executionId", executionId);
         params.put("eventType", type);
         return getDbSqlSession().selectList(query, params);
@@ -158,7 +160,7 @@ public class EventSubscriptionEntityManager extends AbstractManager {
 
     public List<EventSubscriptionEntity> findEventSubscriptions(String executionId, String type, String activityId) {
         final String query = "selectEventSubscriptionsByExecutionTypeAndActivity";
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("executionId", executionId);
         params.put("eventType", type);
         params.put("activityId", activityId);
@@ -167,7 +169,7 @@ public class EventSubscriptionEntityManager extends AbstractManager {
 
     public List<EventSubscriptionEntity> findEventSubscriptionsByConfiguration(String type, String configuration, String tenantId) {
         final String query = "selectEventSubscriptionsByConfiguration";
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("eventType", type);
         params.put("configuration", configuration);
         if (tenantId != null && !tenantId.equals(ProcessEngineConfiguration.NO_TENANT_ID)) {
@@ -178,7 +180,7 @@ public class EventSubscriptionEntityManager extends AbstractManager {
 
     public List<EventSubscriptionEntity> findEventSubscriptionsByTypeAndProcessDefinitionId(String type, String processDefinitionId, String tenantId) {
         final String query = "selectEventSubscriptionsByTypeAndProcessDefinitionId";
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         if (type != null) {
             params.put("eventType", type);
         }
@@ -191,7 +193,7 @@ public class EventSubscriptionEntityManager extends AbstractManager {
 
     public List<EventSubscriptionEntity> findEventSubscriptionsByName(String type, String eventName, String tenantId) {
         final String query = "selectEventSubscriptionsByName";
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("eventType", type);
         params.put("eventName", eventName);
         if (tenantId != null && !tenantId.equals(ProcessEngineConfiguration.NO_TENANT_ID)) {
@@ -202,7 +204,7 @@ public class EventSubscriptionEntityManager extends AbstractManager {
 
     public List<EventSubscriptionEntity> findEventSubscriptionsByNameAndExecution(String type, String eventName, String executionId) {
         final String query = "selectEventSubscriptionsByNameAndExecution";
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("eventType", type);
         params.put("eventName", eventName);
         params.put("executionId", executionId);
@@ -210,7 +212,7 @@ public class EventSubscriptionEntityManager extends AbstractManager {
     }
 
     public MessageEventSubscriptionEntity findMessageStartEventSubscriptionByName(String messageName, String tenantId) {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("eventName", messageName);
         if (tenantId != null && !tenantId.equals(ProcessEngineConfiguration.NO_TENANT_ID)) {
             params.put("tenantId", tenantId);
@@ -220,7 +222,7 @@ public class EventSubscriptionEntityManager extends AbstractManager {
     }
 
     public void updateEventSubscriptionTenantId(String oldTenantId, String newTenantId) {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("oldTenantId", oldTenantId);
         params.put("newTenantId", newTenantId);
         getDbSqlSession().update("updateTenantIdOfEventSubscriptions", params);

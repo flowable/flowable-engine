@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,10 +25,12 @@ import java.util.Map;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
+import org.activiti.engine.impl.JobProcessorContextImpl;
 import org.activiti.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.activiti.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
+import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.db.HasRevision;
@@ -56,12 +58,14 @@ import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
 import org.activiti.engine.impl.pvm.runtime.OutgoingExecution;
 import org.activiti.engine.impl.pvm.runtime.StartingExecution;
 import org.activiti.engine.runtime.Execution;
+import org.activiti.engine.runtime.JobProcessor;
+import org.activiti.engine.runtime.JobProcessorContext;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableListener;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.api.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,15 +92,21 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     protected ProcessDefinitionImpl processDefinition;
 
-    /** current activity */
+    /**
+     * current activity
+     */
     protected ActivityImpl activity;
 
     protected FlowElement currentFlowElement;
 
-    /** current transition. is null when there is no transition being taken. */
+    /**
+     * current transition. is null when there is no transition being taken.
+     */
     protected TransitionImpl transition;
 
-    /** transition that will be taken. is null when there is no transition being taken. */
+    /**
+     * transition that will be taken. is null when there is no transition being taken.
+     */
     protected TransitionImpl transitionBeingTaken;
 
     /**
@@ -104,21 +114,31 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
      */
     protected ExecutionEntity processInstance;
 
-    /** the parent execution */
+    /**
+     * the parent execution
+     */
     protected ExecutionEntity parent;
 
-    /** nested executions representing scopes or concurrent paths */
+    /**
+     * nested executions representing scopes or concurrent paths
+     */
     protected List<ExecutionEntity> executions;
 
-    /** super execution, not-null if this execution is part of a subprocess */
+    /**
+     * super execution, not-null if this execution is part of a subprocess
+     */
     protected ExecutionEntity superExecution;
 
-    /** reference to a subprocessinstance, not-null if currently subprocess is started from this execution */
+    /**
+     * reference to a subprocessinstance, not-null if currently subprocess is started from this execution
+     */
     protected ExecutionEntity subProcessInstance;
 
     protected StartingExecution startingExecution;
 
-    /** The tenant identifier (if any) */
+    /**
+     * The tenant identifier (if any)
+     */
     protected String tenantId = ProcessEngineConfiguration.NO_TENANT_ID;
     protected String name;
     protected String description;
@@ -169,7 +189,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     /**
      * when execution structure is pruned during a takeAll, then the original execution has to be resolved to the replaced execution.
-     * 
+     *
      * @see #takeAll(List, List) {@link OutgoingExecution}
      */
     protected ExecutionEntity replacedBy;
@@ -179,7 +199,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     /**
      * next operation. process execution is in fact runtime interpretation of the process model. each operation is a logical unit of interpretation of the process. so sequentially processing the
      * operations drives the interpretation or execution of a process.
-     * 
+     *
      * @see AtomicOperation
      * @see #performOperation(AtomicOperation)
      */
@@ -191,7 +211,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     /**
      * persisted reference to the processDefinition.
-     * 
+     *
      * @see #processDefinition
      * @see #setProcessDefinition(ProcessDefinitionImpl)
      * @see #getProcessDefinition()
@@ -220,7 +240,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     /**
      * persisted reference to the current position in the diagram within the {@link #processDefinition}.
-     * 
+     *
      * @see #activity
      * @see #setActivity(ActivityImpl)
      * @see #getActivity()
@@ -234,7 +254,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     /**
      * persisted reference to the process instance.
-     * 
+     *
      * @see #getProcessInstance()
      */
     protected String processInstanceId;
@@ -246,7 +266,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     /**
      * persisted reference to the parent of this execution.
-     * 
+     *
      * @see #getParent()
      * @see #setParentId(String)
      */
@@ -254,7 +274,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     /**
      * persisted reference to the super execution of this execution
-     * 
+     *
      * @see #getSuperExecution()
      * @see #setSuperExecution(ExecutionEntity)
      */
@@ -271,7 +291,9 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     public ExecutionEntity() {
     }
 
-    /** creates a new execution. properties processDefinition, processInstance and activity will be initialized. */
+    /**
+     * creates a new execution. properties processDefinition, processInstance and activity will be initialized.
+     */
     @Override
     public ExecutionEntity createExecution() {
         // create the new child execution
@@ -325,7 +347,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     protected ExecutionEntity newExecution() {
         ExecutionEntity newExecution = new ExecutionEntity();
-        newExecution.executions = new ArrayList<ExecutionEntity>();
+        newExecution.executions = new ArrayList<>();
 
         // Inherit tenant id (if any)
         if (getTenantId() != null) {
@@ -351,8 +373,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
         ensureParentInitialized();
 
         // initialize the lists of referenced objects (prevents db queries)
-        variableInstances = new HashMap<String, VariableInstanceEntity>();
-        eventSubscriptions = new ArrayList<EventSubscriptionEntity>();
+        variableInstances = new HashMap<>();
+        eventSubscriptions = new ArrayList<>();
 
         // Cached entity-state initialized to null, all bits are zero, indicating NO entities present
         cachedEntityState = 0;
@@ -362,10 +384,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
             for (TimerDeclarationImpl timerDeclaration : timerDeclarations) {
                 TimerJobEntity timer = timerDeclaration.prepareTimerEntity(this);
                 if (timer != null) {
-                    Context
-                            .getCommandContext()
-                            .getJobEntityManager()
-                            .schedule(timer);
+                    callJobProcessors(JobProcessorContext.Phase.BEFORE_CREATE, timer, Context.getProcessEngineConfiguration());
+                    Context.getCommandContext().getJobEntityManager().schedule(timer);
                 }
             }
         }
@@ -426,7 +446,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
             // If needed, dispatch an event indicating an activity was signalled
             boolean isUserTask = (activityBehavior instanceof UserTaskActivityBehavior)
                     || ((activityBehavior instanceof MultiInstanceActivityBehavior)
-                            && ((MultiInstanceActivityBehavior) activityBehavior).getInnerActivityBehavior() instanceof UserTaskActivityBehavior);
+                    && ((MultiInstanceActivityBehavior) activityBehavior).getInnerActivityBehavior() instanceof UserTaskActivityBehavior);
 
             if (!isUserTask && Context.getProcessEngineConfiguration() != null
                     && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
@@ -447,8 +467,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     }
 
     /**
-     * @param fireActivityCompletionEvent
-     *            This method can be called from other places (like {@link #takeAll(List, List)}), where the event is already fired. In that case, false is passed an no second event is fired.
+     * @param fireActivityCompletionEvent This method can be called from other places (like {@link #takeAll(List, List)}), where the event is already fired. In that case, false is passed an no second event is fired.
      */
     @Override
     public void take(PvmTransition transition, boolean fireActivityCompletionEvent) {
@@ -476,8 +495,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     @Override
     public List<ActivityExecution> findInactiveConcurrentExecutions(PvmActivity activity) {
-        List<ActivityExecution> inactiveConcurrentExecutionsInActivity = new ArrayList<ActivityExecution>();
-        List<ActivityExecution> otherConcurrentExecutions = new ArrayList<ActivityExecution>();
+        List<ActivityExecution> inactiveConcurrentExecutionsInActivity = new ArrayList<>();
+        List<ActivityExecution> otherConcurrentExecutions = new ArrayList<>();
         if (isConcurrent()) {
             List<? extends ActivityExecution> concurrentExecutions = getParent().getAllChildExecutions();
             for (ActivityExecution concurrentExecution : concurrentExecutions) {
@@ -504,7 +523,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     }
 
     protected List<ExecutionEntity> getAllChildExecutions() {
-        List<ExecutionEntity> childExecutions = new ArrayList<ExecutionEntity>();
+        List<ExecutionEntity> childExecutions = new ArrayList<>();
         for (ExecutionEntity childExecution : getExecutions()) {
             childExecutions.add(childExecution);
             childExecutions.addAll(childExecution.getAllChildExecutions());
@@ -513,13 +532,13 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     }
 
     @Override
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void takeAll(List<PvmTransition> transitions, List<ActivityExecution> recyclableExecutions) {
 
         fireActivityCompletedEvent();
 
-        transitions = new ArrayList<PvmTransition>(transitions);
-        recyclableExecutions = (recyclableExecutions != null ? new ArrayList<ActivityExecution>(recyclableExecutions) : new ArrayList<ActivityExecution>());
+        transitions = new ArrayList<>(transitions);
+        recyclableExecutions = (recyclableExecutions != null ? new ArrayList<>(recyclableExecutions) : new ArrayList<>());
 
         if (recyclableExecutions.size() > 1) {
             for (ActivityExecution recyclableExecution : recyclableExecutions) {
@@ -530,8 +549,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
         }
 
         ExecutionEntity concurrentRoot = ((isConcurrent && !isScope) ? getParent() : this);
-        List<ExecutionEntity> concurrentActiveExecutions = new ArrayList<ExecutionEntity>();
-        List<ExecutionEntity> concurrentInActiveExecutions = new ArrayList<ExecutionEntity>();
+        List<ExecutionEntity> concurrentActiveExecutions = new ArrayList<>();
+        List<ExecutionEntity> concurrentInActiveExecutions = new ArrayList<>();
         for (ExecutionEntity execution : concurrentRoot.getExecutions()) {
             if (execution.isActive()) {
                 concurrentActiveExecutions.add(execution);
@@ -575,7 +594,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
         } else {
 
-            List<OutgoingExecution> outgoingExecutions = new ArrayList<OutgoingExecution>();
+            List<OutgoingExecution> outgoingExecutions = new ArrayList<>();
 
             recyclableExecutions.remove(concurrentRoot);
 
@@ -685,10 +704,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
             message.setTenantId(getTenantId());
         }
 
-        Context
-                .getCommandContext()
-                .getJobEntityManager()
-                .send(message);
+        callJobProcessors(JobProcessorContext.Phase.BEFORE_CREATE, message, Context.getProcessEngineConfiguration());
+        Context.getCommandContext().getJobEntityManager().send(message);
     }
 
     public boolean isActive(String activityId) {
@@ -702,14 +719,16 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     // executions ///////////////////////////////////////////////////////////////
 
-    /** ensures initialization and returns the non-null executions list */
+    /**
+     * ensures initialization and returns the non-null executions list
+     */
     @Override
     public List<ExecutionEntity> getExecutions() {
         ensureExecutionsInitialized();
         return executions;
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     protected void ensureExecutionsInitialized() {
         if (executions == null) {
             this.executions = Context
@@ -723,7 +742,9 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
         this.executions = executions;
     }
 
-    /** searches for an execution positioned in the given activity */
+    /**
+     * searches for an execution positioned in the given activity
+     */
     @Override
     public ExecutionEntity findExecution(String activityId) {
         if ((getActivity() != null)
@@ -741,7 +762,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     @Override
     public List<String> findActiveActivityIds() {
-        List<String> activeActivityIds = new ArrayList<String>();
+        List<String> activeActivityIds = new ArrayList<>();
         collectActiveActivityIds(activeActivityIds);
         return activeActivityIds;
     }
@@ -779,7 +800,9 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     // process definition ///////////////////////////////////////////////////////
 
-    /** ensures initialization and returns the process definition. */
+    /**
+     * ensures initialization and returns the process definition.
+     */
     @Override
     public ProcessDefinitionImpl getProcessDefinition() {
         ensureProcessDefinitionInitialized();
@@ -831,7 +854,9 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
         this.deploymentId = deploymentId;
     }
 
-    /** for setting the process definition, this setter must be used as subclasses can override */
+    /**
+     * for setting the process definition, this setter must be used as subclasses can override
+     */
     protected void ensureProcessDefinitionInitialized() {
         if ((processDefinition == null) && (processDefinitionId != null)) {
             ProcessDefinitionEntity deployedProcessDefinition = (ProcessDefinitionEntity) Context
@@ -851,7 +876,9 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     // process instance /////////////////////////////////////////////////////////
 
-    /** ensures initialization and returns the process instance. */
+    /**
+     * ensures initialization and returns the process instance.
+     */
     @Override
     public ExecutionEntity getProcessInstance() {
         ensureProcessInstanceInitialized();
@@ -882,14 +909,18 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     // activity /////////////////////////////////////////////////////////////////
 
-    /** ensures initialization and returns the activity */
+    /**
+     * ensures initialization and returns the activity
+     */
     @Override
     public ActivityImpl getActivity() {
         ensureActivityInitialized();
         return activity;
     }
 
-    /** must be called before the activity member field or getActivity() is called */
+    /**
+     * must be called before the activity member field or getActivity() is called
+     */
     protected void ensureActivityInitialized() {
         if ((activity == null) && (activityId != null)) {
             activity = getProcessDefinition().findActivity(activityId);
@@ -910,7 +941,9 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     // parent ///////////////////////////////////////////////////////////////////
 
-    /** ensures initialization and returns the parent */
+    /**
+     * ensures initialization and returns the parent
+     */
     @Override
     public ExecutionEntity getParent() {
         ensureParentInitialized();
@@ -1063,7 +1096,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
         // remove all child executions and sub process instances:
         HistoryManager historyManager = Context.getCommandContext().getHistoryManager();
-        List<InterpretableExecution> executions = new ArrayList<InterpretableExecution>(getExecutions());
+        List<InterpretableExecution> executions = new ArrayList<>(getExecutions());
         for (InterpretableExecution childExecution : executions) {
             if (childExecution.getSubProcessInstance() != null) {
                 childExecution.getSubProcessInstance().deleteCascade(reason);
@@ -1081,7 +1114,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     }
 
     private void removeEventScopes() {
-        List<InterpretableExecution> childExecutions = new ArrayList<InterpretableExecution>(getExecutions());
+        List<InterpretableExecution> childExecutions = new ArrayList<>(getExecutions());
         for (InterpretableExecution childExecution : childExecutions) {
             if (childExecution.isEventScope()) {
                 LOGGER.debug("removing eventScope {}", childExecution);
@@ -1145,7 +1178,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     }
 
     @Override
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void setReplacedBy(InterpretableExecution replacedBy) {
         this.replacedBy = (ExecutionEntity) replacedBy;
 
@@ -1154,7 +1187,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
         // update the related tasks
 
-        List<TaskEntity> allTasks = new ArrayList<TaskEntity>();
+        List<TaskEntity> allTasks = new ArrayList<>();
         allTasks.addAll(getTasks());
 
         List<TaskEntity> cachedTasks = dbSqlSession.findInCache(TaskEntity.class);
@@ -1247,7 +1280,9 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
         return getParent();
     }
 
-    /** used to calculate the sourceActivityExecution for method {@link #updateActivityInstanceIdInHistoricVariableUpdate(HistoricDetailVariableInstanceUpdateEntity, ExecutionEntity)} */
+    /**
+     * used to calculate the sourceActivityExecution for method {@link #updateActivityInstanceIdInHistoricVariableUpdate(HistoricDetailVariableInstanceUpdateEntity, ExecutionEntity)}
+     */
     @Override
     protected ExecutionEntity getSourceActivityExecution() {
         return (activityId != null ? this : null);
@@ -1255,7 +1290,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     @Override
     protected VariableInstanceEntity createVariableInstance(String variableName, Object value,
-            ExecutionEntity sourceActivityExecution) {
+                                                            ExecutionEntity sourceActivityExecution) {
         VariableInstanceEntity result = super.createVariableInstance(variableName, value, sourceActivityExecution);
 
         // Dispatch event, if needed
@@ -1269,7 +1304,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     @Override
     protected void updateVariableInstance(VariableInstanceEntity variableInstance, Object value,
-            ExecutionEntity sourceActivityExecution) {
+                                          ExecutionEntity sourceActivityExecution) {
         super.updateVariableInstance(variableInstance, value, sourceActivityExecution);
 
         // Dispatch event, if needed
@@ -1309,7 +1344,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     @Override
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("processDefinitionId", this.processDefinitionId);
         persistentState.put("businessKey", this.businessKey);
         persistentState.put("activityId", this.activityId);
@@ -1392,6 +1427,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     // toString /////////////////////////////////////////////////////////////////
 
+    @Override
     public String toString() {
         if (isProcessInstanceType()) {
             return "ProcessInstance[" + getToStringIdentity() + "]";
@@ -1412,12 +1448,12 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     }
 
     public List<EventSubscriptionEntity> getEventSubscriptions() {
-        return new ArrayList<EventSubscriptionEntity>(getEventSubscriptionsInternal());
+        return new ArrayList<>(getEventSubscriptionsInternal());
     }
 
     public List<CompensateEventSubscriptionEntity> getCompensateEventSubscriptions() {
         List<EventSubscriptionEntity> eventSubscriptions = getEventSubscriptionsInternal();
-        List<CompensateEventSubscriptionEntity> result = new ArrayList<CompensateEventSubscriptionEntity>(eventSubscriptions.size());
+        List<CompensateEventSubscriptionEntity> result = new ArrayList<>(eventSubscriptions.size());
         for (EventSubscriptionEntity eventSubscriptionEntity : eventSubscriptions) {
             if (eventSubscriptionEntity instanceof CompensateEventSubscriptionEntity) {
                 result.add((CompensateEventSubscriptionEntity) eventSubscriptionEntity);
@@ -1428,7 +1464,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     public List<CompensateEventSubscriptionEntity> getCompensateEventSubscriptions(String activityId) {
         List<EventSubscriptionEntity> eventSubscriptions = getEventSubscriptionsInternal();
-        List<CompensateEventSubscriptionEntity> result = new ArrayList<CompensateEventSubscriptionEntity>(eventSubscriptions.size());
+        List<CompensateEventSubscriptionEntity> result = new ArrayList<>(eventSubscriptions.size());
         for (EventSubscriptionEntity eventSubscriptionEntity : eventSubscriptions) {
             if (eventSubscriptionEntity instanceof CompensateEventSubscriptionEntity) {
                 if (activityId.equals(eventSubscriptionEntity.getActivityId())) {
@@ -1458,7 +1494,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     // referenced job entities //////////////////////////////////////////////////
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     protected void ensureJobsInitialized() {
         if (jobs == null) {
             jobs = Context.getCommandContext()
@@ -1473,7 +1509,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     }
 
     public List<JobEntity> getJobs() {
-        return new ArrayList<JobEntity>(getJobsInternal());
+        return new ArrayList<>(getJobsInternal());
     }
 
     public void addJob(JobEntity jobEntity) {
@@ -1484,7 +1520,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
         getJobsInternal().remove(job);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     protected void ensureTimerJobsInitialized() {
         if (timerJobs == null) {
             timerJobs = Context.getCommandContext()
@@ -1499,7 +1535,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     }
 
     public List<TimerJobEntity> getTimerJobs() {
-        return new ArrayList<TimerJobEntity>(getTimerJobsInternal());
+        return new ArrayList<>(getTimerJobsInternal());
     }
 
     public void addTimerJob(TimerJobEntity jobEntity) {
@@ -1512,7 +1548,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     // referenced task entities ///////////////////////////////////////////////////
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     protected void ensureTasksInitialized() {
         if (tasks == null) {
             tasks = Context.getCommandContext()
@@ -1527,7 +1563,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     }
 
     public List<TaskEntity> getTasks() {
-        return new ArrayList<TaskEntity>(getTasksInternal());
+        return new ArrayList<>(getTasksInternal());
     }
 
     public void addTask(TaskEntity taskEntity) {
@@ -1828,7 +1864,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     @Override
     public Map<String, Object> getProcessVariables() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         if (queryVariables != null) {
             for (VariableInstanceEntity variableInstance : queryVariables) {
                 if (variableInstance.getId() != null && variableInstance.getTaskId() == null) {
@@ -1886,6 +1922,13 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     @Override
     public void setMultiInstanceRoot(boolean isMultiInstanceRoot) {
 
+    }
+
+    protected void callJobProcessors(JobProcessorContext.Phase processorType, AbstractJobEntity abstractJobEntity, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        JobProcessorContextImpl jobProcessorContext = new JobProcessorContextImpl(processorType, abstractJobEntity);
+        for (JobProcessor jobProcessor : processEngineConfiguration.getJobProcessors()) {
+            jobProcessor.process(jobProcessorContext);
+        }
     }
 
 }

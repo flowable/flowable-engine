@@ -13,11 +13,10 @@
 package org.activiti.examples.bpmn.tasklistener;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 /**
  * @author Rich Kroll, Tijs Rademakers
@@ -27,7 +26,7 @@ public class ScriptTaskListenerTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/activiti/examples/bpmn/tasklistener/ScriptTaskListenerTest.bpmn20.xml" })
     public void testScriptTaskListener() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("scriptTaskListenerProcess");
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Name does not match", "All your base are belong to us", task.getName());
 
         taskService.complete(task.getId());

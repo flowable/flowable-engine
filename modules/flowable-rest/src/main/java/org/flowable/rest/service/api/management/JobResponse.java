@@ -13,11 +13,12 @@
 
 package org.flowable.rest.service.api.management;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.swagger.annotations.ApiModelProperty;
+
 import java.util.Date;
 
-import org.flowable.rest.util.DateToStringSerializer;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.flowable.common.rest.util.DateToStringSerializer;
 
 /**
  * @author Frederik Heremans
@@ -39,6 +40,7 @@ public class JobResponse {
     protected Date createTime;
     protected String tenantId;
 
+    @ApiModelProperty(example = "8")
     public String getId() {
         return id;
     }
@@ -47,6 +49,7 @@ public class JobResponse {
         this.id = id;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/management/jobs/8")
     public String getUrl() {
         return url;
     }
@@ -55,6 +58,7 @@ public class JobResponse {
         this.url = url;
     }
 
+    @ApiModelProperty(example = "5")
     public String getProcessInstanceId() {
         return processInstanceId;
     }
@@ -63,6 +67,7 @@ public class JobResponse {
         this.processInstanceId = processInstanceId;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/runtime/process-instances/5")
     public String getProcessInstanceUrl() {
         return processInstanceUrl;
     }
@@ -71,6 +76,7 @@ public class JobResponse {
         this.processInstanceUrl = processInstanceUrl;
     }
 
+    @ApiModelProperty(example = "timerProcess:1:4")
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
@@ -79,6 +85,7 @@ public class JobResponse {
         this.processDefinitionId = processDefinitionId;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/repository/process-definitions/timerProcess%3A1%3A4")
     public String getProcessDefinitionUrl() {
         return processDefinitionUrl;
     }
@@ -87,6 +94,7 @@ public class JobResponse {
         this.processDefinitionUrl = processDefinitionUrl;
     }
 
+    @ApiModelProperty(example = "7")
     public String getExecutionId() {
         return executionId;
     }
@@ -95,6 +103,7 @@ public class JobResponse {
         this.executionId = executionId;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/runtime/executions/7")
     public String getExecutionUrl() {
         return executionUrl;
     }
@@ -103,6 +112,7 @@ public class JobResponse {
         this.executionUrl = executionUrl;
     }
 
+    @ApiModelProperty(example = "3")
     public Integer getRetries() {
         return retries;
     }
@@ -111,6 +121,7 @@ public class JobResponse {
         this.retries = retries;
     }
 
+    @ApiModelProperty(example = "null")
     public String getExceptionMessage() {
         return exceptionMessage;
     }
@@ -119,6 +130,7 @@ public class JobResponse {
         this.exceptionMessage = exceptionMessage;
     }
 
+    @ApiModelProperty(example = "2013-06-04T22:05:05.474+0000")
     public Date getDueDate() {
         return dueDate;
     }
@@ -127,6 +139,7 @@ public class JobResponse {
         this.dueDate = dueDate;
     }
 
+    @ApiModelProperty(example = "2013-06-03T22:05:05.474+0000")
     public Date getCreateTime() {
         return createTime;
     }
@@ -139,6 +152,7 @@ public class JobResponse {
         this.tenantId = tenantId;
     }
 
+    @ApiModelProperty(example = "null")
     public String getTenantId() {
         return tenantId;
     }

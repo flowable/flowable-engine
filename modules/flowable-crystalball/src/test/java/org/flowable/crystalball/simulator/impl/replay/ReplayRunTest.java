@@ -1,5 +1,16 @@
 package org.flowable.crystalball.simulator.impl.replay;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.crystalball.simulator.ReplaySimulationRun;
 import org.flowable.crystalball.simulator.SimulationDebugger;
 import org.flowable.crystalball.simulator.SimulationEvent;
@@ -15,25 +26,14 @@ import org.flowable.crystalball.simulator.impl.playback.PlaybackUserTaskComplete
 import org.flowable.engine.ProcessEngines;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.el.NoExecutionVariableScope;
 import org.flowable.engine.parse.BpmnParseHandler;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
+import org.flowable.task.api.Task;
+import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author martin.grofcik
@@ -63,7 +63,7 @@ public class ReplayRunTest {
         TaskService taskService = processEngine.getTaskService();
         RuntimeService runtimeService = processEngine.getRuntimeService();
 
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put(TEST_VARIABLE, TEST_VALUE);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(USERTASK_PROCESS, BUSINESS_KEY, variables);
 
@@ -107,24 +107,24 @@ public class ReplayRunTest {
 
     private ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
         ProcessEngineConfigurationImpl configuration = new org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration();
-        configuration.setHistory("full").setDatabaseSchemaUpdate("drop-create");
+        configuration.setHistory("full").setDatabaseSchemaUpdate("true");
         configuration.setCustomDefaultBpmnParseHandlers(
-                Arrays.<BpmnParseHandler>asList(
+                Collections.<BpmnParseHandler>singletonList(
                         new AddListenerUserTaskParseHandler(TaskListener.EVENTNAME_CREATE,
                                 new UserTaskExecutionListener(USER_TASK_COMPLETED_EVENT_TYPE, USER_TASK_COMPLETED_EVENT_TYPE, listener.getSimulationEvents()))));
-        configuration.setEventListeners(Arrays.<FlowableEventListener>asList(listener));
+        configuration.setEventListeners(Collections.<FlowableEventListener>singletonList(listener));
         return configuration;
     }
 
     private static List<Function<FlowableEvent, SimulationEvent>> getTransformers() {
-        List<Function<FlowableEvent, SimulationEvent>> transformers = new ArrayList<Function<FlowableEvent, SimulationEvent>>();
+        List<Function<FlowableEvent, SimulationEvent>> transformers = new ArrayList<>();
         transformers.add(new ProcessInstanceCreateTransformer(PROCESS_INSTANCE_START_EVENT_TYPE, PROCESS_DEFINITION_ID_KEY, BUSINESS_KEY, VARIABLES_KEY));
         transformers.add(new UserTaskCompleteTransformer(USER_TASK_COMPLETED_EVENT_TYPE));
         return transformers;
     }
 
     public static Map<String, SimulationEventHandler> getReplayHandlers(String processInstanceId) {
-        Map<String, SimulationEventHandler> handlers = new HashMap<String, SimulationEventHandler>();
+        Map<String, SimulationEventHandler> handlers = new HashMap<>();
         handlers.put(PROCESS_INSTANCE_START_EVENT_TYPE,
                 new StartReplayProcessEventHandler(processInstanceId, PROCESS_INSTANCE_START_EVENT_TYPE, PROCESS_INSTANCE_START_EVENT_TYPE, listener.getSimulationEvents(), PROCESS_DEFINITION_ID_KEY, BUSINESS_KEY, VARIABLES_KEY));
         handlers.put(USER_TASK_COMPLETED_EVENT_TYPE, new PlaybackUserTaskCompleteEventHandler());

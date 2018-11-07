@@ -16,17 +16,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.history.HistoricData;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.api.history.HistoricData;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
-import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.history.HistoricVariableUpdate;
 import org.flowable.engine.history.ProcessInstanceHistoryLog;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.task.Comment;
-import org.flowable.engine.task.Task;
-import org.flowable.variable.service.history.HistoricVariableInstance;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -35,9 +37,8 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
 
     protected String processInstanceId;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
 
         // Deploy test process
         deployTwoTasksTestProcess();
@@ -57,23 +58,23 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
         runtimeService.setVariable(processInstanceId, "var1", "new Value");
 
         // Finish tasks
-        for (Task task : taskService.createTaskQuery().list()) {
+        for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
             taskService.complete(task.getId());
         }
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
 
         for (Comment comment : taskService.getProcessInstanceComments(processInstanceId)) {
             taskService.deleteComment(comment.getId());
         }
 
-        super.tearDown();
     }
 
+    @Test
     public void testBaseProperties() {
         ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).singleResult();
         assertNotNull(log.getId());
@@ -84,6 +85,7 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
         assertNotNull(log.getStartTime());
     }
 
+    @Test
     public void testIncludeTasks() {
         ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeTasks().singleResult();
         List<HistoricData> events = log.getHistoricData();
@@ -94,6 +96,7 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testIncludeComments() {
         ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeComments().singleResult();
         List<HistoricData> events = log.getHistoricData();
@@ -104,6 +107,7 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testIncludeTasksAndComments() {
         ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeTasks().includeComments().singleResult();
         List<HistoricData> events = log.getHistoricData();
@@ -124,6 +128,7 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
         assertEquals(3, commentCounter);
     }
 
+    @Test
     public void testIncludeActivities() {
         ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeActivities().singleResult();
         List<HistoricData> events = log.getHistoricData();
@@ -134,6 +139,7 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testIncludeVariables() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeVariables().singleResult();
@@ -146,6 +152,7 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testIncludeVariableUpdates() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeVariableUpdates().singleResult();
@@ -158,6 +165,7 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testEverything() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeTasks().includeActivities().includeComments().includeVariables()

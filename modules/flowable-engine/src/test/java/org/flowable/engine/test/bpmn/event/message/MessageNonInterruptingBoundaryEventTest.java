@@ -15,8 +15,8 @@ package org.flowable.engine.test.bpmn.event.message;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * 
@@ -24,13 +24,14 @@ import org.flowable.engine.test.Deployment;
  */
 public class MessageNonInterruptingBoundaryEventTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testSingleNonInterruptingBoundaryMessageEvent() {
         runtimeService.startProcessInstanceByKey("process");
 
         assertEquals(3, runtimeService.createExecutionQuery().count());
 
-        Task userTask = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
+        org.flowable.task.api.Task userTask = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
         assertNotNull(userTask);
 
         Execution execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();

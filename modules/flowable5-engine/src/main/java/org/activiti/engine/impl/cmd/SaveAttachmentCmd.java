@@ -21,7 +21,7 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.AttachmentEntity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.task.Attachment;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 
 /**
  * @author Tom Baeyens
@@ -35,6 +35,7 @@ public class SaveAttachmentCmd implements Command<Object>, Serializable {
         this.attachment = attachment;
     }
 
+    @Override
     public Object execute(CommandContext commandContext) {
         AttachmentEntity updateAttachment = commandContext
                 .getDbSqlSession()

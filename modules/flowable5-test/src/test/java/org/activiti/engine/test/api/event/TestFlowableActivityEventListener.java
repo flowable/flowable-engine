@@ -15,10 +15,10 @@ package org.activiti.engine.test.api.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 /**
  * Test event listener that only records events related to activities ({@link FlowableActivityEvent}s).
@@ -60,5 +60,15 @@ public class TestFlowableActivityEventListener implements FlowableEventListener 
     @Override
     public boolean isFailOnException() {
         return false;
+    }
+    
+    @Override
+    public boolean isFireOnTransactionLifecycleEvent() {
+        return false;
+    }
+
+    @Override
+    public String getOnTransaction() {
+        return null;
     }
 }

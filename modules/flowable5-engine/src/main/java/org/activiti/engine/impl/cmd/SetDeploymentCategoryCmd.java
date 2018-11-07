@@ -19,7 +19,7 @@ import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti.engine.repository.Deployment;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 
 /**
  * @author Tijs Rademakers
@@ -34,6 +34,7 @@ public class SetDeploymentCategoryCmd implements Command<Void> {
         this.category = category;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
 
         if (deploymentId == null) {

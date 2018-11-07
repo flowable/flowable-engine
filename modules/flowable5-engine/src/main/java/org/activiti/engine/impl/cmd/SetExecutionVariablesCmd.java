@@ -34,6 +34,7 @@ public class SetExecutionVariablesCmd extends NeedsActiveExecutionCmd<Object> {
         this.isLocal = isLocal;
     }
 
+    @Override
     protected Object execute(CommandContext commandContext, ExecutionEntity execution) {
         if (isLocal) {
             if (variables != null) {

@@ -13,19 +13,22 @@
 
 package org.flowable.standalone.interceptor;
 
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
  */
 public class CommandContextTest extends PluggableFlowableTestCase {
 
+    @Test
     public void testCommandContextGetCurrentAfterException() {
         try {
             processEngineConfiguration.getCommandExecutor().execute(new Command<Object>() {
+                @Override
                 public Object execute(CommandContext commandContext) {
                     throw new IllegalStateException("here i come!");
                 }

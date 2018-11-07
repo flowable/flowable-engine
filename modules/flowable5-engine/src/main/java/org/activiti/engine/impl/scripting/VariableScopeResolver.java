@@ -17,7 +17,7 @@ import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.pvm.runtime.ExecutionImpl;
-import org.flowable.engine.delegate.VariableScope;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * Bindings implementation using an {@link ExecutionImpl} as 'back-end'.
@@ -44,10 +44,12 @@ public class VariableScopeResolver implements Resolver {
         this.variableScope = variableScope;
     }
 
+    @Override
     public boolean containsKey(Object key) {
         return variableScopeKey.equals(key) || variableScope.hasVariable((String) key);
     }
 
+    @Override
     public Object get(Object key) {
         if (variableScopeKey.equals(key)) {
             return variableScope;

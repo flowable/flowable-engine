@@ -25,10 +25,12 @@ import org.flowable.engine.impl.bpmn.parser.BpmnParse;
  */
 public class SignalEventDefinitionParseHandler extends AbstractBpmnParseHandler<SignalEventDefinition> {
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return SignalEventDefinition.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, SignalEventDefinition signalDefinition) {
 
         Signal signal = null;

@@ -31,6 +31,7 @@ public class DeleteHistoricTaskInstanceCmd implements Command<Object>, Serializa
         this.taskId = taskId;
     }
 
+    @Override
     public Object execute(CommandContext commandContext) {
 
         if (taskId == null) {

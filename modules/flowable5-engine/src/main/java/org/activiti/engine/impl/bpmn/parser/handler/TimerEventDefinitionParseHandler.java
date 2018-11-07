@@ -34,7 +34,7 @@ import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.impl.jobexecutor.TimerDeclarationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,10 +48,12 @@ public class TimerEventDefinitionParseHandler extends AbstractBpmnParseHandler<T
 
     public static final String PROPERTYNAME_START_TIMER = "timerStart";
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return TimerEventDefinition.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, TimerEventDefinition timerEventDefinition) {
 
         ActivityImpl timerActivity = bpmnParse.getCurrentActivity();
@@ -70,7 +72,7 @@ public class TimerEventDefinitionParseHandler extends AbstractBpmnParseHandler<T
 
             List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) processDefinition.getProperty(PROPERTYNAME_START_TIMER);
             if (timerDeclarations == null) {
-                timerDeclarations = new ArrayList<TimerDeclarationImpl>();
+                timerDeclarations = new ArrayList<>();
                 processDefinition.setProperty(PROPERTYNAME_START_TIMER, timerDeclarations);
             }
             timerDeclarations.add(timerDeclaration);
@@ -165,7 +167,7 @@ public class TimerEventDefinitionParseHandler extends AbstractBpmnParseHandler<T
     protected void addTimerDeclaration(ScopeImpl scope, TimerDeclarationImpl timerDeclaration) {
         List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) scope.getProperty(PROPERTYNAME_TIMER_DECLARATION);
         if (timerDeclarations == null) {
-            timerDeclarations = new ArrayList<TimerDeclarationImpl>();
+            timerDeclarations = new ArrayList<>();
             scope.setProperty(PROPERTYNAME_TIMER_DECLARATION, timerDeclarations);
         }
         timerDeclarations.add(timerDeclaration);

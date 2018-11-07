@@ -109,7 +109,7 @@
   <resultMap id="variableInstanceResultMap" type="org.activiti.engine.impl.persistence.entity.VariableInstanceEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
-    <result property="type" column="TYPE_" javaType="org.flowable.variable.service.impl.types.VariableType" jdbcType="VARCHAR" />
+    <result property="type" column="TYPE_" javaType="org.flowable.variable.api.types.VariableType" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" javaType="String" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />

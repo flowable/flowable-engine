@@ -15,11 +15,11 @@ package org.activiti.engine.delegate.event.impl;
 import java.util.Map;
 
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
 
 /**
- * An {@link org.activiti5.engine.delegate.event.ActivitiCancelledEvent} implementation.
+ * An {@link org.activiti.engine.delegate.event.ActivitiCancelledEvent} implementation.
  *
  * @author martin.grofcik
  */

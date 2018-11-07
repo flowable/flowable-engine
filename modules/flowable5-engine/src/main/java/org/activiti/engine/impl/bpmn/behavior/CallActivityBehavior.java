@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,24 +28,25 @@ import org.activiti.engine.impl.pvm.PvmProcessInstance;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti.engine.impl.pvm.delegate.SubProcessActivityBehavior;
 import org.flowable.bpmn.model.MapExceptionEntry;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.impl.bpmn.data.AbstractDataAssociation;
 import org.flowable.engine.repository.ProcessDefinition;
 
 /**
  * Implementation of the BPMN 2.0 call activity (limited currently to calling a subprocess and not (yet) a global task).
- * 
+ *
  * @author Joram Barrez
  */
 public class CallActivityBehavior extends AbstractBpmnActivityBehavior implements SubProcessActivityBehavior {
 
     protected String processDefinitonKey;
-    private List<AbstractDataAssociation> dataInputAssociations = new ArrayList<AbstractDataAssociation>();
-    private List<AbstractDataAssociation> dataOutputAssociations = new ArrayList<AbstractDataAssociation>();
+    private List<AbstractDataAssociation> dataInputAssociations = new ArrayList<>();
+    private List<AbstractDataAssociation> dataOutputAssociations = new ArrayList<>();
     private Expression processDefinitionExpression;
     protected List<MapExceptionEntry> mapExceptions;
     protected boolean inheritVariables;
+    protected boolean sameDeployment;
 
     public CallActivityBehavior(String processDefinitionKey, List<MapExceptionEntry> mapExceptions) {
         this.processDefinitonKey = processDefinitionKey;
@@ -66,6 +67,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         this.dataOutputAssociations.add(dataOutputAssociation);
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
 
         String processDefinitonKey = this.processDefinitonKey;
@@ -76,10 +78,18 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         DeploymentManager deploymentManager = Context.getProcessEngineConfiguration().getDeploymentManager();
 
         ProcessDefinition processDefinition = null;
-        if (execution.getTenantId() == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(execution.getTenantId())) {
-            processDefinition = deploymentManager.findDeployedLatestProcessDefinitionByKey(processDefinitonKey);
-        } else {
-            processDefinition = deploymentManager.findDeployedLatestProcessDefinitionByKeyAndTenantId(processDefinitonKey, execution.getTenantId());
+
+        if(sameDeployment) {
+            String deploymentId = deploymentManager.findDeployedProcessDefinitionById(execution.getProcessDefinitionId()).getDeploymentId();
+            processDefinition = Context.getCommandContext().getProcessDefinitionEntityManager().findProcessDefinitionByDeploymentAndKey(deploymentId, processDefinitonKey);
+        }
+
+        if(processDefinition == null) {
+            if (execution.getTenantId() == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(execution.getTenantId())) {
+                processDefinition = deploymentManager.findDeployedLatestProcessDefinitionByKey(processDefinitonKey);
+            } else {
+                processDefinition = deploymentManager.findDeployedLatestProcessDefinitionByKeyAndTenantId(processDefinitonKey, execution.getTenantId());
+            }
         }
 
         // Do not start a process instance if the process definition is suspended
@@ -136,6 +146,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         }
     }
 
+    @Override
     public void completing(DelegateExecution execution, DelegateExecution subProcessInstance) throws Exception {
         // only data. no control flow available on this execution.
 
@@ -153,6 +164,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         }
     }
 
+    @Override
     public void completed(ActivityExecution execution) throws Exception {
         // only control flow. no sub process instance data available
         leave(execution);
@@ -168,6 +180,10 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
 
     public void setInheritVariables(boolean inheritVariables) {
         this.inheritVariables = inheritVariables;
+    }
+
+    public void setSameDeployment(boolean sameDeployment) {
+        this.sameDeployment = sameDeployment;
     }
 
 }

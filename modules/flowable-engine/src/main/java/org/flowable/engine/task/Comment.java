@@ -15,8 +15,8 @@ package org.flowable.engine.task;
 
 import java.util.Date;
 
+import org.flowable.common.engine.api.history.HistoricData;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.common.impl.history.HistoricData;
 
 /**
  * User comments that form discussions around tasks.
@@ -36,6 +36,7 @@ public interface Comment extends HistoricData {
     void setUserId(String userId);
 
     /** time and date when the user made the comment */
+    @Override
     Date getTime();
     
     void setTime(Date time);

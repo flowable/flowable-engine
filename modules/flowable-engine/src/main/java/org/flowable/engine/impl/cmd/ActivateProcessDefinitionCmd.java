@@ -14,9 +14,9 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Date;
 
+import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.flowable.engine.impl.persistence.entity.SuspensionState;
 import org.flowable.engine.runtime.ProcessInstance;
 
 /**
@@ -33,14 +33,17 @@ public class ActivateProcessDefinitionCmd extends AbstractSetProcessDefinitionSt
         super(processDefinitionId, processDefinitionKey, includeProcessInstances, executionDate, tenantId);
     }
 
+    @Override
     protected SuspensionState getProcessDefinitionSuspensionState() {
         return SuspensionState.ACTIVE;
     }
 
+    @Override
     protected String getDelayedExecutionJobHandlerType() {
         return TimerActivateProcessDefinitionHandler.TYPE;
     }
 
+    @Override
     protected AbstractSetProcessInstanceStateCmd getProcessInstanceChangeStateCmd(ProcessInstance processInstance) {
         return new ActivateProcessInstanceCmd(processInstance.getId());
     }

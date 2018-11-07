@@ -16,8 +16,8 @@ package org.flowable.spring.test.autodeployment;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -27,23 +27,24 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipInputStream;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.spring.configurator.SingleResourceAutoDeploymentStrategy;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.core.io.Resource;
 
 /**
  * @author Tiese Barrell
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class SingleResourceAutoDeploymentStrategyTest extends AbstractAutoDeploymentStrategyTest {
 
     private SingleResourceAutoDeploymentStrategy classUnderTest;
 
     @Before
+    @Override
     public void before() throws Exception {
         super.before();
         classUnderTest = new SingleResourceAutoDeploymentStrategy();
@@ -87,14 +88,6 @@ public class SingleResourceAutoDeploymentStrategyTest extends AbstractAutoDeploy
         verify(deploymentBuilderMock, never()).addInputStream(eq(resourceName2), isA(InputStream.class));
         verify(deploymentBuilderMock, never()).addZipInputStream(isA(ZipInputStream.class));
         verify(deploymentBuilderMock, never()).deploy();
-    }
-
-    @Test(expected = FlowableException.class)
-    public void testDeployResourcesIOExceptionYieldsActivitiException() throws Exception {
-        when(resourceMock3.getInputStream()).thenThrow(new IOException());
-
-        final Resource[] resources = new Resource[] { resourceMock3 };
-        classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
     }
 
 }

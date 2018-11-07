@@ -17,13 +17,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * @author Frederik Heremans
  */
-public class HistoricIdentityLinkEntityImpl extends AbstractEntityNoRevision implements HistoricIdentityLinkEntity, Serializable {
+public class HistoricIdentityLinkEntityImpl extends AbstractIdentityLinkServiceNoRevisionEntity implements HistoricIdentityLinkEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -32,12 +31,16 @@ public class HistoricIdentityLinkEntityImpl extends AbstractEntityNoRevision imp
     protected String groupId;
     protected String taskId;
     protected String processInstanceId;
+    protected String scopeId;
+    protected String scopeType;
+    protected String scopeDefinitionId;
     protected Date createTime;
 
     public HistoricIdentityLinkEntityImpl() {
 
     }
 
+    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("id", this.id);
@@ -58,6 +61,18 @@ public class HistoricIdentityLinkEntityImpl extends AbstractEntityNoRevision imp
         if (this.processInstanceId != null) {
             persistentState.put("processInstanceId", this.processInstanceId);
         }
+        
+        if (this.scopeId != null) {
+            persistentState.put("scopeId", this.scopeId);
+        }
+        
+        if (this.scopeType!= null) {
+            persistentState.put("scopeType", this.scopeType);
+        }
+        
+        if (this.scopeDefinitionId != null) {
+            persistentState.put("scopeDefinitionId", this.scopeDefinitionId);
+        }
 
         if (this.createTime != null) {
             persistentState.put("createTime", this.createTime);
@@ -66,26 +81,32 @@ public class HistoricIdentityLinkEntityImpl extends AbstractEntityNoRevision imp
         return persistentState;
     }
 
+    @Override
     public boolean isUser() {
         return userId != null;
     }
 
+    @Override
     public boolean isGroup() {
         return groupId != null;
     }
 
+    @Override
     public String getType() {
         return type;
     }
 
+    @Override
     public void setType(String type) {
         this.type = type;
     }
 
+    @Override
     public String getUserId() {
         return userId;
     }
 
+    @Override
     public void setUserId(String userId) {
         if (this.groupId != null && userId != null) {
             throw new FlowableException("Cannot assign a userId to a task assignment that already has a groupId");
@@ -93,10 +114,12 @@ public class HistoricIdentityLinkEntityImpl extends AbstractEntityNoRevision imp
         this.userId = userId;
     }
 
+    @Override
     public String getGroupId() {
         return groupId;
     }
 
+    @Override
     public void setGroupId(String groupId) {
         if (this.userId != null && groupId != null) {
             throw new FlowableException("Cannot assign a groupId to a task assignment that already has a userId");
@@ -104,20 +127,54 @@ public class HistoricIdentityLinkEntityImpl extends AbstractEntityNoRevision imp
         this.groupId = groupId;
     }
 
+    @Override
     public String getTaskId() {
         return taskId;
     }
 
+    @Override
     public void setTaskId(String taskId) {
         this.taskId = taskId;
     }
 
+    @Override
     public String getProcessInstanceId() {
         return processInstanceId;
     }
 
+    @Override
     public void setProcessInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
+    }
+    
+    @Override
+    public String getScopeId() {
+        return this.scopeId;
+    }
+    
+    @Override
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    @Override
+    public String getScopeType() {
+        return this.scopeType;
+    }
+    
+    @Override
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
+    @Override
+    public String getScopeDefinitionId() {
+        return this.scopeDefinitionId;
+    }
+
+    @Override
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
     }
 
     @Override

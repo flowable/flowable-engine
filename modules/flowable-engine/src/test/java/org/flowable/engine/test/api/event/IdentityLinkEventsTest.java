@@ -12,15 +12,17 @@
  */
 package org.flowable.engine.test.api.event;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
-import org.flowable.identitylink.service.IdentityLink;
-import org.flowable.identitylink.service.event.FlowableIdentityLinkServiceEntityEvent;
-import org.flowable.identitylink.service.event.FlowableIdentityLinkServiceEventType;
+import org.flowable.identitylink.api.IdentityLink;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case for all {@link FlowableEvent}s related to process definitions.
@@ -34,6 +36,7 @@ public class IdentityLinkEventsTest extends PluggableFlowableTestCase {
     /**
      * Check identity links on process definitions.
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testProcessDefinitionIdentityLinkEvents() throws Exception {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").singleResult();
@@ -45,34 +48,34 @@ public class IdentityLinkEventsTest extends PluggableFlowableTestCase {
         repositoryService.addCandidateStarterGroup(processDefinition.getId(), "sales");
         assertEquals(4, listener.getEventsReceived().size());
 
-        FlowableIdentityLinkServiceEntityEvent event = (FlowableIdentityLinkServiceEntityEvent) listener.getEventsReceived().get(0);
-        assertEquals(FlowableIdentityLinkServiceEventType.ENTITY_CREATED, event.getType());
+        FlowableEntityEvent event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
+        assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
         assertTrue(event.getEntity() instanceof IdentityLink);
         assertEquals(processDefinition.getId(), ((IdentityLink) event.getEntity()).getProcessDefinitionId());
 
-        event = (FlowableIdentityLinkServiceEntityEvent) listener.getEventsReceived().get(1);
-        assertEquals(FlowableIdentityLinkServiceEventType.ENTITY_INITIALIZED, event.getType());
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(1);
+        assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
 
-        event = (FlowableIdentityLinkServiceEntityEvent) listener.getEventsReceived().get(2);
-        assertEquals(FlowableIdentityLinkServiceEventType.ENTITY_CREATED, event.getType());
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(2);
+        assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
         assertTrue(event.getEntity() instanceof IdentityLink);
         assertEquals(processDefinition.getId(), ((IdentityLink) event.getEntity()).getProcessDefinitionId());
 
-        event = (FlowableIdentityLinkServiceEntityEvent) listener.getEventsReceived().get(3);
-        assertEquals(FlowableIdentityLinkServiceEventType.ENTITY_INITIALIZED, event.getType());
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(3);
+        assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
         listener.clearEventsReceived();
 
         // Delete identity links
         repositoryService.deleteCandidateStarterUser(processDefinition.getId(), "kermit");
         repositoryService.deleteCandidateStarterGroup(processDefinition.getId(), "sales");
         assertEquals(2, listener.getEventsReceived().size());
-        event = (FlowableIdentityLinkServiceEntityEvent) listener.getEventsReceived().get(0);
-        assertEquals(FlowableIdentityLinkServiceEventType.ENTITY_DELETED, event.getType());
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
+        assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
         assertTrue(event.getEntity() instanceof IdentityLink);
         assertEquals(processDefinition.getId(), ((IdentityLink) event.getEntity()).getProcessDefinitionId());
         
-        event = (FlowableIdentityLinkServiceEntityEvent) listener.getEventsReceived().get(1);
-        assertEquals(FlowableIdentityLinkServiceEventType.ENTITY_DELETED, event.getType());
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(1);
+        assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
         assertTrue(event.getEntity() instanceof IdentityLink);
         assertEquals(processDefinition.getId(), ((IdentityLink) event.getEntity()).getProcessDefinitionId());
     }
@@ -80,6 +83,7 @@ public class IdentityLinkEventsTest extends PluggableFlowableTestCase {
     /**
      * Check identity links on process instances.
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testProcessInstanceIdentityLinkEvents() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -88,16 +92,16 @@ public class IdentityLinkEventsTest extends PluggableFlowableTestCase {
         runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", "test");
         assertEquals(2, listener.getEventsReceived().size());
 
-        FlowableIdentityLinkServiceEntityEvent event = (FlowableIdentityLinkServiceEntityEvent) listener.getEventsReceived().get(0);
-        assertEquals(FlowableIdentityLinkServiceEventType.ENTITY_CREATED, event.getType());
+        FlowableEntityEvent event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
+        assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
         assertTrue(event.getEntity() instanceof IdentityLink);
         IdentityLink link = (IdentityLink) event.getEntity();
         assertEquals(processInstance.getId(), link.getProcessInstanceId());
         assertEquals("kermit", link.getUserId());
         assertEquals("test", link.getType());
 
-        event = (FlowableIdentityLinkServiceEntityEvent) listener.getEventsReceived().get(1);
-        assertEquals(FlowableIdentityLinkServiceEventType.ENTITY_INITIALIZED, event.getType());
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(1);
+        assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
 
         listener.clearEventsReceived();
 
@@ -105,24 +109,25 @@ public class IdentityLinkEventsTest extends PluggableFlowableTestCase {
         runtimeService.deleteProcessInstance(processInstance.getId(), "test");
         assertEquals(1, listener.getEventsReceived().size());
 
-        event = (FlowableIdentityLinkServiceEntityEvent) listener.getEventsReceived().get(0);
-        assertEquals(FlowableIdentityLinkServiceEventType.ENTITY_DELETED, event.getType());
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
+        assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
         assertTrue(event.getEntity() instanceof IdentityLink);
         link = (IdentityLink) event.getEntity();
         assertEquals("kermit", link.getUserId());
         assertEquals("test", link.getType());
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
     }
 
     /**
      * Check identity links on process instances.
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testTaskIdentityLinks() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         // Add identity link
@@ -133,29 +138,29 @@ public class IdentityLinkEventsTest extends PluggableFlowableTestCase {
         // creates an involvement in the process
         assertEquals(6, listener.getEventsReceived().size());
 
-        FlowableIdentityLinkServiceEntityEvent event = (FlowableIdentityLinkServiceEntityEvent) listener.getEventsReceived().get(0);
-        assertEquals(FlowableIdentityLinkServiceEventType.ENTITY_CREATED, event.getType());
+        FlowableEntityEvent event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
+        assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
         assertTrue(event.getEntity() instanceof IdentityLink);
         IdentityLink link = (IdentityLink) event.getEntity();
         assertEquals("kermit", link.getUserId());
         assertEquals("candidate", link.getType());
         assertEquals(task.getId(), link.getTaskId());
 
-        event = (FlowableIdentityLinkServiceEntityEvent) listener.getEventsReceived().get(1);
-        assertEquals(FlowableIdentityLinkServiceEventType.ENTITY_INITIALIZED, event.getType());
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(1);
+        assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
         assertEquals("kermit", link.getUserId());
         assertEquals("candidate", link.getType());
 
-        event = (FlowableIdentityLinkServiceEntityEvent) listener.getEventsReceived().get(4);
-        assertEquals(FlowableIdentityLinkServiceEventType.ENTITY_CREATED, event.getType());
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(4);
+        assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
         assertTrue(event.getEntity() instanceof IdentityLink);
         link = (IdentityLink) event.getEntity();
         assertEquals("sales", link.getGroupId());
         assertEquals("candidate", link.getType());
         assertEquals(task.getId(), link.getTaskId());
         
-        event = (FlowableIdentityLinkServiceEntityEvent) listener.getEventsReceived().get(5);
-        assertEquals(FlowableIdentityLinkServiceEventType.ENTITY_INITIALIZED, event.getType());
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(5);
+        assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
         assertEquals("sales", link.getGroupId());
         assertEquals("candidate", link.getType());
 
@@ -165,25 +170,26 @@ public class IdentityLinkEventsTest extends PluggableFlowableTestCase {
         runtimeService.deleteProcessInstance(processInstance.getId(), "test");
         assertEquals(3, listener.getEventsReceived().size());
 
-        event = (FlowableIdentityLinkServiceEntityEvent) listener.getEventsReceived().get(0);
-        assertEquals(FlowableIdentityLinkServiceEventType.ENTITY_DELETED, event.getType());
-        event = (FlowableIdentityLinkServiceEntityEvent) listener.getEventsReceived().get(1);
-        assertEquals(FlowableIdentityLinkServiceEventType.ENTITY_DELETED, event.getType());
-        event = (FlowableIdentityLinkServiceEntityEvent) listener.getEventsReceived().get(2);
-        assertEquals(FlowableIdentityLinkServiceEventType.ENTITY_DELETED, event.getType());
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
+        assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(1);
+        assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(2);
+        assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
     }
 
     /**
      * Check deletion of links on process instances.
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testProcessInstanceIdentityDeleteCandidateGroupEvents() throws Exception {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         // Add identity link
@@ -202,17 +208,15 @@ public class IdentityLinkEventsTest extends PluggableFlowableTestCase {
         assertEquals(1, listener.getEventsReceived().size());
     }
 
-    @Override
-    protected void initializeServices() {
-        super.initializeServices();
+    @BeforeEach
+    protected void setUp() {
 
         listener = new TestFlowableEntityEventListener(IdentityLink.class);
         processEngineConfiguration.getEventDispatcher().addEventListener(listener);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
-        super.tearDown();
 
         if (listener != null) {
             listener.clearEventsReceived();

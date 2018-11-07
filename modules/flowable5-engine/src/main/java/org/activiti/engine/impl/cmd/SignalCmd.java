@@ -43,6 +43,7 @@ public class SignalCmd extends NeedsActiveExecutionCmd<Object> {
         this.transientVariables = transientVariables;
     }
 
+    @Override
     protected Object execute(CommandContext commandContext, ExecutionEntity execution) {
         if (processVariables != null) {
             execution.setVariables(processVariables);

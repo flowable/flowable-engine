@@ -14,7 +14,7 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Map;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.Flowable5Util;
@@ -36,6 +36,7 @@ public class SetExecutionVariablesCmd extends NeedsActiveExecutionCmd<Object> {
         this.isLocal = isLocal;
     }
 
+    @Override
     protected Object execute(CommandContext commandContext, ExecutionEntity execution) {
 
         if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {

@@ -17,17 +17,20 @@ import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 public class IntermediateNoneEventTest extends PluggableFlowableTestCase {
 
     private static boolean listenerExecuted;
 
     public static class MyExecutionListener implements ExecutionListener {
+        @Override
         public void notify(DelegateExecution execution) {
             listenerExecuted = true;
         }
     }
 
+    @Test
     @Deployment
     public void testIntermediateNoneTimerEvent() throws Exception {
         assertFalse(listenerExecuted);

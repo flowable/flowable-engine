@@ -14,6 +14,7 @@
 package org.flowable.rest.service.api.repository;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * @author Frederik Heremans
@@ -36,6 +37,7 @@ public class ModelRequest {
     protected boolean deploymentChanged;
     protected boolean tenantChanged;
 
+    @ApiModelProperty(example = "Model name")
     public String getName() {
         return name;
     }
@@ -45,6 +47,7 @@ public class ModelRequest {
         this.nameChanged = true;
     }
 
+    @ApiModelProperty(example = "Model key")
     public String getKey() {
         return key;
     }
@@ -54,6 +57,7 @@ public class ModelRequest {
         this.keyChanged = true;
     }
 
+    @ApiModelProperty(example = "Model category")
     public String getCategory() {
         return category;
     }
@@ -63,6 +67,7 @@ public class ModelRequest {
         this.categoryChanged = true;
     }
 
+    @ApiModelProperty(example = "2")
     public Integer getVersion() {
         return version;
     }
@@ -72,6 +77,7 @@ public class ModelRequest {
         this.versionChanged = true;
     }
 
+    @ApiModelProperty(example = "Model metainfo")
     public String getMetaInfo() {
         return metaInfo;
     }
@@ -81,6 +87,7 @@ public class ModelRequest {
         this.metaInfoChanged = true;
     }
 
+    @ApiModelProperty(example = "7")
     public String getDeploymentId() {
         return deploymentId;
     }
@@ -95,6 +102,7 @@ public class ModelRequest {
         this.tenantId = tenantId;
     }
 
+    @ApiModelProperty(example = "null")
     public String getTenantId() {
         return tenantId;
     }

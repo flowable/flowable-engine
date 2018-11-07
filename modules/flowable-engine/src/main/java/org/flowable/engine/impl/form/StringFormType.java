@@ -22,6 +22,7 @@ public class StringFormType extends AbstractFormType {
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public String getName() {
         return "string";
     }
@@ -30,10 +31,12 @@ public class StringFormType extends AbstractFormType {
         return "text/plain";
     }
 
+    @Override
     public Object convertFormValueToModelValue(String propertyValue) {
         return propertyValue;
     }
 
+    @Override
     public String convertModelValueToFormValue(Object modelValue) {
         return (String) modelValue;
     }

@@ -19,8 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.FormDeploymentQueryImpl;
@@ -42,6 +42,7 @@ public class DeployCmd<T> implements Command<FormDeployment>, Serializable {
         this.deploymentBuilder = deploymentBuilder;
     }
 
+    @Override
     public FormDeployment execute(CommandContext commandContext) {
 
         FormDeploymentEntity deployment = deploymentBuilder.getDeployment();

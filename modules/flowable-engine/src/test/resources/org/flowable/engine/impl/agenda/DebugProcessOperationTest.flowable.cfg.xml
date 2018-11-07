@@ -21,12 +21,17 @@
         <bean class="org.flowable.engine.impl.event.BreakpointJobHandler"/>
       </list>
     </property>
+    <property name="customAsyncRunnableExecutionExceptionHandlers">
+      <list>
+        <bean class="org.flowable.job.service.impl.asyncexecutor.DefaultDebuggerExecutionExceptionHandler"/>
+      </list>
+    </property>
   </bean>
 
   <bean id="debugAgenda" class="org.flowable.engine.impl.agenda.DebugFlowableEngineAgendaFactory">
     <property name="debugger" ref="processDebugger"/>
   </bean>
 
-  <bean id="processDebugger" class="org.flowable.engine.impl.agenda.TestProcessDebugger"/>
+  <bean id="processDebugger" class="org.flowable.engine.test.debugger.TestProcessDebugger"/>
 
 </beans>

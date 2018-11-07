@@ -125,5 +125,29 @@
 			referencedColumnNames="id" referencedTableName="ACT_DE_MODEL" />
 			
 	</changeSet>
+    
+    <!-- 
+        Bugfix: saving a model multiple times can sometimes give a conflict exception on sql server 
+        due to the precision storage of the datetime data type. The datetime2 type has a better precision. 
+    -->
+    <changeSet id="2" author="flowable" dbms="mssql">
+    
+        <modifyDataType tableName="ACT_DE_MODEL" columnName="created" newDataType="datetime2" />
+        <modifyDataType tableName="ACT_DE_MODEL" columnName="last_updated" newDataType="datetime2" />
+        
+        <modifyDataType tableName="ACT_DE_MODEL_HISTORY" columnName="created" newDataType="datetime2" />
+        <modifyDataType tableName="ACT_DE_MODEL_HISTORY" columnName="last_updated" newDataType="datetime2" />
+        <modifyDataType tableName="ACT_DE_MODEL_HISTORY" columnName="removal_date" newDataType="datetime2" />
+        
+    </changeSet>
+
+    <changeSet id="3" author="flowable">
+        <addColumn tableName="ACT_DE_MODEL">
+            <column  name="tenant_id" type="varchar(255)" />
+        </addColumn>
+        <addColumn tableName="ACT_DE_MODEL_HISTORY">
+            <column  name="tenant_id" type="varchar(255)" />
+        </addColumn>
+    </changeSet>
 
 </databaseChangeLog>

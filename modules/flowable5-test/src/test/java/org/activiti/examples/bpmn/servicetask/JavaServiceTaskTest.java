@@ -17,14 +17,13 @@ import java.util.Map;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
-import org.flowable.engine.common.api.FlowableClassLoadingException;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableClassLoadingException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
 
 /**
  * @author Joram Barrez
@@ -186,7 +185,7 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
         // and takes sequence flow to user task
         vars.put("var", "throw-exception");
         runtimeService.startProcessInstanceByKey("exceptionHandling", vars);
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Fix Exception", task.getName());
     }
 

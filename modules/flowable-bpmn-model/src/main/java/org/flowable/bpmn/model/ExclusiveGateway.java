@@ -17,6 +17,7 @@ package org.flowable.bpmn.model;
  */
 public class ExclusiveGateway extends Gateway {
 
+    @Override
     public ExclusiveGateway clone() {
         ExclusiveGateway clone = new ExclusiveGateway();
         clone.setValues(this);

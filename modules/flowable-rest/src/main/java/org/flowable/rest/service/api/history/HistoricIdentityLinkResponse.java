@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.history;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * @author Tijs Rademakers
  */
@@ -26,6 +28,7 @@ public class HistoricIdentityLinkResponse {
     protected String processInstanceId;
     protected String processInstanceUrl;
 
+    @ApiModelProperty(example = "participant")
     public String getType() {
         return type;
     }
@@ -34,6 +37,7 @@ public class HistoricIdentityLinkResponse {
         this.type = type;
     }
 
+    @ApiModelProperty(example = "kermit")
     public String getUserId() {
         return userId;
     }
@@ -42,6 +46,7 @@ public class HistoricIdentityLinkResponse {
         this.userId = userId;
     }
 
+    @ApiModelProperty(example = "sales")
     public String getGroupId() {
         return groupId;
     }
@@ -50,6 +55,7 @@ public class HistoricIdentityLinkResponse {
         this.groupId = groupId;
     }
 
+    @ApiModelProperty(example = "null")
     public String getTaskId() {
         return taskId;
     }
@@ -58,6 +64,7 @@ public class HistoricIdentityLinkResponse {
         this.taskId = taskId;
     }
 
+    @ApiModelProperty(example = "null")
     public String getTaskUrl() {
         return taskUrl;
     }
@@ -66,6 +73,7 @@ public class HistoricIdentityLinkResponse {
         this.taskUrl = taskUrl;
     }
 
+    @ApiModelProperty(example = "5")
     public String getProcessInstanceId() {
         return processInstanceId;
     }
@@ -74,6 +82,7 @@ public class HistoricIdentityLinkResponse {
         this.processInstanceId = processInstanceId;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/history/historic-process-instances/5")
     public String getProcessInstanceUrl() {
         return processInstanceUrl;
     }

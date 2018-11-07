@@ -16,8 +16,8 @@ package org.flowable.idm.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.idm.engine.impl.persistence.entity.IdentityInfoEntity;
 import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
@@ -42,6 +42,7 @@ public class SetUserInfoCmd implements Command<Object>, Serializable {
         this.value = value;
     }
 
+    @Override
     public Object execute(CommandContext commandContext) {
         CommandContextUtil.getIdentityInfoEntityManager(commandContext).updateUserInfo(userId, userPassword, type, key, value, accountPassword, accountDetails);
         return null;

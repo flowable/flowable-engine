@@ -27,7 +27,7 @@ import org.flowable.engine.repository.ProcessDefinition;
  */
 public interface FormHandler extends Serializable {
 
-    ThreadLocal<FormHandler> current = new ThreadLocal<FormHandler>();
+    ThreadLocal<FormHandler> current = new ThreadLocal<>();
 
     void parseConfiguration(List<FormProperty> formProperties, String formKey, DeploymentEntity deployment, ProcessDefinition processDefinition);
 

@@ -18,6 +18,9 @@ import java.util.Map;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class InclusiveGatewayDefaultFlowTest extends PluggableFlowableTestCase {
 
@@ -25,18 +28,19 @@ public class InclusiveGatewayDefaultFlowTest extends PluggableFlowableTestCase {
 
     private String deploymentId;
 
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         deploymentId = repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/engine/test/bpmn/gateway/InclusiveGatewayTest.defaultFlowTest.bpmn20.xml")
                 .deploy().getId();
     }
 
+    @AfterEach
     protected void tearDown() throws Exception {
         repositoryService.deleteDeployment(deploymentId, true);
-        super.tearDown();
     }
 
+    @Test
     public void testDefaultFlowOnly() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("usertask1").singleResult();
@@ -44,6 +48,7 @@ public class InclusiveGatewayDefaultFlowTest extends PluggableFlowableTestCase {
         assertEquals("usertask1", execution.getActivityId());
     }
 
+    @Test
     public void testCompatibleConditionFlow() {
         Map<String, Object> variables = new HashMap<>();
         variables.put("var1", "true");

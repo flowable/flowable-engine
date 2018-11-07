@@ -27,6 +27,7 @@ public class ErrorEventDefinition extends EventDefinition {
         this.errorCode = errorCode;
     }
 
+    @Override
     public ErrorEventDefinition clone() {
         ErrorEventDefinition clone = new ErrorEventDefinition();
         clone.setValues(this);

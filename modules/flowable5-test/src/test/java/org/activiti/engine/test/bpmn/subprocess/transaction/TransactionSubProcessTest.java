@@ -16,13 +16,12 @@ package org.activiti.engine.test.bpmn.subprocess.transaction;
 import java.util.List;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.EventSubscriptionQuery;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -40,7 +39,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         assertEquals(1, createEventSubscriptionQuery().eventType("compensate").activityId("undoBookFlight").count());
 
         // the task is present:
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
 
         // making the tx succeed:
@@ -87,7 +86,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         assertEquals(1, createEventSubscriptionQuery().eventType("compensate").activityId("undoBookFlight").count());
 
         // the task is present:
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
 
         // making the tx fail:
@@ -138,7 +137,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         assertEquals(1, createEventSubscriptionQuery().eventType("compensate").activityId("undoBookFlight").count());
 
         // the task is present:
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
 
         // making the tx fail:
@@ -185,8 +184,8 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         assertEquals(1, createEventSubscriptionQuery().eventType("compensate").activityId("innerTxundoBookFlight").count());
 
         // the tasks are present:
-        Task taskInner = taskService.createTaskQuery().taskDefinitionKey("innerTxaskCustomer").singleResult();
-        Task taskOuter = taskService.createTaskQuery().taskDefinitionKey("bookFlight").singleResult();
+        org.flowable.task.api.Task taskInner = taskService.createTaskQuery().taskDefinitionKey("innerTxaskCustomer").singleResult();
+        org.flowable.task.api.Task taskOuter = taskService.createTaskQuery().taskDefinitionKey("bookFlight").singleResult();
         assertNotNull(taskInner);
         assertNotNull(taskOuter);
 
@@ -242,8 +241,8 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         assertEquals(1, createEventSubscriptionQuery().eventType("compensate").activityId("innerTxundoBookFlight").count());
 
         // the tasks are present:
-        Task taskInner = taskService.createTaskQuery().taskDefinitionKey("innerTxaskCustomer").singleResult();
-        Task taskOuter = taskService.createTaskQuery().taskDefinitionKey("bookFlight").singleResult();
+        org.flowable.task.api.Task taskInner = taskService.createTaskQuery().taskDefinitionKey("innerTxaskCustomer").singleResult();
+        org.flowable.task.api.Task taskOuter = taskService.createTaskQuery().taskDefinitionKey("bookFlight").singleResult();
         assertNotNull(taskInner);
         assertNotNull(taskOuter);
 
@@ -301,7 +300,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
             }
         }
 
-        Task task = taskService.createTaskQuery().listPage(0, 1).get(0);
+        org.flowable.task.api.Task task = taskService.createTaskQuery().listPage(0, 1).get(0);
 
         // canceling one instance triggers compensation for all other instances:
         taskService.setVariable(task.getId(), "confirmed", false);
@@ -340,8 +339,8 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         }
 
         // first complete the inner user-tasks
-        List<Task> tasks = taskService.createTaskQuery().list();
-        for (Task task : tasks) {
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
+        for (org.flowable.task.api.Task task : tasks) {
             taskService.setVariable(task.getId(), "confirmed", true);
             taskService.complete(task.getId());
         }
@@ -415,7 +414,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TransactionSubProcessTest");
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.setVariable(task.getId(), "confirmed", false);
 
         taskService.complete(task.getId());

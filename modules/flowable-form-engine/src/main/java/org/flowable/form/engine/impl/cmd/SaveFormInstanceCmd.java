@@ -15,24 +15,33 @@ package org.flowable.form.engine.impl.cmd;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormInstance;
 import org.flowable.form.api.FormInstanceQuery;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.persistence.entity.FormInstanceEntity;
-import org.flowable.form.model.FormModel;
 
 public class SaveFormInstanceCmd extends AbstractSaveFormInstanceCmd {
 
     private static final long serialVersionUID = 1L;
 
-    public SaveFormInstanceCmd(FormModel formModel, Map<String, Object> variables, String taskId, String processInstanceId) {
-        super(formModel, variables, taskId, processInstanceId);
+    public SaveFormInstanceCmd(FormInfo formInfo, Map<String, Object> variables, String taskId, String processInstanceId, String processDefinitionId) {
+        super(formInfo, variables, taskId, processInstanceId, processDefinitionId);
     }
 
-    public SaveFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String processInstanceId) {
-        super(formModelId, variables, taskId, processInstanceId);
+    public SaveFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String processInstanceId, String processDefinitionId) {
+        super(formModelId, variables, taskId, processInstanceId, processDefinitionId);
+    }
+    
+    public SaveFormInstanceCmd(FormInfo formInfo, Map<String, Object> variables, String taskId, String scopeId, String scopeType, String scopeDefinitionId) {
+        super(formInfo, variables, taskId, scopeId, scopeType, scopeDefinitionId);
     }
 
+    public SaveFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String scopeId, String scopeType, String scopeDefinitionId) {
+        super(formModelId, variables, taskId, scopeId, scopeType, scopeDefinitionId);
+    }
+
+    @Override
     protected FormInstanceEntity findExistingFormInstance(FormEngineConfiguration formEngineConfiguration) {
 
         if (taskId == null) {
@@ -41,7 +50,7 @@ public class SaveFormInstanceCmd extends AbstractSaveFormInstanceCmd {
         }
 
         FormInstanceQuery formInstanceQuery =
-                formEngineConfiguration.getFormService().createFormInstanceQuery().formDefinitionId(formModel.getId()).taskId(taskId);
+                formEngineConfiguration.getFormService().createFormInstanceQuery().formDefinitionId(formInfo.getId()).taskId(taskId);
 
         List<FormInstance> formInstances = formInstanceQuery.orderBySubmittedDate().desc().list();
 

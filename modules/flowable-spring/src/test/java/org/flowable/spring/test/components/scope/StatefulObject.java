@@ -101,6 +101,7 @@ public class StatefulObject implements Serializable, InitializingBean {
         this.name = name;
     }
 
+    @Override
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(this.processInstance, "the processInstance should be equal to the currently active processInstance!");
         LOGGER.info("the 'processInstance' property is non-null: PI ID#{}", this.processInstance.getId());

@@ -18,13 +18,13 @@ import java.util.Map;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.MembershipEntity;
 import org.flowable.idm.engine.impl.persistence.entity.MembershipEntityImpl;
-import org.flowable.idm.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.idm.engine.impl.persistence.entity.data.AbstractIdmDataManager;
 import org.flowable.idm.engine.impl.persistence.entity.data.MembershipDataManager;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisMembershipDataManager extends AbstractDataManager<MembershipEntity> implements MembershipDataManager {
+public class MybatisMembershipDataManager extends AbstractIdmDataManager<MembershipEntity> implements MembershipDataManager {
 
     public MybatisMembershipDataManager(IdmEngineConfiguration idmEngineConfiguration) {
         super(idmEngineConfiguration);
@@ -45,17 +45,17 @@ public class MybatisMembershipDataManager extends AbstractDataManager<Membership
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("userId", userId);
         parameters.put("groupId", groupId);
-        getDbSqlSession().delete("deleteMembership", parameters);
+        getDbSqlSession().delete("deleteMembership", parameters, getManagedEntityClass());
     }
 
     @Override
     public void deleteMembershipByGroupId(String groupId) {
-        getDbSqlSession().delete("deleteMembershipsByGroupId", groupId);
+        getDbSqlSession().delete("deleteMembershipsByGroupId", groupId, getManagedEntityClass());
     }
 
     @Override
     public void deleteMembershipByUserId(String userId) {
-        getDbSqlSession().delete("deleteMembershipsByUserId", userId);
+        getDbSqlSession().delete("deleteMembershipsByUserId", userId, getManagedEntityClass());
     }
 
 }

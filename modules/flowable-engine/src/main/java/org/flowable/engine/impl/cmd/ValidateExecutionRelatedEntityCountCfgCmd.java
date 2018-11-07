@@ -12,8 +12,8 @@
  */
 package org.flowable.engine.impl.cmd;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.engine.impl.persistence.entity.PropertyEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -35,11 +35,19 @@ public class ValidateExecutionRelatedEntityCountCfgCmd implements Command<Void> 
         /*
          * If execution related entity counting is on in config | Current property in database : Result
          * 
-         * A) true | not there : write new property with value 'true' B) true | true : all good C) true | false : the feature was disabled before, but it is enabled now. Old executions will have a
+         * A) true | not there : write new property with value 'true' 
+         * 
+         * B) true | true : all good 
+         * 
+         * C) true | false : the feature was disabled before, but it is enabled now. Old executions will have a
          * local flag with false. It is now enabled. This is fine, will be handled in logic. Update the property.
          * 
-         * D) false | not there: write new property with value 'false' E) false | true : the feature was disabled before and enabled now. To guarantee data consistency, we need to remove the flag from
-         * all executions. Update the property. F) false | false : all good
+         * D) false | not there: write new property with value 'false' 
+         * 
+         * E) false | true : the feature was disabled before and enabled now. 
+         * To guarantee data consistency, we need to remove the flag from all executions. Update the property. 
+         * 
+         * F) false | false : all good
          * 
          * In case A and D (not there), the property needs to be written to the db Only in case E something needs to be done explicitly, the others are okay.
          */

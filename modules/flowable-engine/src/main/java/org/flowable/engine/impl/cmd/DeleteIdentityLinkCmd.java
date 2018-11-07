@@ -13,14 +13,15 @@
 
 package org.flowable.engine.impl.cmd;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.IdentityLinkUtil;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.engine.impl.util.TaskHelper;
+import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Tom Baeyens
@@ -70,6 +71,7 @@ public class DeleteIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
         }
     }
 
+    @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
         if (task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
             Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
@@ -78,14 +80,14 @@ public class DeleteIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
         }
 
         if (IdentityLinkType.ASSIGNEE.equals(type)) {
-            CommandContextUtil.getTaskEntityManager(commandContext).changeTaskAssignee(task, null);
+            TaskHelper.changeTaskAssignee(task, null);
         } else if (IdentityLinkType.OWNER.equals(type)) {
-            CommandContextUtil.getTaskEntityManager(commandContext).changeTaskOwner(task, null);
+            TaskHelper.changeTaskOwner(task, null);
         } else {
             IdentityLinkUtil.deleteTaskIdentityLinks(task, userId, groupId, type);
         }
 
-        CommandContextUtil.getHistoryManager(commandContext).createIdentityLinkComment(taskId, userId, groupId, type, false);
+        CommandContextUtil.getHistoryManager(commandContext).createIdentityLinkComment(task, userId, groupId, type, false);
 
         return null;
     }

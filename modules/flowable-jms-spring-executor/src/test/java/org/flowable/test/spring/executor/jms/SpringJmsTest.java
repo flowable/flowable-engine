@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 import javax.jms.ConnectionFactory;
 
 import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
+import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.spring.impl.test.CleanTestExecutionListener;
 import org.flowable.test.spring.executor.jms.config.SpringJmsConfig;
 import org.junit.Assert;
@@ -59,6 +59,7 @@ public class SpringJmsTest {
 
         // Wait until the process is completely finished
         Awaitility.waitAtMost(1, TimeUnit.MINUTES).pollInterval(500, TimeUnit.MILLISECONDS).until(new Callable<Boolean>() {
+            @Override
             public Boolean call() throws Exception {
                 return processEngine.getRuntimeService().createProcessInstanceQuery().count() == 0;
             }

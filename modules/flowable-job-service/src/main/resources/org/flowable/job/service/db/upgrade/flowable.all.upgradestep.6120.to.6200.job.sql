@@ -1,0 +1,1 @@
+insert into ACT_GE_PROPERTY values ('job.schema.version', '6.2.0.0', 1);

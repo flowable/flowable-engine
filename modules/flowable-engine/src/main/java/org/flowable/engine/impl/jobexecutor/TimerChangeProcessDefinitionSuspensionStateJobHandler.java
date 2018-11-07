@@ -12,7 +12,11 @@
  */
 package org.flowable.engine.impl.jobexecutor;
 
-import org.flowable.engine.impl.util.json.JSONObject;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.job.service.JobHandler;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -22,13 +26,16 @@ public abstract class TimerChangeProcessDefinitionSuspensionStateJobHandler impl
     private static final String JOB_HANDLER_CFG_INCLUDE_PROCESS_INSTANCES = "includeProcessInstances";
 
     public static String createJobHandlerConfiguration(boolean includeProcessInstances) {
-        JSONObject json = new JSONObject();
-        json.put(JOB_HANDLER_CFG_INCLUDE_PROCESS_INSTANCES, includeProcessInstances);
-        return json.toString();
+        ObjectNode jsonNode = CommandContextUtil.getProcessEngineConfiguration().getObjectMapper().createObjectNode();
+        jsonNode.put(JOB_HANDLER_CFG_INCLUDE_PROCESS_INSTANCES, includeProcessInstances);
+        return jsonNode.toString();
     }
 
-    public static boolean getIncludeProcessInstances(JSONObject jobHandlerCfgJson) {
-        return jobHandlerCfgJson.getBoolean(JOB_HANDLER_CFG_INCLUDE_PROCESS_INSTANCES);
+    public static boolean getIncludeProcessInstances(JsonNode configNode) {
+        if (configNode.has(JOB_HANDLER_CFG_INCLUDE_PROCESS_INSTANCES)) {
+            return configNode.get(JOB_HANDLER_CFG_INCLUDE_PROCESS_INSTANCES).asBoolean();
+        }
+        return false;
     }
 
 }

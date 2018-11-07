@@ -66,5 +66,6 @@ public abstract class BasePropertiesParser implements PropertiesParser, DynamicB
 
     protected abstract ObjectNode createPropertiesNode(FlowElement flowElement, ObjectNode flowElementNode, ObjectMapper objectMapper);
 
+    @Override
     public abstract boolean supports(FlowElement flowElement);
 }

@@ -92,6 +92,69 @@
         </createTable>
         
     </changeSet>
+    
+    <changeSet id="2" author="flowable">
+    
+        <createTable tableName="ACT_DMN_HI_DECISION_EXECUTION">
+            <column name="ID_" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="DECISION_DEFINITION_ID_" type="varchar(255)" />
+            <column name="DEPLOYMENT_ID_" type="varchar(255)" />
+            <column name="START_TIME_" type="datetime" />
+            <column name="END_TIME_" type="datetime">
+                <constraints nullable="true" />
+            </column>
+            <column name="INSTANCE_ID_" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="EXECUTION_ID_" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="ACTIVITY_ID_" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="FAILED_" type="boolean" defaultValueBoolean="false" />
+            <column name="TENANT_ID_" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="EXECUTION_JSON_" type="longtext">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+        
+    </changeSet>
+    
+    <changeSet id="3" author="flowable">
+    
+        <addColumn tableName="ACT_DMN_HI_DECISION_EXECUTION">
+            <column name="SCOPE_TYPE_" type="varchar(255)" />
+        </addColumn>
+    
+    </changeSet>
+    
+    <changeSet id="4" author="flowable">
+    
+        <dropColumn columnName="PARENT_DEPLOYMENT_ID_" tableName="ACT_DMN_DECISION_TABLE" />
+        
+    </changeSet>
 
+    <changeSet id="5" author="flowable" dbms="mysql">
+
+        <modifyDataType tableName="ACT_DMN_DEPLOYMENT" columnName="DEPLOY_TIME_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_DMN_HI_DECISION_EXECUTION" columnName="START_TIME_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_DMN_HI_DECISION_EXECUTION" columnName="END_TIME_" newDataType="datetime(3)" />
+
+    </changeSet>
+
+    <changeSet id="6" author="flowable">
+
+        <createIndex tableName="ACT_DMN_DECISION_TABLE" indexName="ACT_IDX_DEC_TBL_UNIQ" unique="true">
+            <column name="KEY_" />
+            <column name="VERSION_" />
+            <column name="TENANT_ID_" />
+        </createIndex>
+
+    </changeSet>
 
 </databaseChangeLog>

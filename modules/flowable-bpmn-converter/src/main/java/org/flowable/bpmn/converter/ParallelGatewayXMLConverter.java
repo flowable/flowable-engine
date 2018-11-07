@@ -25,6 +25,7 @@ import org.flowable.bpmn.model.ParallelGateway;
  */
 public class ParallelGatewayXMLConverter extends BaseBpmnXMLConverter {
 
+    @Override
     public Class<? extends BaseElement> getBpmnElementType() {
         return ParallelGateway.class;
     }

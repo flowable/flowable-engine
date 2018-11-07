@@ -1,0 +1,17 @@
+target
+*.iml
+*.ipr
+*.iws
+.idea
+.classpath
+.project
+.settings
+.DS_Store
+.vscode
+*.bpmn/
+src/en/base/output
+src/en/bpmn/output
+src/en/cmmn/output
+src/en/dmn/output
+src/en/form/output
+src/en/single/output

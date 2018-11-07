@@ -16,8 +16,8 @@ package org.flowable.engine.impl.event;
 import java.util.Map;
 
 import org.flowable.bpmn.model.FlowElement;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
@@ -32,6 +32,7 @@ public class SignalEventHandler extends AbstractEventHandler {
 
     public static final String EVENT_HANDLER_TYPE = "signal";
 
+    @Override
     public String getEventHandlerType() {
         return EVENT_HANDLER_TYPE;
     }

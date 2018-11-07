@@ -1,14 +1,17 @@
 package org.flowable.crystalball.simulator;
 
-import org.flowable.engine.common.impl.util.DefaultClockImpl;
-import org.flowable.engine.common.runtime.Clock;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Comparator;
 import java.util.Date;
 
-import static org.junit.Assert.*;
+import org.flowable.common.engine.impl.runtime.Clock;
+import org.flowable.common.engine.impl.util.DefaultClockImpl;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author martin.grofcik

@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.impl.agenda;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.runtime.ProcessDebugger;
 
@@ -28,14 +28,17 @@ public class DebugFlowableEngineAgenda extends DefaultFlowableEngineAgenda {
         this.processDebugger = processDebugger;
     }
 
+    @Override
     public void planContinueProcessOperation(ExecutionEntity execution) {
         planOperation(new DebugContinueProcessOperation(processDebugger, commandContext, execution), execution);
     }
 
+    @Override
     public void planContinueProcessSynchronousOperation(ExecutionEntity execution) {
         planOperation(new DebugContinueProcessOperation(processDebugger, commandContext, execution, true, false), execution);
     }
 
+    @Override
     public void planContinueProcessInCompensation(ExecutionEntity execution) {
         planOperation(new DebugContinueProcessOperation(processDebugger, commandContext, execution, false, true), execution);
     }

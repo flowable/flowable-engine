@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
 
 public class ShellActivityBehavior extends AbstractBpmnActivityBehavior {
 
@@ -73,13 +73,14 @@ public class ShellActivityBehavior extends AbstractBpmnActivityBehavior {
         String redirectErrorStr = getStringFromField(redirectError, execution);
         String cleanEnvStr = getStringFromField(cleanEnv, execution);
 
-        waitFlag = waitStr == null || waitStr.equals("true");
-        redirectErrorFlag = "true".equals(redirectErrorStr);
-        cleanEnvBoolean = "true".equals(cleanEnvStr);
+        waitFlag = waitStr == null || waitStr.equalsIgnoreCase("true");
+        redirectErrorFlag = "true".equalsIgnoreCase(redirectErrorStr);
+        cleanEnvBoolean = "true".equalsIgnoreCase(cleanEnvStr);
         directoryStr = getStringFromField(directory, execution);
 
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
 
         readFields(execution);

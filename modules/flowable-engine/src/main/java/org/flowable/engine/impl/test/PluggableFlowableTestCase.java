@@ -13,18 +13,8 @@
 
 package org.flowable.engine.impl.test;
 
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.ProcessEngines;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.cfg.CommandExecutorImpl;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
-import org.flowable.engine.impl.ProcessEngineImpl;
-import org.flowable.engine.impl.interceptor.CommandInvoker;
-import org.flowable.engine.impl.interceptor.LoggingExecutionTreeCommandInvoker;
-import org.flowable.engine.test.EnableVerboseExecutionTreeLogging;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * Base class for the flowable test cases.
@@ -36,73 +26,9 @@ import org.slf4j.LoggerFactory;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
+@Tag("pluggable")
+@ExtendWith(PluggableFlowableExtension.class)
 public abstract class PluggableFlowableTestCase extends AbstractFlowableTestCase {
 
-    private static final Logger pluggableActivitiTestCaseLogger = LoggerFactory.getLogger(PluggableFlowableTestCase.class);
-
-    protected static ProcessEngine cachedProcessEngine;
-
-    protected void initializeProcessEngine() {
-        if (cachedProcessEngine == null) {
-            pluggableActivitiTestCaseLogger.info("No cached process engine found for test. Retrieving the default engine.");
-            ProcessEngines.destroy(); // Just to be sure we're not getting any previously cached version
-
-            cachedProcessEngine = ProcessEngines.getDefaultProcessEngine();
-            if (cachedProcessEngine == null) {
-                throw new FlowableException("no default process engine available");
-            }
-        }
-
-        processEngine = cachedProcessEngine;
-        processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
-
-        // Enable verbose execution tree debugging if needed
-        if (this.getClass().isAnnotationPresent(EnableVerboseExecutionTreeLogging.class)) {
-            swapCommandInvoker(true);
-        }
-
-    }
-
-    @Override
-    protected void closeDownProcessEngine() {
-        super.closeDownProcessEngine();
-
-        // Reset command invoker
-        if (this.getClass().isAnnotationPresent(EnableVerboseExecutionTreeLogging.class)) {
-            swapCommandInvoker(false);
-        }
-    }
-
-    protected void swapCommandInvoker(boolean debug) {
-        CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
-        if (commandExecutor instanceof CommandExecutorImpl) {
-            CommandExecutorImpl commandExecutorImpl = (CommandExecutorImpl) commandExecutor;
-
-            CommandInterceptor previousCommandInterceptor = null;
-            CommandInterceptor commandInterceptor = commandExecutorImpl.getFirst();
-
-            while (commandInterceptor != null) {
-
-                boolean matches = debug ? (commandInterceptor instanceof CommandInvoker) : (commandInterceptor instanceof LoggingExecutionTreeCommandInvoker);
-                if (matches) {
-
-                    CommandInterceptor commandInvoker = debug ? new LoggingExecutionTreeCommandInvoker() : new CommandInvoker();
-                    if (previousCommandInterceptor != null) {
-                        previousCommandInterceptor.setNext(commandInvoker);
-                    } else {
-                        commandExecutorImpl.setFirst(previousCommandInterceptor);
-                    }
-                    break;
-
-                } else {
-                    previousCommandInterceptor = commandInterceptor;
-                    commandInterceptor = commandInterceptor.getNext();
-                }
-            }
-
-        } else {
-            pluggableActivitiTestCaseLogger.warn("Not using {}, ignoring the {} annotation", CommandExecutorImpl.class, EnableVerboseExecutionTreeLogging.class);
-        }
-    }
 
 }

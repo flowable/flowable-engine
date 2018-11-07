@@ -13,16 +13,16 @@
 
 package org.flowable.idm.engine.test;
 
+import org.flowable.common.engine.impl.test.LoggingExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
 
 /**
  * @author Tom Baeyens
  */
-public abstract class AbstractTestCase extends TestCase {
+@ExtendWith(LoggingExtension.class)
+public abstract class AbstractTestCase {
 
     protected static final String EMPTY_LINE = "\n";
 
@@ -34,8 +34,8 @@ public abstract class AbstractTestCase extends TestCase {
      * Asserts if the provided text is part of some text.
      */
     public void assertTextPresent(String expected, String actual) {
-        if ((actual == null) || (!actual.contains(expected))) {
-            throw new AssertionFailedError("expected presence of [" + expected + "], but was [" + actual + "]");
+        if ((actual == null) || !actual.contains(expected)) {
+            throw new AssertionError("expected presence of [" + expected + "], but was [" + actual + "]");
         }
     }
 
@@ -45,33 +45,4 @@ public abstract class AbstractTestCase extends TestCase {
     public void assertTextPresentIgnoreCase(String expected, String actual) {
         assertTextPresent(expected.toLowerCase(), actual.toLowerCase());
     }
-
-    @Override
-    protected void runTest() throws Throwable {
-        if (LOGGER.isDebugEnabled()) {
-            if (isEmptyLinesEnabled) {
-                LOGGER.debug(EMPTY_LINE);
-            }
-            LOGGER.debug("#### START {}.{} ###########################################################", this.getClass().getSimpleName(), getName());
-        }
-
-        try {
-
-            super.runTest();
-
-        } catch (AssertionFailedError e) {
-            LOGGER.error(EMPTY_LINE);
-            LOGGER.error("ASSERTION FAILED: {}", e, e);
-            throw e;
-
-        } catch (Throwable e) {
-            LOGGER.error(EMPTY_LINE);
-            LOGGER.error("EXCEPTION: {}", e, e);
-            throw e;
-
-        } finally {
-            LOGGER.debug("#### END {}.{} #############################################################", this.getClass().getSimpleName(), getName());
-        }
-    }
-
 }

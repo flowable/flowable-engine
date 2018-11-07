@@ -12,11 +12,6 @@
  */
 package org.flowable.spring;
 
-import java.util.concurrent.RejectedExecutionException;
-
-import org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
-import org.flowable.engine.impl.asyncexecutor.ExecuteAsyncRunnable;
-import org.flowable.engine.runtime.JobInfo;
 import org.springframework.core.task.TaskExecutor;
 
 /**
@@ -29,60 +24,31 @@ import org.springframework.core.task.TaskExecutor;
  * </p>
  * 
  * @author Pablo Ganga
+ * @deprecated use {@link org.flowable.spring.job.service.SpringAsyncExecutor}
  */
-public class SpringAsyncExecutor extends DefaultAsyncJobExecutor {
-
-    protected TaskExecutor taskExecutor;
-    protected SpringRejectedJobsHandler rejectedJobsHandler;
+@Deprecated
+public class SpringAsyncExecutor extends org.flowable.spring.job.service.SpringAsyncExecutor {
 
     public SpringAsyncExecutor() {
     }
 
     public SpringAsyncExecutor(TaskExecutor taskExecutor, SpringRejectedJobsHandler rejectedJobsHandler) {
-        this.taskExecutor = taskExecutor;
-        this.rejectedJobsHandler = rejectedJobsHandler;
+        super(taskExecutor, rejectedJobsHandler);
     }
 
-    public TaskExecutor getTaskExecutor() {
-        return taskExecutor;
-    }
-
-    /**
-     * Required spring injected {@link TaskExecutor} implementation that will be used to execute runnable jobs.
-     * 
-     * @param taskExecutor
-     */
-    public void setTaskExecutor(TaskExecutor taskExecutor) {
-        this.taskExecutor = taskExecutor;
-    }
-
+    @Override
     public SpringRejectedJobsHandler getRejectedJobsHandler() {
-        return rejectedJobsHandler;
+        return (SpringRejectedJobsHandler) super.getRejectedJobsHandler();
     }
 
     /**
      * Required spring injected {@link RejectedJobsHandler} implementation that will be used when jobs were rejected by the task executor.
      * 
      * @param rejectedJobsHandler
+     * @deprecated use {@link this#setRejectedJobsHandler(org.flowable.spring.job.service.SpringRejectedJobsHandler)}
      */
+    @Deprecated
     public void setRejectedJobsHandler(SpringRejectedJobsHandler rejectedJobsHandler) {
-        this.rejectedJobsHandler = rejectedJobsHandler;
+        super.setRejectedJobsHandler(rejectedJobsHandler);
     }
-
-    @Override
-    public boolean executeAsyncJob(JobInfo job) {
-        try {
-            taskExecutor.execute(new ExecuteAsyncRunnable(job, processEngineConfiguration, jobEntityManager, asyncRunnableExecutionExceptionHandler));
-            return true;
-        } catch (RejectedExecutionException e) {
-            rejectedJobsHandler.jobRejected(this, job);
-            return false;
-        }
-    }
-
-    @Override
-    protected void initAsyncJobExecutionThreadPool() {
-        // Do nothing, using the Spring taskExecutor
-    }
-
 }

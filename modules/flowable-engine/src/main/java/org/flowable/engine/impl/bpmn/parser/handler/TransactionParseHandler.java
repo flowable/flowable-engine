@@ -22,10 +22,12 @@ import org.flowable.engine.impl.bpmn.parser.BpmnParse;
  */
 public class TransactionParseHandler extends AbstractActivityBpmnParseHandler<Transaction> {
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return Transaction.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, Transaction transaction) {
 
         transaction.setBehavior(bpmnParse.getActivityBehaviorFactory().createTransactionActivityBehavior(transaction));

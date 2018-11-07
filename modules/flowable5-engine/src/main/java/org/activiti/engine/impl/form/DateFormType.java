@@ -36,10 +36,12 @@ public class DateFormType extends AbstractFormType {
         this.dateFormat = FastDateFormat.getInstance(datePattern);
     }
 
+    @Override
     public String getName() {
         return "date";
     }
 
+    @Override
     public Object getInformation(String key) {
         if ("datePattern".equals(key)) {
             return datePattern;
@@ -47,6 +49,7 @@ public class DateFormType extends AbstractFormType {
         return null;
     }
 
+    @Override
     public Object convertFormValueToModelValue(String propertyValue) {
         if (StringUtils.isEmpty(propertyValue)) {
             return null;
@@ -54,10 +57,11 @@ public class DateFormType extends AbstractFormType {
         try {
             return dateFormat.parseObject(propertyValue);
         } catch (ParseException e) {
-            throw new ActivitiIllegalArgumentException("invalid date value " + propertyValue);
+            throw new ActivitiIllegalArgumentException("invalid date value " + propertyValue, e);
         }
     }
 
+    @Override
     public String convertModelValueToFormValue(Object modelValue) {
         if (modelValue == null) {
             return null;

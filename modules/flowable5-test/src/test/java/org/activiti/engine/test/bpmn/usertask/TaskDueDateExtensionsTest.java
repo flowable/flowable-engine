@@ -20,10 +20,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.activiti.engine.impl.test.ResourceFlowableTestCase;
-import org.flowable.engine.common.runtime.Clock;
-import org.flowable.engine.impl.calendar.BusinessCalendar;
+import org.flowable.common.engine.impl.calendar.BusinessCalendar;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.joda.time.Period;
 
@@ -46,7 +45,7 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
         // Start process-instance, passing date that should be used as dueDate
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dueDateExtension", variables);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         assertNotNull(task.getDueDate());
         assertEquals(date, task.getDueDate());
@@ -61,7 +60,7 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
         // Start process-instance, passing date that should be used as dueDate
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dueDateExtension", variables);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         assertNotNull(task.getDueDate());
         Date date = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").parse("06-07-1986 12:10:00");
@@ -78,7 +77,7 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
         // Start process-instance, passing ISO8601 duration formatted String that should be used to calculate dueDate
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dueDateExtension", variables);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         assertNotNull(task.getDueDate());
         Period period = new Period(task.getCreateTime().getTime(), task.getDueDate().getTime());
@@ -97,7 +96,7 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
         // Start process-instance, passing ISO8601 duration formatted String that should be used to calculate dueDate
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dueDateExtension", variables);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         assertNotNull(task.getDueDate());
         assertEquals(new Date(0), task.getDueDate());

@@ -19,13 +19,13 @@ import java.util.Map;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.IdentityInfoEntity;
 import org.flowable.idm.engine.impl.persistence.entity.IdentityInfoEntityImpl;
-import org.flowable.idm.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.idm.engine.impl.persistence.entity.data.AbstractIdmDataManager;
 import org.flowable.idm.engine.impl.persistence.entity.data.IdentityInfoDataManager;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisIdentityInfoDataManager extends AbstractDataManager<IdentityInfoEntity> implements IdentityInfoDataManager {
+public class MybatisIdentityInfoDataManager extends AbstractIdmDataManager<IdentityInfoEntity> implements IdentityInfoDataManager {
 
     public MybatisIdentityInfoDataManager(IdmEngineConfiguration idmEngineConfiguration) {
         super(idmEngineConfiguration);

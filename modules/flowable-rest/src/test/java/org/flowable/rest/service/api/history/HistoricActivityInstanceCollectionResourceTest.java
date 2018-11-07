@@ -25,11 +25,12 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.flowable.task.api.Task;
 import org.junit.Assert;
+import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -44,6 +45,7 @@ public class HistoricActivityInstanceCollectionResourceTest extends BaseSpringRe
     /**
      * Test querying historic activity instance. GET history/historic-activity-instances
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/twoTaskProcess.bpmn20.xml" })
     public void testQueryActivityInstances() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");

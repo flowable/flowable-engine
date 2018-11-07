@@ -16,7 +16,7 @@ package org.flowable.engine.impl.bpmn.helper;
 import java.util.List;
 
 import org.flowable.bpmn.model.ServiceTask;
-import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 

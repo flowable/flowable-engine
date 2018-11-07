@@ -12,7 +12,21 @@
     <property name="jdbcPassword" value=""/>
 
     <!-- Database configurations -->
-    <property name="databaseSchemaUpdate" value="true"/>
+    <property name="databaseSchemaUpdate" value="drop-create"/>
+
+    <property name="defaultCommandConfig">
+      <bean class="org.flowable.common.engine.impl.interceptor.CommandConfig">
+        <constructor-arg name="contextReusePossible" value="false"/>
+      </bean>
+    </property>
+
+    <property name="schemaCommandConfig">
+      <bean class="org.flowable.common.engine.impl.interceptor.CommandConfig">
+        <constructor-arg name="contextReusePossible" value="false"/>
+      </bean>
+    </property>
+
+
   </bean>
 
   <bean id="simulationRun" class="org.flowable.crystalball.simulator.SimpleSimulationRunFactory">
@@ -26,7 +40,7 @@
       <bean id="simulatedProcessEngineConfiguration"
             class="org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
 
-        <property name="jdbcUrl" value="jdbc:h2:mem:simulated-activiti;DB_CLOSE_DELAY=1000"/>
+        <property name="jdbcUrl" value="jdbc:h2:mem:flowable-virtual;DB_CLOSE_DELAY=1000"/>
         <property name="jdbcDriver" value="org.h2.Driver"/>
         <property name="jdbcUsername" value="sa"/>
         <property name="jdbcPassword" value=""/>
@@ -36,27 +50,31 @@
 
         <property name="clock" ref="clock"/>
         <property name="disableIdmEngine" value="true"/>
+
+        <property name="defaultCommandConfig">
+          <bean class="org.flowable.common.engine.impl.interceptor.CommandConfig">
+            <constructor-arg name="contextReusePossible" value="false"/>
+          </bean>
+        </property>
+
+        <property name="schemaCommandConfig">
+          <bean class="org.flowable.common.engine.impl.interceptor.CommandConfig">
+            <constructor-arg name="contextReusePossible" value="false"/>
+          </bean>
+        </property>
+
+
       </bean>
     </constructor-arg>
   </bean>
 
-  <bean id="clock" class="org.flowable.engine.common.impl.util.DefaultClockImpl"/>
+  <bean id="clock" class="org.flowable.common.engine.impl.util.DefaultClockImpl"/>
 
   <bean id="eventCalendar" class="org.flowable.crystalball.simulator.SimpleEventCalendarFactory">
     <constructor-arg name="clockReader" ref="clock"/>
     <constructor-arg name="eventComparator"><bean class="org.flowable.crystalball.simulator.SimulationEventComparator"/></constructor-arg>
     <constructor-arg name="simulationEvents">
       <list>
-        <bean class="org.flowable.crystalball.simulator.SimulationEvent.Factory">
-          <constructor-arg name="type" value="startProcessInstance"/>
-          <constructor-arg name="simulationTime" value="1"/>
-          <constructor-arg name="properties">
-            <map>
-
-            </map>
-          </constructor-arg>
-
-        </bean>
       </list>
     </constructor-arg>
   </bean>

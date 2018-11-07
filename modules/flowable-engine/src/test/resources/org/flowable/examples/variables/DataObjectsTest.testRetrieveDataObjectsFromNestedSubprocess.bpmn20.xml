@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             xmlns:sasbpmn="http://www.sas.com/xml/schema/bpmn"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.flowable.org/Test">
+    <process id="DataObjectsTest" name="DataObjectsTest" isExecutable="true">
+        <dataObject itemSubjectRef="xsd:string" name="VariableA" id="ID_91ee51f3-481d-439c-a62d-8b382a1cf7a9"/>
+        <dataObject itemSubjectRef="xsd:string" name="VariableB" id="ID_91ee51f3-481d-439c-a62d-8b382a1cf7b9"/>
+
+        <startEvent id="startevent1" name="Start"/>
+        <endEvent id="endevent1" name="End"></endEvent>
+
+        <subProcess id="subProcess1" name="SubProcess">
+            <dataObject itemSubjectRef="xsd:string" name="VariableB" id="ID_91ee51f3-481d-439c-a62d-8b382a1cf7c9"/>
+            <dataObject itemSubjectRef="xsd:string" name="VariableC" id="ID_91ee51f3-481d-439c-a62d-8b382a1cf7c4"/>
+
+            <startEvent id="startevent2" name="Start"/>
+            <endEvent id="endevent2" name="End"/>
+
+
+            <subProcess id="subProcess2" name="NestedSubProcess">
+                <dataObject itemSubjectRef="xsd:string" name="VariableC" id="ID_91ee51f3-481d-439c-a62d-8b382a1cf7d0"/>
+                <dataObject itemSubjectRef="xsd:string" name="VariableD" id="ID_91ee51f3-481d-439c-a62d-8b382a1cf7d1"/>
+
+                <startEvent id="startevent3" name="Start"/>
+                <endEvent id="endevent3" name="End"/>
+
+                <userTask id="usertask2" name="Task B">
+                    <potentialOwner>
+                        <resourceAssignmentExpression>
+                            <formalExpression>SASWorkflowGroup</formalExpression>
+                        </resourceAssignmentExpression>
+                    </potentialOwner>
+                </userTask>
+
+                <sequenceFlow id="Start3" sourceRef="startevent3" targetRef="usertask2"/>
+                <sequenceFlow id="Done3" sourceRef="usertask2" targetRef="endevent3"/>
+            </subProcess>
+
+            <sequenceFlow id="Start2" sourceRef="startevent2" targetRef="subProcess2"/>
+            <sequenceFlow id="Done2" sourceRef="subProcess2" targetRef="endevent2"/>
+        </subProcess>
+
+
+        <sequenceFlow id="Start1" sourceRef="startevent1" targetRef="subProcess1"/>
+        <sequenceFlow id="Done1" sourceRef="subProcess1" targetRef="endevent1"/>
+    </process>
+</definitions>

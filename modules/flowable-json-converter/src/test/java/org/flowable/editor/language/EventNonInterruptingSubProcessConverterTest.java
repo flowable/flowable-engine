@@ -38,6 +38,7 @@ public class EventNonInterruptingSubProcessConverterTest extends AbstractConvert
         validateModel(bpmnModel);
     }
 
+    @Override
     protected String getResource() {
         return "test.eventnoninterruptingsubprocessmodel.json";
     }

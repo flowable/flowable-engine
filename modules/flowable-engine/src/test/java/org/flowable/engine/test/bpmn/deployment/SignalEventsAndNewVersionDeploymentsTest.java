@@ -15,13 +15,13 @@ package org.flowable.engine.test.bpmn.deployment;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * A test specifically written to test how events (start/boundary) are handled when deploying a new version of a process definition.
@@ -44,6 +44,7 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
      * BOUNDARY SIGNAL EVENT
      */
 
+    @Test
     @Deployment
     public void testGlobalSignalBoundaryEvent() {
         runtimeService.startProcessInstanceByKey("signalTest");
@@ -57,10 +58,10 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
         runtimeService.signalEventReceived("mySignal");
         assertEquals(0, getAllEventSubscriptions().size());
 
-        List<Task> tasks = taskService.createTaskQuery().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertEquals(2, tasks.size());
 
-        for (Task task : tasks) {
+        for (org.flowable.task.api.Task task : tasks) {
             assertEquals("Task after signal", task.getName());
         }
 
@@ -70,6 +71,7 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
     /**
      * Verifying that the event subscriptions do get removed when removing a deployment.
      */
+    @Test
     public void testBoundaryEventSubscriptionDeletedOnDeploymentDelete() {
         String deploymentId = deployBoundarySignalTestProcess();
         runtimeService.startProcessInstanceByKey("signalTest");
@@ -91,6 +93,7 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
     /**
      * Verifying that the event subscriptions do get removed when removing a process instance.
      */
+    @Test
     public void testBoundaryEventSubscrptionsDeletedOnProcessInstanceDelete() {
         String deploymentId1 = deployBoundarySignalTestProcess();
         runtimeService.startProcessInstanceByKey("signalTest");
@@ -117,6 +120,7 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
      * START SIGNAL EVENT
      */
 
+    @Test
     public void testStartSignalEvent() {
         String deploymentId1 = deployStartSignalTestProcess();
         assertEquals(1, getAllEventSubscriptions().size());
@@ -131,6 +135,7 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
         cleanup(deploymentId1, deploymentId2);
     }
 
+    @Test
     public void testSignalStartEventSubscriptionAfterDeploymentDelete() {
 
         // Deploy two version of process definition, delete latest and check if all is good
@@ -166,6 +171,7 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
     /**
      * v1 -> has start signal event v2 -> has no start signal event v3 -> has start signal event
      */
+    @Test
     public void testDeployIntermediateVersionWithoutSignalStartEvent() {
         String deploymentId1 = deployStartSignalTestProcess();
         assertEquals(1, getAllEventSubscriptions().size());
@@ -195,6 +201,7 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
         cleanup(deploymentId1, deploymentId2, deploymentId3);
     }
 
+    @Test
     public void testDeleteDeploymentWithStartSignalEvents1() {
         String deploymentId1;
         String deploymentId2;
@@ -207,6 +214,7 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
         cleanup(deploymentId1, deploymentId2);
     }
 
+    @Test
     public void testDeleteDeploymentWithStartSignalEvents2() {
         String deploymentId1 = deployStartSignalTestProcess();
         String deploymentId2 = deployProcessWithoutEvents();
@@ -219,6 +227,7 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
         cleanup(deploymentId1, deploymentId3);
     }
 
+    @Test
     public void testDeleteDeploymentWithStartSignalEvents3() {
         String deploymentId1 = deployStartSignalTestProcess();
         String deploymentId2 = deployProcessWithoutEvents();
@@ -231,6 +240,7 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
         cleanup(deploymentId2, deploymentId3);
     }
 
+    @Test
     public void testDeleteDeploymentWithStartSignalEvents4() {
         String deploymentId1 = deployStartSignalTestProcess();
         String deploymentId2 = deployProcessWithoutEvents();
@@ -244,6 +254,7 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
         cleanup(deploymentId1);
     }
 
+    @Test
     public void testDeleteDeploymentWithStartSignalEvents5() {
         String deploymentId1 = deployStartSignalTestProcess();
         String deploymentId2 = deployProcessWithoutEvents();
@@ -258,6 +269,7 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
         cleanup(deploymentId1);
     }
 
+    @Test
     public void testDeleteDeploymentWithStartSignalEvents6() {
         String deploymentId1 = deployStartSignalTestProcess();
         String deploymentId2 = deployProcessWithoutEvents();
@@ -277,6 +289,7 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
         cleanup(deploymentId4);
     }
 
+    @Test
     public void testDeleteDeploymentWithStartSignalEvents7() {
         String deploymentId1 = deployStartSignalTestProcess();
         String deploymentId2 = deployProcessWithoutEvents();
@@ -300,6 +313,7 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
      * BOTH BOUNDARY AND START SIGNAL
      */
 
+    @Test
     public void testBothBoundaryAndStartEvent() {
 
         // Deploy process with both boundary and start event
@@ -344,6 +358,7 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
         cleanup(deploymentId1);
     }
 
+    @Test
     public void testBothBoundaryAndStartSameSignalId() {
 
         // Deploy process with both boundary and start event

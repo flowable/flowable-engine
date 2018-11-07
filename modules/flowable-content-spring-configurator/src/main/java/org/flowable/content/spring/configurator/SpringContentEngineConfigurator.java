@@ -12,13 +12,12 @@
  */
 package org.flowable.content.spring.configurator;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.spring.SpringEngineConfiguration;
 import org.flowable.content.engine.ContentEngine;
 import org.flowable.content.engine.configurator.ContentEngineConfigurator;
 import org.flowable.content.spring.SpringContentEngineConfiguration;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.spring.SpringProcessEngineConfiguration;
 
 /**
  * @author Tijs Rademakers
@@ -26,19 +25,24 @@ import org.flowable.spring.SpringProcessEngineConfiguration;
  */
 public class SpringContentEngineConfigurator extends ContentEngineConfigurator {
 
-    protected SpringContentEngineConfiguration contentEngineConfiguration;
-
     @Override
-    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    public void configure(AbstractEngineConfiguration engineConfiguration) {
         if (contentEngineConfiguration == null) {
             contentEngineConfiguration = new SpringContentEngineConfiguration();
+        } else if (!(contentEngineConfiguration instanceof SpringContentEngineConfiguration)) {
+            throw new IllegalArgumentException("Expected contentEngine configuration to be of type"
+                + SpringContentEngineConfiguration.class + " but was " + engineConfiguration.getClass());
         }
-        initialiseCommonProperties(processEngineConfiguration, contentEngineConfiguration, EngineConfigurationConstants.KEY_CONTENT_ENGINE_CONFIG);
-        contentEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
+        initialiseCommonProperties(engineConfiguration, contentEngineConfiguration);
+        SpringEngineConfiguration springEngineConfiguration = (SpringEngineConfiguration) engineConfiguration;
+        ((SpringContentEngineConfiguration) contentEngineConfiguration).setTransactionManager(springEngineConfiguration.getTransactionManager());
         
         initContentEngine();
+        
+        initServiceConfigurations(engineConfiguration, contentEngineConfiguration);
     }
 
+    @Override
     protected synchronized ContentEngine initContentEngine() {
         if (contentEngineConfiguration == null) {
             throw new FlowableException("ContentEngineConfiguration is required");
@@ -46,14 +50,4 @@ public class SpringContentEngineConfigurator extends ContentEngineConfigurator {
 
         return contentEngineConfiguration.buildContentEngine();
     }
-
-    public SpringContentEngineConfiguration getContentEngineConfiguration() {
-        return contentEngineConfiguration;
-    }
-
-    public SpringContentEngineConfigurator setContentEngineConfiguration(SpringContentEngineConfiguration contentEngineConfiguration) {
-        this.contentEngineConfiguration = contentEngineConfiguration;
-        return this;
-    }
-
 }

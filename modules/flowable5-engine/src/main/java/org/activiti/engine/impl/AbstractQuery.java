@@ -95,10 +95,12 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
         return (T) this;
     }
 
+    @Override
     public T asc() {
         return direction(Direction.ASCENDING);
     }
 
+    @Override
     public T desc() {
         return direction(Direction.DESCENDING);
     }
@@ -120,6 +122,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
         }
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public U singleResult() {
         this.resultType = ResultType.SINGLE_RESULT;
@@ -129,6 +132,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
         return executeSingleResult(Context.getCommandContext());
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public List<U> list() {
         this.resultType = ResultType.LIST;
@@ -138,6 +142,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
         return executeList(Context.getCommandContext(), null);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public List<U> listPage(int firstResult, int maxResults) {
         this.firstResult = firstResult;
@@ -149,6 +154,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
         return executeList(Context.getCommandContext(), new Page(firstResult, maxResults));
     }
 
+    @Override
     public long count() {
         this.resultType = ResultType.COUNT;
         if (commandExecutor != null) {
@@ -157,6 +163,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
         return executeCount(Context.getCommandContext());
     }
 
+    @Override
     public Object execute(CommandContext commandContext) {
         if (resultType == ResultType.LIST) {
             return executeList(commandContext, null);
@@ -241,6 +248,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
 
     }
 
+    @Override
     public String getOrderBy() {
         if (orderBy == null) {
             return super.getOrderBy();
@@ -249,14 +257,17 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
         }
     }
 
+    @Override
     public String getOrderByColumns() {
         return getOrderBy();
     }
 
+    @Override
     public String getDatabaseType() {
         return databaseType;
     }
 
+    @Override
     public void setDatabaseType(String databaseType) {
         this.databaseType = databaseType;
     }

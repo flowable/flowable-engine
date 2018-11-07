@@ -10,10 +10,14 @@
 		<groupId>org.flowable</groupId>
 		<artifactId>flowable-root</artifactId>
 		<relativePath>../..</relativePath>
-		<version>6.2.0-SNAPSHOT</version>
+		<version>6.4.1-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-identitylink-service-api</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-engine-common-api</artifactId>
@@ -39,8 +43,9 @@
             <artifactId>joda-time</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>persistence-api</artifactId>
+            <!-- no official JPA 2.1 Jar was ever published, so we have to use a vendor implementation :( -->
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.1-api</artifactId>
             <scope>provided</scope>
         </dependency>
 		<dependency>
@@ -48,6 +53,21 @@
 			<artifactId>junit</artifactId>
 			<scope>provided</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
@@ -66,20 +86,14 @@
 			<artifactId>slf4j-log4j12</artifactId>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>org.apache.openjpa</groupId>
-            <artifactId>openjpa</artifactId>
-            <scope>test</scope>
-        </dependency>
-
 	</dependencies>
 
 	<properties>
 		<flowable.artifact>
-			org.flowable.identitylink
+			org.flowable.identitylink.service
 		</flowable.artifact>
 		<flowable.osgi.export.additional>
-			org.flowable.identitylink.db.mapping.entity
+			org.flowable.identitylink.service.db.mapping.entity
 		</flowable.osgi.export.additional>
 	</properties>
 
@@ -155,5 +169,29 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+    
+    <profiles>
+        <profile>
+            <id>distro</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.1.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

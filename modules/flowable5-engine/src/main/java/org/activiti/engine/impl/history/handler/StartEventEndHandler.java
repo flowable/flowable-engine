@@ -23,6 +23,7 @@ import org.flowable.engine.delegate.ExecutionListener;
  */
 public class StartEventEndHandler implements ExecutionListener {
 
+    @Override
     public void notify(DelegateExecution execution) {
         String activityId = ((ExecutionEntity) execution).getActivityId();
 

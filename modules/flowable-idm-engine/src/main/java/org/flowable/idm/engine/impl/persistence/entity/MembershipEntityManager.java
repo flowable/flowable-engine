@@ -13,7 +13,7 @@
 
 package org.flowable.idm.engine.impl.persistence.entity;
 
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 
 /**
  * @author Joram Barrez

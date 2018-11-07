@@ -25,8 +25,8 @@ import org.flowable.engine.dynamic.DynamicProcessDefinitionSummary;
 import org.flowable.engine.dynamic.PropertiesParserConstants;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -41,10 +41,12 @@ public class DynamicProcessDefinitionSummaryTest extends PluggableFlowableTestCa
     private static final String TASK_TWO_SID = "sid-B1C37EBE-A273-4DDE-B909-89302638526A";
     private static final String SCRIPT_TASK_SID = "sid-A403BAE0-E367-449A-90B2-48834FCAA2F9";
 
+    @Test
     public void testProcessDefinitionInfoCacheIsEnabledWithPluggableActivitiTestCase() throws Exception {
         assertThat(processEngineConfiguration.isEnableProcessDefinitionInfoCache(), is(true));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/dynamic/dynamic-bpmn-test-process.bpmn20.xml" })
     public void testIfNoProcessInfoIsAvailableTheBpmnModelIsUsed() throws Exception {
         // setup
@@ -86,6 +88,7 @@ public class DynamicProcessDefinitionSummaryTest extends PluggableFlowableTestCa
         assertThat(jsonNode.get(SCRIPT_TASK_SCRIPT).get(DYNAMIC_VALUE), is(nullValue()));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/dynamic/dynamic-bpmn-test-process.bpmn20.xml" })
     public void testTheCandidateUserOfTheFirstTasksIsChanged() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTest");
@@ -109,13 +112,14 @@ public class DynamicProcessDefinitionSummaryTest extends PluggableFlowableTestCa
         // verify if runtime is up to date
         runtimeService.startProcessInstanceById(processDefinitionId);
         // bob and david both should have a single task.
-        Task bobTask = taskService.createTaskQuery().taskCandidateUser("bob").singleResult();
+        org.flowable.task.api.Task bobTask = taskService.createTaskQuery().taskCandidateUser("bob").singleResult();
         assertThat("Bob must have one task", bobTask, is(notNullValue()));
 
-        Task davidTask = taskService.createTaskQuery().taskCandidateUser("david").singleResult();
+        org.flowable.task.api.Task davidTask = taskService.createTaskQuery().taskCandidateUser("david").singleResult();
         assertThat("David must have one task", davidTask, is(not(nullValue())));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/dynamic/dynamic-bpmn-test-process.bpmn20.xml" })
     public void testTheCandidateUserOfTheFirstTasksIsChangedMultipleTimes() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTest");
@@ -141,13 +145,14 @@ public class DynamicProcessDefinitionSummaryTest extends PluggableFlowableTestCa
         // verify if runtime is up to date
         runtimeService.startProcessInstanceById(processDefinitionId);
 
-        Task bobTask = taskService.createTaskQuery().taskCandidateUser("bob").singleResult();
+        org.flowable.task.api.Task bobTask = taskService.createTaskQuery().taskCandidateUser("bob").singleResult();
         assertThat("Bob must have one task", bobTask, is(notNullValue()));
 
-        List<Task> davidTasks = taskService.createTaskQuery().taskCandidateUser("david").list();
+        List<org.flowable.task.api.Task> davidTasks = taskService.createTaskQuery().taskCandidateUser("david").list();
         assertThat("David must have two task", davidTasks.size(), is(2));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/dynamic/dynamic-bpmn-test-process.bpmn20.xml" })
     public void testTheCandidateGroupOfTheFirstTasksIsChanged() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTest");
@@ -165,6 +170,7 @@ public class DynamicProcessDefinitionSummaryTest extends PluggableFlowableTestCa
         assertThat((ArrayNode) taskOneNode.get(USER_TASK_CANDIDATE_GROUPS).get(DYNAMIC_VALUE), is(dynamicCandidateGroups));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/dynamic/dynamic-bpmn-test-process.bpmn20.xml" })
     public void testTheCandidateGroupOfTheFirstTasksIsChangedMultipleTimes() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTest");
@@ -184,6 +190,7 @@ public class DynamicProcessDefinitionSummaryTest extends PluggableFlowableTestCa
         assertThat((ArrayNode) taskOneNode.get(USER_TASK_CANDIDATE_GROUPS).get(DYNAMIC_VALUE), is(candidateGroups));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/dynamic/dynamic-bpmn-test-process.bpmn20.xml" })
     public void testTheScriptOfTheScriptTasksIsChanged() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTest");
@@ -198,6 +205,7 @@ public class DynamicProcessDefinitionSummaryTest extends PluggableFlowableTestCa
         assertThat(scriptTaskNode.get(SCRIPT_TASK_SCRIPT).get(DYNAMIC_VALUE).asText(), is("var x = \"hallo\";"));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/dynamic/dynamic-bpmn-test-process.bpmn20.xml" })
     public void testItShouldBePossibleToResetDynamicCandidateUsers() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTest");

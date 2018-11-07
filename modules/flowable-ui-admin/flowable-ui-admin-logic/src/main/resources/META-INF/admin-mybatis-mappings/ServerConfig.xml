@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.flowable.ui.admin.domain.ServerConfig">
+
+	<resultMap id="serverConfigResultMap" type="org.flowable.ui.admin.domain.ServerConfig">
+		<id property="id" column="ID_" jdbcType="VARCHAR" />
+		<result property="name" column="NAME_" jdbcType="VARCHAR" />
+		<result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
+		<result property="serverAddress" column="SERVER_ADDRESS_" jdbcType="VARCHAR" />
+		<result property="port" column="PORT_" jdbcType="INTEGER" />
+		<result property="contextRoot" column="CONTEXT_ROOT_" jdbcType="VARCHAR" />
+		<result property="restRoot" column="REST_ROOT_" jdbcType="VARCHAR" />
+		<result property="userName" column="USER_NAME_" jdbcType="VARCHAR" />
+		<result property="password" column="PASSWORD_" jdbcType="VARCHAR" />
+		<result property="endpointType" column="ENDPOINT_TYPE_" jdbcType="INTEGER" />
+		<result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+	</resultMap>
+	
+    <insert id="insertServerConfig" parameterType="org.flowable.ui.admin.domain.ServerConfig">
+        insert into ${prefix}ACT_ADM_SERVER_CONFIG (
+            ID_,
+            NAME_,
+            DESCRIPTION_,
+            SERVER_ADDRESS_,
+            PORT_,
+            CONTEXT_ROOT_,
+            REST_ROOT_,
+            USER_NAME_,
+            PASSWORD_,
+            ENDPOINT_TYPE_,
+            TENANT_ID_) 
+         values (
+            #{id, jdbcType=VARCHAR},
+            #{name, jdbcType=VARCHAR},
+            #{description, jdbcType=VARCHAR},
+            #{serverAddress, jdbcType=VARCHAR},
+            #{port, jdbcType=INTEGER},
+            #{contextRoot, jdbcType=VARCHAR},
+            #{restRoot, jdbcType=VARCHAR},
+            #{userName, jdbcType=VARCHAR},
+            #{password, jdbcType=VARCHAR},
+            #{endpointType, jdbcType=INTEGER},
+            #{tenantId, jdbcType=VARCHAR}
+          )
+    </insert>
+    
+    <update id="updateServerConfig" parameterType="org.flowable.ui.admin.domain.ServerConfig">
+        update ${prefix}ACT_ADM_SERVER_CONFIG
+        <set>
+            NAME_ = #{name, jdbcType=VARCHAR},
+            DESCRIPTION_ = #{description, jdbcType=VARCHAR},
+            SERVER_ADDRESS_ = #{serverAddress, jdbcType=VARCHAR},
+            PORT_ = #{port, jdbcType=INTEGER},
+            CONTEXT_ROOT_ = #{contextRoot, jdbcType=VARCHAR},
+            REST_ROOT_ = #{restRoot, jdbcType=VARCHAR},
+            USER_NAME_ = #{userName, jdbcType=VARCHAR},
+            PASSWORD_ = #{password, jdbcType=VARCHAR},
+            ENDPOINT_TYPE_ = #{endpointType, jdbcType=INTEGER},
+            TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+        </set>
+        where ID_ = #{id, jdbcType=VARCHAR}
+    </update>
+
+	<select id="selectServerConfig" parameterType="string" resultMap="serverConfigResultMap">
+		select * from ${prefix}ACT_ADM_SERVER_CONFIG where ID_ = #{id, jdbcType=VARCHAR}
+	</select>
+	
+	<select id="selectAllServerConfigs" resultMap="serverConfigResultMap">
+        select * from ${prefix}ACT_ADM_SERVER_CONFIG
+    </select>
+
+    <select id="selectAllServerConfigsByEndpointType" resultMap="serverConfigResultMap">
+        select * from ${prefix}ACT_ADM_SERVER_CONFIG where ENDPOINT_TYPE_ = #{endpointType, jdbcType=INTEGER}
+    </select>
+	
+</mapper>

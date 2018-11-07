@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+    xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" 
+    xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+    xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" 
+    xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    targetNamespace="http://flowable.org/cmmn">
+    
+  <case id="CaseWithDi" name="Case with DI">
+    <casePlanModel id="myPlanModel" name="My Plan Model">
+      <planItem id="planItem1" definitionRef="task1" />
+      <planItem id="planItem2" definitionRef="task2">
+        <entryCriterion id="criterion1" sentryRef="sentry1" />
+      </planItem>
+      <sentry id="sentry1">
+        <planItemOnPart id="onPart1" sourceRef="planItem1">
+            <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <humanTask id="task1" name="Task 1" />
+      <humanTask id="task2" name="Task 2" />
+    </casePlanModel>
+  </case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="CMMNDiagram_CaseWithDi">
+      <cmmndi:CMMNShape id="DI_myPlanModel" cmmnElementRef="myPlanModel">
+        <dc:Bounds x="1" y="19" width="400" height="300" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+        <dc:Bounds x="70" y="65" width="80" height="60" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_criterion1" cmmnElementRef="criterion1">
+        <dc:Bounds x="268" y="216" width="20" height="28" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="CMMNEdge_onPart1" cmmnElementRef="onPart1" targetCMMNElementRef="criterion1">
+        <di:waypoint x="170" y="95" />
+        <di:waypoint x="220" y="95" />
+        <di:waypoint x="220" y="130" />
+        <di:waypoint x="250" y="130" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNEdge>
+      <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+        <dc:Bounds x="250" y="100" width="80" height="60" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</definitions>

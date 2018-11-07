@@ -17,11 +17,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.api.FlowableOptimisticLockingException;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
-import org.flowable.engine.task.Task;
-import org.flowable.variable.service.history.HistoricVariableInstance;
+import org.flowable.common.engine.api.FlowableOptimisticLockingException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 
 /**
  * @author Joram Barrez
@@ -43,7 +42,7 @@ public class StandaloneTaskTest extends PluggableFlowableTestCase {
     public void testCreateToComplete() {
 
         // Create and save task
-        Task task = taskService.newTask();
+        org.flowable.task.api.Task task = taskService.newTask();
         task.setName("testTask");
         taskService.saveTask(task);
         String taskId = task.getId();
@@ -53,7 +52,7 @@ public class StandaloneTaskTest extends PluggableFlowableTestCase {
         taskService.addCandidateUser(taskId, "gonzo");
 
         // Retrieve task list for kermit
-        List<Task> tasks = taskService.createTaskQuery().taskCandidateUser("kermit").list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskCandidateUser("kermit").list();
         assertEquals(1, tasks.size());
         assertEquals("testTask", tasks.get(0).getName());
 
@@ -62,6 +61,7 @@ public class StandaloneTaskTest extends PluggableFlowableTestCase {
         assertEquals(1, tasks.size());
         assertEquals("testTask", tasks.get(0).getName());
 
+        task = tasks.get(0);
         task.setName("Update name");
         taskService.saveTask(task);
         tasks = taskService.createTaskQuery().taskCandidateUser("kermit").list();
@@ -78,19 +78,19 @@ public class StandaloneTaskTest extends PluggableFlowableTestCase {
         // Complete task
         taskService.deleteTask(taskId, true);
 
-        // Task should be removed from runtime data
+        // org.flowable.task.service.Task should be removed from runtime data
         // TODO: check for historic data when implemented!
         assertNull(taskService.createTaskQuery().taskId(taskId).singleResult());
     }
 
     public void testOptimisticLockingThrownOnMultipleUpdates() {
-        Task task = taskService.newTask();
+        org.flowable.task.api.Task task = taskService.newTask();
         taskService.saveTask(task);
         String taskId = task.getId();
 
         // first modification
-        Task task1 = taskService.createTaskQuery().taskId(taskId).singleResult();
-        Task task2 = taskService.createTaskQuery().taskId(taskId).singleResult();
+        org.flowable.task.api.Task task1 = taskService.createTaskQuery().taskId(taskId).singleResult();
+        org.flowable.task.api.Task task2 = taskService.createTaskQuery().taskId(taskId).singleResult();
 
         task1.setDescription("first modification");
         taskService.saveTask(task1);
@@ -109,7 +109,7 @@ public class StandaloneTaskTest extends PluggableFlowableTestCase {
 
     // See https://activiti.atlassian.net/browse/ACT-1290
     public void testRevisionUpdatedOnSave() {
-        Task task = taskService.newTask();
+        org.flowable.task.api.Task task = taskService.newTask();
         taskService.saveTask(task);
         assertEquals(1, ((TaskEntity) task).getRevision());
 
@@ -126,7 +126,7 @@ public class StandaloneTaskTest extends PluggableFlowableTestCase {
 
     // See https://activiti.atlassian.net/browse/ACT-1290
     public void testRevisionUpdatedOnSaveWhenFetchedUsingQuery() {
-        Task task = taskService.newTask();
+        org.flowable.task.api.Task task = taskService.newTask();
         taskService.saveTask(task);
         assertEquals(1, ((TaskEntity) task).getRevision());
 
@@ -148,7 +148,7 @@ public class StandaloneTaskTest extends PluggableFlowableTestCase {
     public void testHistoricVariableOkOnUpdate() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             // 1. create a task
-            Task task = taskService.newTask();
+            org.flowable.task.api.Task task = taskService.newTask();
             task.setName("test execution");
             task.setOwner("josOwner");
             task.setAssignee("JosAssignee");

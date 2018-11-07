@@ -18,8 +18,9 @@ import java.io.Serializable;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
+import org.junit.jupiter.api.Test;
 
 /**
  * 
@@ -37,6 +38,7 @@ public class ServiceTaskVariablesTest extends PluggableFlowableTestCase {
 
     public static class Delegate1 implements JavaDelegate {
 
+        @Override
         public void execute(DelegateExecution execution) {
             Variable v = new Variable();
             v.value = "delegate1";
@@ -47,6 +49,7 @@ public class ServiceTaskVariablesTest extends PluggableFlowableTestCase {
 
     public static class Delegate2 implements JavaDelegate {
 
+        @Override
         public void execute(DelegateExecution execution) {
             Variable v = (Variable) execution.getVariable("variable");
             synchronized (ServiceTaskVariablesTest.class) {
@@ -61,6 +64,7 @@ public class ServiceTaskVariablesTest extends PluggableFlowableTestCase {
 
     public static class Delegate3 implements JavaDelegate {
 
+        @Override
         public void execute(DelegateExecution execution) {
             Variable v = (Variable) execution.getVariable("variable");
             synchronized (ServiceTaskVariablesTest.class) {
@@ -71,6 +75,7 @@ public class ServiceTaskVariablesTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testSerializedVariablesBothAsync() {
 
@@ -91,6 +96,7 @@ public class ServiceTaskVariablesTest extends PluggableFlowableTestCase {
         assertTrue(isOkInDelegate3);
     }
 
+    @Test
     @Deployment
     public void testSerializedVariablesThirdAsync() {
 

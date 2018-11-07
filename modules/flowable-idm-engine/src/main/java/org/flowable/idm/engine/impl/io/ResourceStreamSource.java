@@ -15,8 +15,8 @@ package org.flowable.idm.engine.impl.io;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.util.io.StreamSource;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.util.io.StreamSource;
 
 /**
  * @author Joram Barrez
@@ -29,6 +29,7 @@ public class ResourceStreamSource implements StreamSource {
         this.resource = resource;
     }
 
+    @Override
     public InputStream getInputStream() {
         InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resource);
         if (inputStream == null) {
@@ -37,6 +38,7 @@ public class ResourceStreamSource implements StreamSource {
         return new BufferedInputStream(inputStream);
     }
 
+    @Override
     public String toString() {
         return "Resource[" + resource + "]";
     }

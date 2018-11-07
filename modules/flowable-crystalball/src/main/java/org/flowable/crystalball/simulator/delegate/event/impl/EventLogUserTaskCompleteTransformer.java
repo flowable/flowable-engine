@@ -16,9 +16,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.crystalball.simulator.CrystalballException;
 import org.flowable.crystalball.simulator.SimulationEvent;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.event.logger.handler.Fields;
 
@@ -63,7 +63,7 @@ public class EventLogUserTaskCompleteTransformer extends EventLog2SimulationEven
             }
             String taskDefinitionKeyValue = (String) data.get(Fields.TASK_DEFINITION_KEY);
 
-            Map<String, Object> properties = new HashMap<String, Object>();
+            Map<String, Object> properties = new HashMap<>();
             properties.put("taskId", taskIdValue);
             properties.put(TASK_DEFINITION_KEY, taskDefinitionKeyValue);
             properties.put(PROCESS_INSTANCE_ID, event.getProcessInstanceId());

@@ -43,6 +43,7 @@ public interface Problems {
     String SERVICE_TASK_RESULT_VAR_NAME_WITH_DELEGATE = "flowable-servicetask-result-var-name-with-delegate";
     String SERVICE_TASK_MISSING_IMPLEMENTATION = "flowable-servicetask-missing-implementation";
     String SERVICE_TASK_WEBSERVICE_INVALID_OPERATION_REF = "flowable-servicetask-webservice-invalid-operation-ref";
+    String SERVICE_TASK_USE_LOCAL_SCOPE_FOR_RESULT_VAR_WITHOUT_RESULT_VARIABLE_NAME = "flowable-servicetask-use-local-scope-for-result-var-without-result-variable-name";
 
     String SEND_TASK_INVALID_IMPLEMENTATION = "flowable-sendtask-invalid-implementation";
     String SEND_TASK_INVALID_TYPE = "flowable-sendtask-invalid-type";
@@ -97,7 +98,8 @@ public interface Problems {
     String THROW_EVENT_INVALID_EVENTDEFINITION = "flowable-throw-event-invalid-eventdefinition";
 
     String MULTI_INSTANCE_MISSING_COLLECTION = "flowable-multi-instance-missing-collection";
-
+    String MULTI_INSTANCE_MISSING_COLLECTION_FUNCTION_PARAMETERS = "flowable-multi-instance-missing-collection-parser";
+    
     String MESSAGE_MISSING_NAME = "flowable-message-missing-name";
     String MESSAGE_INVALID_ITEM_REF = "flowable-message-invalid-item-ref";
     String MESSAGE_EVENT_MISSING_MESSAGE_REF = "flowable-message-event-missing-message-ref";

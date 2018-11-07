@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,13 +14,13 @@ package org.flowable.engine.impl.bpmn.behavior;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
-import org.flowable.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Implementation of the BPMN 2.0 script task.
- * 
+ *
  * @author Joram Barrez
  * @author Christian Stettler
  * @author Falko Menge
@@ -58,6 +58,7 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
         this.storeScriptVariables = storeScriptVariables;
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
 
         ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
@@ -75,6 +76,12 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
         boolean noErrors = true;
         try {
             Object result = scriptingEngines.evaluate(script, language, execution, storeScriptVariables);
+
+            if (null != result) {
+                if (language.equalsIgnoreCase("juel") && (result instanceof String) && script.equals(result.toString())) {
+                    throw new FlowableException("Error in Script");
+                }
+            }
 
             if (resultVariable != null) {
                 execution.setVariable(resultVariable, result);

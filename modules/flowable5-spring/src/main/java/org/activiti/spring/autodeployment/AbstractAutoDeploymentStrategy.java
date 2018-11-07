@@ -13,12 +13,12 @@
 
 package org.activiti.spring.autodeployment;
 
+import java.io.IOException;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ContextResource;
 import org.springframework.core.io.Resource;
-
-import java.io.IOException;
 
 /**
  * Abstract base class for implementations of {@link AutoDeploymentStrategy}.

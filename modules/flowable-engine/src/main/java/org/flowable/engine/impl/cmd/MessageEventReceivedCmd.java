@@ -17,9 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.event.MessageEventHandler;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -60,6 +60,7 @@ public class MessageEventReceivedCmd extends NeedsActiveExecutionCmd<Void> {
         this.async = async;
     }
 
+    @Override
     protected Void execute(CommandContext commandContext, ExecutionEntity execution) {
         if (messageName == null) {
             throw new FlowableIllegalArgumentException("messageName cannot be null");

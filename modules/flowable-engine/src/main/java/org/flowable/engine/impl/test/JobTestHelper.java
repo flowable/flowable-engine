@@ -16,12 +16,13 @@ package org.flowable.engine.impl.test;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
+import java.util.function.Predicate;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.engine.test.FlowableRule;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 
 /**
  * @author Joram Barrez
@@ -33,99 +34,51 @@ import org.flowable.engine.test.FlowableRule;
 // between Junit3 and junit 4 test support classes
 public class JobTestHelper {
 
-    public static void waitForJobExecutorToProcessAllJobs(FlowableRule activitiRule, long maxMillisToWait, long intervalMillis) {
-        waitForJobExecutorToProcessAllJobs(activitiRule.getProcessEngine().getProcessEngineConfiguration(), activitiRule.getManagementService(), maxMillisToWait, intervalMillis);
+    public static void waitForJobExecutorToProcessAllJobs(FlowableRule rule, long maxMillisToWait, long intervalMillis) {
+        waitForJobExecutorToProcessAllJobs(rule.getProcessEngine().getProcessEngineConfiguration(),
+            rule.getManagementService(), maxMillisToWait, intervalMillis);
     }
 
-    public static void waitForJobExecutorToProcessAllJobs(ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService, long maxMillisToWait, long intervalMillis) {
+    public static void waitForJobExecutorToProcessAllJobs(ProcessEngineConfiguration processEngineConfiguration,
+            ManagementService managementService, long maxMillisToWait, long intervalMillis) {
         waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, maxMillisToWait, intervalMillis, true);
     }
 
-    public static void waitForJobExecutorToProcessAllJobs(ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService, long maxMillisToWait, long intervalMillis,
-            boolean shutdownExecutorWhenFinished) {
-
-        AsyncExecutor asyncExecutor = processEngineConfiguration.getAsyncExecutor();
-        asyncExecutor.start();
-
-        try {
-            Timer timer = new Timer();
-            InterruptTask task = new InterruptTask(Thread.currentThread());
-            timer.schedule(task, maxMillisToWait);
-            boolean areJobsAvailable = true;
-            try {
-                while (areJobsAvailable && !task.isTimeLimitExceeded()) {
-                    Thread.sleep(intervalMillis);
-                    try {
-                        areJobsAvailable = areJobsAvailable(managementService);
-                    } catch (Throwable t) {
-                        // Ignore, possible that exception occurs due to locking/updating of table on MSSQL when
-                        // isolation level doesn't allow READ of the table
-                    }
-                }
-            } catch (InterruptedException e) {
-                // ignore
-            } finally {
-                timer.cancel();
-            }
-            if (areJobsAvailable) {
-                throw new FlowableException("time limit of " + maxMillisToWait + " was exceeded");
-            }
-
-        } finally {
-            if (shutdownExecutorWhenFinished) {
-                asyncExecutor.shutdown();
-            }
-        }
+    public static void waitForJobExecutorToProcessAllJobs(ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService,
+            long maxMillisToWait, long intervalMillis, boolean shutdownExecutorWhenFinished) {
+        internalWaitForJobs(processEngineConfiguration, managementService, JobTestHelper::areJobsAvailable,
+            maxMillisToWait, intervalMillis, shutdownExecutorWhenFinished);
     }
 
-    public static void waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService, long maxMillisToWait, long intervalMillis) {
-        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(processEngineConfiguration, managementService, maxMillisToWait, intervalMillis, true);
+    public static void waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(ProcessEngineConfiguration processEngineConfiguration,
+            ManagementService managementService, long maxMillisToWait, long intervalMillis) {
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(processEngineConfiguration, managementService,
+            maxMillisToWait, intervalMillis, true);
     }
 
-    public static void waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService, long maxMillisToWait, long intervalMillis,
-            boolean shutdownExecutorWhenFinished) {
+    public static void waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(ProcessEngineConfiguration processEngineConfiguration,
+            ManagementService managementService, long maxMillisToWait, long intervalMillis, boolean shutdownExecutorWhenFinished) {
+        internalWaitForJobs(processEngineConfiguration, managementService, JobTestHelper::areJobsOrExecutableTimersAvailable,
+            maxMillisToWait, intervalMillis, shutdownExecutorWhenFinished);
+    }
 
-        AsyncExecutor asyncExecutor = processEngineConfiguration.getAsyncExecutor();
-        asyncExecutor.start();
-        processEngineConfiguration.setAsyncExecutorActivate(true);
+    public static void waitForJobExecutorToProcessAllJobsAndTimerJobs(ProcessEngineConfiguration processEngineConfiguration,
+            ManagementService managementService, long maxMillisToWait, long intervalMillis) {
+        waitForJobExecutorToProcessAllJobsAndTimerJobs(processEngineConfiguration, managementService, maxMillisToWait, intervalMillis, true);
+    }
 
-        try {
-            Timer timer = new Timer();
-            InterruptTask task = new InterruptTask(Thread.currentThread());
-            timer.schedule(task, maxMillisToWait);
-            boolean areJobsAvailable = true;
-            try {
-                while (areJobsAvailable && !task.isTimeLimitExceeded()) {
-                    Thread.sleep(intervalMillis);
-                    try {
-                        areJobsAvailable = areJobsOrExecutableTimersAvailable(managementService);
-                    } catch (Throwable t) {
-                        // Ignore, possible that exception occurs due to locking/updating of table on MSSQL when
-                        // isolation level doesn't allow READ of the table
-                    }
-                }
-            } catch (InterruptedException e) {
-                // ignore
-            } finally {
-                timer.cancel();
-            }
-            if (areJobsAvailable) {
-                throw new FlowableException("time limit of " + maxMillisToWait + " was exceeded");
-            }
-
-        } finally {
-            if (shutdownExecutorWhenFinished) {
-                processEngineConfiguration.setAsyncExecutorActivate(false);
-                asyncExecutor.shutdown();
-            }
-        }
+    public static void waitForJobExecutorToProcessAllJobsAndTimerJobs(ProcessEngineConfiguration processEngineConfiguration,
+            ManagementService managementService, long maxMillisToWait, long intervalMillis, boolean shutdownExecutorWhenFinished) {
+        internalWaitForJobs(processEngineConfiguration, managementService, JobTestHelper::areJobsOrTimersAvailable,
+            maxMillisToWait, intervalMillis, shutdownExecutorWhenFinished);
     }
 
     public static void waitForJobExecutorOnCondition(FlowableRule activitiRule, long maxMillisToWait, long intervalMillis, Callable<Boolean> condition) {
         waitForJobExecutorOnCondition(activitiRule.getProcessEngine().getProcessEngineConfiguration(), maxMillisToWait, intervalMillis, condition);
     }
 
-    public static void waitForJobExecutorOnCondition(ProcessEngineConfiguration processEngineConfiguration, long maxMillisToWait, long intervalMillis, Callable<Boolean> condition) {
+    public static void waitForJobExecutorOnCondition(ProcessEngineConfiguration processEngineConfiguration,
+            long maxMillisToWait, long intervalMillis, Callable<Boolean> condition) {
         AsyncExecutor asyncExecutor = processEngineConfiguration.getAsyncExecutor();
         asyncExecutor.start();
 
@@ -201,6 +154,57 @@ public class JobTestHelper {
         }
     }
 
+    /**
+     * Returns true when there are any entries for the jobs or timers (unlike {@link #areJobsOrExecutableTimersAvailable(ManagementService)},
+     * which only take in account executable timers).
+     */
+    public static boolean areJobsOrTimersAvailable(ManagementService managementService) {
+        boolean emptyJobs = managementService.createJobQuery().count() == 0L;
+        if (emptyJobs) {
+            return !(managementService.createTimerJobQuery().count() == 0L);
+        } else {
+            return true;
+        }
+    }
+
+    protected static void internalWaitForJobs(ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService,
+        Predicate<ManagementService> jobsAvailablePredicate, long maxMillisToWait, long intervalMillis, boolean shutdownExecutorWhenFinished) {
+        AsyncExecutor asyncExecutor = processEngineConfiguration.getAsyncExecutor();
+        asyncExecutor.start();
+        processEngineConfiguration.setAsyncExecutorActivate(true);
+
+        try {
+            Timer timer = new Timer();
+            InterruptTask task = new InterruptTask(Thread.currentThread());
+            timer.schedule(task, maxMillisToWait);
+            boolean areJobsAvailable = true;
+            try {
+                while (areJobsAvailable && !task.isTimeLimitExceeded()) {
+                    Thread.sleep(intervalMillis);
+                    try {
+                        areJobsAvailable = jobsAvailablePredicate.test(managementService);
+                    } catch (Throwable t) {
+                        // Ignore, possible that exception occurs due to locking/updating of table on MSSQL when
+                        // isolation level doesn't allow READ of the table
+                    }
+                }
+            } catch (InterruptedException e) {
+                // ignore
+            } finally {
+                timer.cancel();
+            }
+            if (areJobsAvailable) {
+                throw new FlowableException("time limit of " + maxMillisToWait + " was exceeded");
+            }
+
+        } finally {
+            if (shutdownExecutorWhenFinished) {
+                processEngineConfiguration.setAsyncExecutorActivate(false);
+                asyncExecutor.shutdown();
+            }
+        }
+    }
+
     private static class InterruptTask extends TimerTask {
 
         protected boolean timeLimitExceeded;
@@ -214,9 +218,11 @@ public class JobTestHelper {
             return timeLimitExceeded;
         }
 
+        @Override
         public void run() {
             timeLimitExceeded = true;
             thread.interrupt();
         }
     }
+
 }

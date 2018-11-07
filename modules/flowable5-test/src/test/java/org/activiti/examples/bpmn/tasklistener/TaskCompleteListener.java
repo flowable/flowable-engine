@@ -12,9 +12,9 @@
  */
 package org.activiti.examples.bpmn.tasklistener;
 
-import org.flowable.engine.delegate.DelegateTask;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * @author Joram Barrez
@@ -26,8 +26,8 @@ public class TaskCompleteListener implements TaskListener {
     private Expression shortName;
 
     public void notify(DelegateTask delegateTask) {
-        delegateTask.getExecution().setVariable("greeting", "Hello from " + greeter.getValue(delegateTask.getExecution()));
-        delegateTask.getExecution().setVariable("shortName", shortName.getValue(delegateTask.getExecution()));
+        delegateTask.setVariable("greeting", "Hello from " + greeter.getValue(delegateTask));
+        delegateTask.setVariable("shortName", shortName.getValue(delegateTask));
 
         delegateTask.setVariableLocal("myTaskVariable", "test");
     }

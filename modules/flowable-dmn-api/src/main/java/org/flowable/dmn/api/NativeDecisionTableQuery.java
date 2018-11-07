@@ -12,7 +12,7 @@
  */
 package org.flowable.dmn.api;
 
-import org.flowable.engine.common.api.query.NativeQuery;
+import org.flowable.common.engine.api.query.NativeQuery;
 
 public interface NativeDecisionTableQuery extends NativeQuery<NativeDecisionTableQuery, DmnDecisionTable> {
 

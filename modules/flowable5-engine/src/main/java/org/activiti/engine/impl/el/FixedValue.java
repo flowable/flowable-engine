@@ -14,8 +14,8 @@
 package org.activiti.engine.impl.el;
 
 import org.activiti.engine.ActivitiException;
-import org.flowable.engine.delegate.Expression;
-import org.flowable.engine.delegate.VariableScope;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.variable.VariableContainer;
 
 /**
  * Expression that always returns the same value when <code>getValue</code> is called. Setting of the value is not supported.
@@ -30,15 +30,18 @@ public class FixedValue implements Expression {
     public FixedValue(Object value) {
         this.value = value;
     }
-
-    public Object getValue(VariableScope variableScope) {
+    
+    @Override
+    public Object getValue(VariableContainer variableContainer) {
         return value;
     }
-
-    public void setValue(Object value, VariableScope variableScope) {
+    
+    @Override
+    public void setValue(Object value, VariableContainer variableContainer) {
         throw new ActivitiException("Cannot change fixed value");
     }
 
+    @Override
     public String getExpressionText() {
         return value.toString();
     }

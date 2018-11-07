@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" 
+    xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" 
+    xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI"
+    xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:flowable="http://flowable.org/cmmn"
+    targetNamespace="http://flowable.org/cmmn">
+
+    <case id="myCase">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+
+            <planItem id="planItem1" name="The Process" definitionRef="theProcess" />
+            <planItem id="planItem2" name="Task Two" definitionRef="theTask">
+                <entryCriterion sentryRef="sentry1" />
+            </planItem>
+            <planItem id="planItem3" name="Process has been called" definitionRef="mileStone">
+                <entryCriterion sentryRef="sentry1" />
+            </planItem>
+
+            <sentry id="sentry1">
+                <planItemOnPart sourceRef="planItem1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <task id="theTask" name="The Task" isBlocking="true" />
+            <processTask id="theProcess" isBlocking="true" flowable:fallbackToDefaultTenant="true">
+                <extensionElements>
+                  <flowable:in source="num2" target="num"></flowable:in>
+                  <flowable:out source="num" target="num3"></flowable:out>
+                </extensionElements>
+                <processRefExpression><![CDATA[${processDefinitionKey}]]></processRefExpression>
+            </processTask>
+            <milestone id="mileStone" name="Milestone" />
+
+        </casePlanModel>
+    </case>
+
+</definitions>

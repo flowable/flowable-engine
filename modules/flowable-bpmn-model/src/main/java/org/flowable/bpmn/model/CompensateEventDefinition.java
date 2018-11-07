@@ -36,6 +36,7 @@ public class CompensateEventDefinition extends EventDefinition {
         this.waitForCompletion = waitForCompletion;
     }
 
+    @Override
     public CompensateEventDefinition clone() {
         CompensateEventDefinition clone = new CompensateEventDefinition();
         clone.setValues(this);

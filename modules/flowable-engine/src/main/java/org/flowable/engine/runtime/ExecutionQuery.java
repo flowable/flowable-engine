@@ -16,8 +16,8 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
+import org.flowable.common.engine.api.query.Query;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link Execution}s.
@@ -225,6 +225,22 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution> {
      *            variable value, cannot be null. The string can include the wildcard character '%' to express like-strategy: starts with (string%), ends with (%string) or contains (%string%).
      */
     ExecutionQuery variableValueLikeIgnoreCase(String name, String value);
+    
+    /**
+     * Only select executions which have a local variable with the given name.
+     * 
+     * @param name
+     *            cannot be null.
+     */
+    ExecutionQuery variableExists(String name);
+    
+    /**
+     * Only select executions which does not have a local variable with the given name.
+     * 
+     * @param name
+     *            cannot be null.
+     */
+    ExecutionQuery variableNotExists(String name);
 
     /**
      * Only select executions which are part of a process that have a variable with the given name set to the given value. Byte-arrays and {@link Serializable} objects (which are not primitive type
@@ -283,6 +299,66 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution> {
      * type wrappers) are not supported.
      */
     ExecutionQuery processVariableValueLikeIgnoreCase(String name, String value);
+    
+    /**
+     * Only select executions which have a process instance variable value greater than the passed value. Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not
+     * supported.
+     * 
+     * @param name
+     *            variable name, cannot be null.
+     * @param value
+     *            variable value, cannot be null.
+     */
+    ExecutionQuery processVariableValueGreaterThan(String name, Object value);
+
+    /**
+     * Only select executions which have a process instance variable value greater than or equal to the passed value. Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type
+     * wrappers) are not supported.
+     * 
+     * @param name
+     *            variable name, cannot be null.
+     * @param value
+     *            variable value, cannot be null.
+     */
+    ExecutionQuery processVariableValueGreaterThanOrEqual(String name, Object value);
+
+    /**
+     * Only select executions which have a process instance variable value less than the passed value. Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not
+     * supported.
+     * 
+     * @param name
+     *            variable name, cannot be null.
+     * @param value
+     *            variable value, cannot be null.
+     */
+    ExecutionQuery processVariableValueLessThan(String name, Object value);
+
+    /**
+     * Only select executions which have a process instance variable value less than or equal to the passed value. Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
+     * are not supported.
+     * 
+     * @param name
+     *            variable name, cannot be null.
+     * @param value
+     *            variable value, cannot be null.
+     */
+    ExecutionQuery processVariableValueLessThanOrEqual(String name, Object value);
+    
+    /**
+     * Only select executions which are part of a process that have a variable with the given name.
+     * 
+     * @param name
+     *            cannot be null.
+     */
+    ExecutionQuery processVariableExists(String name);
+    
+    /**
+     * Only select executions which are part of a process that don't have a variable with the given name.
+     * 
+     * @param name
+     *            cannot be null.
+     */
+    ExecutionQuery processVariableNotExists(String name);
 
     // event subscriptions //////////////////////////////////////////////////
 
@@ -339,6 +415,16 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution> {
      *            the user id of the authenticated user that started the execution (cannot be null)
      */
     ExecutionQuery startedBy(String userId);
+    
+    /**
+     * Begin an OR statement. Make sure you invoke the endOr method at the end of your OR statement. Only one OR statement is allowed, for the second call to this method an exception will be thrown.
+     */
+    ExecutionQuery or();
+
+    /**
+     * End an OR statement. Only one OR statement is allowed, for the second call to this method an exception will be thrown.
+     */
+    ExecutionQuery endOr();
 
     // ordering //////////////////////////////////////////////////////////////
 

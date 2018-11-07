@@ -13,7 +13,7 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.data.ProcessDefinitionInfoDataManager;
 
@@ -37,14 +37,17 @@ public class ProcessDefinitionInfoEntityManagerImpl extends
         return processDefinitionInfoDataManager;
     }
 
+    @Override
     public void insertProcessDefinitionInfo(ProcessDefinitionInfoEntity processDefinitionInfo) {
         insert(processDefinitionInfo);
     }
 
+    @Override
     public void updateProcessDefinitionInfo(ProcessDefinitionInfoEntity updatedProcessDefinitionInfo) {
         update(updatedProcessDefinitionInfo, true);
     }
 
+    @Override
     public void deleteProcessDefinitionInfo(String processDefinitionId) {
         ProcessDefinitionInfoEntity processDefinitionInfo = findProcessDefinitionInfoByProcessDefinitionId(processDefinitionId);
         if (processDefinitionInfo != null) {
@@ -53,6 +56,7 @@ public class ProcessDefinitionInfoEntityManagerImpl extends
         }
     }
 
+    @Override
     public void updateInfoJson(String id, byte[] json) {
         ProcessDefinitionInfoEntity processDefinitionInfo = findById(id);
         if (processDefinitionInfo != null) {
@@ -66,6 +70,7 @@ public class ProcessDefinitionInfoEntityManagerImpl extends
         }
     }
 
+    @Override
     public void deleteInfoJson(ProcessDefinitionInfoEntity processDefinitionInfo) {
         if (processDefinitionInfo.getInfoJsonId() != null) {
             ByteArrayRef ref = new ByteArrayRef(processDefinitionInfo.getInfoJsonId());
@@ -73,10 +78,12 @@ public class ProcessDefinitionInfoEntityManagerImpl extends
         }
     }
 
+    @Override
     public ProcessDefinitionInfoEntity findProcessDefinitionInfoByProcessDefinitionId(String processDefinitionId) {
         return processDefinitionInfoDataManager.findProcessDefinitionInfoByProcessDefinitionId(processDefinitionId);
     }
 
+    @Override
     public byte[] findInfoJsonById(String infoJsonId) {
         ByteArrayRef ref = new ByteArrayRef(infoJsonId);
         return ref.getBytes();

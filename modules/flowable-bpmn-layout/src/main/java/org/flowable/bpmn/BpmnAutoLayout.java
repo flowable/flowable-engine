@@ -393,10 +393,10 @@ public class BpmnAutoLayout {
                 Object gatewayVertex = generatedVertices.get(sourceElement.getId());
                 mxCellState gatewayState = graph.getView().getState(gatewayVertex);
 
-                mxPoint northPoint = new mxPoint(gatewayState.getX() + (gatewayState.getWidth()) / 2, gatewayState.getY());
-                mxPoint southPoint = new mxPoint(gatewayState.getX() + (gatewayState.getWidth()) / 2, gatewayState.getY() + gatewayState.getHeight());
-                mxPoint eastPoint = new mxPoint(gatewayState.getX() + gatewayState.getWidth(), gatewayState.getY() + (gatewayState.getHeight()) / 2);
-                mxPoint westPoint = new mxPoint(gatewayState.getX(), gatewayState.getY() + (gatewayState.getHeight()) / 2);
+                mxPoint northPoint = new mxPoint(gatewayState.getX() + gatewayState.getWidth() / 2, gatewayState.getY());
+                mxPoint southPoint = new mxPoint(gatewayState.getX() + gatewayState.getWidth() / 2, gatewayState.getY() + gatewayState.getHeight());
+                mxPoint eastPoint = new mxPoint(gatewayState.getX() + gatewayState.getWidth(), gatewayState.getY() + gatewayState.getHeight() / 2);
+                mxPoint westPoint = new mxPoint(gatewayState.getX(), gatewayState.getY() + gatewayState.getHeight() / 2);
 
                 double closestDistance = Double.MAX_VALUE;
                 mxPoint closestPoint = null;

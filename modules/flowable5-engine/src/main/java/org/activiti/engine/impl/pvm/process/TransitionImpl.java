@@ -18,8 +18,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.activiti.engine.impl.pvm.PvmTransition;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.delegate.Expression;
 
 /**
  * @author Tom Baeyens
@@ -33,14 +33,17 @@ public class TransitionImpl extends ProcessElementImpl implements PvmTransition 
     protected List<ExecutionListener> executionListeners;
     protected Expression skipExpression;
 
-    /** Graphical information: a list of waypoints: x1, y1, x2, y2, x3, y3, .. */
-    protected List<Integer> waypoints = new ArrayList<Integer>();
+    /**
+     * Graphical information: a list of waypoints: x1, y1, x2, y2, x3, y3, ..
+     */
+    protected List<Integer> waypoints = new ArrayList<>();
 
     public TransitionImpl(String id, Expression skipExpression, ProcessDefinitionImpl processDefinition) {
         super(id, processDefinition);
         this.skipExpression = skipExpression;
     }
 
+    @Override
     public ActivityImpl getSource() {
         return source;
     }
@@ -52,11 +55,12 @@ public class TransitionImpl extends ProcessElementImpl implements PvmTransition 
 
     public void addExecutionListener(ExecutionListener executionListener) {
         if (executionListeners == null) {
-            executionListeners = new ArrayList<ExecutionListener>();
+            executionListeners = new ArrayList<>();
         }
         executionListeners.add(executionListener);
     }
 
+    @Override
     public String toString() {
         return "(" + source.getId() + ")--" + (id != null ? id + "-->(" : ">(") + destination.getId() + ")";
     }
@@ -75,6 +79,7 @@ public class TransitionImpl extends ProcessElementImpl implements PvmTransition 
         this.source = source;
     }
 
+    @Override
     public ActivityImpl getDestination() {
         return destination;
     }
@@ -91,6 +96,7 @@ public class TransitionImpl extends ProcessElementImpl implements PvmTransition 
         this.waypoints = waypoints;
     }
 
+    @Override
     public Expression getSkipExpression() {
         return skipExpression;
     }

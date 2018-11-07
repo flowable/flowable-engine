@@ -18,12 +18,12 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceException;
 import javax.persistence.TransactionRequiredException;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.cfg.TransactionContext;
-import org.flowable.engine.common.impl.cfg.TransactionListener;
-import org.flowable.engine.common.impl.cfg.TransactionState;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.cfg.TransactionContext;
+import org.flowable.common.engine.impl.cfg.TransactionListener;
+import org.flowable.common.engine.impl.cfg.TransactionState;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Frederik Heremans
@@ -47,6 +47,7 @@ public class EntityManagerSessionImpl implements EntityManagerSession {
         this.closeEntityManager = closeEntityManager;
     }
 
+    @Override
     public void flush() {
         if (entityManager != null && (!handleTransactions || isTransactionActive())) {
             try {
@@ -68,6 +69,7 @@ public class EntityManagerSessionImpl implements EntityManagerSession {
         return false;
     }
 
+    @Override
     public void close() {
         if (closeEntityManager && entityManager != null && entityManager.isOpen()) {
             try {
@@ -78,6 +80,7 @@ public class EntityManagerSessionImpl implements EntityManagerSession {
         }
     }
 
+    @Override
     public EntityManager getEntityManager() {
         if (entityManager == null) {
             entityManager = getEntityManagerFactory().createEntityManager();
@@ -85,6 +88,7 @@ public class EntityManagerSessionImpl implements EntityManagerSession {
             if (handleTransactions) {
                 // Add transaction listeners, if transactions should be handled
                 TransactionListener jpaTransactionCommitListener = new TransactionListener() {
+                    @Override
                     public void execute(CommandContext commandContext) {
                         if (isTransactionActive()) {
                             entityManager.getTransaction().commit();
@@ -93,6 +97,7 @@ public class EntityManagerSessionImpl implements EntityManagerSession {
                 };
 
                 TransactionListener jpaTransactionRollbackListener = new TransactionListener() {
+                    @Override
                     public void execute(CommandContext commandContext) {
                         if (isTransactionActive()) {
                             entityManager.getTransaction().rollback();

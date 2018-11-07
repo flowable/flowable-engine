@@ -17,7 +17,7 @@ import java.util.Map;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.EventLogEntryEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 
 /**
  * @author Joram Barrez

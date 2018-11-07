@@ -27,6 +27,7 @@ public class FormValue extends BaseElement {
         this.name = name;
     }
 
+    @Override
     public FormValue clone() {
         FormValue clone = new FormValue();
         clone.setValues(this);

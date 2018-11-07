@@ -46,6 +46,7 @@ public class CommentEntity implements Comment, Event, PersistentObject, Serializ
     protected String message;
     protected String fullMessage;
 
+    @Override
     public Object getPersistentState() {
         return CommentEntity.class;
     }
@@ -78,11 +79,12 @@ public class CommentEntity implements Comment, Event, PersistentObject, Serializ
         message = stringBuilder.toString();
     }
 
+    @Override
     public List<String> getMessageParts() {
         if (message == null) {
             return null;
         }
-        List<String> messageParts = new ArrayList<String>();
+        List<String> messageParts = new ArrayList<>();
 
         String[] parts = MESSAGE_PARTS_MARKER_REGEX.split(message);
         for (String part : parts) {
@@ -97,14 +99,17 @@ public class CommentEntity implements Comment, Event, PersistentObject, Serializ
 
     // getters and setters //////////////////////////////////////////////////////
 
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public void setId(String id) {
         this.id = id;
     }
 
+    @Override
     public String getUserId() {
         return userId;
     }
@@ -113,6 +118,7 @@ public class CommentEntity implements Comment, Event, PersistentObject, Serializ
         this.userId = userId;
     }
 
+    @Override
     public String getTaskId() {
         return taskId;
     }
@@ -121,6 +127,7 @@ public class CommentEntity implements Comment, Event, PersistentObject, Serializ
         this.taskId = taskId;
     }
 
+    @Override
     public String getMessage() {
         return message;
     }
@@ -129,6 +136,7 @@ public class CommentEntity implements Comment, Event, PersistentObject, Serializ
         this.message = message;
     }
 
+    @Override
     public Date getTime() {
         return time;
     }
@@ -137,6 +145,7 @@ public class CommentEntity implements Comment, Event, PersistentObject, Serializ
         this.time = time;
     }
 
+    @Override
     public String getProcessInstanceId() {
         return processInstanceId;
     }
@@ -145,6 +154,7 @@ public class CommentEntity implements Comment, Event, PersistentObject, Serializ
         this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public String getType() {
         return type;
     }
@@ -153,6 +163,7 @@ public class CommentEntity implements Comment, Event, PersistentObject, Serializ
         this.type = type;
     }
 
+    @Override
     public String getFullMessage() {
         return fullMessage;
     }
@@ -161,6 +172,7 @@ public class CommentEntity implements Comment, Event, PersistentObject, Serializ
         this.fullMessage = fullMessage;
     }
 
+    @Override
     public String getAction() {
         return action;
     }

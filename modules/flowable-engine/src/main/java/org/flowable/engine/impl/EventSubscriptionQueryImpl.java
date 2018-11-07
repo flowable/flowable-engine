@@ -16,10 +16,10 @@ package org.flowable.engine.impl;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.engine.common.impl.query.AbstractQuery;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.AbstractQuery;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.EventSubscriptionQuery;
@@ -50,6 +50,7 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
         super(commandExecutor);
     }
 
+    @Override
     public EventSubscriptionQueryImpl id(String id) {
         if (id == null) {
             throw new FlowableIllegalArgumentException("Provided event subscription id is null");
@@ -58,6 +59,7 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
         return this;
     }
 
+    @Override
     public EventSubscriptionQueryImpl eventType(String eventType) {
         if (eventType == null) {
             throw new FlowableIllegalArgumentException("Provided event type is null");
@@ -66,6 +68,7 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
         return this;
     }
 
+    @Override
     public EventSubscriptionQueryImpl eventName(String eventName) {
         if (eventName == null) {
             throw new FlowableIllegalArgumentException("Provided event name is null");
@@ -74,6 +77,7 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
         return this;
     }
 
+    @Override
     public EventSubscriptionQueryImpl executionId(String executionId) {
         if (executionId == null) {
             throw new FlowableIllegalArgumentException("Provided execution id is null");
@@ -82,6 +86,7 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
         return this;
     }
 
+    @Override
     public EventSubscriptionQueryImpl processInstanceId(String processInstanceId) {
         if (processInstanceId == null) {
             throw new FlowableIllegalArgumentException("Provided process instance id is null");
@@ -90,6 +95,7 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
         return this;
     }
 
+    @Override
     public EventSubscriptionQueryImpl processDefinitionId(String processDefinitionId) {
         if (processDefinitionId == null) {
             throw new FlowableIllegalArgumentException("Provided process definition id is null");
@@ -98,6 +104,7 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
         return this;
     }
 
+    @Override
     public EventSubscriptionQueryImpl activityId(String activityId) {
         if (activityId == null) {
             throw new FlowableIllegalArgumentException("Provided activity id is null");
@@ -106,6 +113,7 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
         return this;
     }
 
+    @Override
     public EventSubscriptionQueryImpl createdBefore(Date beforeTime) {
         if (beforeTime == null) {
             throw new FlowableIllegalArgumentException("created before time is null");
@@ -115,6 +123,7 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
         return this;
     }
 
+    @Override
     public EventSubscriptionQueryImpl createdAfter(Date afterTime) {
         if (afterTime == null) {
             throw new FlowableIllegalArgumentException("created after time is null");
@@ -124,6 +133,7 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
         return this;
     }
 
+    @Override
     public EventSubscriptionQueryImpl tenantId(String tenantId) {
         if (tenantId == null) {
             throw new FlowableIllegalArgumentException("tenant id is null");
@@ -132,26 +142,32 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
         return this;
     }
 
+    @Override
     public EventSubscriptionQuery orderById() {
         return orderBy(EventSubscriptionQueryProperty.ID);
     }
 
+    @Override
     public EventSubscriptionQuery orderByExecutionId() {
         return orderBy(EventSubscriptionQueryProperty.EXECUTION_ID);
     }
 
+    @Override
     public EventSubscriptionQuery orderByProcessInstanceId() {
         return orderBy(EventSubscriptionQueryProperty.PROCESS_INSTANCE_ID);
     }
 
+    @Override
     public EventSubscriptionQuery orderByProcessDefinitionId() {
         return orderBy(EventSubscriptionQueryProperty.PROCESS_DEFINITION_ID);
     }
 
+    @Override
     public EventSubscriptionQuery orderByCreateDate() {
         return orderBy(EventSubscriptionQueryProperty.CREATED);
     }
 
+    @Override
     public EventSubscriptionQuery orderByTenantId() {
         return orderBy(EventSubscriptionQueryProperty.TENANT_ID);
     }

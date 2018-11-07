@@ -1,0 +1,72 @@
+<div class="container" id="detail-container">
+	<div class="row">
+		<div class="col-md-9">
+			<div class="component" ng-show="cmmnDeployment">
+				<div class="title">
+					<div class="pull-right">
+						<a ng-click="returnToList()" class="action">&larr; {{'GENERAL.ACTION.RETURN-TO-LIST' | translate}}</a>
+					</div>
+					<h2>{{cmmnDeployment.name || cmmnDeployment.id}}</h2>
+				</div>
+
+				<div class="property-wrapper">
+					<table>
+						<tr class="property">
+							<td class="property-name" translate="CMMN-DEPLOYMENT.ID"></td>
+							<td>{{cmmnDeployment.id}}</td>
+							<td class="property-name" translate="CMMN-DEPLOYMENT.NAME"></td>
+							<td>{{cmmnDeployment.name | empty}}</td>
+						</tr>
+						<tr class="property">
+							<td class="property-name" translate="CMMN-DEPLOYMENT.TIME"></td>
+							<td>{{cmmnDeployment.deploymentTime | dateformat}}</td>
+							<td class="property-name" translate="CMMN-DEPLOYMENT.CATEGORY"></td>
+							<td>{{cmmnDeployment.category | empty}}</td>
+						</tr>
+						<tr class="property">
+                            <td class="property-name" translate="CMMN-DEPLOYMENT.TENANTID"></td>
+                            <td>{{cmmnDeployment.tenantId | empty}}</td>
+                            <td ng-if="cmmnDeployment.parentDeploymentId" class="property-name" translate="CMMN-DEPLOYMENT.PARENT-DEPLOYMENT-ID"></td>
+                            <td ng-if="cmmnDeployment.parentDeploymentId"><a ng-href="#/app-deployment/{{cmmnDeployment.parentDeploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{cmmnDeployment.parentDeploymentId}}</a></td>
+                        </tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	    <div class="col-md-3">
+			<div class="component tip-left">
+				<div class="title">
+					<h2 translate="GENERAL.TITLE.ACTIONS"></h2>
+				</div>
+				<ul class="list-group">
+					  <li>
+					    <button type="button" class="btn btn-sm btn-default btn-danger" ng-click="deleteDeployment()">
+							<i class="glyphicon glyphicon-remove"></i><span translate="CMMN-DEPLOYMENTS.ACTION.DELETE"></span>
+					    </button>
+					  </li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-9">
+			<div class="component">
+				<div class="title">
+					<div class="pull-right">
+						<a ng-click="showAllCaseDefinitions()" class="action"><i class="glyphicon glyphicon-zoom-in"></i> {{'DEPLOYMENT.ACTION.SHOW-ALL-DEFINITIONS' | translate}}</a>
+					</div>
+					<h2 translate="CMMN-DEPLOYMENT.TITLE.CASE-DEFINITIONS"></h2>
+				</div>
+				<div class="grid-wrapper grid-wrapper-compact" ng-if="caseDefinitions">
+					<div class="grid-message" ng-if="caseDefinitions.size > 0">
+	                       <span>{{'CMMN-DEPLOYMENT.DEFINITIONS-MESSAGE' | translate:caseDefinitions}}</span>
+	                   </div>
+	                    <div class="grid-message" ng-if="caseDefinitions.size == 0">
+	                       <span>{{'CMMN-DEPLOYMENT.DEFINITIONS-MESSAGE-EMPTY' | translate}}</span>
+	                   </div>
+					<div ng-grid="gridCaseDefinitions" class="gridStyle" ng-if="gridCaseDefinitions && caseDefinitions.data" ng-show="caseDefinitions.size > 0"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

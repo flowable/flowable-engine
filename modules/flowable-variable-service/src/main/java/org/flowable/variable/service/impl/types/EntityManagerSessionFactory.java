@@ -15,10 +15,10 @@ package org.flowable.variable.service.impl.types;
 
 import javax.persistence.EntityManagerFactory;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.Session;
-import org.flowable.engine.common.impl.interceptor.SessionFactory;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Session;
+import org.flowable.common.engine.impl.interceptor.SessionFactory;
 
 /**
  * @author Frederik Heremans
@@ -42,10 +42,12 @@ public class EntityManagerSessionFactory implements SessionFactory {
         this.closeEntityManager = closeEntityManager;
     }
 
+    @Override
     public Class<?> getSessionType() {
         return EntityManagerSession.class;
     }
 
+    @Override
     public Session openSession(CommandContext commandContext) {
         return new EntityManagerSessionImpl(entityManagerFactory, handleTransactions, closeEntityManager);
     }

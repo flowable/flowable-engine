@@ -40,6 +40,10 @@ public class FormEngineImpl implements FormEngine {
         this.managementService = engineConfiguration.getFormManagementService();
         this.repositoryService = engineConfiguration.getFormRepositoryService();
         this.formService = engineConfiguration.getFormService();
+        
+        if (engineConfiguration.getSchemaManagementCmd() != null) {
+            engineConfiguration.getCommandExecutor().execute(engineConfiguration.getSchemaCommandConfig(), engineConfiguration.getSchemaManagementCmd());
+        }
 
         if (name == null) {
             LOGGER.info("default flowable FormEngine created");
@@ -50,6 +54,7 @@ public class FormEngineImpl implements FormEngine {
         FormEngines.registerFormEngine(this);
     }
 
+    @Override
     public void close() {
         FormEngines.unregister(this);
     }
@@ -57,22 +62,27 @@ public class FormEngineImpl implements FormEngine {
     // getters and setters
     // //////////////////////////////////////////////////////
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public FormManagementService getFormManagementService() {
         return managementService;
     }
 
+    @Override
     public FormRepositoryService getFormRepositoryService() {
         return repositoryService;
     }
 
+    @Override
     public FormService getFormService() {
         return formService;
     }
 
+    @Override
     public FormEngineConfiguration getFormEngineConfiguration() {
         return engineConfiguration;
     }

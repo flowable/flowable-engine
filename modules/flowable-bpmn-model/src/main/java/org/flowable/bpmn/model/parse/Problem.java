@@ -42,6 +42,7 @@ public class Problem {
         this.column = graphicInfo.getXmlColumnNumber();
     }
 
+    @Override
     public String toString() {
         return errorMessage + (resource != null ? " | " + resource : "") + " | line " + line + " | column " + column;
     }

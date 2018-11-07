@@ -17,13 +17,13 @@ import java.util.List;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.IdmByteArrayEntity;
 import org.flowable.idm.engine.impl.persistence.entity.IdmByteArrayEntityImpl;
-import org.flowable.idm.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.idm.engine.impl.persistence.entity.data.AbstractIdmDataManager;
 import org.flowable.idm.engine.impl.persistence.entity.data.ByteArrayDataManager;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisByteArrayDataManager extends AbstractDataManager<IdmByteArrayEntity> implements ByteArrayDataManager {
+public class MybatisByteArrayDataManager extends AbstractIdmDataManager<IdmByteArrayEntity> implements ByteArrayDataManager {
 
     public MybatisByteArrayDataManager(IdmEngineConfiguration idmEngineConfiguration) {
         super(idmEngineConfiguration);
@@ -47,7 +47,7 @@ public class MybatisByteArrayDataManager extends AbstractDataManager<IdmByteArra
 
     @Override
     public void deleteByteArrayNoRevisionCheck(String byteArrayEntityId) {
-        getDbSqlSession().delete("deleteIdmByteArrayNoRevisionCheck", byteArrayEntityId);
+        getDbSqlSession().delete("deleteIdmByteArrayNoRevisionCheck", byteArrayEntityId, getManagedEntityClass());
     }
 
 }

@@ -14,10 +14,10 @@ package org.flowable.content.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Tijs Rademakers
@@ -26,6 +26,7 @@ public class CreateContentItemCmd implements Command<ContentItem>, Serializable 
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public ContentItem execute(CommandContext commandContext) {
         return CommandContextUtil.getContentItemEntityManager().create();
     }

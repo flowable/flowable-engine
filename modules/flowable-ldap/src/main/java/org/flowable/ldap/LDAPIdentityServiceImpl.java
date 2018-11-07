@@ -21,7 +21,7 @@ import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.NativeGroupQuery;
@@ -146,6 +146,7 @@ public class LDAPIdentityServiceImpl extends IdmIdentityServiceImpl {
             LDAPTemplate ldapTemplate = new LDAPTemplate(ldapConfigurator);
             return ldapTemplate.execute(new LDAPCallBack<Boolean>() {
 
+                @Override
                 public Boolean executeInContext(InitialDirContext initialDirContext) {
 
                     if (initialDirContext == null) {

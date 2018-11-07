@@ -15,10 +15,10 @@ package org.flowable.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -41,6 +41,7 @@ public class ChangeDeploymentTenantIdCmd implements Command<Void>, Serializable 
         this.newTenantId = newTenantId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (deploymentId == null) {
             throw new FlowableIllegalArgumentException("deploymentId is null");
@@ -65,11 +66,8 @@ public class ChangeDeploymentTenantIdCmd implements Command<Void>, Serializable 
         // (otherwise would not be performant)
         CommandContextUtil.getProcessDefinitionEntityManager(commandContext).updateProcessDefinitionTenantIdForDeployment(deploymentId, newTenantId);
         CommandContextUtil.getExecutionEntityManager(commandContext).updateExecutionTenantIdForDeployment(deploymentId, newTenantId);
-        CommandContextUtil.getTaskEntityManager(commandContext).updateTaskTenantIdForDeployment(deploymentId, newTenantId);
-        CommandContextUtil.getJobEntityManager(commandContext).updateJobTenantIdForDeployment(deploymentId, newTenantId);
-        CommandContextUtil.getTimerJobEntityManager(commandContext).updateJobTenantIdForDeployment(deploymentId, newTenantId);
-        CommandContextUtil.getSuspendedJobEntityManager(commandContext).updateJobTenantIdForDeployment(deploymentId, newTenantId);
-        CommandContextUtil.getDeadLetterJobEntityManager(commandContext).updateJobTenantIdForDeployment(deploymentId, newTenantId);
+        CommandContextUtil.getTaskService().updateTaskTenantIdForDeployment(deploymentId, newTenantId);
+        CommandContextUtil.getJobService().updateAllJobTypesTenantIdForDeployment(deploymentId, newTenantId);
         CommandContextUtil.getEventSubscriptionEntityManager(commandContext).updateEventSubscriptionTenantId(oldTenantId, newTenantId);
 
         // Doing process definitions in memory, cause we need to clear the process definition cache

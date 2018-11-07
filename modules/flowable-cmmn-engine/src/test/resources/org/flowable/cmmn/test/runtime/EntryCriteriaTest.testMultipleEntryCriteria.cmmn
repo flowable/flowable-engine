@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" 
+    xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" 
+    xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI"
+    xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    targetNamespace="http://flowable.org/cmmn">
+    
+    <case id="myCase">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+
+            <planItem id="planItemTask1" name="Task One" definitionRef="taskA" />
+            <planItem id="planItemTask2" name="Task Two" definitionRef="taskB" />
+            <planItem id="planItemTask3" name="Task Three" definitionRef="taskC" />
+            <planItem id="planItemMileStoneOne" name="M1" definitionRef="milestone">
+                <entryCriterion sentryRef="sentry1" />
+                <entryCriterion sentryRef="sentry2" />
+                <entryCriterion sentryRef="sentry3" />
+            </planItem>
+
+            <sentry id="sentry1">
+                <planItemOnPart sourceRef="planItemTask1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            
+            <sentry id="sentry2">
+                <planItemOnPart sourceRef="planItemTask2">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            
+             <sentry id="sentry3">
+                <planItemOnPart sourceRef="planItemTask3">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <task id="taskA" name="A" isBlocking="true" />
+            <task id="taskB" name="B" isBlocking="true" />
+            <task id="taskC" name="C" isBlocking="true" />
+            <milestone id="milestone" name="Milestone" />
+
+        </casePlanModel>
+    </case>
+</definitions>

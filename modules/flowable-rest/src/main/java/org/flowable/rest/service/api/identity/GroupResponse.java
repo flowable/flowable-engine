@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.identity;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * @author Frederik Heremans
  */
@@ -23,6 +25,7 @@ public class GroupResponse {
     protected String name;
     protected String type;
 
+    @ApiModelProperty(example = "testgroup")
     public String getId() {
         return id;
     }
@@ -31,6 +34,7 @@ public class GroupResponse {
         this.id = id;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/identity/groups/testgroup")
     public String getUrl() {
         return url;
     }
@@ -39,6 +43,7 @@ public class GroupResponse {
         this.url = url;
     }
 
+    @ApiModelProperty(example = "Test group")
     public String getName() {
         return name;
     }
@@ -47,6 +52,7 @@ public class GroupResponse {
         this.name = name;
     }
 
+    @ApiModelProperty(example = "Test type")
     public String getType() {
         return type;
     }

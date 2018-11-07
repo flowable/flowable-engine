@@ -114,66 +114,79 @@ public class IndentingXMLStreamWriter extends DelegatingXMLStreamWriter {
         }
     }
 
+    @Override
     public void writeStartDocument() throws XMLStreamException {
         super.writeStartDocument();
         super.writeCharacters("\n");
     }
 
+    @Override
     public void writeStartDocument(String version) throws XMLStreamException {
         super.writeStartDocument(version);
         super.writeCharacters("\n");
     }
 
+    @Override
     public void writeStartDocument(String encoding, String version) throws XMLStreamException {
         super.writeStartDocument(encoding, version);
         super.writeCharacters("\n");
     }
 
+    @Override
     public void writeStartElement(String localName) throws XMLStreamException {
         onStartElement();
         super.writeStartElement(localName);
     }
 
+    @Override
     public void writeStartElement(String namespaceURI, String localName) throws XMLStreamException {
         onStartElement();
         super.writeStartElement(namespaceURI, localName);
     }
 
+    @Override
     public void writeStartElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
         onStartElement();
         super.writeStartElement(prefix, localName, namespaceURI);
     }
 
+    @Override
     public void writeEmptyElement(String namespaceURI, String localName) throws XMLStreamException {
         onEmptyElement();
         super.writeEmptyElement(namespaceURI, localName);
     }
 
+    @Override
     public void writeEmptyElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
         onEmptyElement();
         super.writeEmptyElement(prefix, localName, namespaceURI);
     }
 
+    @Override
     public void writeEmptyElement(String localName) throws XMLStreamException {
         onEmptyElement();
         super.writeEmptyElement(localName);
     }
 
+    @Override
     public void writeEndElement() throws XMLStreamException {
         onEndElement();
         super.writeEndElement();
     }
 
+    @Override
     public void writeCharacters(String text) throws XMLStreamException {
         state = SEEN_DATA;
         super.writeCharacters(text);
     }
 
+    @Override
     public void writeCharacters(char[] text, int start, int len) throws XMLStreamException {
         state = SEEN_DATA;
         super.writeCharacters(text, start, len);
     }
 
+    @Override
     public void writeCData(String data) throws XMLStreamException {
         state = SEEN_DATA;
         super.writeCData(data);

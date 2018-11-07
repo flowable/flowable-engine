@@ -19,13 +19,13 @@ import java.util.Map;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityImpl;
-import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ResourceDataManager;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisResourceDataManager extends AbstractDataManager<ResourceEntity> implements ResourceDataManager {
+public class MybatisResourceDataManager extends AbstractProcessDataManager<ResourceEntity> implements ResourceDataManager {
 
     public MybatisResourceDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);

@@ -20,6 +20,7 @@ import org.flowable.engine.delegate.DelegateExecution;
  */
 public interface ExecutionListenerExecution extends DelegateExecution {
 
+    @Override
     String getEventName();
 
     PvmProcessElement getEventSource();

@@ -1,0 +1,82 @@
+{
+  "bounds": {
+    "lowerRight": {
+      "x": 1485.0,
+      "y": 804.0
+    },
+    "upperLeft": {
+      "x": 0.0,
+      "y": 0.0
+    }
+  },
+  "stencil": {
+    "id": "CMMNDiagram"
+  },
+  "stencilset": {
+    "namespace": "http://b3mn.org/stencilset/cmmn1.1#",
+    "url": "../editor/stencilsets/cmmn1.1/cmmn1.1.json"
+  },
+  "properties": {
+    "case_id": "dmnExportCase",
+    "name": "dmnExportCase",
+    "case_initiatorvariablename": "initiator",
+    "case_namespace": "http://www.flowable.org/casedef"
+  },
+  "childShapes": [
+    {
+      "bounds": {
+        "lowerRight": {
+          "x": 758.0,
+          "y": 754.0
+        },
+        "upperLeft": {
+          "x": 40.0,
+          "y": 40.0
+        }
+      },
+      "resourceId": "casePlanModel",
+      "childShapes": [
+        {
+          "bounds": {
+            "lowerRight": {
+              "x": 355.72728155467115,
+              "y": 229.00000216744158
+            },
+            "upperLeft": {
+              "x": 255.72728155467115,
+              "y": 149.00000216744158
+            }
+          },
+          "resourceId": "planItem1",
+          "childShapes": [],
+          "stencil": {
+            "id": "HttpTask"
+          },
+          "properties": {
+            "overrideid": "sid-24B595C4-EE31-4A3E-A94F-CF2D2B13247B",
+            "name": "HttpTaskName",
+            "documentation": "documentation",
+            "httptaskrequestmethod": "httptaskrequestmethod",
+            "httptaskrequesturl": "httptaskrequesturl",
+            "httptaskrequestheaders": "httptaskrequestheaders",
+            "httptaskrequestbodyencoding": "httptaskrequestbodyencoding",
+            "httptaskrequesttimeout": "httptaskrequesttimeout",
+            "httptaskdisallowredirects": "httptaskdisallowredirects",
+            "httptaskfailstatuscodes": "httptaskfailstatuscodes",
+            "httptaskhandlestatuscodes": "httptaskhandlestatuscodes",
+            "httptaskignoreexception": "httptaskignoreexception",
+            "httptasksaverequestvariables": "httptasksaverequestvariables",
+            "httptasksaveresponseparameters": "httptasksaveresponseparameters",
+            "httptaskresultvariableprefix": "httptaskresultvariableprefix",
+            "servicetaskclass": "AbcClass"
+          },
+          "outgoing": []
+        }
+      ],
+      "stencil": {
+        "id": "CasePlanModel"
+      },
+      "outgoing": []
+    }
+  ]
+}

@@ -13,7 +13,7 @@
 package org.flowable.dmn.engine.test.history;
 
 import org.flowable.dmn.engine.impl.test.ResourceFlowableDmnTestCase;
-import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
+import org.flowable.dmn.engine.test.DmnDeployment;
 
 /**
  * @author Tijs Rademakers
@@ -24,7 +24,7 @@ public class HistoryNoneTest extends ResourceFlowableDmnTestCase {
         super("historynone.flowable.dmn.cfg.xml");
     }
 
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void testFirstHitPolicy() throws Exception {
         ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")

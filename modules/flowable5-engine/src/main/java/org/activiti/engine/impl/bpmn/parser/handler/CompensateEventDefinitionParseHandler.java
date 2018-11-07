@@ -30,10 +30,12 @@ public class CompensateEventDefinitionParseHandler extends AbstractBpmnParseHand
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CompensateEventDefinitionParseHandler.class);
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return CompensateEventDefinition.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, CompensateEventDefinition eventDefinition) {
 
         ScopeImpl scope = bpmnParse.getCurrentScope();

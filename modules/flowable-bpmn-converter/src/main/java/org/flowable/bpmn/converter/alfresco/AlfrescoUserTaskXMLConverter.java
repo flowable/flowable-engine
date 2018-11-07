@@ -21,6 +21,7 @@ import org.flowable.bpmn.model.alfresco.AlfrescoUserTask;
  */
 public class AlfrescoUserTaskXMLConverter extends UserTaskXMLConverter {
 
+    @Override
     public Class<? extends BaseElement> getBpmnElementType() {
         return AlfrescoUserTask.class;
     }

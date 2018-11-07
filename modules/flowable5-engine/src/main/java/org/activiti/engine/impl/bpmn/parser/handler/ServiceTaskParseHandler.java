@@ -33,10 +33,12 @@ public class ServiceTaskParseHandler extends AbstractExternalInvocationBpmnParse
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceTaskParseHandler.class);
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return ServiceTask.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, ServiceTask serviceTask) {
 
         ActivityImpl activity = createActivityOnCurrentScope(bpmnParse, serviceTask, BpmnXMLConstants.ELEMENT_TASK_SERVICE);

@@ -39,6 +39,7 @@ public class SaveProcessDefinitionInfoCmd implements Command<Void>, Serializable
         this.infoNode = infoNode;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (processDefinitionId == null) {
             throw new ActivitiIllegalArgumentException("process definition id is null");
@@ -62,7 +63,7 @@ public class SaveProcessDefinitionInfoCmd implements Command<Void>, Serializable
             ObjectWriter writer = commandContext.getProcessEngineConfiguration().getObjectMapper().writer();
             commandContext.getProcessDefinitionInfoEntityManager().updateInfoJson(definitionInfoEntity.getId(), writer.writeValueAsBytes(infoNode));
         } catch (Exception e) {
-            throw new ActivitiException("Unable to serialize info node " + infoNode);
+            throw new ActivitiException("Unable to serialize info node " + infoNode, e);
         }
 
         return null;

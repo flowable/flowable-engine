@@ -22,6 +22,7 @@ import org.flowable.engine.impl.delegate.ActivityBehavior;
  */
 public class ThrowsExceptionBehavior implements ActivityBehavior {
 
+    @Override
     public void execute(DelegateExecution execution) {
         String var = (String) execution.getVariable("var");
 

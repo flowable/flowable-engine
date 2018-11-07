@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.flowable.common.rest.util.DateToStringSerializer;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
-import org.flowable.rest.util.DateToStringSerializer;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -54,6 +54,9 @@ public class HistoricTaskInstanceResponse {
     protected String parentTaskId;
     protected String url;
     protected List<RestVariable> variables = new ArrayList<>();
+    protected String scopeDefinitionId;
+    protected String scopeId;
+    protected String scopeType;
     protected String tenantId;
     protected String category;
 
@@ -243,6 +246,30 @@ public class HistoricTaskInstanceResponse {
 
     public void addVariable(RestVariable variable) {
         variables.add(variable);
+    }
+    
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
+    }
+
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
+    }
+
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
     }
 
     public void setTenantId(String tenantId) {

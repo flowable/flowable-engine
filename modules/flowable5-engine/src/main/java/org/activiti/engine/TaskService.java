@@ -27,9 +27,9 @@ import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.engine.task.NativeTaskQuery;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
-import org.flowable.engine.task.DelegationState;
-import org.flowable.identitylink.service.IdentityLink;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.task.api.DelegationState;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
  * Service which provides access to {@link Task} and form related operations.

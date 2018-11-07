@@ -1,0 +1,55 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="definition_7bd4e515-2c47-11e8-85e5-eecfadc0abcd" name="Collection2" namespace="http://www.flowable.org/dmn">
+  <decision id="COL2" name="Collection2">
+    <decisionTable id="decisionTable_7bd4e515-2c47-11e8-85e5-eecfadc0abcd" hitPolicy="FIRST">
+      <input label="Input One">
+        <inputExpression id="inputExpression_1" typeRef="collection">
+          <text>inputCollection1</text>
+        </inputExpression>
+      </input>
+      <input label="Input Two">
+        <inputExpression id="inputExpression_3" typeRef="number">
+          <text>inputNumber1</text>
+        </inputExpression>
+      </input>
+      <output id="outputExpression_2" name="output1" typeRef="string"></output>
+      <rule>
+        <inputEntry id="inputEntry_1_1">
+          <extensionElements>
+            <flowable:operator xmlns:flowable="http://flowable.org/dmn">IN</flowable:operator>
+            <flowable:expression xmlns:flowable="http://flowable.org/dmn">"VAL1", "VAL2"</flowable:expression>
+          </extensionElements>
+          <text><![CDATA[${collection:contains(inputCollection1, '"VAL1","VAL2"')}]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_3_1">
+          <extensionElements>
+            <flowable:operator xmlns:flowable="http://flowable.org/dmn">NOT IN</flowable:operator>
+            <flowable:expression xmlns:flowable="http://flowable.org/dmn">10, 20</flowable:expression>
+          </extensionElements>
+          <text><![CDATA[${collection:contains('10,20', inputNumber1)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_1">
+          <text><![CDATA["HIT 1"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_2">
+          <extensionElements>
+            <flowable:operator xmlns:flowable="http://flowable.org/dmn">IN</flowable:operator>
+            <flowable:expression xmlns:flowable="http://flowable.org/dmn">"VAL1", "VAL2"</flowable:expression>
+          </extensionElements>
+          <text><![CDATA[${collection:notContains(inputCollection1, '"VAL1","VAL2"')}]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_3_2">
+          <extensionElements>
+            <flowable:operator xmlns:flowable="http://flowable.org/dmn">IN</flowable:operator>
+            <flowable:expression xmlns:flowable="http://flowable.org/dmn">10, 20</flowable:expression>
+          </extensionElements>
+          <text><![CDATA[${collection:notContains('10,20', inputnumber1)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_2">
+          <text><![CDATA["HIT 2"]]></text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

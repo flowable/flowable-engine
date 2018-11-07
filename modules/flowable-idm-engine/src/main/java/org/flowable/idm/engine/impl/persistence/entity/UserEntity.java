@@ -12,8 +12,8 @@
  */
 package org.flowable.idm.engine.impl.persistence.entity;
 
-import org.flowable.engine.common.impl.db.HasRevision;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.db.HasRevision;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.idm.api.Picture;
 import org.flowable.idm.api.User;
 
@@ -27,26 +27,43 @@ public interface UserEntity extends User, Entity, HasRevision {
 
     void setPicture(Picture picture);
 
+    @Override
     String getId();
 
+    @Override
     void setId(String id);
 
+    @Override
     String getFirstName();
 
+    @Override
     void setFirstName(String firstName);
 
+    @Override
     String getLastName();
 
+    @Override
     void setLastName(String lastName);
+    
+    @Override
+    String getDisplayName();
 
+    @Override
+    void setDisplayName(String displayName);
+
+    @Override
     String getEmail();
 
+    @Override
     void setEmail(String email);
 
+    @Override
     String getPassword();
 
+    @Override
     void setPassword(String password);
 
+    @Override
     boolean isPictureSet();
 
     ByteArrayRef getPictureByteArrayRef();

@@ -13,7 +13,7 @@
 package org.flowable.management.jmx.mbeans;
 
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.management.jmx.annotations.ManagedAttribute;
 import org.flowable.management.jmx.annotations.ManagedOperation;
 import org.flowable.management.jmx.annotations.ManagedResource;

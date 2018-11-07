@@ -40,7 +40,7 @@
             "exclusivedefinition" : "No",
             "executionlisteners" : "",
             "formkeydefinition" : "",
-            "formproperties" : { "items" : [ { "formproperty_expression" : "",
+            "formproperties" : { "formProperties" : [ { "formproperty_expression" : "",
                       "formproperty_id" : "test",
                       "formproperty_name" : "Test",
                       "formproperty_type" : "string",
@@ -176,7 +176,8 @@
           ],
         "properties" : { "documentation" : "",
             "name" : "",
-            "dataproperties" : { "items" : [ { "dataproperty_id" : "dObj7",
+            "dataproperties" : { "items" : [
+                                { "dataproperty_id" : "dObj7",
                                   "dataproperty_name" : "SubStringTest",
                                   "dataproperty_type" : "string",
                                   "dataproperty_value" : "Testing456"
@@ -205,9 +206,39 @@
                                   "dataproperty_name" : "SubLongTest",
                                   "dataproperty_type" : "long",
                                   "dataproperty_value" : "456123"
+                                },
+                                { "dataproperty_id" : "dObj19",
+                                  "dataproperty_name" : "SubStringTest2",
+                                  "dataproperty_type" : "string",
+                                  "dataproperty_value" : ""
+                                },
+                                { "dataproperty_id" : "dObj20",
+                                  "dataproperty_name" : "SubBooleanTest2",
+                                  "dataproperty_type" : "boolean",
+                                  "dataproperty_value" : ""
+                                },
+                                { "dataproperty_id" : "dObj21",
+                                  "dataproperty_name" : "SubDateTest2",
+                                  "dataproperty_type" : "datetime",
+                                  "dataproperty_value" : ""
+                                },
+                                { "dataproperty_id" : "dObj22",
+                                  "dataproperty_name" : "SubDoubleTest2",
+                                  "dataproperty_type" : "double",
+                                  "dataproperty_value" : ""
+                                },
+                                { "dataproperty_id" : "dObj23",
+                                  "dataproperty_name" : "SubIntegerTest2",
+                                  "dataproperty_type" : "int",
+                                  "dataproperty_value" : ""
+                                },
+                                { "dataproperty_id" : "dObj24",
+                                  "dataproperty_name" : "SubLongTest2",
+                                  "dataproperty_type" : "long",
+                                  "dataproperty_value" : ""
                                 }
                               ],
-                           "totalCount" : 6
+                           "totalCount" : 12
                           }
           },
         "resourceId" : "subprocess1",
@@ -387,7 +418,8 @@
     ],
   "properties" : { "documentation" : "",
       "executionlisteners" : "",
-      "dataproperties" : { "items" : [ { "dataproperty_id" : "dObj1",
+      "dataproperties" : { "items" : [
+                          { "dataproperty_id" : "dObj1",
                             "dataproperty_name" : "StringTest",
                             "dataproperty_type" : "string",
                             "dataproperty_value" : "Testing123"
@@ -416,9 +448,39 @@
                             "dataproperty_name" : "LongTest",
                             "dataproperty_type" : "long",
                             "dataproperty_value" : "-123456"
+                          },
+                          { "dataproperty_id" : "dObj13",
+                            "dataproperty_name" : "StringTest2",
+                            "dataproperty_type" : "string",
+                            "dataproperty_value" : ""
+                          },
+                          { "dataproperty_id" : "dObj14",
+                            "dataproperty_name" : "BooleanTest2",
+                            "dataproperty_type" : "boolean",
+                            "dataproperty_value" : ""
+                          },
+                          { "dataproperty_id" : "dObj15",
+                            "dataproperty_name" : "DateTest2",
+                            "dataproperty_type" : "datetime",
+                            "dataproperty_value" : ""
+                          },
+                          { "dataproperty_id" : "dObj16",
+                            "dataproperty_name" : "DoubleTest2",
+                            "dataproperty_type" : "double",
+                            "dataproperty_value" : ""
+                          },
+                          { "dataproperty_id" : "dObj17",
+                            "dataproperty_name" : "IntegerTest2",
+                            "dataproperty_type" : "int",
+                            "dataproperty_value" : ""
+                          },
+                          { "dataproperty_id" : "dObj18",
+                            "dataproperty_name" : "LongTest2",
+                            "dataproperty_type" : "long",
+                            "dataproperty_value" : ""
                           }
                         ],
-                      "totalCount" : 6
+                      "totalCount" : 12
                     },
       "name" : "",
       "process_author" : "",

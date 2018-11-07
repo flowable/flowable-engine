@@ -62,6 +62,7 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
         }
     }
 
+    @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
 
         boolean assignedToNoOne = false;

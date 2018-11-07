@@ -4,6 +4,9 @@ Flowable (V6)
 [Maven Central:  
     ![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.flowable/flowable-engine/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.flowable/flowable-engine)
 
+[Docker Images:  
+    ![Docker Hub](https://images.microbadger.com/badges/version/flowable/flowable-rest.svg)](https://hub.docker.com/u/flowable/)
+
 [Travis CI:  
 	![build status badge](https://travis-ci.org/flowable/flowable-engine.svg?branch=master)](https://travis-ci.org/flowable/flowable-engine)
 
@@ -11,7 +14,7 @@ Flowable (V6)
 	![license](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/flowable/flowable-engine/blob/master/LICENSE)
 
 
-Homepage: http://flowable.org/
+Homepage: http://www.flowable.org/
 
 ## flowable / flowəb(ə)l /
 * a compact and highly efficient workflow and Business Process Management (BPM) platform for developers, system admins and business users.
@@ -26,15 +29,15 @@ Flowable is distributed under the Apache V2 license (http://www.apache.org/licen
 
 ### Download
 
-The Flowable downloads can be found on http://flowable.org/downloads.html.
+The Flowable downloads can be found on http://www.flowable.org/downloads.html.
 
 ### Sources
 
 The distribution contains most of the sources as jar files. The source code of Flowable can be found on https://github.com/flowable/flowable-engine.
 
-### JDK 7+
+### JDK 8+
 
-Flowable runs on a JDK higher than or equal to version 7. Go to http://www.oracle.com/technetwork/java/javase/downloads/index.html and click on button "Download JDK".  There are installation instructions on that page as well. To verify that your installation was successful, run "java -version" on the command line.  That should print the installed version of your JDK.
+Flowable runs on a JDK higher than or equal to version 8. Go to http://www.oracle.com/technetwork/java/javase/downloads/index.html and click on button "Download JDK".  There are installation instructions on that page as well. To verify that your installation was successful, run "java -version" on the command line.  That should print the installed version of your JDK.
 
 ### Contributing
 
@@ -42,7 +45,7 @@ Contributing to Flowable: https://github.com/flowable/flowable-engine/wiki.
 
 ### Reporting problems
 
-Every self-respecting developer should have read link on how to ask smart questions: http://www.catb.org/~esr/faqs/smart-questions.html.
+Every self-respecting developer should have read this link on how to ask smart questions: http://www.catb.org/~esr/faqs/smart-questions.html.
 
 After you've done that you can post questions and comments on http://forum.flowable.org and create issues in https://github.com/flowable/flowable-engine/issues.
 

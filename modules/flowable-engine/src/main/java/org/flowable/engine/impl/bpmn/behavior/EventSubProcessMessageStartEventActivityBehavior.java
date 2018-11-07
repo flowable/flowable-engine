@@ -23,8 +23,8 @@ import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.ValuedDataObject;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -49,6 +49,7 @@ public class EventSubProcessMessageStartEventActivityBehavior extends AbstractBp
         this.messageEventDefinition = messageEventDefinition;
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
         StartEvent startEvent = (StartEvent) execution.getCurrentFlowElement();
         EventSubProcess eventSubProcess = (EventSubProcess) startEvent.getSubProcess();

@@ -19,12 +19,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
-
 /**
  * @author Tom Baeyens
  */
-public class CommentEntityImpl extends AbstractEntityNoRevision implements CommentEntity, Serializable {
+public class CommentEntityImpl extends AbstractBpmnEngineNoRevisionEntity implements CommentEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -43,14 +41,17 @@ public class CommentEntityImpl extends AbstractEntityNoRevision implements Comme
 
     }
 
+    @Override
     public Object getPersistentState() {
         return CommentEntityImpl.class;
     }
 
+    @Override
     public byte[] getFullMessageBytes() {
         return (fullMessage != null ? fullMessage.getBytes() : null);
     }
 
+    @Override
     public void setFullMessageBytes(byte[] fullMessageBytes) {
         fullMessage = (fullMessageBytes != null ? new String(fullMessageBytes) : null);
     }
@@ -58,6 +59,7 @@ public class CommentEntityImpl extends AbstractEntityNoRevision implements Comme
     public static String MESSAGE_PARTS_MARKER = "_|_";
     public static Pattern MESSAGE_PARTS_MARKER_REGEX = Pattern.compile("_\\|_");
 
+    @Override
     public void setMessage(String[] messageParts) {
         StringBuilder stringBuilder = new StringBuilder();
         for (String part : messageParts) {
@@ -75,6 +77,7 @@ public class CommentEntityImpl extends AbstractEntityNoRevision implements Comme
         message = stringBuilder.toString();
     }
 
+    @Override
     public List<String> getMessageParts() {
         if (message == null) {
             return null;
@@ -95,66 +98,82 @@ public class CommentEntityImpl extends AbstractEntityNoRevision implements Comme
     // getters and setters
     // //////////////////////////////////////////////////////
 
+    @Override
     public String getUserId() {
         return userId;
     }
 
+    @Override
     public void setUserId(String userId) {
         this.userId = userId;
     }
 
+    @Override
     public String getTaskId() {
         return taskId;
     }
 
+    @Override
     public void setTaskId(String taskId) {
         this.taskId = taskId;
     }
 
+    @Override
     public String getMessage() {
         return message;
     }
 
+    @Override
     public void setMessage(String message) {
         this.message = message;
     }
 
+    @Override
     public Date getTime() {
         return time;
     }
 
+    @Override
     public void setTime(Date time) {
         this.time = time;
     }
 
+    @Override
     public String getProcessInstanceId() {
         return processInstanceId;
     }
 
+    @Override
     public void setProcessInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public String getType() {
         return type;
     }
 
+    @Override
     public void setType(String type) {
         this.type = type;
     }
 
+    @Override
     public String getFullMessage() {
         return fullMessage;
     }
 
+    @Override
     public void setFullMessage(String fullMessage) {
         this.fullMessage = fullMessage;
     }
 
+    @Override
     public String getAction() {
         return action;
     }
 
+    @Override
     public void setAction(String action) {
         this.action = action;
     }

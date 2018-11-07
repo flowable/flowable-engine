@@ -44,7 +44,7 @@ public class ProcessDefinitionInfoCache {
     /** Cache with no limit */
     public ProcessDefinitionInfoCache(CommandExecutor commandExecutor) {
         this.commandExecutor = commandExecutor;
-        this.cache = Collections.synchronizedMap(new HashMap<String, ProcessDefinitionInfoCacheObject>());
+        this.cache = Collections.synchronizedMap(new HashMap<>());
     }
 
     /** Cache which has a hard limit: no more elements will be cached than the limit. */
@@ -56,6 +56,7 @@ public class ProcessDefinitionInfoCache {
             // true will keep the 'access-order', which is needed to have a real LRU cache
             private static final long serialVersionUID = 1L;
 
+            @Override
             protected boolean removeEldestEntry(Map.Entry<String, ProcessDefinitionInfoCacheObject> eldest) {
                 boolean removeEldest = size() > limit;
                 if (removeEldest) {

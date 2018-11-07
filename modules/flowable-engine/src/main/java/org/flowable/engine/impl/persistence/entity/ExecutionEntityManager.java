@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.bpmn.model.FlowElement;
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.engine.impl.ExecutionQueryImpl;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -29,8 +29,8 @@ import org.flowable.engine.runtime.ProcessInstance;
  */
 public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
 
-    ExecutionEntity createProcessInstanceExecution(ProcessDefinition processDefinition, String businessKey, String tenantId, 
-                    String initiatorVariableName, String startActivityId);
+    ExecutionEntity createProcessInstanceExecution(ProcessDefinition processDefinition, String predefinedProcessInstanceId,
+                    String businessKey, String tenantId, String initiatorVariableName, String startActivityId);
 
     ExecutionEntity createChildExecution(ExecutionEntity parentExecutionEntity);
 
@@ -92,7 +92,8 @@ public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
     void deleteProcessInstanceExecutionEntity(String processInstanceId, String currentFlowElementId,
             String deleteReason, boolean cascade, boolean cancel, boolean fireEvents);
 
-    void deleteChildExecutions(ExecutionEntity executionEntity, Collection<String> executionIdsNotToDelete,String deleteReason, boolean cancel, FlowElement cancelActivity);
+    void deleteChildExecutions(ExecutionEntity executionEntity, Collection<String> executionIdsNotToDelete, 
+            Collection<String> executionIdsNotToSendCancelledEventsFor, String deleteReason, boolean cancel, FlowElement cancelActivity);
     
     void deleteChildExecutions(ExecutionEntity executionEntity, String deleteReason, boolean cancel);
 

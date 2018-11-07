@@ -13,11 +13,12 @@
 
 package org.flowable.rest.service.api.repository;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.swagger.annotations.ApiModelProperty;
+
 import java.util.Date;
 
-import org.flowable.rest.util.DateToStringSerializer;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.flowable.common.rest.util.DateToStringSerializer;
 
 /**
  * @author Frederik Heremans
@@ -35,6 +36,7 @@ public class ModelResponse extends ModelRequest {
     protected String sourceUrl;
     protected String sourceExtraUrl;
 
+    @ApiModelProperty(example = "5")
     public String getId() {
         return id;
     }
@@ -43,6 +45,7 @@ public class ModelResponse extends ModelRequest {
         this.id = id;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/repository/models/5")
     public String getUrl() {
         return url;
     }
@@ -51,6 +54,7 @@ public class ModelResponse extends ModelRequest {
         this.url = url;
     }
 
+    @ApiModelProperty(example = "2013-06-12T12:31:19.861+0000")
     public Date getCreateTime() {
         return createTime;
     }
@@ -59,6 +63,7 @@ public class ModelResponse extends ModelRequest {
         this.createTime = createTime;
     }
 
+    @ApiModelProperty(example = "2013-06-12T12:31:19.861+0000")
     public Date getLastUpdateTime() {
         return lastUpdateTime;
     }
@@ -67,6 +72,7 @@ public class ModelResponse extends ModelRequest {
         this.lastUpdateTime = lastUpdateTime;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/repository/deployments/2")
     public String getDeploymentUrl() {
         return deploymentUrl;
     }
@@ -75,10 +81,13 @@ public class ModelResponse extends ModelRequest {
         this.deploymentUrl = deploymentUrl;
     }
 
+    @ApiModelProperty(example = "null")
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }

@@ -13,10 +13,11 @@
 package org.flowable.spring.test.expression.callactivity;
 
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskQuery;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskQuery;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -28,6 +29,7 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration("classpath:org/flowable/spring/test/expression/callactivity/testCallActivityByExpression-context.xml")
 public class CallActivityBasedOnSpringBeansExpressionTest extends SpringFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/spring/test/expression/callactivity/CallActivityBasedOnSpringBeansExpressionTest.testCallActivityByExpression.bpmn20.xml",
             "org/flowable/spring/test/expression/callactivity/simpleSubProcess.bpmn20.xml" })
     public void testCallActivityByExpression() throws Exception {

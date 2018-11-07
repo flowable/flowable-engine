@@ -26,6 +26,7 @@ import org.flowable.engine.impl.interceptor.CommandInvoker;
  */
 public class CdiCommandInvoker extends CommandInvoker {
 
+    @Override
     public void executeOperation(Runnable runnable) {
 
         boolean executionContextSet = false;

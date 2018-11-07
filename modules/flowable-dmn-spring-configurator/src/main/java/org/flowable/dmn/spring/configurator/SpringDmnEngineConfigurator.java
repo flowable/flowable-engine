@@ -12,14 +12,14 @@
  */
 package org.flowable.dmn.spring.configurator;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.spring.SpringEngineConfiguration;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.configurator.DmnEngineConfigurator;
 import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
 import org.flowable.dmn.spring.SpringDmnExpressionManager;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.spring.SpringProcessEngineConfiguration;
 
 /**
  * @author Tijs Rademakers
@@ -27,23 +27,39 @@ import org.flowable.spring.SpringProcessEngineConfiguration;
  */
 public class SpringDmnEngineConfigurator extends DmnEngineConfigurator {
 
-    protected SpringDmnEngineConfiguration dmnEngineConfiguration;
-
     @Override
-    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    public void configure(AbstractEngineConfiguration engineConfiguration) {
         if (dmnEngineConfiguration == null) {
             dmnEngineConfiguration = new SpringDmnEngineConfiguration();
+        } else if (!(dmnEngineConfiguration instanceof SpringDmnEngineConfiguration)) {
+            throw new IllegalArgumentException("Expected dmnEngine configuration to be of type"
+                + SpringDmnEngineConfiguration.class + " but was " + dmnEngineConfiguration.getClass());
         }
-        initialiseCommonProperties(processEngineConfiguration, dmnEngineConfiguration, EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
+        initialiseCommonProperties(engineConfiguration, dmnEngineConfiguration);
         
-        SpringProcessEngineConfiguration springProcessEngineConfiguration = (SpringProcessEngineConfiguration) processEngineConfiguration;
-        dmnEngineConfiguration.setTransactionManager(springProcessEngineConfiguration.getTransactionManager());
-        dmnEngineConfiguration.setExpressionManager(new SpringDmnExpressionManager(
-                        springProcessEngineConfiguration.getApplicationContext(), springProcessEngineConfiguration.getBeans()));
+        SpringEngineConfiguration springEngineConfiguration = (SpringEngineConfiguration) engineConfiguration;
+        ((SpringDmnEngineConfiguration) dmnEngineConfiguration).setTransactionManager(springEngineConfiguration.getTransactionManager());
+        ExpressionManager configuredExpressionManager = dmnEngineConfiguration.getExpressionManager();
+		if (configuredExpressionManager == null) {
+			dmnEngineConfiguration.setExpressionManager(new SpringDmnExpressionManager(
+					springEngineConfiguration.getApplicationContext(), springEngineConfiguration.getBeans()));
+		} else if (configuredExpressionManager instanceof SpringDmnExpressionManager) {
+			if (((SpringDmnExpressionManager) configuredExpressionManager).getApplicationContext() == null) {
+				((SpringDmnExpressionManager) configuredExpressionManager)
+						.setApplicationContext(springEngineConfiguration.getApplicationContext());
+			}
+			if (((SpringDmnExpressionManager) configuredExpressionManager).getBeans() == null) {
+				((SpringDmnExpressionManager) configuredExpressionManager)
+						.setBeans(springEngineConfiguration.getBeans());
+			}
+		}
 
         initDmnEngine();
+        
+        initServiceConfigurations(engineConfiguration, dmnEngineConfiguration);
     }
 
+    @Override
     protected synchronized DmnEngine initDmnEngine() {
         if (dmnEngineConfiguration == null) {
             throw new FlowableException("DmnEngineConfiguration is required");
@@ -51,14 +67,4 @@ public class SpringDmnEngineConfigurator extends DmnEngineConfigurator {
 
         return dmnEngineConfiguration.buildDmnEngine();
     }
-
-    public SpringDmnEngineConfiguration getDmnEngineConfiguration() {
-        return dmnEngineConfiguration;
-    }
-
-    public SpringDmnEngineConfigurator setDmnEngineConfiguration(SpringDmnEngineConfiguration dmnEngineConfiguration) {
-        this.dmnEngineConfiguration = dmnEngineConfiguration;
-        return this;
-    }
-
 }

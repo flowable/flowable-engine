@@ -16,11 +16,10 @@ package org.activiti.engine.test.api.task;
 import java.util.List;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.task.Event;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
-import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
 
 import junit.framework.AssertionFailedError;
@@ -167,7 +166,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
     }
 
     public void testDeleteAssignee() {
-        Task task = taskService.newTask();
+        org.flowable.task.api.Task task = taskService.newTask();
         task.setAssignee("nonExistingUser");
         taskService.saveTask(task);
 
@@ -182,7 +181,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
     }
 
     public void testDeleteOwner() {
-        Task task = taskService.newTask();
+        org.flowable.task.api.Task task = taskService.newTask();
         task.setOwner("nonExistingUser");
         taskService.saveTask(task);
 
@@ -245,7 +244,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
     public void testCustomIdentityLink() {
         runtimeService.startProcessInstanceByKey("customIdentityLink");
 
-        List<Task> tasks = taskService.createTaskQuery().taskInvolvedUser("kermit").list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskInvolvedUser("kermit").list();
         assertEquals(1, tasks.size());
 
         List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(tasks.get(0).getId());

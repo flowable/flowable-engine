@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" 
+    xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" 
+    xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI"
+    xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    targetNamespace="http://flowable.org/cmmn">
+    
+    <case id="myCase">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+
+            <planItem id="taskA" name="A" definitionRef="taskDefinition" />
+            <planItem id="taskB" name="B" definitionRef="taskDefinition" />
+            <planItem id="taskC" name="C" definitionRef="taskDefinition">
+                <exitCriterion sentryRef="completionSentry" />
+            </planItem>
+            <planItem id="taskD" name="D" definitionRef="taskDefinition">
+                <exitCriterion sentryRef="exitSentry" />
+            </planItem>
+            <planItem id="taskE" name="E" definitionRef="taskDefinition">
+                <exitCriterion sentryRef="exitSentry" />
+            </planItem>
+
+            <sentry id="completionSentry">
+                <planItemOnPart sourceRef="taskA">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+                <planItemOnPart sourceRef="taskB">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <sentry id="exitSentry">
+                <planItemOnPart sourceRef="taskC">
+                    <standardEvent>exit</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <task id="taskDefinition" name="A" isBlocking="true" />
+
+        </casePlanModel>
+    </case>
+</definitions>

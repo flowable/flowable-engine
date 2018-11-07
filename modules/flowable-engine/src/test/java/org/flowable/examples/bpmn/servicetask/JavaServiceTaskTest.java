@@ -15,15 +15,15 @@ package org.flowable.examples.bpmn.servicetask;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableClassLoadingException;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.common.engine.api.FlowableClassLoadingException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -31,6 +31,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class JavaServiceTaskTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testJavaServiceDelegation() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("javaServiceDelegation", CollectionUtil.singletonMap("input", "Activiti BPM Engine"));
@@ -38,6 +39,7 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
         assertEquals("ACTIVITI BPM ENGINE", runtimeService.getVariable(execution.getId(), "input"));
     }
 
+    @Test
     @Deployment
     public void testFieldInjection() {
         // Process contains 2 service-tasks using field-injection. One should
@@ -50,6 +52,7 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
         assertEquals("HELLO SETTER", runtimeService.getVariable(execution.getId(), "setterVar"));
     }
 
+    @Test
     @Deployment
     public void testExpressionFieldInjection() {
         Map<String, Object> vars = new HashMap<>();
@@ -64,6 +67,7 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
         assertEquals("elam :si redneg ruoY", runtimeService.getVariable(execution.getId(), "var1"));
     }
     
+    @Test
     @Deployment
     public void testServiceTaskWithSkipExpression() {
       Map<String, Object> vars = new HashMap<>();
@@ -78,6 +82,7 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
       assertEquals("waitState", waitExecution.getActivityId());
     }
     
+    @Test
     @Deployment
     public void testAsyncServiceTaskWithSkipExpression() {
       Map<String, Object> vars = new HashMap<>();
@@ -99,6 +104,7 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
       assertEquals("waitState", waitExecution.getActivityId());
     }
 
+    @Test
     @Deployment
     public void testExpressionFieldInjectionWithSkipExpression() {
         Map<String, Object> vars = new HashMap<>();
@@ -133,6 +139,7 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
         assertFalse(pi2VarMap.containsKey("var2"));
     }
 
+    @Test
     @Deployment
     public void testUnexistingClassDelegation() {
         try {
@@ -145,15 +152,19 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testIllegalUseOfResultVariableName() {
         try {
-            repositoryService.createDeployment().addClasspathResource("org/flowable/examples/bpmn/servicetask/JavaServiceTaskTest.testIllegalUseOfResultVariableName.bpmn20.xml").deploy();
+            deploymentIdsForAutoCleanup.add(
+                repositoryService.createDeployment().addClasspathResource("org/flowable/examples/bpmn/servicetask/JavaServiceTaskTest.testIllegalUseOfResultVariableName.bpmn20.xml").deploy().getId()
+            );
             fail();
         } catch (FlowableException e) {
             assertTrue(e.getMessage().contains("resultVariable"));
         }
     }
 
+    @Test
     @Deployment
     public void testExceptionHandling() {
 
@@ -169,10 +180,11 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
         // and takes sequence flow to user task
         vars.put("var", "throw-exception");
         runtimeService.startProcessInstanceByKey("exceptionHandling", vars);
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Fix Exception", task.getName());
     }
 
+    @Test
     @Deployment
     public void testGetBusinessKeyFromDelegateExecution() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("businessKeyProcess", "1234567890");

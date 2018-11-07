@@ -20,14 +20,14 @@ import org.activiti.engine.query.QueryProperty;
 
 /**
  * Contains the possible properties which can be used in a {@link HistoricProcessInstanceQueryProperty}.
- * 
+ *
  * @author Joram Barrez
  */
 public class HistoricProcessInstanceQueryProperty implements QueryProperty {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Map<String, HistoricProcessInstanceQueryProperty> properties = new HashMap<String, HistoricProcessInstanceQueryProperty>();
+    private static final Map<String, HistoricProcessInstanceQueryProperty> properties = new HashMap<>();
 
     public static final HistoricProcessInstanceQueryProperty PROCESS_INSTANCE_ID_ = new HistoricProcessInstanceQueryProperty("RES.PROC_INST_ID_");
     public static final HistoricProcessInstanceQueryProperty PROCESS_DEFINITION_ID = new HistoricProcessInstanceQueryProperty("RES.PROC_DEF_ID_");
@@ -47,6 +47,7 @@ public class HistoricProcessInstanceQueryProperty implements QueryProperty {
         properties.put(name, this);
     }
 
+    @Override
     public String getName() {
         return name;
     }

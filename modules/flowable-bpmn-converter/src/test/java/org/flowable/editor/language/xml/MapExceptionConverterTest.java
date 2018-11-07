@@ -28,6 +28,7 @@ public class MapExceptionConverterTest extends AbstractConverterTest {
 
     String resourceName;
 
+    @Override
     protected String getResource() {
         return resourceName;
     }

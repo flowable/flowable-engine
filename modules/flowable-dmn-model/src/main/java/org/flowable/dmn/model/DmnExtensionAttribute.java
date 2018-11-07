@@ -80,6 +80,7 @@ public class DmnExtensionAttribute {
         return sb.toString();
     }
 
+    @Override
     public DmnExtensionAttribute clone() {
         DmnExtensionAttribute clone = new DmnExtensionAttribute();
         clone.setValues(this);

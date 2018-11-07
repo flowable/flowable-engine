@@ -15,9 +15,9 @@ package org.flowable.dmn.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.engine.impl.DecisionTableQueryImpl;
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 
 /**
  * @author Joram Barrez
@@ -28,11 +28,6 @@ public interface DecisionTableEntityManager extends EntityManager<DecisionTableE
 
     DecisionTableEntity findLatestDecisionTableByKeyAndTenantId(String decisionTableKey, String tenantId);
 
-    DecisionTableEntity findLatestDecisionTableByKeyAndParentDeploymentId(String decisionTableKey, String parentDeploymentId);
-
-    DecisionTableEntity findLatestDecisionTableByKeyParentDeploymentIdAndTenantId(String decisionTableKey,
-            String parentDeploymentId, String tenantId);
-
     List<DmnDecisionTable> findDecisionTablesByQueryCriteria(DecisionTableQueryImpl decisionTableQuery);
 
     long findDecisionTableCountByQueryCriteria(DecisionTableQueryImpl decisionTableQuery);
@@ -41,7 +36,7 @@ public interface DecisionTableEntityManager extends EntityManager<DecisionTableE
 
     DecisionTableEntity findDecisionTableByDeploymentAndKeyAndTenantId(String deploymentId, String decisionTableKey, String tenantId);
 
-    DecisionTableEntity findDecisionTableByKeyAndVersionAndTenantId(String decisionTableKey, Integer processDefinitionVersion, String tenantId);
+    DecisionTableEntity findDecisionTableByKeyAndVersionAndTenantId(String decisionTableKey, Integer decisionTableVersion, String tenantId);
 
     List<DmnDecisionTable> findDecisionTablesByNativeQuery(Map<String, Object> parameterMap);
 

@@ -4,21 +4,12 @@
 
 	<property file="${user.home}/.flowable/build.properties" />
 
-	<property name="flowable.version" value="6.2.0-SNAPSHOT" />
+	<property name="flowable.version" value="6.4.1-SNAPSHOT" />
 	<property name="target.distro.root" value="target/zip/flowable-${flowable.version}" />
 	<property name="flowable.website" value="../../flowable-website" />
 
 	<condition property="mvn.executable" value="mvn.bat" else="mvn">
 		<os family="windows" />
-	</condition>
-
-	<condition property="usingJdk8OrHigher" value=",java8" else="">
-		<not>
-			<or>
-				<!-- Flowable supports java 7 as minimum -->
-				<equals arg1="${ant.java.version}" arg2="1.7" />
-			</or>
-		</not>
 	</condition>
 
 	<target name="clean">
@@ -44,24 +35,24 @@
 			<equals arg1="${nodocs}" arg2="true" />
 		</condition>
 		<exec executable="${mvn.executable}" dir=".." failonerror="true">
-			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m -XX:MaxPermSize=256M" />
-			<arg line="-Pdistro${nodocs.profile}${usingJdk8OrHigher} -DskipTests clean install" />
+			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m" />
+			<arg line="-Pdistro${nodocs.profile} -DskipTests clean install" />
 		</exec>
 		<exec executable="${mvn.executable}" dir="../modules/flowable-ui-idm" failonerror="true">
-			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m -XX:MaxPermSize=256M" />
-			<arg line="-Pdistro${usingJdk8OrHigher} -DskipTests clean install" />
+			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m" />
+			<arg line="-Pdistro${nodocs.profile} -DskipTests clean install" />
 		</exec>
 		<exec executable="${mvn.executable}" dir="../modules/flowable-ui-modeler" failonerror="true">
-			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m -XX:MaxPermSize=256M" />
-			<arg line="-Pdistro${usingJdk8OrHigher} -DskipTests clean install" />
+			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m" />
+			<arg line="-Pdistro${nodocs.profile} -DskipTests clean install" />
 		</exec>
 		<exec executable="${mvn.executable}" dir="../modules/flowable-ui-task" failonerror="true">
-			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m -XX:MaxPermSize=256M" />
-			<arg line="-Pdistro${usingJdk8OrHigher} -DskipTests clean install" />
+			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m" />
+			<arg line="-Pdistro${nodocs.profile} -DskipTests clean install" />
 		</exec>
 		<exec executable="${mvn.executable}" dir="../modules/flowable-ui-admin" failonerror="true">
-			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m -XX:MaxPermSize=256M" />
-			<arg line="-Pdistro${usingJdk8OrHigher} -DskipTests clean install" />
+			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m" />
+			<arg line="-Pdistro${nodocs.profile} -DskipTests clean install" />
 		</exec>
 	</target>
 
@@ -75,7 +66,7 @@
 
 		<!-- MOVE ALL LIBS TO libs -->
 		<mkdir dir="${target.distro.root}/libs" />
-		<copy todir="${target.distro.root}/libs">
+		<copy todir="${target.distro.root}/libs" flatten="true">
 			<fileset dir="../modules/flowable-engine/target">
 				<include name="flowable-engine-*.jar" />
 			</fileset>
@@ -85,8 +76,14 @@
 			<fileset dir="../modules/flowable-engine-common/target">
 				<include name="flowable-engine-common-*.jar" />
 			</fileset>
+			<fileset dir="../modules/flowable-spring-common/target">
+                <include name="flowable-spring-common-*.jar" />
+            </fileset>
 			<fileset dir="../modules/flowable-spring/target">
 				<include name="flowable-spring-*.jar" />
+			</fileset>
+			<fileset dir="../modules/flowable-spring-security/target">
+				<include name="flowable-spring-security-*.jar" />
 			</fileset>
 			<fileset dir="../modules/flowable-bpmn-model/target">
 				<include name="flowable-bpmn-model-*.jar" />
@@ -100,6 +97,75 @@
 			<fileset dir="../modules/flowable-secure-javascript/target">
 				<include name="flowable-secure-javascript-*.jar" />
 			</fileset>
+			<fileset dir="../modules/flowable-identitylink-service-api/target">
+                <include name="flowable-identitylink-service-api-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-identitylink-service/target">
+                <include name="flowable-identitylink-service-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-job-service-api/target">
+                <include name="flowable-job-service-api-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-job-service/target">
+                <include name="flowable-job-service-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-job-spring-service/target">
+                <include name="flowable-job-spring-service-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-task-service-api/target">
+                <include name="flowable-task-service-api-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-task-service/target">
+                <include name="flowable-task-service-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-variable-service-api/target">
+                <include name="flowable-variable-service-api-*.jar" />
+            </fileset>
+            <fileset dir="../modules/flowable-variable-service/target">
+                <include name="flowable-variable-service-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-cmmn-api/target">
+                <include name="flowable-cmmn-api-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-cmmn-converter/target">
+                <include name="flowable-cmmn-converter-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-cmmn-engine/target">
+                <include name="flowable-cmmn-engine-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-cmmn-engine-configurator/target">
+                <include name="flowable-cmmn-engine-configurator-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-cmmn-image-generator/target">
+                <include name="flowable-cmmn-image-generator-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-cmmn-json-converter/target">
+                <include name="flowable-cmmn-json-converter-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-cmmn-model/target">
+                <include name="flowable-cmmn-model-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-cmmn-spring/target">
+                <include name="flowable-cmmn-spring-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-cmmn-spring-configurator/target">
+                <include name="flowable-cmmn-spring-configurator-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-cmmn-rest/target">
+			    <include name="flowable-cmmn-rest-*.jar" />
+			</fileset>
+			<fileset dir="../modules/flowable-app-engine-api/target">
+                <include name="flowable-app-engine-api-*.jar" />
+            </fileset>
+            <fileset dir="../modules/flowable-app-engine/target">
+                <include name="flowable-app-engine-*.jar" />
+            </fileset>
+            <fileset dir="../modules/flowable-app-engine-spring/target">
+                <include name="flowable-app-engine-spring-*.jar" />
+            </fileset>
+            <fileset dir="../modules/flowable-app-engine-rest/target">
+                <include name="flowable-app-engine-rest-*.jar" />
+            </fileset>
 			<fileset dir="../modules/flowable-dmn-model/target">
 				<include name="flowable-dmn-model-*.jar" />
 			</fileset>
@@ -205,6 +271,9 @@
 			<fileset dir="../modules/flowable-cdi/target">
 				<include name="flowable-cdi*.jar" />
 			</fileset>
+			<fileset dir="../modules/flowable-camel-cdi/target">
+                <include name="flowable-camel-cdi-*.jar" />
+            </fileset>
 			<fileset dir="../modules/flowable-cxf/target">
 				<include name="flowable-cxf-*.jar" />
 			</fileset>
@@ -214,27 +283,24 @@
 			<fileset dir="../modules/flowable-http/target">
 				<include name="flowable-http-*.jar" />
 			</fileset>
-			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-actuator/target">
-				<include name="flowable-spring-boot-starter-actuator-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-basic/target">
-				<include name="flowable-spring-boot-starter-basic-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-integration/target">
-				<include name="flowable-spring-boot-starter-integration-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-jpa/target">
-				<include name="flowable-spring-boot-starter-jpa-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-rest-api/target">
-				<include name="flowable-spring-boot-starter-rest-api-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-security/target">
-				<include name="flowable-spring-boot-starter-security-*.jar" />
+			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/">
+				<include name="**/flowable-spring-boot-*.jar" />
 			</fileset>
 			<fileset dir="../modules/flowable-ui-common/target">
 				<include name="flowable-ui-common-*.jar" />
 			</fileset>
+			<fileset dir="../modules/flowable-ui-edge/target">
+				<include name="flowable-ui-edge-*.jar" />
+			</fileset>
+			<fileset dir="../modules/flowable-ui-admin/flowable-ui-admin-conf/target">
+                <include name="flowable-ui-admin-conf-*.jar" />
+            </fileset>
+            <fileset dir="../modules/flowable-ui-admin/flowable-ui-admin-logic/target">
+                <include name="flowable-ui-admin-logic-*.jar" />
+            </fileset>
+            <fileset dir="../modules/flowable-ui-admin/flowable-ui-admin-rest/target">
+                <include name="flowable-ui-admin-rest-*.jar" />
+            </fileset>
 			<fileset dir="../modules/flowable-ui-idm/flowable-ui-idm-conf/target">
 				<include name="flowable-ui-idm-conf-*.jar" />
 			</fileset>
@@ -287,7 +353,7 @@
 			<fileset dir="../modules/flowable-ui-task/flowable-ui-task-app/target">
 				<include name="flowable-task.war" />
 			</fileset>
-			<fileset dir="../modules/flowable-ui-admin/target">
+			<fileset dir="../modules/flowable-ui-admin/flowable-ui-admin-app/target">
 				<include name="flowable-admin.war" />
 			</fileset>
 			<fileset dir="../modules/flowable-app-rest/target">
@@ -310,21 +376,56 @@
 		<copy todir="${target.distro.root}/docs/javadocs">
 			<fileset dir="../modules/flowable-engine/target/site/apidocs" />
 		</copy>
+		
+		<exec executable="${mvn.executable}" dir="../modules/flowable-cmmn-engine">
+            <arg line="-DexcludePackageNames=org.flowable.cmmn.engine.impl* javadoc:javadoc" />
+        </exec>
+        <mkdir dir="${target.distro.root}/docs/cmmn-javadocs" />
+        <copy todir="${target.distro.root}/docs/cmmn-javadocs">
+            <fileset dir="../modules/flowable-cmmn-engine/target/site/apidocs" />
+        </copy>
+		
+		<exec executable="${mvn.executable}" dir="../modules/flowable-task-service-api">
+			<arg line="javadoc:javadoc" />
+		</exec>
+        <mkdir dir="${target.distro.root}/docs/task-javadocs" />
+        <copy todir="${target.distro.root}/docs/task-javadocs">
+            <fileset dir="../modules/flowable-task-service-api/target/site/apidocs" />
+        </copy>
+		
+		<exec executable="${mvn.executable}" dir="../modules/flowable-variable-service-api">
+			<arg line="javadoc:javadoc" />
+	    </exec>
+        <mkdir dir="${target.distro.root}/docs/variable-javadocs" />
+        <copy todir="${target.distro.root}/docs/variable-javadocs">
+            <fileset dir="../modules/flowable-variable-service-api/target/site/apidocs" />
+        </copy>
+		
+		<exec executable="${mvn.executable}" dir="../modules/flowable-job-service-api">
+			<arg line="javadoc:javadoc" />
+        </exec>
+        <mkdir dir="${target.distro.root}/docs/job-javadocs" />
+        <copy todir="${target.distro.root}/docs/job-javadocs">
+            <fileset dir="../modules/flowable-job-service-api/target/site/apidocs" />
+        </copy>
+		
 		<!-- USERGUIDE -->
-		<ant antfile="../userguide/build.xml" inheritall="false" />
+		<ant antfile="../docs/userguide/build.xml" inheritall="false" />
 		<mkdir dir="${target.distro.root}/docs/userguide" />
 		<copy todir="${target.distro.root}/docs/userguide">
-			<fileset dir="../userguide/target/html/en" />
+			<fileset dir="../docs/userguide/target/html/en/bpmn" />
 		</copy>
-		<ant antfile="../userguide-dmn/build.xml" inheritall="false" />
+        <mkdir dir="${target.distro.root}/docs/userguide-cmmn" />
+        <copy todir="${target.distro.root}/docs/userguide-cmmn">
+            <fileset dir="../docs/userguide/target/html/en/cmmn" />
+        </copy>
 		<mkdir dir="${target.distro.root}/docs/userguide-dmn" />
 		<copy todir="${target.distro.root}/docs/userguide-dmn">
-			<fileset dir="../userguide-dmn/target/html/en" />
+			<fileset dir="../docs/userguide/target/html/en/dmn" />
 		</copy>
-		<ant antfile="../userguide-form/build.xml" inheritall="false" />
 		<mkdir dir="${target.distro.root}/docs/userguide-form" />
 		<copy todir="${target.distro.root}/docs/userguide-form">
-			<fileset dir="../userguide-form/target/html/en" />
+			<fileset dir="../docs/userguide/target/html/en/form" />
 		</copy>
 	</target>
 
@@ -346,6 +447,10 @@
 		<copy todir="${flowable.website}/userguide" overwrite="true">
 			<fileset dir="../userguide/target/html/en" />
 		</copy>
+		<mkdir dir="${flowable.website}/userguide-cmmn" />
+        <copy todir="${flowable.website}/userguide-cmmn" overwrite="true">
+            <fileset dir="../userguide-cmmn/target/html/en" />
+        </copy>
 		<mkdir dir="${flowable.website}/userguide-dmn" />
 		<copy todir="${flowable.website}/userguide-dmn" overwrite="true">
 			<fileset dir="../userguide-dmn/target/html/en" />
@@ -364,14 +469,7 @@
 	<target name="copy.sql">
 		<!-- COPY SQL -->
 		<copy todir="${target.distro.root}/database">
-			<fileset dir="../modules/flowable-engine/src/main/resources/org/flowable/db">
-				<include name="create/**" />
-				<include name="drop/**" />
-				<include name="upgrade/**" />
-			</fileset>
-		</copy>
-		<copy todir="${target.distro.root}/database/idm">
-			<fileset dir="../modules/flowable-idm-engine/src/main/resources/org/flowable/idm/db">
+			<fileset dir="sql">
 				<include name="create/**" />
 				<include name="drop/**" />
 				<include name="upgrade/**" />

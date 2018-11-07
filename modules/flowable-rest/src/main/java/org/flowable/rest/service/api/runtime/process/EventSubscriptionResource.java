@@ -15,14 +15,14 @@ package org.flowable.rest.service.api.runtime.process;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.RuntimeService;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.runtime.EventSubscription;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -44,18 +44,25 @@ public class EventSubscriptionResource {
 
     @Autowired
     protected RuntimeService runtimeService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get a single event subscription", tags = { "Event subscriptions" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the event subscription exists and is returned."),
             @ApiResponse(code = 404, message = "Indicates the requested event subscription does not exist.")
     })
-    @RequestMapping(value = "/runtime/event-subscriptions/{eventSubscriptionId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/runtime/event-subscriptions/{eventSubscriptionId}", produces = "application/json")
     public EventSubscriptionResponse getEventSubscription(@ApiParam(name = "eventSubscriptionId") @PathVariable String eventSubscriptionId, HttpServletRequest request) {
         EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().id(eventSubscriptionId).singleResult();
 
         if (eventSubscription == null) {
             throw new FlowableObjectNotFoundException("Could not find a event subscription with id '" + eventSubscriptionId + "'.", EventSubscription.class);
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessEventSubscriptionById(eventSubscription);
         }
 
         return restResponseFactory.createEventSubscriptionResponse(eventSubscription);

@@ -85,7 +85,7 @@ import org.flowable.bpmn.model.Task;
 import org.flowable.bpmn.model.ThrowEvent;
 import org.flowable.bpmn.model.Transaction;
 import org.flowable.bpmn.model.UserTask;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 
 /**

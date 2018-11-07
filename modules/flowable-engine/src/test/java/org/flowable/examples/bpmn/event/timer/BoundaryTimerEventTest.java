@@ -13,16 +13,17 @@
 package org.flowable.examples.bpmn.event.timer;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testInterruptingTimerDuration() {
 
@@ -30,7 +31,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("escalationExample");
 
         // There should be one task, with a timer : first line support
-        Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals("First line support", task.getName());
 
         // Manually execute the job

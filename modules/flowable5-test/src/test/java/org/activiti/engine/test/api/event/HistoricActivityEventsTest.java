@@ -16,10 +16,10 @@ import java.util.List;
 
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 
@@ -91,7 +91,7 @@ public class HistoricActivityEventsTest extends PluggableFlowableTestCase {
             assertEquals("subProcessStart", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(5)).getEntity()).getActivityId()));
             assertNotNull("subProcessStart", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(5)).getEntity()).getEndTime()));
 
-            // Task a
+            // org.flowable.task.service.Task a
             assertEquals(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, events.get(6).getType());
             assertEquals("a", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(6)).getEntity()).getActivityId()));
 
@@ -99,7 +99,7 @@ public class HistoricActivityEventsTest extends PluggableFlowableTestCase {
             assertEquals("a", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(7)).getEntity()).getActivityId()));
             assertNotNull("a", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(7)).getEntity()).getEndTime()));
 
-            // Task b
+            // org.flowable.task.service.Task b
             assertEquals(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, events.get(8).getType());
             assertEquals("b", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(8)).getEntity()).getActivityId()));
 

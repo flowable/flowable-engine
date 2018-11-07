@@ -5,17 +5,16 @@ import java.util.List;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
+import org.flowable.job.api.Job;
 import org.junit.Assert;
 
 /**
@@ -460,7 +459,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
             }
 
             // Complete all tasks
-            for (Task task : taskService.createTaskQuery().list()) {
+            for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
                 taskService.complete(task.getId());
             }
 

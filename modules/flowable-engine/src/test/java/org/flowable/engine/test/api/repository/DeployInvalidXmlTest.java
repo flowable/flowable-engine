@@ -16,25 +16,27 @@ import org.flowable.bpmn.exceptions.XMLException;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class DeployInvalidXmlTest extends PluggableFlowableTestCase {
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
 
         processEngineConfiguration.setEnableSafeBpmnXml(true); // Needs to be enabled to test this
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         processEngineConfiguration.setEnableSafeBpmnXml(false); // set back to default
-        super.tearDown();
     }
 
+    @Test
     public void testDeployNonSchemaConformantXml() {
         try {
             repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/repository/nonSchemaConformantXml.bpmn20.xml").deploy().getId();
@@ -45,6 +47,7 @@ public class DeployInvalidXmlTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     public void testDeployWithMissingWaypointsForSequenceflowInDiagramInterchange() {
         try {
             repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/repository/noWayPointsForSequenceFlowInDiagramInterchange.bpmn20.xml").deploy().getId();
@@ -63,11 +66,12 @@ public class DeployInvalidXmlTest extends PluggableFlowableTestCase {
             + "<!ENTITY lol5 '&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;'>" + "<!ENTITY lol6 '&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;'>"
             + "<!ENTITY lol7 '&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;'>" + "<!ENTITY lol8 '&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;'>"
             + "<!ENTITY lol9 '&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;'>" + "]>" + "<lolz>&lol9;</lolz>" + "<definitions " + "xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL'"
-            + "xmlns:activiti='http://activiti.org/bpmn'" + "targetNamespace='Examples'>" + "<process id='oneTaskProcess' name='The One Task Process'>"
+            + "xmlns:activiti='http://activiti.org/bpmn'" + "targetNamespace='Examples'>" + "<process id='oneTaskProcess' name='The One org.flowable.task.service.Task Process'>"
             + "  <documentation>This is a process for testing purposes</documentation>" + " <startEvent id='theStart' />" + " <sequenceFlow id='flow1' sourceRef='theStart' targetRef='theTask' />"
             + " <userTask id='theTask' name='my task' />" + " <sequenceFlow id='flow2' sourceRef='theTask' targetRef='theEnd' />" + " <endEvent id='theEnd' />" + "</process>" + "</definitions>";
 
     // See https://activiti.atlassian.net/browse/ACT-1579?focusedCommentId=319886#comment-319886
+    @Test
     public void testProcessEngineDenialOfServiceAttackUsingUnsafeXmlTest() throws InterruptedException {
 
         // Putting this in a Runnable so we can time it out
@@ -93,6 +97,7 @@ public class DeployInvalidXmlTest extends PluggableFlowableTestCase {
             this.repositoryService = repositoryService;
         }
 
+        @Override
         public void run() {
             try {
                 String deploymentId = repositoryService.createDeployment().addString("test.bpmn20.xml", UNSAFE_XML).deploy().getId();
@@ -107,6 +112,7 @@ public class DeployInvalidXmlTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     public void testExternalEntityResolvingTest() {
         String deploymentId = repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/engine/test/api/repository/DeployInvalidXmlTest.testExternalEntityResolvingTest.bpmn20.xml")

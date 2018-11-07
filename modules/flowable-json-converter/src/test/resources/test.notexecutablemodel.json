@@ -458,7 +458,7 @@
       "orientation" : "horizontal",
       "process_author" : "",
       "process_id" : "simpleProcess",
-      "process_executable" : "No",
+      "isexecutable" : "No",
       "process_namespace" : "http://www.activiti.org/processdef",
       "process_version" : "",
       "targetnamespace" : "http://www.activiti.org/processdef",

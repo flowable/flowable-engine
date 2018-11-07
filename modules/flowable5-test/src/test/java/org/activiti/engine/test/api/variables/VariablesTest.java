@@ -11,7 +11,6 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentProperties;
-import org.flowable.engine.task.Task;
 
 /**
  * Testing various constructs with variables. Created to test the changes done in https://activiti.atlassian.net/browse/ACT-1900.
@@ -108,7 +107,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals(10, nrOfSerializable);
 
         // Trying the same after moving the process
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().taskName("Task 3").singleResult();
@@ -177,7 +176,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals(10, nrOfSerializable);
 
         // Trying the same after moving the process
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().taskName("Task 3").singleResult();
@@ -201,7 +200,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     public void testGetVariablesLocal2() {
 
         // Trying the same after moving the process
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().taskName("Task 3").singleResult();
@@ -292,7 +291,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals(4, runtimeService.getVariablesLocal(processInstanceId, Arrays.asList("intVar1", "intVar3", "intVar5", "intVar9")).size());
 
         // Trying the same after moving the process
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().taskName("Task 3").singleResult();
@@ -381,7 +380,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
 
     public void testTaskGetVariables() {
 
-        Task task = taskService.createTaskQuery().taskName("Task 1").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().taskName("Task 1").singleResult();
         Map<String, Object> vars = taskService.getVariables(task.getId());
         assertEquals(50, vars.size());
         int nrOfStrings = 0;

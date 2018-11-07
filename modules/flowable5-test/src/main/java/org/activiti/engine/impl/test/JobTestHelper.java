@@ -18,10 +18,10 @@ import java.util.TimerTask;
 import java.util.concurrent.Callable;
 
 import org.activiti.engine.test.ActivitiRule;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 
 /**
  * @author Joram Barrez
@@ -192,7 +192,12 @@ public class JobTestHelper {
     }
 
     public static boolean areJobsAvailable(ManagementService managementService) {
-        return !managementService.createJobQuery().list().isEmpty();
+        boolean emptyJobs = managementService.createJobQuery().list().isEmpty();
+        if (emptyJobs) {
+            return !managementService.createTimerJobQuery().executable().list().isEmpty();
+        } else {
+            return true;
+        }
     }
 
     public static boolean areJobsAvailable(org.activiti.engine.ManagementService managementService) {

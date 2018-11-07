@@ -14,10 +14,10 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -40,6 +40,7 @@ public class SaveProcessDefinitionInfoCmd implements Command<Void>, Serializable
         this.infoNode = infoNode;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (processDefinitionId == null) {
             throw new FlowableIllegalArgumentException("process definition id is null");
@@ -61,7 +62,7 @@ public class SaveProcessDefinitionInfoCmd implements Command<Void>, Serializable
             ObjectWriter writer = CommandContextUtil.getProcessEngineConfiguration(commandContext).getObjectMapper().writer();
             CommandContextUtil.getProcessDefinitionInfoEntityManager().updateInfoJson(definitionInfoEntity.getId(), writer.writeValueAsBytes(infoNode));
         } catch (Exception e) {
-            throw new FlowableException("Unable to serialize info node " + infoNode);
+            throw new FlowableException("Unable to serialize info node " + infoNode, e);
         }
 
         return null;

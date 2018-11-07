@@ -12,11 +12,11 @@
  */
 package org.flowable.engine.test.bpmn.event.end;
 
-import org.flowable.engine.common.api.FlowableOptimisticLockingException;
+import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -24,10 +24,11 @@ import org.flowable.engine.test.Deployment;
 public class EndEventTest extends PluggableFlowableTestCase {
 
     // Test case for ACT-1259
+    @Test
     @Deployment
     public void testConcurrentEndOfSameProcess() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskWithDelay");
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
 
         // We will now start two threads that both complete the task.
@@ -72,6 +73,7 @@ public class EndEventTest extends PluggableFlowableTestCase {
             return succeeded;
         }
 
+        @Override
         public void run() {
             try {
                 taskService.complete(taskId);

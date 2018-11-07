@@ -15,12 +15,12 @@ package org.flowable.dmn.engine.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.AbstractNativeQuery;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.api.NativeHistoricDecisionExecutionQuery;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.engine.common.impl.query.AbstractNativeQuery;
 
 public class NativeHistoryDecisionExecutionQueryImpl extends AbstractNativeQuery<NativeHistoricDecisionExecutionQuery, DmnHistoricDecisionExecution>
         implements NativeHistoricDecisionExecutionQuery {
@@ -37,10 +37,12 @@ public class NativeHistoryDecisionExecutionQueryImpl extends AbstractNativeQuery
 
     // results ////////////////////////////////////////////////////////////////
 
+    @Override
     public List<DmnHistoricDecisionExecution> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getHistoricDecisionExecutionEntityManager().findHistoricDecisionExecutionsByNativeQuery(parameterMap);
     }
 
+    @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getHistoricDecisionExecutionEntityManager().findHistoricDecisionExecutionCountByNativeQuery(parameterMap);
     }

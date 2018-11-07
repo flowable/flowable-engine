@@ -1,0 +1,506 @@
+
+=== Deployment
+
+*When using tomcat, please read <<restUsageInTomcat,Usage in Tomcat>>.*
+
+
+==== List of DMN Deployments
+
+----
+GET dmn-repository/deployments
+----
+
+.URL query parameters
+[options="header"]
+|===============
+|Parameter|Required|Value|Description
+|name|No|String|Only return deployments with the given name.
+|nameLike|No|String|Only return deployments with a name like the given name.
+|category|No|String|Only return deployments with the given category.
+|categoryNotEquals|No|String|Only return deployments which don't have the given category.
+|tenantId|No|String|Only return deployments with the given tenantId.
+|tenantIdLike|No|String|Only return deployments with a tenantId like the given value.
+|withoutTenantId|No|Boolean|If +true+, only returns deployments without a tenantId set. If +false+, the +withoutTenantId+ parameter is ignored.
+|sort|No|'id' (default), 'name', 'deploytime' or 'tenantId'|Property to sort on, to be used together with the 'order'.
+|The general <<restPagingAndSort,paging and sorting query-parameters>> can be used for this URL.
+
+|===============
+
+
+.REST Response codes
+[options="header"]
+|===============
+|Response code|Description
+|200|Indicates the request was successful.
+
+|===============
+
+*Success response body:*
+
+[source,json,linenums]
+----
+{
+  "data": [
+    {
+      "id": "03ab310d-c1de-11e6-a4f4-62ce84ef239e",
+      "name": null,
+      "deploymentTime": "2016-12-14T10:16:37.000+01:00",
+      "category": null,
+      "url": "http://localhost:8080/flowable-rest/dmn-api/dmn-repository/deployments/03ab310d-c1de-11e6-a4f4-62ce84ef239e",
+      "parentDeploymentId": "17510",
+      "tenantId": ""
+    }
+  ],
+  "total": 1,
+  "start": 0,
+  "sort": "id",
+  "order": "asc",
+  "size": 1
+}
+----
+
+
+==== Get a DMN deployment
+
+----
+GET dmn-repository/deployments/{deploymentId}
+----
+
+.Get a deployment - URL parameters
+[options="header"]
+|===============
+|Parameter|Required|Value|Description
+|deploymentId|Yes|String|The identifier of the deployment to get.
+
+|===============
+
+
+.Get a deployment - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|200|Indicates the deployment was found and returned.
+|404|Indicates the requested deployment was not found.
+
+|===============
+
+*Success response body:*
+
+[source,json,linenums]
+----
+{
+  "id": "03ab310d-c1de-11e6-a4f4-62ce84ef239e",
+  "name": null,
+  "deploymentTime": "2016-12-14T10:16:37.000+01:00",
+  "category": null,
+  "url": "http://localhost:8080/flowable-rest/dmn-api/dmn-repository/deployments/03ab310d-c1de-11e6-a4f4-62ce84ef239e",
+  "parentDeploymentId": "17510",
+  "tenantId": ""
+}
+----
+
+
+==== Create a new DMN deployment
+
+----
+POST dmn-repository/deployments
+----
+
+*Request body:*
+
+The request body should contain data of type _multipart/form-data_. There should be exactly one file in the request: any additional files will be ignored. The deployment name is the name of the file-field passed in.
+
+An additional parameter (form-field) can be passed in the request body with name +tenantId+. The value of this field will be used as the identifier of the tenant in which this deployment is done.
+
+.Create a new DMN deployment - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|201|Indicates the deployment was created.
+|400|Indicates there was no content present in the request body or the content mime-type is not supported for deployment. The status-description contains additional information.
+
+|===============
+
+*Success response body:*
+
+
+[source,json,linenums]
+----
+{
+  "id": "03ab310d-c1de-11e6-a4f4-62ce84ef239e",
+  "name": "newDeployment1",
+  "deploymentTime": "2016-12-14T10:16:37.000+01:00",
+  "category": null,
+  "url": "http://localhost:8080/flowable-rest/dmn-api/dmn-repository/deployments/03ab310d-c1de-11e6-a4f4-62ce84ef239e",
+  "tenantId" : "myTenant"
+}
+----
+
+
+==== Delete a DMN deployment
+
+----
+DELETE dmn-repository/deployments/{deploymentId}
+----
+
+.Delete a DMN deployment - URL parameters
+[options="header"]
+|===============
+|Parameter|Required|Value|Description
+|deploymentId|Yes|String|The identifier of the deployment to delete.
+
+|===============
+
+
+.Delete a DMN deployment - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|204|Indicates the deployment was found and has been deleted. Response-body is intentionally empty.
+|404|Indicates the requested deployment was not found.
+
+|===============
+
+
+==== Get a DMN deployment resource content
+
+----
+GET dmn-repository/deployments/{deploymentId}/resourcedata/{resourceId}
+----
+
+.Get a deployment resource content - URL parameters
+[options="header"]
+|===============
+|Parameter|Required|Value|Description
+|deploymentId|Yes|String|The identifier of the deployment the requested resource is part of.
+|resourceId|Yes|String|The identifier of the resource to get the data for. *Make sure you URL-encode the resourceId in case it contains forward slashes. For example, use 'decisions%2Fmy-decision.dmn' instead of 'decisions/my-decision.dmn'.*
+
+|===============
+
+
+
+.Get a deployment resource content - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|200|Indicates both deployment and resource have been found and the resource data has been returned.
+|404|Indicates the requested deployment was not found or there is no resource with the given identifier present in the deployment. The status-description contains additional information.
+
+|===============
+
+*Success response body:*
+
+
+The response body will contain the binary resource-content for the requested resource. The response content-type will be the same as the type returned in the resources 'mimeType' property. Also, a content-disposition header is set, allowing browsers to download the file instead of displaying it.
+
+
+=== Decision Tables
+
+
+==== List of decision tables
+
+
+----
+GET dmn-repository/decision-tables
+----
+
+.List of process definitions - URL parameters
+[options="header"]
+|===============
+|Parameter|Required|Value|Description
+|version|No|integer|Only return process definitions with the given version.
+|name|No|String|Only return process definitions with the given name.
+|nameLike|No|String|Only return process definitions with a name like the given name.
+|key|No|String|Only return process definitions with the given key.
+|keyLike|No|String|Only return process definitions with a name like the given key.
+|resourceName|No|String|Only return process definitions with the given resource name.
+|resourceNameLike|No|String|Only return process definitions with a name like the given resource name.
+|category|No|String|Only return process definitions with the given category.
+|categoryLike|No|String|Only return process definitions with a category like the given name.
+|categoryNotEquals|No|String|Only return process definitions which don't have the given category.
+|deploymentId|No|String|Only return process definitions which are part of a deployment with the given identifier.
+|latest|No|Boolean|Only return the latest process definition versions. Can only be used together with 'key' and 'keyLike' parameters, using any other parameter will result in a 400-response.
+|sort|No|'name' (default), 'id', 'key', 'category', 'deploymentId' and 'version'|Property to sort on, to be used together with the 'order'.
+|The general <<restPagingAndSort,paging and sorting query-parameters>> can be used for this URL.
+
+|===============
+
+
+.List of process definitions - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|200|Indicates request was successful and the decision tables are returned
+|400|Indicates a parameter was passed in the wrong format or that 'latest' is used with other parameters other than 'key' and 'keyLike'. The status-message contains additional information.
+
+|===============
+
+
+*Success response body:*
+
+[source,json,linenums]
+----
+{
+  "data": [
+        {
+      "id": "46b0379c-c0a1-11e6-bc93-6ab56fad108a",
+      "url": "http://localhost:8080/flowable-rest/dmn-api/dmn-repository/decision-tables/46b0379c-c0a1-11e6-bc93-6ab56fad108a",
+      "category": null,
+      "name": "Decision Table One",
+      "key": "DecisionTableOne",
+      "description": null,
+      "version": 3,
+      "resourceName": "dmn-DecisionTableOne.dmn",
+      "deploymentId": "46aa6b3a-c0a1-11e6-bc93-6ab56fad108a",
+      "parentDeploymentId": "5001",
+      "tenantId": ""
+    }
+  ],
+  "total": 1,
+  "start": 0,
+  "sort": "name",
+  "order": "asc",
+  "size": 1
+}
+----
+
+
+==== Get a decision table
+
+----
+GET dmn-repository/decision-tables/{decisionTableId}
+----
+
+.Get a decision table - URL parameters
+[options="header"]
+|===============
+|Parameter|Required|Value|Description
+|decisionTableId|Yes|String|The identifier of the decision table to get.
+
+|===============
+
+
+.Get a decision table - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|200|Indicates the decision table was found and returned.
+|404|Indicates the requested decision table was not found.
+
+|===============
+
+
+*Success response body:*
+
+[source,json,linenums]
+----
+{
+  "id": "46b0379c-c0a1-11e6-bc93-6ab56fad108a",
+  "url": "http://localhost:8080/flowable-rest/dmn-api/dmn-repository/decision-tables/46b0379c-c0a1-11e6-bc93-6ab56fad108a",
+  "category": null,
+  "name": "Decision Table One",
+  "key": "DecisionTableOne",
+  "description": null,
+  "version": 3,
+  "resourceName": "dmn-DecisionTableOne.dmn",
+  "deploymentId": "46aa6b3a-c0a1-11e6-bc93-6ab56fad108a",
+  "parentDeploymentId": "5001",
+  "tenantId": ""
+}
+----
+
+
+==== Get a decision table resource content
+
+----
+GET dmn-repository/decision-tables/{decisionTableId}/resourcedata
+----
+
+.Get a decision table resource content - URL parameters
+[options="header"]
+|===============
+|Parameter|Required|Value|Description
+|decisionTableId|Yes|String|The identifier of the decision table to get the resource data for.
+
+|===============
+
+*Response:*
+
+Exactly the same response codes/boy as +GET dmn-repository/deployment/{deploymentId}/resourcedata/{resourceId}+.
+
+
+==== Get a decision table DMN model
+
+----
+GET dmn-repository/decision-tables/{decisionTableId}/model
+----
+
+.Get a decision table DMN model - URL parameters
+[options="header"]
+|===============
+|Parameter|Required|Value|Description
+|decisionTableId|Yes|String|The identifier of the decision table to get the model for.
+
+|===============
+
+
+.Get a decision table DMN model - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|200|Indicates the decision table was found and the model is returned.
+|404|Indicates the requested decision table was not found.
+
+|===============
+
+
+*Response body:*
+The response body is a JSON representation of the +org.flowable.dmn.model.DmnDefinition+ and contains the full DMN definition model.
+
+[source,json,linenums]
+----
+{
+   "processes":[
+      {
+         "id":"oneTaskProcess",
+         "xmlRowNumber":7,
+         "xmlColumnNumber":60,
+         "extensionElements":{
+
+         },
+         "name":"The One Task Process",
+         "executable":true,
+         "documentation":"One task process description",
+
+    ]
+}
+----
+
+
+=== DMN Rule Service
+
+
+==== Execute a decision
+
+----
+POST dmn-rule/execute
+----
+
+*Request body:*
+
+The request body should contain data of type _multipart/form-data_. The decisionKey is required. The tenantId, parentDeploymentId and a map of inputVariables (restVariables) are optional.
+
+*Response body:*
+
+[source,json,linenums]
+----
+{
+  "resultVariables": [
+    [
+      {
+        "name": "output1",
+        "type": "string",
+        "value": "result 1"
+      }
+    ],
+    [
+      {
+        "name": "output1",
+        "type": "string",
+        "value": "result 2"
+      }
+    ],
+    [
+      {
+        "name": "output1",
+        "type": "string",
+        "value": "result 3"
+      }
+    ]
+  ],
+  "url": "http://localhost:8080/flowable-rest/dmn-api/dmn-rule/execute"
+}
+----
+.Execute a decision - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|201|Indicates the Decision has been executed.
+|===============
+
+==== Execute a single result decision
+
+----
+POST dmn-rule/execute/single-result
+----
+
+*Request body:*
+
+The request body should contain data of type _multipart/form-data_. The decisionKey is required. The tenantId, parentDeploymentId and a map of inputVariables (restVariables) are optional.
+
+When multiple rules are valid the service will respond with a 500 code. 
+*Note: a single hit with a compound output is valid (see response below)*
+
+
+*Response body:*
+
+[source,json,linenums]
+----
+{
+  "resultVariables": [
+    {
+      "name": "output1",
+      "type": "string",
+      "value": "compound 1"
+    },
+    {
+      "name": "output2",
+      "type": "string",
+      "value": "compound 2"
+    }
+  ],
+  "url": "http://localhost:8080/flowable-rest/dmn-api/dmn-rule/execute/single-result"
+}
+----
+.Execute a single resultdecision - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|201|Indicates the Decision has been executed.
+|500|Indicates the Decision returned multiple results.
+|===============
+
+
+
+=== Engine
+
+
+==== Get DMN engine info
+
+----
+GET dmn-management/engine
+----
+
+
+Returns a read-only view of the DMN engine that is used in this REST-service.
+
+
+*Success response body:*
+
+[source,json,linenums]
+----
+{
+   "name":"default",
+   "version":"6.4.1-SNAPSHOT",
+   "resourceUrl":"file://flowable-dmn/flowable.dmn.cfg.xml",
+   "exception":null
+}
+----
+
+.Get engine information - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|200|Indicates the engine information has been returned.
+
+|===============

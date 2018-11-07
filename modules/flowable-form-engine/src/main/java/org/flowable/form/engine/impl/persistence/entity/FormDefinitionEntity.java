@@ -12,7 +12,7 @@
  */
 package org.flowable.form.engine.impl.persistence.entity;
 
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.form.api.FormDefinition;
 
 /**
@@ -28,8 +28,6 @@ public interface FormDefinitionEntity extends FormDefinition, Entity {
     void setDescription(String description);
 
     void setDeploymentId(String deploymentId);
-
-    void setParentDeploymentId(String parentDeploymentId);
 
     void setVersion(int version);
 

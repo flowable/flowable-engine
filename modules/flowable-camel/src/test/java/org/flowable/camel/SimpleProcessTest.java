@@ -25,9 +25,14 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
+@Tag("camel")
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
 public class SimpleProcessTest extends SpringFlowableTestCase {
 
@@ -38,6 +43,7 @@ public class SimpleProcessTest extends SpringFlowableTestCase {
 
     protected MockEndpoint service2;
 
+    @BeforeEach
     public void setUp() throws Exception {
         service1 = (MockEndpoint) camelContext.getEndpoint("mock:service1");
         service1.reset();
@@ -48,13 +54,14 @@ public class SimpleProcessTest extends SpringFlowableTestCase {
             @Override
             public void configure() throws Exception {
                 from("direct:start").to("flowable:camelProcess");
-                from("flowable:camelProcess:serviceTask1").setBody().exchangeProperty("var1").to("mock:service1").setProperty("var2").constant("var2").setBody().properties();
+                from("flowable:camelProcess:serviceTask1").setBody().exchangeProperty("var1").to("mock:service1").setProperty("var2").constant("var2").setBody().exchangeProperties();
                 from("direct:receive").to("flowable:camelProcess:receive");
                 from("flowable:camelProcess:serviceTask2?copyVariablesToBodyAsMap=true").to("mock:service2");
             }
         });
     }
 
+    @AfterEach
     public void tearDown() throws Exception {
         List<Route> routes = camelContext.getRoutes();
         for (Route r : routes) {
@@ -63,6 +70,7 @@ public class SimpleProcessTest extends SpringFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "process/example.bpmn20.xml" })
     public void testRunProcess() throws Exception {
         CamelContext ctx = applicationContext.getBean(CamelContext.class);
@@ -84,6 +92,7 @@ public class SimpleProcessTest extends SpringFlowableTestCase {
         assertEquals("var2", m.get("var2"));
     }
 
+    @Test
     @Deployment(resources = { "process/example.bpmn20.xml" })
     public void testRunProcessByKey() throws Exception {
         CamelContext ctx = applicationContext.getBean(CamelContext.class);

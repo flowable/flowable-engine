@@ -12,7 +12,7 @@
  */
 package org.flowable.crystalball.simulator;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * @author martin.grofcik

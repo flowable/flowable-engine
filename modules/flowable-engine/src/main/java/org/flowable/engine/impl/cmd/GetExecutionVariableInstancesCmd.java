@@ -16,16 +16,16 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 public class GetExecutionVariableInstancesCmd implements Command<Map<String, VariableInstance>>, Serializable {
 
@@ -40,6 +40,7 @@ public class GetExecutionVariableInstancesCmd implements Command<Map<String, Var
         this.isLocal = isLocal;
     }
 
+    @Override
     public Map<String, VariableInstance> execute(CommandContext commandContext) {
 
         // Verify existence of execution

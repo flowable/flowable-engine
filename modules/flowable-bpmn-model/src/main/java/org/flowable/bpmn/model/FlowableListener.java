@@ -14,6 +14,7 @@ package org.flowable.bpmn.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -32,6 +33,11 @@ public class FlowableListener extends BaseElement {
 
     @JsonIgnore
     protected Object instance; // Can be used to set an instance of the listener directly. That instance will then always be reused.
+    
+    public FlowableListener() {
+        // Always generate a random identifier to look up the listener while executing the logic
+        setId(UUID.randomUUID().toString());
+    }
 
     public String getEvent() {
         return event;
@@ -97,6 +103,7 @@ public class FlowableListener extends BaseElement {
         this.instance = instance;
     }
 
+    @Override
     public FlowableListener clone() {
         FlowableListener clone = new FlowableListener();
         clone.setValues(this);

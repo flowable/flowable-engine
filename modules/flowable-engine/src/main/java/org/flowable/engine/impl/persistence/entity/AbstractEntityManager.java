@@ -12,11 +12,11 @@
  */
 package org.flowable.engine.impl.persistence.entity;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.AbstractManager;
@@ -52,9 +52,14 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
     @Override
     public void insert(EntityImpl entity, boolean fireCreateEvent) {
         getDataManager().insert(entity);
+        if (fireCreateEvent) {
+            fireEntityInsertedEvent(entity);
+        }
+    }
 
+    protected void fireEntityInsertedEvent(Entity entity) {
         FlowableEventDispatcher eventDispatcher = getEventDispatcher();
-        if (fireCreateEvent && eventDispatcher.isEnabled()) {
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, entity));
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, entity));
         }
@@ -68,12 +73,17 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
     @Override
     public EntityImpl update(EntityImpl entity, boolean fireUpdateEvent) {
         EntityImpl updatedEntity = getDataManager().update(entity);
+        if (fireUpdateEvent) {
+            fireEntityUpdatedEvent(entity);
+        }
+        return updatedEntity;
+    }
 
-        if (fireUpdateEvent && getEventDispatcher().isEnabled()) {
+    protected void fireEntityUpdatedEvent(Entity entity) {
+        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, entity));
         }
-
-        return updatedEntity;
     }
 
     @Override
@@ -92,7 +102,14 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
         getDataManager().delete(entity);
 
         if (fireDeleteEvent && getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, entity));
+            fireEntityDeletedEvent(entity);
+        }
+    }
+
+    protected void fireEntityDeletedEvent(Entity entity) {
+        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, entity));
         }
     }
 

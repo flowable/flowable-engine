@@ -17,13 +17,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
-import org.flowable.engine.impl.delegate.event.FlowableEngineEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -43,7 +42,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertNotNull(processInstance);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         // Check create event
@@ -121,7 +120,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
         listener.clearEventsReceived();
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         // Set assignee through API
@@ -188,7 +187,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
         listener.clearEventsReceived();
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         // Delete process, should delete task as well, but not complete
@@ -210,7 +209,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/activiti/engine/test/api/event/TaskEventsTest.testEventFiring.bpmn20.xml" })
     public void testEventFiringOrdering() {
 
-        // We need to add a special listener that copies the Task values - to record its state when the event fires,
+        // We need to add a special listener that copies the org.flowable.task.service.Task values - to record its state when the event fires,
         // otherwise the in-memory task instances is changed after the event fires.
         TestFlowableEntityEventTaskListener tlistener = new TestFlowableEntityEventTaskListener(org.activiti.engine.task.Task.class);
         processEngineConfiguration.getEventDispatcher().addEventListener(tlistener);
@@ -220,7 +219,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
             runtimeService.startProcessInstanceByKey("testTaskLocalVars");
 
             // Fetch first task
-            Task task = taskService.createTaskQuery().singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
 
             // Complete first task
             Map<String, Object> taskParams = new HashMap<String, Object>();

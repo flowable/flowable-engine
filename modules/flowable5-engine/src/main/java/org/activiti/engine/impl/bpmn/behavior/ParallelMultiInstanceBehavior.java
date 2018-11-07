@@ -33,6 +33,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
     /**
      * Handles the parallel case of spawning the instances. Will create child executions accordingly for every instance needed.
      */
+    @Override
     protected void createInstances(ActivityExecution execution) {
         int nrOfInstances = resolveNrOfInstances(execution);
         if (nrOfInstances < 0) {
@@ -44,7 +45,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         setLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES, 0);
         setLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES, nrOfInstances);
 
-        List<ActivityExecution> concurrentExecutions = new ArrayList<ActivityExecution>();
+        List<ActivityExecution> concurrentExecutions = new ArrayList<>();
         for (int loopCounter = 0; loopCounter < nrOfInstances; loopCounter++) {
             ActivityExecution concurrentExecution = execution.createExecution();
             concurrentExecution.setActive(true);
@@ -94,6 +95,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
     /**
      * Called when the wrapped {@link ActivityBehavior} calls the {@link AbstractBpmnActivityBehavior#leave(ActivityExecution)} method. Handles the completion of one of the parallel instances
      */
+    @Override
     public void leave(ActivityExecution execution) {
         callActivityEndListeners(execution);
 
@@ -132,7 +134,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
             if (joinedExecutions.size() >= nrOfInstances || completionConditionSatisfied(execution)) {
 
                 // Removing all active child executions (ie because completionCondition is true)
-                List<ExecutionEntity> executionsToRemove = new ArrayList<ExecutionEntity>();
+                List<ExecutionEntity> executionsToRemove = new ArrayList<>();
                 for (ActivityExecution childExecution : executionEntity.getParent().getExecutions()) {
                     if (childExecution.isActive()) {
                         executionsToRemove.add((ExecutionEntity) childExecution);

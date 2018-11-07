@@ -19,10 +19,10 @@ import java.util.Map;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
-import org.flowable.identitylink.service.IdentityLink;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.api.IdentityLinkType;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -31,13 +31,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class DynamicUserTaskTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/usertask/DynamicUserTaskTest.assignment.bpmn20.xml" })
     public void testChangeAssignee() {
         // first test without changing the form key
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask");
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("test", task.getAssignee());
         taskService.complete(task.getId());
 
@@ -56,13 +57,14 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/usertask/DynamicUserTaskTest.assignment.bpmn20.xml" })
     public void testChangeOwner() {
         // first test without changing the form key
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask");
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("ownerTest", task.getOwner());
         taskService.complete(task.getId());
 
@@ -81,13 +83,14 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/usertask/DynamicUserTaskTest.basictask.bpmn20.xml" })
     public void testChangeCandidateUsers() {
         // first test without changing the form key
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask");
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         List<IdentityLink> taskIdentityLinks = taskService.getIdentityLinksForTask(task.getId());
         boolean candidateUserTestFound = false;
         for (IdentityLink identityLink : taskIdentityLinks) {
@@ -147,13 +150,14 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/usertask/DynamicUserTaskTest.basictask.bpmn20.xml" })
     public void testChangeCandidateGroups() {
         // first test without changing the form key
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask");
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         List<IdentityLink> taskIdentityLinks = taskService.getIdentityLinksForTask(task.getId());
         boolean candidateGroupTestFound = false;
         for (IdentityLink identityLink : taskIdentityLinks) {
@@ -213,13 +217,14 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/usertask/DynamicUserTaskTest.basictask.bpmn20.xml" })
     public void testChangeCandidateUsersAndGroups() {
         // first test without changing the form key
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask");
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         List<IdentityLink> taskIdentityLinks = taskService.getIdentityLinksForTask(task.getId());
         boolean candidateUserTestFound = false;
         boolean candidateGroupTestFound = false;
@@ -303,13 +308,14 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/usertask/DynamicUserTaskTest.basictask.bpmn20.xml" })
     public void testChangeNameAndDescription() {
         // first test without changing the form key
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask");
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(task.getName());
         assertNull(task.getDescription());
         taskService.complete(task.getId());
@@ -331,13 +337,14 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/usertask/DynamicUserTaskTest.assignment.bpmn20.xml" })
     public void testChangePriorityAndCategory() {
         // first test without changing the form key
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask");
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals(50, task.getPriority());
         assertNull(task.getCategory());
         taskService.complete(task.getId());
@@ -359,13 +366,14 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment
     public void testChangeFormKey() {
         // first test without changing the form key
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask");
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("test", task.getFormKey());
         taskService.complete(task.getId());
 
@@ -384,6 +392,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment
     public void testChangeFormKeyWithExpression() {
         // first test without changing the form key
@@ -392,7 +401,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask", varMap);
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("test", task.getFormKey());
         taskService.complete(task.getId());
 

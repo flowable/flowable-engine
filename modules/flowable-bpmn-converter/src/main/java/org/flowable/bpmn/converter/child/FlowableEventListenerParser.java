@@ -27,9 +27,11 @@ import org.flowable.bpmn.model.Process;
  */
 public class FlowableEventListenerParser extends BaseChildElementParser {
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
         EventListener listener = new EventListener();
         BpmnXMLUtil.addXMLLocation(listener, xtr);
+
         if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_CLASS))) {
             listener.setImplementation(xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_CLASS));
             listener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
@@ -54,8 +56,13 @@ public class FlowableEventListenerParser extends BaseChildElementParser {
                 listener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_INVALID_THROW_EVENT);
             }
         }
+        
         listener.setEvents(xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_EVENTS));
         listener.setEntityType(xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_ENTITY_TYPE));
+        
+        if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_ON_TRANSACTION))){
+            listener.setOnTransaction(xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_ON_TRANSACTION));
+        }
 
         Process parentProcess = (Process) parentElement;
         parentProcess.getEventListeners().add(listener);

@@ -17,11 +17,11 @@ import java.io.Serializable;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.ValuedDataObject;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.DataObjectImpl;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
@@ -31,7 +31,7 @@ import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -59,6 +59,7 @@ public class GetDataObjectCmd implements Command<DataObject>, Serializable {
         this.withLocalizationFallback = withLocalizationFallback;
     }
 
+    @Override
     public DataObject execute(CommandContext commandContext) {
         if (executionId == null) {
             throw new FlowableIllegalArgumentException("executionId is null");
@@ -108,7 +109,7 @@ public class GetDataObjectCmd implements Command<DataObject>, Serializable {
                 }
 
             } else {
-                SubProcess subProcess = (SubProcess) bpmnModel.getFlowElement(execution.getActivityId());
+                SubProcess subProcess = (SubProcess) bpmnModel.getFlowElement(executionEntity.getActivityId());
                 for (ValuedDataObject dataObjectDefinition : subProcess.getDataObjects()) {
                     if (dataObjectDefinition.getName().equals(variableEntity.getName())) {
                         foundDataObject = dataObjectDefinition;

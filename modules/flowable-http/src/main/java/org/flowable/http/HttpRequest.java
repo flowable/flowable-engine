@@ -23,6 +23,7 @@ public class HttpRequest {
     protected String url;
     protected String headers;
     protected String body;
+    protected String bodyEncoding;
     protected int timeout;
     protected boolean noRedirects;
     protected Set<String> failCodes;
@@ -30,6 +31,8 @@ public class HttpRequest {
     protected boolean ignoreErrors;
     protected boolean saveRequest;
     protected boolean saveResponse;
+    protected boolean saveResponseTransient;
+    protected boolean saveResponseAsJson;
     protected String prefix;
 
     public String getMethod() {
@@ -62,6 +65,14 @@ public class HttpRequest {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public String getBodyEncoding() {
+        return bodyEncoding;
+    }
+
+    public void setBodyEncoding(String bodyEncoding) {
+        this.bodyEncoding = bodyEncoding;
     }
 
     public int getTimeout() {
@@ -118,6 +129,22 @@ public class HttpRequest {
 
     public void setSaveResponse(boolean saveResponse) {
         this.saveResponse = saveResponse;
+    }
+    
+    public boolean isSaveResponseTransient() {
+        return saveResponseTransient;
+    }
+
+    public void setSaveResponseTransient(boolean saveResponseTransient) {
+        this.saveResponseTransient = saveResponseTransient;
+    }
+    
+    public boolean isSaveResponseAsJson() {
+        return saveResponseAsJson;
+    }
+
+    public void setSaveResponseAsJson(boolean saveResponseAsJson) {
+        this.saveResponseAsJson = saveResponseAsJson;
     }
 
     public String getPrefix() {

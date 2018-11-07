@@ -14,8 +14,8 @@ package org.flowable.engine.impl.bpmn.deployer;
 
 import java.util.Map;
 
+import org.flowable.common.engine.api.repository.EngineDeployment;
 import org.flowable.engine.impl.bpmn.parser.BpmnParser;
-import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 
 public class ParsedDeploymentBuilderFactory {
 
@@ -29,11 +29,11 @@ public class ParsedDeploymentBuilderFactory {
         this.bpmnParser = bpmnParser;
     }
 
-    public ParsedDeploymentBuilder getBuilderForDeployment(DeploymentEntity deployment) {
+    public ParsedDeploymentBuilder getBuilderForDeployment(EngineDeployment deployment) {
         return getBuilderForDeploymentAndSettings(deployment, null);
     }
 
-    public ParsedDeploymentBuilder getBuilderForDeploymentAndSettings(DeploymentEntity deployment,
+    public ParsedDeploymentBuilder getBuilderForDeploymentAndSettings(EngineDeployment deployment,
             Map<String, Object> deploymentSettings) {
         return new ParsedDeploymentBuilder(deployment, bpmnParser, deploymentSettings);
     }

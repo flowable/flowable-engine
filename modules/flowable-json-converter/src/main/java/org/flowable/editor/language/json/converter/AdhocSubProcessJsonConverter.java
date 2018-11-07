@@ -49,10 +49,12 @@ public class AdhocSubProcessJsonConverter extends BaseBpmnJsonConverter implemen
         convertersToJsonMap.put(AdhocSubProcess.class, AdhocSubProcessJsonConverter.class);
     }
 
+    @Override
     protected String getStencilId(BaseElement baseElement) {
         return STENCIL_ADHOC_SUB_PROCESS;
     }
 
+    @Override
     protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
         AdhocSubProcess subProcess = (AdhocSubProcess) baseElement;
         propertiesNode.put("completioncondition", subProcess.getCompletionCondition());
@@ -65,6 +67,7 @@ public class AdhocSubProcessJsonConverter extends BaseBpmnJsonConverter implemen
         flowElementNode.set("childShapes", subProcessShapesArrayNode);
     }
 
+    @Override
     protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
         AdhocSubProcess subProcess = new AdhocSubProcess();
         subProcess.setCompletionCondition(getPropertyValueAsString("completioncondition", elementNode));

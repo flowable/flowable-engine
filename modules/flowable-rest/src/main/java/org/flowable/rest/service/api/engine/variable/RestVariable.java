@@ -13,10 +13,11 @@
 
 package org.flowable.rest.service.api.engine.variable;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.rest.variable.EngineRestVariable;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModelProperty;
+
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.rest.variable.EngineRestVariable;
 
 /**
  * Pojo representing a variable used in REST-service which defines it's name, variable, scope and type.
@@ -31,6 +32,7 @@ public class RestVariable extends EngineRestVariable {
 
     private RestVariableScope variableScope;
 
+    @ApiModelProperty(example = "global", value = "Scope of the variable.", notes = "If local, the variable is explicitly defined on the resource it’s requested from. When global, the variable is defined on the parent (or any parent in the parent-tree) of the resource it’s requested from. When writing a variable and the scope is omitted, global is assumed.")
     @JsonIgnore
     public RestVariableScope getVariableScope() {
         return variableScope;

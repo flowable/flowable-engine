@@ -22,8 +22,8 @@ import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.flowable.engine.common.impl.javax.el.ELContext;
-import org.flowable.engine.common.impl.javax.el.ELResolver;
+import org.flowable.common.engine.impl.javax.el.ELContext;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.osgi.service.blueprint.container.BlueprintContainer;
 
 /**
@@ -51,6 +51,7 @@ public class BlueprintContextELResolver extends ELResolver {
         this.blueprintContainer = blueprintContainer;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public Object getValue(ELContext context, Object base, Object property) {
         if (base == null) {
@@ -67,21 +68,26 @@ public class BlueprintContextELResolver extends ELResolver {
         return null;
     }
 
+    @Override
     public boolean isReadOnly(ELContext context, Object base, Object property) {
         return true;
     }
 
+    @Override
     public void setValue(ELContext context, Object base, Object property, Object value) {
     }
 
+    @Override
     public Class<?> getCommonPropertyType(ELContext context, Object arg) {
         return Object.class;
     }
 
+    @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object arg) {
         return null;
     }
 
+    @Override
     public Class<?> getType(ELContext context, Object arg1, Object arg2) {
         return Object.class;
     }

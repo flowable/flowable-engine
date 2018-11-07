@@ -57,6 +57,7 @@ public class StartEvent extends Event {
         this.formProperties = formProperties;
     }
 
+    @Override
     public StartEvent clone() {
         StartEvent clone = new StartEvent();
         clone.setValues(this);

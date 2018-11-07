@@ -30,10 +30,12 @@ public class ActivityBehaviorInvocation extends DelegateInvocation {
         this.execution = execution;
     }
 
+    @Override
     protected void invoke() {
         behaviorInstance.execute(execution);
     }
 
+    @Override
     public Object getTarget() {
         return behaviorInstance;
     }

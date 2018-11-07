@@ -12,20 +12,17 @@
  */
 package org.flowable.variable.service.impl.persistence.entity;
 
-import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.common.engine.impl.db.HasRevision;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.api.types.VariableType;
 
 /**
  * @author Tom Baeyens
  * @author Marcus Klimstra (CGI)
  * @author Joram Barrez
  */
-public interface VariableInstanceEntity extends VariableInstance {
-
-    void setDeleted(boolean isDeleted);
-
-    boolean isDeleted();
-
-    //void setExecution(ExecutionEntity execution);
+public interface VariableInstanceEntity extends VariableInstance, Entity, HasRevision {
 
     void forceUpdate();
 

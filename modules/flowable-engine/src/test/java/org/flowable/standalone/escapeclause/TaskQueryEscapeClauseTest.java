@@ -15,10 +15,12 @@ package org.flowable.standalone.escapeclause;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
 
@@ -30,11 +32,11 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
 
     private ProcessInstance processInstance2;
 
-    private Task task1;
+    private org.flowable.task.api.Task task1;
 
-    private Task task2;
+    private org.flowable.task.api.Task task2;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
         deploymentOneId = repositoryService
                 .createDeployment()
@@ -69,20 +71,19 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
         taskService.setOwner(task2.getId(), "owner_");
         taskService.setVariableLocal(task2.getId(), "var1", "Two_");
 
-        super.setUp();
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
-        super.tearDown();
         repositoryService.deleteDeployment(deploymentOneId, true);
         repositoryService.deleteDeployment(deploymentTwoId, true);
     }
 
+    @Test
     public void testQueryByNameLike() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // nameLike
-            Task task = taskService.createTaskQuery().taskNameLike("%\\%%").singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().taskNameLike("%\\%%").singleResult();
             assertNotNull(task);
             assertEquals(task1.getId(), task.getId());
 
@@ -101,10 +102,11 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
         }
     }
 
+    @Test
     public void testQueryByNameLikeIgnoreCase() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // nameLikeIgnoreCase
-            Task task = taskService.createTaskQuery().taskNameLikeIgnoreCase("%\\%%").singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().taskNameLikeIgnoreCase("%\\%%").singleResult();
             assertNotNull(task);
             assertEquals(task1.getId(), task.getId());
 
@@ -123,10 +125,11 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
         }
     }
 
+    @Test
     public void testQueryByDescriptionLike() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // descriptionLike
-            Task task = taskService.createTaskQuery().taskDescriptionLike("%\\%%").singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().taskDescriptionLike("%\\%%").singleResult();
             assertNotNull(task);
             assertEquals(task1.getId(), task.getId());
 
@@ -145,10 +148,11 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
         }
     }
 
+    @Test
     public void testQueryByDescriptionLikeIgnoreCase() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // descriptionLikeIgnoreCase
-            Task task = taskService.createTaskQuery().taskDescriptionLikeIgnoreCase("%\\%%").singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().taskDescriptionLikeIgnoreCase("%\\%%").singleResult();
             assertNotNull(task);
             assertEquals(task1.getId(), task.getId());
 
@@ -167,10 +171,11 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
         }
     }
 
+    @Test
     public void testQueryByAssigneeLike() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // assigneeLike
-            Task task = taskService.createTaskQuery().taskAssigneeLike("%\\%%").singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().taskAssigneeLike("%\\%%").singleResult();
             assertNotNull(task);
             assertEquals(task1.getId(), task.getId());
 
@@ -187,10 +192,11 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
         }
     }
 
+    @Test
     public void testQueryByAssigneeLikeIgnoreCase() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // assigneeLikeIgnoreCase
-            Task task = taskService.createTaskQuery().taskAssigneeLike("%\\%%").singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().taskAssigneeLike("%\\%%").singleResult();
             assertNotNull(task);
             assertEquals(task1.getId(), task.getId());
 
@@ -207,10 +213,11 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
         }
     }
 
+    @Test
     public void testQueryByOwnerLike() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // taskOwnerLike
-            Task task = taskService.createTaskQuery().taskOwnerLike("%\\%%").singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().taskOwnerLike("%\\%%").singleResult();
             assertNotNull(task);
             assertEquals(task1.getId(), task.getId());
 
@@ -229,10 +236,11 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
         }
     }
 
+    @Test
     public void testQueryByOwnerLikeIgnoreCase() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // taskOwnerLikeIgnoreCase
-            Task task = taskService.createTaskQuery().taskOwnerLikeIgnoreCase("%\\%%").singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().taskOwnerLikeIgnoreCase("%\\%%").singleResult();
             assertNotNull(task);
             assertEquals(task1.getId(), task.getId());
 
@@ -251,10 +259,11 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
         }
     }
 
+    @Test
     public void testQueryByProcessInstanceBusinessKeyLike() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // processInstanceBusinessKeyLike
-            Task task = taskService.createTaskQuery().processInstanceBusinessKeyLike("%\\%%").singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceBusinessKeyLike("%\\%%").singleResult();
             assertNotNull(task);
             assertEquals(task1.getId(), task.getId());
 
@@ -273,10 +282,11 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
         }
     }
 
+    @Test
     public void testQueryByProcessInstanceBusinessKeyLikeIgnoreCase() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // processInstanceBusinessKeyLike
-            Task task = taskService.createTaskQuery().processInstanceBusinessKeyLikeIgnoreCase("%\\%%").singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceBusinessKeyLikeIgnoreCase("%\\%%").singleResult();
             assertNotNull(task);
             assertEquals(task1.getId(), task.getId());
 
@@ -295,10 +305,11 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
         }
     }
 
+    @Test
     public void testQueryByKeyLike() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // taskDefinitionKeyLike
-            Task task = taskService.createTaskQuery().taskDefinitionKeyLike("%\\%%").singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKeyLike("%\\%%").singleResult();
             assertNull(task);
 
             task = taskService.createTaskQuery().taskDefinitionKeyLike("%\\_%").singleResult();
@@ -313,10 +324,11 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
         }
     }
 
+    @Test
     public void testQueryByProcessDefinitionKeyLike() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // processDefinitionKeyLike
-            Task task = taskService.createTaskQuery().processDefinitionKeyLike("%\\%%").singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processDefinitionKeyLike("%\\%%").singleResult();
             assertNull(task);
 
             task = taskService.createTaskQuery().processDefinitionKeyLike("%\\_%").singleResult();
@@ -331,10 +343,11 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
         }
     }
 
+    @Test
     public void testQueryByProcessDefinitionKeyLikeIgnoreCase() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // processDefinitionKeyLikeIgnoreCase
-            Task task = taskService.createTaskQuery().processDefinitionKeyLikeIgnoreCase("%\\%%").singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processDefinitionKeyLikeIgnoreCase("%\\%%").singleResult();
             assertNull(task);
 
             task = taskService.createTaskQuery().processDefinitionKeyLikeIgnoreCase("%\\_%").singleResult();
@@ -349,13 +362,14 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
         }
     }
 
+    @Test
     public void testQueryByProcessDefinitionNameLike() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // processDefinitionNameLike
-            List<Task> list = taskService.createTaskQuery().processDefinitionNameLike("%\\%%").orderByTaskCreateTime().asc().list();
+            List<org.flowable.task.api.Task> list = taskService.createTaskQuery().processDefinitionNameLike("%\\%%").orderByTaskCreateTime().asc().list();
             // only check for existence and assume that the SQL processing has ordered the values correctly
             // see https://github.com/flowable/flowable-engine/issues/8
-            ArrayList tasks = new ArrayList(2);
+            List<String> tasks = new ArrayList<>(2);
             tasks.add(list.get(0).getId());
             tasks.add(list.get(1).getId());
             assertTrue(tasks.contains(task1.getId()));
@@ -366,7 +380,7 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
             assertEquals(2, list.size());
             // only check for existence and assume that the SQL processing has ordered the values correctly
             // see https://github.com/flowable/flowable-engine/issues/8
-            tasks = new ArrayList(2);
+            tasks = new ArrayList<>(2);
             tasks.add(list.get(0).getId());
             tasks.add(list.get(1).getId());
             assertTrue(tasks.contains(task1.getId()));
@@ -374,10 +388,11 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
         }
     }
 
+    @Test
     public void testQueryLikeByQueryVariableValue() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // taskVariableValueLike
-            Task task = taskService.createTaskQuery().taskVariableValueLike("var1", "%\\%%").singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().taskVariableValueLike("var1", "%\\%%").singleResult();
             assertNotNull(task);
             assertEquals(task1.getId(), task.getId());
 
@@ -396,10 +411,11 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
         }
     }
 
+    @Test
     public void testQueryLikeIgnoreCaseByQueryVariableValue() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // taskVariableValueLikeIgnoreCase
-            Task task = taskService.createTaskQuery().taskVariableValueLikeIgnoreCase("var1", "%\\%%").singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().taskVariableValueLikeIgnoreCase("var1", "%\\%%").singleResult();
             assertNotNull(task);
             assertEquals(task1.getId(), task.getId());
 

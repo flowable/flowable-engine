@@ -26,10 +26,10 @@ import org.activiti.engine.impl.bpmn.parser.factory.ActivityBehaviorFactory;
 import org.activiti.engine.impl.bpmn.parser.factory.ListenerFactory;
 import org.activiti.engine.impl.el.ExpressionManager;
 import org.activiti.engine.parse.BpmnParseHandler;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.EngineDeployer;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
-import org.flowable.engine.impl.persistence.deploy.Deployer;
 import org.flowable.engine.impl.rules.RulesDeployer;
 
 public class DefaultProcessEngineFactory {
@@ -68,6 +68,7 @@ public class DefaultProcessEngineFactory {
         flowable5Configuration.setEventDispatcher(flowable6Configuration.getEventDispatcher());
         copyPostDeployers(flowable6Configuration, flowable5Configuration);
         flowable5Configuration.setBusinessCalendarManager(flowable6Configuration.getBusinessCalendarManager());
+        copyCustomVariableTypes(flowable6Configuration, flowable5Configuration);
     }
 
     protected void copyJdbcConfig(ProcessEngineConfigurationImpl flowable6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl flowable5Configuration) {
@@ -206,8 +207,8 @@ public class DefaultProcessEngineFactory {
 
     protected void copyPostDeployers(ProcessEngineConfigurationImpl flowable6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl flowable5Configuration) {
         if (flowable6Configuration.getCustomPostDeployers() != null) {
-            List<org.activiti.engine.impl.persistence.deploy.Deployer> activiti5Deployers = new ArrayList<org.activiti.engine.impl.persistence.deploy.Deployer>();
-            for (Deployer deployer : flowable6Configuration.getCustomPostDeployers()) {
+            List<org.activiti.engine.impl.persistence.deploy.Deployer> activiti5Deployers = new ArrayList<>();
+            for (EngineDeployer deployer : flowable6Configuration.getCustomPostDeployers()) {
                 if (deployer instanceof RulesDeployer) {
                     activiti5Deployers.add(new org.activiti.engine.impl.rules.RulesDeployer());
                     break;
@@ -224,6 +225,11 @@ public class DefaultProcessEngineFactory {
         }
     }
 
+    protected void copyCustomVariableTypes(ProcessEngineConfigurationImpl flowable6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl flowable5Configuration) {
+        flowable5Configuration.setCustomPreVariableTypes(flowable6Configuration.getCustomPreVariableTypes());
+        flowable5Configuration.setCustomPostVariableTypes(flowable6Configuration.getCustomPostVariableTypes());
+    }
+
     protected void convertParseHandlers(ProcessEngineConfigurationImpl flowable6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl flowable5Configuration) {
         flowable5Configuration.setPreBpmnParseHandlers(convert(flowable6Configuration.getFlowable5PreBpmnParseHandlers()));
         flowable5Configuration.setPostBpmnParseHandlers(convert(flowable6Configuration.getFlowable5PostBpmnParseHandlers()));
@@ -235,7 +241,7 @@ public class DefaultProcessEngineFactory {
             return null;
         }
 
-        List<BpmnParseHandler> parseHandlers = new ArrayList<BpmnParseHandler>(activiti5BpmnParseHandlers.size());
+        List<BpmnParseHandler> parseHandlers = new ArrayList<>(activiti5BpmnParseHandlers.size());
         for (Object activiti6BpmnParseHandler : activiti5BpmnParseHandlers) {
             parseHandlers.add((BpmnParseHandler) activiti6BpmnParseHandler);
         }

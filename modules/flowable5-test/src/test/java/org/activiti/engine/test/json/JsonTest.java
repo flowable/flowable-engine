@@ -18,11 +18,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
-import org.flowable.variable.service.history.HistoricVariableInstance;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -66,7 +65,7 @@ public class JsonTest extends PluggableFlowableTestCase {
         assertEquals("myValue", value.get("var").asText());
         assertEquals("myOtherValue", value.get("var2").asText());
 
-        Task task = taskService.createTaskQuery().active().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().active().singleResult();
         assertNotNull(task);
         ObjectNode var3Node = objectMapper.createObjectNode();
         var3Node.put("var", "myValue");
@@ -141,7 +140,7 @@ public class JsonTest extends PluggableFlowableTestCase {
         assertEquals("myValue", value.get(0).get("var").asText());
         assertEquals("myOtherValue", value.get(1).get("var").asText());
 
-        Task task = taskService.createTaskQuery().active().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().active().singleResult();
         assertNotNull(task);
         ArrayNode varArray3 = objectMapper.createArrayNode();
         varNode = objectMapper.createObjectNode();

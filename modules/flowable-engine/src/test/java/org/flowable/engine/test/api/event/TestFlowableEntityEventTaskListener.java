@@ -15,18 +15,17 @@ package org.flowable.engine.test.api.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.task.Task;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * Records a copy of the tasks involved in the events
  */
 public class TestFlowableEntityEventTaskListener extends TestFlowableEntityEventListener {
 
-    private List<Task> tasks;
+    private List<org.flowable.task.api.Task> tasks;
 
     public TestFlowableEntityEventTaskListener(Class<?> entityClass) {
         super(entityClass);
@@ -42,13 +41,13 @@ public class TestFlowableEntityEventTaskListener extends TestFlowableEntityEvent
     @Override
     public void onEvent(FlowableEvent event) {
         super.onEvent(event);
-        if (event instanceof FlowableEntityEvent && Task.class.isAssignableFrom(((FlowableEntityEvent) event).getEntity().getClass())) {
-            tasks.add(copy((Task) ((FlowableEntityEvent) event).getEntity()));
+        if (event instanceof FlowableEntityEvent && org.flowable.task.api.Task.class.isAssignableFrom(((FlowableEntityEvent) event).getEntity().getClass())) {
+            tasks.add(copy((org.flowable.task.api.Task) ((FlowableEntityEvent) event).getEntity()));
         }
     }
 
-    protected Task copy(Task aTask) {
-        TaskEntity ent = CommandContextUtil.getTaskEntityManager().create();
+    protected org.flowable.task.api.Task copy(org.flowable.task.api.Task aTask) {
+        TaskEntity ent = CommandContextUtil.getTaskService().createTask();
         ent.setId(aTask.getId());
         ent.setName(aTask.getName());
         ent.setDescription(aTask.getDescription());
@@ -59,7 +58,7 @@ public class TestFlowableEntityEventTaskListener extends TestFlowableEntityEvent
         return ent;
     }
 
-    public List<Task> getTasks() {
+    public List<org.flowable.task.api.Task> getTasks() {
         return tasks;
     }
 }

@@ -13,20 +13,30 @@
 package org.flowable.engine.test.api.event;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.impl.cfg.TransactionState;
+import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 
 /**
  * @author Joram Barrez
  */
-public class TestHistoricActivityEventListener implements FlowableEventListener {
+public class TestHistoricActivityEventListener extends AbstractFlowableEngineEventListener {
 
     private List<FlowableEvent> eventsReceived;
 
     public TestHistoricActivityEventListener() {
+        super(new HashSet<>(Arrays.asList(
+                FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED,
+                FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED,
+                FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED,
+                FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED
+        )));
         eventsReceived = new ArrayList<>();
     }
 
@@ -39,17 +49,37 @@ public class TestHistoricActivityEventListener implements FlowableEventListener 
     }
 
     @Override
-    public void onEvent(FlowableEvent event) {
-        if (event.getType().equals(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED)
-                || event.getType().equals(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED)
-                || event.getType().equals(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED)
-                || event.getType().equals(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED)) {
-            eventsReceived.add(event);
-        }
+    protected void historicActivityInstanceCreated(FlowableEngineEntityEvent event) {
+        eventsReceived.add(event);
+    }
+
+    @Override
+    protected void historicActivityInstanceEnded(FlowableEngineEntityEvent event) {
+        eventsReceived.add(event);
+    }
+
+    @Override
+    protected void historicProcessInstanceCreated(FlowableEngineEntityEvent event) {
+        eventsReceived.add(event);
+    }
+
+    @Override
+    protected void historicProcessInstanceEnded(FlowableEngineEntityEvent event) {
+        eventsReceived.add(event);
     }
 
     @Override
     public boolean isFailOnException() {
         return false;
+    }
+    
+    @Override
+    public boolean isFireOnTransactionLifecycleEvent() {
+        return true;
+    }
+    
+    @Override
+    public String getOnTransaction() {
+        return TransactionState.COMMITTED.name();
     }
 }

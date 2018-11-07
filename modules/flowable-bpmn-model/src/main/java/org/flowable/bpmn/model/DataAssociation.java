@@ -54,6 +54,7 @@ public class DataAssociation extends BaseElement {
         this.assignments = assignments;
     }
 
+    @Override
     public DataAssociation clone() {
         DataAssociation clone = new DataAssociation();
         clone.setValues(this);

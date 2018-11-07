@@ -28,7 +28,7 @@ import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.persistence.entity.ResourceEntity;
 import org.activiti.engine.impl.repository.DeploymentBuilderImpl;
 import org.activiti.engine.repository.Deployment;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 
 /**
  * @author Tom Baeyens
@@ -43,6 +43,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
         this.deploymentBuilder = deploymentBuilder;
     }
 
+    @Override
     public Deployment execute(CommandContext commandContext) {
         DeploymentEntity deployment = deploymentBuilder.getDeployment();
 
@@ -50,7 +51,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
         if (deploymentBuilder.isDuplicateFilterEnabled()) {
 
-            List<Deployment> existingDeployments = new ArrayList<Deployment>();
+            List<Deployment> existingDeployments = new ArrayList<>();
             if (deployment.getTenantId() == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(deployment.getTenantId())) {
                 DeploymentEntity existingDeployment = commandContext
                         .getDeploymentEntityManager()
@@ -95,7 +96,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
         }
 
         // Deployment settings
-        Map<String, Object> deploymentSettings = new HashMap<String, Object>();
+        Map<String, Object> deploymentSettings = new HashMap<>();
         deploymentSettings.put(DeploymentSettings.IS_BPMN20_XSD_VALIDATION_ENABLED, deploymentBuilder.isBpmn20XsdValidationEnabled());
         deploymentSettings.put(DeploymentSettings.IS_PROCESS_VALIDATION_ENABLED, deploymentBuilder.isProcessValidationEnabled());
 

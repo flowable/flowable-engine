@@ -43,10 +43,12 @@ public class FileSystemContentObject implements ContentObject {
         this.length = length;
     }
 
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public long getContentLength() {
         if (length == null) {
             length = file.length();
@@ -54,6 +56,7 @@ public class FileSystemContentObject implements ContentObject {
         return length;
     }
 
+    @Override
     public InputStream getContent() {
         if (inputStream == null) {
             try {

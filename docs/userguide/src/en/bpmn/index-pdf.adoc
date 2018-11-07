@@ -1,0 +1,19 @@
+= Flowable DOCS (v 6.4.1-SNAPSHOT)
+:doctype: book
+:toc: left
+:toclevels: 4
+:icons: font
+:numbered:
+:source-highlighter: pygments
+:pygments-css: class
+:pygments-linenums-mode: table
+:compat-mode:
+:pdf-page-size: A4
+:nofooter:
+:github-tag: master
+:github-code: https://github.com/flowable/flowable-engine/tree/{github-tag}
+:sc-flowable-starter: {github-code}/modules/flowable-spring-boot/flowable-spring-boot-starters
+:sc-flowable-boot: {sc-flowable-starter}/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot
+:sc-flowable-ui-admin: {github-code}/modules/flowable-ui-admin
+
+include::index-common.adoc[]

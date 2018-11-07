@@ -12,15 +12,15 @@
  */
 package org.flowable.engine.delegate.event.impl;
 
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableCancelledEvent;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 /**
  * An {@link org.flowable.engine.delegate.event.FlowableCancelledEvent} implementation.
  * 
  * @author martin.grofcik
  */
-public class FlowableProcessCancelledEventImpl extends FlowableEventImpl implements FlowableCancelledEvent {
+public class FlowableProcessCancelledEventImpl extends FlowableProcessEventImpl implements FlowableCancelledEvent {
 
     protected Object cause;
 
@@ -32,6 +32,7 @@ public class FlowableProcessCancelledEventImpl extends FlowableEventImpl impleme
         this.cause = cause;
     }
 
+    @Override
     public Object getCause() {
         return cause;
     }

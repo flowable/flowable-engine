@@ -36,6 +36,7 @@ public class SetTaskVariablesCmd extends NeedsActiveTaskCmd<Object> {
         this.isLocal = isLocal;
     }
 
+    @Override
     protected Object execute(CommandContext commandContext, TaskEntity task) {
 
         if (isLocal) {

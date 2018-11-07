@@ -17,8 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskQuery;
+import org.flowable.task.api.TaskQuery;
 
 /**
  * Tests for cub-tasks querying
@@ -231,7 +230,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
         // 1 parent task for kermit
         processEngineConfiguration.getClock().setCurrentTime(sdf.parse("01/01/2008 01:01:01.000"));
-        Task rootTask1 = taskService.newTask();
+        org.flowable.task.api.Task rootTask1 = taskService.newTask();
         rootTask1.setName("rootTestTask");
         rootTask1.setDescription("rootTestTask description");
         taskService.saveTask(rootTask1);
@@ -240,7 +239,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
         // 2 sub-tasks for the task above
         processEngineConfiguration.getClock().setCurrentTime(sdf.parse("01/01/2009 01:01:01.000"));
         for (int i = 1; i <= 2; i++) {
-            Task subtask = taskService.newTask();
+            org.flowable.task.api.Task subtask = taskService.newTask();
             subtask.setName("kermitSubTask" + i);
             subtask.setParentTaskId(rootTask1.getId());
             subtask.setDescription("description for kermit sub-task" + i);
@@ -252,7 +251,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
         // 2 parent tasks for gonzo
         // first parent task for gonzo
         processEngineConfiguration.getClock().setCurrentTime(sdf.parse("01/02/2008 02:02:02.000"));
-        Task rootTask2 = taskService.newTask();
+        org.flowable.task.api.Task rootTask2 = taskService.newTask();
         rootTask2.setName("gonzoRootTask1");
         rootTask2.setDescription("gonzo Root task1 description");
         taskService.saveTask(rootTask2);
@@ -260,7 +259,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
         ids.add(rootTask2.getId());
         // second parent task for gonzo
         processEngineConfiguration.getClock().setCurrentTime(sdf.parse("05/02/2008 02:02:02.000"));
-        Task rootTask3 = taskService.newTask();
+        org.flowable.task.api.Task rootTask3 = taskService.newTask();
         rootTask3.setName("gonzoRootTask2");
         rootTask3.setDescription("gonzo Root task2 description");
         taskService.saveTask(rootTask3);
@@ -269,7 +268,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
         // 3 sub-tasks for the first parent task
         processEngineConfiguration.getClock().setCurrentTime(sdf.parse("01/01/2009 01:01:01.000"));
         for (int i = 1; i <= 3; i++) {
-            Task subtask = taskService.newTask();
+            org.flowable.task.api.Task subtask = taskService.newTask();
             subtask.setName("gonzoSubTask1_" + i);
             subtask.setParentTaskId(rootTask2.getId());
             subtask.setDescription("description for gonzo sub-task1_" + i);
@@ -280,7 +279,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
         // 2 sub-tasks for the second parent task
         processEngineConfiguration.getClock().setCurrentTime(sdf.parse("02/01/2009 01:01:01.000"));
         for (int i = 1; i <= 2; i++) {
-            Task subtask = taskService.newTask();
+            org.flowable.task.api.Task subtask = taskService.newTask();
             subtask.setName("gonzoSubTask2_" + i);
             subtask.setParentTaskId(rootTask3.getId());
             subtask.setDescription("description for gonzo sub-task2_" + i);

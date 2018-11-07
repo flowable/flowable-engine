@@ -46,6 +46,7 @@ public class DataObjectImpl implements DataObject {
         this.id = id;
     }
 
+    @Override
     public String getId() {
         return id;
     }
@@ -54,6 +55,7 @@ public class DataObjectImpl implements DataObject {
         this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public String getProcessInstanceId() {
         return processInstanceId;
     }
@@ -62,10 +64,12 @@ public class DataObjectImpl implements DataObject {
         this.executionId = executionId;
     }
 
+    @Override
     public String getExecutionId() {
         return executionId;
     }
 
+    @Override
     public String getName() {
         return name;
     }
@@ -74,6 +78,7 @@ public class DataObjectImpl implements DataObject {
         this.name = name;
     }
 
+    @Override
     public String getLocalizedName() {
         if (localizedName != null && localizedName.length() > 0) {
             return localizedName;
@@ -86,6 +91,7 @@ public class DataObjectImpl implements DataObject {
         this.localizedName = localizedName;
     }
 
+    @Override
     public String getDescription() {
         if (localizedDescription != null && localizedDescription.length() > 0) {
             return localizedDescription;
@@ -98,6 +104,7 @@ public class DataObjectImpl implements DataObject {
         this.description = description;
     }
 
+    @Override
     public Object getValue() {
         return value;
     }
@@ -106,6 +113,7 @@ public class DataObjectImpl implements DataObject {
         this.value = value;
     }
 
+    @Override
     public String getType() {
         return type;
     }
@@ -114,6 +122,7 @@ public class DataObjectImpl implements DataObject {
         this.type = type;
     }
 
+    @Override
     public String getDataObjectDefinitionKey() {
         return dataObjectDefinitionKey;
     }

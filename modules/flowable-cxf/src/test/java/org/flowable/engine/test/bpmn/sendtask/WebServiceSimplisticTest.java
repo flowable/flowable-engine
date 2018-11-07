@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.bpmn.servicetask.AbstractWebServiceTaskTest;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Esteban Robles Luna
@@ -24,10 +25,12 @@ import org.flowable.engine.test.bpmn.servicetask.AbstractWebServiceTaskTest;
  */
 public class WebServiceSimplisticTest extends AbstractWebServiceTaskTest {
 
+    @Override
     protected boolean isValidating() {
         return false;
     }
 
+    @Test
     @Deployment
     public void testAsyncInvocationWithSimplisticDataFlow() throws Exception {
         assertEquals(-1, webServiceMock.getCount());

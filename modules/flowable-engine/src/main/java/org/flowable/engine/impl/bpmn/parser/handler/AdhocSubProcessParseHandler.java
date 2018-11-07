@@ -22,10 +22,12 @@ import org.flowable.engine.impl.bpmn.parser.BpmnParse;
  */
 public class AdhocSubProcessParseHandler extends AbstractActivityBpmnParseHandler<SubProcess> {
 
+    @Override
     protected Class<? extends BaseElement> getHandledType() {
         return AdhocSubProcess.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, SubProcess subProcess) {
 
         subProcess.setBehavior(bpmnParse.getActivityBehaviorFactory().createAdhocSubprocessActivityBehavior(subProcess));

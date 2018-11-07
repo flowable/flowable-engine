@@ -12,8 +12,8 @@
  */
 package org.flowable.idm.engine.impl;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.idm.engine.impl.db.IdmDbSchemaManager;
 import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
@@ -21,10 +21,11 @@ import org.flowable.idm.engine.impl.util.CommandContextUtil;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public final class SchemaOperationsIdmEngineBuild implements Command<Object> {
+public final class SchemaOperationsIdmEngineBuild implements Command<Void> {
 
-    public Object execute(CommandContext commandContext) {
-        IdmDbSchemaManager idmDbSchemaManager = (IdmDbSchemaManager) CommandContextUtil.getIdmEngineConfiguration(commandContext).getDbSchemaManager();
+    @Override
+    public Void execute(CommandContext commandContext) {
+        IdmDbSchemaManager idmDbSchemaManager = (IdmDbSchemaManager) CommandContextUtil.getIdmEngineConfiguration(commandContext).getSchemaManager();
         idmDbSchemaManager.performSchemaOperationsIdmEngineBuild();
         return null;
     }

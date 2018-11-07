@@ -18,15 +18,15 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.rest.service.api.engine.RestIdentityLink;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -43,29 +43,25 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessDefinitionIdentityLinkCollectionResource extends BaseProcessDefinitionResource {
 
-    @ApiOperation(value = "Get all candidate starters for a process-definition", tags = { "Process Definitions" })
+    @ApiOperation(value = "List candidate starters for a process-definition", nickname = "listProcessDefinitionIdentityLinks", tags = { "Process Definitions" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the process definition was found and the requested identity links are returned."),
             @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
     })
-    @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/identitylinks", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/repository/process-definitions/{processDefinitionId}/identitylinks", produces = "application/json")
     public List<RestIdentityLink> getIdentityLinks(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId, HttpServletRequest request) {
         ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
         return restResponseFactory.createRestIdentityLinks(repositoryService.getIdentityLinksForProcessDefinition(processDefinition.getId()));
     }
 
-    @ApiOperation(value = "Add a candidate starter to a process definition", tags = { "Process Definitions" }, notes = "## For a User\n\n"
-            + " ```JSON\n" + "{\n" + "  \"user\" : \"kermit\"\n" + "} ```"
-            + "\n\n"
-            + "## For a Group\n\n"
-            + " ```JSON\n" + "{\n" + "  \"groupId\" : \"sales\"\n" + "} ```")
+    @ApiOperation(value = "Add a candidate starter to a process definition", tags = { "Process Definitions" },
+            notes = "It's possible to add either a user or a group.")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the process definition was found and the identity link was created."),
-            @ApiResponse(code = 400, message = "Indicates the body doesn't contains the correct information."),
+            @ApiResponse(code = 400, message = "Indicates the body does not contain the correct information."),
             @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
     })
-
-    @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/identitylinks", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/repository/process-definitions/{processDefinitionId}/identitylinks", produces = "application/json")
     public RestIdentityLink createIdentityLink(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId, @RequestBody RestIdentityLink identityLink, HttpServletRequest request, HttpServletResponse response) {
 
         ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);

@@ -39,9 +39,9 @@ public class HttpServiceTask2ConverterTest extends AbstractConverterTest {
         BpmnModel bpmnModel = readXMLFile();
         BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
         validateModel(parsedModel);
-        deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "httpservicetaskmodel2.bpmn";
     }

@@ -15,9 +15,7 @@ package org.flowable.idm.engine.impl.persistence.entity;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
-
-public class PrivilegeEntityImpl extends AbstractEntity implements PrivilegeEntity {
+public class PrivilegeEntityImpl extends AbstractIdmEngineEntity implements PrivilegeEntity {
 
     protected String name;
 
@@ -29,10 +27,12 @@ public class PrivilegeEntityImpl extends AbstractEntity implements PrivilegeEnti
         return state;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }

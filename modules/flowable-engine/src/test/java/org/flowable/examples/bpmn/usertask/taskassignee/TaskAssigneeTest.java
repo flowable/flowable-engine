@@ -16,8 +16,8 @@ import java.util.List;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * Simple process test to validate the current implementation prototype.
@@ -26,6 +26,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class TaskAssigneeTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testTaskAssignee() {
 
@@ -33,9 +34,9 @@ public class TaskAssigneeTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskAssigneeExampleProcess");
 
         // Get task list
-        List<Task> tasks = taskService.createTaskQuery().taskAssignee("kermit").list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee("kermit").list();
         assertEquals(1, tasks.size());
-        Task myTask = tasks.get(0);
+        org.flowable.task.api.Task myTask = tasks.get(0);
         assertEquals("Schedule meeting", myTask.getName());
         assertEquals("Schedule an engineering meeting for next week with the new hire.", myTask.getDescription());
 

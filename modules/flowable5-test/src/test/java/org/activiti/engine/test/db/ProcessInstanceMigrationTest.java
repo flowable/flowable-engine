@@ -21,17 +21,16 @@ import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.impl.cmd.SetProcessDefinitionVersionCmd;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 /**
  * @author Falko Menge
@@ -313,7 +312,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             commandExecutor.execute(new SetProcessDefinitionVersionCmd(pi.getId(), 2));
 
             // check UserTask
-            Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
             assertEquals(newProcessDefinition.getId(), task.getProcessDefinitionId());
             assertEquals("testFormKey", formService.getTaskFormData(task.getId()).getFormKey());
 

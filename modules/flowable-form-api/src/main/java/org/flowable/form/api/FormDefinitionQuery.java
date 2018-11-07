@@ -15,8 +15,8 @@ package org.flowable.form.api;
 
 import java.util.Set;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.query.Query;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link FormDefinition}s.
@@ -64,16 +64,6 @@ public interface FormDefinitionQuery extends Query<FormDefinitionQuery, FormDefi
      * Select forms that are deployed in deployments with the given set of ids
      */
     FormDefinitionQuery deploymentIds(Set<String> deploymentIds);
-
-    /**
-     * Only select forms that have the given parent deployment id
-     */
-    FormDefinitionQuery parentDeploymentId(String parentDeploymentId);
-
-    /**
-     * Only select forms that have a parent deployment id like the given parameter
-     */
-    FormDefinitionQuery parentDeploymentIdLike(String parentDeploymentIdLike);
 
     /**
      * Only select form with the given key.

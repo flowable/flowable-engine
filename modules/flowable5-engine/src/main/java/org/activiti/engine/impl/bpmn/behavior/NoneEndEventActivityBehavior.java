@@ -20,6 +20,7 @@ import org.flowable.engine.delegate.DelegateExecution;
  */
 public class NoneEndEventActivityBehavior extends FlowNodeActivityBehavior {
 
+    @Override
     public void execute(DelegateExecution execution) {
         ActivityExecution activityExecution = (ActivityExecution) execution;
         activityExecution.end();

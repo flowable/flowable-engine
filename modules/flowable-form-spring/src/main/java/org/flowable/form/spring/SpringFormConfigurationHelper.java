@@ -16,11 +16,10 @@ package org.flowable.form.spring;
 import java.net.URL;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.form.engine.FormEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.io.UrlResource;
 
@@ -34,16 +33,17 @@ public class SpringFormConfigurationHelper {
     public static FormEngine buildFormEngine(URL resource) {
         LOGGER.debug("==== BUILDING SPRING APPLICATION CONTEXT AND FORM ENGINE =========================================");
 
-        ApplicationContext applicationContext = new GenericXmlApplicationContext(new UrlResource(resource));
-        Map<String, FormEngine> beansOfType = applicationContext.getBeansOfType(FormEngine.class);
-        if ((beansOfType == null) || (beansOfType.isEmpty())) {
-            throw new FlowableException("no " + FormEngine.class.getName() + " defined in the application context " + resource.toString());
+        try (GenericXmlApplicationContext applicationContext = new GenericXmlApplicationContext(new UrlResource(resource))) {
+            Map<String, FormEngine> beansOfType = applicationContext.getBeansOfType(FormEngine.class);
+            if ((beansOfType == null) || beansOfType.isEmpty()) {
+                throw new FlowableException("no " + FormEngine.class.getName() + " defined in the application context " + resource.toString());
+            }
+
+            FormEngine formEngine = beansOfType.values().iterator().next();
+
+            LOGGER.debug("==== SPRING FORM ENGINE CREATED ==================================================================");
+            return formEngine;
         }
-
-        FormEngine formEngine = beansOfType.values().iterator().next();
-
-        LOGGER.debug("==== SPRING FORM ENGINE CREATED ==================================================================");
-        return formEngine;
     }
 
 }

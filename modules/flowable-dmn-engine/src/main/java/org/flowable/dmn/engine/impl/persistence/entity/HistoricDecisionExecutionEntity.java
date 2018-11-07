@@ -14,8 +14,8 @@ package org.flowable.dmn.engine.impl.persistence.entity;
 
 import java.util.Date;
 
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
 
 /**
  * @author Tijs Rademakers
@@ -35,11 +35,12 @@ public interface HistoricDecisionExecutionEntity extends DmnHistoricDecisionExec
     void setExecutionId(String executionId);
 
     void setActivityId(String activityId);
+    
+    void setScopeType(String scopeType);
 
     void setFailed(boolean failed);
 
     void setTenantId(String tenantId);
 
     void setExecutionJson(String executionJson);
-
 }

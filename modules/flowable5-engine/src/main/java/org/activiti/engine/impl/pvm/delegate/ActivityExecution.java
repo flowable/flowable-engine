@@ -59,6 +59,7 @@ public interface ActivityExecution extends DelegateExecution {
     /**
      * returns the parent of this execution, or null if there no parent.
      */
+    @Override
     ActivityExecution getParent();
 
     ActivityExecution getProcessInstance();
@@ -66,6 +67,7 @@ public interface ActivityExecution extends DelegateExecution {
     /**
      * returns the list of execution of which this execution the parent of.
      */
+    @Override
     List<? extends ActivityExecution> getExecutions();
 
     /**
@@ -78,16 +80,19 @@ public interface ActivityExecution extends DelegateExecution {
     /**
      * makes this execution active or inactive.
      */
+    @Override
     void setActive(boolean isActive);
 
     /**
      * returns whether this execution is currently active.
      */
+    @Override
     boolean isActive();
 
     /**
      * returns whether this execution has ended or not.
      */
+    @Override
     boolean isEnded();
 
     /**
@@ -98,31 +103,37 @@ public interface ActivityExecution extends DelegateExecution {
     /**
      * changes the concurrent indicator on this execution.
      */
+    @Override
     void setConcurrent(boolean isConcurrent);
 
     /**
      * returns whether this execution is concurrent or not.
      */
+    @Override
     boolean isConcurrent();
 
     /**
      * returns whether this execution is a process instance or not.
      */
+    @Override
     boolean isProcessInstanceType();
 
     /**
      * Inactivates this execution. This is useful for example in a join: the execution still exists, but it is not longer active.
      */
+    @Override
     void inactivate();
 
     /**
      * Returns whether this execution is a scope.
      */
+    @Override
     boolean isScope();
 
     /**
      * Changes whether this execution is a scope or not
      */
+    @Override
     void setScope(boolean isScope);
 
     /**

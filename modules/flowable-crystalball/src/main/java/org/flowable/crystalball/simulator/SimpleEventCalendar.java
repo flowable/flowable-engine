@@ -17,8 +17,8 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.runtime.ClockReader;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.runtime.ClockReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +31,7 @@ public class SimpleEventCalendar implements EventCalendar {
 
     private static final int NULL = -1;
 
-    protected List<SimulationEvent> eventList = new ArrayList<SimulationEvent>();
+    protected List<SimulationEvent> eventList = new ArrayList<>();
     protected int minIndex = NULL;
     protected Comparator<SimulationEvent> eventComparator;
     protected final ClockReader clockReader;
@@ -101,9 +101,8 @@ public class SimpleEventCalendar implements EventCalendar {
 
     /**
      * is event the first event in the calendar?
-     * 
-     * @param event
-     *            - used in comparison
+     *
+     * @param event - used in comparison
      * @return is minimal event decision
      */
     private boolean isMinimal(SimulationEvent event) {
