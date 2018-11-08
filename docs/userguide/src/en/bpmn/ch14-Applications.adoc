@@ -1,8 +1,8 @@
-[[flowableUIApps]]
+[[flowableApps]]
 
-== Flowable UI applications
+== Flowable applications
 
-Flowable provides several web applications to demonstrate and leverage the functionality provided by the Flowable project:
+Flowable provides several ui web applications to demonstrate and leverage the functionality provided by the Flowable project:
 
 * Flowable IDM: an Identity Management application that provides single sign-on authentication functionality for all the Flowable UI applications, and, for users with the IDM administrative privilege, it also provides functionality to manage users, groups and privileges.
 * Flowable Modeler: an application that allows users with modeler privileges to model processes, forms, decision tables and application definitions.
@@ -11,13 +11,15 @@ Flowable provides several web applications to demonstrate and leverage the funct
 
 The Flowable IDM is required for all other apps to enable authentication. The WAR files for each app can be deployed to the same servlet container (such as Apache Tomcat), but can also be deployed on different servlet containers. Because the same cookie is used for authentication with each app, the apps need to run on the same domain.
 
+Flowable also provides the `flowable-rest.war` which contains the Flowable REST API. More about this can be read in the <<restApiChapter, REST API>> chapter.
+
 The apps are Spring Boot 2.0 based, which means that that the WAR files are actually executable and can be run as a normal standalone applications.
 See  https://docs.spring.io/spring-boot/docs/current/reference/html/build-tool-plugins-maven-plugin.html#build-tool-plugins-maven-packaging[The Executable Jar Format] in the Spring Boot reference documentation.
 
 
 [[uiAppInstallation]]
 
-=== Installation
+=== Flowable UI Applications installation
 
 As mentioned before, all four UI apps can be deployed together on the same Tomcat server, and to get started this is probably the easiest approach. You can choose to only install the Modeler app, for example, but make sure the Flowable IDM app is always running/deployed as well. For this installation guide we'll describe the installation of all four apps to a Tomcat server.
 
@@ -938,3 +940,85 @@ The security is configured in such way that the `info` and `health` endpoint are
 Full details of the `health` endpoint can only be seen by users with the privilege `access-admin`.
 In case you want to change that you need to configure `management.endpoint.health.show-details`.
 All the rest of the endpoints are accessing only to users with the `access-admin` privilege.
+
+[[custom-bean-deployment]]
+=== Custom bean deployment
+
+There are multiple ways of providing custom beans to the Flowable applications.
+
+
+[[custom-bean-deployment-spring-boot-auto]]
+==== Using Spring Boot auto configuration
+
+The Flowable applications are Spring Boot 2 applications.
+Which means that normal Spring Boot auto configuration can be used to make the beans to Flowable.
+This can be done in the following manner
+
+```
+package com.your.own.package.configuration;
+
+@Configuration
+@AutoConfigureOrder(Ordered.LOWEST_PRECEDENCE) // Makes sure that this configuration will be processed last by Spring Boot
+@ConditionalOnBean(type = "org.flowable.engine.ProcessEngine") // The configuration will only be used when the ProcessEngine bean is present
+public class YourOwnConfiguration {
+
+    @Configuration
+    @ComponentScan ("com.your.own.package.beans")
+    public static class ComponentScanConfiguration {
+        // This class is needed in order to conditionally perform the component scan (i.e. when the ProcessEngine bean is present)
+        // It is an optional class, in case you don't need component scanning then you don't need to do this
+    }
+
+    @Bean
+    public CustomBean customBean() {
+        // create your bean
+    }
+
+    @Bean
+    public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> customProcessEngineConfigurationConfigurer() {
+        return engineConfiguration -> {
+            // You can use this to add extra configuration to the process engine
+        }
+    }
+}
+```
+
+Note that when using Spring Boot the configuration class can be under your own package and not under some Flowable package.
+
+In order to make this class an auto configuration class a file named `spring.factories` should be created in the `META-INF` folder of your jar.
+In this file you should add
+
+```
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.your.own.package.configuration.YourOwnCustomConfiguration
+```
+
+In order to use this approach you would need to include your jar in the `WEB-INF/lib` folder of the exploded war.
+Placing this jar in the lib folder of the servlet container (e.g. Tomcat) is not going to work due to the way Spring proxies the `@Configuration` classes.
+
+
+[[custom-bean-deployment-component-scan]]
+==== Component scan
+
+Another way to provide custom Spring beans to the Flowable engine is to put them under a certain package and have the Flowable application component scan that package.
+Based on the used application this package is different:
+
+* `org.flowable.rest.app` for the `flowable-rest.war`
+* `org.flowable.ui.task.application` for the `flowable-task.war`
+
+
+The custom beans can be located in a single JAR and this jar should be present on the classpath when the applications are starting up.
+Depending where there JAR is placed, the lib folder of the servlet container (e.g. Tomcat) or the `WEB-INF/lib` folder of the exploded war, there are different possibilities.
+
+When using the lib folder of the servlet container then the created classes should be self contained, i.e. they should only use classes from within the jar.
+You can use any of the Spring `@Component` annotations (with the exception of `@Configuration`).
+The reason for not being able to use `@Configuration` classes is the fact that each configuration class is proxied by Spring with the help of the `ConfigurationClassPostProcessor`.
+However, the classloader loading the `@Configuration` class does not have access to the needed classes by Spring.
+
+When including the jar in the `WEB-INF/lib` folder of the exploded war then `@Configuration` classes and dependencies to other jars is possible.
+
+[[custom-bean-deployment-own-spring-boot]]
+==== Creating your own Spring Boot application
+
+This approach is the most flexible and most powerful approach of all.
+In order to follow this approach have a look at the <<springSpringBootGettingStarted,Getting Started with Spring Boot>> section of this documentation.
