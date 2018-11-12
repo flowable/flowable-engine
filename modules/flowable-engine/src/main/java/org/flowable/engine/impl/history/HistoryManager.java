@@ -90,7 +90,7 @@ public interface HistoryManager {
     /**
      * Finds the {@link HistoricActivityInstanceEntity} that is active in the given execution.
      */
-    HistoricActivityInstanceEntity findActivityInstance(ExecutionEntity execution, boolean createOnNotFound, boolean validateEndTimeNull);
+    HistoricActivityInstanceEntity findHistoricActivityInstance(ExecutionEntity execution, boolean createOnNotFound, boolean validateEndTimeNull);
 
     /**
      * Record a change of the process-definition id of a process instance, if activity history is enabled.

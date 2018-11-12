@@ -63,6 +63,8 @@ import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.dynamic.MoveExecutionEntityContainer.FlowElementMoveEntry;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
+import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntity;
+import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -904,18 +906,34 @@ public abstract class AbstractDynamicStateManager {
 
         HistoryLevel currentHistoryLevel = CommandContextUtil.getProcessEngineConfiguration(commandContext).getHistoryLevel();
         if (currentHistoryLevel.isAtLeast(HistoryLevel.ACTIVITY)) {
-            HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager = CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext);
-            List<HistoricActivityInstanceEntity> historicActivityInstances = historicActivityInstanceEntityManager.findHistoricActivityInstancesByExecutionAndActivityId(childExecution.getId(), oldActivityId);
-            for (HistoricActivityInstanceEntity historicActivityInstance : historicActivityInstances) {
-                historicActivityInstance.setProcessDefinitionId(childExecution.getProcessDefinitionId());
-                historicActivityInstance.setActivityId(childExecution.getActivityId());
-                historicActivityInstance.setActivityName(newFlowElement.getName());
-            }
+            synchronizeHistoricActivityInstance(commandContext, childExecution, oldActivityId, newFlowElement);
+            synchronizeActivityInstance(commandContext, childExecution, oldActivityId, newFlowElement);
         }
 
         if (currentHistoryLevel.isAtLeast(HistoryLevel.AUDIT)) {
             HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
             historicTaskService.recordTaskInfoChange(task);
+        }
+    }
+    protected void synchronizeActivityInstance(CommandContext commandContext, ExecutionEntity childExecution, String oldActivityId,
+        FlowElement newFlowElement) {
+        ActivityInstanceEntityManager activityInstanceEntityManager = CommandContextUtil.getActivityInstanceEntityManager(commandContext);
+        List<ActivityInstanceEntity> activityInstances = activityInstanceEntityManager.findActivityInstancesByExecutionAndActivityId(childExecution.getId(), oldActivityId);
+        for (ActivityInstanceEntity activityInstance : activityInstances) {
+            activityInstance.setProcessDefinitionId(childExecution.getProcessDefinitionId());
+            activityInstance.setActivityId(childExecution.getActivityId());
+            activityInstance.setActivityName(newFlowElement.getName());
+        }
+    }
+
+    protected void synchronizeHistoricActivityInstance(CommandContext commandContext, ExecutionEntity childExecution, String oldActivityId,
+        FlowElement newFlowElement) {
+        HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager = CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext);
+        List<HistoricActivityInstanceEntity> historicActivityInstances = historicActivityInstanceEntityManager.findHistoricActivityInstancesByExecutionAndActivityId(childExecution.getId(), oldActivityId);
+        for (HistoricActivityInstanceEntity historicActivityInstance : historicActivityInstances) {
+            historicActivityInstance.setProcessDefinitionId(childExecution.getProcessDefinitionId());
+            historicActivityInstance.setActivityId(childExecution.getActivityId());
+            historicActivityInstance.setActivityName(newFlowElement.getName());
         }
     }
 

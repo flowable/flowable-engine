@@ -28,11 +28,14 @@ import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
+import org.flowable.engine.runtime.ActivityInstance;
+import org.flowable.engine.runtime.ActivityInstanceQuery;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.runtime.EventSubscriptionQuery;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ExecutionQuery;
+import org.flowable.engine.runtime.NativeActivityInstanceQuery;
 import org.flowable.engine.runtime.NativeExecutionQuery;
 import org.flowable.engine.runtime.NativeProcessInstanceQuery;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -1016,6 +1019,18 @@ public interface RuntimeService {
      * creates a new {@link NativeProcessInstanceQuery} to query {@link ProcessInstance}s by SQL directly
      */
     NativeProcessInstanceQuery createNativeProcessInstanceQuery();
+
+    /**
+     * Creates a new {@link ActivityInstanceQuery} instance, that can be used to query activities in the currently running
+     * process instances.
+     */
+    ActivityInstanceQuery createActivityInstanceQuery();
+
+    /**
+     * creates a new {@link NativeActivityInstanceQuery} to query {@link ActivityInstance}s which are included
+     * in the cuby SQL directly.
+     */
+    NativeActivityInstanceQuery createNativeActivityInstanceQuery();
 
     /**
      * Creates a new {@link EventSubscriptionQuery} instance, that can be used to query the event subscriptions.

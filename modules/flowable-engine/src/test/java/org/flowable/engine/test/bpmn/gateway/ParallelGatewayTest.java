@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.bpmn.gateway;
 
+import static org.assertj.core.api.Java6Assertions.assertThat;
+
 import java.util.List;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -158,6 +160,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
             ProcessInstance pi = runtimeService.startProcessInstanceByKey("testHistoryRecords");
             List<HistoricActivityInstance> history = historyService.createHistoricActivityInstanceQuery().processInstanceId(pi.getId()).list();
             for (HistoricActivityInstance h : history) {
+                assertThat(h).isEqualToComparingFieldByField(runtimeService.createActivityInstanceQuery().activityInstanceId(h.getId()).singleResult());
                 if (h.getActivityId().equals("parallelgateway2")) {
                     assertNotNull(h.getEndTime());
                 }

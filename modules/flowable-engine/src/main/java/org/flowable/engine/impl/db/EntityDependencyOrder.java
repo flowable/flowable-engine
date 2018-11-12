@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ByteArrayEntityImpl;
 import org.flowable.engine.impl.persistence.entity.CommentEntityImpl;
@@ -73,6 +74,9 @@ public class EntityDependencyOrder {
          * 'FK from X': X should be ABOVE the entity
          * 
          */
+
+        /* FK from ExecutionEntity, ProcessDefinition */
+        DELETE_ORDER.add(ActivityInstanceEntityImpl.class);
 
         /* No FK */
         DELETE_ORDER.add(PropertyEntityImpl.class);
@@ -171,7 +175,7 @@ public class EntityDependencyOrder {
 
         /*
          * FK from VariableInstance FK from EventSubscription FK from IdentityLink FK from Task
-         * 
+         *
          * FK to ProcessDefinition
          */
         DELETE_ORDER.add(ExecutionEntityImpl.class);

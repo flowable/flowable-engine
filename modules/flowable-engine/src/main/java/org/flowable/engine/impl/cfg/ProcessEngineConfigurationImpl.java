@@ -252,6 +252,8 @@ import org.flowable.engine.impl.migration.ProcessInstanceMigrationManagerImpl;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionInfoCache;
+import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityManager;
+import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityManager;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.ByteArrayEntityManager;
@@ -285,6 +287,7 @@ import org.flowable.engine.impl.persistence.entity.ResourceEntityManager;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.engine.impl.persistence.entity.TableDataManagerImpl;
+import org.flowable.engine.impl.persistence.entity.data.ActivityInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.AttachmentDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ByteArrayDataManager;
 import org.flowable.engine.impl.persistence.entity.data.CommentDataManager;
@@ -300,6 +303,7 @@ import org.flowable.engine.impl.persistence.entity.data.ProcessDefinitionDataMan
 import org.flowable.engine.impl.persistence.entity.data.ProcessDefinitionInfoDataManager;
 import org.flowable.engine.impl.persistence.entity.data.PropertyDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ResourceDataManager;
+import org.flowable.engine.impl.persistence.entity.data.impl.MybatisActivityInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisAttachmentDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisByteArrayDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisCommentDataManager;
@@ -434,6 +438,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected EventLogEntryDataManager eventLogEntryDataManager;
     protected EventSubscriptionDataManager eventSubscriptionDataManager;
     protected ExecutionDataManager executionDataManager;
+    protected ActivityInstanceDataManager activityInstanceDataManager;
     protected HistoricActivityInstanceDataManager historicActivityInstanceDataManager;
     protected HistoricDetailDataManager historicDetailDataManager;
     protected HistoricProcessInstanceDataManager historicProcessInstanceDataManager;
@@ -452,6 +457,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected EventLogEntryEntityManager eventLogEntryEntityManager;
     protected EventSubscriptionEntityManager eventSubscriptionEntityManager;
     protected ExecutionEntityManager executionEntityManager;
+    protected ActivityInstanceEntityManager activityInstanceEntityManager;
     protected HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager;
     protected HistoricDetailEntityManager historicDetailEntityManager;
     protected HistoricProcessInstanceEntityManager historicProcessInstanceEntityManager;
@@ -1163,6 +1169,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (historicActivityInstanceDataManager == null) {
             historicActivityInstanceDataManager = new MybatisHistoricActivityInstanceDataManager(this);
         }
+        if (activityInstanceDataManager == null) {
+            activityInstanceDataManager = new MybatisActivityInstanceDataManager(this);
+        }
         if (historicDetailDataManager == null) {
             historicDetailDataManager = new MybatisHistoricDetailDataManager(this);
         }
@@ -1209,6 +1218,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
         if (executionEntityManager == null) {
             executionEntityManager = new ExecutionEntityManagerImpl(this, executionDataManager);
+        }
+        if (activityInstanceEntityManager == null) {
+            activityInstanceEntityManager = new ActivityInstanceEntityManagerImpl(this, activityInstanceDataManager);
         }
         if (historicActivityInstanceEntityManager == null) {
             historicActivityInstanceEntityManager = new HistoricActivityInstanceEntityManagerImpl(this, historicActivityInstanceDataManager);
@@ -3577,6 +3589,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    public ActivityInstanceDataManager getActivityInstanceDataManager() {
+        return activityInstanceDataManager;
+    }
+
+    public ProcessEngineConfigurationImpl setActivityInstanceDataManager(ActivityInstanceDataManager activityInstanceDataManager) {
+        this.activityInstanceDataManager = activityInstanceDataManager;
+        return this;
+    }
+
     public HistoricActivityInstanceDataManager getHistoricActivityInstanceDataManager() {
         return historicActivityInstanceDataManager;
     }
@@ -3709,6 +3730,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setExecutionEntityManager(ExecutionEntityManager executionEntityManager) {
         this.executionEntityManager = executionEntityManager;
+        return this;
+    }
+
+    public ActivityInstanceEntityManager getActivityInstanceEntityManager() {
+        return activityInstanceEntityManager;
+    }
+
+    public ProcessEngineConfigurationImpl setActivityInstanceEntityManager(ActivityInstanceEntityManager activityInstanceEntityManager) {
+        this.activityInstanceEntityManager = activityInstanceEntityManager;
         return this;
     }
 

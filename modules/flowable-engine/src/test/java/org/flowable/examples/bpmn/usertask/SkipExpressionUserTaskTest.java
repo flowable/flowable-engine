@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.api.Java6Assertions;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
@@ -118,7 +119,6 @@ public class SkipExpressionUserTaskTest extends PluggableFlowableTestCase {
             HistoricActivityInstance skipActivityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(skipPi.getId())
                     .activityId("userTask1")
                     .singleResult();
-            
             assertNotNull(skipActivityInstance);
             
             HistoricTaskInstance skipTaskInstance = historyService.createHistoricTaskInstanceQuery()

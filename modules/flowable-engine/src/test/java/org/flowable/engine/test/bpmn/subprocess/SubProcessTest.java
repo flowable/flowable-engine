@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.bpmn.subprocess;
 
+import static org.assertj.core.api.Java6Assertions.assertThat;
+
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -88,6 +90,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
             assertNotNull(historicTaskInstance.getEndTime());
 
             HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("subProcessTask").singleResult();
+            assertThat(historicActivityInstance).isEqualToComparingFieldByField(runtimeService.createActivityInstanceQuery().activityInstanceId(historicActivityInstance.getId()).singleResult());
             assertNotNull(historicActivityInstance.getEndTime());
         }
     }

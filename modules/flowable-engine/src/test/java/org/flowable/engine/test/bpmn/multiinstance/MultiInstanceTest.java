@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.bpmn.multiinstance;
 
+import static org.assertj.core.api.Java6Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -519,6 +521,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
             assertEquals(7, historicInstances.size());
             for (int i = 0; i < 7; i++) {
                 HistoricActivityInstance hai = historicInstances.get(i);
+                assertThat(hai).isEqualToComparingFieldByField(runtimeService.createActivityInstanceQuery().activityInstanceId(hai.getId()).singleResult());
                 assertEquals("scriptTask", hai.getActivityType());
                 assertNotNull(hai.getStartTime());
                 assertNotNull(hai.getEndTime());
@@ -583,6 +586,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
             List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityType("scriptTask").list();
             assertEquals(4, historicActivityInstances.size());
             for (HistoricActivityInstance hai : historicActivityInstances) {
+                assertThat(hai).isEqualToComparingFieldByField(runtimeService.createActivityInstanceQuery().activityInstanceId(hai.getId()).singleResult());
                 assertNotNull(hai.getStartTime());
                 assertNotNull(hai.getEndTime());
             }
@@ -1686,6 +1690,7 @@ assertProcessEnded(procId);
         List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityId("subprocess1").list();
         assertEquals(2, historicActivityInstances.size());
         for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
+            assertThat(historicActivityInstance).isEqualToComparingFieldByField(runtimeService.createActivityInstanceQuery().activityInstanceId(historicActivityInstance.getId()).singleResult());
             assertNotNull(historicActivityInstance.getStartTime());
             assertNull(historicActivityInstance.getEndTime());
         }
@@ -1698,6 +1703,7 @@ assertProcessEnded(procId);
         historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityId("subprocess1").list();
         assertEquals(2, historicActivityInstances.size());
         for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
+            assertThat(historicActivityInstance).isEqualToComparingFieldByField(runtimeService.createActivityInstanceQuery().activityInstanceId(historicActivityInstance.getId()).singleResult());
             assertNull(historicActivityInstance.getEndTime());
         }
 
@@ -1708,6 +1714,7 @@ assertProcessEnded(procId);
         historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityId("subprocess1").list();
         assertEquals(2, historicActivityInstances.size());
         for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
+            assertThat(historicActivityInstance).isEqualToComparingFieldByField(runtimeService.createActivityInstanceQuery().activityInstanceId(historicActivityInstance.getId()).singleResult());
             assertNull(historicActivityInstance.getEndTime());
         }
 
@@ -1721,6 +1728,7 @@ assertProcessEnded(procId);
             historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityId("subprocess1").list();
             assertEquals(2, historicActivityInstances.size());
             for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
+                assertThat(historicActivityInstance).isEqualToComparingFieldByField(runtimeService.createActivityInstanceQuery().activityInstanceId(historicActivityInstance.getId()).singleResult());
                 assertNull(historicActivityInstance.getEndTime());
             }
         }

@@ -254,9 +254,9 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
     }
 
     @Override
-    public HistoricActivityInstanceEntity findActivityInstance(ExecutionEntity execution, boolean createOnNotFound, boolean endTimeMustBeNull) {
+    public HistoricActivityInstanceEntity findHistoricActivityInstance(ExecutionEntity execution, boolean createOnNotFound, boolean endTimeMustBeNull) {
         String activityId = getActivityIdForExecution(execution);
-        return activityId != null ? findActivityInstance(execution, activityId, createOnNotFound, endTimeMustBeNull) : null;
+        return activityId != null ? findHistoricActivityInstance(execution, activityId, createOnNotFound, endTimeMustBeNull) : null;
     }
 
     protected String getActivityIdForExecution(ExecutionEntity execution) {
@@ -270,7 +270,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
         return activityId;
     }
 
-    protected HistoricActivityInstanceEntity findActivityInstance(ExecutionEntity execution, String activityId, boolean createOnNotFound, boolean endTimeMustBeNull) {
+    protected HistoricActivityInstanceEntity findHistoricActivityInstance(ExecutionEntity execution, String activityId, boolean createOnNotFound, boolean endTimeMustBeNull) {
 
         // No use looking for the HistoricActivityInstance when no activityId is provided.
         if (activityId == null) {

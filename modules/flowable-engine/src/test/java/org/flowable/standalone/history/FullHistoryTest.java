@@ -25,6 +25,7 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
+import org.assertj.core.api.Java6Assertions;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.history.HistoricActivityInstance;
@@ -72,11 +73,14 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         // Start-task should be added to history
         HistoricActivityInstance historicStartEvent = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("theStart").singleResult();
         assertNotNull(historicStartEvent);
+        Java6Assertions.assertThat(historicStartEvent).isEqualToComparingFieldByField(runtimeService.createActivityInstanceQuery().activityInstanceId(historicStartEvent.getId()).singleResult());
 
         HistoricActivityInstance waitStateActivity = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("waitState").singleResult();
+        Java6Assertions.assertThat(waitStateActivity).isEqualToComparingFieldByField(runtimeService.createActivityInstanceQuery().activityInstanceId(waitStateActivity.getId()).singleResult());
         assertNotNull(waitStateActivity);
 
         HistoricActivityInstance serviceTaskActivity = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("serviceTask").singleResult();
+        Java6Assertions.assertThat(serviceTaskActivity).isEqualToComparingFieldByField(runtimeService.createActivityInstanceQuery().activityInstanceId(serviceTaskActivity.getId()).singleResult());
         assertNotNull(serviceTaskActivity);
 
         List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().orderByVariableName().asc().orderByVariableRevision().asc().list();
@@ -914,8 +918,10 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertNotSame(details.get(0).getActivityInstanceId(), details.get(1).getActivityInstanceId());
 
         HistoricActivityInstance historicActInst1 = historyService.createHistoricActivityInstanceQuery().activityInstanceId(details.get(0).getActivityInstanceId()).singleResult();
+        Java6Assertions.assertThat(historicActInst1).isEqualToComparingFieldByField(runtimeService.createActivityInstanceQuery().activityInstanceId(historicActInst1.getId()).singleResult());
 
         HistoricActivityInstance historicActInst2 = historyService.createHistoricActivityInstanceQuery().activityInstanceId(details.get(1).getActivityInstanceId()).singleResult();
+        Java6Assertions.assertThat(historicActInst2).isEqualToComparingFieldByField(runtimeService.createActivityInstanceQuery().activityInstanceId(historicActInst2.getId()).singleResult());
 
         assertEquals(historicActInst1.getActivityId(), historicActInst2.getActivityId());
     }

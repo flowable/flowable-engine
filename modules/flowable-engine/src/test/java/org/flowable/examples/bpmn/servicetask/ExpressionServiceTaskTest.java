@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.api.Java6Assertions;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
@@ -64,7 +65,8 @@ public class ExpressionServiceTaskTest extends PluggableFlowableTestCase {
             HistoricActivityInstance skipActivityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(pi2.getId())
                     .activityId("valueExpressionServiceWithResultVariableNameSet")
                     .singleResult();
-            
+            Java6Assertions.assertThat(skipActivityInstance ).isEqualToComparingFieldByField(runtimeService.createActivityInstanceQuery().activityInstanceId(skipActivityInstance .getId()).singleResult());
+
             assertNotNull(skipActivityInstance);
         }
 

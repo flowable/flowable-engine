@@ -17,15 +17,15 @@ import java.util.Collection;
 import java.util.List;
 
 import org.flowable.common.engine.impl.db.BulkDeleteOperation;
-import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.engine.impl.db.ProcessDbSqlSession;
 
 /**
  * @author Joram Barrez
  */
-public class ProfilingDbSqlSession extends DbSqlSession {
+public class ProfilingDbSqlSession extends ProcessDbSqlSession {
 
     protected CommandExecutionResult commandExecutionResult;
 
