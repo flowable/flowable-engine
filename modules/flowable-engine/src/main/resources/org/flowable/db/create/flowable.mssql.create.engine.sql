@@ -127,6 +127,26 @@ create table ACT_PROCDEF_INFO (
     primary key (ID_)
 );
 
+create table ACT_RU_ACTINST (
+    ID_ nvarchar(64) not null,
+    REV_ int default 1,
+    PROC_DEF_ID_ nvarchar(64) not null,
+    PROC_INST_ID_ nvarchar(64) not null,
+    EXECUTION_ID_ nvarchar(64) not null,
+    ACT_ID_ nvarchar(255) not null,
+    TASK_ID_ nvarchar(64),
+    CALL_PROC_INST_ID_ nvarchar(64),
+    ACT_NAME_ nvarchar(255),
+    ACT_TYPE_ nvarchar(255) not null,
+    ASSIGNEE_ nvarchar(255),
+    START_TIME_ datetime not null,
+    END_TIME_ datetime,
+    DURATION_ numeric(19,0),
+    DELETE_REASON_ nvarchar(4000),
+    TENANT_ID_ nvarchar(255) default '',
+    primary key (ID_)
+);
+
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDX_EXEC_ROOT on ACT_RU_EXECUTION(ROOT_PROC_INST_ID_);
 create index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR(CONFIGURATION_);
@@ -158,6 +178,11 @@ create index ACT_IDX_DEADLETTER_JOB_EXECUTION_ID on ACT_RU_DEADLETTER_JOB(EXECUT
 create index ACT_IDX_DEADLETTER_JOB_PROCESS_INSTANCE_ID on ACT_RU_DEADLETTER_JOB(PROCESS_INSTANCE_ID_);
 create index ACT_IDX_DEADLETTER_JOB_PROC_DEF_ID on ACT_RU_DEADLETTER_JOB(PROC_DEF_ID_);
 create index ACT_IDX_INFO_PROCDEF on ACT_PROCDEF_INFO(PROC_DEF_ID_);
+
+create index ACT_IDX_RU_ACT_INST_START on ACT_RU_ACTINST(START_TIME_);
+create index ACT_IDX_RU_ACT_INST_END on ACT_RU_ACTINST(END_TIME_);
+create index ACT_IDX_RU_ACT_INST_PROCINST on ACT_RU_ACTINST(PROC_INST_ID_, ACT_ID_);
+create index ACT_IDX_RU_ACT_INST_EXEC on ACT_RU_ACTINST(EXECUTION_ID_, ACT_ID_);
 
 alter table ACT_GE_BYTEARRAY
     add constraint ACT_FK_BYTEARR_DEPL 
@@ -316,6 +341,18 @@ alter table ACT_PROCDEF_INFO
 alter table ACT_PROCDEF_INFO
     add constraint ACT_UNIQ_INFO_PROCDEF
     unique (PROC_DEF_ID_);
+
+create index ACT_IDX_ACTINST_PROC_DEF on ACT_RU_ACTINST(PROC_DEF_ID_);
+alter table ACT_RU_ACTINST
+    add constraint ACT_FK_RU_ACTINST_PROCDEF
+    foreign key (PROC_DEF_ID_)
+    references ACT_RE_PROCDEF (ID_);
+
+create index ACT_IDX_ACTINST_EXECUTION on ACT_RU_ACTINST(PROC_INST_ID_);
+alter table ACT_RU_ACTINST
+    add constraint ACT_FK_RU_ACTINST_PROCINST
+    foreign key (PROC_INST_ID_)
+    references ACT_RU_EXECUTION (ID_);
     
 insert into ACT_GE_PROPERTY
 values ('schema.version', '6.4.1.0', 1);  
