@@ -15,9 +15,14 @@ The Spring Boot - Flowable integration has been developed together with Spring c
 Flowable supports both Spring Boot 2.0 and 1.5 with the same starters. The base support is for Spring Boot 2.0, which means that the actuator endpoints are only supported on 2.0.
 The Flowable starters are also puling spring boot starter transitively, which means that users will have to define the 1.5 version of the spring boot starters in their own build files.
 
+[[springSpringBootGettingStarted]]
 ==== Getting started
 
-Spring Boot is all about convention over configuration. To get started, simply add the _flowable-spring-boot-starter_ or _flowable-spring-boot-starter-rest_ dependency to your Spring Boot project.
+Spring Boot is all about convention over configuration.
+To get started, you would need to create a Spring Boot project.
+The easiest way to do this would be to create a project via link:$$https://start.spring.io/$$[start.spring.io].
+For example create a project with web and h2 dependencies.
+Then in the created project simply add the _flowable-spring-boot-starter_ or _flowable-spring-boot-starter-rest_ dependency.
 In case you don't need all the engines see the other <<springBootFlowableStarter, Flowable starters>>.
 For example for Maven:
 
@@ -31,7 +36,8 @@ For example for Maven:
 </dependency>
 ----
 
-That's all that's needed. This dependency will transitively add the correct Flowable and Spring dependencies to the classpath. You can now write the Spring Boot application:
+That's all that's needed. This dependency will transitively add the correct Flowable dependencies to the classpath.
+You can now run your Spring Boot application:
 
 [source,java,,linenums]
 ----
@@ -48,18 +54,8 @@ public class MyApplication {
 }
 ----
 
-Flowable needs a database to store its data. If you run the code above, it will give you an informative exception message that you need to add a database driver dependency to the classpath. For now, add the H2 database dependency:
 
-[source,xml,linenums]
-----
-<dependency>
-	<groupId>com.h2database</groupId>
-	<artifactId>h2</artifactId>
-	<version>1.4.197</version>
-</dependency>
-----
-
-The application can now be started. You will see output like this:
+You will see an output like this:
 
 ----
   .   ____          _            __ _ _

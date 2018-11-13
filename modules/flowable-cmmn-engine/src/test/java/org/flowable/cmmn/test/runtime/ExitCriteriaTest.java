@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.test.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -23,6 +24,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.task.api.Task;
 import org.junit.Test;
 
 /**
@@ -181,6 +183,21 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId());
 
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testExitTriggersAnotherExit() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("exitTriggersAnotherExit").start();
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("A", "B", "C");
+
+        // Completing A cascades into exiting B and C
+        cmmnTaskService.complete(tasks.get(0).getId());
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).hasSize(0);
+        assertCaseInstanceEnded(caseInstance);
     }
     
 }

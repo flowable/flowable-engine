@@ -1,0 +1,1397 @@
+{
+  "modelId": "5be42931-e23a-11e8-91ec-46e923f5848c",
+  "bounds": {
+    "lowerRight": {
+      "x": 1200,
+      "y": 1050
+    },
+    "upperLeft": {
+      "x": 0,
+      "y": 0
+    }
+  },
+  "properties": {
+    "process_id": "Complex_compensation",
+    "name": "Complex_compensation",
+    "documentation": "",
+    "process_author": "",
+    "process_version": "",
+    "process_namespace": "http://www.flowable.org/processdef",
+    "process_historylevel": "",
+    "isexecutable": true,
+    "dataproperties": "",
+    "executionlisteners": "{\"executionListeners\":[]}",
+    "eventlisteners": "{\"eventListeners\":[]}",
+    "signaldefinitions": "[]",
+    "messagedefinitions": "[]",
+    "process_potentialstarteruser": "",
+    "process_potentialstartergroup": "",
+    "iseagerexecutionfetch": "false",
+    "messages": []
+  },
+  "childShapes": [
+    {
+      "resourceId": "SUB_PROCESS",
+      "properties": {
+        "overrideid": "SUB_PROCESS",
+        "name": "SUB_PROCESS",
+        "documentation": "",
+        "asynchronousdefinition": false,
+        "exclusivedefinition": true,
+        "dataproperties": {
+          "items": []
+        },
+        "executionlisteners": {
+          "executionListeners": []
+        },
+        "multiinstance_type": "None",
+        "multiinstance_cardinality": "",
+        "multiinstance_collection": "",
+        "multiinstance_variable": "",
+        "multiinstance_condition": "",
+        "istransaction": true,
+        "activitytype": "SubProcess",
+        "isforcompensation": false
+      },
+      "stencil": {
+        "id": "SubProcess"
+      },
+      "childShapes": [
+        {
+          "resourceId": "SUBSTART",
+          "properties": {
+            "overrideid": "SUBSTART",
+            "name": "",
+            "documentation": "",
+            "executionlisteners": {
+              "executionListeners": []
+            },
+            "initiator": "",
+            "formkeydefinition": "",
+            "formreference": "",
+            "formproperties": "",
+            "interrupting": true
+          },
+          "stencil": {
+            "id": "StartNoneEvent"
+          },
+          "childShapes": [],
+          "outgoing": [
+            {
+              "resourceId": "SUBSTART_TO_TASK1"
+            }
+          ],
+          "bounds": {
+            "lowerRight": {
+              "x": 65,
+              "y": 176.9015757812657
+            },
+            "upperLeft": {
+              "x": 35,
+              "y": 146.9015757812657
+            }
+          },
+          "dockers": []
+        },
+        {
+          "resourceId": "SCRIPT_1",
+          "properties": {
+            "scriptformat": "groovy",
+            "scripttext": "stepNumber = 01\nprintln \"stepNumber \" + stepNumber\nprintln \"\"",
+            "overrideid": "SCRIPT_1",
+            "name": "SCRIPT 1",
+            "documentation": "",
+            "asynchronousdefinition": false,
+            "exclusivedefinition": true,
+            "executionlisteners": {
+              "executionListeners": []
+            },
+            "multiinstance_type": "None",
+            "multiinstance_cardinality": "",
+            "multiinstance_collection": "",
+            "multiinstance_variable": "",
+            "multiinstance_condition": "",
+            "isforcompensation": false,
+            "scriptautostorevariables": false
+          },
+          "stencil": {
+            "id": "ScriptTask"
+          },
+          "childShapes": [],
+          "outgoing": [
+            {
+              "resourceId": "TASK1_TO_TASK2"
+            },
+            {
+              "resourceId": "ERROR_1"
+            },
+            {
+              "resourceId": "COMP_1"
+            }
+          ],
+          "bounds": {
+            "lowerRight": {
+              "x": 208.78296659225043,
+              "y": 201.9015757812657
+            },
+            "upperLeft": {
+              "x": 108.78296659225043,
+              "y": 121.9015757812657
+            }
+          },
+          "dockers": []
+        },
+        {
+          "resourceId": "SCRIPT_2",
+          "properties": {
+            "scriptformat": "groovy",
+            "scripttext": "stepNumber = stepNumber + 10\nprintln \"stepNumber \" + stepNumber\nprintln \"\"",
+            "overrideid": "SCRIPT_2",
+            "name": "SCRIPT 2",
+            "documentation": "",
+            "asynchronousdefinition": false,
+            "exclusivedefinition": true,
+            "executionlisteners": {
+              "executionListeners": []
+            },
+            "multiinstance_type": "None",
+            "multiinstance_cardinality": "",
+            "multiinstance_collection": "",
+            "multiinstance_variable": "",
+            "multiinstance_condition": "",
+            "isforcompensation": false,
+            "scriptautostorevariables": false
+          },
+          "stencil": {
+            "id": "ScriptTask"
+          },
+          "childShapes": [],
+          "outgoing": [
+            {
+              "resourceId": "TASK2_TO_TASK3"
+            },
+            {
+              "resourceId": "ERROR_2"
+            },
+            {
+              "resourceId": "COMP_2"
+            }
+          ],
+          "bounds": {
+            "lowerRight": {
+              "x": 344.6,
+              "y": 201.9015757812657
+            },
+            "upperLeft": {
+              "x": 244.60000000000002,
+              "y": 121.9015757812657
+            }
+          },
+          "dockers": []
+        },
+        {
+          "resourceId": "SCRIPT_3",
+          "properties": {
+            "scriptformat": "groovy",
+            "scripttext": "stepNumber = stepNumber + 100\nprintln \"stepNumber \" + stepNumber\nprintln \"\"",
+            "overrideid": "SCRIPT_3",
+            "name": "SCRIPT 3",
+            "documentation": "",
+            "asynchronousdefinition": false,
+            "exclusivedefinition": true,
+            "executionlisteners": {
+              "executionListeners": []
+            },
+            "multiinstance_type": "None",
+            "multiinstance_cardinality": "",
+            "multiinstance_collection": "",
+            "multiinstance_variable": "",
+            "multiinstance_condition": "",
+            "isforcompensation": false,
+            "scriptautostorevariables": false
+          },
+          "stencil": {
+            "id": "ScriptTask"
+          },
+          "childShapes": [],
+          "outgoing": [
+            {
+              "resourceId": "TASK3_TO_SUBENDCANCEL"
+            },
+            {
+              "resourceId": "ERROR_3"
+            },
+            {
+              "resourceId": "COMP_3"
+            }
+          ],
+          "bounds": {
+            "lowerRight": {
+              "x": 475.04570513210626,
+              "y": 201.9015757812657
+            },
+            "upperLeft": {
+              "x": 375.04570513210626,
+              "y": 121.9015757812657
+            }
+          },
+          "dockers": []
+        },
+        {
+          "resourceId": "COMP_SCRIPT_11",
+          "properties": {
+            "scriptformat": "groovy",
+            "scripttext": "stepNumber = stepNumber - 1\nprintln \"compensation 01: stepNumber = \" + stepNumber\nprintln \"\"",
+            "overrideid": "COMP_SCRIPT_11",
+            "name": "COMP SCRIPT 11",
+            "documentation": "",
+            "asynchronousdefinition": false,
+            "exclusivedefinition": true,
+            "executionlisteners": {
+              "executionListeners": []
+            },
+            "multiinstance_type": "None",
+            "multiinstance_cardinality": "",
+            "multiinstance_collection": "",
+            "multiinstance_variable": "",
+            "multiinstance_condition": "",
+            "isforcompensation": true,
+            "scriptautostorevariables": false
+          },
+          "stencil": {
+            "id": "ScriptTask"
+          },
+          "childShapes": [],
+          "outgoing": [],
+          "bounds": {
+            "lowerRight": {
+              "x": 210,
+              "y": 340.09842421873435
+            },
+            "upperLeft": {
+              "x": 110,
+              "y": 260.09842421873435
+            }
+          },
+          "dockers": []
+        },
+        {
+          "resourceId": "END_CANCEL",
+          "properties": {
+            "overrideid": "END_CANCEL",
+            "name": "END_CANCEL",
+            "documentation": "",
+            "executionlisteners": {
+              "executionListeners": []
+            }
+          },
+          "stencil": {
+            "id": "EndCancelEvent"
+          },
+          "childShapes": [],
+          "outgoing": [],
+          "bounds": {
+            "lowerRight": {
+              "x": 536.2,
+              "y": 59.901575781265706
+            },
+            "upperLeft": {
+              "x": 508.20000000000005,
+              "y": 31.901575781265706
+            }
+          },
+          "dockers": []
+        },
+        {
+          "resourceId": "COMP_SCRIPT_31",
+          "properties": {
+            "scriptformat": "groovy",
+            "scripttext": "stepNumber = stepNumber - 100\nprintln \"compensation 03: stepNumber = \" + stepNumber\nprintln \"\"",
+            "overrideid": "COMP_SCRIPT_31",
+            "name": "COMP SCRIPT 31",
+            "documentation": "",
+            "asynchronousdefinition": false,
+            "exclusivedefinition": true,
+            "executionlisteners": {
+              "executionListeners": []
+            },
+            "multiinstance_type": "None",
+            "multiinstance_cardinality": "",
+            "multiinstance_collection": "",
+            "multiinstance_variable": "",
+            "multiinstance_condition": "",
+            "isforcompensation": true,
+            "scriptautostorevariables": false
+          },
+          "stencil": {
+            "id": "ScriptTask"
+          },
+          "childShapes": [],
+          "outgoing": [],
+          "bounds": {
+            "lowerRight": {
+              "x": 475.04570513210626,
+              "y": 340.09842421873435
+            },
+            "upperLeft": {
+              "x": 375.04570513210626,
+              "y": 260.09842421873435
+            }
+          },
+          "dockers": []
+        },
+        {
+          "resourceId": "COMP_SCRIPT_21",
+          "properties": {
+            "scriptformat": "groovy",
+            "scripttext": "stepNumber = stepNumber - 10\nprintln \"compensation 02: stepNumber = \" + stepNumber\nprintln \"\"",
+            "overrideid": "COMP_SCRIPT_21",
+            "name": "COMP SCRIPT 21",
+            "documentation": "",
+            "asynchronousdefinition": false,
+            "exclusivedefinition": true,
+            "executionlisteners": {
+              "executionListeners": []
+            },
+            "multiinstance_type": "None",
+            "multiinstance_cardinality": "",
+            "multiinstance_collection": "",
+            "multiinstance_variable": "",
+            "multiinstance_condition": "",
+            "isforcompensation": true,
+            "scriptautostorevariables": false
+          },
+          "stencil": {
+            "id": "ScriptTask"
+          },
+          "childShapes": [],
+          "outgoing": [],
+          "bounds": {
+            "lowerRight": {
+              "x": 350.5817380010493,
+              "y": 340.09842421873435
+            },
+            "upperLeft": {
+              "x": 250.5817380010493,
+              "y": 260.09842421873435
+            }
+          },
+          "dockers": []
+        },
+        {
+          "resourceId": "ERROR_1",
+          "properties": {
+            "overrideid": "ERROR_1",
+            "name": "ERROR_1",
+            "documentation": "",
+            "errorref": "",
+            "cancelactivity": false,
+            "executionlisteners": {
+              "executionListeners": []
+            }
+          },
+          "stencil": {
+            "id": "BoundaryErrorEvent"
+          },
+          "childShapes": [],
+          "outgoing": [
+            {
+              "resourceId": "ERROR1_TO_SUBENDCANCEL"
+            }
+          ],
+          "bounds": {
+            "lowerRight": {
+              "x": 167.20747135855794,
+              "y": 121.73488257222118
+            },
+            "upperLeft": {
+              "x": 137.20747135855794,
+              "y": 91.73488257222118
+            }
+          },
+          "dockers": [
+            {
+              "x": 43.42450476630751,
+              "y": -15.166693209044524
+            }
+          ]
+        },
+        {
+          "resourceId": "ERROR_2",
+          "properties": {
+            "overrideid": "ERROR_2",
+            "name": "ERROR_2",
+            "documentation": "",
+            "errorref": "",
+            "cancelactivity": false,
+            "executionlisteners": {
+              "executionListeners": []
+            }
+          },
+          "stencil": {
+            "id": "BoundaryErrorEvent"
+          },
+          "childShapes": [],
+          "outgoing": [
+            {
+              "resourceId": "ERROR2_TO_SUBENDCANCEL"
+            }
+          ],
+          "bounds": {
+            "lowerRight": {
+              "x": 300.5817380010493,
+              "y": 121.63997221163655
+            },
+            "upperLeft": {
+              "x": 270.5817380010493,
+              "y": 91.63997221163655
+            }
+          },
+          "dockers": [
+            {
+              "x": 40.98173800104928,
+              "y": -15.261603569629159
+            }
+          ]
+        },
+        {
+          "resourceId": "ERROR_3",
+          "properties": {
+            "overrideid": "ERROR_3",
+            "name": "ERROR_3",
+            "documentation": "",
+            "errorref": "",
+            "cancelactivity": false,
+            "executionlisteners": {
+              "executionListeners": []
+            }
+          },
+          "stencil": {
+            "id": "BoundaryErrorEvent"
+          },
+          "childShapes": [],
+          "outgoing": [
+            {
+              "resourceId": "ERROR3_TO_SUBENDCANCEL"
+            }
+          ],
+          "bounds": {
+            "lowerRight": {
+              "x": 424.75529636801673,
+              "y": 121.71361360842806
+            },
+            "upperLeft": {
+              "x": 394.75529636801673,
+              "y": 91.71361360842806
+            }
+          },
+          "dockers": [
+            {
+              "x": 34.709591235910466,
+              "y": -15.187962172837643
+            }
+          ]
+        },
+        {
+          "resourceId": "COMP_1",
+          "properties": {
+            "overrideid": "COMP_1",
+            "name": "COMP_1",
+            "documentation": "",
+            "cancelactivity": false,
+            "executionlisteners": {
+              "executionListeners": []
+            }
+          },
+          "stencil": {
+            "id": "BoundaryCompensationEvent"
+          },
+          "childShapes": [],
+          "outgoing": [
+            {
+              "resourceId": "COMP1_TO_COMPSCRIPT11"
+            }
+          ],
+          "bounds": {
+            "lowerRight": {
+              "x": 148.12280473076373,
+              "y": 217.43949832049714
+            },
+            "upperLeft": {
+              "x": 118.12280473076373,
+              "y": 187.43949832049714
+            }
+          },
+          "dockers": [
+            {
+              "x": 33.78296659225043,
+              "y": 65.61966863841877
+            }
+          ]
+        },
+        {
+          "resourceId": "COMP_2",
+          "properties": {
+            "overrideid": "COMP_2",
+            "name": "COMP_2",
+            "documentation": "",
+            "cancelactivity": false,
+            "executionlisteners": {
+              "executionListeners": []
+            }
+          },
+          "stencil": {
+            "id": "BoundaryCompensationEvent"
+          },
+          "childShapes": [],
+          "outgoing": [
+            {
+              "resourceId": "COMP2_TO_COMPSCRIPT21"
+            }
+          ],
+          "bounds": {
+            "lowerRight": {
+              "x": 286.2961304137704,
+              "y": 217.46228432113344
+            },
+            "upperLeft": {
+              "x": 256.2961304137704,
+              "y": 187.46228432113344
+            }
+          },
+          "dockers": [
+            {
+              "x": 35.280155673503316,
+              "y": 65.62009340423259
+            }
+          ]
+        },
+        {
+          "resourceId": "COMP_3",
+          "properties": {
+            "overrideid": "COMP_3",
+            "name": "COMP_3",
+            "documentation": "",
+            "cancelactivity": false,
+            "executionlisteners": {
+              "executionListeners": []
+            }
+          },
+          "stencil": {
+            "id": "BoundaryCompensationEvent"
+          },
+          "childShapes": [],
+          "outgoing": [
+            {
+              "resourceId": "COMP3_TO_COMPSCRIPT31"
+            }
+          ],
+          "bounds": {
+            "lowerRight": {
+              "x": 416.3007077842386,
+              "y": 217.4581791103073
+            },
+            "upperLeft": {
+              "x": 386.3007077842386,
+              "y": 187.4581791103073
+            }
+          },
+          "dockers": [
+            {
+              "x": 35,
+              "y": 65.62009340423259
+            }
+          ]
+        }
+      ],
+      "outgoing": [
+        {
+          "resourceId": "SUBPROCESS_TO_END"
+        },
+        {
+          "resourceId": "CANCEL"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 753,
+          "y": 382
+        },
+        "upperLeft": {
+          "x": 145,
+          "y": 10
+        }
+      },
+      "dockers": []
+    },
+    {
+      "resourceId": "SUBSTART_TO_TASK1",
+      "properties": {
+        "overrideid": "SUBSTART_TO_TASK1",
+        "name": "",
+        "documentation": "",
+        "conditionsequenceflow": "",
+        "executionlisteners": "",
+        "defaultflow": "false",
+        "skipexpression": ""
+      },
+      "stencil": {
+        "id": "SequenceFlow"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "SCRIPT_1"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 253.49068485513698,
+          "y": 171.9015757812657
+        },
+        "upperLeft": {
+          "x": 210.44773775053326,
+          "y": 171.9015757812657
+        }
+      },
+      "dockers": [
+        {
+          "x": 15,
+          "y": 15
+        },
+        {
+          "x": 50,
+          "y": 40
+        }
+      ],
+      "target": {
+        "resourceId": "SCRIPT_1"
+      }
+    },
+    {
+      "resourceId": "TASK1_TO_TASK2",
+      "properties": {
+        "overrideid": "TASK1_TO_TASK2",
+        "name": "",
+        "documentation": "",
+        "conditionsequenceflow": "",
+        "executionlisteners": "",
+        "defaultflow": "false",
+        "skipexpression": ""
+      },
+      "stencil": {
+        "id": "SequenceFlow"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "SCRIPT_2"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 388.729683045592,
+          "y": 171.9015757812657
+        },
+        "upperLeft": {
+          "x": 354.65328354665843,
+          "y": 171.9015757812657
+        }
+      },
+      "dockers": [
+        {
+          "x": 50,
+          "y": 40
+        },
+        {
+          "x": 50,
+          "y": 40
+        }
+      ],
+      "target": {
+        "resourceId": "SCRIPT_2"
+      }
+    },
+    {
+      "resourceId": "TASK2_TO_TASK3",
+      "properties": {
+        "overrideid": "TASK2_TO_TASK3",
+        "name": "",
+        "documentation": "",
+        "conditionsequenceflow": "",
+        "executionlisteners": "",
+        "defaultflow": "false",
+        "skipexpression": ""
+      },
+      "stencil": {
+        "id": "SequenceFlow"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "SCRIPT_3"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 519.1094586362218,
+          "y": 171.9015757812657
+        },
+        "upperLeft": {
+          "x": 490.5362464958845,
+          "y": 171.9015757812657
+        }
+      },
+      "dockers": [
+        {
+          "x": 50,
+          "y": 40
+        },
+        {
+          "x": 50,
+          "y": 40
+        }
+      ],
+      "target": {
+        "resourceId": "SCRIPT_3"
+      }
+    },
+    {
+      "resourceId": "ERROR2_TO_SUBENDCANCEL",
+      "properties": {
+        "overrideid": "ERROR2_TO_SUBENDCANCEL",
+        "name": "",
+        "documentation": "",
+        "conditionsequenceflow": "",
+        "executionlisteners": "",
+        "defaultflow": "false",
+        "skipexpression": ""
+      },
+      "stencil": {
+        "id": "SequenceFlow"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "END_CANCEL"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 652.3125082315383,
+          "y": 101.21938711098626
+        },
+        "upperLeft": {
+          "x": 434.18878109631396,
+          "y": 55
+        }
+      },
+      "dockers": [
+        {
+          "x": 15,
+          "y": 15
+        },
+        {
+          "x": 445,
+          "y": 55
+        },
+        {
+          "x": 14,
+          "y": 14
+        }
+      ],
+      "target": {
+        "resourceId": "END_CANCEL"
+      }
+    },
+    {
+      "resourceId": "ERROR3_TO_SUBENDCANCEL",
+      "properties": {
+        "overrideid": "ERROR3_TO_SUBENDCANCEL",
+        "name": "",
+        "documentation": "",
+        "conditionsequenceflow": "",
+        "executionlisteners": "",
+        "defaultflow": "false",
+        "skipexpression": ""
+      },
+      "stencil": {
+        "id": "SequenceFlow"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "END_CANCEL"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 652.3906671428641,
+          "y": 101.27510494999515
+        },
+        "upperLeft": {
+          "x": 558.3188047659296,
+          "y": 55
+        }
+      },
+      "dockers": [
+        {
+          "x": 15,
+          "y": 15
+        },
+        {
+          "x": 569,
+          "y": 55
+        },
+        {
+          "x": 14,
+          "y": 14
+        }
+      ],
+      "target": {
+        "resourceId": "END_CANCEL"
+      }
+    },
+    {
+      "resourceId": "TASK3_TO_SUBENDCANCEL",
+      "properties": {
+        "overrideid": "TASK3_TO_SUBENDCANCEL",
+        "name": "",
+        "documentation": "",
+        "conditionsequenceflow": "",
+        "executionlisteners": "",
+        "defaultflow": "false",
+        "skipexpression": ""
+      },
+      "stencil": {
+        "id": "SequenceFlow"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "END_CANCEL"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 667.1748248593727,
+          "y": 171.42740219383063
+        },
+        "upperLeft": {
+          "x": 621.0377201906789,
+          "y": 70.3896708597
+        }
+      },
+      "dockers": [
+        {
+          "x": 50,
+          "y": 40
+        },
+        {
+          "x": 667,
+          "y": 171
+        },
+        {
+          "x": 14,
+          "y": 14
+        }
+      ],
+      "target": {
+        "resourceId": "END_CANCEL"
+      }
+    },
+    {
+      "resourceId": "ERROR1_TO_SUBENDCANCEL",
+      "properties": {
+        "overrideid": "ERROR1_TO_SUBENDCANCEL",
+        "name": "",
+        "documentation": "",
+        "conditionsequenceflow": "",
+        "executionlisteners": "",
+        "defaultflow": "false",
+        "skipexpression": ""
+      },
+      "stencil": {
+        "id": "SequenceFlow"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "END_CANCEL"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 652.3250032212651,
+          "y": 101.29329700063614
+        },
+        "upperLeft": {
+          "x": 300.9074880641819,
+          "y": 55
+        }
+      },
+      "dockers": [
+        {
+          "x": 15,
+          "y": 15
+        },
+        {
+          "x": 312,
+          "y": 55
+        },
+        {
+          "x": 14,
+          "y": 14
+        }
+      ],
+      "target": {
+        "resourceId": "END_CANCEL"
+      }
+    },
+    {
+      "resourceId": "SCRIPT_AFTER_CANCEL",
+      "properties": {
+        "scriptformat": "groovy",
+        "scripttext": "println \"Cancel with stepNumber = \" + stepNumber\nprintln \"\"",
+        "overrideid": "SCRIPT_AFTER_CANCEL",
+        "name": "SCRIPT AFTER CANCEL",
+        "documentation": "",
+        "asynchronousdefinition": false,
+        "exclusivedefinition": true,
+        "executionlisteners": {
+          "executionListeners": []
+        },
+        "multiinstance_type": "None",
+        "multiinstance_cardinality": "",
+        "multiinstance_collection": "",
+        "multiinstance_variable": "",
+        "multiinstance_condition": "",
+        "isforcompensation": false,
+        "scriptautostorevariables": false
+      },
+      "stencil": {
+        "id": "ScriptTask"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "TASKAFTERCANCEL_TO_END"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 919,
+          "y": 340.152487487604
+        },
+        "upperLeft": {
+          "x": 819,
+          "y": 260.152487487604
+        }
+      },
+      "dockers": []
+    },
+    {
+      "resourceId": "START",
+      "properties": {
+        "overrideid": "START",
+        "name": "START",
+        "documentation": "",
+        "executionlisteners": {
+          "executionListeners": []
+        },
+        "initiator": "",
+        "formkeydefinition": "",
+        "formreference": "",
+        "formproperties": "",
+        "interrupting": true
+      },
+      "stencil": {
+        "id": "StartNoneEvent"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "START_TO_SUBPROCESS"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 105,
+          "y": 211
+        },
+        "upperLeft": {
+          "x": 75,
+          "y": 181
+        }
+      },
+      "dockers": []
+    },
+    {
+      "resourceId": "END",
+      "properties": {
+        "overrideid": "END",
+        "name": "END",
+        "documentation": "",
+        "executionlisteners": {
+          "executionListeners": []
+        }
+      },
+      "stencil": {
+        "id": "EndNoneEvent"
+      },
+      "childShapes": [],
+      "outgoing": [],
+      "bounds": {
+        "lowerRight": {
+          "x": 883,
+          "y": 210
+        },
+        "upperLeft": {
+          "x": 855,
+          "y": 182
+        }
+      },
+      "dockers": []
+    },
+    {
+      "resourceId": "CANCEL",
+      "properties": {
+        "overrideid": "CANCEL",
+        "name": "CANCEL",
+        "documentation": "",
+        "cancelactivity": false,
+        "executionlisteners": {
+          "executionListeners": []
+        }
+      },
+      "stencil": {
+        "id": "BoundaryCancelEvent"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "CANCEL_TO_TASKAFTERCANCEL"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 768.7171456616131,
+          "y": 299.0758023445284
+        },
+        "upperLeft": {
+          "x": 738.7171456616131,
+          "y": 269.0758023445284
+        }
+      },
+      "dockers": [
+        {
+          "x": 593.1392454223036,
+          "y": 269.57314772874963
+        }
+      ]
+    },
+    {
+      "resourceId": "SUBPROCESS_TO_END",
+      "properties": {
+        "overrideid": "SUBPROCESS_TO_END",
+        "name": "",
+        "documentation": "",
+        "conditionsequenceflow": "",
+        "executionlisteners": "",
+        "defaultflow": "false",
+        "skipexpression": ""
+      },
+      "stencil": {
+        "id": "SequenceFlow"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "END"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 854.875,
+          "y": 196
+        },
+        "upperLeft": {
+          "x": 753.515625,
+          "y": 196
+        }
+      },
+      "dockers": [
+        {
+          "x": 304,
+          "y": 186
+        },
+        {
+          "x": 14,
+          "y": 14
+        }
+      ],
+      "target": {
+        "resourceId": "END"
+      }
+    },
+    {
+      "resourceId": "CANCEL_TO_TASKAFTERCANCEL",
+      "properties": {
+        "overrideid": "CANCEL_TO_TASKAFTERCANCEL",
+        "name": "",
+        "documentation": "",
+        "conditionsequenceflow": "",
+        "executionlisteners": "",
+        "defaultflow": "false",
+        "skipexpression": ""
+      },
+      "stencil": {
+        "id": "SequenceFlow"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "SCRIPT_AFTER_CANCEL"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 818.4739827049971,
+          "y": 293.10641913470687
+        },
+        "upperLeft": {
+          "x": 769.1179182753887,
+          "y": 286.2235056928947
+        }
+      },
+      "dockers": [
+        {
+          "x": 15,
+          "y": 15
+        },
+        {
+          "x": 50,
+          "y": 40
+        }
+      ],
+      "target": {
+        "resourceId": "SCRIPT_AFTER_CANCEL"
+      }
+    },
+    {
+      "resourceId": "TASKAFTERCANCEL_TO_END",
+      "properties": {
+        "overrideid": "TASKAFTERCANCEL_TO_END",
+        "name": "",
+        "documentation": "",
+        "conditionsequenceflow": "",
+        "executionlisteners": "",
+        "defaultflow": "false",
+        "skipexpression": ""
+      },
+      "stencil": {
+        "id": "SequenceFlow"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "END"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 869,
+          "y": 260.0953046797525
+        },
+        "upperLeft": {
+          "x": 869,
+          "y": 210.0190609359505
+        }
+      },
+      "dockers": [
+        {
+          "x": 50,
+          "y": 40
+        },
+        {
+          "x": 14,
+          "y": 14
+        }
+      ],
+      "target": {
+        "resourceId": "END"
+      }
+    },
+    {
+      "resourceId": "START_TO_SUBPROCESS",
+      "properties": {
+        "overrideid": "START_TO_SUBPROCESS",
+        "name": "",
+        "documentation": "",
+        "conditionsequenceflow": "",
+        "executionlisteners": "",
+        "defaultflow": "false",
+        "skipexpression": ""
+      },
+      "stencil": {
+        "id": "SequenceFlow"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "SUB_PROCESS"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 144.392578125,
+          "y": 196
+        },
+        "upperLeft": {
+          "x": 105.0234375,
+          "y": 196
+        }
+      },
+      "dockers": [
+        {
+          "x": 15,
+          "y": 15
+        },
+        {
+          "x": 304,
+          "y": 186
+        }
+      ],
+      "target": {
+        "resourceId": "SUB_PROCESS"
+      }
+    },
+    {
+      "resourceId": "COMP1_TO_COMPSCRIPT11",
+      "properties": {
+        "overrideid": "COMP1_TO_COMPSCRIPT11",
+        "name": "",
+        "documentation": ""
+      },
+      "stencil": {
+        "id": "Association"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "COMP_SCRIPT_11"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 305,
+          "y": 270.09842421873435
+        },
+        "upperLeft": {
+          "x": 284.8446416316762,
+          "y": 226.85967467771425
+        }
+      },
+      "dockers": [
+        {
+          "x": 15,
+          "y": 15
+        },
+        {
+          "x": 50,
+          "y": 0
+        }
+      ],
+      "target": {
+        "resourceId": "COMP_SCRIPT_11"
+      }
+    },
+    {
+      "resourceId": "COMP2_TO_COMPSCRIPT21",
+      "properties": {
+        "overrideid": "COMP2_TO_COMPSCRIPT21",
+        "name": "",
+        "documentation": ""
+      },
+      "stencil": {
+        "id": "Association"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "COMP_SCRIPT_21"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 445.5817380010493,
+          "y": 270.09842421873435
+        },
+        "upperLeft": {
+          "x": 423.1553468104144,
+          "y": 225.96170565451973
+        }
+      },
+      "dockers": [
+        {
+          "x": 15,
+          "y": 15
+        },
+        {
+          "x": 50,
+          "y": 0
+        }
+      ],
+      "target": {
+        "resourceId": "COMP_SCRIPT_21"
+      }
+    },
+    {
+      "resourceId": "COMP3_TO_COMPSCRIPT31",
+      "properties": {
+        "overrideid": "COMP3_TO_COMPSCRIPT31",
+        "name": "",
+        "documentation": ""
+      },
+      "stencil": {
+        "id": "Association"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "COMP_SCRIPT_31"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 570.0457051321063,
+          "y": 270.09842421873435
+        },
+        "upperLeft": {
+          "x": 552.2468391762294,
+          "y": 226.8922287696999
+        }
+      },
+      "dockers": [
+        {
+          "x": 15,
+          "y": 15
+        },
+        {
+          "x": 50,
+          "y": 0
+        }
+      ],
+      "target": {
+        "resourceId": "COMP_SCRIPT_31"
+      }
+    }
+  ],
+  "stencil": {
+    "id": "BPMNDiagram"
+  },
+  "stencilset": {
+    "namespace": "http://b3mn.org/stencilset/bpmn2.0#",
+    "url": "../editor/stencilsets/bpmn2.0/bpmn2.0.json"
+  }
+}

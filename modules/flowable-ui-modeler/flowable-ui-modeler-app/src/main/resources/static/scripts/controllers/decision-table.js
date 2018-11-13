@@ -440,8 +440,8 @@ angular.module('flowableModeler')
                 return newOutputExpression;
             };
 
-            var _loadDecisionTableDefinition = function (modelId) {
-                DecisionTableService.fetchDecisionTableDetails(modelId).then(function (decisionTable) {
+            var _loadDecisionTableDefinition = function (modelId, historyId) {
+                DecisionTableService.fetchDecisionTableDetails(modelId, historyId).then(function (decisionTable) {
 
                     $rootScope.currentDecisionTable = decisionTable.decisionTableDefinition;
                     $rootScope.currentDecisionTable.id = decisionTable.id;
@@ -724,7 +724,7 @@ angular.module('flowableModeler')
             };
 
             // fetch table from service and populate model
-            _loadDecisionTableDefinition($routeParams.modelId);
+            _loadDecisionTableDefinition($routeParams.modelId, $routeParams.modelHistoryId);
 
             var _generateColumnId = function () {
                 columnIdCounter++;
