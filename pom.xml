@@ -902,7 +902,7 @@
 			<dependency>
 				<groupId>joda-time</groupId>
 				<artifactId>joda-time</artifactId>
-				<version>2.10</version>
+				<version>2.10.1</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>
