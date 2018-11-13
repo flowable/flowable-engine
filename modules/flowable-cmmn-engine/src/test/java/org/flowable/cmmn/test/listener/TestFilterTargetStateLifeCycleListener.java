@@ -12,8 +12,6 @@
  */
 package org.flowable.cmmn.test.listener;
 
-import java.util.List;
-
 /**
  * @author Joram Barrez
  */
@@ -23,11 +21,6 @@ public class TestFilterTargetStateLifeCycleListener extends AbstractTestLifeCycl
 
     public TestFilterTargetStateLifeCycleListener(String targetState) {
         this.targetState = targetState;
-    }
-
-    @Override
-    public List<String> getItemDefinitionTypes() {
-        return null;
     }
 
     @Override

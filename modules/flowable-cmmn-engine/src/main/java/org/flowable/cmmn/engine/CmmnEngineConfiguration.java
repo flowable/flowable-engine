@@ -321,7 +321,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CmmnHistoryManager cmmnHistoryManager;
     protected ProcessInstanceService processInstanceService;
     protected Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks;
-    protected List<PlanItemInstanceLifeCycleListener> planItemInstanceLifeCycleListeners;
+    protected Map<String, List<PlanItemInstanceLifeCycleListener>> planItemInstanceLifeCycleListeners;
 
     protected boolean executeServiceSchemaManagers = true;
 
@@ -2126,13 +2126,36 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
-    public List<PlanItemInstanceLifeCycleListener> getPlanItemInstanceLifeCycleListeners() {
+    public Map<String, List<PlanItemInstanceLifeCycleListener>> getPlanItemInstanceLifeCycleListeners() {
         return planItemInstanceLifeCycleListeners;
     }
 
-    public CmmnEngineConfiguration setPlanItemInstanceLifeCycleListeners(List<PlanItemInstanceLifeCycleListener> planItemInstanceLifeCycleListeners) {
+    public void setPlanItemInstanceLifeCycleListeners(Map<String, List<PlanItemInstanceLifeCycleListener>> planItemInstanceLifeCycleListeners) {
         this.planItemInstanceLifeCycleListeners = planItemInstanceLifeCycleListeners;
-        return this;
+    }
+
+    /**
+     * Register a global {@link PlanItemInstanceLifeCycleListener} to listen to {@link org.flowable.cmmn.api.runtime.PlanItemInstance} state changes.
+     *
+     * @param planItemDefinitionType A string from {@link org.flowable.cmmn.api.runtime.PlanItemDefinitionType}.
+     *                               If null is passed, the listener will be invoked for any type.
+     * @param planItemInstanceLifeCycleListener The listener instance.
+     */
+    public void addPlanItemInstanceLifeCycleListeners(String planItemDefinitionType, PlanItemInstanceLifeCycleListener planItemInstanceLifeCycleListener) {
+        if (planItemInstanceLifeCycleListeners == null) {
+            planItemInstanceLifeCycleListeners = new HashMap<>();
+        }
+        planItemInstanceLifeCycleListeners
+            .computeIfAbsent(planItemDefinitionType, key -> new ArrayList<PlanItemInstanceLifeCycleListener>())
+            .add(planItemInstanceLifeCycleListener);
+    }
+
+    /**
+     * Register a global {@link PlanItemInstanceLifeCycleListener} to listen to any (all plan item definition types)
+     * {@link org.flowable.cmmn.api.runtime.PlanItemInstance} state changes.
+     */
+    public void addPlanItemInstanceLifeCycleListeners(PlanItemInstanceLifeCycleListener planItemInstanceLifeCycleListener) {
+        addPlanItemInstanceLifeCycleListeners(null, planItemInstanceLifeCycleListener);
     }
 
     @Override
