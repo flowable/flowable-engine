@@ -114,7 +114,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
                     && (!(flowNode instanceof Activity) || ((Activity) flowNode).getLoopCharacteristics() == null) // Multi instance root execution leaving the node isn't stored in history
                     ) {  
                 // If no sequence flow: will be handled by the deletion of executions
-                CommandContextUtil.getHistoryManager(commandContext).recordActivityEnd(execution, null);
+                CommandContextUtil.getActivityInstanceEntityManager().recordActivityEnd(execution, null);
             }
 
             if (!(execution.getCurrentFlowElement() instanceof SubProcess) &&
@@ -252,7 +252,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
     }
 
     protected void handleSequenceFlow() {
-        CommandContextUtil.getHistoryManager(commandContext).recordActivityEnd(execution, null);
+        CommandContextUtil.getActivityInstanceEntityManager().recordActivityEnd(execution, null);
         agenda.planContinueProcessOperation(execution);
     }
 

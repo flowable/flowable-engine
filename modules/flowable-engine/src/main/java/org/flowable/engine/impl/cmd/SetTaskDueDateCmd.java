@@ -43,7 +43,7 @@ public class SetTaskDueDateCmd extends NeedsActiveTaskCmd<Void> {
         }
 
         task.setDueDate(dueDate);
-        CommandContextUtil.getHistoryManager(commandContext).recordTaskInfoChange(task);
+        CommandContextUtil.getActivityInstanceEntityManager().recordTaskInfoChange(task);
         CommandContextUtil.getTaskService().updateTask(task, true);
         return null;
     }

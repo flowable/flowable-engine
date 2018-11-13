@@ -15,6 +15,7 @@ package org.flowable.engine.impl.history;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -80,12 +81,12 @@ public interface HistoryManager {
     /**
      * Record the start of an activity, if activity history is enabled.
      */
-    void recordActivityStart(ExecutionEntity executionEntity);
+    HistoricActivityInstance recordActivityStart(ExecutionEntity executionEntity);
 
     /**
      * Record the end of an activity, if activity history is enabled.
      */
-    void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason);
+    HistoricActivityInstance recordActivityEnd(ExecutionEntity executionEntity, String deleteReason);
 
     /**
      * Finds the {@link HistoricActivityInstanceEntity} that is active in the given execution.

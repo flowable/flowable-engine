@@ -134,7 +134,7 @@ public class ContinueProcessOperation extends AbstractOperation {
     }
 
     protected void executeSynchronous(FlowNode flowNode) {
-        CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(execution);
+        CommandContextUtil.getActivityInstanceEntityManager().recordActivityStart(execution);
 
         // Execution listener: event 'start'
         if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {

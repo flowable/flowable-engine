@@ -628,7 +628,7 @@ public abstract class AbstractDynamicStateManager {
                     }
 
                     if (newFlowElement instanceof CallActivity) {
-                        CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(newChildExecution);
+                        CommandContextUtil.getActivityInstanceEntityManager().recordActivityStart(newChildExecution);
 
                         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
                         if (eventDispatcher.isEnabled()) {
@@ -725,7 +725,7 @@ public abstract class AbstractDynamicStateManager {
 
         subProcessExecution.setVariablesLocal(processDataObjects(subProcess.getDataObjects()));
 
-        CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(subProcessExecution);
+        CommandContextUtil.getActivityInstanceEntityManager().recordActivityStart(subProcessExecution);
 
         List<BoundaryEvent> boundaryEvents = subProcess.getBoundaryEvents();
         if (CollectionUtil.isNotEmpty(boundaryEvents)) {
@@ -804,7 +804,7 @@ public abstract class AbstractDynamicStateManager {
         }
 
         ExecutionEntity subProcessInstance = executionEntityManager.createSubprocessInstance(subProcessDefinition, parentExecution, businessKey, initialFlowElement.getId());
-        CommandContextUtil.getHistoryManager(commandContext).recordSubProcessInstanceStart(parentExecution, subProcessInstance);
+        CommandContextUtil.getActivityInstanceEntityManager().recordSubProcessInstanceStart(parentExecution, subProcessInstance);
 
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher.isEnabled()) {
@@ -848,7 +848,7 @@ public abstract class AbstractDynamicStateManager {
         ExecutionEntity subProcessInitialExecution = executionEntityManager.createChildExecution(subProcessInstance);
         subProcessInitialExecution.setCurrentFlowElement(initialFlowElement);
 
-        CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(subProcessInitialExecution);
+        CommandContextUtil.getActivityInstanceEntityManager().recordActivityStart(subProcessInitialExecution);
 
         return subProcessInitialExecution;
     }

@@ -122,7 +122,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
             setLoopVariable(miRootExecution, NUMBER_OF_ACTIVE_INSTANCES, nrOfActiveInstances);
         }
 
-        CommandContextUtil.getHistoryManager().recordActivityEnd((ExecutionEntity) execution, null);
+        CommandContextUtil.getActivityInstanceEntityManager().recordActivityEnd((ExecutionEntity) execution, null);
         callActivityEndListeners(execution);
         
         logLoopDetails(execution, "instance completed", loopCounter, nrOfCompletedInstances, nrOfActiveInstances, nrOfInstances);
@@ -144,7 +144,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
                 if (nrOfInstances > 0) {
                     leavingExecution = executionEntity.getParent();
                 } else {
-                    CommandContextUtil.getHistoryManager().recordActivityEnd((ExecutionEntity) execution, null);
+                    CommandContextUtil.getActivityInstanceEntityManager().recordActivityEnd((ExecutionEntity) execution, null);
                     leavingExecution = executionEntity;
                 }
 

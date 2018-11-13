@@ -73,8 +73,7 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
     }
 
     protected void executeSynchronous(FlowNode flowNode) {
-        
-        CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(execution);
+        CommandContextUtil.getActivityInstanceEntityManager().recordActivityStart(execution);
         
         // Execution listener
         if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {

@@ -18,6 +18,7 @@ import java.util.Map;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.engine.impl.ActivityInstanceQueryImpl;
 import org.flowable.engine.runtime.ActivityInstance;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author martin.grofcik
@@ -25,7 +26,7 @@ import org.flowable.engine.runtime.ActivityInstance;
 public interface ActivityInstanceEntityManager extends EntityManager<ActivityInstanceEntity> {
 
     List<ActivityInstanceEntity> findUnfinishedActivityInstancesByExecutionAndActivityId(String executionId, String activityId);
-    
+
     List<ActivityInstanceEntity> findActivityInstancesByExecutionAndActivityId(String executionId, String activityId);
 
     List<ActivityInstanceEntity> findUnfinishedActivityInstancesByProcessInstanceId(String processInstanceId);
@@ -41,4 +42,43 @@ public interface ActivityInstanceEntityManager extends EntityManager<ActivityIns
     void deleteActivityInstancesByProcessInstanceId(String processInstanceId);
 
     void deleteActivityInstancesByProcessDefinitionId(String processDefinitionId);
+
+    /**
+     * Record Activity end, if activity event logging is enabled.
+     *
+     * @param executionEntity
+     *     execution entity during which execution activity was ended
+     * @param deleteReason
+     *     the reason why activity was ended
+     */
+    void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason);
+
+    /**
+     * Record the start of an activity, if activity event logging is enabled.
+     *
+     * @param executionEntity
+     *     execution which is starting activityz
+     */
+    void recordActivityStart(ExecutionEntity executionEntity);
+
+    /**
+     * Record the sub process instance start
+     */
+    void recordSubProcessInstanceStart(ExecutionEntity parentExecution, ExecutionEntity subProcessInstance);
+
+    /**
+     * Record task created
+     *
+     * @param task the task which was created
+     * @param execution execution which created the task
+     */
+    void recordTaskCreated(TaskEntity task, ExecutionEntity execution);
+
+    /**
+     * Record task information change
+     *
+     * @param taskEntity task entity which was changed
+     */
+    void recordTaskInfoChange(TaskEntity taskEntity);
+
 }

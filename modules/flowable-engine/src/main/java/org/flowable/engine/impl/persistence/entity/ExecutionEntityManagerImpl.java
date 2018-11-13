@@ -501,7 +501,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
                 && executionEntity.getCurrentFlowElement() != null
                 && !executionEntity.isMultiInstanceRoot()
                 && !(executionEntity.getCurrentFlowElement() instanceof BoundaryEvent)) {  // Boundary events will handle the history themselves (see TriggerExecutionOperation for example)
-            getHistoryManager().recordActivityEnd(executionEntity, deleteReason);
+            CommandContextUtil.getActivityInstanceEntityManager().recordActivityEnd(executionEntity, deleteReason);
         }
         deleteRelatedDataForExecution(executionEntity, deleteReason);
         delete(executionEntity);

@@ -51,7 +51,7 @@ public class DestroyScopeOperation extends AbstractOperation {
         executionEntityManager.deleteExecutionAndRelatedData(scopeExecution, execution.getDeleteReason(), true, null);
 
         if (scopeExecution.isActive()) {
-            CommandContextUtil.getHistoryManager(commandContext).recordActivityEnd(scopeExecution, scopeExecution.getDeleteReason());
+            CommandContextUtil.getActivityInstanceEntityManager().recordActivityEnd(scopeExecution, scopeExecution.getDeleteReason());
         }
         executionEntityManager.delete(scopeExecution);
     }
