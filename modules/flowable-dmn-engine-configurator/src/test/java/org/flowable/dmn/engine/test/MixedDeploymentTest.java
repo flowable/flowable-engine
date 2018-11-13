@@ -110,6 +110,7 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
     public void testNoHitsDecisionTask() {
         try {
             runtimeService.startProcessInstanceByKey("oneDecisionTaskProcess", Collections.singletonMap("inputVariable1", (Object) 2));
+            fail("Expected Exception");
         } catch (Exception e) {
             assertTrue(e.getMessage().contains("did not hit any rules for the provided input"));
         } finally {
@@ -117,6 +118,20 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
         }
     }
 
+    @Test
+    @Deployment(resources = { "org/flowable/dmn/engine/test/deployment/oneDecisionTaskNoHitsErrorProcess.bpmn20.xml"})
+    public void testDecisionNotFound() {
+        try {
+            runtimeService.startProcessInstanceByKey("oneDecisionTaskProcess", Collections.singletonMap("inputVariable1", (Object) 2));
+            fail("Expected Exception");
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("Decision table for key [decision1] was not found"));
+        } finally {
+            deleteAllDmnDeployments();
+        }
+    }
+
+    @Test
     @Deployment(resources = { "org/flowable/dmn/engine/test/deployment/oneDecisionTaskProcessFallBackToDefaultTenant.bpmn20.xml" },
         tenantId = "flowable"
     )
@@ -153,6 +168,7 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
         this.expectedException.expect(FlowableException.class);
         this.expectedException.expectMessage("Decision table for key [decision1] and tenantId [flowable] was not found");
 
+        deleteAllDmnDeployments();
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().
             addClasspathResource("org/flowable/dmn/engine/test/deployment/simple.dmn").
             tenantId("anotherTenant").
@@ -213,16 +229,7 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
         assertEquals("result1", variables.get(1).getValue());
     }
 
-    @Deployment(resources = { "org/flowable/dmn/engine/test/deployment/oneDecisionTaskNoHitsErrorProcess.bpmn20.xml"})
-    public void testDecisionNotFound() {
-        deleteAllDmnDeployments();
-        try {
-            runtimeService.startProcessInstanceByKey("oneDecisionTaskProcess", Collections.singletonMap("inputVariable1", (Object) 2));
-            fail("Expected Exception");
-        } catch (Exception e) {
-            assertTrue(e.getMessage().contains("Decision table for key [decision1] was not found"));
-        }
-    }
+
 
     protected void deleteAllDmnDeployments() {
         DmnEngineConfiguration dmnEngineConfiguration = (DmnEngineConfiguration) flowableRule.getProcessEngine().getProcessEngineConfiguration().getEngineConfigurations()
