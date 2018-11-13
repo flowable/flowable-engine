@@ -361,7 +361,6 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
 
             assertDatabaseUpdates("CompleteTaskCmd", "org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityImpl", 1L,
                     "org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl", 2L,
-                    "org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityImpl", 1L,
                     "org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityImpl", 1L,
                     "org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl", 1L);
 
@@ -563,7 +562,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         }
     }
 
-    private Map<String, Object> createVariables(long count, String prefix) {
+   private Map<String, Object> createVariables(long count, String prefix) {
         Map<String, Object> vars = new HashMap<>();
         for (int i = 0; i < count; i++) {
             vars.put(prefix + "_var0" + i, prefix + "+values0" + i);

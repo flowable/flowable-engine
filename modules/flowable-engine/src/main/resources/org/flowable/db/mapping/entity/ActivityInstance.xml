@@ -297,7 +297,7 @@
     select * from ${prefix}ACT_RU_ACTINST RES
     where EXECUTION_ID_ = #{parameter.executionId, jdbcType=VARCHAR} and ACT_ID_ = #{parameter.activityId, jdbcType=VARCHAR}
   </select>
-  
+
    <select id="selectUnfinishedActivityInstanceByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="ActivityInstanceResultMap">
     select * from ${prefix}ACT_RU_ACTINST RES
     where PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=VARCHAR} and END_TIME_ is null

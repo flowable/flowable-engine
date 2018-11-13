@@ -28,7 +28,6 @@ import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.cfg.MailServerInfo;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
-import org.flowable.engine.impl.db.ProcessDbSqlSessionFactory;
 import org.flowable.image.ProcessDiagramGenerator;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.task.service.TaskPostProcessor;
@@ -724,7 +723,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     }
 
     public DbSqlSessionFactory createDbSqlSessionFactory() {
-        return new ProcessDbSqlSessionFactory(usePrefixId);
+        return new DbSqlSessionFactory(usePrefixId);
     }
 
 }

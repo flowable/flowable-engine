@@ -767,13 +767,13 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         deleteUserTasks(executionEntity, deleteReason, commandContext, enableExecutionRelationshipCounts, eventDispatcherEnabled);
         deleteJobs(executionEntity, commandContext, enableExecutionRelationshipCounts, eventDispatcherEnabled);
         deleteEventSubScriptions(executionEntity, enableExecutionRelationshipCounts, eventDispatcherEnabled);
-        if (executionEntity.isProcessInstanceType()) {
-            deleteActivityInstances(executionEntity, commandContext);
-        }
+        deleteActivityInstances(executionEntity, commandContext);
     }
 
     protected void deleteActivityInstances(ExecutionEntity executionEntity, CommandContext commandContext) {
-        CommandContextUtil.getActivityInstanceEntityManager(commandContext).deleteActivityInstancesByProcessInstanceId(executionEntity.getId());
+        if (executionEntity.isProcessInstanceType()) {
+            CommandContextUtil.getActivityInstanceEntityManager(commandContext).deleteActivityInstancesByProcessInstanceId(executionEntity.getId());
+        }
     }
 
     protected void deleteIdentityLinks(ExecutionEntity executionEntity, CommandContext commandContext, boolean eventDispatcherEnabled) {

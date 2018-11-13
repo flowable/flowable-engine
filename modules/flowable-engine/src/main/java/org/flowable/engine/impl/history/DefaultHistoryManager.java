@@ -186,7 +186,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, executionEntity.getProcessDefinitionId())) {
             if (executionEntity.getActivityId() != null && executionEntity.getCurrentFlowElement() != null) {
 
-
                 // Historic activity instance could have been created (but only in cache, never persisted)
                 // for example when submitting form properties
                 HistoricActivityInstanceEntity historicActivityInstanceEntityFromCache = getHistoricActivityInstanceFromCache(executionEntity.getId(), executionEntity.getActivityId(), true);

@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.engine.impl.ActivityInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -34,6 +35,7 @@ public class MybatisActivityInstanceDataManager extends AbstractProcessDataManag
 
     protected CachedEntityMatcher<ActivityInstanceEntity> unfinishedActivityInstanceMatcher = new UnfinishedActivityInstanceMatcher();
     protected CachedEntityMatcher<ActivityInstanceEntity> activityInstanceMatcher = new ActivityInstanceMatcher();
+    protected CachedEntityMatcher<ActivityInstanceEntity> activitiesByProcessInstanceIdMatcher = new ActivityByProcessInstanceIdMatcher();
 
     public MybatisActivityInstanceDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);
@@ -74,7 +76,11 @@ public class MybatisActivityInstanceDataManager extends AbstractProcessDataManag
 
     @Override
     public void deleteActivityInstancesByProcessInstanceId(String processInstanceId) {
-        getDbSqlSession().delete("deleteActivityInstancesByProcessInstanceId", processInstanceId, ActivityInstanceEntityImpl.class);
+        DbSqlSession dbSqlSession = getDbSqlSession();
+        deleteCachedEntities(dbSqlSession, activitiesByProcessInstanceIdMatcher, processInstanceId);
+        if (!isEntityInserted(dbSqlSession, "execution", processInstanceId)) {
+            dbSqlSession.delete("deleteActivityInstancesByProcessInstanceId", processInstanceId, ActivityInstanceEntityImpl.class);
+        }
     }
 
     @Override
