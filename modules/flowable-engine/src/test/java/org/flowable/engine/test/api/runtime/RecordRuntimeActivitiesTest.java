@@ -14,6 +14,7 @@ public class RecordRuntimeActivitiesTest extends AbstractTestCase {
     @Test
     public void falseRecordRuntimeActivities() {
         ProcessEngineConfiguration processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration()
+            .setJdbcUrl("jdbc:h2:mem:RecordRuntimeActivitiesTest")
             .setRecordRuntimeActivities(false);
         ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
 
@@ -34,7 +35,8 @@ public class RecordRuntimeActivitiesTest extends AbstractTestCase {
 
     @Test
     public void defaultRecordRuntimeActivities() {
-        StandaloneInMemProcessEngineConfiguration processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
+        ProcessEngineConfiguration processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration()
+            .setJdbcUrl("jdbc:h2:mem:RecordRuntimeActivitiesTest");
         ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
 
         Deployment deployment = processEngine.getRepositoryService().createDeployment()
@@ -55,6 +57,7 @@ public class RecordRuntimeActivitiesTest extends AbstractTestCase {
     @Test
     public void recordRuntimeActivities() {
         ProcessEngineConfiguration processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration()
+            .setJdbcUrl("jdbc:h2:mem:RecordRuntimeActivitiesTest")
             .setRecordRuntimeActivities(true);
         ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
 
