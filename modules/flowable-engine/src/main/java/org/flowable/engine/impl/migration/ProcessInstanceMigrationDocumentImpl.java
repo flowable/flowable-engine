@@ -40,7 +40,6 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
     protected List<ActivityMigrationMapping> activityMigrationMappings;
     protected Map<String, Map<String, Object>> activitiesLocalVariables;
     protected Map<String, Object> processInstanceVariables;
-    protected Set<String> mappedFromActivities;
 
     public static ProcessInstanceMigrationDocument fromProcessInstanceMigrationDocumentJson(String processInstanceMigrationDocumentJson) {
         return ProcessInstanceMigrationDocumentConverter.convertFromJson(processInstanceMigrationDocumentJson);
@@ -86,15 +85,16 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
         if (duplicates.isEmpty()) {
             this.activityMigrationMappings = activityMigrationMappings;
             this.activitiesLocalVariables = buildActivitiesLocalVariablesMap(activityMigrationMappings);
-            this.mappedFromActivities = extractMappedFromActivities(activityMigrationMappings);
         } else {
             throw new FlowableException("From activity '" + Arrays.toString(duplicates.toArray()) + "' is mapped more than once");
         }
     }
 
+    //TODO WIP - need to account for duplicate mappings in callActivities (toParentProcess)
     protected static List<String> findDuplicatedFromActivityIds(List<ActivityMigrationMapping> activityMigrationMappings) {
         //Frequency Map
         Map<String, Long> frequencyMap = activityMigrationMappings.stream()
+            .filter(mapping -> !mapping.isToParentProcess())
             .flatMap(mapping -> mapping.getFromActivityIds().stream())
             .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
@@ -130,13 +130,6 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
             });
         });
         return variablesMap;
-    }
-
-    protected static Set<String> extractMappedFromActivities(List<ActivityMigrationMapping> activityMigrationMappings) {
-        Set<String> fromActivities = activityMigrationMappings.stream()
-            .flatMap(mapping -> mapping.getFromActivityIds().stream())
-            .collect(Collectors.toSet());
-        return fromActivities;
     }
 
     @Override

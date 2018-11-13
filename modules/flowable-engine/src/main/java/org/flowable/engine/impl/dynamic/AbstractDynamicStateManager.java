@@ -263,6 +263,7 @@ public abstract class AbstractDynamicStateManager {
                     bpmnModel = ProcessDefinitionUtil.getBpmnModel(migrateToProcessDefinitionId.get());
                 }
                 newFlowElement = resolveFlowElementFromBpmnModel(bpmnModel, activityId);
+                canContainerDirectMigrate = false;
             } else if (moveExecutionContainer.isMoveToSubProcessInstance()) {
                 //The subProcess model is defined in the callActivity of the current processDefinition or the migrateProcessDefinition if defined
                 ExecutionEntity firstExecution = moveExecutionContainer.getExecutions().get(0);
@@ -310,6 +311,7 @@ public abstract class AbstractDynamicStateManager {
                 moveExecutionContainer.setSubProcessModel(subProcessModel);
 
                 newFlowElement = resolveFlowElementFromBpmnModel(subProcessModel, activityId);
+                canContainerDirectMigrate = false;
             } else {
                 // Get first execution to get process definition id
                 ExecutionEntity firstExecution = moveExecutionContainer.getExecutions().get(0);
@@ -332,7 +334,7 @@ public abstract class AbstractDynamicStateManager {
     protected FlowElement resolveFlowElementFromBpmnModel(BpmnModel bpmnModel, String activityId) {
         FlowElement flowElement = bpmnModel.getFlowElement(activityId);
         if (flowElement == null) {
-            throw new FlowableException("Activity could not be found in process definition for id " + activityId);
+            throw new FlowableException("Cannot find activity '"+activityId+"' in process definition for with id '" + bpmnModel.getMainProcess().getId()+"'");
         }
         return flowElement;
     }
