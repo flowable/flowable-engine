@@ -12,12 +12,6 @@
  */
 package org.flowable.cmmn.test.listener;
 
-import java.util.Collections;
-import java.util.List;
-
-import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
-import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
-
 /**
  * @author Joram Barrez
  */
@@ -27,11 +21,6 @@ public class TestFilterSourceStateLifeCycleListener extends AbstractTestLifeCycl
 
     public TestFilterSourceStateLifeCycleListener(String sourceState) {
         this.sourceState = sourceState;
-    }
-
-    @Override
-    public List<String> getItemDefinitionTypes() {
-        return null;
     }
 
     @Override

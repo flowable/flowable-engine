@@ -12,17 +12,10 @@
  */
 package org.flowable.cmmn.test.listener;
 
-import java.util.List;
-
 /**
  * @author Joram Barrez
  */
 public class TestReceiveAllLifeCycleListener extends AbstractTestLifeCycleListener {
-
-    @Override
-    public List<String> getItemDefinitionTypes() {
-        return null;
-    }
 
     @Override
     public String getSourceState() {
