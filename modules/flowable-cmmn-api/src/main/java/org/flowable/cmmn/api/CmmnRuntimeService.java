@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
+import org.flowable.cmmn.api.runtime.GenericEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery;
@@ -52,6 +53,8 @@ public interface CmmnRuntimeService {
     void terminatePlanItemInstance(String planItemInstanceId);
 
     void evaluateCriteria(String caseInstanceId);
+    
+    void completeGenericEventListenerInstance(String genericEventListenerInstanceId);
 
     void completeUserEventListenerInstance(String userEventListenerInstanceId);
     
@@ -97,6 +100,8 @@ public interface CmmnRuntimeService {
     PlanItemInstanceQuery createPlanItemInstanceQuery();
     
     MilestoneInstanceQuery createMilestoneInstanceQuery();
+    
+    GenericEventListenerInstanceQuery createGenericEventListenerInstanceQuery();
 
     UserEventListenerInstanceQuery createUserEventListenerInstanceQuery();
     

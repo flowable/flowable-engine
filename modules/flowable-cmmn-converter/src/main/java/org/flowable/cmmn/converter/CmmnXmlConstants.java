@@ -50,6 +50,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_DECISION_TASK = "decisionTask";
     String ELEMENT_TIMER_EVENT_LISTENER = "timerEventListener";
     String ELEMENT_USER_EVENT_LISTENER = "userEventListener";
+    String ELEMENT_GENERIC_EVENT_LISTENER = "eventListener";
     String ELEMENT_PLAN_ITEM = "planItem";
     String ELEMENT_ITEM_CONTROL = "itemControl";
     String ELEMENT_DEFAULT_CONTROL = "defaultControl";

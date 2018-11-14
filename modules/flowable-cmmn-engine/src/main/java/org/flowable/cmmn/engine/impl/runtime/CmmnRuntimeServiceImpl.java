@@ -20,6 +20,7 @@ import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
+import org.flowable.cmmn.api.runtime.GenericEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery;
@@ -139,6 +140,11 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     public void evaluateCriteria(String caseInstanceId) {
         commandExecutor.execute(new EvaluateCriteriaCmd(caseInstanceId));
     }
+    
+    @Override
+    public void completeGenericEventListenerInstance(String genericEventListenerInstanceId) {
+        commandExecutor.execute(new TriggerPlanItemInstanceCmd(genericEventListenerInstanceId));
+    }
 
     @Override
     public void completeUserEventListenerInstance(String userEventListenerInstanceId) {
@@ -228,6 +234,11 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     @Override
     public MilestoneInstanceQuery createMilestoneInstanceQuery() {
         return configuration.getMilestoneInstanceEntityManager().createMilestoneInstanceQuery();
+    }
+    
+    @Override
+    public GenericEventListenerInstanceQuery createGenericEventListenerInstanceQuery() {
+        return new GenericEventListenerInstanceQueryImpl(configuration.getCommandExecutor());
     }
 
     @Override

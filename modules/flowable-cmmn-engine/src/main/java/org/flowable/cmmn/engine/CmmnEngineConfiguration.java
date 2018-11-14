@@ -104,6 +104,7 @@ import org.flowable.cmmn.engine.impl.parser.DefaultCmmnActivityBehaviorFactory;
 import org.flowable.cmmn.engine.impl.parser.handler.CaseParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.CaseTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.DecisionTaskParseHandler;
+import org.flowable.cmmn.engine.impl.parser.handler.GenericEventListenerParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.HumanTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.MilestoneParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.PlanFragmentParseHandler;
@@ -1135,6 +1136,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         cmmnParseHandlers.add(new ServiceTaskParseHandler());
         cmmnParseHandlers.add(new StageParseHandler());
         cmmnParseHandlers.add(new TaskParseHandler());
+        cmmnParseHandlers.add(new GenericEventListenerParseHandler());
         cmmnParseHandlers.add(new TimerEventListenerParseHandler());
         cmmnParseHandlers.add(new UserEventListenerParseHandler());
 
