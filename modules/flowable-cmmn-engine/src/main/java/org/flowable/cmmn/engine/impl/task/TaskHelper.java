@@ -40,10 +40,10 @@ public class TaskHelper {
     public static void insertTask(TaskEntity taskEntity, boolean fireCreateEvent) {
         if (taskEntity.getOwner() != null) {
             addOwnerIdentityLink(taskEntity);
-            CommandContextUtil.getCmmnEngineConfiguration().getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_ASSIGNMENT);
         }
         if (taskEntity.getAssignee() != null) {
             addAssigneeIdentityLinks(taskEntity);
+            CommandContextUtil.getCmmnEngineConfiguration().getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_ASSIGNMENT);
         }
 
         CommandContextUtil.getTaskService().insertTask(taskEntity, fireCreateEvent);
@@ -118,6 +118,7 @@ public class TaskHelper {
                 || (taskEntity.getAssignee() == null && assignee != null)) {
             
             CommandContextUtil.getTaskService().changeTaskAssignee(taskEntity, assignee);
+            CommandContextUtil.getCmmnEngineConfiguration().getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_ASSIGNMENT);
 
             if (taskEntity.getId() != null) {
                 addAssigneeIdentityLinks(taskEntity);
