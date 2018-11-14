@@ -11,16 +11,33 @@
  * limitations under the License.
  */
 
-package org.flowable.engine.delegate;
+package org.flowable.cmmn.engine.impl.listener;
 
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.task.service.delegate.DelegateTask;
+import org.flowable.task.service.delegate.TaskListener;
 
 /**
- * Here for backwards compatibility, prefer use the {@link org.flowable.task.service.delegate.TaskListener}.
- *
- * @author Tom Baeyens
  * @author Joram Barrez
  */
-public interface TaskListener extends org.flowable.task.service.delegate.TaskListener {
+public class ExpressionTaskListener implements TaskListener {
+
+    protected Expression expression;
+
+    public ExpressionTaskListener(Expression expression) {
+        this.expression = expression;
+    }
+
+    @Override
+    public void notify(DelegateTask delegateTask) {
+        expression.getValue(delegateTask);
+    }
+
+    /**
+     * returns the expression text for this task listener.
+     */
+    public String getExpressionText() {
+        return expression.getExpressionText();
+    }
 
 }

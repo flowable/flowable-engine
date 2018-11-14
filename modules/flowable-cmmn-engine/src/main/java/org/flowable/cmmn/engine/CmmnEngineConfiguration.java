@@ -95,6 +95,9 @@ import org.flowable.cmmn.engine.impl.interceptor.CmmnCommandInvoker;
 import org.flowable.cmmn.engine.impl.job.AsyncActivatePlanItemInstanceJobHandler;
 import org.flowable.cmmn.engine.impl.job.AsyncInitializePlanModelJobHandler;
 import org.flowable.cmmn.engine.impl.job.TriggerTimerEventJobHandler;
+import org.flowable.cmmn.engine.impl.listener.CmmnListenerFactory;
+import org.flowable.cmmn.engine.impl.listener.CmmnListenerNotificationHelper;
+import org.flowable.cmmn.engine.impl.listener.DefaultCmmnListenerFactory;
 import org.flowable.cmmn.engine.impl.parser.CmmnActivityBehaviorFactory;
 import org.flowable.cmmn.engine.impl.parser.CmmnParseHandler;
 import org.flowable.cmmn.engine.impl.parser.CmmnParseHandlers;
@@ -340,6 +343,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected List<CmmnParseHandler> preCmmnParseHandlers;
     protected List<CmmnParseHandler> postCmmnParseHandlers;
     protected List<CmmnParseHandler> customCmmnParseHandlers;
+
+    protected CmmnListenerFactory listenerFactory;
+    protected CmmnListenerNotificationHelper listenerNotificationHelper;
 
     protected HistoryLevel historyLevel = HistoryLevel.AUDIT;
 
@@ -751,6 +757,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initEntityManagers();
         initClassDelegateFactory();
         initActivityBehaviorFactory();
+        initListenerFactory();
+        initListenerNotificationHelper();
         initDeployers();
         initCaseDefinitionCache();
         initDeploymentManager();
@@ -1048,6 +1056,18 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             defaultCmmnActivityBehaviorFactory.setClassDelegateFactory(classDelegateFactory);
             defaultCmmnActivityBehaviorFactory.setExpressionManager(expressionManager);
             activityBehaviorFactory = defaultCmmnActivityBehaviorFactory;
+        }
+    }
+
+    protected void initListenerFactory() {
+        if (listenerFactory == null) {
+            listenerFactory = new DefaultCmmnListenerFactory(classDelegateFactory, expressionManager);
+        }
+    }
+
+    protected void initListenerNotificationHelper() {
+        if (listenerNotificationHelper == null) {
+            listenerNotificationHelper = new CmmnListenerNotificationHelper();
         }
     }
 
@@ -2027,24 +2047,45 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return preCmmnParseHandlers;
     }
 
-    public void setPreCmmnParseHandlers(List<CmmnParseHandler> preCmmnParseHandlers) {
+    public CmmnEngineConfiguration setPreCmmnParseHandlers(List<CmmnParseHandler> preCmmnParseHandlers) {
         this.preCmmnParseHandlers = preCmmnParseHandlers;
+        return this;
     }
 
     public List<CmmnParseHandler> getPostCmmnParseHandlers() {
         return postCmmnParseHandlers;
     }
 
-    public void setPostCmmnParseHandlers(List<CmmnParseHandler> postCmmnParseHandlers) {
+    public CmmnEngineConfiguration setPostCmmnParseHandlers(List<CmmnParseHandler> postCmmnParseHandlers) {
         this.postCmmnParseHandlers = postCmmnParseHandlers;
+        return this;
     }
 
     public List<CmmnParseHandler> getCustomCmmnParseHandlers() {
         return customCmmnParseHandlers;
     }
 
-    public void setCustomCmmnParseHandlers(List<CmmnParseHandler> customCmmnParseHandlers) {
+    public CmmnEngineConfiguration setCustomCmmnParseHandlers(List<CmmnParseHandler> customCmmnParseHandlers) {
         this.customCmmnParseHandlers = customCmmnParseHandlers;
+        return this;
+    }
+
+    public CmmnListenerFactory getListenerFactory() {
+        return listenerFactory;
+    }
+
+    public CmmnEngineConfiguration setListenerFactory(CmmnListenerFactory listenerFactory) {
+        this.listenerFactory = listenerFactory;
+        return this;
+    }
+
+    public CmmnListenerNotificationHelper getListenerNotificationHelper() {
+        return listenerNotificationHelper;
+    }
+
+    public CmmnEngineConfiguration setListenerNotificationHelper(CmmnListenerNotificationHelper listenerNotificationHelper) {
+        this.listenerNotificationHelper = listenerNotificationHelper;
+        return this;
     }
 
     public CmmnDeployer getCmmnDeployer() {
