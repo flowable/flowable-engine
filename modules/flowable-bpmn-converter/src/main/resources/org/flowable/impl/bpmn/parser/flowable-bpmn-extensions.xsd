@@ -799,4 +799,13 @@
       <attribute name="name" type="string" use="required" />
     </complexType>
   </element>
+
+  <attribute name="autoStoreVariables" type="boolean" default="false">
+    <annotation>
+      <documentation>
+        Optional script task attribute flag (default: false) that indicates whether or not variables defined in the script will be stored
+        in the Execution instance context.
+      </documentation>
+    </annotation>
+  </attribute>
 </schema>
