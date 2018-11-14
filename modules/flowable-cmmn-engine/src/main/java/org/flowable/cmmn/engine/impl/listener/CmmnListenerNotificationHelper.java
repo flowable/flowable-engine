@@ -12,6 +12,10 @@
  */
 package org.flowable.cmmn.engine.impl.listener;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.CaseElement;
@@ -19,6 +23,8 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.FlowableListener;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.ImplementationType;
+import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.task.service.delegate.TaskListener;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -72,6 +78,34 @@ public class CmmnListenerNotificationHelper {
         }
 
         return taskListener;
+    }
+
+    protected List<PlanItemInstanceLifecycleListener> createPlanItemLifecycleListeners(PlanItem planItem) {
+        PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
+        if (planItemDefinition != null) {
+            List<FlowableListener> lifecycleListeners = planItemDefinition.getLifecycleListeners();
+            List<PlanItemInstanceLifecycleListener> instances = new ArrayList<>(lifecycleListeners.size());
+            for (FlowableListener flowableListener : lifecycleListeners) {
+                instances.add(createLifecycleListener(flowableListener));
+            }
+            return instances;
+        }
+        return null;
+    }
+
+    protected PlanItemInstanceLifecycleListener createLifecycleListener(FlowableListener listener) {
+        PlanItemInstanceLifecycleListener lifecycleListener = null;
+
+        CmmnListenerFactory listenerFactory = CommandContextUtil.getCmmnEngineConfiguration().getListenerFactory();
+        if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equalsIgnoreCase(listener.getImplementationType())) {
+            lifecycleListener = listenerFactory.createClassDelegateLifeCycleListener(listener);
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equalsIgnoreCase(listener.getImplementationType())) {
+            lifecycleListener = listenerFactory.createExpressionLifeCycleListener(listener);
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equalsIgnoreCase(listener.getImplementationType())) {
+            lifecycleListener = listenerFactory.createDelegateExpressionLifeCycleListener(listener);
+        }
+
+        return lifecycleListener;
     }
 
 }

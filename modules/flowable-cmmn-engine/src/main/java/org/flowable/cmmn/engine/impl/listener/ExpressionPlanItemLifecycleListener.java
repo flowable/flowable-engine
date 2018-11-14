@@ -44,7 +44,7 @@ public class ExpressionPlanItemLifecycleListener implements PlanItemInstanceLife
     }
 
     @Override
-    public void stateChanged(PlanItemInstance planItemInstance, String oldState, String newState) {
+    public void stateChanged(DelegatePlanItemInstance planItemInstance, String oldState, String newState) {
         expression.getValue((DelegatePlanItemInstance) planItemInstance);
     }
 
