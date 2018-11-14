@@ -29,6 +29,7 @@ import org.flowable.cmmn.model.AbstractFlowableHttpHandler;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.CompletionNeutralRule;
+import org.flowable.cmmn.model.DecisionTask;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.FlowableHttpRequestHandler;
@@ -195,6 +196,8 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
         if (currentCmmnElement instanceof ServiceTask) {
             ((ServiceTask) currentCmmnElement).getFieldExtensions().add(extension);
 
+        } else if (currentCmmnElement instanceof DecisionTask) {
+            ((DecisionTask) currentCmmnElement).getFieldExtensions().add(extension);
         } else if (currentCmmnElement instanceof FlowableListener) {
             ((FlowableListener) currentCmmnElement).getFieldExtensions().add(extension);
 
