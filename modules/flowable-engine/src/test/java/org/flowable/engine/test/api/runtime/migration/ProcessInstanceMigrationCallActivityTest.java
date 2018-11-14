@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -830,6 +831,72 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         completeProcessInstanceTasks(processInstance.getId());
         assertProcessEnded(processInstance.getId());
 
+    }
+
+    @Test
+    public void testMigrateProcessWithCallActivityWithoutAlteringTheSubProcessDefinitionAndExecution() {
+        ProcessDefinition procDefWithCallActivityV1 = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-with-call-activity.bpmn20.xml");
+        ProcessDefinition procDefWithCallActivityV2 = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-with-call-activity.bpmn20.xml");
+        ProcessDefinition procDefSubProcess = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml");
+
+        //Start the processInstance and confirm the migration state to validate
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefWithCallActivityV1.getId());
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("firstTask");
+        completeTask(task);
+
+        List<Execution> processExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(processExecutions).extracting(Execution::getActivityId).containsExactly("callActivity");
+        assertThat(processExecutions).extracting("processDefinitionId").containsOnly(procDefWithCallActivityV1.getId());
+
+        ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
+        List<Execution> subProcessExecutions = runtimeService.createExecutionQuery().processInstanceId(subProcessInstance.getId()).onlyChildExecutions().list();
+        assertThat(subProcessExecutions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("theTask");
+        assertThat(subProcessExecutions).extracting("processDefinitionId").containsOnly(procDefSubProcess.getId());
+        List<Task> subProcessTasks = taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).list();
+        assertThat(subProcessTasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("theTask");
+        assertThat(subProcessTasks).extracting(Task::getProcessDefinitionId).containsOnly(procDefSubProcess.getId());
+
+        //Prepare migration and validate
+        //Call activity is not mapped explicitly or by auto-map since the call activity element exists by id and refers to the same discernible subProcess (call element)
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder().migrateToProcessDefinition(procDefWithCallActivityV2.getId());
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.hasErrors()).isFalse();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
+
+        //Confirm migration
+        processExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(processExecutions).extracting(Execution::getActivityId).containsExactly("callActivity");
+        assertThat(processExecutions).extracting("processDefinitionId").containsOnly(procDefWithCallActivityV2.getId());
+
+        //Same subProcess but its call activity execution its for the new definition
+        processExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(processExecutions).extracting(Execution::getActivityId).containsExactly("callActivity");
+        assertThat(processExecutions).extracting("processDefinitionId").containsOnly(procDefWithCallActivityV2.getId());
+        ProcessInstance subProcessInstanceAfterMigration = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
+        assertThat(subProcessInstanceAfterMigration).isEqualToComparingFieldByField(subProcessInstance);
+        List<Execution> subProcessExecutionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(subProcessInstanceAfterMigration.getId()).onlyChildExecutions().list();
+        assertThat(subProcessExecutionsAfterMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("theTask");
+        assertThat(subProcessExecutionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefSubProcess.getId());
+        subProcessExecutions.sort(Comparator.comparing(Execution::getId));
+        subProcessExecutionsAfterMigration.sort(Comparator.comparing(Execution::getId));
+        assertThat(subProcessExecutionsAfterMigration).usingFieldByFieldElementComparator().isEqualTo(subProcessExecutions);
+
+        List<Task> subProcessTasksAfterMigration = taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).list();
+        assertThat(subProcessTasksAfterMigration).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("theTask");
+        assertThat(subProcessTasksAfterMigration).extracting(Task::getProcessDefinitionId).containsOnly(procDefSubProcess.getId());
+        subProcessTasks.sort(Comparator.comparing(Task::getId));
+        subProcessTasksAfterMigration.sort(Comparator.comparing(Task::getId));
+        assertThat(subProcessTasksAfterMigration).usingFieldByFieldElementComparator().isEqualTo(subProcessTasks);
+
+        subProcessTasksAfterMigration.forEach(this::completeTask);
+
+        //Check the new activity added with the migration
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("secondTask");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefWithCallActivityV2.getId());
     }
 
     @Test

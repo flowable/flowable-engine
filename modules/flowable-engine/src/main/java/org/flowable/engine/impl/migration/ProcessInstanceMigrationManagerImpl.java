@@ -355,6 +355,11 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
 
         doMoveExecutionState(processInstanceChangeState, commandContext);
 
+        //TODO WIP - Could we capture these executions during ChangeStateBuilderPreparation and for processing instead of querying...?
+        LOGGER.debug("Updating Process definition of call unchanged call activity");
+        List<ExecutionEntity> callActivities = executionEntityManager.findChildExecutionsByProcessInstanceId(processInstanceId).stream().filter(executionEntity -> executionEntity.getCurrentFlowElement() instanceof CallActivity).collect(Collectors.toList());
+        callActivities.forEach(executionEntity -> executionEntity.setProcessDefinitionId(procDefToMigrateTo.getId()));
+
         LOGGER.debug("Updating Process definition reference in history");
         changeProcessDefinitionReferenceOfHistory(processExecution, procDefToMigrateTo, commandContext);
 
