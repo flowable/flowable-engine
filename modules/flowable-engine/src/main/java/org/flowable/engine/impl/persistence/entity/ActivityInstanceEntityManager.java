@@ -42,6 +42,8 @@ public interface ActivityInstanceEntityManager extends EntityManager<ActivityIns
 
     void deleteActivityInstancesByProcessInstanceId(String processInstanceId);
 
+    void deleteActivityInstancesByProcessDefinitionId(String processDefinitionId);
+
     /**
      * Record Activity end, if activity event logging is enabled.
      *
