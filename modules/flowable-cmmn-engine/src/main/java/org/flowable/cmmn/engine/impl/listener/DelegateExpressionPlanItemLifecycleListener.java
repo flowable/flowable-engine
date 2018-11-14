@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.util.DelegateExpressionUtil;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.common.engine.api.FlowableException;
@@ -53,7 +52,7 @@ public class DelegateExpressionPlanItemLifecycleListener implements PlanItemInst
     }
 
     @Override
-    public void stateChanged(PlanItemInstance planItemInstance, String oldState, String newState) {
+    public void stateChanged(DelegatePlanItemInstance planItemInstance, String oldState, String newState) {
         try {
             DelegatePlanItemInstance delegatePlanItemInstance = (DelegatePlanItemInstance) planItemInstance;
             Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, (DelegatePlanItemInstance) planItemInstance, fieldExtensions);

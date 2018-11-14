@@ -89,7 +89,7 @@ public class CmmnClassDelegate implements CmmnActivityBehavior, TaskListener, Pl
     }
 
     @Override
-    public void stateChanged(PlanItemInstance planItemInstance, String oldState, String newState) {
+    public void stateChanged(DelegatePlanItemInstance planItemInstance, String oldState, String newState) {
         PlanItemInstanceLifecycleListener planItemLifeCycleListenerInstance = getPlanItemLifeCycleListenerInstance(planItemInstance);
         planItemLifeCycleListenerInstance.stateChanged(planItemInstance, oldState, newState);
     }

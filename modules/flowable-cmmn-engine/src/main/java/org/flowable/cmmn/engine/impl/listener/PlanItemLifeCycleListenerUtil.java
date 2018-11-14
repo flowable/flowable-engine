@@ -16,9 +16,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.FlowableListener;
+import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
@@ -26,9 +28,20 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  */
 public class PlanItemLifeCycleListenerUtil {
 
-    public static void callLifecycleListeners(CommandContext commandContext, PlanItemInstance planItemInstance, String oldState, String newState) {
+    public static void callLifecycleListeners(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String oldState, String newState) {
         if (Objects.equals(oldState, newState)) {
             return;
+        }
+
+        // Lifecycle listeners on the element itself
+        PlanItemDefinition planItemDefinition = planItemInstance.getPlanItem().getPlanItemDefinition();
+        if (planItemDefinition != null) {
+            List<FlowableListener> lifecycleListeners = planItemDefinition.getLifecycleListeners();
+            if (lifecycleListeners != null && !lifecycleListeners.isEmpty()) {
+                CmmnListenerNotificationHelper listenerNotificationHelper = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper();
+                List<PlanItemInstanceLifecycleListener> planItemLifecycleListeners = listenerNotificationHelper.createPlanItemLifecycleListeners(planItemInstance.getPlanItem());
+                executeListeners(planItemLifecycleListeners, planItemInstance, oldState, newState);
+            }
         }
 
         // Lifecycle listeners defined on the cmmn engine configuration
@@ -45,7 +58,7 @@ public class PlanItemLifeCycleListenerUtil {
         }
     }
 
-    public static void executeListeners(List<PlanItemInstanceLifecycleListener> listeners, PlanItemInstance planItemInstance, String oldState, String newState) {
+    public static void executeListeners(List<PlanItemInstanceLifecycleListener> listeners, DelegatePlanItemInstance planItemInstance, String oldState, String newState) {
         if (listeners != null) {
             for (PlanItemInstanceLifecycleListener lifecycleListener : listeners) {
                 if (lifecycleListenerMatches(lifecycleListener, oldState, newState)) {

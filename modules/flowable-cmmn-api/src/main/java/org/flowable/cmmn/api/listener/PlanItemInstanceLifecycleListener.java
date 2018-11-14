@@ -12,7 +12,7 @@
  */
 package org.flowable.cmmn.api.listener;
 
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 
 /**
  * [Experimental]
@@ -39,9 +39,9 @@ public interface PlanItemInstanceLifecycleListener {
     String getTargetState();
 
     /**
-     * Will be called when the state of a {@link PlanItemInstance} changes and the
+     * Will be called when the state of a {@link DelegatePlanItemInstance} changes and the
      * {@link #getSourceState()} and {@link #getTargetState()} match.
      */
-    void stateChanged(PlanItemInstance planItemInstance, String oldState, String newState);
+    void stateChanged(DelegatePlanItemInstance planItemInstance, String oldState, String newState);
 
 }
