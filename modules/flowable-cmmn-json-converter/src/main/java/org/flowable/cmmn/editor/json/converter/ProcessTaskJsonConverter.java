@@ -23,7 +23,6 @@ import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.PlanItem;
-import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ProcessTask;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -62,7 +61,7 @@ public class ProcessTaskJsonConverter extends BaseCmmnJsonConverter implements P
         ProcessTask processTask = (ProcessTask) ((PlanItem) baseElement).getPlanItemDefinition();
 
         propertiesNode.put(PROPERTY_FALLBACK_TO_DEFAULT_TENANT, processTask.isFallbackToDefaultTenant());
-        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, ((PlanItemDefinition) baseElement));
+        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, processTask);
     }
 
     @Override

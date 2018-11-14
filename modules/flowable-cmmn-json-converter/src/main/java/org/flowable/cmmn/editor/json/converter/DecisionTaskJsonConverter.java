@@ -24,7 +24,6 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.DecisionTask;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.PlanItem;
-import org.flowable.cmmn.model.PlanItemDefinition;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -109,7 +108,7 @@ public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter implements 
             }
         }
 
-        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, ((PlanItemDefinition) baseElement));
+        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, decisionTask);
     }
 
     @Override

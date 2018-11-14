@@ -83,7 +83,7 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
                     BaseElement baseElement, CmmnModel cmmnModel) {
 
         ServiceTask serviceTask = (ServiceTask) ((PlanItem) baseElement).getPlanItemDefinition();
-        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, ((PlanItemDefinition) baseElement));
+        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, serviceTask);
 
         if (HttpServiceTask.HTTP_TASK.equalsIgnoreCase(serviceTask.getType())) {
             if (StringUtils.isNotEmpty(serviceTask.getImplementation())) {
