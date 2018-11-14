@@ -568,6 +568,4 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
     }
 
-
-
 }

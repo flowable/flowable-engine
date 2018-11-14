@@ -75,9 +75,6 @@ public class EntityDependencyOrder {
          * 
          */
 
-        /* FK from ExecutionEntity, ProcessDefinition */
-        DELETE_ORDER.add(ActivityInstanceEntityImpl.class);
-
         /* No FK */
         DELETE_ORDER.add(PropertyEntityImpl.class);
 
@@ -172,6 +169,11 @@ public class EntityDependencyOrder {
          * FK to Execution FK to process definition
          */
         DELETE_ORDER.add(TaskEntityImpl.class);
+
+        /*
+         * FK from ExecutionEntity, ProcessDefinition
+         */
+        DELETE_ORDER.add(ActivityInstanceEntityImpl.class);
 
         /*
          * FK from VariableInstance FK from EventSubscription FK from IdentityLink FK from Task

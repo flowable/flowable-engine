@@ -15,6 +15,7 @@ package org.flowable.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.bpmn.model.FlowElement;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.engine.impl.ActivityInstanceQueryImpl;
 import org.flowable.engine.runtime.ActivityInstance;
@@ -80,5 +81,15 @@ public interface ActivityInstanceEntityManager extends EntityManager<ActivityIns
      * @param taskEntity task entity which was changed
      */
     void recordTaskInfoChange(TaskEntity taskEntity);
+
+    /**
+     * Synchronize data with the new user task execution
+     *
+     * @param executionEntity execution which executes user task
+     * @param newFlowElement user task flow element
+     * @param oldActivityId previous activity id
+     * @param task the user task
+     */
+    void syncUserTaskExecution(ExecutionEntity executionEntity, FlowElement newFlowElement, String oldActivityId, TaskEntity task);
 
 }

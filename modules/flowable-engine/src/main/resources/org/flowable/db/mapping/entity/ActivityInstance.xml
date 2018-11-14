@@ -77,29 +77,29 @@
         DELETE_REASON_,
         TENANT_ID_
       ) values 
-      <foreach collection="list" item="ActivityInstance" index="index" separator=",">
-         (#{ActivityInstance.id ,jdbcType=VARCHAR},
+      <foreach collection="list" item="activityInstance" index="index" separator=",">
+         (#{activityInstance.id ,jdbcType=VARCHAR},
           1,
-          #{ActivityInstance.processDefinitionId, jdbcType=VARCHAR},
-          #{ActivityInstance.processInstanceId, jdbcType=VARCHAR},
-          #{ActivityInstance.executionId, jdbcType=VARCHAR},
-          #{ActivityInstance.activityId ,jdbcType=VARCHAR},
-          #{ActivityInstance.taskId ,jdbcType=VARCHAR},
-          #{ActivityInstance.calledProcessInstanceId ,jdbcType=VARCHAR},
-          #{ActivityInstance.activityName ,jdbcType=VARCHAR},
-          #{ActivityInstance.activityType ,jdbcType=VARCHAR},
-          #{ActivityInstance.assignee ,jdbcType=VARCHAR},
-          #{ActivityInstance.startTime, jdbcType=TIMESTAMP},
-          #{ActivityInstance.endTime, jdbcType=TIMESTAMP},
-          #{ActivityInstance.durationInMillis ,jdbcType=BIGINT},
-          #{ActivityInstance.deleteReason ,jdbcType=VARCHAR},
-          #{ActivityInstance.tenantId, jdbcType=VARCHAR})
+          #{activityInstance.processDefinitionId, jdbcType=VARCHAR},
+          #{activityInstance.processInstanceId, jdbcType=VARCHAR},
+          #{activityInstance.executionId, jdbcType=VARCHAR},
+          #{activityInstance.activityId ,jdbcType=VARCHAR},
+          #{activityInstance.taskId ,jdbcType=VARCHAR},
+          #{activityInstance.calledProcessInstanceId ,jdbcType=VARCHAR},
+          #{activityInstance.activityName ,jdbcType=VARCHAR},
+          #{activityInstance.activityType ,jdbcType=VARCHAR},
+          #{activityInstance.assignee ,jdbcType=VARCHAR},
+          #{activityInstance.startTime, jdbcType=TIMESTAMP},
+          #{activityInstance.endTime, jdbcType=TIMESTAMP},
+          #{activityInstance.durationInMillis ,jdbcType=BIGINT},
+          #{activityInstance.deleteReason ,jdbcType=VARCHAR},
+          #{activityInstance.tenantId, jdbcType=VARCHAR})
       </foreach>
   </insert>
   
   <insert id="bulkInsertActivityInstance" databaseId="oracle" parameterType="java.util.List">
       INSERT ALL 
-      <foreach collection="list" item="ActivityInstance" index="index">
+      <foreach collection="list" item="activityInstance" index="index">
         INTO ${prefix}ACT_RU_ACTINST (
           ID_,
           REV_,
@@ -118,22 +118,22 @@
           DELETE_REASON_,
           TENANT_ID_
         ) VALUES 
-           (#{ActivityInstance.id ,jdbcType=VARCHAR},
+           (#{activityInstance.id ,jdbcType=VARCHAR},
             1,
-            #{ActivityInstance.processDefinitionId, jdbcType=VARCHAR},
-            #{ActivityInstance.processInstanceId, jdbcType=VARCHAR},
-            #{ActivityInstance.executionId, jdbcType=VARCHAR},
-            #{ActivityInstance.activityId ,jdbcType=VARCHAR},
-            #{ActivityInstance.taskId ,jdbcType=VARCHAR},
-            #{ActivityInstance.calledProcessInstanceId ,jdbcType=VARCHAR},
-            #{ActivityInstance.activityName ,jdbcType=VARCHAR},
-            #{ActivityInstance.activityType ,jdbcType=VARCHAR},
-            #{ActivityInstance.assignee ,jdbcType=VARCHAR},
-            #{ActivityInstance.startTime, jdbcType=TIMESTAMP},
-            #{ActivityInstance.endTime, jdbcType=TIMESTAMP},
-            #{ActivityInstance.durationInMillis ,jdbcType=BIGINT},
-            #{ActivityInstance.deleteReason ,jdbcType=VARCHAR},
-            #{ActivityInstance.tenantId, jdbcType=VARCHAR})
+            #{activityInstance.processDefinitionId, jdbcType=VARCHAR},
+            #{activityInstance.processInstanceId, jdbcType=VARCHAR},
+            #{activityInstance.executionId, jdbcType=VARCHAR},
+            #{activityInstance.activityId ,jdbcType=VARCHAR},
+            #{activityInstance.taskId ,jdbcType=VARCHAR},
+            #{activityInstance.calledProcessInstanceId ,jdbcType=VARCHAR},
+            #{activityInstance.activityName ,jdbcType=VARCHAR},
+            #{activityInstance.activityType ,jdbcType=VARCHAR},
+            #{activityInstance.assignee ,jdbcType=VARCHAR},
+            #{activityInstance.startTime, jdbcType=TIMESTAMP},
+            #{activityInstance.endTime, jdbcType=TIMESTAMP},
+            #{activityInstance.durationInMillis ,jdbcType=BIGINT},
+            #{activityInstance.deleteReason ,jdbcType=VARCHAR},
+            #{activityInstance.tenantId, jdbcType=VARCHAR})
       </foreach>
     SELECT * FROM dual
   </insert>

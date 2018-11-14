@@ -29,6 +29,7 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.ActivityInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.data.ActivityInstanceDataManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
@@ -145,6 +146,23 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
     public void recordTaskInfoChange(TaskEntity taskEntity) {
         recordActivityTaskInfoChange(taskEntity);
         getHistoryManager().recordTaskInfoChange(taskEntity);
+    }
+
+    @Override
+    public void syncUserTaskExecution(ExecutionEntity executionEntity, FlowElement newFlowElement, String oldActivityId, TaskEntity task) {
+        syncUserTaskExecutionActivityInstance(executionEntity, oldActivityId, newFlowElement);
+        getHistoryManager().syncUserTaskExecution(executionEntity, oldActivityId, newFlowElement, task);
+    }
+
+    protected void syncUserTaskExecutionActivityInstance(ExecutionEntity childExecution, String oldActivityId,
+        FlowElement newFlowElement) {
+        ActivityInstanceEntityManager activityInstanceEntityManager = CommandContextUtil.getActivityInstanceEntityManager();
+        List<ActivityInstanceEntity> activityInstances = activityInstanceEntityManager.findActivityInstancesByExecutionAndActivityId(childExecution.getId(), oldActivityId);
+        for (ActivityInstanceEntity activityInstance : activityInstances) {
+            activityInstance.setProcessDefinitionId(childExecution.getProcessDefinitionId());
+            activityInstance.setActivityId(childExecution.getActivityId());
+            activityInstance.setActivityName(newFlowElement.getName());
+        }
     }
 
     protected void recordActivityTaskInfoChange(TaskEntity taskEntity) {

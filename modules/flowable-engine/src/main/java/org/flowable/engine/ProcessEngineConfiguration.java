@@ -21,7 +21,6 @@ import javax.sql.DataSource;
 
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
-import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.cfg.HttpClientConfig;
@@ -721,9 +720,4 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     public void setTaskPostProcessor(TaskPostProcessor processor) {
         this.taskPostProcessor = processor;
     }
-
-    public DbSqlSessionFactory createDbSqlSessionFactory() {
-        return new DbSqlSessionFactory(usePrefixId);
-    }
-
 }

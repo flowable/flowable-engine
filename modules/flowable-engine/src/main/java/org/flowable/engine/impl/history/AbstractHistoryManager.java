@@ -31,9 +31,12 @@ import org.flowable.engine.impl.persistence.AbstractManager;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
+import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.task.Event;
+import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -236,6 +239,25 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
             comment.setMessage(attachmentName);
             getCommentEntityManager().insert(comment);
         }
+    }
+
+    @Override
+    public void syncUserTaskExecution(ExecutionEntity childExecution, String oldActivityId, FlowElement newFlowElement, TaskEntity task) {
+        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager = CommandContextUtil.getHistoricActivityInstanceEntityManager();
+            List<HistoricActivityInstanceEntity> historicActivityInstances = historicActivityInstanceEntityManager.findHistoricActivityInstancesByExecutionAndActivityId(childExecution.getId(), oldActivityId);
+            for (HistoricActivityInstanceEntity historicActivityInstance : historicActivityInstances) {
+                historicActivityInstance.setProcessDefinitionId(childExecution.getProcessDefinitionId());
+                historicActivityInstance.setActivityId(childExecution.getActivityId());
+                historicActivityInstance.setActivityName(newFlowElement.getName());
+            }
+        }
+
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
+            HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
+            historicTaskService.recordTaskInfoChange(task);
+        }
+
     }
 
     protected HistoricActivityInstanceEntity getHistoricActivityInstanceFromCache(String executionId, String activityId, boolean endTimeMustBeNull) {

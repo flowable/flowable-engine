@@ -52,7 +52,6 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.el.ExpressionManager;
-import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -63,15 +62,11 @@ import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.dynamic.MoveExecutionEntityContainer.FlowElementMoveEntry;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
-import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntity;
-import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
@@ -87,7 +82,6 @@ import org.flowable.engine.impl.util.TimerUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
-import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.slf4j.Logger;
@@ -876,7 +870,7 @@ public abstract class AbstractDynamicStateManager {
             task.setName(newFlowElement.getName());
 
             //Sync history
-            syncTaskExecutionHistory(childExecution, newFlowElement, oldActivityId, task, commandContext);
+            CommandContextUtil.getActivityInstanceEntityManager().syncUserTaskExecution(childExecution, newFlowElement, oldActivityId, task);
         }
 
         // Boundary Events - only applies to Activities and up to this point we have a UserTask or ReceiveTask execution, both are Activities
@@ -900,41 +894,6 @@ public abstract class AbstractDynamicStateManager {
 
     protected boolean isEventSubProcessStart(FlowElement flowElement) {
         return flowElement instanceof StartEvent && flowElement.getSubProcess() != null && flowElement.getSubProcess() instanceof EventSubProcess;
-    }
-
-    protected void syncTaskExecutionHistory(ExecutionEntity childExecution, FlowElement newFlowElement, String oldActivityId, TaskEntityImpl task, CommandContext commandContext) {
-
-        HistoryLevel currentHistoryLevel = CommandContextUtil.getProcessEngineConfiguration(commandContext).getHistoryLevel();
-        if (currentHistoryLevel.isAtLeast(HistoryLevel.ACTIVITY)) {
-            synchronizeHistoricActivityInstance(commandContext, childExecution, oldActivityId, newFlowElement);
-            synchronizeActivityInstance(commandContext, childExecution, oldActivityId, newFlowElement);
-        }
-
-        if (currentHistoryLevel.isAtLeast(HistoryLevel.AUDIT)) {
-            HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
-            historicTaskService.recordTaskInfoChange(task);
-        }
-    }
-    protected void synchronizeActivityInstance(CommandContext commandContext, ExecutionEntity childExecution, String oldActivityId,
-        FlowElement newFlowElement) {
-        ActivityInstanceEntityManager activityInstanceEntityManager = CommandContextUtil.getActivityInstanceEntityManager(commandContext);
-        List<ActivityInstanceEntity> activityInstances = activityInstanceEntityManager.findActivityInstancesByExecutionAndActivityId(childExecution.getId(), oldActivityId);
-        for (ActivityInstanceEntity activityInstance : activityInstances) {
-            activityInstance.setProcessDefinitionId(childExecution.getProcessDefinitionId());
-            activityInstance.setActivityId(childExecution.getActivityId());
-            activityInstance.setActivityName(newFlowElement.getName());
-        }
-    }
-
-    protected void synchronizeHistoricActivityInstance(CommandContext commandContext, ExecutionEntity childExecution, String oldActivityId,
-        FlowElement newFlowElement) {
-        HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager = CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext);
-        List<HistoricActivityInstanceEntity> historicActivityInstances = historicActivityInstanceEntityManager.findHistoricActivityInstancesByExecutionAndActivityId(childExecution.getId(), oldActivityId);
-        for (HistoricActivityInstanceEntity historicActivityInstance : historicActivityInstances) {
-            historicActivityInstance.setProcessDefinitionId(childExecution.getProcessDefinitionId());
-            historicActivityInstance.setActivityId(childExecution.getActivityId());
-            historicActivityInstance.setActivityName(newFlowElement.getName());
-        }
     }
 
     protected List<ExecutionEntity> createBoundaryEvents(List<BoundaryEvent> boundaryEvents, ExecutionEntity execution, CommandContext commandContext) {

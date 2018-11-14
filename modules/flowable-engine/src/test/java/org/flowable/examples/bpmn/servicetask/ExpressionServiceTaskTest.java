@@ -65,7 +65,7 @@ public class ExpressionServiceTaskTest extends PluggableFlowableTestCase {
             HistoricActivityInstance skipActivityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(pi2.getId())
                     .activityId("valueExpressionServiceWithResultVariableNameSet")
                     .singleResult();
-            Java6Assertions.assertThat(skipActivityInstance ).isEqualToComparingFieldByField(runtimeService.createActivityInstanceQuery().activityInstanceId(skipActivityInstance .getId()).singleResult());
+            Java6Assertions.assertThat(skipActivityInstance).isEqualToComparingFieldByField(runtimeService.createActivityInstanceQuery().activityInstanceId(skipActivityInstance .getId()).singleResult());
 
             assertNotNull(skipActivityInstance);
         }
