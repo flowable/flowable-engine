@@ -19,11 +19,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.runtime.EventSubscription;
@@ -2676,6 +2678,69 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/twoTasksParentProcess.bpmn20.xml", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testSetCurrentActivityInSubProcessInstanceSpecificVersion() {
+
+        //Deploy second version of the process definition
+        ProcessDefinition procDefCallActivityV1 = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskProcessV2.bpmn20.xml");
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksParentProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("firstTask", task.getTaskDefinitionKey());
+
+        try {
+            runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(processInstance.getId())
+                .moveActivityIdToSubProcessInstanceActivityId("firstTask", "theTask", "callActivity")
+                .changeState();
+            fail("Change state should not be possible as it referring to an activity of a previous version");
+        } catch (FlowableException e) {
+            assertTextPresent("Cannot find activity 'theTask' in process definition for with id 'oneTaskProcess'", e.getMessage());
+        }
+
+        //Invalid "unExistent" process definition version
+        try {
+            runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(processInstance.getId())
+                .moveActivityIdToSubProcessInstanceActivityId("firstTask", "theTask", "callActivity", 5)
+                .changeState();
+            fail("Change state should not be possible as it referring to an activity of a previous version");
+        } catch (FlowableException e) {
+            assertTextPresent("Cannot find activity 'theTask' in process definition for with id 'oneTaskProcess'", e.getMessage());
+        }
+
+        //Change state specifying the first version
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdToSubProcessInstanceActivityId("firstTask", "theTask", "callActivity", 1)
+            .changeState();
+
+        ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(subProcessInstance);
+
+        assertEquals(0, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(1, taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).count());
+
+        assertEquals(1, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count());
+        assertEquals(1, runtimeService.createExecutionQuery().processInstanceId(subProcessInstance.getId()).onlyChildExecutions().count());
+
+        task = taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).singleResult();
+        assertEquals("theTask", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(subProcessInstance.getId()).count());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("secondTask", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+
+        deleteDeployments();
     }
 
     @Test

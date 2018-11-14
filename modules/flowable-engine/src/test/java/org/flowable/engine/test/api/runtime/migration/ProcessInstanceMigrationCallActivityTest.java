@@ -253,6 +253,22 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
             assertTextPresent("Cannot find activity 'userTask1Id' in process definition for with id 'MP'", e.getMessage());
         }
 
+        //Second migration attempt using and invalid "unExistent" version
+        processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procDefWithCallActivity.getId())
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("theTask", "userTask1Id").inSubProcessOfCallActivityId("callActivity", 5));
+        processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.hasErrors()).isTrue();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).contains("Invalid mapping for 'theTask' to 'userTask1Id', cannot be found in the process definition with id 'MP'");
+
+        try {
+            processInstanceMigrationBuilder.migrate(processInstance.getId());
+            fail("Migration should not be possible");
+        } catch (FlowableException e) {
+            assertTextPresent("Cannot find activity 'userTask1Id' in process definition for with id 'MP'", e.getMessage());
+        }
+
+
         //Second migration attempt specifies the version of the call activity subProcess
         processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefWithCallActivity.getId())
