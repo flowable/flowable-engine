@@ -11,16 +11,12 @@
  * limitations under the License.
  */
 
-package org.flowable.engine.delegate;
-
-import org.flowable.task.service.delegate.DelegateTask;
+package org.flowable.task.service.delegate;
 
 /**
- * Here for backwards compatibility, prefer use the {@link org.flowable.task.service.delegate.TaskListener}.
- *
- * @author Tom Baeyens
  * @author Joram Barrez
  */
-public interface TaskListener extends org.flowable.task.service.delegate.TaskListener {
+public interface TaskListener extends BaseTaskListener {
 
+    void notify(DelegateTask delegateTask);
 }

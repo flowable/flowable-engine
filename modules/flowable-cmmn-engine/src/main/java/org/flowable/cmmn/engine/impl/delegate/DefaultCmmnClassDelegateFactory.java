@@ -12,12 +12,12 @@
  */
 package org.flowable.cmmn.engine.impl.delegate;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.common.engine.impl.util.ReflectUtil;
-
-import java.util.List;
 
 /**
  * @author Joram Barrez
@@ -27,6 +27,14 @@ public class DefaultCmmnClassDelegateFactory implements CmmnClassDelegateFactory
     @Override
     public CmmnClassDelegate create(String className, List<FieldExtension> fieldExtensions) {
         return new CmmnClassDelegate(className, fieldExtensions);
+    }
+
+    @Override
+    public CmmnClassDelegate createLifeCycleListener(String className, String sourceState, String targetState, List<FieldExtension> fieldExtensions) {
+        CmmnClassDelegate cmmnClassDelegate = create(className, fieldExtensions);
+        cmmnClassDelegate.setSourceState(sourceState);
+        cmmnClassDelegate.setTargetState(targetState);
+        return cmmnClassDelegate;
     }
 
     @Override

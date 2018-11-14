@@ -25,6 +25,7 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.TaskService;
+import org.flowable.task.service.delegate.TaskListener;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -39,6 +40,7 @@ public class TaskHelper {
     public static void insertTask(TaskEntity taskEntity, boolean fireCreateEvent) {
         if (taskEntity.getOwner() != null) {
             addOwnerIdentityLink(taskEntity);
+            CommandContextUtil.getCmmnEngineConfiguration().getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_ASSIGNMENT);
         }
         if (taskEntity.getAssignee() != null) {
             addAssigneeIdentityLinks(taskEntity);
@@ -105,7 +107,8 @@ public class TaskHelper {
             } else {
                 CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskEnd(task, deleteReason);
             }
-            
+
+            CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_DELETE);
             CommandContextUtil.getTaskService().deleteTask(task, fireEvents);
         }
     }
