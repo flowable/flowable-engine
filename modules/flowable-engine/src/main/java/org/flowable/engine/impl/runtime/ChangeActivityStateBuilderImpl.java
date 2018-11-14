@@ -121,13 +121,14 @@ public class ChangeActivityStateBuilderImpl implements ChangeActivityStateBuilde
 
     @Override
     public ChangeActivityStateBuilder moveActivityIdToSubProcessInstanceActivityId(String currentActivityId, String newActivityId, String callActivityId) {
-        return moveActivityIdToSubProcessInstanceActivityId(currentActivityId, newActivityId, callActivityId, null);
+        return moveActivityIdToSubProcessInstanceActivityId(currentActivityId, newActivityId, callActivityId, null, null);
     }
 
-    public ChangeActivityStateBuilder moveActivityIdToSubProcessInstanceActivityId(String currentActivityId, String newActivityId, String callActivityId, String newAssigneeId) {
+    public ChangeActivityStateBuilder moveActivityIdToSubProcessInstanceActivityId(String currentActivityId, String newActivityId, String callActivityId, Integer callActivitySubProcessVersion, String newAssigneeId) {
         MoveActivityIdContainer moveActivityIdContainer = new MoveActivityIdContainer(currentActivityId, newActivityId, newAssigneeId);
         moveActivityIdContainer.setMoveToSubProcessInstance(true);
         moveActivityIdContainer.setCallActivityId(callActivityId);
+        moveActivityIdContainer.setCallActivitySubProcessVersion(callActivitySubProcessVersion);
         moveActivityIdList.add(moveActivityIdContainer);
         return this;
     }

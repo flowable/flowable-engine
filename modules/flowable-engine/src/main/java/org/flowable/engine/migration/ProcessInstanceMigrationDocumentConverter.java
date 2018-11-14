@@ -233,9 +233,9 @@ public class ProcessInstanceMigrationDocumentConverter {
         }
 
         protected <V> V getLocalVariablesFromJson(JsonNode jsonNode, ObjectMapper objectMapper) {
-            Optional<JsonNode> withLocalVariablesNode = Optional.ofNullable(jsonNode.get(LOCAL_VARIABLES_JSON_SECTION));
-            if (withLocalVariablesNode.isPresent()) {
-                return ProcessInstanceMigrationDocumentConverter.convertFromJsonNodeToObject(withLocalVariablesNode.get(), objectMapper);
+            JsonNode localVariablesNode = jsonNode.get(LOCAL_VARIABLES_JSON_SECTION);
+            if (localVariablesNode != null) {
+                return ProcessInstanceMigrationDocumentConverter.convertFromJsonNodeToObject(localVariablesNode, objectMapper);
             }
             return null;
         }
@@ -282,8 +282,10 @@ public class ProcessInstanceMigrationDocumentConverter {
             Optional.ofNullable(getNewAssigneeFromJson(jsonNode))
                 .ifPresent(oneToOneMapping::withNewAssignee);
 
-            Optional.<Map<String, Object>>ofNullable(getLocalVariablesFromJson(jsonNode, objectMapper))
-                .ifPresent(oneToOneMapping::withLocalVariables);
+            Map<String, Object> localVariables = getLocalVariablesFromJson(jsonNode, objectMapper);
+            if (localVariables != null) {
+                oneToOneMapping.withLocalVariables(localVariables);
+            }
 
             return oneToOneMapping;
         }
@@ -327,8 +329,10 @@ public class ProcessInstanceMigrationDocumentConverter {
             Optional.ofNullable(getNewAssigneeFromJson(jsonNode))
                 .ifPresent(manyToOneMapping::withNewAssignee);
 
-            Optional.<Map<String, Object>>ofNullable(getLocalVariablesFromJson(jsonNode, objectMapper))
-                .ifPresent(manyToOneMapping::withLocalVariables);
+            Map<String, Object> localVariables = getLocalVariablesFromJson(jsonNode, objectMapper);
+            if (localVariables != null) {
+                manyToOneMapping.withLocalVariables(localVariables);
+            }
 
             return manyToOneMapping;
         }
@@ -368,8 +372,10 @@ public class ProcessInstanceMigrationDocumentConverter {
             ActivityMigrationMapping.OneToManyMapping oneToManyMapping = ActivityMigrationMapping.createMappingFor(fromActivityId, toActivityIds);
             convertAdditionalMappingInfoFromJson(oneToManyMapping, jsonNode);
 
-            Optional.<Map<String, Map<String, Object>>>ofNullable(getLocalVariablesFromJson(jsonNode, objectMapper))
-                .ifPresent(oneToManyMapping::withLocalVariables);
+            Map<String, Map<String, Object>> localVariables = getLocalVariablesFromJson(jsonNode, objectMapper);
+            if (localVariables != null) {
+                oneToManyMapping.withLocalVariables(localVariables);
+            }
 
             return oneToManyMapping;
         }

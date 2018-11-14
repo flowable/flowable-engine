@@ -221,6 +221,71 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
     }
 
     @Test
+    public void testMigrateMovingActivityIntoCallActivitySubProcessSpecificVersion() {
+        ProcessDefinition procDefSimpleOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml");
+        ProcessDefinition procDefWithCallActivity = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-with-call-activity-v2.bpmn20.xml");
+        ProcessDefinition procDefCallActivityV1 = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition procDefCallActivityV2 = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process-v2.bpmn20.xml");
+
+        //Start the processInstance
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefSimpleOneTask.getId());
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactly("theTask");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefSimpleOneTask.getId());
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("theTask");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefSimpleOneTask.getId());
+
+        //First migration attempt using latest "latest" version (default) - The first version of the subProcess contains "userTaskId" but the latest version does not
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procDefWithCallActivity.getId())
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("theTask", "userTask1Id").inSubProcessOfCallActivityId("callActivity"));
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.hasErrors()).isTrue();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).contains("Invalid mapping for 'theTask' to 'userTask1Id', cannot be found in the process definition with id 'MP'");
+
+        try {
+            processInstanceMigrationBuilder.migrate(processInstance.getId());
+            fail("Migration should not be possible");
+        } catch (FlowableException e) {
+            assertTextPresent("Cannot find activity 'userTask1Id' in process definition for with id 'MP'", e.getMessage());
+        }
+
+        //Second migration attempt specifies the version of the call activity subProcess
+        processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procDefWithCallActivity.getId())
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("theTask", "userTask1Id").inSubProcessOfCallActivityId("callActivity", 1));
+        processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.hasErrors()).isFalse();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
+
+        //Confirm migration
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactly("callActivity");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefWithCallActivity.getId());
+
+        ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(subProcessInstance);
+
+        List<Execution> subProcessExecutions = runtimeService.createExecutionQuery().processInstanceId(subProcessInstance.getId()).onlyChildExecutions().list();
+        assertThat(subProcessExecutions).extracting(Execution::getActivityId).containsExactly("userTask1Id");
+        assertThat(subProcessExecutions).extracting("processDefinitionId").containsOnly(procDefCallActivityV1.getId());
+
+        List<Task> subProcessTasks = taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).list();
+        assertThat(subProcessTasks).extracting(Task::getTaskDefinitionKey).containsExactly("userTask1Id");
+        assertThat(subProcessTasks).extracting(Task::getProcessDefinitionId).containsOnly(procDefCallActivityV1.getId());
+
+        //Complete process
+        completeProcessInstanceTasks(subProcessInstance.getId());
+        completeProcessInstanceTasks(processInstance.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
     public void testValidationOfInvalidCallActivityInMigrateMappingToCallActivitySubProcess() {
         ProcessDefinition procDefSimpleOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
         ProcessDefinition procDefWithCallActivity = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-with-call-activity.bpmn20.xml");
@@ -453,6 +518,7 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
+        //Confirm migration
         ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
         assertNotNull(subProcessInstance);
 

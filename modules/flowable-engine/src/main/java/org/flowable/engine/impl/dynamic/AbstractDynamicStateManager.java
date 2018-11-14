@@ -63,6 +63,7 @@ import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.dynamic.MoveExecutionEntityContainer.FlowElementMoveEntry;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
+import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -243,6 +244,7 @@ public abstract class AbstractDynamicStateManager {
         } else if (activityContainer.isMoveToSubProcessInstance()) {
             moveExecutionEntityContainer.setMoveToSubProcessInstance(true);
             moveExecutionEntityContainer.setCallActivityId(activityContainer.getCallActivityId());
+            moveExecutionEntityContainer.setCallActivitySubProcessVersion(activityContainer.getCallActivitySubProcessVersion());
         }
         return moveExecutionEntityContainer;
     }
@@ -272,6 +274,7 @@ public abstract class AbstractDynamicStateManager {
                 currentActivityId = firstExecution.getCurrentActivityId();
                 currentFlowElement = resolveFlowElementFromBpmnModel(bpmnModel, currentActivityId);
                 if (migrateToProcessDefinitionId.isPresent()) {
+                    processDefinitionIdOfCallActivity = migrateToProcessDefinitionId.get();
                     bpmnModel = ProcessDefinitionUtil.getBpmnModel(migrateToProcessDefinitionId.get());
                 }
 
@@ -280,6 +283,7 @@ public abstract class AbstractDynamicStateManager {
                     throw new FlowableException("Call activity could not be found in process definition for id " + activityId);
                 }
 
+                //TODO WIP - Check instanceof FlowElement before casting?
                 CallActivity callActivity = (CallActivity) callActivityElement;
                 moveExecutionContainer.setCallActivity(callActivity);
 
@@ -287,25 +291,8 @@ public abstract class AbstractDynamicStateManager {
                 ProcessDefinition callActivityProcessDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionIdOfCallActivity);
                 String deploymentId = callActivityProcessDefinition.getDeploymentId();
                 String tenantId = callActivityProcessDefinition.getTenantId();
-
-                ProcessDefinition subProcessDefinition = null;
-                if (callActivity.isSameDeployment()) {
-                    ProcessDefinitionEntityManager processDefinitionEntityManager = CommandContextUtil.getProcessDefinitionEntityManager(commandContext);
-                    if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-                        subProcessDefinition = processDefinitionEntityManager.findProcessDefinitionByDeploymentAndKey(deploymentId, calledProcessDefinitionKey);
-                    } else {
-                        subProcessDefinition = processDefinitionEntityManager.findProcessDefinitionByDeploymentAndKeyAndTenantId(deploymentId, calledProcessDefinitionKey, tenantId);
-                    }
-                }
-
-                if (subProcessDefinition == null) {
-                    if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-                        subProcessDefinition = CommandContextUtil.getProcessEngineConfiguration().getDeploymentManager().findDeployedLatestProcessDefinitionByKey(calledProcessDefinitionKey);
-                    } else {
-                        subProcessDefinition = CommandContextUtil.getProcessEngineConfiguration().getDeploymentManager().findDeployedLatestProcessDefinitionByKeyAndTenantId(calledProcessDefinitionKey, tenantId);
-                    }
-                }
-
+                Integer calledProcessVersion = moveExecutionContainer.getCallActivitySubProcessVersion();
+                ProcessDefinition subProcessDefinition = resolveProcessDefinition(calledProcessDefinitionKey, calledProcessVersion, tenantId, commandContext);
                 BpmnModel subProcessModel = ProcessDefinitionUtil.getBpmnModel(subProcessDefinition.getId());
                 moveExecutionContainer.setSubProcessDefinition(subProcessDefinition);
                 moveExecutionContainer.setSubProcessModel(subProcessModel);
@@ -334,7 +321,7 @@ public abstract class AbstractDynamicStateManager {
     protected FlowElement resolveFlowElementFromBpmnModel(BpmnModel bpmnModel, String activityId) {
         FlowElement flowElement = bpmnModel.getFlowElement(activityId);
         if (flowElement == null) {
-            throw new FlowableException("Cannot find activity '"+activityId+"' in process definition for with id '" + bpmnModel.getMainProcess().getId()+"'");
+            throw new FlowableException("Cannot find activity '" + activityId + "' in process definition for with id '" + bpmnModel.getMainProcess().getId() + "'");
         }
         return flowElement;
     }
@@ -887,11 +874,9 @@ public abstract class AbstractDynamicStateManager {
         childExecution.setParent(parentExecutionEntity);
         parentExecutionEntity.addChildExecution(childExecution);
 
-
-
         //Additional changes if the new activity Id doesn't match
         String oldActivityId = childExecution.getCurrentActivityId();
-        if (childExecution.getCurrentActivityId() != newFlowElement.getId()) {
+        if (!childExecution.getCurrentActivityId().equals(newFlowElement.getId())) {
             ((ExecutionEntityImpl) childExecution).setActivityId(newFlowElement.getId());
         }
 
@@ -1126,6 +1111,30 @@ public abstract class AbstractDynamicStateManager {
             .filter(execution -> !execution.getId().equals(executionEntity.getId()))
             .filter(execution -> !ignoreExecutionIds.contains(execution.getId()))
             .count() == 0;
+    }
+
+    protected ProcessDefinition resolveProcessDefinition(String processDefinitionKey, Integer processDefinitionVersion, String tenantId, CommandContext commandContext) {
+        ProcessDefinitionEntityManager processDefinitionEntityManager = CommandContextUtil.getProcessDefinitionEntityManager(commandContext);
+        ProcessDefinition processDefinition;
+        if (processDefinitionVersion != null) {
+            processDefinition = processDefinitionEntityManager.findProcessDefinitionByKeyAndVersionAndTenantId(processDefinitionKey, processDefinitionVersion, tenantId);
+        } else {
+            if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
+                processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKey(processDefinitionKey);
+            } else {
+                processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
+            }
+        }
+
+        if (processDefinition == null) {
+            DeploymentManager deploymentManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDeploymentManager();
+            if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
+                processDefinition = deploymentManager.findDeployedLatestProcessDefinitionByKey(processDefinitionKey);
+            } else {
+                processDefinition = deploymentManager.findDeployedLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
+            }
+        }
+        return processDefinition;
     }
 
     private String printFlowElementIds(Collection<FlowElementMoveEntry> flowElements) {

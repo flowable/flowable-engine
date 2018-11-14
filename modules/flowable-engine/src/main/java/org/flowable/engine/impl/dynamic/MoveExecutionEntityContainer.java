@@ -33,6 +33,7 @@ public class MoveExecutionEntityContainer {
     protected boolean moveToSubProcessInstance;
     protected boolean directExecutionMigration;
     protected String callActivityId;
+    protected Integer callActivitySubProcessVersion;
     protected CallActivity callActivity;
     protected ProcessDefinition subProcessDefinition;
     protected BpmnModel subProcessModel;
@@ -85,6 +86,14 @@ public class MoveExecutionEntityContainer {
 
     public void setCallActivityId(String callActivityId) {
         this.callActivityId = callActivityId;
+    }
+
+    public Integer getCallActivitySubProcessVersion() {
+        return callActivitySubProcessVersion;
+    }
+
+    public void setCallActivitySubProcessVersion(Integer callActivitySubProcessVersion) {
+        this.callActivitySubProcessVersion = callActivitySubProcessVersion;
     }
 
     public CallActivity getCallActivity() {

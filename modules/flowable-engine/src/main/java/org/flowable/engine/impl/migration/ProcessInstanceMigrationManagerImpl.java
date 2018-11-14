@@ -529,7 +529,6 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                 fromCallActivityId = activityMapping.getFromCallActivityId();
                 //TODO WIP - Confirm if we allow to mix mapping of the call activity with mapping of its subProcess activity
                 if (activityMapping.isToParentProcess() && !executionActivityIdsToMapExplicitly.contains(fromCallActivityId)) {
-                    //TODO WIP - currently ChangeActivityStateBuilder cannot mix moveToParent with other moves or more than one moveToParent (MultiInstance callActivities) - using activity activity id's
                     List<ExecutionEntity> callActivityExecutions = filteredExecutionsByActivityId.get(fromCallActivityId).stream().filter(ExecutionEntity::isActive).collect(Collectors.toList());
                     for (ExecutionEntity callActivityExecution : callActivityExecutions) {
                         ExecutionEntity subProcessInstanceExecution = executionEntityManager.findSubProcessInstanceBySuperExecutionId(callActivityExecution.getId());
@@ -540,8 +539,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                     }
                 } else if (executionActivityIdsToMapExplicitly.contains(fromActivityId)) {
                     if (activityMapping.isToCallActivity()) {
-                        //TODO WIP - need to handle different versions of the subProcess definition
-                        mainProcessChangeActivityStateBuilder.moveActivityIdToSubProcessInstanceActivityId(fromActivityId, toActivityId, activityMapping.getToCallActivityId(), newAssignee);
+                        mainProcessChangeActivityStateBuilder.moveActivityIdToSubProcessInstanceActivityId(fromActivityId, toActivityId, activityMapping.getToCallActivityId(), activityMapping.getCallActivityProcessDefinitionVersion(), newAssignee);
                     } else {
                         mainProcessChangeActivityStateBuilder.moveActivityIdTo(fromActivityId, toActivityId, newAssignee);
                     }
@@ -623,19 +621,6 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         } else {
             document.getMigrateToProcessDefinitionTenantId();
             return resolveProcessDefinition(document.getMigrateToProcessDefinitionKey(), document.getMigrateToProcessDefinitionVersion(), document.getMigrateToProcessDefinitionTenantId(), commandContext);
-        }
-    }
-
-    protected ProcessDefinition resolveProcessDefinition(String processDefinitionKey, Integer processDefinitionVersion, String processDefinitionTenantId, CommandContext commandContext) {
-        ProcessDefinitionEntityManager processDefinitionEntityManager = CommandContextUtil.getProcessDefinitionEntityManager(commandContext);
-        if (processDefinitionVersion != null) {
-            return processDefinitionEntityManager.findProcessDefinitionByKeyAndVersionAndTenantId(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId);
-        } else {
-            if (processDefinitionTenantId != null) {
-                return processDefinitionEntityManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, processDefinitionTenantId);
-            } else {
-                return processDefinitionEntityManager.findLatestProcessDefinitionByKey(processDefinitionKey);
-            }
         }
     }
 
