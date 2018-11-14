@@ -55,6 +55,16 @@ public interface CmmnXmlConstants {
     String ELEMENT_ITEM_CONTROL = "itemControl";
     String ELEMENT_DEFAULT_CONTROL = "defaultControl";
 
+    String ELEMENT_TASK_LISTENER = "taskListener";
+    String ELEMENT_PLAN_ITEM_LIFECYCLE_LISTENER = "planItemLifecycleListener";
+    public static final String ATTRIBUTE_LISTENER_CLASS = "class";
+    public static final String ATTRIBUTE_LISTENER_EXPRESSION = "expression";
+    public static final String ATTRIBUTE_LISTENER_DELEGATEEXPRESSION = "delegateExpression";
+    public static final String ATTRIBUTE_LISTENER_EVENT = "event";
+    public static final String ATTRIBUTE_LISTENER_SOURCE_STATE = "sourceState";
+    public static final String ATTRIBUTE_LISTENER_TARGET_STATE = "targetState";
+    public static final String ATTRIBUTE_LISTENER_ON_TRANSACTION = "onTransaction";
+
     String ELEMENT_SENTRY = "sentry";
     String ELEMENT_PLAN_ITEM_ON_PART = "planItemOnPart";
     String ELEMENT_STANDARD_EVENT = "standardEvent";

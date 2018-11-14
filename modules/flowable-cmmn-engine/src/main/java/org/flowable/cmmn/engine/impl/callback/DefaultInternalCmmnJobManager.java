@@ -95,7 +95,7 @@ public class DefaultInternalCmmnJobManager implements InternalJobManager {
             String oldState = newPlanItemInstanceEntity.getState();
             String newState = PlanItemInstanceState.AVAILABLE;
             newPlanItemInstanceEntity.setState(newState);
-            PlanItemLifeCycleListenerUtil.callLifeCycleListeners(Context.getCommandContext(), planItemInstanceEntity, oldState, newState);
+            PlanItemLifeCycleListenerUtil.callLifecycleListeners(Context.getCommandContext(), planItemInstanceEntity, oldState, newState);
 
             // Plan createOperation, it will also sync planItemInstance history
             CommandContextUtil.getAgenda().planCreatePlanItemInstanceOperation(newPlanItemInstanceEntity);

@@ -126,7 +126,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                             String oldState = childPlanItemInstanceEntity.getState();
                             String newState = PlanItemInstanceState.WAITING_FOR_REPETITION;
                             childPlanItemInstanceEntity.setState(newState);
-                            PlanItemLifeCycleListenerUtil.callLifeCycleListeners(commandContext, planItemInstanceEntity, oldState, newState);
+                            PlanItemLifeCycleListenerUtil.callLifecycleListeners(commandContext, planItemInstanceEntity, oldState, newState);
 
                             if (newChildPlanItemInstances == null) {
                                 newChildPlanItemInstances = new ArrayList<>(1);

@@ -18,7 +18,7 @@ import static org.junit.Assert.assertNull;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.cmmn.api.listener.PlanItemInstanceLifeCycleListener;
+import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
@@ -31,16 +31,16 @@ import org.junit.Test;
 /**
  * @author Joram Barrez
  */
-public class PlanItemInstanceLifeCycleListenerTest extends FlowableCmmnTestCase {
+public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase {
 
-    private Map<String, List<PlanItemInstanceLifeCycleListener>> originalLifeCycleListeners;
+    private Map<String, List<PlanItemInstanceLifecycleListener>> originalLifeCycleListeners;
     private String deploymentId;
 
-    private AbstractTestLifeCycleListener testLifeCycleListener;
+    private AbstractTestLifecycleListener testLifeCycleListener;
 
     @Before
     public void addListeners() {
-        this.originalLifeCycleListeners = cmmnEngineConfiguration.getPlanItemInstanceLifeCycleListeners();
+        this.originalLifeCycleListeners = cmmnEngineConfiguration.getPlanItemInstanceLifecycleListeners();
 
         this.deploymentId = cmmnRepositoryService.createDeployment()
             .addClasspathResource("org/flowable/cmmn/test/listener/PlanItemInstanceLifeCycleListenerTest.cmmn")
@@ -50,13 +50,13 @@ public class PlanItemInstanceLifeCycleListenerTest extends FlowableCmmnTestCase 
 
     @After
     public void removeListeners() {
-        cmmnEngineConfiguration.setPlanItemInstanceLifeCycleListeners(originalLifeCycleListeners);
+        cmmnEngineConfiguration.setPlanItemInstanceLifecycleListeners(originalLifeCycleListeners);
         cmmnRepositoryService.deleteDeployment(deploymentId, true);
     }
 
     @Test
     public void testReceiveAllLifeCycleEvents() {
-        setTestLifeCycleListener(null, new TestReceiveAllLifeCycleListener());
+        setTestLifeCycleListener(null, new TestReceiveAllLifecycleListener());
 
         // Start case instance
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testLifeCycleListener").start();
@@ -131,7 +131,7 @@ public class PlanItemInstanceLifeCycleListenerTest extends FlowableCmmnTestCase 
 
     @Test
     public void testFilterOnType() {
-        setTestLifeCycleListener(PlanItemDefinitionType.HUMAN_TASK, new TestFilterTypesLifeCycleListener());
+        setTestLifeCycleListener(PlanItemDefinitionType.HUMAN_TASK, new TestFilterTypesLifecycleListener());
 
         // Start case instance
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testLifeCycleListener").start();
@@ -192,7 +192,7 @@ public class PlanItemInstanceLifeCycleListenerTest extends FlowableCmmnTestCase 
 
     @Test
     public void testFilterBySourceState() {
-        setTestLifeCycleListener(null, new TestFilterSourceStateLifeCycleListener(PlanItemInstanceState.AVAILABLE));
+        setTestLifeCycleListener(null, new TestFilterSourceStateLifecycleListener(PlanItemInstanceState.AVAILABLE));
 
         // Start case instance
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testLifeCycleListener").start();
@@ -243,7 +243,7 @@ public class PlanItemInstanceLifeCycleListenerTest extends FlowableCmmnTestCase 
 
     @Test
     public void testFilterByTargetState() {
-        setTestLifeCycleListener(null, new TestFilterTargetStateLifeCycleListener(PlanItemInstanceState.ACTIVE));
+        setTestLifeCycleListener(null, new TestFilterTargetStateLifecycleListener(PlanItemInstanceState.ACTIVE));
 
         // Start case instance
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testLifeCycleListener").start();
@@ -292,7 +292,7 @@ public class PlanItemInstanceLifeCycleListenerTest extends FlowableCmmnTestCase 
         assertEvent(events.get(2), "C", PlanItemInstanceState.AVAILABLE, PlanItemInstanceState.ACTIVE);
     }
 
-    private void setTestLifeCycleListener(String planItemDefinitionType, AbstractTestLifeCycleListener testLifeCycleListener) {
+    private void setTestLifeCycleListener(String planItemDefinitionType, AbstractTestLifecycleListener testLifeCycleListener) {
         cmmnEngineConfiguration.addPlanItemInstanceLifeCycleListeners(planItemDefinitionType, testLifeCycleListener);
         this.testLifeCycleListener = testLifeCycleListener;
     }

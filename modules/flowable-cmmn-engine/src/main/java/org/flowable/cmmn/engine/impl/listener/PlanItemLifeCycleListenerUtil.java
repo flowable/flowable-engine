@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.flowable.cmmn.api.listener.PlanItemInstanceLifeCycleListener;
+import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -26,37 +26,37 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  */
 public class PlanItemLifeCycleListenerUtil {
 
-    public static void callLifeCycleListeners(CommandContext commandContext, PlanItemInstance planItemInstance, String oldState, String newState) {
+    public static void callLifecycleListeners(CommandContext commandContext, PlanItemInstance planItemInstance, String oldState, String newState) {
         if (Objects.equals(oldState, newState)) {
             return;
         }
 
         // Lifecycle listeners defined on the cmmn engine configuration
-        Map<String, List<PlanItemInstanceLifeCycleListener>> planItemInstanceLifeCycleListeners
-            = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getPlanItemInstanceLifeCycleListeners();
+        Map<String, List<PlanItemInstanceLifecycleListener>> planItemInstanceLifeCycleListeners
+            = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getPlanItemInstanceLifecycleListeners();
         if (planItemInstanceLifeCycleListeners != null && !planItemInstanceLifeCycleListeners.isEmpty()) {
 
-            List<PlanItemInstanceLifeCycleListener> specificListeners = planItemInstanceLifeCycleListeners.get(planItemInstance.getPlanItemDefinitionType());
+            List<PlanItemInstanceLifecycleListener> specificListeners = planItemInstanceLifeCycleListeners.get(planItemInstance.getPlanItemDefinitionType());
             executeListeners(specificListeners, planItemInstance, oldState, newState);
 
-            List<PlanItemInstanceLifeCycleListener> genericListeners = planItemInstanceLifeCycleListeners.get(null);
+            List<PlanItemInstanceLifecycleListener> genericListeners = planItemInstanceLifeCycleListeners.get(null);
             executeListeners(genericListeners, planItemInstance, oldState, newState);
 
         }
     }
 
-    public static void executeListeners(List<PlanItemInstanceLifeCycleListener> listeners, PlanItemInstance planItemInstance, String oldState, String newState) {
+    public static void executeListeners(List<PlanItemInstanceLifecycleListener> listeners, PlanItemInstance planItemInstance, String oldState, String newState) {
         if (listeners != null) {
-            for (PlanItemInstanceLifeCycleListener lifeCycleListener : listeners) {
-                if (lifeCycleListenerMatches(lifeCycleListener, oldState, newState)) {
-                    lifeCycleListener.stateChanged(planItemInstance, oldState, newState);
+            for (PlanItemInstanceLifecycleListener lifecycleListener : listeners) {
+                if (lifecycleListenerMatches(lifecycleListener, oldState, newState)) {
+                    lifecycleListener.stateChanged(planItemInstance, oldState, newState);
                 }
             }
         }
     }
 
-    protected static boolean lifeCycleListenerMatches(PlanItemInstanceLifeCycleListener lifeCycleListener, String oldState, String newState) {
-        return stateMatches(lifeCycleListener.getSourceState(), oldState) && stateMatches(lifeCycleListener.getTargetState(), newState);
+    protected static boolean lifecycleListenerMatches(PlanItemInstanceLifecycleListener lifecycleListener, String oldState, String newState) {
+        return stateMatches(lifecycleListener.getSourceState(), oldState) && stateMatches(lifecycleListener.getTargetState(), newState);
     }
 
     protected static boolean stateMatches(String listenerExpectedState, String actualState) {

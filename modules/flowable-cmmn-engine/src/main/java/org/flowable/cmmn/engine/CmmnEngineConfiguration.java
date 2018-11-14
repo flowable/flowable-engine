@@ -34,7 +34,7 @@ import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
-import org.flowable.cmmn.api.listener.PlanItemInstanceLifeCycleListener;
+import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.engine.impl.CmmnEngineImpl;
 import org.flowable.cmmn.engine.impl.CmmnHistoryServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
@@ -322,7 +322,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CmmnHistoryManager cmmnHistoryManager;
     protected ProcessInstanceService processInstanceService;
     protected Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks;
-    protected Map<String, List<PlanItemInstanceLifeCycleListener>> planItemInstanceLifeCycleListeners;
+    protected Map<String, List<PlanItemInstanceLifecycleListener>> planItemInstanceLifecycleListeners;
 
     protected boolean executeServiceSchemaManagers = true;
 
@@ -2128,35 +2128,35 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
-    public Map<String, List<PlanItemInstanceLifeCycleListener>> getPlanItemInstanceLifeCycleListeners() {
-        return planItemInstanceLifeCycleListeners;
+    public Map<String, List<PlanItemInstanceLifecycleListener>> getPlanItemInstanceLifecycleListeners() {
+        return planItemInstanceLifecycleListeners;
     }
 
-    public void setPlanItemInstanceLifeCycleListeners(Map<String, List<PlanItemInstanceLifeCycleListener>> planItemInstanceLifeCycleListeners) {
-        this.planItemInstanceLifeCycleListeners = planItemInstanceLifeCycleListeners;
+    public void setPlanItemInstanceLifecycleListeners(Map<String, List<PlanItemInstanceLifecycleListener>> planItemInstanceLifecycleListeners) {
+        this.planItemInstanceLifecycleListeners = planItemInstanceLifecycleListeners;
     }
 
     /**
-     * Register a global {@link PlanItemInstanceLifeCycleListener} to listen to {@link org.flowable.cmmn.api.runtime.PlanItemInstance} state changes.
+     * Register a global {@link PlanItemInstanceLifecycleListener} to listen to {@link org.flowable.cmmn.api.runtime.PlanItemInstance} state changes.
      *
      * @param planItemDefinitionType A string from {@link org.flowable.cmmn.api.runtime.PlanItemDefinitionType}.
      *                               If null is passed, the listener will be invoked for any type.
      * @param planItemInstanceLifeCycleListener The listener instance.
      */
-    public void addPlanItemInstanceLifeCycleListeners(String planItemDefinitionType, PlanItemInstanceLifeCycleListener planItemInstanceLifeCycleListener) {
-        if (planItemInstanceLifeCycleListeners == null) {
-            planItemInstanceLifeCycleListeners = new HashMap<>();
+    public void addPlanItemInstanceLifeCycleListeners(String planItemDefinitionType, PlanItemInstanceLifecycleListener planItemInstanceLifeCycleListener) {
+        if (planItemInstanceLifecycleListeners == null) {
+            planItemInstanceLifecycleListeners = new HashMap<>();
         }
-        planItemInstanceLifeCycleListeners
-            .computeIfAbsent(planItemDefinitionType, key -> new ArrayList<PlanItemInstanceLifeCycleListener>())
+        planItemInstanceLifecycleListeners
+            .computeIfAbsent(planItemDefinitionType, key -> new ArrayList<PlanItemInstanceLifecycleListener>())
             .add(planItemInstanceLifeCycleListener);
     }
 
     /**
-     * Register a global {@link PlanItemInstanceLifeCycleListener} to listen to any (all plan item definition types)
+     * Register a global {@link PlanItemInstanceLifecycleListener} to listen to any (all plan item definition types)
      * {@link org.flowable.cmmn.api.runtime.PlanItemInstance} state changes.
      */
-    public void addPlanItemInstanceLifeCycleListeners(PlanItemInstanceLifeCycleListener planItemInstanceLifeCycleListener) {
+    public void addPlanItemInstanceLifeCycleListeners(PlanItemInstanceLifecycleListener planItemInstanceLifeCycleListener) {
         addPlanItemInstanceLifeCycleListeners(null, planItemInstanceLifeCycleListener);
     }
 

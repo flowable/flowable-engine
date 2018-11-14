@@ -15,11 +15,17 @@ package org.flowable.cmmn.test.listener;
 /**
  * @author Joram Barrez
  */
-public class TestReceiveAllLifeCycleListener extends AbstractTestLifeCycleListener {
+public class TestFilterSourceStateLifecycleListener extends AbstractTestLifecycleListener {
+
+    protected String sourceState;
+
+    public TestFilterSourceStateLifecycleListener(String sourceState) {
+        this.sourceState = sourceState;
+    }
 
     @Override
     public String getSourceState() {
-        return null;
+        return sourceState;
     }
 
     @Override

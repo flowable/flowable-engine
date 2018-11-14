@@ -12,11 +12,6 @@
  */
 package org.flowable.editor.language.json.converter;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -50,6 +45,11 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
@@ -301,8 +301,10 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
     }
 
     protected static void parseListeners(JsonNode listenersNode, BaseElement element, boolean isTaskListener) {
-        if (listenersNode == null)
+        if (listenersNode == null) {
             return;
+        }
+
         listenersNode = validateIfNodeIsTextual(listenersNode);
         for (JsonNode listenerNode : listenersNode) {
             listenerNode = validateIfNodeIsTextual(listenerNode);

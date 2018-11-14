@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
+import org.flowable.cmmn.editor.json.converter.util.ListenerConverterUtil;
 import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseElement;
@@ -23,6 +24,7 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.DecisionTask;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemDefinition;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -69,8 +71,9 @@ public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter implements 
         }
 
         addBooleanField(elementNode, decisionTask, PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS, PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY);
-
         addBooleanField(elementNode, decisionTask, PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT, PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT_KEY);
+
+        ListenerConverterUtil.convertJsonToLifeCycleListeners(elementNode, decisionTask);
 
         return decisionTask;
     }
@@ -105,6 +108,8 @@ public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter implements 
                 propertiesNode.put(PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT, Boolean.parseBoolean(fieldExtension.getStringValue()));
             }
         }
+
+        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, ((PlanItemDefinition) baseElement));
     }
 
     @Override

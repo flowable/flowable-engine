@@ -12,10 +12,12 @@
  */
 package org.flowable.cmmn.converter.exception;
 
+import org.flowable.common.engine.api.FlowableException;
+
 /**
  * @author Tijs Rademakers
  */
-public class XMLException extends RuntimeException {
+public class XMLException extends FlowableException {
 
     private static final long serialVersionUID = 1L;
 

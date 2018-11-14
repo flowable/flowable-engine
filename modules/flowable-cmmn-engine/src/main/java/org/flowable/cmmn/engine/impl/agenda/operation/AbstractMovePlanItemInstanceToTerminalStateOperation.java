@@ -44,7 +44,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
             String oldState = newPlanItemInstanceEntity.getState();
             String newState = PlanItemInstanceState.WAITING_FOR_REPETITION;
             newPlanItemInstanceEntity.setState(newState);
-            PlanItemLifeCycleListenerUtil.callLifeCycleListeners(commandContext, newPlanItemInstanceEntity, oldState, newState);
+            PlanItemLifeCycleListenerUtil.callLifecycleListeners(commandContext, newPlanItemInstanceEntity, oldState, newState);
 
             // Plan item creation "for Repetition"
             CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceForRepetitionOperation(newPlanItemInstanceEntity);
