@@ -580,7 +580,7 @@ Properties:
 * *name*: task attribute to indicate the name of the task
 * *type*: task attribute whose value must be "script" to indicate the type of task
 * *scriptFormat*: extended attribute that indicate the language of the script (for example, javascript, groovy)
-* *script*: the script to execute, defined as a string in a extension field element named "script"
+* *script*: the script to execute, defined as a string in a field element named "script"
 * *autoStoreVariables*: optional task attribute flag (default: false) that indicates whether or not variables defined in the script will be stored in the Plan Item Instance context (see note below)
 * *resultVariableName*: optional task attribute that when present will store a variable with the specified name in the Plan Item instance context with the script evaluation result (see note below)
 
@@ -633,7 +633,7 @@ All case variables that are accessible through the PlanItem instance that arrive
 </flowable:field>
 ----
 
-*Note*: It's also possible to set process variables in a script, simply by calling _planItemInstance.setVariable("variableName", variableValue)_. By default, no variables are stored automatically. It's possible to automatically store any variable defined in the script (for example, __sum__ in the example above) by setting the property ++autoStoreVariables++ on the ++scriptTask++ to ++true++. However, *the best practice is not to do this and use an explicit execution.setVariable() call*, as with some recent versions of the JDK, auto storing of variables does not work for some scripting languages. See link:$$http://www.jorambarrez.be/blog/2013/03/25/bug-on-jdk-1-7-0_17-when-using-scripttask-in-activiti/$$[this link] for more details.
+*Note*: It's also possible to set plan item instance variables in a script, simply by calling _planItemInstance.setVariable("variableName", variableValue)_. By default, no variables are stored automatically. It's possible to automatically store any variable defined in the script (for example, __sum__ in the example above) by setting the property ++autoStoreVariables++ on the ++scriptTask++ to ++true++. However, *the best practice is not to do this and use an explicit planItemInstance.setVariable() call*, as with some recent versions of the JDK, auto storing of variables does not work for some scripting languages. See link:$$http://www.jorambarrez.be/blog/2013/03/25/bug-on-jdk-1-7-0_17-when-using-scripttask-in-activiti/$$[this link] for more details.
 
 [source,xml,linenums]
 ----
@@ -656,7 +656,7 @@ Here's an example of how to set a variable in a script:
 
 The following names are reserved and *cannot be used* as variable names: *out, out:print, lang:import, context, elcontext*.
 
-*Note* The return value of a script task can be assigned to an already existing or new process variable by specifying its name as a literal value for the _'flowable:resultVariable'_ attribute of a script task definition. Any existing value for a specific process variable will be overwritten by the result value of the script execution. When a result variable name is not specified, the script result value gets ignored.
+*Note* The return value of a script task can be assigned to an already existing or new plan item instance variable by specifying its name as a literal value for the _'flowable:resultVariable'_ attribute of a script task definition. Any existing value for a specific plan item instance variable will be overwritten by the result value of the script execution. When a result variable name is not specified, the script result value gets ignored.
 
 [source,xml,linenums]
 ----

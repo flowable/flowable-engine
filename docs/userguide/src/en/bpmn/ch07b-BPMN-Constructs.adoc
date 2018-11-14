@@ -2437,6 +2437,15 @@ public class FakeLdapService {
 
 A script task is an automatic activity. When a process execution arrives at the script task, the corresponding script is executed.
 
+Properties:
+
+* *name*: task attribute to indicate the name of the task
+* *type*: task attribute whose value must be "script" to indicate the type of task
+* *scriptFormat*: extended attribute that indicate the language of the script (for example, javascript, groovy)
+* *script*: the script to execute, defined as a string in a field element named "script"
+* *autoStoreVariables*: optional task attribute flag (default: false) that indicates whether or not variables defined in the script will be stored in the Execution context (see note below)
+* *resultVariableName*: optional task attribute that when present will store a variable with the specified name in the Execution context with the script evaluation result (see note below)
+
 
 [[bpmnScriptTaskGraphicalNotation]]
 
