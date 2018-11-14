@@ -76,12 +76,6 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
             activityInstanceDataManager.deleteActivityInstancesByProcessInstanceId(processInstanceId);
         }
     }
-    @Override
-    public void deleteActivityInstancesByProcessDefinitionId(String processDefinitionId) {
-        if (recordRuntimeActivities) {
-            activityInstanceDataManager.deleteActivityInstancesByProcessDefinitionId(processDefinitionId);
-        }
-    }
 
     @Override
     public long findActivityInstanceCountByQueryCriteria(ActivityInstanceQueryImpl historicActivityInstanceQuery) {
