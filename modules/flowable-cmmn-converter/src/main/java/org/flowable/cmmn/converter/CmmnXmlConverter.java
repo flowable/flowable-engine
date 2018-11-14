@@ -108,6 +108,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new ProcessTaskXmlConverter());
         addElementConverter(new DecisionXmlConverter());
         addElementConverter(new DecisionTaskXmlConverter());
+        addElementConverter(new GenericEventListenerXmlConverter());
         addElementConverter(new TimerEventListenerXmlConverter());
         addElementConverter(new UserEventListenerXmlConverter());
         addElementConverter(new PlanItemStartTriggerXmlConverter());
