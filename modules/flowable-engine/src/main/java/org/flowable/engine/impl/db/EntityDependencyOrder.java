@@ -62,7 +62,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 public class EntityDependencyOrder {
 
     public static List<Class<? extends Entity>> DELETE_ORDER = new ArrayList<>();
-    public static List<Class<? extends Entity>> INSERT_ORDER = new ArrayList<>();
+    public static List<Class<? extends Entity>> INSERT_ORDER;
 
     static {
 
