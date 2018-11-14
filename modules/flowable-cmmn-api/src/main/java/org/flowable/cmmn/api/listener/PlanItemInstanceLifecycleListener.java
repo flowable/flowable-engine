@@ -22,7 +22,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
  *
  * @author Joram Barrez
  */
-public interface PlanItemInstanceLifeCycleListener {
+public interface PlanItemInstanceLifecycleListener {
 
     /**
      * @return The type a plan item instance is changing from, use a value from {@link org.flowable.cmmn.api.runtime.PlanItemInstanceState}.

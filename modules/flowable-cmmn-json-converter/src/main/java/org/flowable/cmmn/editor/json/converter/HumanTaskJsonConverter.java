@@ -20,11 +20,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.editor.json.converter.util.CollectionUtils;
+import org.flowable.cmmn.editor.json.converter.util.ListenerConverterUtil;
 import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.ExtensionElement;
+import org.flowable.cmmn.model.FlowableListener;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.PlanItem;
 
@@ -34,6 +36,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements FormAwareConverter, FormKeyAwareConverter {
 
@@ -66,6 +69,34 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
         HumanTask humanTask = (HumanTask) planItem.getPlanItemDefinition();
         String assignee = humanTask.getAssignee();
 
+        convertAssignmentSettings(propertiesNode, humanTask, assignee);
+
+        if (humanTask.getPriority() != null) {
+            setPropertyValue(PROPERTY_USERTASK_PRIORITY, humanTask.getPriority(), propertiesNode);
+        }
+
+        if (StringUtils.isNotEmpty(humanTask.getFormKey())) {
+            if (formKeyMap != null && formKeyMap.containsKey(humanTask.getFormKey())) {
+                ObjectNode formRefNode = objectMapper.createObjectNode();
+                CmmnModelInfo modelInfo = formKeyMap.get(humanTask.getFormKey());
+                formRefNode.put("id", modelInfo.getId());
+                formRefNode.put("name", modelInfo.getName());
+                formRefNode.put("key", modelInfo.getKey());
+                propertiesNode.set(PROPERTY_FORM_REFERENCE, formRefNode);
+
+            } else {
+                setPropertyValue(PROPERTY_FORMKEY, humanTask.getFormKey(), propertiesNode);
+            }
+        }
+
+        setPropertyValue(PROPERTY_USERTASK_DUEDATE, humanTask.getDueDate(), propertiesNode);
+        setPropertyValue(PROPERTY_USERTASK_CATEGORY, humanTask.getCategory(), propertiesNode);
+
+        convertTaskListenersToJson(propertiesNode, humanTask);
+        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, humanTask);
+    }
+
+    protected void convertAssignmentSettings(ObjectNode propertiesNode, HumanTask humanTask, String assignee) {
         if (StringUtils.isNotEmpty(assignee) || CollectionUtils.isNotEmpty(humanTask.getCandidateUsers()) || CollectionUtils.isNotEmpty(humanTask.getCandidateGroups())) {
 
             ObjectNode assignmentNode = objectMapper.createObjectNode();
@@ -193,27 +224,13 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
             assignmentNode.set("assignment", assignmentValuesNode);
             propertiesNode.set(PROPERTY_USERTASK_ASSIGNMENT, assignmentNode);
         }
+    }
 
-        if (humanTask.getPriority() != null) {
-            setPropertyValue(PROPERTY_USERTASK_PRIORITY, humanTask.getPriority(), propertiesNode);
+    protected void convertTaskListenersToJson(ObjectNode propertiesNode, HumanTask humanTask) {
+        ObjectNode taskListenersNode = ListenerConverterUtil.convertListenersToJson(objectMapper, "taskListeners", humanTask.getTaskListeners());
+        if (taskListenersNode != null) {
+            propertiesNode.set(PROPERTY_USERTASK_LISTENERS, taskListenersNode);
         }
-
-        if (StringUtils.isNotEmpty(humanTask.getFormKey())) {
-            if (formKeyMap != null && formKeyMap.containsKey(humanTask.getFormKey())) {
-                ObjectNode formRefNode = objectMapper.createObjectNode();
-                CmmnModelInfo modelInfo = formKeyMap.get(humanTask.getFormKey());
-                formRefNode.put("id", modelInfo.getId());
-                formRefNode.put("name", modelInfo.getName());
-                formRefNode.put("key", modelInfo.getKey());
-                propertiesNode.set(PROPERTY_FORM_REFERENCE, formRefNode);
-
-            } else {
-                setPropertyValue(PROPERTY_FORMKEY, humanTask.getFormKey(), propertiesNode);
-            }
-        }
-
-        setPropertyValue(PROPERTY_USERTASK_DUEDATE, humanTask.getDueDate(), propertiesNode);
-        setPropertyValue(PROPERTY_USERTASK_CATEGORY, humanTask.getCategory(), propertiesNode);
     }
 
     protected int getExtensionElementValueAsInt(String name, HumanTask humanTask) {
@@ -245,6 +262,9 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
 
         task.setDueDate(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_USERTASK_DUEDATE, elementNode));
         task.setCategory(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_USERTASK_CATEGORY, elementNode));
+
+        convertJsonToTaskListeners(elementNode, task);
+        ListenerConverterUtil.convertJsonToLifeCycleListeners(elementNode, task);
 
         JsonNode assignmentNode = CmmnJsonConverterUtil.getProperty(PROPERTY_USERTASK_ASSIGNMENT, elementNode);
         if (assignmentNode != null) {
@@ -300,6 +320,13 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
         }
 
         return task;
+    }
+
+    protected void convertJsonToTaskListeners(JsonNode elementNode, HumanTask task) {
+        List<FlowableListener> listeners = ListenerConverterUtil.convertJsonToListeners(elementNode, PROPERTY_USERTASK_LISTENERS, "taskListeners");
+        if (listeners != null && !listeners.isEmpty()) {
+            task.setTaskListeners(listeners);
+        }
     }
 
     protected void fillAssigneeInfo(JsonNode idmDefNode, JsonNode canCompleteTaskNode, HumanTask task) {

@@ -18,10 +18,12 @@ import java.util.Map;
 
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
+import org.flowable.cmmn.editor.json.converter.util.ListenerConverterUtil;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ProcessTask;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -60,7 +62,7 @@ public class ProcessTaskJsonConverter extends BaseCmmnJsonConverter implements P
         ProcessTask processTask = (ProcessTask) ((PlanItem) baseElement).getPlanItemDefinition();
 
         propertiesNode.put(PROPERTY_FALLBACK_TO_DEFAULT_TENANT, processTask.isFallbackToDefaultTenant());
-
+        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, ((PlanItemDefinition) baseElement));
     }
 
     @Override
@@ -84,7 +86,6 @@ public class ProcessTaskJsonConverter extends BaseCmmnJsonConverter implements P
             task.setInParameters(readIOParameters(inParametersNode));
         }
 
-
         JsonNode processTaskOutParametersNode = CmmnJsonConverterUtil.getProperty(CmmnStencilConstants.PROPERTY_PROCESS_OUT_PARAMETERS, elementNode);
         if (processTaskOutParametersNode != null && processTaskOutParametersNode.has("outParameters") && !processTaskOutParametersNode.get("outParameters").isNull()) {
             JsonNode outParametersNode =  processTaskOutParametersNode.get("outParameters");
@@ -95,6 +96,8 @@ public class ProcessTaskJsonConverter extends BaseCmmnJsonConverter implements P
         if (fallbackToDefaultTenant != null) {
             task.setFallbackToDefaultTenant(fallbackToDefaultTenant.booleanValue());
         }
+
+        ListenerConverterUtil.convertJsonToLifeCycleListeners(elementNode, task);
 
         return task;
     }

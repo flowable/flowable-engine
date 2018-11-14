@@ -16,10 +16,12 @@ import java.util.Map;
 
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
+import org.flowable.cmmn.editor.json.converter.util.ListenerConverterUtil;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemDefinition;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -57,6 +59,7 @@ public class CaseTaskJsonConverter extends BaseCmmnJsonConverter implements Case
         CaseTask caseTask = (CaseTask) ((PlanItem) baseElement).getPlanItemDefinition();
 
         propertiesNode.put(PROPERTY_FALLBACK_TO_DEFAULT_TENANT, caseTask.isFallbackToDefaultTenant());
+        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, ((PlanItemDefinition) baseElement));
     }
 
     @Override
@@ -79,6 +82,8 @@ public class CaseTaskJsonConverter extends BaseCmmnJsonConverter implements Case
         if (fallbackToDefaultTenant) {
             task.setFallbackToDefaultTenant(true);
         }
+
+        ListenerConverterUtil.convertJsonToLifeCycleListeners(elementNode, task);
 
         return task;
     }

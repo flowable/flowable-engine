@@ -15,13 +15,13 @@ package org.flowable.cmmn.test.listener;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.cmmn.api.listener.PlanItemInstanceLifeCycleListener;
+import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 
 /**
  * @author Joram Barrez
  */
-public abstract class AbstractTestLifeCycleListener implements PlanItemInstanceLifeCycleListener {
+public abstract class AbstractTestLifecycleListener implements PlanItemInstanceLifecycleListener {
 
     protected List<TestLifeCycleEvent> events = new ArrayList<>();
 

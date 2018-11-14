@@ -36,14 +36,17 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
      * @throws Exception in case of write exception
      */
     public void writePlanItemDefinition(CmmnModel model, T planItemDefinition, XMLStreamWriter xtw) throws Exception {
+
         writePlanItemDefinitionStartElement(planItemDefinition, xtw);
         writePlanItemDefinitionCommonAttributes(planItemDefinition, xtw);
         writePlanItemDefinitionSpecificAttributes(planItemDefinition, xtw);
+
         boolean didWriteExtensionElement = writePlanItemDefinitionCommonElements(model, planItemDefinition, xtw);
         didWriteExtensionElement = writePlanItemDefinitionExtensionElements(model, planItemDefinition, didWriteExtensionElement, xtw);
         if (didWriteExtensionElement) {
             xtw.writeEndElement();
         }
+
         writePlanItemDefinitionDefaultItemControl(planItemDefinition, xtw);
         writePlanItemDefinitionBody(model, planItemDefinition, xtw);
         writePlanItemDefinitionEndElement(xtw);
@@ -100,7 +103,8 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
     }
     
     protected boolean writePlanItemDefinitionExtensionElements(CmmnModel model, T planItemDefinition, boolean didWriteExtensionElement, XMLStreamWriter xtw) throws Exception {
-        return didWriteExtensionElement;
+        return FlowableListenerExport.writeFlowableListeners(xtw, CmmnXmlConstants.ELEMENT_PLAN_ITEM_LIFECYCLE_LISTENER,
+            planItemDefinition.getLifecycleListeners(), didWriteExtensionElement);
     }
 
     protected void writePlanItemDefinitionDefaultItemControl(T planItemDefinition, XMLStreamWriter xtw) throws Exception {
