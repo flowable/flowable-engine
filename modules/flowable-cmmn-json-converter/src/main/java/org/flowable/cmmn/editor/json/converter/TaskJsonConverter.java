@@ -19,7 +19,7 @@ import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelp
 import org.flowable.cmmn.editor.json.converter.util.ListenerConverterUtil;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.Task;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -52,7 +52,7 @@ public class TaskJsonConverter extends BaseCmmnJsonConverter {
     @Override
     protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor,
             BaseElement baseElement, CmmnModel cmmnModel) {
-        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, ((PlanItemDefinition) baseElement));
+        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, ((PlanItem) baseElement).getPlanItemDefinition());
     }
 
     @Override

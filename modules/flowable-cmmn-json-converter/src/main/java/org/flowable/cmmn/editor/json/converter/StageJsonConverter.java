@@ -24,7 +24,6 @@ import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.GraphicInfo;
 import org.flowable.cmmn.model.PlanItem;
-import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -81,7 +80,7 @@ public class StageJsonConverter extends BaseCmmnJsonConverter implements FormAwa
         
         elementNode.set("childShapes", subProcessShapesArrayNode);
 
-        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, ((PlanItemDefinition) baseElement));
+        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, stage);
     }
     
     @Override

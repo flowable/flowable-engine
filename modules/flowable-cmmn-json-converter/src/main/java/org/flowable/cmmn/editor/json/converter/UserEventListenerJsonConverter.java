@@ -18,6 +18,7 @@ import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.util.ListenerConverterUtil;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.UserEventListener;
 
@@ -46,7 +47,8 @@ public class UserEventListenerJsonConverter extends BaseCmmnJsonConverter {
 
     @Override
     protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement, CmmnModel cmmnModel) {
-        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, ((PlanItemDefinition) baseElement));
+        PlanItemDefinition planItemDefinition = ((PlanItem) baseElement).getPlanItemDefinition();
+        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, planItemDefinition);
     }
 
     @Override
