@@ -36,11 +36,16 @@ public class PlanItemLifeCycleListenerUtil {
         // Lifecycle listeners on the element itself
         PlanItemDefinition planItemDefinition = planItemInstance.getPlanItem().getPlanItemDefinition();
         if (planItemDefinition != null) {
-            List<FlowableListener> lifecycleListeners = planItemDefinition.getLifecycleListeners();
-            if (lifecycleListeners != null && !lifecycleListeners.isEmpty()) {
+            List<FlowableListener> flowableListeners = planItemDefinition.getLifecycleListeners();
+            if (flowableListeners != null && !flowableListeners.isEmpty()) {
+
                 CmmnListenerNotificationHelper listenerNotificationHelper = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper();
-                List<PlanItemInstanceLifecycleListener> planItemLifecycleListeners = listenerNotificationHelper.createPlanItemLifecycleListeners(planItemInstance.getPlanItem());
-                executeListeners(planItemLifecycleListeners, planItemInstance, oldState, newState);
+                for (FlowableListener flowableListener : flowableListeners) {
+                    if (stateMatches(flowableListener.getSourceState(), oldState) && stateMatches(flowableListener.getTargetState(), newState)) {
+                        PlanItemInstanceLifecycleListener lifecycleListener = listenerNotificationHelper.createLifecycleListener(flowableListener);
+                        executeLifecycleListener(planItemInstance, oldState, newState, lifecycleListener);
+                    }
+                }
             }
         }
 
@@ -61,10 +66,15 @@ public class PlanItemLifeCycleListenerUtil {
     public static void executeListeners(List<PlanItemInstanceLifecycleListener> listeners, DelegatePlanItemInstance planItemInstance, String oldState, String newState) {
         if (listeners != null) {
             for (PlanItemInstanceLifecycleListener lifecycleListener : listeners) {
-                if (lifecycleListenerMatches(lifecycleListener, oldState, newState)) {
-                    lifecycleListener.stateChanged(planItemInstance, oldState, newState);
-                }
+                executeLifecycleListener(planItemInstance, oldState, newState, lifecycleListener);
             }
+        }
+    }
+
+    public static void executeLifecycleListener(DelegatePlanItemInstance planItemInstance, String oldState, String newState,
+        PlanItemInstanceLifecycleListener lifecycleListener) {
+        if (lifecycleListenerMatches(lifecycleListener, oldState, newState)) {
+            lifecycleListener.stateChanged(planItemInstance, oldState, newState);
         }
     }
 
