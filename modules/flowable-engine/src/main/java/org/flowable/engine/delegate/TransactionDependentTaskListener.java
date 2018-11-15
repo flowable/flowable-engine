@@ -16,6 +16,7 @@ package org.flowable.engine.delegate;
 import java.util.Map;
 
 import org.flowable.bpmn.model.Task;
+import org.flowable.task.service.delegate.BaseTaskListener;
 
 /**
  * Callback interface to be notified of transaction events.

@@ -12,36 +12,25 @@
  */
 package org.flowable.cmmn.test.listener;
 
-import java.util.Collections;
-import java.util.List;
-
-import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
-import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
-
 /**
  * @author Joram Barrez
  */
-public class TestFilterSourceStateLifeCycleListener extends AbstractTestLifeCycleListener {
+public class TestFilterTargetStateLifecycleListener extends AbstractTestLifecycleListener {
 
-    protected String sourceState;
+    protected String targetState;
 
-    public TestFilterSourceStateLifeCycleListener(String sourceState) {
-        this.sourceState = sourceState;
-    }
-
-    @Override
-    public List<String> getItemDefinitionTypes() {
-        return null;
+    public TestFilterTargetStateLifecycleListener(String targetState) {
+        this.targetState = targetState;
     }
 
     @Override
     public String getSourceState() {
-        return sourceState;
+        return null;
     }
 
     @Override
     public String getTargetState() {
-        return null;
+        return targetState;
     }
 
 }

@@ -199,5 +199,17 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
         assertThat(tasks).hasSize(0);
         assertCaseInstanceEnded(caseInstance);
     }
+
+    @Test
+    @CmmnDeployment
+    public void testNestedPlanItemExitsOuterStage() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testNestedPlanItemExitsOuterStage").start();
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("A", "B", "C");
+
+        // Completing C should exit the outer stage and terminate all tasks
+        cmmnTaskService.complete(tasks.get(2).getId());
+        assertCaseInstanceEnded(caseInstance);
+    }
     
 }

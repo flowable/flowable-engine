@@ -112,6 +112,16 @@
       "popular" : true
     } ]
   }, {
+    "name" : "tasklistenerspackage",
+    "properties" : [ {
+      "id" : "tasklisteners",
+      "type" : "multiplecomplex",
+      "title" : "Task listeners",
+      "value" : "",
+      "description" : "Listeners for a human task",
+      "popular" : true
+    } ]
+  }, {
     "name" : "formpropertiespackage",
     "properties" : [ {
       "id" : "formproperties",
@@ -791,6 +801,16 @@
       "popular" : true
     }]
   }, {
+      "name" : "planitemlifecyclelistenerspackage",
+      "properties" : [ {
+        "id" : "planitemlifecyclelisteners",
+        "type" : "multiplecomplex",
+        "title" : "Lifecycle listeners",
+        "value" : "",
+        "description" : "Listeners for lifecycle events of a plan item",
+        "popular" : true
+      } ]
+    }, {
       "name" : "displayorderpackage",
       "properties" : [ {
         "id" : "displayorder",
@@ -889,6 +909,7 @@
       "repetitionrulepackage",
       "manualactivationrulepackage",
       "completionneutralrulepackage",
+      "planitemlifecyclelistenerspackage",
       "displayorderpackage"
     ],
     "hiddenPropertyPackages" : [ ],
@@ -910,7 +931,8 @@
       "requiredrulepackage",
       "repetitionrulepackage",
       "manualactivationrulepackage",
-      "completionneutralrulepackage"],
+      "completionneutralrulepackage",
+      "planitemlifecyclelistenerspackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -931,11 +953,13 @@
       "formreferencepackage",
       "duedatedefinitionpackage",
       "prioritydefinitionpackage",
+      "tasklistenerspackage",
       "asyncpackage",
       "requiredrulepackage",
       "repetitionrulepackage",
       "manualactivationrulepackage",
-      "completionneutralrulepackage" ],
+      "completionneutralrulepackage",
+      "planitemlifecyclelistenerspackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -959,7 +983,8 @@
       "requiredrulepackage",
       "repetitionrulepackage",
       "manualactivationrulepackage",
-      "completionneutralrulepackage" ],
+      "completionneutralrulepackage",
+      "planitemlifecyclelistenerspackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   },
@@ -984,7 +1009,8 @@
         "requiredrulepackage",
         "repetitionrulepackage",
         "manualactivationrulepackage",
-        "completionneutralrulepackage"
+        "completionneutralrulepackage",
+        "planitemlifecyclelistenerspackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": [
@@ -1029,7 +1055,8 @@
         "httptasksaveresponseparameterspackage",
         "httptaskresultvariableprefixpackage",
         "httptasksaveresponseparameterstransientpackage",
-        "httptasksaveresponseasjsonpackage"
+        "httptasksaveresponseasjsonpackage",
+        "planitemlifecyclelistenerspackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": [
@@ -1059,7 +1086,8 @@
         "completionneutralrulepackage",
         "scriptformatpackage", 
         "scripttextpackage",
-        "servicetaskresultvariablepackage"
+        "servicetaskresultvariablepackage",
+        "planitemlifecyclelistenerspackage"
       ],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
@@ -1077,7 +1105,8 @@
       "documentationpackage",
       "requiredrulepackage",
       "repetitionrulepackage",
-      "completionneutralrulepackage" ],
+      "completionneutralrulepackage",
+      "planitemlifecyclelistenerspackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -1099,7 +1128,8 @@
       "requiredrulepackage",
       "repetitionrulepackage",
       "manualactivationrulepackage",
-      "completionneutralrulepackage"],
+      "completionneutralrulepackage",
+      "planitemlifecyclelistenerspackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -1123,7 +1153,8 @@
       "requiredrulepackage",
       "repetitionrulepackage",
       "manualactivationrulepackage",
-      "completionneutralrulepackage"],
+      "completionneutralrulepackage",
+      "planitemlifecyclelistenerspackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -1140,7 +1171,8 @@
       "documentationpackage",
       "timerexpressionpackage",
       "timerstarttriggerpackage",
-      "completionneutralrulepackage"],
+      "completionneutralrulepackage",
+      "planitemlifecyclelistenerspackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -1155,7 +1187,8 @@
         "overrideidpackage",
         "namepackage",
         "documentationpackage",
-        "completionneutralrulepackage"],
+        "completionneutralrulepackage",
+        "planitemlifecyclelistenerspackage"],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {

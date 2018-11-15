@@ -12,20 +12,10 @@
  */
 package org.flowable.cmmn.test.listener;
 
-import java.util.Collections;
-import java.util.List;
-
-import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
-
 /**
  * @author Joram Barrez
  */
-public class TestFilterTypesLifeCycleListener extends AbstractTestLifeCycleListener {
-
-    @Override
-    public List<String> getItemDefinitionTypes() {
-        return Collections.singletonList(PlanItemDefinitionType.HUMAN_TASK);
-    }
+public class TestFilterTypesLifecycleListener extends AbstractTestLifecycleListener {
 
     @Override
     public String getSourceState() {

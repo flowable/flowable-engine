@@ -15,18 +15,18 @@ package org.flowable.cmmn.test.listener;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.cmmn.api.listener.PlanItemInstanceLifeCycleListener;
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 
 /**
  * @author Joram Barrez
  */
-public abstract class AbstractTestLifeCycleListener implements PlanItemInstanceLifeCycleListener {
+public abstract class AbstractTestLifecycleListener implements PlanItemInstanceLifecycleListener {
 
     protected List<TestLifeCycleEvent> events = new ArrayList<>();
 
     @Override
-    public void stateChanged(PlanItemInstance planItemInstance, String oldState, String newState) {
+    public void stateChanged(DelegatePlanItemInstance planItemInstance, String oldState, String newState) {
         events.add(new TestLifeCycleEvent(planItemInstance, oldState, newState));
     }
 
@@ -43,3 +43,4 @@ public abstract class AbstractTestLifeCycleListener implements PlanItemInstanceL
     }
 
 }
+

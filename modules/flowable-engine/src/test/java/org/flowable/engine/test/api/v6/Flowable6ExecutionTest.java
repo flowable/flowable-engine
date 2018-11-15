@@ -12,8 +12,12 @@
  */
 package org.flowable.engine.test.api.v6;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -331,6 +335,20 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         assertEquals(subProcessExecution.getId(), event.getExecutionId());
 
         processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
+    }
+
+    @Test
+    @Deployment
+    void testCurrentActivityNamePresentDuringExecution() {
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("currentActivityNameProcess");
+
+        Map<String, Object> processVariables = runtimeService.getVariables(processInstance.getId());
+        assertThat(processVariables)
+            .contains(
+                entry("serviceTaskActivityName", "The famous task"),
+                entry("scriptTaskActivityName", "Script Task name")
+            );
     }
 
     public class SubProcessEventListener extends AbstractFlowableEngineEventListener {

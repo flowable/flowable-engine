@@ -12,6 +12,7 @@
  */
 package org.flowable.spring.boot.ldap;
 
+import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
 import org.flowable.ldap.LDAPConfiguration;
 import org.flowable.ldap.LDAPGroupCache;
@@ -22,12 +23,14 @@ import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.FlowableSecurityAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnLdap;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
+import org.flowable.spring.security.FlowableAuthenticationProvider;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
  * {@link org.springframework.boot.autoconfigure.EnableAutoConfiguration} for the Flowable LDAP Integration.
@@ -82,6 +85,12 @@ public class FlowableLdapAutoConfiguration {
     public EngineConfigurationConfigurer<SpringIdmEngineConfiguration> ldapIdmEngineConfigurer(LDAPConfiguration ldapConfiguration) {
         return idmEngineConfiguration -> idmEngineConfiguration
             .setIdmIdentityService(new LDAPIdentityServiceImpl(ldapConfiguration, createCache(idmEngineConfiguration, ldapConfiguration)));
+    }
+
+    @Bean
+    public FlowableAuthenticationProvider flowableAuthenticationProvider(IdmIdentityService idmIdentitySerivce,
+        UserDetailsService userDetailsService) {
+        return new FlowableAuthenticationProvider(idmIdentitySerivce, userDetailsService);
     }
 
     protected LDAPGroupCache createCache(SpringIdmEngineConfiguration engineConfiguration, LDAPConfiguration ldapConfiguration) {

@@ -17,6 +17,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
+import org.flowable.cmmn.editor.json.converter.util.ListenerConverterUtil;
 import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseElement;
@@ -78,6 +79,8 @@ public class StageJsonConverter extends BaseCmmnJsonConverter implements FormAwa
         processor.processPlanItems(stage, cmmnModel, subProcessShapesArrayNode, formKeyMap, decisionTableKeyMap, graphicInfo.getX(), graphicInfo.getY());
         
         elementNode.set("childShapes", subProcessShapesArrayNode);
+
+        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, stage);
     }
     
     @Override
@@ -100,6 +103,8 @@ public class StageJsonConverter extends BaseCmmnJsonConverter implements FormAwa
         
         Stage parentStage = (Stage) parentElement;
         stage.setParent(parentStage);
+
+        ListenerConverterUtil.convertJsonToLifeCycleListeners(elementNode, stage);
 
         return stage;
     }

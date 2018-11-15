@@ -28,7 +28,7 @@ public abstract class BaseCmmnXmlConverter {
     public abstract String getXMLElementName();
 
     /**
-     * @return True of the current {@link CmmnElement} can have child elements and needs to be pushed 
+     * @return True if the current {@link CmmnElement} can have child elements and needs to be pushed
      *         to the stack of elements during parsing. 
      */
     public abstract boolean hasChildElements();

@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.engine.delegate;
+package org.flowable.task.service.delegate;
 
 import java.io.Serializable;
 

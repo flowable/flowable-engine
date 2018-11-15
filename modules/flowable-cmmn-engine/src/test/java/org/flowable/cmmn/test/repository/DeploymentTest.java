@@ -37,7 +37,7 @@ import org.junit.Test;
  * @author Joram Barrez
  */
 public class DeploymentTest extends FlowableCmmnTestCase {
-    
+
     /**
      * Simplest test possible: deploy the simple-case.cmmn (from the cmmn-converter module) and see if 
      * - a deployment exists
@@ -47,8 +47,14 @@ public class DeploymentTest extends FlowableCmmnTestCase {
      * - case definition properties set
      */
     @Test
-    @CmmnDeployment
     public void testCaseDefinitionDeployed() throws Exception {
+
+        DeploymentCache<CaseDefinitionCacheEntry> caseDefinitionCache = cmmnEngineConfiguration.getCaseDefinitionCache();
+        caseDefinitionCache.clear();
+
+        String deploymentId = cmmnRepositoryService.createDeployment()
+            .addClasspathResource("org/flowable/cmmn/test/repository/DeploymentTest.testCaseDefinitionDeployed.cmmn").deploy().getId();
+
         org.flowable.cmmn.api.repository.CmmnDeployment cmmnDeployment = cmmnRepositoryService.createDeploymentQuery().singleResult();
         assertNotNull(cmmnDeployment);
         
@@ -60,9 +66,8 @@ public class DeploymentTest extends FlowableCmmnTestCase {
         assertNotNull(inputStream);
         inputStream.close();
         
-        DeploymentCache<CaseDefinitionCacheEntry> caseDefinitionCache = cmmnEngineConfiguration.getCaseDefinitionCache();
         assertEquals(1, ((DefaultDeploymentCache<CaseDefinitionCacheEntry>) caseDefinitionCache).getAll().size());
-        
+
         CaseDefinitionCacheEntry cachedCaseDefinition = ((DefaultDeploymentCache<CaseDefinitionCacheEntry>) caseDefinitionCache).getAll().iterator().next();
         assertNotNull(cachedCaseDefinition.getCase());
         assertNotNull(cachedCaseDefinition.getCmmnModel());
@@ -89,6 +94,8 @@ public class DeploymentTest extends FlowableCmmnTestCase {
         for (PlanItem planItem : cmmnModel.getPrimaryCase().getPlanModel().getPlanItems()) {
             assertNotNull(planItem.getBehavior());
         }
+
+        cmmnRepositoryService.deleteDeployment(deploymentId, true);
     }
     
     @Test

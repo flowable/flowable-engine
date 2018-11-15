@@ -95,6 +95,22 @@ public interface CmmnStencilConstants {
     String PROPERTY_USERTASK_CANDIDATE_GROUPS = "candidateGroups";
     String PROPERTY_USERTASK_CATEGORY = "categorydefinition";
 
+    String PROPERTY_USERTASK_LISTENERS = "tasklisteners";
+    String PROPERTY_LISTENER_EVENT = "event";
+    String PROPERTY_LISTENER_CLASS_NAME = "className";
+    String PROPERTY_LISTENER_EXPRESSION = "expression";
+    String PROPERTY_LISTENER_DELEGATE_EXPRESSION = "delegateExpression";
+    String PROPERTY_LISTENER_FIELDS = "fields";
+
+    String PROPERTY_LIFECYCLE_LISTENERS = "planitemlifecyclelisteners";
+    String PROPERTY_LISTENER_SOURCE_STATE = "sourceState";
+    String PROPERTY_LISTENER_TARGET_STATE = "targetState";
+
+    String PROPERTY_FIELD_NAME = "name";
+    String PROPERTY_FIELD_STRING_VALUE = "stringValue";
+    String PROPERTY_FIELD_EXPRESSION = "expression";
+    String PROPERTY_FIELD_STRING = "string";
+
     String PROPERTY_SERVICETASK_CLASS = "servicetaskclass";
     String PROPERTY_SERVICETASK_EXPRESSION = "servicetaskexpression";
     String PROPERTY_SERVICETASK_DELEGATE_EXPRESSION = "servicetaskdelegateexpression";

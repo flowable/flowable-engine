@@ -18,6 +18,7 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.VariableContainerELResolver;
 import org.flowable.common.engine.impl.javax.el.ELContext;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Joram Barrez
@@ -26,6 +27,7 @@ public class CmmnVariableScopeELResolver extends VariableContainerELResolver {
 
     public static final String PLAN_ITEM_INSTANCE_KEY = "planItemInstance";
     public static final String CASE_INSTANCE_KEY = "caseInstance";
+    public static final String TASK_KEY = "task";
 
     public CmmnVariableScopeELResolver(VariableContainer variableContainer) {
         super(variableContainer);
@@ -35,7 +37,8 @@ public class CmmnVariableScopeELResolver extends VariableContainerELResolver {
     public Object getValue(ELContext context, Object base, Object property) {
         if (base == null) {
             if ((CASE_INSTANCE_KEY.equals(property) && variableContainer instanceof CaseInstanceEntity)
-                    || (PLAN_ITEM_INSTANCE_KEY.equals(property) && variableContainer instanceof PlanItemInstanceEntity)) {
+                    || (PLAN_ITEM_INSTANCE_KEY.equals(property) && variableContainer instanceof PlanItemInstanceEntity)
+                    || (TASK_KEY.equals(property) && variableContainer instanceof TaskEntity)) {
                 context.setPropertyResolved(true);
                 return variableContainer;
 

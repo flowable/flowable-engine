@@ -34,7 +34,7 @@ import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
-import org.flowable.cmmn.api.listener.PlanItemInstanceLifeCycleListener;
+import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.engine.impl.CmmnEngineImpl;
 import org.flowable.cmmn.engine.impl.CmmnHistoryServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
@@ -95,10 +95,30 @@ import org.flowable.cmmn.engine.impl.interceptor.CmmnCommandInvoker;
 import org.flowable.cmmn.engine.impl.job.AsyncActivatePlanItemInstanceJobHandler;
 import org.flowable.cmmn.engine.impl.job.AsyncInitializePlanModelJobHandler;
 import org.flowable.cmmn.engine.impl.job.TriggerTimerEventJobHandler;
+import org.flowable.cmmn.engine.impl.listener.CmmnListenerFactory;
+import org.flowable.cmmn.engine.impl.listener.CmmnListenerNotificationHelper;
+import org.flowable.cmmn.engine.impl.listener.DefaultCmmnListenerFactory;
 import org.flowable.cmmn.engine.impl.parser.CmmnActivityBehaviorFactory;
+import org.flowable.cmmn.engine.impl.parser.CmmnParseHandler;
+import org.flowable.cmmn.engine.impl.parser.CmmnParseHandlers;
 import org.flowable.cmmn.engine.impl.parser.CmmnParser;
 import org.flowable.cmmn.engine.impl.parser.CmmnParserImpl;
 import org.flowable.cmmn.engine.impl.parser.DefaultCmmnActivityBehaviorFactory;
+import org.flowable.cmmn.engine.impl.parser.handler.CaseParseHandler;
+import org.flowable.cmmn.engine.impl.parser.handler.CaseTaskParseHandler;
+import org.flowable.cmmn.engine.impl.parser.handler.DecisionTaskParseHandler;
+import org.flowable.cmmn.engine.impl.parser.handler.GenericEventListenerParseHandler;
+import org.flowable.cmmn.engine.impl.parser.handler.HttpTaskParseHandler;
+import org.flowable.cmmn.engine.impl.parser.handler.HumanTaskParseHandler;
+import org.flowable.cmmn.engine.impl.parser.handler.MilestoneParseHandler;
+import org.flowable.cmmn.engine.impl.parser.handler.PlanFragmentParseHandler;
+import org.flowable.cmmn.engine.impl.parser.handler.ProcessTaskParseHandler;
+import org.flowable.cmmn.engine.impl.parser.handler.ScriptTaskParseHandler;
+import org.flowable.cmmn.engine.impl.parser.handler.ServiceTaskParseHandler;
+import org.flowable.cmmn.engine.impl.parser.handler.StageParseHandler;
+import org.flowable.cmmn.engine.impl.parser.handler.TaskParseHandler;
+import org.flowable.cmmn.engine.impl.parser.handler.TimerEventListenerParseHandler;
+import org.flowable.cmmn.engine.impl.parser.handler.UserEventListenerParseHandler;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
@@ -150,6 +170,7 @@ import org.flowable.cmmn.engine.impl.scripting.CmmnVariableScopeResolverFactory;
 import org.flowable.cmmn.engine.impl.task.DefaultCmmnTaskVariableScopeResolver;
 import org.flowable.cmmn.image.CaseDiagramGenerator;
 import org.flowable.cmmn.image.impl.DefaultCaseDiagramGenerator;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.FlowableExpressionEnhancer;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
@@ -304,20 +325,27 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CmmnHistoryManager cmmnHistoryManager;
     protected ProcessInstanceService processInstanceService;
     protected Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks;
-    protected List<PlanItemInstanceLifeCycleListener> planItemInstanceLifeCycleListeners;
+    protected Map<String, List<PlanItemInstanceLifecycleListener>> planItemInstanceLifecycleListeners;
 
     protected boolean executeServiceSchemaManagers = true;
 
     protected boolean enableSafeCmmnXml;
     protected CmmnActivityBehaviorFactory activityBehaviorFactory;
     protected CmmnClassDelegateFactory classDelegateFactory;
-    protected CmmnParser cmmnParser;
     protected CmmnDeployer cmmnDeployer;
     protected CmmnDeploymentManager deploymentManager;
     protected CaseDefinitionDiagramHelper caseDefinitionDiagramHelper;
 
     protected int caseDefinitionCacheLimit = -1;
     protected DeploymentCache<CaseDefinitionCacheEntry> caseDefinitionCache;
+
+    protected CmmnParser cmmnParser;
+    protected List<CmmnParseHandler> preCmmnParseHandlers;
+    protected List<CmmnParseHandler> postCmmnParseHandlers;
+    protected List<CmmnParseHandler> customCmmnParseHandlers;
+
+    protected CmmnListenerFactory listenerFactory;
+    protected CmmnListenerNotificationHelper listenerNotificationHelper;
 
     protected HistoryLevel historyLevel = HistoryLevel.AUDIT;
 
@@ -729,6 +757,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initEntityManagers();
         initClassDelegateFactory();
         initActivityBehaviorFactory();
+        initListenerFactory();
+        initListenerNotificationHelper();
         initDeployers();
         initCaseDefinitionCache();
         initDeploymentManager();
@@ -1029,6 +1059,18 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
     }
 
+    protected void initListenerFactory() {
+        if (listenerFactory == null) {
+            listenerFactory = new DefaultCmmnListenerFactory(classDelegateFactory, expressionManager);
+        }
+    }
+
+    protected void initListenerNotificationHelper() {
+        if (listenerNotificationHelper == null) {
+            listenerNotificationHelper = new CmmnListenerNotificationHelper();
+        }
+    }
+
     protected void initDeployers() {
         if (this.cmmnDeployer == null) {
             this.deployers = new ArrayList<>();
@@ -1087,8 +1129,70 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             CmmnParserImpl cmmnParserImpl = new CmmnParserImpl();
             cmmnParserImpl.setActivityBehaviorFactory(activityBehaviorFactory);
             cmmnParserImpl.setExpressionManager(expressionManager);
+
+            List<CmmnParseHandler> parseHandlers = new ArrayList<>();
+            if (getPreCmmnParseHandlers() != null) {
+                parseHandlers.addAll(getPreCmmnParseHandlers());
+            }
+            parseHandlers.addAll(getDefaultCmmnParseHandlers());
+            if (getPostCmmnParseHandlers() != null) {
+                parseHandlers.addAll(getPostCmmnParseHandlers());
+            }
+            cmmnParserImpl.setCmmnParseHandlers(new CmmnParseHandlers(parseHandlers));
+
             cmmnParser = cmmnParserImpl;
         }
+    }
+
+    public List<CmmnParseHandler> getDefaultCmmnParseHandlers() {
+        List<CmmnParseHandler> cmmnParseHandlers = new ArrayList<>();
+        cmmnParseHandlers.add(new CaseParseHandler());
+        cmmnParseHandlers.add(new CaseTaskParseHandler());
+        cmmnParseHandlers.add(new DecisionTaskParseHandler());
+        cmmnParseHandlers.add(new HumanTaskParseHandler());
+        cmmnParseHandlers.add(new MilestoneParseHandler());
+        cmmnParseHandlers.add(new PlanFragmentParseHandler());
+        cmmnParseHandlers.add(new ProcessTaskParseHandler());
+        cmmnParseHandlers.add(new ScriptTaskParseHandler());
+        cmmnParseHandlers.add(new ServiceTaskParseHandler());
+        cmmnParseHandlers.add(new StageParseHandler());
+        cmmnParseHandlers.add(new HttpTaskParseHandler());
+        cmmnParseHandlers.add(new TaskParseHandler());
+        cmmnParseHandlers.add(new GenericEventListenerParseHandler());
+        cmmnParseHandlers.add(new TimerEventListenerParseHandler());
+        cmmnParseHandlers.add(new UserEventListenerParseHandler());
+
+        // Replace any default handler with a custom one (if needed)
+        if (getCustomCmmnParseHandlers() != null) {
+            Map<Class<?>, CmmnParseHandler> customParseHandlerMap = new HashMap<>();
+            for (CmmnParseHandler cmmnParseHandler : getCustomCmmnParseHandlers()) {
+                for (Class<?> handledType : cmmnParseHandler.getHandledTypes()) {
+                    customParseHandlerMap.put(handledType, cmmnParseHandler);
+                }
+            }
+
+            for (int i = 0; i < cmmnParseHandlers.size(); i++) {
+                // All the default handlers support only one type
+                CmmnParseHandler defaultCmmnParseHandler = cmmnParseHandlers.get(i);
+                if (defaultCmmnParseHandler.getHandledTypes().size() != 1) {
+                    StringBuilder supportedTypes = new StringBuilder();
+                    for (Class<?> type : defaultCmmnParseHandler.getHandledTypes()) {
+                        supportedTypes.append(" ").append(type.getCanonicalName()).append(" ");
+                    }
+                    throw new FlowableException("The default CMMN parse handlers should only support one type, but " + defaultCmmnParseHandler.getClass() + " supports " + supportedTypes
+                        + ". This is likely a programmatic error");
+                } else {
+                    Class<?> handledType = defaultCmmnParseHandler.getHandledTypes().iterator().next();
+                    if (customParseHandlerMap.containsKey(handledType)) {
+                        CmmnParseHandler newBpmnParseHandler = customParseHandlerMap.get(handledType);
+                        LOGGER.info("Replacing default CmmnParseHandler {} with {}", defaultCmmnParseHandler.getClass().getName(), newBpmnParseHandler.getClass().getName());
+                        cmmnParseHandlers.set(i, newBpmnParseHandler);
+                    }
+                }
+            }
+        }
+
+        return cmmnParseHandlers;
     }
 
     public void initCaseDefinitionDiagramHelper() {
@@ -1939,6 +2043,51 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public List<CmmnParseHandler> getPreCmmnParseHandlers() {
+        return preCmmnParseHandlers;
+    }
+
+    public CmmnEngineConfiguration setPreCmmnParseHandlers(List<CmmnParseHandler> preCmmnParseHandlers) {
+        this.preCmmnParseHandlers = preCmmnParseHandlers;
+        return this;
+    }
+
+    public List<CmmnParseHandler> getPostCmmnParseHandlers() {
+        return postCmmnParseHandlers;
+    }
+
+    public CmmnEngineConfiguration setPostCmmnParseHandlers(List<CmmnParseHandler> postCmmnParseHandlers) {
+        this.postCmmnParseHandlers = postCmmnParseHandlers;
+        return this;
+    }
+
+    public List<CmmnParseHandler> getCustomCmmnParseHandlers() {
+        return customCmmnParseHandlers;
+    }
+
+    public CmmnEngineConfiguration setCustomCmmnParseHandlers(List<CmmnParseHandler> customCmmnParseHandlers) {
+        this.customCmmnParseHandlers = customCmmnParseHandlers;
+        return this;
+    }
+
+    public CmmnListenerFactory getListenerFactory() {
+        return listenerFactory;
+    }
+
+    public CmmnEngineConfiguration setListenerFactory(CmmnListenerFactory listenerFactory) {
+        this.listenerFactory = listenerFactory;
+        return this;
+    }
+
+    public CmmnListenerNotificationHelper getListenerNotificationHelper() {
+        return listenerNotificationHelper;
+    }
+
+    public CmmnEngineConfiguration setListenerNotificationHelper(CmmnListenerNotificationHelper listenerNotificationHelper) {
+        this.listenerNotificationHelper = listenerNotificationHelper;
+        return this;
+    }
+
     public CmmnDeployer getCmmnDeployer() {
         return cmmnDeployer;
     }
@@ -2020,13 +2169,36 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
-    public List<PlanItemInstanceLifeCycleListener> getPlanItemInstanceLifeCycleListeners() {
-        return planItemInstanceLifeCycleListeners;
+    public Map<String, List<PlanItemInstanceLifecycleListener>> getPlanItemInstanceLifecycleListeners() {
+        return planItemInstanceLifecycleListeners;
     }
 
-    public CmmnEngineConfiguration setPlanItemInstanceLifeCycleListeners(List<PlanItemInstanceLifeCycleListener> planItemInstanceLifeCycleListeners) {
-        this.planItemInstanceLifeCycleListeners = planItemInstanceLifeCycleListeners;
-        return this;
+    public void setPlanItemInstanceLifecycleListeners(Map<String, List<PlanItemInstanceLifecycleListener>> planItemInstanceLifecycleListeners) {
+        this.planItemInstanceLifecycleListeners = planItemInstanceLifecycleListeners;
+    }
+
+    /**
+     * Register a global {@link PlanItemInstanceLifecycleListener} to listen to {@link org.flowable.cmmn.api.runtime.PlanItemInstance} state changes.
+     *
+     * @param planItemDefinitionType A string from {@link org.flowable.cmmn.api.runtime.PlanItemDefinitionType}.
+     *                               If null is passed, the listener will be invoked for any type.
+     * @param planItemInstanceLifeCycleListener The listener instance.
+     */
+    public void addPlanItemInstanceLifeCycleListeners(String planItemDefinitionType, PlanItemInstanceLifecycleListener planItemInstanceLifeCycleListener) {
+        if (planItemInstanceLifecycleListeners == null) {
+            planItemInstanceLifecycleListeners = new HashMap<>();
+        }
+        planItemInstanceLifecycleListeners
+            .computeIfAbsent(planItemDefinitionType, key -> new ArrayList<PlanItemInstanceLifecycleListener>())
+            .add(planItemInstanceLifeCycleListener);
+    }
+
+    /**
+     * Register a global {@link PlanItemInstanceLifecycleListener} to listen to any (all plan item definition types)
+     * {@link org.flowable.cmmn.api.runtime.PlanItemInstance} state changes.
+     */
+    public void addPlanItemInstanceLifeCycleListeners(PlanItemInstanceLifecycleListener planItemInstanceLifeCycleListener) {
+        addPlanItemInstanceLifeCycleListeners(null, planItemInstanceLifeCycleListener);
     }
 
     @Override

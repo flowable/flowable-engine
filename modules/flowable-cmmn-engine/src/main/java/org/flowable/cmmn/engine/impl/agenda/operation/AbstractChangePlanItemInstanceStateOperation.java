@@ -43,7 +43,7 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
         String oldState = planItemInstanceEntity.getState();
         String newState = getNewState();
         planItemInstanceEntity.setState(newState);
-        PlanItemLifeCycleListenerUtil.callLifeCycleListeners(commandContext, planItemInstanceEntity, oldState, getNewState());
+        PlanItemLifeCycleListenerUtil.callLifecycleListeners(commandContext, planItemInstanceEntity, oldState, getNewState());
 
         CommandContextUtil.getAgenda(commandContext).planEvaluateCriteriaOperation(planItemInstanceEntity.getCaseInstanceId(), createPlanItemLifeCycleEvent());
         internalExecute();

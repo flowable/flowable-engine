@@ -12,9 +12,7 @@
  */
 package org.flowable.cmmn.api.listener;
 
-import java.util.List;
-
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 
 /**
  * [Experimental]
@@ -24,13 +22,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
  *
  * @author Joram Barrez
  */
-public interface PlanItemInstanceLifeCycleListener {
-
-    /**
-     * @return The list of types (from {@link org.flowable.cmmn.api.runtime.PlanItemDefinitionType)} this listener listens for.
-     *         If an empty list or null is returned, all types will be assumed.
-     */
-    List<String> getItemDefinitionTypes();
+public interface PlanItemInstanceLifecycleListener {
 
     /**
      * @return The type a plan item instance is changing from, use a value from {@link org.flowable.cmmn.api.runtime.PlanItemInstanceState}.
@@ -47,9 +39,9 @@ public interface PlanItemInstanceLifeCycleListener {
     String getTargetState();
 
     /**
-     * Will be called when the state of a {@link PlanItemInstance} changes, if the {@link #getItemDefinitionTypes()} and the
+     * Will be called when the state of a {@link DelegatePlanItemInstance} changes and the
      * {@link #getSourceState()} and {@link #getTargetState()} match.
      */
-    void stateChanged(PlanItemInstance planItemInstance, String oldState, String newState);
+    void stateChanged(DelegatePlanItemInstance planItemInstance, String oldState, String newState);
 
 }

@@ -10,34 +10,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.test.listener;
+package org.flowable.cmmn.converter.export;
 
-import java.util.List;
+import org.flowable.cmmn.model.GenericEventListener;
 
 /**
- * @author Joram Barrez
+ * @author Tijs Rademakers
  */
-public class TestFilterTargetStateLifeCycleListener extends AbstractTestLifeCycleListener {
+public class GenericEventListenerExport extends AbstractPlanItemDefinitionExport<GenericEventListener> {
 
-    protected String targetState;
-
-    public TestFilterTargetStateLifeCycleListener(String targetState) {
-        this.targetState = targetState;
+    @Override
+    protected Class<? extends GenericEventListener> getExportablePlanItemDefinitionClass() {
+        return GenericEventListener.class;
     }
 
     @Override
-    public List<String> getItemDefinitionTypes() {
-        return null;
+    protected String getPlanItemDefinitionXmlElementValue(GenericEventListener planItemDefinition) {
+        return ELEMENT_GENERIC_EVENT_LISTENER;
     }
-
-    @Override
-    public String getSourceState() {
-        return null;
-    }
-
-    @Override
-    public String getTargetState() {
-        return targetState;
-    }
-
 }

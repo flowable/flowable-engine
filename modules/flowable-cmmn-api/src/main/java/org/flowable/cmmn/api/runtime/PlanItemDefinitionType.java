@@ -14,6 +14,7 @@ package org.flowable.cmmn.api.runtime;
 
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.DecisionTask;
+import org.flowable.cmmn.model.GenericEventListener;
 import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.Milestone;
@@ -38,6 +39,8 @@ public interface PlanItemDefinitionType {
     String TIMER_EVENT_LISTENER = TimerEventListener.class.getSimpleName().toLowerCase();
 
     String USER_EVENT_LISTENER = UserEventListener.class.getSimpleName().toLowerCase();
+    
+    String GENERIC_EVENT_LISTENER = GenericEventListener.class.getSimpleName().toLowerCase();
     
     String HUMAN_TASK = HumanTask.class.getSimpleName().toLowerCase();
     
