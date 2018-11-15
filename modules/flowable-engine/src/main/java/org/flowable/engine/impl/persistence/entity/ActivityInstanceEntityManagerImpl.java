@@ -23,9 +23,11 @@ import java.util.Objects;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
-import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.ActivityInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.data.ActivityInstanceDataManager;
@@ -41,13 +43,11 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
     protected ActivityInstanceDataManager activityInstanceDataManager;
 
     protected final boolean usePrefixId;
-    protected final boolean recordRuntimeActivities;
 
     public ActivityInstanceEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration, ActivityInstanceDataManager activityInstanceDataManager) {
         super(processEngineConfiguration);
         this.activityInstanceDataManager = activityInstanceDataManager;
         this.usePrefixId = processEngineConfiguration.isUsePrefixId();
-        this.recordRuntimeActivities = processEngineConfiguration.isRecordRuntimeActivities();
     }
 
     @Override
@@ -72,15 +72,11 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
 
     @Override
     public void deleteActivityInstancesByProcessInstanceId(String processInstanceId) {
-        if (recordRuntimeActivities) {
-            activityInstanceDataManager.deleteActivityInstancesByProcessInstanceId(processInstanceId);
-        }
+        activityInstanceDataManager.deleteActivityInstancesByProcessInstanceId(processInstanceId);
     }
     @Override
     public void deleteActivityInstancesByProcessDefinitionId(String processDefinitionId) {
-        if (recordRuntimeActivities) {
-            activityInstanceDataManager.deleteActivityInstancesByProcessDefinitionId(processDefinitionId);
-        }
+        activityInstanceDataManager.deleteActivityInstancesByProcessDefinitionId(processDefinitionId);
     }
 
     @Override
@@ -105,23 +101,21 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
 
     @Override
     public void recordActivityStart(ExecutionEntity executionEntity) {
-        HistoricActivityInstance historicActivityInstanceEntity = getHistoryManager().recordActivityStart(executionEntity);
-        recordRuntimeActivityStart(executionEntity, historicActivityInstanceEntity);
+        ActivityInstance activityInstance = recordRuntimeActivityStart(executionEntity);
+        getHistoryManager().recordActivityStart(activityInstance);
     }
 
     @Override
     public void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason) {
-        HistoricActivityInstance historicActivityInstance = getHistoryManager().recordActivityEnd(executionEntity, deleteReason);
-        recordActivityInstanceEnd(executionEntity, deleteReason, historicActivityInstance);
+        ActivityInstance activityInstance = recordActivityInstanceEnd(executionEntity, deleteReason);
+        getHistoryManager().recordActivityEnd(activityInstance);
     }
 
     @Override
     public void recordSubProcessInstanceStart(ExecutionEntity parentExecution, ExecutionEntity subProcessInstance) {
-        if (recordRuntimeActivities) {
-            ActivityInstanceEntity activityInstance = findActivityInstance(parentExecution, false, true);
-            if (activityInstance != null) {
-                activityInstance.setCalledProcessInstanceId(subProcessInstance.getProcessInstanceId());
-            }
+        ActivityInstanceEntity activityInstance = findActivityInstance(parentExecution, true);
+        if (activityInstance != null) {
+            activityInstance.setCalledProcessInstanceId(subProcessInstance.getProcessInstanceId());
         }
 
         getHistoryManager().recordSubProcessInstanceStart(parentExecution, subProcessInstance);
@@ -134,8 +128,8 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
     }
 
     protected void recordActivityTaskCreated(TaskEntity task, ExecutionEntity execution) {
-        if (recordRuntimeActivities && execution != null) {
-            ActivityInstanceEntity activityInstance = findActivityInstance(execution, false, true);
+        if (execution != null) {
+            ActivityInstanceEntity activityInstance = findActivityInstance(execution, true);
             if (activityInstance != null) {
                 activityInstance.setTaskId(task.getId());
             }
@@ -166,74 +160,47 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
     }
 
     protected void recordActivityTaskInfoChange(TaskEntity taskEntity) {
-        if (recordRuntimeActivities) {
-            ExecutionEntity executionEntity = getExecutionEntityManager().findById(taskEntity.getExecutionId());
-            if (executionEntity != null) {
-                ActivityInstanceEntity activityInstance = findActivityInstance(executionEntity, false, true);
-                if (activityInstance != null && !Objects.equals(activityInstance.getAssignee(), taskEntity.getAssignee())) {
-                    activityInstance.setAssignee(taskEntity.getAssignee());
-                }
+        ExecutionEntity executionEntity = getExecutionEntityManager().findById(taskEntity.getExecutionId());
+        if (executionEntity != null) {
+            ActivityInstanceEntity activityInstance = findActivityInstance(executionEntity, true);
+            if (activityInstance != null && !Objects.equals(activityInstance.getAssignee(), taskEntity.getAssignee())) {
+                activityInstance.setAssignee(taskEntity.getAssignee());
             }
         }
     }
 
-    protected void recordRuntimeActivityStart(ExecutionEntity executionEntity, HistoricActivityInstance historicActivityInstance) {
-        if (this.recordRuntimeActivities &&
-           executionEntity.getActivityId() != null && executionEntity.getCurrentFlowElement() != null) {
-            ActivityInstanceEntity activityInstanceEntity = findActivityInstance(executionEntity, executionEntity.getActivityId(), false,  true);
-            if (activityInstanceEntity == null) {
-                if (historicActivityInstance != null) {
-                    cloneActivityInstanceFrom(historicActivityInstance);
-                } else {
-                    createActivityInstance(executionEntity);
-                }
+    protected ActivityInstance recordRuntimeActivityStart(ExecutionEntity executionEntity) {
+        ActivityInstance activityInstance = null;
+        if (executionEntity.getActivityId() != null && executionEntity.getCurrentFlowElement() != null) {
+            activityInstance = findActivityInstance(executionEntity,  true);
+            if (activityInstance == null) {
+                activityInstance = createActivityInstance(executionEntity);
             }
         }
+
+        return activityInstance;
     }
 
-    protected void cloneActivityInstanceFrom(HistoricActivityInstance historicActivityInstance) {
-        ActivityInstanceEntity activityInstanceEntity = create();
-        activityInstanceEntity.setId(historicActivityInstance.getId());
-
-        activityInstanceEntity.setProcessDefinitionId(historicActivityInstance.getProcessDefinitionId());
-        activityInstanceEntity.setProcessInstanceId(historicActivityInstance.getProcessInstanceId());
-        activityInstanceEntity.setExecutionId(historicActivityInstance.getExecutionId());
-        activityInstanceEntity.setActivityId(historicActivityInstance.getActivityId());
-        activityInstanceEntity.setActivityName(historicActivityInstance.getActivityName());
-        activityInstanceEntity.setActivityType(historicActivityInstance.getActivityType());
-        activityInstanceEntity.setStartTime(historicActivityInstance.getStartTime());
-        activityInstanceEntity.setTenantId(historicActivityInstance.getTenantId());
-
-        insert(activityInstanceEntity);
-    }
-
-
-    protected void createActivityInstance(ExecutionEntity executionEntity) {
+    protected ActivityInstance createActivityInstance(ExecutionEntity executionEntity) {
+        ActivityInstance activityInstance = null;
         if (executionEntity.getActivityId() != null && executionEntity.getCurrentFlowElement() != null) {
 
             // activity instance could have been created (but only in cache, never persisted)
             // for example when submitting form properties
-            ActivityInstanceEntity activityInstanceEntityFromCache = getActivityInstanceFromCache(executionEntity.getId(),
-                executionEntity.getActivityId(), true);
-            if (activityInstanceEntityFromCache == null) {
-                createActivityInstanceEntity(executionEntity);
+            activityInstance = getActivityInstanceFromCache(executionEntity.getId(), executionEntity.getActivityId(), true);
+            if (activityInstance  == null) {
+                activityInstance = createActivityInstanceEntity(executionEntity);
             }
         }
+        return activityInstance;
     }
 
-    protected void recordActivityInstanceEnd(ExecutionEntity executionEntity, String deleteReason, HistoricActivityInstance historicActivityInstance) {
-        if (this.recordRuntimeActivities) {
-            ActivityInstanceEntity activityInstance = findActivityInstance(executionEntity, false, true);
-            if (activityInstance != null) {
-                if (historicActivityInstance != null) {
-                    activityInstance.setDeleteReason(deleteReason);
-                    activityInstance.setEndTime(historicActivityInstance.getEndTime());
-                    activityInstance.setDurationInMillis(historicActivityInstance.getDurationInMillis());
-                } else {
-                    activityInstance.markEnded(deleteReason);
-                }
-            }
+    protected ActivityInstance recordActivityInstanceEnd(ExecutionEntity executionEntity, String deleteReason) {
+        ActivityInstanceEntity activityInstance = findActivityInstance(executionEntity, true);
+        if (activityInstance != null) {
+            activityInstance.markEnded(deleteReason);
         }
+        return activityInstance;
     }
 
     public ActivityInstanceDataManager getActivityInstanceDataManager() {
@@ -244,49 +211,41 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
         this.activityInstanceDataManager = activityInstanceDataManager;
     }
 
-    public ActivityInstanceEntity findActivityInstance(ExecutionEntity execution, boolean createOnNotFound, boolean endTimeMustBeNull) {
+    public ActivityInstanceEntity findActivityInstance(ExecutionEntity execution, boolean endTimeMustBeNull) {
         String activityId = getActivityIdForExecution(execution);
-        return activityId != null ? findActivityInstance(execution, activityId, createOnNotFound, endTimeMustBeNull) : null;
-    }
+        if (activityId != null) {
+            // No use looking for the HistoricActivityInstance when no activityId is provided.
+            if (activityId == null) {
+                return null;
+            }
 
-    protected ActivityInstanceEntity findActivityInstance(ExecutionEntity execution, String activityId, boolean createOnNotFound, boolean endTimeMustBeNull) {
+            String executionId = execution.getId();
 
-        // No use looking for the HistoricActivityInstance when no activityId is provided.
-        if (activityId == null) {
-            return null;
-        }
+            // Check the cache
+            ActivityInstanceEntity activityInstanceFromCache = getActivityInstanceFromCache(executionId, activityId, endTimeMustBeNull);
+            if (activityInstanceFromCache != null) {
+                return activityInstanceFromCache;
+            }
 
-        String executionId = execution.getId();
+            // If the execution was freshly created, there is no need to check the database,
+            // there can never be an entry for a activity instance with this execution id.
+            if (!execution.isInserted() && !execution.isProcessInstanceType()) {
 
-        // Check the cache
-        ActivityInstanceEntity activityInstanceFromCache = getActivityInstanceFromCache(executionId, activityId, endTimeMustBeNull);
-        if (activityInstanceFromCache != null) {
-            return activityInstanceFromCache;
-        }
-
-        // If the execution was freshly created, there is no need to check the database,
-        // there can never be an entry for a activity instance with this execution id.
-        if (!execution.isInserted() && !execution.isProcessInstanceType()) {
-
-            // Check the database
-            List<ActivityInstanceEntity> activityInstances = getActivityInstanceEntityManager()
-                .findUnfinishedActivityInstancesByExecutionAndActivityId(executionId, activityId);
-            if (endTimeMustBeNull) {
-                // cache can be updated before DB
-                ActivityInstanceEntity activityFromCache = getActivityInstanceFromCache(executionId, activityId, false);
-                if (activityFromCache != null && activityFromCache.getEndTime() != null) {
-                    activityInstances.remove(activityFromCache);
+                // Check the database
+                List<ActivityInstanceEntity> activityInstances = getActivityInstanceEntityManager()
+                    .findUnfinishedActivityInstancesByExecutionAndActivityId(executionId, activityId);
+                if (endTimeMustBeNull) {
+                    // cache can be updated before DB
+                    ActivityInstanceEntity activityFromCache = getActivityInstanceFromCache(executionId, activityId, false);
+                    if (activityFromCache != null && activityFromCache.getEndTime() != null) {
+                        activityInstances.remove(activityFromCache);
+                    }
                 }
-            }
-            if (activityInstances.size() > 0) {
-                return activityInstances.get(0);
-            }
+                if (activityInstances.size() > 0) {
+                    return activityInstances.get(0);
+                }
 
-        }
-
-        if (createOnNotFound
-            && ((execution.getCurrentFlowElement() != null && execution.getCurrentFlowElement() instanceof FlowNode) || execution.getCurrentFlowElement() == null)) {
-            return createActivityInstanceEntity(execution);
+            }
         }
 
         return null;

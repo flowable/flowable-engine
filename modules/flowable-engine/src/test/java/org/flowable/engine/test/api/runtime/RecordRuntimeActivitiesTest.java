@@ -12,53 +12,9 @@ import org.junit.jupiter.api.Test;
 public class RecordRuntimeActivitiesTest extends AbstractTestCase {
 
     @Test
-    public void falseRecordRuntimeActivities() {
-        ProcessEngineConfiguration processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration()
-            .setJdbcUrl("jdbc:h2:mem:RecordRuntimeActivitiesTest")
-            .setRecordRuntimeActivities(false);
-        ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
-
-        Deployment deployment = processEngine.getRepositoryService().createDeployment()
-            .addClasspathResource("org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
-            .deploy();
-
-        try {
-            processEngine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess");
-
-            assertThat(processEngine.getRuntimeService().createActivityInstanceQuery().count()).isEqualTo(0L);
-        } finally {
-            processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
-            processEngine.close();
-        }
-
-    }
-
-    @Test
-    public void defaultRecordRuntimeActivities() {
+    public void mandatoryRecordRuntimeActivities() {
         ProcessEngineConfiguration processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration()
             .setJdbcUrl("jdbc:h2:mem:RecordRuntimeActivitiesTest");
-        ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
-
-        Deployment deployment = processEngine.getRepositoryService().createDeployment()
-            .addClasspathResource("org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
-            .deploy();
-
-        try {
-            processEngine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess");
-
-            assertThat(processEngine.getRuntimeService().createActivityInstanceQuery().count()).isGreaterThan(0L);
-        } finally {
-            processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
-            processEngine.close();
-        }
-
-    }
-
-    @Test
-    public void recordRuntimeActivities() {
-        ProcessEngineConfiguration processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration()
-            .setJdbcUrl("jdbc:h2:mem:RecordRuntimeActivitiesTest")
-            .setRecordRuntimeActivities(true);
         ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
 
         Deployment deployment = processEngine.getRepositoryService().createDeployment()

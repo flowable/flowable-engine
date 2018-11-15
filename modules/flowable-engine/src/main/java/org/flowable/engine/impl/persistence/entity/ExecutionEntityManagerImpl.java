@@ -390,7 +390,6 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         List<String> processInstanceIds = executionDataManager.findProcessInstanceIdsByProcessDefinitionId(processDefinitionId);
 
         for (String processInstanceId : processInstanceIds) {
-            getActivityInstanceEntityManager().deleteActivityInstancesByProcessInstanceId(processInstanceId);
             deleteProcessInstanceCascade(findById(processInstanceId), deleteReason, cascade);
         }
 
@@ -436,6 +435,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         if (deleteReason == null) {
             deleteReason = DeleteReason.PROCESS_INSTANCE_DELETED;
         }
+        getActivityInstanceEntityManager().deleteActivityInstancesByProcessInstanceId(execution.getId());
 
         for (ExecutionEntity subExecutionEntity : execution.getExecutions()) {
             if (subExecutionEntity.isMultiInstanceRoot()) {

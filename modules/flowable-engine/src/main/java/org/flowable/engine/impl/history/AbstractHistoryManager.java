@@ -276,9 +276,9 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
     }
 
     @Override
-    public HistoricActivityInstanceEntity findHistoricActivityInstance(ExecutionEntity execution, boolean createOnNotFound, boolean endTimeMustBeNull) {
+    public HistoricActivityInstanceEntity findHistoricActivityInstance(ExecutionEntity execution, boolean endTimeMustBeNull) {
         String activityId = getActivityIdForExecution(execution);
-        return activityId != null ? findHistoricActivityInstance(execution, activityId, createOnNotFound, endTimeMustBeNull) : null;
+        return activityId != null ? findHistoricActivityInstance(execution, activityId, endTimeMustBeNull) : null;
     }
 
     protected String getActivityIdForExecution(ExecutionEntity execution) {
@@ -292,7 +292,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
         return activityId;
     }
 
-    protected HistoricActivityInstanceEntity findHistoricActivityInstance(ExecutionEntity execution, String activityId, boolean createOnNotFound, boolean endTimeMustBeNull) {
+    protected HistoricActivityInstanceEntity findHistoricActivityInstance(ExecutionEntity execution, String activityId, boolean endTimeMustBeNull) {
 
         // No use looking for the HistoricActivityInstance when no activityId is provided.
         if (activityId == null) {
@@ -315,52 +315,15 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
             List<HistoricActivityInstanceEntity> historicActivityInstances = getHistoricActivityInstanceEntityManager()
                             .findUnfinishedHistoricActivityInstancesByExecutionAndActivityId(executionId, activityId);
 
-            if (historicActivityInstances.size() > 0) {
+            if (historicActivityInstances.size() > 0 && (!endTimeMustBeNull || historicActivityInstances.get(0).getEndTime() == null)) {
                 return historicActivityInstances.get(0);
             }
 
         }
 
-        if (createOnNotFound
-                        && ((execution.getCurrentFlowElement() != null && execution.getCurrentFlowElement() instanceof FlowNode) || execution.getCurrentFlowElement() == null)) {
-            return createHistoricActivityInstanceEntity(execution);
-        }
-
         return null;
     }
 
-    protected HistoricActivityInstanceEntity createHistoricActivityInstanceEntity(ExecutionEntity execution) {
-        IdGenerator idGenerator = getProcessEngineConfiguration().getIdGenerator();
-
-        String processDefinitionId = execution.getProcessDefinitionId();
-        String processInstanceId = execution.getProcessInstanceId();
-
-        HistoricActivityInstanceEntity historicActivityInstance = getHistoricActivityInstanceEntityManager().create();
-        if (usePrefixId) {
-            historicActivityInstance.setId(historicActivityInstance.getIdPrefix() + idGenerator.getNextId());
-        } else {
-            historicActivityInstance.setId(idGenerator.getNextId());
-        }
-        
-        historicActivityInstance.setProcessDefinitionId(processDefinitionId);
-        historicActivityInstance.setProcessInstanceId(processInstanceId);
-        historicActivityInstance.setExecutionId(execution.getId());
-        historicActivityInstance.setActivityId(execution.getActivityId());
-        if (execution.getCurrentFlowElement() != null) {
-            historicActivityInstance.setActivityName(execution.getCurrentFlowElement().getName());
-            historicActivityInstance.setActivityType(parseActivityType(execution.getCurrentFlowElement()));
-        }
-        Date now = getClock().getCurrentTime();
-        historicActivityInstance.setStartTime(now);
-
-        if (execution.getTenantId() != null) {
-            historicActivityInstance.setTenantId(execution.getTenantId());
-        }
-
-        getHistoricActivityInstanceEntityManager().insert(historicActivityInstance);
-        return historicActivityInstance;
-    }
-    
     protected HistoryLevel getProcessDefinitionHistoryLevel(String processDefinitionId) {
         HistoryLevel processDefinitionHistoryLevel = null;
 

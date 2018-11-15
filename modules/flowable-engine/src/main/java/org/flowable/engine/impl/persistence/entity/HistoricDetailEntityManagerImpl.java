@@ -54,10 +54,15 @@ public class HistoricDetailEntityManagerImpl extends AbstractEntityManager<Histo
         historicFormPropertyEntity.setPropertyValue(propertyValue);
         historicFormPropertyEntity.setTime(getClock().getCurrentTime());
 
-        HistoricActivityInstanceEntity historicActivityInstance = getHistoryManager().findHistoricActivityInstance(execution, true, false);
-        if (historicActivityInstance != null) {
-            historicFormPropertyEntity.setActivityInstanceId(historicActivityInstance.getId());
+        List<ActivityInstanceEntity> activityInstances = getActivityInstanceEntityManager().findUnfinishedActivityInstancesByExecutionAndActivityId(execution.getId(), execution.getActivityId());
+        String activityInstanceId;
+        if (!activityInstances.isEmpty()) {
+            activityInstanceId = activityInstances.get(0).getId();
+        } else {
+            getActivityInstanceEntityManager().recordActivityStart(execution);
+            activityInstanceId = getHistoryManager().findHistoricActivityInstance(execution, true).getId();
         }
+        historicFormPropertyEntity.setActivityInstanceId(activityInstanceId);
 
         insert(historicFormPropertyEntity);
         return historicFormPropertyEntity;

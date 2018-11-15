@@ -85,7 +85,6 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected String history = HistoryLevel.AUDIT.getKey();
     protected boolean asyncExecutorActivate;
     protected boolean asyncHistoryExecutorActivate;
-    protected boolean recordRuntimeActivities = true;
 
     protected String mailServerHost = "localhost";
     protected String mailServerUsername; // by default no name and password are provided, which
@@ -480,16 +479,6 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
         this.asyncHistoryExecutorActivate = asyncHistoryExecutorActivate;
         return this;
     }
-
-    public boolean isRecordRuntimeActivities() {
-        return recordRuntimeActivities;
-    }
-
-    public ProcessEngineConfiguration setRecordRuntimeActivities(boolean recordRuntimeActivities) {
-        this.recordRuntimeActivities = recordRuntimeActivities;
-        return this;
-    }
-
 
     @Override
     public ProcessEngineConfiguration setClassLoader(ClassLoader classLoader) {

@@ -16,10 +16,10 @@ import java.util.Map;
 
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.common.engine.impl.history.HistoryLevel;
-import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.api.IdentityLink;
@@ -81,18 +81,22 @@ public interface HistoryManager {
 
     /**
      * Record the start of an activity, if activity history is enabled.
+     *
+     * @param activityInstance activity instance template
      */
-    HistoricActivityInstance recordActivityStart(ExecutionEntity executionEntity);
+    void recordActivityStart(ActivityInstance activityInstance);
 
     /**
      * Record the end of an activity, if activity history is enabled.
+     *
+     * @param activityInstance activity instance template
      */
-    HistoricActivityInstance recordActivityEnd(ExecutionEntity executionEntity, String deleteReason);
+    void recordActivityEnd(ActivityInstance activityInstance);
 
     /**
      * Finds the {@link HistoricActivityInstanceEntity} that is active in the given execution.
      */
-    HistoricActivityInstanceEntity findHistoricActivityInstance(ExecutionEntity execution, boolean createOnNotFound, boolean validateEndTimeNull);
+    HistoricActivityInstanceEntity findHistoricActivityInstance(ExecutionEntity execution, boolean validateEndTimeNull);
 
     /**
      * Record a change of the process-definition id of a process instance, if activity history is enabled.
