@@ -212,8 +212,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         if (activityInstance != null && isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, activityInstance.getProcessDefinitionId())) {
             ExecutionEntity executionEntity = getExecutionEntityManager().findById(activityInstance.getExecutionId());
             historicActivityInstance = findHistoricActivityInstance(executionEntity, true);
-            //historicActivityInstance  = getHistoricActivityInstanceFromCache(activityInstance.getId(), activityInstance
-            //                                .getActivityId(), true);
             historicActivityInstance.setDeleteReason(activityInstance.getDeleteReason());
             historicActivityInstance.setEndTime(activityInstance.getEndTime());
             historicActivityInstance.setDurationInMillis(activityInstance.getDurationInMillis());
