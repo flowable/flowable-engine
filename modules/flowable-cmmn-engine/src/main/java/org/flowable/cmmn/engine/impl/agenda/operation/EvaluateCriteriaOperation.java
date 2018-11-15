@@ -498,14 +498,15 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                         List<PlanItem> parentPlanItems = PlanItemUtil.getAllParentPlanItems(entryDependentPlanItem);
                         Map<String, List<PlanItemInstanceEntity>> existingPlanItemInstancesMap = CaseInstanceUtil
                             .findChildPlanItemInstancesMap(caseInstanceEntity, parentPlanItems);
-                        List<PlanItemInstanceEntity> newParentPlanItemInstances = new ArrayList<>();
+                        List<PlanItemInstanceEntity> parentPlanItemInstancesToActivate = new ArrayList<>();
 
                         PlanItemInstance previousParentPlanItemInstance = null;
                         for (int i = parentPlanItems.size() - 1; i >= 0; i--) { // going from outermost to direct parent
 
                             PlanItem parentPlanItem = parentPlanItems.get(i);
+                            List<PlanItemInstanceEntity> parentPlanItemInstances = existingPlanItemInstancesMap.get(parentPlanItem.getId());
 
-                            if (!existingPlanItemInstancesMap.containsKey(parentPlanItem.getId())) {
+                            if (parentPlanItemInstances == null || parentPlanItemInstances.isEmpty()) {
                                 PlanItemInstanceEntity parentPlanItemInstance = planItemInstanceEntityManager.createChildPlanItemInstance(
                                     parentPlanItem,
                                     caseInstanceEntity.getCaseDefinitionId(),
@@ -513,10 +514,17 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                                     previousParentPlanItemInstance != null ? previousParentPlanItemInstance.getId() : null,
                                     caseInstanceEntity.getTenantId(),
                                     true);
-                                newParentPlanItemInstances.add(parentPlanItemInstance);
+                                parentPlanItemInstancesToActivate.add(parentPlanItemInstance);
 
                             } else {
-                                previousParentPlanItemInstance = existingPlanItemInstancesMap.get(parentPlanItem.getId()).get(0);
+
+                                for (PlanItemInstanceEntity parentPlanItemInstance : parentPlanItemInstances) {
+                                    if (!PlanItemInstanceState.ACTIVE.equals(parentPlanItemInstance.getState())) {
+                                        parentPlanItemInstancesToActivate.add(parentPlanItemInstance);
+                                    }
+                                }
+
+                                previousParentPlanItemInstance = parentPlanItemInstances.get(0);
 
                             }
                         }
@@ -533,8 +541,8 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
                         // All plan item instances are created. Now activate them.
                         CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(entryDependentPlanItemInstance, satisfiedCriterion);
-                        for (int i = newParentPlanItemInstances.size() - 1; i >= 0; i--) {
-                            CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(newParentPlanItemInstances.get(i), null); // null -> no sentry satisfied, activation is because of child activation
+                        for (int i = parentPlanItemInstancesToActivate.size() - 1; i >= 0; i--) {
+                            CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(parentPlanItemInstancesToActivate.get(i), null); // null -> no sentry satisfied, activation is because of child activation
                         }
                     }
 
