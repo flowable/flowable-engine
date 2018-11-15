@@ -333,6 +333,10 @@ public abstract class AbstractDynamicStateManager {
         Map<String, List<ExecutionEntity>> activeEmbeddedSubProcesses = resolveActiveEmbeddedSubProcesses(processInstanceChangeState.getProcessInstanceId(), commandContext);
         processInstanceChangeState.setProcessInstanceActiveEmbeddedExecutions(activeEmbeddedSubProcesses);
 
+        //Set the processInstance variables first so they are available during te change state
+        ExecutionEntity processInstanceExecution = executionEntityManager.findById(processInstanceChangeState.getProcessInstanceId());
+        processInstanceExecution.setVariables(processInstanceChangeState.getProcessInstanceVariables());
+
         for (MoveExecutionEntityContainer moveExecutionContainer : processInstanceChangeState.getMoveExecutionEntityContainers()) {
 
             // Action the moves (changeState)
@@ -414,16 +418,7 @@ public abstract class AbstractDynamicStateManager {
                 }
                 newChildExecutions = createEmbeddedSubProcessAndExecutions(moveExecutionContainer.getMoveToFlowElements(), moveExecutions, subProcessMoveExecutionEntityContainer, new ProcessInstanceChangeState(), commandContext);
 
-                defaultContinueParentExecution = newChildExecutions.get(0);
-
-            } else {
-                // The default parent execution is retrieved from the match with the first source execution
-                defaultContinueParentExecution = moveExecutionContainer.getContinueParentExecution(executionsToMove.get(0).getId());
             }
-
-            //TODO WIP - Set process variables to both the root process and any subProcess??
-            ExecutionEntity processInstanceExecution = defaultContinueParentExecution.getProcessInstance();
-            processInstanceExecution.setVariables(processInstanceChangeState.getProcessInstanceVariables());
 
             if (!processInstanceChangeState.getLocalVariables().isEmpty()) {
                 Map<String, Map<String, Object>> localVariables = processInstanceChangeState.getLocalVariables();
