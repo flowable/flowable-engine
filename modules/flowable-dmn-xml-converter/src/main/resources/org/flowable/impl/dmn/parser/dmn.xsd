@@ -430,7 +430,7 @@
 					<xsd:element name="outputDecision" type="tDMNElementReference" maxOccurs="unbounded"/>
 					<xsd:element name="encapsulatedDecision" type="tDMNElementReference" minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:element name="inputDecision" type="tDMNElementReference" minOccurs="0" maxOccurs="unbounded"/>
-					<xsd:element name="inputData" type="tDMNElementReference" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element name="input" type="tDMNElementReference" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>

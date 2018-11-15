@@ -263,6 +263,15 @@ public class ModelServiceImpl implements ModelService {
             stencilNode.put("id", "CasePlanModel");
             json = editorNode.toString();
 
+        } else if (Integer.valueOf(AbstractModel.MODEL_TYPE_DRD).equals(model.getModelType())) {
+            ObjectNode editorNode = objectMapper.createObjectNode();
+            editorNode.put("id", "canvas");
+            editorNode.put("resourceId", "canvas");
+            ObjectNode stencilSetNode = objectMapper.createObjectNode();
+            stencilSetNode.put("namespace", "http://b3mn.org/stencilset/dmn1.2#");
+            editorNode.set("stencilset", stencilSetNode);
+            json = editorNode.toString();
+
         } else {
             ObjectNode editorNode = objectMapper.createObjectNode();
             editorNode.put("id", "canvas");
@@ -710,7 +719,8 @@ public class ModelServiceImpl implements ModelService {
                 handleCmmnProcessModelRelations(model, jsonNode);
 
             } else if (model.getModelType().intValue() == Model.MODEL_TYPE_FORM ||
-                    model.getModelType().intValue() == Model.MODEL_TYPE_DECISION_TABLE) {
+                    model.getModelType().intValue() == Model.MODEL_TYPE_DECISION_TABLE ||
+                    model.getModelType().intValue() == Model.MODEL_TYPE_DRD) {
 
                 jsonNode.put("name", model.getName());
                 jsonNode.put("key", model.getKey());

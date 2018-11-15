@@ -146,6 +146,7 @@
         "TITLE": "Decision Tables",
         "SEARCH-PLACEHOLDER": "Search",
         "ACTION": {
+            "CREATE-DRD": "Create DRD",
             "CREATE": "Create Decision Table",
             "IMPORT": "Import Decision Table",
             "CREATE-INLINE": "Create a new decision table now!",
@@ -382,7 +383,15 @@
           "USE-AS-NEW-UNRESOLVED-MODEL": "Model '{{name}}' with internal id {{id}}, created by {{createdBy}}"
         }
     },
-
+    "DECISION-REQUIREMENT-DIAGRAM": {
+      "NAME": "Decision requirement name",
+      "KEY": "Decision requirement key",
+      "DESCRIPTION": "Description",
+      "POPUP": {
+        "CREATE-TITLE": "Create a new decision requirement diagram",
+        "CREATE-DESCRIPTION": "You need to give a name for the new decision requirement diagram and you may want to add a description at the same time."
+      }
+    },
     "DECISION-TABLE": {
         "NAME": "Decision Table name",
         "KEY": "Decision Table key",

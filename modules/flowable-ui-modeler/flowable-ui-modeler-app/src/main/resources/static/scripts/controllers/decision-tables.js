@@ -131,7 +131,22 @@ angular.module('flowableModeler')
 		  }, $modal, $scope);
 	  };
 
-	  $scope.showDecisionTableDetails = function(decisionTable) {
+      $scope.createDRD = function() {
+          $rootScope.currentKickstartModel = undefined;
+          $rootScope.currentDRDModel = undefined;
+          $scope.createDRDCallback = function(result) {
+              $rootScope.editorHistory = [];
+              $location.url("/drd-editor/" + encodeURIComponent(result.id));
+          };
+
+          _internalCreateModal({
+              template: 'views/popup/decision-drd-create.html?version=' + Date.now(),
+              scope: $scope
+          }, $modal, $scope);
+      };
+
+
+      $scope.showDecisionTableDetails = function(decisionTable) {
 	      if (decisionTable) {
 	      	  $rootScope.editorHistory = [];
 			  $rootScope.currentKickstartModel = undefined;
@@ -197,6 +212,54 @@ angular.module('flowableModeler')
         }
     };
 }]);
+
+angular.module('flowableModeler')
+    .controller('CreateNewDRDCtrl', ['$rootScope', '$scope', '$http', function ($rootScope, $scope, $http) {
+
+        $scope.model = {
+            loading: false,
+            drd: {
+                name: '',
+                key: '',
+                description: '',
+                modelType: 6
+            }
+        };
+
+        $scope.ok = function () {
+
+            if (!$scope.model.drd.name || $scope.model.drd.name.length == 0 ||
+                !$scope.model.drd.key || $scope.model.drd.key.length == 0) {
+
+                return;
+            }
+
+            $scope.model.loading = true;
+
+            $http({method: 'POST', url: FLOWABLE.APP_URL.getModelsUrl(), data: $scope.model.drd}).
+            success(function(data, status, headers, config) {
+                $scope.$hide();
+                $scope.model.loading = false;
+
+                if ($scope.createDRDCallback) {
+                    $scope.createDRDCallback(data);
+                    $scope.createDRDCallback = undefined;
+                }
+
+            }).
+            error(function(data, status, headers, config) {
+                $scope.model.loading = false;
+                $scope.model.errorMessage = data.message;
+            });
+        };
+
+        $scope.cancel = function () {
+            if(!$scope.model.loading) {
+                $scope.$hide();
+            }
+        };
+    }]);
+
 
 angular.module('flowableModeler')
 	.controller('DuplicateDecisionTableCtrl', ['$rootScope', '$scope', '$http',

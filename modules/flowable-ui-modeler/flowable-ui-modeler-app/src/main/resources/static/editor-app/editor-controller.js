@@ -401,9 +401,11 @@ angular.module('flowableModeler')
 	}).then(function (modelData) {
 	    if(modelData.data.model.stencilset.namespace == 'http://b3mn.org/stencilset/cmmn1.1#') {
 	       return $http.get(FLOWABLE.URL.getCmmnStencilSet());
+	    } else if (modelData.data.model.stencilset.namespace == 'http://b3mn.org/stencilset/dmn1.2#') {
+	       return $http.get(FLOWABLE.URL.getDmnStencilSet());
 	    } else {
-	       return $http.get(FLOWABLE.URL.getStencilSet());
-	    }
+            return $http.get(FLOWABLE.URL.getStencilSet());
+        }
     }).then(function (response) {
  		var baseUrl = "http://b3mn.org/stencilset/";
 		editorManager.setStencilData(response.data);

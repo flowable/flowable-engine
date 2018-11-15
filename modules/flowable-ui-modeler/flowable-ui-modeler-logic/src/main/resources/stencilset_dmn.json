@@ -1,0 +1,585 @@
+{
+  "title": "DMN DRD editor",
+  "namespace": "http://b3mn.org/stencilset/dmn1.2#",
+  "description": "DMN DRD editor",
+  "propertyPackages": [
+    {
+      "name": "overrideidpackage",
+      "properties": [
+        {
+          "id": "overrideid",
+          "type": "String",
+          "title": "Id",
+          "value": "",
+          "description": "Unique identifier of the element.",
+          "popular": true
+        }
+      ]
+    },
+    {
+      "name": "namepackage",
+      "properties": [
+        {
+          "id": "name",
+          "type": "String",
+          "title": "Name",
+          "value": "",
+          "description": "The descriptive name of the DRD element.",
+          "popular": true,
+          "refToView": "text_name"
+        }
+      ]
+    },
+    {
+      "name": "decisiondecisiontablereferencepackage",
+      "properties": [
+        {
+          "id": "decisiontaskdecisiontablereference",
+          "type": "Complex",
+          "title": "Decision table reference",
+          "value": "",
+          "description": "Set the decision table reference",
+          "popular": true
+        }
+      ]
+    },
+    {
+      "name": "scriptformatpackage",
+      "properties" : [ {
+        "id": "scriptformat",
+        "type": "String",
+        "title": "Script format",
+        "value": "",
+        "description": "Script format of the script decision.",
+        "popular": true
+      } ]
+    }, {
+      "name": "scripttextpackage",
+      "properties" : [ {
+        "id": "scripttext",
+        "type": "Text",
+        "title": "Script",
+        "value": "",
+        "description": "Script text of the script decision.",
+        "popular": true
+      }
+      ]
+    },
+    {
+      "name" : "decisionclasspackage",
+      "properties" : [ {
+        "id" : "servicetaskclass",
+        "type" : "String",
+        "title" : "Class",
+        "value" : "",
+        "description" : "Class that implements the decision logic.",
+        "popular" : true
+      } ]
+    },
+    {
+      "name" : "decisionexpressionpackage",
+      "properties" : [ {
+        "id" : "servicetaskexpression",
+        "type" : "Text",
+        "title" : "Expression",
+        "value" : "",
+        "description" : "Decision logic defined with an expression.",
+        "popular" : true
+      } ]
+    }
+  ],
+  "stencils": [
+    {
+      "type": "node",
+      "id": "DMNDiagram",
+      "title": "DMN-Diagram",
+      "description": "A DMN DRD diagram.",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n   width=\"800\"\n   height=\"600\"\n   version=\"1.0\">\n  <defs></defs>\n  <g pointer-events=\"fill\" >\n    <polygon stroke=\"black\" fill=\"black\" stroke-width=\"1\" points=\"0,0 0,590 9,599 799,599 799,9 790,0\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\" stroke-miterlimit=\"10\" />\n    <rect id=\"diagramcanvas\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"790\" height=\"590\" stroke=\"black\" stroke-width=\"2\" fill=\"white\" />\n    \t<text font-size=\"22\" id=\"diagramtext\" x=\"400\" y=\"25\" oryx:align=\"top center\" stroke=\"#373e48\"></text>\n  </g>\n</svg>",
+      "icon": "diagram.png",
+      "groups": [
+        "Diagram"
+      ],
+      "mayBeRoot": true,
+      "hide": true,
+      "propertyPackages": [
+        "overrideidpackage",
+        "namepackage"
+      ],
+      "hiddenPropertyPackages": [],
+      "roles": []
+    },
+    {
+      "type": "node",
+      "id": "DecisionTable",
+      "title": "Decision Table Decision",
+      "description": "A decision table decision",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"102\" height=\"82\" version=\"1.0\">\n\t<defs>\n\t</defs>\n\t<magnets>\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n\t</magnets>\n\t<g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n\t\t<rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"61\" rx=\"10\">\n\t\t</rect>\n\t\t<rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" stroke=\"#BBBBBB\" fill=\"#F9F9F9\" x=\"0\" y=\"0\" width=\"100\" height=\"62\">\n\t\t</rect>\n\t\t<text font-size=\"12\" id=\"text_name\" x=\"50\" y=\"31\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"#373e48\">\n\t\t</text>\n\t</g>\n</svg>\n",
+      "icon" : "activity/list/type.decision.png",
+      "groups": [
+        "Decision"
+      ],
+      "propertyPackages": [
+        "overrideidpackage",
+        "namepackage",
+        "decisiondecisiontablereferencepackage"
+      ],
+      "hiddenPropertyPackages": [],
+      "roles": [
+        "information_requirement_start",
+        "information_requirement_end",
+        "knowledge_requirement_start",
+        "StartEventsMorph",
+        "all"
+      ]
+    },
+    {
+      "type": "node",
+      "id": "ScriptDecision",
+      "title": "Script Decision",
+      "description": "A script decision",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"102\" height=\"82\" version=\"1.0\">\n\t<defs>\n\t</defs>\n\t<magnets>\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n\t</magnets>\n\t<g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n\t\t<rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"61\" rx=\"10\">\n\t\t</rect>\n\t\t<rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" stroke=\"#BBBBBB\" fill=\"#F9F9F9\" x=\"0\" y=\"0\" width=\"100\" height=\"62\">\n\t\t</rect>\n\t\t<text font-size=\"12\" id=\"text_name\" x=\"50\" y=\"31\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"#373e48\">\n\t\t</text>\n\t</g>\n</svg>\n",
+      "icon" : "activity/list/type.script.png",
+      "groups": [
+        "Decision"
+      ],
+      "propertyPackages": [
+        "overrideidpackage",
+        "namepackage",
+        "scriptformatpackage",
+        "scripttextpackage"
+      ],
+      "hiddenPropertyPackages": [],
+      "roles": [
+        "information_requirement_start",
+        "information_requirement_end",
+        "knowledge_requirement_start",
+        "StartEventsMorph",
+        "all"
+      ]
+    },
+    {
+      "type": "node",
+      "id": "ExpressionDecision",
+      "title": "Expression Decision",
+      "description": "A expression decision",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"102\" height=\"82\" version=\"1.0\">\n\t<defs>\n\t</defs>\n\t<magnets>\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n\t</magnets>\n\t<g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n\t\t<rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"61\" rx=\"10\">\n\t\t</rect>\n\t\t<rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" stroke=\"#BBBBBB\" fill=\"#F9F9F9\" x=\"0\" y=\"0\" width=\"100\" height=\"62\">\n\t\t</rect>\n\t\t<text font-size=\"12\" id=\"text_name\" x=\"50\" y=\"31\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"#373e48\">\n\t\t</text>\n\t</g>\n</svg>\n",
+      "icon" : "activity/task.png",
+      "groups": [
+        "Decision"
+      ],
+      "propertyPackages": [
+        "overrideidpackage",
+        "namepackage",
+        "decisionexpressionpackage"
+      ],
+      "hiddenPropertyPackages": [],
+      "roles": [
+        "information_requirement_start",
+        "information_requirement_end",
+        "knowledge_requirement_start",
+        "StartEventsMorph",
+        "all"
+      ]
+    },
+    {
+      "type": "node",
+      "id": "JavaDecision",
+      "title": "Java Decision",
+      "description": "A Java decision",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"102\" height=\"82\" version=\"1.0\">\n\t<defs>\n\t</defs>\n\t<magnets>\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n\t</magnets>\n\t<g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n\t\t<rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"61\" rx=\"10\">\n\t\t</rect>\n\t\t<rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" stroke=\"#BBBBBB\" fill=\"#F9F9F9\" x=\"0\" y=\"0\" width=\"100\" height=\"62\">\n\t\t</rect>\n\t\t<text font-size=\"12\" id=\"text_name\" x=\"50\" y=\"31\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"#373e48\">\n\t\t</text>\n\t</g>\n</svg>\n",
+      "icon": "activity/list/type.service.png",
+      "groups": [
+        "Decision"
+      ],
+      "propertyPackages": [
+        "overrideidpackage",
+        "namepackage",
+        "decisionclasspackage"
+      ],
+      "hiddenPropertyPackages": [],
+      "roles": [
+        "information_requirement_start",
+        "information_requirement_end",
+        "knowledge_requirement_start",
+        "StartEventsMorph",
+        "all"
+      ]
+    },
+    {
+      "type": "node",
+      "id": "Invocation Decision",
+      "title": "Invocation Decision",
+      "description": "A invocation decision",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"102\" height=\"82\" version=\"1.0\">\n\t<defs>\n\t</defs>\n\t<magnets>\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n\t</magnets>\n\t<g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n\t\t<rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"61\" rx=\"10\">\n\t\t</rect>\n\t\t<rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" stroke=\"#BBBBBB\" fill=\"#F9F9F9\" x=\"0\" y=\"0\" width=\"100\" height=\"62\">\n\t\t</rect>\n\t\t<text font-size=\"12\" id=\"text_name\" x=\"50\" y=\"31\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"#373e48\">\n\t\t</text>\n\t</g>\n</svg>\n",
+      "icon" : "activity/task.png",
+      "groups": [
+        "Decision"
+      ],
+      "propertyPackages": [
+        "overrideidpackage",
+        "namepackage",
+        "decisiondecisiontablereferencepackage"
+      ],
+      "hiddenPropertyPackages": [],
+      "roles": [
+        "information_requirement_start",
+        "information_requirement_end",
+        "knowledge_requirement_start",
+        "StartEventsMorph",
+        "all"
+      ]
+    },
+    {
+      "type": "node",
+      "id": "InputData",
+      "title": "Input data",
+      "description": "Input data",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"102\" height=\"82\" version=\"1.0\">\n\t<defs>\n\t</defs>\n\t<magnets>\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n\t</magnets>\n\t<g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n\t\t<rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"61\" rx=\"31\">\n\t\t</rect>\n\t\t<rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" stroke=\"#BBBBBB\" fill=\"#F9F9F9\" x=\"0\" y=\"0\" width=\"100\" height=\"62\" rx=\"31\">\n\t\t</rect>\n\t\t<text font-size=\"12\" id=\"text_name\" x=\"50\" y=\"31\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"#373e48\">\n\t\t</text>\n\t</g>\n</svg>",
+      "icon": "activity/list/type.service.png",
+      "groups": [
+        "Elements"
+      ],
+      "propertyPackages": [
+        "overrideidpackage",
+        "namepackage"
+      ],
+      "hiddenPropertyPackages": [],
+      "roles": [
+        "information_requirement_start"
+      ]
+    },
+    {
+      "type": "node",
+      "id": "KnowledgeSource",
+      "title": "Knowledge source",
+      "description": "Knowledge Source",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   width=\"40\"\n   height=\"40\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"16\" oryx:cy=\"16\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <g pointer-events=\"fill\">\n    <circle id=\"bg_frame\" cx=\"16\" cy=\"16\" r=\"15\" stroke=\"#585858\" fill=\"#ffffff\" stroke-width=\"1\"/>\n\t<text font-size=\"11\" \n\t\tid=\"text_name\" \n\t\tx=\"16\" y=\"33\" \n\t\toryx:align=\"top center\" \n\t\tstroke=\"#373e48\"\n\t></text>\n  </g>\n</svg>",
+      "icon": "activity/list/type.service.png",
+      "groups": [
+        "Elements"
+      ],
+      "propertyPackages": [
+        "overrideidpackage",
+        "namepackage"
+      ],
+      "hiddenPropertyPackages": [],
+      "roles": [
+        "information_requirement_start",
+        "information_requirement_end"
+      ]
+    },
+    {
+      "type": "node",
+      "id": "ExpandedDecisionService",
+      "title": "Expanded Decision service",
+      "description": "A decision service",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n   width=\"200\"\n   height=\"160\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"50\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"80\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"110\" oryx:anchors=\"left\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"70\" oryx:cy=\"159\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"100\" oryx:cy=\"159\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"130\" oryx:cy=\"159\" oryx:anchors=\"bottom\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"199\" oryx:cy=\"50\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"199\" oryx:cy=\"80\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"199\" oryx:cy=\"110\" oryx:anchors=\"right\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"70\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"100\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"130\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"100\" oryx:cy=\"80\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <g pointer-events=\"fill\" oryx:minimumSize=\"120 100\" oryx:maximumSize=\"\" >\n    <rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"0\" y=\"0\" width=\"190\" height=\"160\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" />\n\t<rect id=\"bg_frame\" oryx:anchors=\"bottom top right left\" x=\"0\" y=\"0\" width=\"200\" height=\"160\" rx=\"10\" ry=\"10\" stroke=\"#bbbbbb\" stroke-width=\"1\" fill=\"#ffffff\" />\n    <path id=\"seperator\" oryx:resize=\"vertical horizontal\" d=\"M2.5,80 L197.5,80\" stroke=\"black\" stroke-width=\"1\" fill=\"none\"></path>\n    <rect id=\"border\" oryx:anchors=\"top bottom left right\" oryx:resize=\"vertical horizontal\" x=\"2.5\" y=\"2.5\" width=\"195\" height=\"155\" rx=\"8\" ry=\"8\" stroke=\"black\" stroke-width=\"1\" fill=\"none\" />\n\t<text \n\t\tfont-size=\"12\" \n\t\tid=\"text_name\" \n\t\tx=\"8\" \n\t\ty=\"10\" \n\t\toryx:align=\"top left\"\n\t\toryx:fittoelem=\"text_frame\"\n\t\toryx:anchors=\"left top\" \n\t\tstroke=\"#373e48\">\n\t</text>\n  </g>\n</svg>",
+      "icon" : "activity/expanded.subprocess.png",
+      "groups": [
+        "Elements"
+      ],
+      "propertyPackages": [
+        "overrideidpackage",
+        "namepackage"
+      ],
+      "hiddenPropertyPackages": [],
+      "roles": [
+      ]
+    },
+    {
+      "type": "node",
+      "id": "CollapsedDecisionService",
+      "title": "Collapsed Decision service",
+      "description": "A decision service",
+      "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n   width=\"102\"\n   height=\"82\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n\t<rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"79\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" />\n\t<rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"100\" height=\"80\" rx=\"10\" ry=\"10\" stroke=\"#bbbbbb\" stroke-width=\"1\" fill=\"#f9f9f9\" />\n\t\t<text \n\t\t\tfont-size=\"12\" \n\t\t\tid=\"text_name\" \n\t\t\tx=\"50\" \n\t\t\ty=\"40\" \n\t\t\toryx:align=\"middle center\"\n\t\t\toryx:fittoelem=\"text_frame\"\n\t\t\tstroke=\"#373e48\">\n\t\t</text>\n\t<g id=\"subprocess\">\n\t\t<rect height=\"10\" width=\"10\" x=\"45\" y=\"65\" stroke=\"#bbbbbb\" fill=\"none\" />\n\t\t<path d=\"M50 65 L50 75\" stroke=\"black\" />\n\t\t<path d=\"M45 70 L55 70\" stroke=\"black\" />\n\t</g>\n  </g>\n</svg>",
+      "icon" : "activity/subprocess.png",
+      "groups": [
+        "Elements"
+      ],
+      "propertyPackages": [
+        "overrideidpackage",
+        "namepackage"
+      ],
+      "hiddenPropertyPackages": [],
+      "roles": [
+        "knowledge_requirement_end"
+      ]
+    },
+    {
+      "type": "edge",
+      "id": "InformationRequirement",
+      "title": "Information requirement",
+      "description": "Input data or a decision output being used as one of the inputs of a decision",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n<svg\r\n\txmlns=\"http://www.w3.org/2000/svg\"\r\n\txmlns:oryx=\"http://www.b3mn.org/oryx\"\r\n\tversion=\"1.0\"\r\n\toryx:edge=\"edge\" >\r\n\t<defs>\r\n\t  \t<marker id=\"end\" refX=\"15\" refY=\"6\" markerUnits=\"userSpaceOnUse\" markerWidth=\"15\" markerHeight=\"12\" orient=\"auto\">\r\n\t  \t\t<path id=\"arrowhead\" d=\"M 0 1 L 15 6 L 0 11z\" fill=\"#585858\" stroke=\"#585858\" stroke-linejoin=\"round\" stroke-width=\"2\" />\r\n\t  \t</marker>\r\n\t</defs>\r\n\t<g id=\"edge\">\r\n\t\t<path id=\"bg_frame\" d=\"M10 50 L210 50\" stroke=\"#585858\" fill=\"none\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" marker-start=\"url(#start)\" marker-end=\"url(#end)\" />\r\n\t\t<text id=\"text_name\" x=\"0\" y=\"0\" oryx:edgePosition=\"startTop\"/>\r\n\t</g>\r\n</svg>",
+      "icon": "connector/sequenceflow.png",
+      "groups": [
+        "Requirements"
+      ],
+      "layout": [
+        {
+          "type": "layout.bpmn2_0.sequenceflow"
+        }
+      ],
+      "propertyPackages": [],
+      "hiddenPropertyPackages": [],
+      "roles": [
+        "ConnectingObjectsMorph",
+        "all"
+      ]
+    },
+    {
+      "type": "edge",
+      "id": "KnowledgeRequirement",
+      "title": "Knowledge requirement",
+      "description": "The invocation of a business knownledge model",
+      "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n\txmlns=\"http://www.w3.org/2000/svg\"\n\txmlns:oryx=\"http://www.b3mn.org/oryx\"\n\tversion=\"1.0\"\n\toryx:edge=\"edge\" >\n    <defs>\n\t  \t<marker id=\"end\" refX=\"15\" refY=\"6\" markerUnits=\"userSpaceOnUse\" markerWidth=\"15\" markerHeight=\"12\" orient=\"auto\">\n\t  \t\t<path id=\"arrowhead\" d=\"M 0 1 L 15 6 L 0 11z\" fill=\"#585858\" stroke=\"#585858\" stroke-linejoin=\"round\" stroke-width=\"2\" />\n\t  \t</marker>\n\t</defs>\n\t<g id=\"edge\">\n\t    <path id=\"bg_frame\" d=\"M10 50 L210 50\" stroke=\"#585858\" fill=\"none\" stroke-width=\"2\" stroke-dasharray=\"3, 4\" marker-end=\"url(#end)\" />\n\t\t<text id=\"name\" x=\"0\" y=\"0\" oryx:edgePosition=\"midTop\" oryx:offsetTop=\"6\" style=\"font-size:9px;\"/>\n\t</g>\n</svg>",
+      "icon" : "connector/association.undirected.png",
+      "groups": [
+        "Requirements"
+      ],
+      "layout": [
+        {
+          "type": "layout.bpmn2_0.sequenceflow"
+        }
+      ],
+      "propertyPackages": [],
+      "hiddenPropertyPackages": [],
+      "roles": [
+        "ConnectingObjectsMorph",
+        "all"
+      ]
+    },
+    {
+      "type": "edge",
+      "id": "AuthorityRequirement",
+      "title": "Authority requirement",
+      "description": "The dependence of a DRD element on another DRD element",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n<svg\r\n\txmlns=\"http://www.w3.org/2000/svg\"\r\n\txmlns:oryx=\"http://www.b3mn.org/oryx\"\r\n\tversion=\"1.0\"\r\n\toryx:edge=\"edge\" >\r\n\t<defs>\r\n\t  \t<marker id=\"start\" refX=\"1\" refY=\"5\" markerUnits=\"userSpaceOnUse\" markerWidth=\"17\" markerHeight=\"11\" orient=\"auto\">\r\n\t  \t\t<!-- <path id=\"conditional\"   d=\"M 0 6 L 8 1 L 15 5 L 8 9 L 1 5\" fill=\"white\" stroke=\"black\" stroke-width=\"1\" /> -->\r\n\t\t\t<path id=\"default\" d=\"M 5 0 L 11 10\" fill=\"white\" stroke=\"#585858\" stroke-width=\"1\" />\r\n\t  \t</marker>\r\n\t  \t<marker id=\"end\" refX=\"15\" refY=\"6\" markerUnits=\"userSpaceOnUse\" markerWidth=\"15\" markerHeight=\"12\" orient=\"auto\">\r\n\t  \t\t<path id=\"arrowhead\" d=\"M 0 1 L 15 6 L 0 11z\" fill=\"#585858\" stroke=\"#585858\" stroke-linejoin=\"round\" stroke-width=\"2\" />\r\n\t  \t</marker>\r\n\t</defs>\r\n\t<g id=\"edge\">\r\n\t\t<path id=\"bg_frame\" d=\"M10 50 L210 50\" stroke=\"#585858\" fill=\"none\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" marker-start=\"url(#start)\" marker-end=\"url(#end)\" />\r\n\t\t<text id=\"text_name\" x=\"0\" y=\"0\" oryx:edgePosition=\"startTop\"/>\r\n\t</g>\r\n</svg>",
+      "icon": "connector/sequenceflow.png",
+      "groups": [
+        "Requirements"
+      ],
+      "layout": [
+        {
+          "type": "layout.bpmn2_0.sequenceflow"
+        }
+      ],
+      "propertyPackages": [],
+      "hiddenPropertyPackages": [],
+      "roles": [
+        "ConnectingObjectsMorph",
+        "all"
+      ]
+    }
+  ],
+  "rules": {
+    "cardinalityRules": [
+      {
+        "role": "Startevents_all",
+        "incomingEdges": [
+          {
+            "role": "SequenceFlow",
+            "maximum": 0
+          }
+        ]
+      },
+      {
+        "role": "Endevents_all",
+        "outgoingEdges": [
+          {
+            "role": "SequenceFlow",
+            "maximum": 0
+          }
+        ]
+      }
+    ],
+    "connectionRules": [
+      {
+        "role": "InformationRequirement",
+        "connects": [
+          {
+            "from": "information_requirement_start",
+            "to": [
+              "information_requirement_end"
+            ]
+          }
+        ]
+      },
+      {
+        "role": "KnowledgeRequirement",
+        "connects": [
+          {
+            "from": "knowledge_requirement_start",
+            "to": [
+              "knowledge_requirement_end"
+            ]
+          }
+        ]
+      },
+      {
+        "role": "Association",
+        "connects": [
+          {
+            "from": "sequence_start",
+            "to": [
+              "TextAnnotation"
+            ]
+          },
+          {
+            "from": "sequence_end",
+            "to": [
+              "TextAnnotation"
+            ]
+          },
+          {
+            "from": "TextAnnotation",
+            "to": [
+              "sequence_end"
+            ]
+          },
+          {
+            "from": "BoundaryCompensationEvent",
+            "to": [
+              "sequence_end"
+            ]
+          },
+          {
+            "from": "TextAnnotation",
+            "to": [
+              "sequence_start"
+            ]
+          },
+          {
+            "from": "BoundaryCompensationEvent",
+            "to": [
+              "sequence_start"
+            ]
+          }
+        ]
+      },
+      {
+        "role": "DataAssociation",
+        "connects": [
+          {
+            "from": "sequence_start",
+            "to": [
+              "DataStore"
+            ]
+          },
+          {
+            "from": "sequence_end",
+            "to": [
+              "DataStore"
+            ]
+          },
+          {
+            "from": "DataStore",
+            "to": [
+              "sequence_end"
+            ]
+          },
+          {
+            "from": "DataStore",
+            "to": [
+              "sequence_start"
+            ]
+          }
+        ]
+      },
+      {
+        "role": "IntermediateEventOnActivityBoundary",
+        "connects": [
+          {
+            "from": "Activity",
+            "to": [
+              "IntermediateEventOnActivityBoundary"
+            ]
+          }
+        ]
+      }
+    ],
+    "containmentRules": [
+      {
+        "role": "DRDDiagram",
+        "contains": [
+          "all"
+        ]
+      },
+      {
+        "role": "ExpandedDecisionService",
+        "contains": [
+          "information_requirement_start",
+          "information_requirement_end",
+          "knowledge_requirement_start",
+          "knowledge_requirement_end",
+          "DecisionTable",
+          "ExpressionDecision",
+          "JavaDecision"
+        ]
+      }
+    ],
+    "morphingRules": [
+      {
+        "role": "ActivitiesMorph",
+        "baseMorphs": [
+          "UserTask"
+        ],
+        "preserveBounds": true
+      },
+      {
+        "role": "GatewaysMorph",
+        "baseMorphs": [
+          "ExclusiveGateway"
+        ]
+      },
+      {
+        "role": "StartEventsMorph",
+        "baseMorphs": [
+          "StartNoneEvent"
+        ]
+      },
+      {
+        "role": "EndEventsMorph",
+        "baseMorphs": [
+          "StartNoneEvent"
+        ]
+      },
+      {
+        "role": "CatchEventsMorph",
+        "baseMorphs": [
+          "CatchTimerEvent"
+        ]
+      },
+      {
+        "role": "ThrowEventsMorph",
+        "baseMorphs": [
+          "ThrowNoneEvent"
+        ]
+      },
+      {
+        "role": "BoundaryEventsMorph",
+        "baseMorphs": [
+          "ThrowNoneEvent"
+        ]
+      },
+      {
+        "role": "BoundaryCompensationEvent",
+        "baseMorphs": [
+          "BoundaryCompensationEvent"
+        ]
+      },
+      {
+        "role": "TextAnnotation",
+        "baseMorphs": [
+          "TextAnnotation"
+        ]
+      },
+      {
+        "role": "DataStore",
+        "baseMorphs": [
+          "DataStore"
+        ]
+      }
+    ]
+  }
+}
