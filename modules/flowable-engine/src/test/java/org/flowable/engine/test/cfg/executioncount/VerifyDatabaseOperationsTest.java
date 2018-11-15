@@ -12,8 +12,6 @@
  */
 package org.flowable.engine.test.cfg.executioncount;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -136,7 +134,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
 
-        assertThat(runtimeService.createActivityInstanceQuery().count()).isEqualTo(0L);
+        assertEquals(runtimeService.createActivityInstanceQuery().count(), 0L);
     }
 
     @Test

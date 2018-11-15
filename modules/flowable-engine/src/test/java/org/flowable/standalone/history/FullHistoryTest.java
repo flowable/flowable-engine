@@ -21,11 +21,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.assertj.core.api.Java6Assertions;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.history.HistoricActivityInstance;
@@ -35,6 +35,7 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricVariableUpdate;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.api.runtime.DummySerializable;
@@ -73,14 +74,14 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         // Start-task should be added to history
         HistoricActivityInstance historicStartEvent = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("theStart").singleResult();
         assertNotNull(historicStartEvent);
-        Java6Assertions.assertThat(historicStartEvent).isEqualToComparingFieldByField(runtimeService.createActivityInstanceQuery().activityInstanceId(historicStartEvent.getId()).singleResult());
+        assertActivityInstancesAreSame(historicStartEvent, runtimeService.createActivityInstanceQuery().activityInstanceId(historicStartEvent.getId()).singleResult());
 
         HistoricActivityInstance waitStateActivity = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("waitState").singleResult();
-        Java6Assertions.assertThat(waitStateActivity).isEqualToComparingFieldByField(runtimeService.createActivityInstanceQuery().activityInstanceId(waitStateActivity.getId()).singleResult());
+        assertActivityInstancesAreSame(waitStateActivity, runtimeService.createActivityInstanceQuery().activityInstanceId(waitStateActivity.getId()).singleResult());
         assertNotNull(waitStateActivity);
 
         HistoricActivityInstance serviceTaskActivity = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("serviceTask").singleResult();
-        Java6Assertions.assertThat(serviceTaskActivity).isEqualToComparingFieldByField(runtimeService.createActivityInstanceQuery().activityInstanceId(serviceTaskActivity.getId()).singleResult());
+        assertActivityInstancesAreSame(serviceTaskActivity, runtimeService.createActivityInstanceQuery().activityInstanceId(serviceTaskActivity.getId()).singleResult());
         assertNotNull(serviceTaskActivity);
 
         List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().orderByVariableName().asc().orderByVariableRevision().asc().list();
@@ -918,10 +919,10 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertNotSame(details.get(0).getActivityInstanceId(), details.get(1).getActivityInstanceId());
 
         HistoricActivityInstance historicActInst1 = historyService.createHistoricActivityInstanceQuery().activityInstanceId(details.get(0).getActivityInstanceId()).singleResult();
-        Java6Assertions.assertThat(historicActInst1).isEqualToComparingFieldByField(runtimeService.createActivityInstanceQuery().activityInstanceId(historicActInst1.getId()).singleResult());
+        assertActivityInstancesAreSame(historicActInst1, runtimeService.createActivityInstanceQuery().activityInstanceId(historicActInst1.getId()).singleResult());
 
         HistoricActivityInstance historicActInst2 = historyService.createHistoricActivityInstanceQuery().activityInstanceId(details.get(1).getActivityInstanceId()).singleResult();
-        Java6Assertions.assertThat(historicActInst2).isEqualToComparingFieldByField(runtimeService.createActivityInstanceQuery().activityInstanceId(historicActInst2.getId()).singleResult());
+        assertActivityInstancesAreSame(historicActInst2, runtimeService.createActivityInstanceQuery().activityInstanceId(historicActInst2.getId()).singleResult());
 
         assertEquals(historicActInst1.getActivityId(), historicActInst2.getActivityId());
     }
@@ -1431,5 +1432,25 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         }
 
     }
+
+    public static void assertActivityInstancesAreSame(HistoricActivityInstance historicActInst, ActivityInstance activityInstance) {
+        assertTrue(Objects.equals(historicActInst.getId(), activityInstance.getId()));
+        assertTrue(Objects.equals(historicActInst.getActivityId(), activityInstance.getActivityId()));
+        assertTrue(Objects.equals(historicActInst.getEndTime(), activityInstance.getEndTime()));
+        assertTrue(Objects.equals(historicActInst.getProcessDefinitionId(), activityInstance.getProcessDefinitionId()));
+        assertTrue(Objects.equals(historicActInst.getStartTime(), activityInstance.getStartTime()));
+        assertTrue(Objects.equals(historicActInst.getExecutionId(), activityInstance.getExecutionId()));
+        assertTrue(Objects.equals(historicActInst.getActivityType(), activityInstance.getActivityType()));
+        assertTrue(Objects.equals(historicActInst.getProcessInstanceId(), activityInstance.getProcessInstanceId()));
+        assertTrue(Objects.equals(historicActInst.getAssignee(), activityInstance.getAssignee()));
+        assertTrue(Objects.equals(historicActInst.getDurationInMillis(), activityInstance.getDurationInMillis()));
+        assertTrue(Objects.equals(historicActInst.getTenantId(), activityInstance.getTenantId()));
+        assertTrue(Objects.equals(historicActInst.getDeleteReason(), activityInstance.getDeleteReason()));
+        assertTrue(Objects.equals(historicActInst.getActivityName(), activityInstance.getActivityName()));
+        assertTrue(Objects.equals(historicActInst.getCalledProcessInstanceId(), activityInstance.getCalledProcessInstanceId()));
+        assertTrue(Objects.equals(historicActInst.getTaskId(), activityInstance.getTaskId()));
+        assertTrue(Objects.equals(historicActInst.getTime(), activityInstance.getTime()));
+    }
+
 
 }

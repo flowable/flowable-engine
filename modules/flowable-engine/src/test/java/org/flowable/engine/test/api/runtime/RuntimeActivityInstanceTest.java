@@ -13,7 +13,7 @@
 
 package org.flowable.engine.test.api.runtime;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.flowable.standalone.history.FullHistoryTest.assertActivityInstancesAreSame;
 
 import java.util.List;
 
@@ -54,12 +54,10 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         assertNotNull(activityInstance.getEndTime());
         assertTrue(activityInstance.getDurationInMillis() >= 0);
 
-        assertThat(activityInstance).isEqualToComparingFieldByField(
-            historyService.createHistoricActivityInstanceQuery().activityId("noop").singleResult()
-        );
+        assertActivityInstancesAreSame(historyService.createHistoricActivityInstanceQuery().activityId("noop").singleResult(), activityInstance);
 
         this.runtimeService.trigger(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult().getId());
-        assertThat(runtimeService.createActivityInstanceQuery().activityId("noop").count()).isEqualTo(0L);
+        assertEquals(0L, runtimeService.createActivityInstanceQuery().activityId("noop").count());
     }
 
     @Test
@@ -79,10 +77,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         assertEquals(processInstance.getId(), activityInstance.getProcessInstanceId());
         assertNotNull(activityInstance.getStartTime());
 
-        assertThat(activityInstance).isEqualToComparingFieldByField(
-            historyService.createHistoricActivityInstanceQuery().activityId("receive").singleResult()
-        );
-
+        assertActivityInstancesAreSame(historyService.createHistoricActivityInstanceQuery().activityId("receive").singleResult(), activityInstance);
 
         Execution execution = runtimeService.createExecutionQuery().onlyChildExecutions().processInstanceId(processInstance.getId()).singleResult();
         runtimeService.trigger(execution.getId());
@@ -98,16 +93,11 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         assertNotNull(activityInstance.getStartTime());
 
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
-        assertThat(activityInstance).isEqualToComparingFieldByField(
-            historyService.createHistoricActivityInstanceQuery().activityId("receive").singleResult()
-        );
+        assertActivityInstancesAreSame(historyService.createHistoricActivityInstanceQuery().activityId("receive").singleResult(), activityInstance).;
 
         runtimeService.trigger(execution.getId());
 
-        assertThat(
-            runtimeService.createActivityInstanceQuery().count()
-        ).isEqualTo(0L);
-
+        assertEquals(0L, runtimeService.createActivityInstanceQuery().count());
     }
 
     @Test
@@ -201,14 +191,12 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
 
         runtimeService.trigger(runtimeService.createExecutionQuery().processInstanceId(pi.getId()).onlyChildExecutions().singleResult().getId());
 
-        assertThat(runtimeService.createActivityInstanceQuery().processInstanceId(pi.getId()).count()).isEqualTo(0L);
+        assertEquals(runtimeService.createActivityInstanceQuery().processInstanceId(pi.getId()).count(), 0L);
     }
 
     protected void assertThatActivityInstancesAreSame(String userTask) {
-        assertThat(runtimeService.createActivityInstanceQuery().activityId(userTask).singleResult()).
-            isEqualToComparingFieldByField(
-                historyService.createHistoricActivityInstanceQuery().activityId(userTask).singleResult()
-            );
+        assertActivityInstancesAreSame(historyService.createHistoricActivityInstanceQuery().activityId(userTask).singleResult(),
+            runtimeService.createActivityInstanceQuery().activityId(userTask).singleResult());
     }
 
     @Test
@@ -234,8 +222,8 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
-        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0L);
-        assertThat(runtimeService.createActivityInstanceQuery().count()).isEqualTo(0L);
+        assertEquals(runtimeService.createProcessInstanceQuery().count(), 0L);
+        assertEquals(runtimeService.createActivityInstanceQuery().count(), 0L);
     }
 
     @Test
@@ -248,7 +236,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         ActivityInstance activityInstance = runtimeService.createActivityInstanceQuery().activityId("callSubProcess").singleResult();
 
         HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("callSubProcess").singleResult();
-        assertThat(activityInstance).isEqualToComparingFieldByField(historicActivityInstance);
+        assertActivityInstancesAreSame(historicActivityInstance, activityInstance);
 
         HistoricProcessInstance oldInstance = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("calledProcess").singleResult();
 
@@ -359,12 +347,11 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         assertNotNull(activityInstance.getStartTime());
         assertNotNull(activityInstance.getEndTime());
 
-        assertThat(activityInstance).isEqualToComparingFieldByField(
-            historyService.createHistoricActivityInstanceQuery().
-                activityId("boundary").
-                processInstanceId(processInstance.getId()).
-                singleResult()
-        );
+        assertActivityInstancesAreSame(historyService.createHistoricActivityInstanceQuery().
+            activityId("boundary").
+            processInstanceId(processInstance.getId()).
+            singleResult(),
+            activityInstance);
     }
 
     @Test

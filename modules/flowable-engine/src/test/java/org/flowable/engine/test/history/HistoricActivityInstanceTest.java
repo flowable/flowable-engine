@@ -13,7 +13,7 @@
 
 package org.flowable.engine.test.history;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.flowable.standalone.history.FullHistoryTest.assertActivityInstancesAreSame;
 
 import java.util.List;
 
@@ -62,7 +62,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
         HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("receive").singleResult();
-        assertThat(historicActivityInstance).isEqualToComparingFieldByField(runtimeService.createActivityInstanceQuery().activityInstanceId(historicActivityInstance.getId()).singleResult());
+        assertActivityInstancesAreSame(historicActivityInstance, runtimeService.createActivityInstanceQuery().activityInstanceId(historicActivityInstance.getId()).singleResult());
 
         assertEquals("receive", historicActivityInstance.getActivityId());
         assertEquals("receiveTask", historicActivityInstance.getActivityType());
@@ -204,7 +204,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
 
         // Get task list
         HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("theTask").singleResult();
-        assertThat(historicActivityInstance).isEqualToComparingFieldByField(runtimeService.createActivityInstanceQuery().activityInstanceId(historicActivityInstance.getId()).singleResult());
+        assertActivityInstancesAreSame(historicActivityInstance, runtimeService.createActivityInstanceQuery().activityInstanceId(historicActivityInstance.getId()).singleResult());
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals(task.getId(), historicActivityInstance.getTaskId());

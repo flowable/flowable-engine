@@ -13,8 +13,6 @@
 
 package org.flowable.engine.test.history;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;

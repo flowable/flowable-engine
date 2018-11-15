@@ -622,7 +622,7 @@ public abstract class AbstractDynamicStateManager {
                     }
 
                     if (newFlowElement instanceof CallActivity) {
-                        CommandContextUtil.getActivityInstanceEntityManager().recordActivityStart(newChildExecution);
+                        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(newChildExecution);
 
                         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
                         if (eventDispatcher.isEnabled()) {
@@ -719,7 +719,7 @@ public abstract class AbstractDynamicStateManager {
 
         subProcessExecution.setVariablesLocal(processDataObjects(subProcess.getDataObjects()));
 
-        CommandContextUtil.getActivityInstanceEntityManager().recordActivityStart(subProcessExecution);
+        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(subProcessExecution);
 
         List<BoundaryEvent> boundaryEvents = subProcess.getBoundaryEvents();
         if (CollectionUtil.isNotEmpty(boundaryEvents)) {
@@ -798,7 +798,7 @@ public abstract class AbstractDynamicStateManager {
         }
 
         ExecutionEntity subProcessInstance = executionEntityManager.createSubprocessInstance(subProcessDefinition, parentExecution, businessKey, initialFlowElement.getId());
-        CommandContextUtil.getActivityInstanceEntityManager().recordSubProcessInstanceStart(parentExecution, subProcessInstance);
+        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordSubProcessInstanceStart(parentExecution, subProcessInstance);
 
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher.isEnabled()) {
@@ -842,7 +842,7 @@ public abstract class AbstractDynamicStateManager {
         ExecutionEntity subProcessInitialExecution = executionEntityManager.createChildExecution(subProcessInstance);
         subProcessInitialExecution.setCurrentFlowElement(initialFlowElement);
 
-        CommandContextUtil.getActivityInstanceEntityManager().recordActivityStart(subProcessInitialExecution);
+        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(subProcessInitialExecution);
 
         return subProcessInitialExecution;
     }
@@ -870,7 +870,7 @@ public abstract class AbstractDynamicStateManager {
             task.setName(newFlowElement.getName());
 
             //Sync history
-            CommandContextUtil.getActivityInstanceEntityManager().syncUserTaskExecution(childExecution, newFlowElement, oldActivityId, task);
+            CommandContextUtil.getActivityInstanceEntityManager(commandContext).syncUserTaskExecution(childExecution, newFlowElement, oldActivityId, task);
         }
 
         // Boundary Events - only applies to Activities and up to this point we have a UserTask or ReceiveTask execution, both are Activities

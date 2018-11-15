@@ -12,12 +12,15 @@
  */
 package org.flowable.examples.bpmn.servicetask;
 
+import static org.flowable.standalone.history.FullHistoryTest.assertActivityInstancesAreSame;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.assertj.core.api.Java6Assertions;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
@@ -26,9 +29,6 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author Christian Stettler
@@ -65,7 +65,7 @@ public class ExpressionServiceTaskTest extends PluggableFlowableTestCase {
             HistoricActivityInstance skipActivityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(pi2.getId())
                     .activityId("valueExpressionServiceWithResultVariableNameSet")
                     .singleResult();
-            Java6Assertions.assertThat(skipActivityInstance).isEqualToComparingFieldByField(runtimeService.createActivityInstanceQuery().activityInstanceId(skipActivityInstance .getId()).singleResult());
+            assertActivityInstancesAreSame(skipActivityInstance, runtimeService.createActivityInstanceQuery().activityInstanceId(skipActivityInstance .getId()).singleResult());
 
             assertNotNull(skipActivityInstance);
         }

@@ -12,8 +12,6 @@
  */
 package org.flowable.engine.test.api.deletereason;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
-
 import java.util.List;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -168,7 +166,7 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
                     .processInstanceId(processInstance.getId()).singleResult().getDeleteReason());
 
             assertNull(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("boundaryTimer").singleResult());
-            assertThat(runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0L);
+            assertEquals(runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()), 0L);
             assertHistoricActivitiesDeleteReason(processInstance, null, "A");
             assertHistoricActivitiesDeleteReason(processInstance, DeleteReason.PROCESS_INSTANCE_DELETED, "B", "C");
         }

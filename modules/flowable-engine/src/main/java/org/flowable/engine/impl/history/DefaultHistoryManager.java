@@ -132,8 +132,8 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             }
 
             HistoricActivityInstanceEntity historicActivityInstance = findHistoricActivityInstance(parentExecution, true);
-            if (historicActivityInstance  != null) {
-                historicActivityInstance .setCalledProcessInstanceId(subProcessInstance.getProcessInstanceId());
+            if (historicActivityInstance != null) {
+                historicActivityInstance.setCalledProcessInstanceId(subProcessInstance.getProcessInstanceId());
             }
         }
     }
