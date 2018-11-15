@@ -48,6 +48,10 @@ public class HistoricEntityLinkEntityManagerImpl extends AbstractEntityManager<H
     public List<HistoricEntityLink> findHistoricEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType, String linkType) {
         return historicEntityLinkDataManager.findHistoricEntityLinksByScopeIdAndScopeType(scopeId, scopeType, linkType);
     }
+    @Override
+    public List<HistoricEntityLink> findHistoricEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String scopeType, String linkType) {
+        return historicEntityLinkDataManager.findHistoricEntityLinksByReferenceScopeIdAndType(referenceScopeId, scopeType, linkType);
+    }
     
     @Override
     public List<HistoricEntityLink> findHistoricEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType, String linkType) {
