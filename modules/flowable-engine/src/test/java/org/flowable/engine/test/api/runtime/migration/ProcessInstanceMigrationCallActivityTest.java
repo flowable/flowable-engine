@@ -982,6 +982,112 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
     }
 
     @Test
+    public void testMigrateMovingSingleActivityToParallelActivitiesInsideCallActivitySubProcess() {
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml");
+        ProcessDefinition procDefWithCallActivity = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-with-call-activity-v3.bpmn20.xml");
+        ProcessDefinition procDefCallActivity = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/parallel-gateway-two-splits-four-tasks.bpmn20.xml");
+
+        //Start the processInstance
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
+
+        //Confirm state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("theTask");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("theTask");
+        assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
+
+        //Prepare and action the migration
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procDefWithCallActivity.getId())
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("theTask", Arrays.asList("oddFlowTask1", "evenFlowTask4")).inSubProcessOfCallActivityId("callActivity"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.hasErrors()).isFalse();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
+
+        //Confirm migration
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactly("callActivity");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefWithCallActivity.getId());
+
+        ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
+        assertThat(subProcessInstance).extracting(ProcessInstance::getProcessDefinitionId).isEqualTo(procDefCallActivity.getId());
+
+        List<Execution> subProcessExecutions = runtimeService.createExecutionQuery().processInstanceId(subProcessInstance.getId()).onlyChildExecutions().list();
+        assertThat(subProcessExecutions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("oddFlowTask1", "evenFlowTask4");
+        assertThat(subProcessExecutions).extracting("processDefinitionId").containsOnly(procDefCallActivity.getId());
+
+        List<Task> subProcessTasks = taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).list();
+        assertThat(subProcessTasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("oddFlowTask1", "evenFlowTask4");
+        assertThat(subProcessTasks).extracting(Task::getProcessDefinitionId).containsOnly(procDefCallActivity.getId());
+
+        completeProcessInstanceTasks(subProcessInstance.getId());
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("secondTask");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefWithCallActivity.getId());
+
+        completeTask(task);
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testMigrateMovingSingleActivityToParallelActivitiesInSubProcessParent() {
+        ProcessDefinition procDefWithCallActivity = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-with-call-activity.bpmn20.xml");
+        ProcessDefinition procDefCallActivity = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml");
+        ProcessDefinition procDefParallelTasks = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/parallel-gateway-two-splits-four-tasks.bpmn20.xml");
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefWithCallActivity.getId());
+
+        //Confirm state to migrate
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("firstTask");
+        completeTask(task);
+
+        List<Execution> processExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(processExecutions).extracting(Execution::getActivityId).containsExactly("callActivity");
+        assertThat(processExecutions).extracting("processDefinitionId").containsOnly(procDefWithCallActivity.getId());
+
+        ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
+        assertThat(subProcessInstance).extracting(ProcessInstance::getProcessDefinitionId).isEqualTo(procDefCallActivity.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("theTask");
+
+        //Prepare and action the migration
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procDefParallelTasks.getId())
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("theTask", Arrays.asList("oddFlowTask1", "evenFlowTask4")).inParentProcessOfCallActivityId("callActivity"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.hasErrors()).isFalse();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
+
+        //Confirm migration
+        subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
+        assertThat(subProcessInstance).isNull();
+
+        processExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(processExecutions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("oddFlowTask1", "evenFlowTask4");
+        assertThat(processExecutions).extracting("processDefinitionId").containsOnly(procDefParallelTasks.getId());
+
+        List<Task> processTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(processTasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("oddFlowTask1", "evenFlowTask4");
+        assertThat(processTasks).extracting(Task::getProcessDefinitionId).containsOnly(procDefParallelTasks.getId());
+
+        completeProcessInstanceTasks(processInstance.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
     public void testMigrateMovingParallelCallActivitySubProcessesToParallelActivitiesInSubProcessParent() {
         ProcessDefinition procDefParallelCallActivity = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/parallel-gateway-two-splits-with-call-activities.bpmn20.xml");
         ProcessDefinition procDefCallActivity1 = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml");

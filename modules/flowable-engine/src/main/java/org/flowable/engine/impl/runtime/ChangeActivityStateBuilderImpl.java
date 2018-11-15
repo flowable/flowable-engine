@@ -126,6 +126,13 @@ public class ChangeActivityStateBuilderImpl implements ChangeActivityStateBuilde
         return this;
     }
 
+    public ChangeActivityStateBuilder moveSingleActivityIdToParentActivityIds(String currentActivityId, List<String> newActivityIds) {
+        MoveActivityIdContainer moveActivityIdContainer = new MoveActivityIdContainer(currentActivityId, newActivityIds);
+        moveActivityIdContainer.setMoveToParentProcess(true);
+        moveActivityIdList.add(moveActivityIdContainer);
+        return this;
+    }
+
     @Override
     public ChangeActivityStateBuilder moveActivityIdToSubProcessInstanceActivityId(String currentActivityId, String newActivityId, String callActivityId) {
         return moveActivityIdToSubProcessInstanceActivityId(currentActivityId, newActivityId, callActivityId, null, null);
@@ -147,6 +154,15 @@ public class ChangeActivityStateBuilderImpl implements ChangeActivityStateBuilde
 
     public ChangeActivityStateBuilder moveActivityIdsToSubProcessInstanceActivityId(List<String> activityIds, String newActivityId, String callActivityId, Integer callActivitySubProcessVersion, String newAssigneeId) {
         MoveActivityIdContainer moveActivityIdsContainer = new MoveActivityIdContainer(activityIds, newActivityId, newAssigneeId);
+        moveActivityIdsContainer.setMoveToSubProcessInstance(true);
+        moveActivityIdsContainer.setCallActivityId(callActivityId);
+        moveActivityIdsContainer.setCallActivitySubProcessVersion(callActivitySubProcessVersion);
+        moveActivityIdList.add(moveActivityIdsContainer);
+        return this;
+    }
+
+    public ChangeActivityStateBuilder moveSingleActivityIdToSubProcessInstanceActivityIds(String currentActivityId, List<String> newActivityIds, String callActivityId, Integer callActivitySubProcessVersion) {
+        MoveActivityIdContainer moveActivityIdsContainer = new MoveActivityIdContainer(currentActivityId, newActivityIds);
         moveActivityIdsContainer.setMoveToSubProcessInstance(true);
         moveActivityIdsContainer.setCallActivityId(callActivityId);
         moveActivityIdsContainer.setCallActivitySubProcessVersion(callActivitySubProcessVersion);

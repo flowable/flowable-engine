@@ -517,16 +517,12 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         LOGGER.debug("Process explicit mapping for '" + executionActivityIdsToMapExplicitly.size() + "' activity executions");
         for (
             ActivityMigrationMapping activityMapping : activityMigrationMappings) {
-            String fromActivityId;
-            String toActivityId;
-            String newAssignee;
-            String fromCallActivityId;
 
             if (activityMapping instanceof ActivityMigrationMapping.OneToOneMapping) {
-                fromActivityId = ((ActivityMigrationMapping.OneToOneMapping) activityMapping).getFromActivityId();
-                toActivityId = ((ActivityMigrationMapping.OneToOneMapping) activityMapping).getToActivityId();
-                newAssignee = ((ActivityMigrationMapping.OneToOneMapping) activityMapping).getWithNewAssignee();
-                fromCallActivityId = activityMapping.getFromCallActivityId();
+                String fromActivityId = ((ActivityMigrationMapping.OneToOneMapping) activityMapping).getFromActivityId();
+                String toActivityId = ((ActivityMigrationMapping.OneToOneMapping) activityMapping).getToActivityId();
+                String newAssignee = ((ActivityMigrationMapping.OneToOneMapping) activityMapping).getWithNewAssignee();
+                String fromCallActivityId = activityMapping.getFromCallActivityId();
                 //TODO WIP - Confirm if we allow to mix mapping of the call activity with mapping of its subProcess activity
                 if (activityMapping.isToParentProcess() && !executionActivityIdsToMapExplicitly.contains(fromCallActivityId)) {
                     List<ExecutionEntity> callActivityExecutions = filteredExecutionsByActivityId.get(fromCallActivityId).stream().filter(ExecutionEntity::isActive).collect(Collectors.toList());
@@ -546,14 +542,21 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                     executionActivityIdsToMapExplicitly.remove(fromActivityId);
                 }
             } else if (activityMapping instanceof ActivityMigrationMapping.OneToManyMapping) {
-                fromActivityId = ((ActivityMigrationMapping.OneToManyMapping) activityMapping).getFromActivityId();
+                String fromActivityId = ((ActivityMigrationMapping.OneToManyMapping) activityMapping).getFromActivityId();
                 List<String> toActivityIds = activityMapping.getToActivityIds();
-                fromCallActivityId = activityMapping.getFromCallActivityId();
+                String fromCallActivityId = activityMapping.getFromCallActivityId();
                 if (activityMapping.isToParentProcess() && !executionActivityIdsToMapExplicitly.contains(fromCallActivityId)) {
-                    throw new UnsupportedOperationException("Mapping one activity to multiple activities in the parent process is not implemented yet!!!");
+                    List<ExecutionEntity> callActivityExecutions = filteredExecutionsByActivityId.get(fromCallActivityId).stream().filter(ExecutionEntity::isActive).collect(Collectors.toList());
+                    for (ExecutionEntity callActivityExecution : callActivityExecutions) {
+                        ExecutionEntity subProcessInstanceExecution = executionEntityManager.findSubProcessInstanceBySuperExecutionId(callActivityExecution.getId());
+                        ChangeActivityStateBuilderImpl subProcessChangeActivityStateBuilder = new ChangeActivityStateBuilderImpl();
+                        subProcessChangeActivityStateBuilder.processInstanceId(subProcessInstanceExecution.getId());
+                        subProcessChangeActivityStateBuilder.moveSingleActivityIdToParentActivityIds(fromActivityId, toActivityIds);
+                        changeActivityStateBuilders.add(subProcessChangeActivityStateBuilder);
+                    }
                 } else if (executionActivityIdsToMapExplicitly.contains(fromActivityId)) {
                     if (activityMapping.isToCallActivity()) {
-                        throw new UnsupportedOperationException("Mapping one activity to multiple activities in a subProcess is not implemented yet!!!");
+                        mainProcessChangeActivityStateBuilder.moveSingleActivityIdToSubProcessInstanceActivityIds(fromActivityId, toActivityIds, activityMapping.getToCallActivityId(), activityMapping.getCallActivityProcessDefinitionVersion());
                     } else {
                         mainProcessChangeActivityStateBuilder.moveSingleActivityIdToActivityIds(fromActivityId, toActivityIds);
                     }
@@ -561,9 +564,9 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                 }
             } else if (activityMapping instanceof ActivityMigrationMapping.ManyToOneMapping) {
                 List<String> fromActivityIds = activityMapping.getFromActivityIds();
-                toActivityId = ((ActivityMigrationMapping.ManyToOneMapping) activityMapping).getToActivityId();
-                fromCallActivityId = activityMapping.getFromCallActivityId();
-                newAssignee = ((ActivityMigrationMapping.ManyToOneMapping) activityMapping).getWithNewAssignee();
+                String toActivityId = ((ActivityMigrationMapping.ManyToOneMapping) activityMapping).getToActivityId();
+                String fromCallActivityId = activityMapping.getFromCallActivityId();
+                String newAssignee = ((ActivityMigrationMapping.ManyToOneMapping) activityMapping).getWithNewAssignee();
                 if (activityMapping.isToParentProcess() && !executionActivityIdsToMapExplicitly.contains(fromCallActivityId)) {
                     List<ExecutionEntity> callActivityExecutions = filteredExecutionsByActivityId.get(fromCallActivityId).stream().filter(ExecutionEntity::isActive).collect(Collectors.toList());
                     for (ExecutionEntity callActivityExecution : callActivityExecutions) {
