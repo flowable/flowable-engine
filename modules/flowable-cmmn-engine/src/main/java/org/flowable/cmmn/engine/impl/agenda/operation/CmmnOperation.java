@@ -64,20 +64,40 @@ public abstract class CmmnOperation implements Runnable {
     }
     
     
-    protected List<PlanItemInstanceEntity> createPlanItemInstances(CommandContext commandContext,
-                                                                        List<PlanItem> planItems,
-                                                                        String caseDefinitionId,
-                                                                        String caseInstanceId, 
-                                                                        String stagePlanItemInstanceId, 
-                                                                        String tenantId) {
+    protected List<PlanItemInstanceEntity> createPlanItemInstances(CommandContext commandContext, List<PlanItem> planItems, String caseDefinitionId,
+            String caseInstanceId, PlanItemInstanceEntity stagePlanItemInstanceEntity, String tenantId) {
+
         List<PlanItemInstanceEntity> planItemInstances = new ArrayList<>();
         for (PlanItem planItem : planItems) {
-            PlanItemInstanceEntity childPlanItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
-                .createChildPlanItemInstance(planItem, caseDefinitionId, caseInstanceId, stagePlanItemInstanceId, tenantId, true);
-            planItemInstances.add(childPlanItemInstance);
-            CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(childPlanItemInstance);
+
+            // In some cases (e.g. cross-border triggering of a sentry, the child plan item instance has been activated already
+            // As such, it doesn't need to be created again (this is the if check here, which goes against the cache)
+
+            if (stagePlanItemInstanceEntity == null || !childPlanItemInstanceDoesnExist(stagePlanItemInstanceEntity, planItem)) {
+                PlanItemInstanceEntity childPlanItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
+                    .createChildPlanItemInstance(planItem,
+                        caseDefinitionId,
+                        caseInstanceId,
+                        stagePlanItemInstanceEntity != null ? stagePlanItemInstanceEntity.getId() : null,
+                        tenantId,
+                        true);
+                planItemInstances.add(childPlanItemInstance);
+                CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(childPlanItemInstance);
+            }
         }
         return planItemInstances;
+    }
+
+    protected boolean childPlanItemInstanceDoesnExist(PlanItemInstanceEntity stagePlanItemInstanceEntity, PlanItem planItem) {
+        List<PlanItemInstanceEntity> childPlanItemInstances = stagePlanItemInstanceEntity.getChildPlanItemInstances();
+        if (childPlanItemInstances != null && !childPlanItemInstances.isEmpty()) {
+            for (PlanItemInstanceEntity childPlanItemInstanceEntity : childPlanItemInstances) {
+                if (childPlanItemInstanceEntity.getPlanItem() != null && planItem.getId().equals(childPlanItemInstanceEntity.getPlanItem().getId())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     protected PlanItemInstanceEntity copyAndInsertPlanItemInstance(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntityToCopy, boolean addToParent) {

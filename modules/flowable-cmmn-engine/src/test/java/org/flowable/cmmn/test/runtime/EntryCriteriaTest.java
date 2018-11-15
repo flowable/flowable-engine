@@ -12,8 +12,10 @@
  */
 package org.flowable.cmmn.test.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
@@ -144,6 +146,75 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
         cmmnTaskService.complete(task.getId());
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertEquals("B", task.getName());
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testCrossBorderSentry() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCrossBorderSentry").start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertEquals("A", task.getName());
+
+        PlanItemInstance stage2PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 2").singleResult();
+        assertEquals(PlanItemInstanceState.ACTIVE, stage2PlanItemInstance.getState());
+
+        PlanItemInstance stage3PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 3").singleResult();
+        assertEquals(PlanItemInstanceState.AVAILABLE, stage3PlanItemInstance.getState());
+
+        assertNull(cmmnTaskService.createTaskQuery().taskName("B").singleResult());
+        assertNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult());
+
+        // Completing A should activate B and it's stage (that has a sentry that isn't yet satisfied, but due to B's activation it gets activated too)
+        cmmnTaskService.complete(cmmnTaskService.createTaskQuery().taskName("A").singleResult().getId());
+
+        stage2PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 2").singleResult();
+        assertEquals(PlanItemInstanceState.ACTIVE, stage2PlanItemInstance.getState());
+
+        stage3PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 3").singleResult();
+        assertEquals(PlanItemInstanceState.ACTIVE, stage3PlanItemInstance.getState());
+
+        assertNotNull(cmmnTaskService.createTaskQuery().taskName("B").singleResult());
+        assertNotNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult());
+        assertNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult());
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testCrossBorderMultipleSentries() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCrossBorderSentry").start();
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+        assertEquals(1, tasks.size());
+        assertEquals("A", tasks.get(0).getName());
+
+        PlanItemInstance stage2PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 2").singleResult();
+        assertEquals(PlanItemInstanceState.AVAILABLE, stage2PlanItemInstance.getState());
+
+        PlanItemInstance stage3PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 3").singleResult();
+        assertNull(stage3PlanItemInstance);
+
+        PlanItemInstance stage4PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 4").singleResult();
+        assertEquals(PlanItemInstanceState.AVAILABLE, stage4PlanItemInstance.getState());
+
+        PlanItemInstance stage5PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 5").singleResult();
+        assertNull(stage5PlanItemInstance);
+
+        // Completing A should activate B,C,D an E
+        cmmnTaskService.complete(cmmnTaskService.createTaskQuery().taskName("A").singleResult().getId());
+
+        stage2PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 2").singleResult();
+        assertEquals(PlanItemInstanceState.ACTIVE, stage2PlanItemInstance.getState());
+
+        stage3PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 3").singleResult();
+        assertEquals(PlanItemInstanceState.ACTIVE, stage3PlanItemInstance.getState());
+
+        stage4PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 4").singleResult();
+        assertEquals(PlanItemInstanceState.ACTIVE, stage4PlanItemInstance.getState());
+
+        stage5PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 5").singleResult();
+        assertEquals(PlanItemInstanceState.ACTIVE, stage5PlanItemInstance.getState());
+
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("B", "C", "D", "E");
     }
 
 }
