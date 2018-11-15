@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.converter.util;
 
+import java.util.List;
+
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.Sentry;
@@ -21,6 +23,18 @@ import org.flowable.cmmn.model.SentryOnPart;
  * @author Joram Barrez
  */
 public class CriterionUtil {
+
+    public static boolean planItemHasOneEntryCriterionDependingOnPlanItem(PlanItem planItemToCheck, PlanItem planItem, String event) {
+        List<Criterion> entryCriteria = planItemToCheck.getEntryCriteria();
+        if (!entryCriteria.isEmpty()) {
+            for (Criterion criterion : entryCriteria) {
+                if (criterionHasOnPartDependingOnPlanItem(criterion, planItem, event)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     public static boolean criterionHasOnPartDependingOnPlanItem(Criterion criterion, PlanItem planItem, String event) {
         Sentry sentry = criterion.getSentry();

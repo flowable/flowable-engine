@@ -479,7 +479,8 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         List<PlanItem> entryDependentPlanItems = planItemLifeCycleEvent.getPlanItem().getEntryDependentPlanItems();
         for (PlanItem entryDependentPlanItem : entryDependentPlanItems) {
             // Only needed for sentries that cross the outer stage border
-            if (!planItemsShareDirectParentStage(entryDependentPlanItem, planItemLifeCycleEvent.getPlanItem())) {
+            if (!planItemsShareDirectParentStage(entryDependentPlanItem, planItemLifeCycleEvent.getPlanItem())
+                    && CriterionUtil.planItemHasOneEntryCriterionDependingOnPlanItem(entryDependentPlanItem, planItemLifeCycleEvent.getPlanItem(), planItemLifeCycleEvent.getTransition())) {
 
                 PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext);
                 List<PlanItemInstanceEntity> childPlanItemInstances = CaseInstanceUtil.findChildPlanItemInstances(caseInstanceEntity, entryDependentPlanItem);
