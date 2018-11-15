@@ -128,6 +128,11 @@ public class PlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager
     }
 
     @Override
+    public List<PlanItemInstanceEntity> findByCaseInstanceIdAndPlanItemId(String caseInstanceId, String planitemId) {
+        return planItemInstanceDataManager.findByCaseInstanceIdAndPlanItemId(caseInstanceId, planitemId);
+    }
+
+    @Override
     public void delete(PlanItemInstanceEntity planItemInstanceEntity, boolean fireEvent) {
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         

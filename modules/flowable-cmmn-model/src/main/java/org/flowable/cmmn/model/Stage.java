@@ -34,7 +34,7 @@ public class Stage extends PlanFragment implements HasExitCriteria {
         planItemDefinitionMap.put(planItemDefinition.getId(), planItemDefinition);
     }
 
-    public PlanItemDefinition findPlanItemDefinition(String planItemDefinitionId) {
+    public PlanItemDefinition findPlanItemDefinitionInStageOrUpwards(String planItemDefinitionId) {
         if (id != null && id.equals(planItemDefinitionId)) {
             return this;
         }
@@ -45,7 +45,29 @@ public class Stage extends PlanFragment implements HasExitCriteria {
 
         Stage parentStage = getParentStage();
         if (parentStage != null) {
-            return parentStage.findPlanItemDefinition(planItemDefinitionId);
+            return parentStage.findPlanItemDefinitionInStageOrUpwards(planItemDefinitionId);
+        }
+
+        return null;
+    }
+
+    public PlanItemDefinition findPlanItemDefinitionInStageOrDownwards(String planItemDefinitionId) {
+        if (id != null && id.equals(planItemDefinitionId)) {
+            return this;
+        }
+
+        if (planItemDefinitionMap.containsKey(planItemDefinitionId)) {
+            return planItemDefinitionMap.get(planItemDefinitionId);
+        }
+
+        for (String key : planItemDefinitionMap.keySet()) {
+            PlanItemDefinition planItemDefinition = planItemDefinitionMap.get(key);
+            if (planItemDefinition instanceof Stage) {
+                PlanItemDefinition p = ((Stage) planItemDefinition).findPlanItemDefinitionInStageOrDownwards(planItemDefinitionId);
+                if (p != null) {
+                    return p;
+                }
+            }
         }
 
         return null;
