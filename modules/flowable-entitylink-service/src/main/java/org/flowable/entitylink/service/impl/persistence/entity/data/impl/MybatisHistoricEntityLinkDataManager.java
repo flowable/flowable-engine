@@ -50,6 +50,16 @@ public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<Hi
         parameters.put("linkType", linkType);
         return (List) getList("selectHistoricEntityLinksByScopeIdAndType", parameters, historicEntityLinksByScopeIdAndTypeMatcher, true);
     }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
+    public List<HistoricEntityLink> findHistoricEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String scopeType, String linkType) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("referenceScopeId", referenceScopeId);
+        parameters.put("referenceScopeType", scopeType);
+        parameters.put("linkType", linkType);
+        return (List) getList("selectHistoricEntityLinksByScopeIdAndType", parameters, historicEntityLinksByScopeIdAndTypeMatcher, true);
+    }
     
     @Override
     @SuppressWarnings("unchecked")

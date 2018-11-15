@@ -92,11 +92,15 @@
   <select id="selectHistoricEntityLink" parameterType="string" resultMap="historicEntityLinkResultMap">
     select * from ${prefix}ACT_HI_ENTITYLINK where ID_ = #{id, jdbcType=VARCHAR}
   </select>
-  
+
   <select id="selectHistoricEntityLinksByScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicEntityLinkResultMap">
     select * from ${prefix}ACT_HI_ENTITYLINK where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType}
   </select>
-  
+
+  <select id="selectHistoricEntityLinksByReferenceScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicEntityLinkResultMap">
+    select * from ${prefix}ACT_HI_ENTITYLINK where REF_SCOPE_ID_ = #{parameter.referenceScopeId} and SCOPE_TYPE_ = #{parameter.referenceScopeType} and LINK_TYPE_ = #{parameter.linkType}
+  </select>
+
   <select id="selectHistoricEntityLinksByScopeDefinitionIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicEntityLinkResultMap">
     select * from ${prefix}ACT_HI_ENTITYLINK where SCOPE_DEFINITION_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType}
   </select>
