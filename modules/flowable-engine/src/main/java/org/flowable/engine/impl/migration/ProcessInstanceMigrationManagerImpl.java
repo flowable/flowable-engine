@@ -534,7 +534,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                         ExecutionEntity subProcessInstanceExecution = executionEntityManager.findSubProcessInstanceBySuperExecutionId(callActivityExecution.getId());
                         ChangeActivityStateBuilderImpl subProcessChangeActivityStateBuilder = new ChangeActivityStateBuilderImpl();
                         subProcessChangeActivityStateBuilder.processInstanceId(subProcessInstanceExecution.getId());
-                        subProcessChangeActivityStateBuilder.moveActivityIdToParentActivityId(fromActivityId, toActivityId, ((ActivityMigrationMapping.OneToOneMapping) activityMapping).getWithNewAssignee());
+                        subProcessChangeActivityStateBuilder.moveActivityIdToParentActivityId(fromActivityId, toActivityId, newAssignee);
                         changeActivityStateBuilders.add(subProcessChangeActivityStateBuilder);
                     }
                 } else if (executionActivityIdsToMapExplicitly.contains(fromActivityId)) {
@@ -563,8 +563,16 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                 List<String> fromActivityIds = activityMapping.getFromActivityIds();
                 toActivityId = ((ActivityMigrationMapping.ManyToOneMapping) activityMapping).getToActivityId();
                 fromCallActivityId = activityMapping.getFromCallActivityId();
+                newAssignee = ((ActivityMigrationMapping.ManyToOneMapping) activityMapping).getWithNewAssignee();
                 if (activityMapping.isToParentProcess() && !executionActivityIdsToMapExplicitly.contains(fromCallActivityId)) {
-                    throw new UnsupportedOperationException("Mapping multiple activities to single activity in the parent process is not implemented yet!!!");
+                    List<ExecutionEntity> callActivityExecutions = filteredExecutionsByActivityId.get(fromCallActivityId).stream().filter(ExecutionEntity::isActive).collect(Collectors.toList());
+                    for (ExecutionEntity callActivityExecution : callActivityExecutions) {
+                        ExecutionEntity subProcessInstanceExecution = executionEntityManager.findSubProcessInstanceBySuperExecutionId(callActivityExecution.getId());
+                        ChangeActivityStateBuilderImpl subProcessChangeActivityStateBuilder = new ChangeActivityStateBuilderImpl();
+                        subProcessChangeActivityStateBuilder.processInstanceId(subProcessInstanceExecution.getId());
+                        subProcessChangeActivityStateBuilder.moveActivityIdsToParentActivityId(fromActivityIds, toActivityId, newAssignee);
+                        changeActivityStateBuilders.add(subProcessChangeActivityStateBuilder);
+                    }
                 } else {
                     List<String> executionIds = new ArrayList<>();
                     for (String activityId : fromActivityIds) {
@@ -575,9 +583,9 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                         }
                     }
                     if (activityMapping.isToCallActivity()) {
-                        throw new UnsupportedOperationException("Mapping multiple activities to single activity in a subProcess is not implemented yet!!!");
+                        mainProcessChangeActivityStateBuilder.moveActivityIdsToSubProcessInstanceActivityId(fromActivityIds, toActivityId, activityMapping.getToCallActivityId(), activityMapping.getCallActivityProcessDefinitionVersion(), newAssignee);
                     } else {
-                        mainProcessChangeActivityStateBuilder.moveExecutionsToSingleActivityId(executionIds, toActivityId, ((ActivityMigrationMapping.ManyToOneMapping) activityMapping).getWithNewAssignee());
+                        mainProcessChangeActivityStateBuilder.moveExecutionsToSingleActivityId(executionIds, toActivityId, newAssignee);
                     }
                 }
             } else {

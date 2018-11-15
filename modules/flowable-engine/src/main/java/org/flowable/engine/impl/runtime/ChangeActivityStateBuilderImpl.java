@@ -119,6 +119,13 @@ public class ChangeActivityStateBuilderImpl implements ChangeActivityStateBuilde
         return this;
     }
 
+    public ChangeActivityStateBuilder moveActivityIdsToParentActivityId(List<String> currentActivityIds, String newActivityId, String newAssigneeId) {
+        MoveActivityIdContainer moveActivityIdContainer = new MoveActivityIdContainer(currentActivityIds, newActivityId, newAssigneeId);
+        moveActivityIdContainer.setMoveToParentProcess(true);
+        moveActivityIdList.add(moveActivityIdContainer);
+        return this;
+    }
+
     @Override
     public ChangeActivityStateBuilder moveActivityIdToSubProcessInstanceActivityId(String currentActivityId, String newActivityId, String callActivityId) {
         return moveActivityIdToSubProcessInstanceActivityId(currentActivityId, newActivityId, callActivityId, null, null);
@@ -135,6 +142,15 @@ public class ChangeActivityStateBuilderImpl implements ChangeActivityStateBuilde
         moveActivityIdContainer.setCallActivityId(callActivityId);
         moveActivityIdContainer.setCallActivitySubProcessVersion(callActivitySubProcessVersion);
         moveActivityIdList.add(moveActivityIdContainer);
+        return this;
+    }
+
+    public ChangeActivityStateBuilder moveActivityIdsToSubProcessInstanceActivityId(List<String> activityIds, String newActivityId, String callActivityId, Integer callActivitySubProcessVersion, String newAssigneeId) {
+        MoveActivityIdContainer moveActivityIdsContainer = new MoveActivityIdContainer(activityIds, newActivityId, newAssigneeId);
+        moveActivityIdsContainer.setMoveToSubProcessInstance(true);
+        moveActivityIdsContainer.setCallActivityId(callActivityId);
+        moveActivityIdsContainer.setCallActivitySubProcessVersion(callActivitySubProcessVersion);
+        moveActivityIdList.add(moveActivityIdsContainer);
         return this;
     }
 
