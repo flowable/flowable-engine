@@ -45,21 +45,12 @@ public abstract class CmmnOperation implements Runnable {
     }
     
     protected Stage getStage(PlanItemInstanceEntity planItemInstanceEntity) {
-        if (planItemInstanceEntity.getPlanItem() != null
-                && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() != null) {
-            PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
-            if (planItemDefinition instanceof Stage) {
-                return (Stage) planItemDefinition;
-            } else {
-                return planItemDefinition.getParentStage();
-            }
+        PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
+        if (planItemDefinition instanceof Stage) {
+            return (Stage) planItemDefinition;
         } else {
-            return getStage(planItemInstanceEntity.getCaseDefinitionId(), planItemInstanceEntity.getElementId());
+            return planItemDefinition.getParentStage();
         }
-    }
-    
-    protected Stage getStage(String caseDefinitionId, String stageId) {
-        return CaseDefinitionUtil.getCase(caseDefinitionId).findStage(stageId);
     }
     
     protected boolean isStage(PlanItemInstanceEntity planItemInstanceEntity) {
@@ -81,11 +72,10 @@ public abstract class CmmnOperation implements Runnable {
                                                                         String tenantId) {
         List<PlanItemInstanceEntity> planItemInstances = new ArrayList<>();
         for (PlanItem planItem : planItems) {
-            planItemInstances.add(CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
-                    .createChildPlanItemInstance(planItem, caseDefinitionId, caseInstanceId, stagePlanItemInstanceId, tenantId, true));
-        }
-        for (PlanItemInstanceEntity planItemInstance : planItemInstances) {
-            CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(planItemInstance);
+            PlanItemInstanceEntity childPlanItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
+                .createChildPlanItemInstance(planItem, caseDefinitionId, caseInstanceId, stagePlanItemInstanceId, tenantId, true);
+            planItemInstances.add(childPlanItemInstance);
+            CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(childPlanItemInstance);
         }
         return planItemInstances;
     }

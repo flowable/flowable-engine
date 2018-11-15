@@ -26,10 +26,18 @@ import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.api.FlowableException;
 
 /**
- * + * @author Joram Barrez
- * +
+ * @author Joram Barrez
  */
 public class CaseInstanceUtil {
+
+    /**
+     * Returns a list of {@link PlanItemInstanceEntity} instances for the given {@link CaseInstanceEntity}, irregardless of the state.
+     */
+    public static List<PlanItemInstanceEntity> findChildPlanItemInstances(CaseInstanceEntity caseInstanceEntity, PlanItem planItem) {
+        return getAllChildPlanItemInstances(caseInstanceEntity).stream()
+            .filter(planItemInstance -> planItem.getId().equals(planItemInstance.getPlanItem().getId()))
+            .collect(Collectors.toList());
+    }
 
     /**
      * Returns a list of {@link PlanItemInstanceEntity} instances for the given {@link CaseInstanceEntity},
@@ -47,13 +55,12 @@ public class CaseInstanceUtil {
      * which have a plan item that matches any of the given plan items and which are in any state.
      */
     public static List<PlanItemInstanceEntity> findChildPlanItemInstances(CaseInstanceEntity caseInstanceEntity, List<PlanItem> planItems) {
-        List<String> planItemIds = planItems.stream().map(planItem -> planItem.getId()).collect(Collectors.toList());
+        List<String> planItemIds = planItems.stream().map(PlanItem::getId).collect(Collectors.toList());
         List<PlanItemInstanceEntity> childPlanItemInstances = getAllChildPlanItemInstances(caseInstanceEntity);
         return childPlanItemInstances.stream()
             .filter(planItemInstance -> planItemIds.contains(planItemInstance.getPlanItem().getId()))
             .collect(Collectors.toList());
     }
-
 
     /**
      * Similar to {@link #findChildPlanItemInstances(CaseInstanceEntity, List)}, but returns a map {planItemId, List<PlanItemInstances>}
@@ -62,7 +69,7 @@ public class CaseInstanceUtil {
 
         Map<String, List<PlanItemInstanceEntity>> result = new HashMap<>();
 
-        List<String> planItemIds = planItems.stream().map(planItem -> planItem.getId()).collect(Collectors.toList());
+        List<String> planItemIds = planItems.stream().map(PlanItem::getId).collect(Collectors.toList());
         List<PlanItemInstanceEntity> childPlanItemInstances = getAllChildPlanItemInstances(caseInstanceEntity);
 
         for (PlanItemInstanceEntity childPlanItemInstance : childPlanItemInstances) {

@@ -49,7 +49,29 @@ public class PlanFragment extends PlanItemDefinition {
         
         PlanFragment parentPlanFragment = getParent();
         if (parentPlanFragment != null) {
-            return parentPlanFragment.findPlanItemInPlanFragmentOrUpwards(planItemId);
+            PlanItem p = parentPlanFragment.findPlanItemInPlanFragmentOrUpwards(planItemId);
+            if (p != null) {
+                return p;
+            }
+        }
+
+        return null;
+    }
+
+    public PlanItem findPlanItemForPlanItemDefinitionInPlanFragmentOrUpwards(String planItemDefinitionId) {
+        for (String planItemId : planItemMap.keySet()) {
+            PlanItem planItem = planItemMap.get(planItemId);
+            if (planItem.getPlanItemDefinition() != null && planItem.getPlanItemDefinition().getId().equals(planItemDefinitionId)) {
+                return planItem;
+            }
+        }
+
+        PlanFragment parentPlanFragment = getParent();
+        if (parentPlanFragment != null) {
+            PlanItem p = parentPlanFragment.findPlanItemForPlanItemDefinitionInPlanFragmentOrUpwards(planItemDefinitionId);
+            if (p != null) {
+                return p;
+            }
         }
 
         return null;

@@ -17,11 +17,9 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.converter.util.PlanItemDependencyUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
@@ -166,7 +164,7 @@ public abstract class AbstractPlanItemInstanceOperation extends CmmnOperation {
             // Step 3
             if (!eventListenerPlanItemInstance.isEmpty()) {
 
-                List<PlanItem> dependentPlanItems = eventListenerPlanItem.getDependentPlanItems();
+                List<PlanItem> dependentPlanItems = eventListenerPlanItem.getAllDependentPlanItems();
                 Map<String, List<PlanItemInstanceEntity>> dependentPlanItemInstancesMap = CaseInstanceUtil
                     .findChildPlanItemInstancesMap(caseInstanceEntity, dependentPlanItems);
 

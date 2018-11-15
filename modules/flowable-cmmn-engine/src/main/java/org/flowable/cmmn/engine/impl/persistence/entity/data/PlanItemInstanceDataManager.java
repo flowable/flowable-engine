@@ -23,6 +23,8 @@ import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
  * @author Joram Barrez
  */
 public interface PlanItemInstanceDataManager extends DataManager<PlanItemInstanceEntity> {
+
+    List<PlanItemInstanceEntity> findByCaseInstanceIdAndPlanItemId(String caseInstanceId, String planitemId);
     
     List<PlanItemInstance> findByCriteria(PlanItemInstanceQueryImpl planItemInstanceQuery);
     

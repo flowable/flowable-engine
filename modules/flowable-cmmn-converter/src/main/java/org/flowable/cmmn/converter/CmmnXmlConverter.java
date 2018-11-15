@@ -362,8 +362,8 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             planItem.getExitDependencies().addAll(PlanItemDependencyUtil.getExitDependencies(planItem));
 
             // Dependents
-            planItem.getEntryDependencies().forEach(entryDependency -> entryDependency.getDependentPlanItems().add(planItem));
-            planItem.getExitDependencies().forEach(exitDependency -> exitDependency.getDependentPlanItems().add(planItem));
+            planItem.getEntryDependencies().forEach(entryDependency -> entryDependency.addEntryDependentPlanItem(planItem));
+            planItem.getExitDependencies().forEach(exitDependency -> exitDependency.addExitDependentPlanItem(planItem));
         }
 
 
@@ -426,8 +426,9 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
     protected void processPlanItems(CmmnModel cmmnModel, PlanFragment planFragment) {
         for (PlanItem planItem : planFragment.getPlanItems()) {
 
+            // Plan items are defined on the same level or in a higher parent stage, never in a child stage.
             Stage parentStage = planItem.getParentStage();
-            PlanItemDefinition planItemDefinition = parentStage.findPlanItemDefinition(planItem.getDefinitionRef());
+            PlanItemDefinition planItemDefinition = parentStage.findPlanItemDefinitionInStageOrUpwards(planItem.getDefinitionRef());
             if (planItemDefinition == null) {
                 throw new FlowableException("No matching plan item definition found for reference "
                         + planItem.getDefinitionRef() + " of plan item " + planItem.getId());

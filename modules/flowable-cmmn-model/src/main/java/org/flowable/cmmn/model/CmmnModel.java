@@ -101,7 +101,7 @@ public class CmmnModel {
     public PlanItemDefinition findPlanItemDefinition(String id) {
         PlanItemDefinition foundPlanItemDefinition = null;
         for (Case caseModel : cases) {
-            foundPlanItemDefinition = caseModel.getPlanModel().findPlanItemDefinition(id);
+            foundPlanItemDefinition = caseModel.getPlanModel().findPlanItemDefinitionInStageOrUpwards(id);
             if (foundPlanItemDefinition != null) {
                 break;
             }
@@ -110,7 +110,7 @@ public class CmmnModel {
         if (foundPlanItemDefinition == null) {
             for (Case caseModel : cases) {
                 for (Stage stage : caseModel.getPlanModel().findPlanItemDefinitionsOfType(Stage.class, true)) {
-                    foundPlanItemDefinition = stage.findPlanItemDefinition(id);
+                    foundPlanItemDefinition = stage.findPlanItemDefinitionInStageOrUpwards(id);
                     if (foundPlanItemDefinition != null) {
                         break;
                     }

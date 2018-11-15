@@ -28,10 +28,12 @@ public interface PlanItemInstanceEntityManager extends EntityManager<PlanItemIns
             String caseInstanceId, String stagePlanItemInstanceId, String tenantId, boolean addToParent);
     
     PlanItemInstanceQuery createPlanItemInstanceQuery();
-    
+
     long countByCriteria(PlanItemInstanceQuery planItemInstanceQuery);
     
     List<PlanItemInstance> findByCriteria(PlanItemInstanceQuery planItemInstanceQuery);
+
+    List<PlanItemInstanceEntity> findByCaseInstanceIdAndPlanItemId(String caseInstanceId, String planitemId);
     
     void deleteByCaseDefinitionId(String caseDefinitionId);
     
