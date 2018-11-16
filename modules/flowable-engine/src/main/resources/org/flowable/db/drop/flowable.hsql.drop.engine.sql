@@ -17,5 +17,4 @@ drop index if exists ACT_IDX_RU_ACT_INST_START;
 drop index if exists ACT_IDX_RU_ACT_INST_END;
 drop index if exists ACT_IDX_RU_ACT_INST_PROCINST;
 drop index if exists ACT_IDX_RU_ACT_INST_EXEC;
-drop index if exists ACT_IDX_ACTINST_PROC_DEF;
 drop index if exists ACT_IDX_ACTINST_EXECUTION;

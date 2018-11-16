@@ -33,8 +33,6 @@ public interface ActivityInstanceDataManager extends DataManager<ActivityInstanc
 
     void deleteActivityInstancesByProcessInstanceId(String processInstanceId);
 
-    void deleteActivityInstancesByProcessDefinitionId(String processDefinitionId);
-
     long findActivityInstanceCountByQueryCriteria(ActivityInstanceQueryImpl activityInstanceQuery);
 
     List<ActivityInstance> findActivityInstancesByQueryCriteria(ActivityInstanceQueryImpl activityInstanceQuery);

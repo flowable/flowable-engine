@@ -96,8 +96,6 @@ public class DeploymentEntityManagerImpl extends AbstractEntityManager<Deploymen
             // we fall back to the previous timer/signal/message start event
 
             restorePreviousStartEventsIfNeeded(processDefinition);
-
-            deleteActivityInstancesForProcessDefinition(processDefinition);
         }
 
         deleteProcessDefinitionForDeployment(deploymentId);
@@ -246,10 +244,6 @@ public class DeploymentEntityManagerImpl extends AbstractEntityManager<Deploymen
         }
 
         getEventSubscriptionEntityManager().insert(newSubscription);
-    }
-
-    protected void deleteActivityInstancesForProcessDefinition(ProcessDefinition processDefinition) {
-        getActivityInstanceEntityManager().deleteActivityInstancesByProcessDefinitionId(processDefinition.getId());
     }
 
     protected ProcessDefinitionEntity findLatestProcessDefinition(ProcessDefinition processDefinition) {

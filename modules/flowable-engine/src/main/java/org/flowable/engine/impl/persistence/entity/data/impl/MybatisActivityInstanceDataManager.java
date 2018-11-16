@@ -84,10 +84,6 @@ public class MybatisActivityInstanceDataManager extends AbstractProcessDataManag
     }
 
     @Override
-    public void deleteActivityInstancesByProcessDefinitionId(String processDefinitionId) {
-        getDbSqlSession().delete("deleteActivityInstancesByProcessDefinitionId", processDefinitionId, ActivityInstanceEntityImpl.class);
-    }
-    @Override
     public long findActivityInstanceCountByQueryCriteria(ActivityInstanceQueryImpl activityInstanceQuery) {
         return (Long) getDbSqlSession().selectOne("selectActivityInstanceCountByQueryCriteria", activityInstanceQuery);
     }

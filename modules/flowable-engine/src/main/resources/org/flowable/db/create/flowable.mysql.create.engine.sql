@@ -322,12 +322,6 @@ alter table ACT_PROCDEF_INFO
     add constraint ACT_UNIQ_INFO_PROCDEF
     unique (PROC_DEF_ID_);
 
-create index ACT_IDX_ACTINST_PROC_DEF on ACT_RU_ACTINST(PROC_DEF_ID_);
-alter table ACT_RU_ACTINST
-    add constraint ACT_FK_RU_ACTINST_PROCDEF
-    foreign key (PROC_DEF_ID_)
-    references ACT_RE_PROCDEF (ID_);
-
 create index ACT_IDX_ACTINST_EXECUTION on ACT_RU_ACTINST(PROC_INST_ID_);
 alter table ACT_RU_ACTINST
     add constraint ACT_FK_RU_ACTINST_PROCINST
