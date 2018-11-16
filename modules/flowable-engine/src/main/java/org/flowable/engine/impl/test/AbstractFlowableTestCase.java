@@ -158,6 +158,11 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
                         assertNotNull("Historic activity instance " + historicActivityInstance.getId() + " / " + historicActivityInstance.getActivityId() + " has no execution id", historicActivityInstance.getExecutionId());
                         assertNotNull("Historic activity instance " + historicActivityInstance.getId() + " / " + historicActivityInstance.getActivityId() + " has no start time", historicActivityInstance.getStartTime());
                         assertNotNull("Historic activity instance " + historicActivityInstance.getId() + " / " + historicActivityInstance.getActivityId() + " has no end time", historicActivityInstance.getEndTime());
+                        if (historicProcessInstance.getEndTime() == null) {
+                            assertActivityInstancesAreSame(historicActivityInstance,
+                                processEngine.getRuntimeService().createActivityInstanceQuery().activityInstanceId(historicActivityInstance.getId()).singleResult()
+                            );
+                        }
                     }
                 }
             }
@@ -210,16 +215,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
         }
 
         // runtime activities
-        List<ActivityInstance> activityInstances = runtimeService.createActivityInstanceQuery()
-            .processInstanceId(processInstanceId).list();
-        if (activityInstances != null && activityInstances.size() > 0) {
-            for (ActivityInstance activityInstance : activityInstances) {
-                assertEquals(processInstanceId, activityInstance.getProcessInstanceId());
-                assertNotNull(activityInstance.getId() + " activity instance '" + activityInstance.getActivityId() +"' has no start time", activityInstance.getStartTime());
-                assertNotNull(activityInstance.getId() + " activity instance '" + activityInstance.getActivityId() + "' has no end time", activityInstance.getEndTime());
-            }
-        }
-
+        assertEquals(0L, runtimeService.createActivityInstanceQuery().count());
     }
 
     public static void assertActivityInstancesAreSame(HistoricActivityInstance historicActInst, ActivityInstance activityInstance) {
