@@ -21,7 +21,15 @@ import org.flowable.engine.FormService;
 import org.flowable.engine.form.StartFormData;
 import org.flowable.engine.form.TaskFormData;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.cmd.*;
+import org.flowable.engine.impl.cmd.GetFormKeyCmd;
+import org.flowable.engine.impl.cmd.GetRenderedStartFormCmd;
+import org.flowable.engine.impl.cmd.GetRenderedTaskFormCmd;
+import org.flowable.engine.impl.cmd.GetStartFormCmd;
+import org.flowable.engine.impl.cmd.GetTaskFormCmd;
+import org.flowable.engine.impl.cmd.SubmitStartFormCmd;
+import org.flowable.engine.impl.cmd.SubmitTaskFormCmd;
+import org.flowable.engine.impl.cmd.GetDeployedStartFormCmd;
+import org.flowable.engine.impl.cmd.GetDeployedTaskFormCmd;
 import org.flowable.engine.runtime.ProcessInstance;
 
 /**
@@ -93,5 +101,10 @@ public class FormServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
     @Override
     public InputStream getDeployedStartForm(String processDefinitionId) {
         return commandExecutor.execute(new GetDeployedStartFormCmd(processDefinitionId));
+    }
+
+    @Override
+    public InputStream getDeployedTaskForm(String taskId) {
+        return commandExecutor.execute(new GetDeployedTaskFormCmd(taskId));
     }
 }

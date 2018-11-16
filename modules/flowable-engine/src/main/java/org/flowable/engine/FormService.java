@@ -110,4 +110,9 @@ public interface FormService {
      * Retrieves a deployed start form for a process definition with a given id.
      */
     InputStream getDeployedStartForm(String processDefinitionId);
+
+    /**
+     * Retrieves a deployed task form for a task with a given id.
+     */
+    InputStream getDeployedTaskForm(String taskId);
 }

@@ -117,8 +117,43 @@ public class TaskFormsTest extends PluggableFlowableTestCase {
         }catch (FlowableIllegalArgumentException e){
             assertEquals("processDefinitionId is null", e.getMessage());
         }
+    }
 
+    @Test
+    @Deployment(resources = { "org/flowable/examples/taskforms/VacationRequest_deprecated_forms.bpmn20.xml", "org/flowable/examples/taskforms/approve.form",
+            "org/flowable/examples/taskforms/request.form", "org/flowable/examples/taskforms/adjustRequest.form" })
+    public void testGetDeployedTaskForm() {
 
+        // Get start form
+        String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+        Object startForm = formService.getRenderedStartForm(procDefId);
+        assertNotNull(startForm);
+
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+        String processDefinitionId = processDefinition.getId();
+        assertEquals("org/flowable/examples/taskforms/request.form", formService.getStartFormData(processDefinitionId).getFormKey());
+
+        // Define variables that would be filled in through the form
+        Map<String, String> formProperties = new HashMap<>();
+        formProperties.put("employeeName", "kermit");
+        formProperties.put("numberOfDays", "4");
+        formProperties.put("vacationMotivation", "I'm tired");
+        formService.submitStartFormData(procDefId, formProperties);
+
+        // Management should now have a task assigned to them
+        org.flowable.task.api.Task task = taskService.createTaskQuery().taskCandidateGroup("management").singleResult();
+        assertEquals("Vacation request by kermit", task.getDescription());
+        Object taskForm = formService.getRenderedTaskForm(task.getId());
+        assertNotNull(taskForm);
+
+        String taskId = taskService.createTaskQuery().singleResult().getId();
+        InputStream deployedTaskForm = formService.getDeployedTaskForm(taskId);
+        assertNotNull(deployedTaskForm);
+
+        String fileAsString = IoUtil.readFileAsString("org/flowable/examples/taskforms/approve.form");
+        byte[] deployedStartFormsBytes = IoUtil.readInputStream(deployedTaskForm, "testGetDeployedTaskForm");
+        String deployedStartFormAsString= new String(deployedStartFormsBytes, Charset.forName("UTF-8"));
+        assertEquals(deployedStartFormAsString, fileAsString);
     }
 
 }
