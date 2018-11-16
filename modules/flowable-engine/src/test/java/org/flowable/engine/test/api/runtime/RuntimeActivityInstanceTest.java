@@ -13,8 +13,6 @@
 
 package org.flowable.engine.test.api.runtime;
 
-import static org.flowable.standalone.history.FullHistoryTest.assertActivityInstancesAreSame;
-
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -25,6 +23,7 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.ActivityInstanceQuery;
 import org.flowable.engine.runtime.Execution;
@@ -441,5 +440,24 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         assertEquals(2, runtimeService.createNativeActivityInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(ActivityInstanceEntity.class)).list().size());
         assertEquals(1, runtimeService.createNativeActivityInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(ActivityInstanceEntity.class)).listPage(0, 1).size());
     }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml")
+    public void upgradeFromHistoryToRuntimeActivities() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        assertNotNull(processInstance);
+
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
+
+        managementService.executeCommand(commandContext -> {
+            CommandContextUtil.getActivityInstanceEntityManager(commandContext).deleteActivityInstancesByProcessInstanceId(processInstance.getId());
+            return null;
+        });
+
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
 
 }

@@ -13,8 +13,6 @@
 
 package org.flowable.engine.test.bpmn.multiinstance;
 
-import static org.flowable.standalone.history.FullHistoryTest.assertActivityInstancesAreSame;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;

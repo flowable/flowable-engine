@@ -13,8 +13,6 @@
 
 package org.flowable.engine.test.history;
 
-import static org.flowable.standalone.history.FullHistoryTest.assertActivityInstancesAreSame;
-
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;

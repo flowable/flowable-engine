@@ -12,7 +12,6 @@
  */
 package org.flowable.examples.bpmn.servicetask;
 
-import static org.flowable.standalone.history.FullHistoryTest.assertActivityInstancesAreSame;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 

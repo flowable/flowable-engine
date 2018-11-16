@@ -13,8 +13,6 @@
 
 package org.flowable.engine.test.bpmn.gateway;
 
-import static org.flowable.standalone.history.FullHistoryTest.assertActivityInstancesAreSame;
-
 import java.util.List;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;

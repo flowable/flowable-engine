@@ -13,8 +13,6 @@
 
 package org.flowable.engine.test.bpmn.subprocess;
 
-import static org.flowable.standalone.history.FullHistoryTest.assertActivityInstancesAreSame;
-
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
