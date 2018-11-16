@@ -58,7 +58,7 @@ public class EntityLinkUtil {
 
         // Check if existing links already have root, if not, current is root
         Optional<EntityLink> entityLinkWithRoot = entityLinkService
-            .findEntityLinksByReferenceScopeIdAndType(scopeId, ScopeTypes.CMMN, EntityLinkType.CHILD)
+            .findEntityLinksByReferenceScopeIdAndType(scopeId, ScopeTypes.BPMN, EntityLinkType.CHILD)
             .stream()
             .filter(e -> e.getRootScopeId() != null)
             .findFirst();
