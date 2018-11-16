@@ -12,10 +12,16 @@
  */
 package org.flowable.examples.taskforms;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.util.CollectionUtil;
+import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.test.Deployment;
@@ -84,6 +90,35 @@ public class TaskFormsTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("noStartOrTaskForm");
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNull(formService.getRenderedTaskForm(task.getId()));
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/taskforms/VacationRequest_deprecated_forms.bpmn20.xml", "org/flowable/examples/taskforms/approve.form",
+            "org/flowable/examples/taskforms/request.form", "org/flowable/examples/taskforms/adjustRequest.form" })
+    public void testGetDeployedStartForm() throws IOException {
+        // Get start form
+        String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+        Object startForm = formService.getRenderedStartForm(procDefId);
+        assertNotNull(startForm);
+        InputStream deployedStartForm = formService.getDeployedStartForm(procDefId);
+        assertNotNull(deployedStartForm);
+
+        String fileAsString = IoUtil.readFileAsString("org/flowable/examples/taskforms/request.form");
+        byte[] deployedStartFormsBytes = IoUtil.readInputStream(deployedStartForm, "deployedStartForm");
+        String deployedStartFormAsString= new String(deployedStartFormsBytes, Charset.forName("UTF-8"));
+        assertEquals(deployedStartFormAsString, fileAsString);
+    }
+
+    @Test
+    public void testGetDeployedStartFormWithNullProcDefId() {
+        try {
+            formService.getDeployedStartForm(null);
+            fail("Exception expected");
+        }catch (FlowableIllegalArgumentException e){
+            assertEquals("processDefinitionId is null", e.getMessage());
+        }
+
+
     }
 
 }

@@ -13,6 +13,7 @@
 
 package org.flowable.engine;
 
+import java.io.InputStream;
 import java.util.Map;
 
 import org.flowable.engine.form.StartFormData;
@@ -105,4 +106,8 @@ public interface FormService {
      */
     String getTaskFormKey(String processDefinitionId, String taskDefinitionKey);
 
+    /**
+     * Retrieves a deployed start form for a process definition with a given id.
+     */
+    InputStream getDeployedStartForm(String processDefinitionId);
 }
