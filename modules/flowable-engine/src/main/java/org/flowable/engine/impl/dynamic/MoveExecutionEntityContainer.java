@@ -35,6 +35,7 @@ public class MoveExecutionEntityContainer {
     protected String callActivityId;
     protected Integer callActivitySubProcessVersion;
     protected CallActivity callActivity;
+    protected String subProcessDefKey;
     protected ProcessDefinition subProcessDefinition;
     protected BpmnModel subProcessModel;
     protected BpmnModel processModel;
@@ -102,6 +103,14 @@ public class MoveExecutionEntityContainer {
 
     public void setCallActivity(CallActivity callActivity) {
         this.callActivity = callActivity;
+    }
+
+    public String getSubProcessDefKey() {
+        return subProcessDefKey;
+    }
+
+    public void setSubProcessDefKey(String subProcessDefKey) {
+        this.subProcessDefKey = subProcessDefKey;
     }
 
     public ProcessDefinition getSubProcessDefinition() {

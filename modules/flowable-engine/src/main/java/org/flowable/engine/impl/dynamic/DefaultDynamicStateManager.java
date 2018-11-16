@@ -34,7 +34,7 @@ public class DefaultDynamicStateManager extends AbstractDynamicStateManager impl
 
     @Override
     public void moveExecutionState(ChangeActivityStateBuilderImpl changeActivityStateBuilder, CommandContext commandContext) {
-        List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = resolveMoveExecutionEntityContainers(changeActivityStateBuilder, Optional.empty(), commandContext);
+        List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = resolveMoveExecutionEntityContainers(changeActivityStateBuilder, Optional.empty(), changeActivityStateBuilder.getProcessInstanceVariables(), commandContext);
         List<ExecutionEntity> executions = moveExecutionEntityContainerList.iterator().next().getExecutions();
         String processInstanceId = executions.iterator().next().getProcessInstanceId();
         

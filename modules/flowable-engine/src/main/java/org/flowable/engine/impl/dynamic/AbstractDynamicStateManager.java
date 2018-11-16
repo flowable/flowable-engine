@@ -101,7 +101,7 @@ public abstract class AbstractDynamicStateManager {
     protected final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
     //-- Move container preparation section start
-    public List<MoveExecutionEntityContainer> resolveMoveExecutionEntityContainers(ChangeActivityStateBuilderImpl changeActivityStateBuilder, Optional<String> migrateToProcessDefinitionId, CommandContext commandContext) {
+    public List<MoveExecutionEntityContainer> resolveMoveExecutionEntityContainers(ChangeActivityStateBuilderImpl changeActivityStateBuilder, Optional<String> migrateToProcessDefinitionId, Map<String, Object> variables, CommandContext commandContext) {
         List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = new ArrayList<>();
         if (changeActivityStateBuilder.getMoveExecutionIdList().size() > 0) {
             for (MoveExecutionIdContainer executionContainer : changeActivityStateBuilder.getMoveExecutionIdList()) {
@@ -176,7 +176,7 @@ public abstract class AbstractDynamicStateManager {
 
         // Complete each moveExecutionEntityContainer to make the move for each target activity (get next flowElement, and other flags)
         for (MoveExecutionEntityContainer moveExecutionEntityContainer : moveExecutionEntityContainerList) {
-            prepareMoveExecutionEntityContainer(moveExecutionEntityContainer, migrateToProcessDefinitionId, commandContext);
+            prepareMoveExecutionEntityContainer(moveExecutionEntityContainer, migrateToProcessDefinitionId, variables, commandContext);
         }
 
         return moveExecutionEntityContainerList;
@@ -249,7 +249,8 @@ public abstract class AbstractDynamicStateManager {
         return moveExecutionEntityContainer;
     }
 
-    protected void prepareMoveExecutionEntityContainer(MoveExecutionEntityContainer moveExecutionContainer, Optional<String> migrateToProcessDefinitionId, CommandContext commandContext) {
+    protected void prepareMoveExecutionEntityContainer(MoveExecutionEntityContainer moveExecutionContainer, Optional<String> migrateToProcessDefinitionId, Map<String, Object> variables, CommandContext commandContext) {
+        ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager();
         boolean canContainerDirectMigrate = (moveExecutionContainer.getMoveToActivityIds().size() == 1) && (moveExecutionContainer.getExecutions().size() == 1);
         for (String activityId : moveExecutionContainer.getMoveToActivityIds()) {
             FlowElement currentFlowElement;
@@ -283,16 +284,25 @@ public abstract class AbstractDynamicStateManager {
                     throw new FlowableException("Call activity could not be found in process definition for id " + activityId);
                 }
 
-                //TODO WIP - Check instanceof FlowElement before casting?
                 CallActivity callActivity = (CallActivity) callActivityElement;
                 moveExecutionContainer.setCallActivity(callActivity);
-
-                String calledProcessDefinitionKey = callActivity.getCalledElement();
                 ProcessDefinition callActivityProcessDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionIdOfCallActivity);
                 String deploymentId = callActivityProcessDefinition.getDeploymentId();
                 String tenantId = callActivityProcessDefinition.getTenantId();
                 Integer calledProcessVersion = moveExecutionContainer.getCallActivitySubProcessVersion();
-                ProcessDefinition subProcessDefinition = resolveProcessDefinition(calledProcessDefinitionKey, calledProcessVersion, tenantId, commandContext);
+                String calledProcessDefKey = callActivity.getCalledElement();
+                if (isExpression(calledProcessDefKey)) {
+                    try {
+                        calledProcessDefKey = expressionManager.createExpression(calledProcessDefKey).getValue(firstExecution.getProcessInstance()).toString();
+                    } catch (FlowableException e) {
+                        if (variables != null) {
+                            calledProcessDefKey = variables.getOrDefault(calledProcessDefKey.substring(2, calledProcessDefKey.length() - 1), calledProcessDefKey).toString();
+                        }
+                    }
+
+                }
+                moveExecutionContainer.setSubProcessDefKey(calledProcessDefKey);
+                ProcessDefinition subProcessDefinition = resolveProcessDefinition(calledProcessDefKey, calledProcessVersion, tenantId, commandContext);
                 BpmnModel subProcessModel = ProcessDefinitionUtil.getBpmnModel(subProcessDefinition.getId());
                 moveExecutionContainer.setSubProcessDefinition(subProcessDefinition);
                 moveExecutionContainer.setSubProcessModel(subProcessModel);
@@ -390,7 +400,7 @@ public abstract class AbstractDynamicStateManager {
             ExecutionEntity defaultContinueParentExecution;
             if (moveExecutionContainer.isMoveToSubProcessInstance()) {
                 CallActivity callActivity = moveExecutionContainer.getCallActivity();
-                Process subProcess = moveExecutionContainer.getSubProcessModel().getProcessById(callActivity.getCalledElement());
+                Process subProcess = moveExecutionContainer.getSubProcessModel().getProcessById(moveExecutionContainer.getSubProcessDefKey());
                 ExecutionEntity callActivityInstanceExecution = createCallActivityInstance(callActivity, moveExecutionContainer.getSubProcessDefinition(), newChildExecutions.get(0), subProcess.getInitialFlowElement().getId(), commandContext);
 
                 MoveExecutionEntityContainer subProcessMoveExecutionEntityContainer;
@@ -1106,6 +1116,10 @@ public abstract class AbstractDynamicStateManager {
             .filter(execution -> !execution.getId().equals(executionEntity.getId()))
             .filter(execution -> !ignoreExecutionIds.contains(execution.getId()))
             .count() == 0;
+    }
+
+    protected boolean isExpression(String variableName) {
+        return variableName.startsWith("${") || variableName.startsWith("#{");
     }
 
     protected ProcessDefinition resolveProcessDefinition(String processDefinitionKey, Integer processDefinitionVersion, String tenantId, CommandContext commandContext) {

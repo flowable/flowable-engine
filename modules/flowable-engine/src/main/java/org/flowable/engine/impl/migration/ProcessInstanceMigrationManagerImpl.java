@@ -33,6 +33,8 @@ import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.Task;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
@@ -142,6 +144,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
 
     protected void doValidateActivityMappings(String processInstanceId, List<ActivityMigrationMapping> activityMappings, BpmnModel newModel, ProcessInstanceMigrationDocument document, ProcessInstanceMigrationValidationResult validationResult, CommandContext commandContext) {
 
+        ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager();
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         ExecutionEntity processInstanceExecution = executionEntityManager.findById(processInstanceId);
         BpmnModel currentModel = ProcessDefinitionUtil.getBpmnModel(processInstanceExecution.getProcessDefinitionId());
@@ -248,8 +251,22 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                     FlowElement callActivityFlowElement = newModel.getFlowElement(mapping.getToCallActivityId());
                     if (callActivityFlowElement instanceof CallActivity) {
                         CallActivity callActivity = (CallActivity) callActivityFlowElement;
-                        ProcessDefinition mappingProcDef = resolveProcessDefinition(callActivity.getCalledElement(), mapping.getCallActivityProcessDefinitionVersion(), document.getMigrateToProcessDefinitionTenantId(), commandContext);
-                        mappingModel = ProcessDefinitionUtil.getBpmnModel(mappingProcDef.getId());
+                        String procDefKey = callActivity.getCalledElement();
+                        if (isExpression(procDefKey)) {
+                            Expression expression = expressionManager.createExpression(procDefKey);
+                            try {
+                                procDefKey = expression.getValue(processInstanceExecution).toString();
+                            } catch (FlowableException e) {
+                                procDefKey = document.getProcessInstanceVariables().getOrDefault(procDefKey.substring(2, procDefKey.length() - 1), procDefKey).toString();
+                            }
+                        }
+                        try {
+                            ProcessDefinition mappingProcDef = resolveProcessDefinition(procDefKey, mapping.getCallActivityProcessDefinitionVersion(), document.getMigrateToProcessDefinitionTenantId(), commandContext);
+                            mappingModel = ProcessDefinitionUtil.getBpmnModel(mappingProcDef.getId());
+                        } catch (FlowableException e) {
+                            validationResult.addValidationMessage(e.getMessage()+ " for call activity element with id '" + mapping.getToCallActivityId() + "' in the process definition with id '" + mappingModel.getMainProcess().getId() + "'");
+                            continue;
+                        }
                     } else {
                         validationResult.addValidationMessage("There's no call activity element with id '" + mapping.getToCallActivityId() + "' in the process definition with id '" + mappingModel.getMainProcess().getId() + "'");
                         continue;
@@ -340,18 +357,15 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         LOGGER.debug("Migrating activity executions");
         List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = new ArrayList<>();
         for (ChangeActivityStateBuilderImpl builder : changeActivityStateBuilders) {
-            moveExecutionEntityContainerList.addAll(resolveMoveExecutionEntityContainers(builder, Optional.of(procDefToMigrateTo.getId()), commandContext));
-
+            moveExecutionEntityContainerList.addAll(resolveMoveExecutionEntityContainers(builder, Optional.of(procDefToMigrateTo.getId()), document.getProcessInstanceVariables(), commandContext));
         }
-        //TODO WIP - NEED TO REVIEW THE HANDLING OF THE PROCESS AND LOCAL VARIABLES ...
-        //The first changeActivityStateBuilder holds the process and local variables, but call activity moves are not well accounted for
 
         ProcessInstanceChangeState processInstanceChangeState = new ProcessInstanceChangeState()
             .setProcessInstanceId(processInstanceId)
             .setProcessDefinitionToMigrateTo(procDefToMigrateTo)
             .setMoveExecutionEntityContainers(moveExecutionEntityContainerList)
-            .setProcessInstanceVariables(changeActivityStateBuilders.get(0).getProcessInstanceVariables())
-            .setLocalVariables(changeActivityStateBuilders.get(0).getLocalVariables());
+            .setProcessInstanceVariables(document.getProcessInstanceVariables())
+            .setLocalVariables(document.getActivitiesLocalVariables());
 
         doMoveExecutionState(processInstanceChangeState, commandContext);
 
@@ -600,9 +614,10 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
             throw new FlowableException("Migration Activity mapping missing for activity definition Ids:'" + Arrays.toString(executionActivityIdsToMapExplicitly.toArray()) + "'");
         }
 
+        //TODO WIP - remove this commented lines
         //Assign variables to the changeStateBuilder
-        document.getActivitiesLocalVariables().forEach(mainProcessChangeActivityStateBuilder::localVariables);
-        mainProcessChangeActivityStateBuilder.processVariables(document.getProcessInstanceVariables());
+//        document.getActivitiesLocalVariables().forEach(mainProcessChangeActivityStateBuilder::localVariables);
+//        mainProcessChangeActivityStateBuilder.processVariables(document.getProcessInstanceVariables());
 
         return changeActivityStateBuilders;
     }
@@ -667,8 +682,5 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         return calledElement1.equals(calledElement2) && !isExpression(calledElement1);
     }
 
-    protected boolean isExpression(String variableName) {
-        return variableName.startsWith("${") || variableName.startsWith("#{");
-    }
 }
 

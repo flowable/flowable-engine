@@ -2681,6 +2681,61 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/variables/callActivityWithCalledElementExpression.bpmn20.xml" })
+    public void testSetCurrentActivityInSubProcessInstanceWithCalledElementExpression() {
+
+        //Deploy second version of the process definition
+        ProcessDefinition procDefCallActivity = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml");
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("calledElementExpression");
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("firstTask", task.getTaskDefinitionKey());
+
+        //First change state attempt fails as the calledElement expression cannot be evaluated
+        try {
+            runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(processInstance.getId())
+                .moveActivityIdToSubProcessInstanceActivityId("firstTask", "theTask", "callActivity")
+                .changeState();
+            fail("Change state should not be possible calledElement expression could not be evaluated");
+        } catch (FlowableException e) {
+            assertTextPresent("no processes deployed with key '${subProcessDefId}", e.getMessage());
+        }
+
+        //Change state specifying the variable with the value
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdToSubProcessInstanceActivityId("firstTask", "theTask", "callActivity", 1)
+            .processVariable("subProcessDefId", "oneTaskProcess")
+            .changeState();
+
+        ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(subProcessInstance);
+
+        assertEquals(0, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(1, taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).count());
+
+        assertEquals(1, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count());
+        assertEquals(1, runtimeService.createExecutionQuery().processInstanceId(subProcessInstance.getId()).onlyChildExecutions().count());
+
+        task = taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).singleResult();
+        assertEquals("theTask", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(subProcessInstance.getId()).count());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("lastTask", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+
+        deleteDeployments();
+    }
+
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/twoTasksParentProcess.bpmn20.xml", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testSetCurrentActivityInSubProcessInstanceSpecificVersion() {
 
