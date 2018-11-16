@@ -98,7 +98,6 @@ public class FlowableVersions {
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.3.1.0"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.3.2.0"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.4.0.0"));
-        FLOWABLE_VERSIONS.add(new FlowableVersion("6.4.0.0"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.4.1.0"));
 
         /* Current */

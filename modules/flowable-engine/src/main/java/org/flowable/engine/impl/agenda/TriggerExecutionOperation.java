@@ -57,7 +57,7 @@ public class TriggerExecutionOperation extends AbstractOperation {
 
                 if (currentFlowElement instanceof BoundaryEvent
                         || currentFlowElement instanceof ServiceTask) { // custom service task with no automatic leave (will not have a activity-start history entry in ContinueProcessOperation)
-                    CommandContextUtil.getActivityInstanceEntityManager().recordActivityStart(execution);
+                    CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(execution);
                 }
 
                 if(!triggerAsync) {

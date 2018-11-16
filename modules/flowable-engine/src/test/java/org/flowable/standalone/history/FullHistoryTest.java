@@ -1452,5 +1452,4 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertTrue(Objects.equals(historicActInst.getTime(), activityInstance.getTime()));
     }
 
-
 }

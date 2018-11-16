@@ -118,10 +118,10 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
         execution.setProcessDefinitionKey(newProcessDefinition.getKey());
 
         // and change possible existing tasks (as the process definition id is stored there too)
-        List<TaskEntity> tasks = CommandContextUtil.getTaskService().findTasksByExecutionId(execution.getId());
+        List<TaskEntity> tasks = CommandContextUtil.getTaskService(commandContext).findTasksByExecutionId(execution.getId());
         for (TaskEntity taskEntity : tasks) {
             taskEntity.setProcessDefinitionId(newProcessDefinition.getId());
-            CommandContextUtil.getActivityInstanceEntityManager().recordTaskInfoChange(taskEntity);
+            CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordTaskInfoChange(taskEntity);
         }
     }
 

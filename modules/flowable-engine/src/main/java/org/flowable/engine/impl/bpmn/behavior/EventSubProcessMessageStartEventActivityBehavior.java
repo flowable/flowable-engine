@@ -99,7 +99,7 @@ public class EventSubProcessMessageStartEventActivityBehavior extends AbstractBp
         ExecutionEntity outgoingFlowExecution = executionEntityManager.createChildExecution(newSubProcessExecution);
         outgoingFlowExecution.setCurrentFlowElement(startEvent);
 
-        CommandContextUtil.getActivityInstanceEntityManager().recordActivityStart(outgoingFlowExecution);
+        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(outgoingFlowExecution);
 
         leave(outgoingFlowExecution);
     }

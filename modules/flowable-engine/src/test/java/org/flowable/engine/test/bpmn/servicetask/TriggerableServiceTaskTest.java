@@ -77,7 +77,7 @@ public class TriggerableServiceTaskTest extends PluggableFlowableTestCase {
         assertEquals(1, jobs.size());
         assertEquals(AsyncContinuationJobHandler.TYPE, jobs.get(0).getJobHandlerType());
         
-        waitForJobExecutorToProcessAllJobs(700000L, 250L);
+        waitForJobExecutorToProcessAllJobs(7000L, 250L);
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("service1").singleResult();
         assertNotNull(execution);
@@ -92,7 +92,7 @@ public class TriggerableServiceTaskTest extends PluggableFlowableTestCase {
         assertEquals(1, jobs.size());
         assertEquals(AsyncTriggerJobHandler.TYPE, jobs.get(0).getJobHandlerType());
         
-        waitForJobExecutorToProcessAllJobs(700000L, 250L);
+        waitForJobExecutorToProcessAllJobs(7000L, 250L);
 
         execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("usertask1").singleResult();
         assertNotNull(execution);

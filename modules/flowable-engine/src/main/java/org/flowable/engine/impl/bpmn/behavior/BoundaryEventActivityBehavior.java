@@ -94,7 +94,7 @@ public class BoundaryEventActivityBehavior extends FlowNodeActivityBehavior {
         // (This is a theoretical case ... shouldn't use a boundary event without outgoing sequence flow ...)
         if (executionEntity.getCurrentFlowElement() instanceof FlowNode
                 && ((FlowNode) executionEntity.getCurrentFlowElement()).getOutgoingFlows().isEmpty()) {
-            CommandContextUtil.getActivityInstanceEntityManager().recordActivityEnd(executionEntity, null);
+            CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityEnd(executionEntity, null);
         }
 
         CommandContextUtil.getAgenda(commandContext).planTakeOutgoingSequenceFlowsOperation(executionEntity, true);
@@ -129,7 +129,7 @@ public class BoundaryEventActivityBehavior extends FlowNodeActivityBehavior {
             throw new FlowableException("Programmatic error: no parent scope execution found for boundary event");
         }
 
-        CommandContextUtil.getActivityInstanceEntityManager().recordActivityEnd(executionEntity, null);
+        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityEnd(executionEntity, null);
 
         ExecutionEntity nonInterruptingExecution = executionEntityManager.createChildExecution(scopeExecution);
         nonInterruptingExecution.setActive(false);

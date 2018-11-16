@@ -124,7 +124,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
 
         ExecutionEntity subProcessInstance = CommandContextUtil.getExecutionEntityManager(commandContext).createSubprocessInstance(
                 processDefinition, executionEntity, businessKey, initialFlowElement.getId());
-        CommandContextUtil.getActivityInstanceEntityManager().recordSubProcessInstanceStart(executionEntity, subProcessInstance);
+        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordSubProcessInstanceStart(executionEntity, subProcessInstance);
 
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher.isEnabled()) {

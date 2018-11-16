@@ -207,7 +207,7 @@ public class InjectParallelUserTaskCmd extends AbstractDynamicInjectionCmd imple
         ExecutionEntity subProcessExecution = executionEntityManager.createChildExecution(executionAtTask.getParent());
         subProcessExecution.setScope(true);
         subProcessExecution.setCurrentFlowElement(subProcessElement);
-        CommandContextUtil.getActivityInstanceEntityManager().recordActivityStart(subProcessExecution);
+        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(subProcessExecution);
         
         executionAtTask.setParent(subProcessExecution);
         
