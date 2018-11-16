@@ -114,7 +114,7 @@
   </select>
   
   <select id="selectEntityLinksByReferenceScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="entityLinkResultMap">
-    select * from ${prefix}ACT_RU_ENTITYLINK where REF_SCOPE_ID_ = #{parameter.referenceScopeId} and SCOPE_TYPE_ = #{parameter.referenceScopeType} and LINK_TYPE_ = #{parameter.linkType}
+    select * from ${prefix}ACT_RU_ENTITYLINK where REF_SCOPE_ID_ = #{parameter.referenceScopeId} and REF_SCOPE_TYPE_ = #{parameter.referenceScopeType} and LINK_TYPE_ = #{parameter.linkType}
   </select>
   
   <select id="selectEntityLinksByScopeDefinitionAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="entityLinkResultMap">
