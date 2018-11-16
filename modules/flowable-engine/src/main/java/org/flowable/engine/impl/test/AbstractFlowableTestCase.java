@@ -202,9 +202,6 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
                     .processInstanceId(processInstanceId).list();
             if (historicActivityInstances != null && historicActivityInstances.size() > 0) {
                 for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
-                    assertActivityInstancesAreSame(historicActivityInstance,
-                        runtimeService.createActivityInstanceQuery().activityInstanceId(historicActivityInstance.getId()).singleResult()
-                    );
                     assertEquals(processInstanceId, historicActivityInstance.getProcessInstanceId());
                     assertNotNull(historicActivityInstance.getId() + " Historic activity instance '" + historicActivityInstance.getActivityId() +"' has no start time", historicActivityInstance.getStartTime());
                     assertNotNull(historicActivityInstance.getId() + " Historic activity instance '" + historicActivityInstance.getActivityId() + "' has no end time", historicActivityInstance.getEndTime());

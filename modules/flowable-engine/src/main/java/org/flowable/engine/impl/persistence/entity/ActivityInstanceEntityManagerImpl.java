@@ -25,6 +25,7 @@ import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.ActivityInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.data.ActivityInstanceDataManager;
@@ -192,6 +193,14 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
         ActivityInstanceEntity activityInstance = findActivityInstance(executionEntity, true);
         if (activityInstance != null) {
             activityInstance.markEnded(deleteReason);
+        } else {
+            // in the case of upgrade from 6.4.0 to 6.4.1 we have to create activityInstance for all already unfinished historicActivities
+            // which are going to be ended
+            HistoricActivityInstanceEntity historicActivityInstance = getHistoryManager().findHistoricActivityInstance(executionEntity, true);
+            if (historicActivityInstance != null) {
+                activityInstance = createActivityInstance(historicActivityInstance);
+                activityInstance.markEnded(deleteReason);
+            }
         }
         return activityInstance;
     }
@@ -306,6 +315,24 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
             activityId = ((SequenceFlow) execution.getCurrentFlowElement()).getSourceFlowElement().getId();
         }
         return activityId;
+    }
+
+    protected ActivityInstanceEntity createActivityInstance(HistoricActivityInstance historicActivityInstance) {
+        ActivityInstanceEntity activityInstanceEntity = create();
+        activityInstanceEntity.setId(historicActivityInstance.getId());
+
+        activityInstanceEntity.setProcessDefinitionId(historicActivityInstance.getProcessDefinitionId());
+        activityInstanceEntity.setProcessInstanceId(historicActivityInstance.getProcessInstanceId());
+        activityInstanceEntity.setExecutionId(historicActivityInstance.getExecutionId());
+        activityInstanceEntity.setActivityId(historicActivityInstance.getActivityId());
+        activityInstanceEntity.setActivityName(historicActivityInstance.getActivityName());
+        activityInstanceEntity.setActivityType(historicActivityInstance.getActivityType());
+        activityInstanceEntity.setAssignee(historicActivityInstance.getAssignee());
+        activityInstanceEntity.setStartTime(historicActivityInstance.getStartTime());
+        activityInstanceEntity.setTenantId(historicActivityInstance.getTenantId());
+
+        insert(activityInstanceEntity);
+        return activityInstanceEntity;
     }
 
 }
