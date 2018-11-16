@@ -93,7 +93,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         assertNotNull(activityInstance.getStartTime());
 
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
-        assertActivityInstancesAreSame(historyService.createHistoricActivityInstanceQuery().activityId("receive").singleResult(), activityInstance).;
+        assertActivityInstancesAreSame(historyService.createHistoricActivityInstanceQuery().activityId("receive").singleResult(), activityInstance);
 
         runtimeService.trigger(execution.getId());
 
