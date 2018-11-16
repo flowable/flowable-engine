@@ -23,6 +23,7 @@ import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowElementsContainer;
 import org.flowable.bpmn.model.GraphicInfo;
+import org.flowable.bpmn.model.InclusiveGateway;
 import org.flowable.bpmn.model.SequenceFlow;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -106,6 +107,9 @@ public class SequenceFlowJsonConverter extends BaseBpmnJsonConverter {
                 if (sourceFlowElement instanceof ExclusiveGateway) {
                     ExclusiveGateway parentExclusiveGateway = (ExclusiveGateway) sourceFlowElement;
                     defaultFlowId = parentExclusiveGateway.getDefaultFlow();
+                } else if (sourceFlowElement instanceof InclusiveGateway) {
+                    InclusiveGateway parentInclusiveGateway = (InclusiveGateway) sourceFlowElement;
+                    defaultFlowId = parentInclusiveGateway.getDefaultFlow();
                 } else if (sourceFlowElement instanceof Activity) {
                     Activity parentActivity = (Activity) sourceFlowElement;
                     defaultFlowId = parentActivity.getDefaultFlow();
