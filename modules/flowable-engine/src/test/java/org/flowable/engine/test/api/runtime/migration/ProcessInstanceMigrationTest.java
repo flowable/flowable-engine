@@ -14,7 +14,9 @@
 package org.flowable.engine.test.api.runtime.migration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotEquals;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -28,11 +30,14 @@ import org.flowable.engine.delegate.event.FlowableActivityEvent;
 import org.flowable.engine.delegate.event.FlowableMessageEvent;
 import org.flowable.engine.delegate.event.FlowableSignalEvent;
 import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.migration.ActivityMigrationMapping;
+import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
+import org.flowable.engine.migration.ProcessInstanceMigrationDocumentConverter;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.DataObject;
@@ -46,6 +51,10 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Dennis Federico
@@ -126,6 +135,259 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertEquals(1, tasks.size());
         assertEquals("userTask2Id", tasks.get(0).getTaskDefinitionKey());
         taskService.complete(tasks.get(0).getId());
+        assertProcessEnded(processInstanceToMigrate.getId());
+    }
+    
+    @Test
+    public void testSimpleMigrationWithTaskMapping() {
+        //Deploy first version of the process
+        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
+
+        //Start and instance of the recent first version of the process for migration and one for reference
+        ProcessInstance processInstanceToMigrate = runtimeService.startProcessInstanceByKey("MP");
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult().getId());
+        
+        Task beforeMigrationTask = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
+
+        //Deploy second version of the process
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/three-tasks-simple-process.bpmn20.xml");
+
+        //Migrate process
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(version2ProcessDef.getId())
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask2Id", "intermediateTask"))
+            .migrate(processInstanceToMigrate.getId());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstanceToMigrate.getId()).list();
+        assertEquals(2, executions.size()); //includes root execution
+        for (Execution execution : executions) {
+            assertEquals(version2ProcessDef.getId(), ((ExecutionEntity) execution).getProcessDefinitionId());
+        }
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
+        assertEquals(version2ProcessDef.getId(), task.getProcessDefinitionId());
+        assertEquals("intermediateTask", task.getTaskDefinitionKey());
+        assertEquals(beforeMigrationTask.getId(), task.getId());
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
+            assertEquals(version2ProcessDef.getId(), historicProcessInstance.getProcessDefinitionId());
+            
+            List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).list();
+            assertEquals(2, historicTaskInstances.size());
+            for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
+                assertEquals(version2ProcessDef.getId(), historicTaskInstance.getProcessDefinitionId());
+            }
+            
+            List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).list();
+            assertEquals(3, historicActivityInstances.size());
+            for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
+                assertEquals(version2ProcessDef.getId(), historicActivityInstance.getProcessDefinitionId());
+            }
+        }
+
+        // complete intermediate task
+        taskService.complete(task.getId());
+        
+        // complete final task
+        task = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
+        taskService.complete(task.getId());
+        
+        assertProcessEnded(processInstanceToMigrate.getId());
+    }
+    
+    @Test
+    public void testSimpleMigrationWithTaskJsonMapping() {
+        //Deploy first version of the process
+        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
+
+        //Start and instance of the recent first version of the process for migration and one for reference
+        ProcessInstance processInstanceToMigrate = runtimeService.startProcessInstanceByKey("MP");
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult().getId());
+        
+        Task beforeMigrationTask = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
+
+        //Deploy second version of the process
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/three-tasks-simple-process.bpmn20.xml");
+
+        ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
+        ObjectNode migrationNode = objectMapper.createObjectNode();
+        migrationNode.put("toProcessDefinitionId", version2ProcessDef.getId());
+        ArrayNode activitiesNode = migrationNode.putArray("activityMappings");
+        ObjectNode activityNode = activitiesNode.addObject();
+        activityNode.put("fromActivityId", "userTask2Id");
+        activityNode.put("toActivityId", "intermediateTask");
+        
+        //Migrate process
+        ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentConverter.convertFromJson(migrationNode.toString());
+        runtimeService.migrateProcessInstance(processInstanceToMigrate.getId(), migrationDocument);
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
+        assertEquals(version2ProcessDef.getId(), task.getProcessDefinitionId());
+        assertEquals("intermediateTask", task.getTaskDefinitionKey());
+        assertEquals(beforeMigrationTask.getId(), task.getId());
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
+            assertEquals(version2ProcessDef.getId(), historicProcessInstance.getProcessDefinitionId());
+            
+            List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).list();
+            assertEquals(2, historicTaskInstances.size());
+            for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
+                assertEquals(version2ProcessDef.getId(), historicTaskInstance.getProcessDefinitionId());
+            }
+            
+            List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).list();
+            assertEquals(3, historicActivityInstances.size());
+            for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
+                assertEquals(version2ProcessDef.getId(), historicActivityInstance.getProcessDefinitionId());
+            }
+        }
+
+        // complete intermediate task
+        taskService.complete(task.getId());
+        
+        // complete final task
+        task = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
+        taskService.complete(task.getId());
+        
+        assertProcessEnded(processInstanceToMigrate.getId());
+    }
+    
+    @Test
+    public void testMigrationWithParallelTaskMapping() {
+        //Deploy first version of the process
+        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/parallel-gateway-two-tasks.bpmn20.xml");
+
+        //Start and instance of the recent first version of the process for migration and one for reference
+        ProcessInstance processInstanceToMigrate = runtimeService.startProcessInstanceByKey("startParallelProcess");
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult().getId());
+        
+        List<Task> parallelTasks = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).list();
+        assertEquals(2, parallelTasks.size());
+
+        //Deploy second version of the process
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/parallel-gateway-two-tasks-and-before.bpmn20.xml");
+
+        List<String> fromActivityIds = new ArrayList<>();
+        fromActivityIds.add("parallelTask1");
+        fromActivityIds.add("parallelTask2");
+        //Migrate process
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(version2ProcessDef.getId())
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor(fromActivityIds, "beforeTask"))
+            .migrate(processInstanceToMigrate.getId());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstanceToMigrate.getId()).list();
+        assertEquals(2, executions.size()); //includes root execution
+        for (Execution execution : executions) {
+            assertEquals(version2ProcessDef.getId(), ((ExecutionEntity) execution).getProcessDefinitionId());
+        }
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
+        assertEquals(version2ProcessDef.getId(), task.getProcessDefinitionId());
+        assertEquals("beforeTask", task.getTaskDefinitionKey());
+        assertNotEquals(parallelTasks.get(0).getId(), task.getId());
+        assertNotEquals(parallelTasks.get(1).getId(), task.getId());
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
+            assertEquals(version2ProcessDef.getId(), historicProcessInstance.getProcessDefinitionId());
+            
+            List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).list();
+            assertEquals(4, historicTaskInstances.size());
+            for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
+                assertEquals(version2ProcessDef.getId(), historicTaskInstance.getProcessDefinitionId());
+            }
+            
+            List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).list();
+            assertEquals(6, historicActivityInstances.size());
+            for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
+                assertEquals(version2ProcessDef.getId(), historicActivityInstance.getProcessDefinitionId());
+            }
+        }
+
+        // complete before task
+        taskService.complete(task.getId());
+        
+        // complete parallel task 1
+        task = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).list().get(0);
+        taskService.complete(task.getId());
+        
+        // complete parallel task 2
+        task = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
+        taskService.complete(task.getId());
+        
+        // complete final task
+        task = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
+        taskService.complete(task.getId());
+        
+        assertProcessEnded(processInstanceToMigrate.getId());
+    }
+    
+    @Test
+    public void testMigrationWithNewSubProcessScope() {
+        //Deploy first version of the process
+        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
+
+        //Start and instance of the recent first version of the process for migration and one for reference
+        ProcessInstance processInstanceToMigrate = runtimeService.startProcessInstanceByKey("MP");
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult().getId());
+        
+        Task lastTask = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
+
+        //Deploy second version of the process
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/three-tasks-with-sub-process.bpmn20.xml");
+
+        //Migrate process
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(version2ProcessDef.getId())
+            .addActivityMigrationMapping(
+                    ActivityMigrationMapping.createMappingFor("userTask2Id", "subScriptTask")
+                        .withLocalVariable("subprocessVariable", "passedValue"))
+            .migrate(processInstanceToMigrate.getId());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstanceToMigrate.getId()).list();
+        assertEquals(3, executions.size()); //includes root execution
+        for (Execution execution : executions) {
+            assertEquals(version2ProcessDef.getId(), ((ExecutionEntity) execution).getProcessDefinitionId());
+        }
+        
+        Execution execution = runtimeService.createExecutionQuery().activityId("subProcess").singleResult();
+        assertEquals("passedValue", runtimeService.getVariable(execution.getId(), "subprocessVariable"));
+        assertFalse(runtimeService.hasVariable(execution.getProcessInstanceId(), "subprocessVariable"));
+        assertEquals("hello", runtimeService.getVariable(execution.getId(), "anotherVar"));
+        assertFalse(runtimeService.hasVariable(execution.getProcessInstanceId(), "anotherVar"));
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
+        assertEquals(version2ProcessDef.getId(), task.getProcessDefinitionId());
+        assertEquals("subTask", task.getTaskDefinitionKey());
+        assertNotEquals(lastTask.getId(), task.getId());
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
+            assertEquals(version2ProcessDef.getId(), historicProcessInstance.getProcessDefinitionId());
+            
+            List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).list();
+            assertEquals(3, historicTaskInstances.size());
+            for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
+                assertEquals(version2ProcessDef.getId(), historicTaskInstance.getProcessDefinitionId());
+            }
+            
+            List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).list();
+            assertEquals(6, historicActivityInstances.size());
+            for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
+                assertEquals(version2ProcessDef.getId(), historicActivityInstance.getProcessDefinitionId());
+            }
+        }
+
+        // complete sub task
+        taskService.complete(task.getId());
+        
+        // complete final task
+        task = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
+        taskService.complete(task.getId());
+        
         assertProcessEnded(processInstanceToMigrate.getId());
     }
 
