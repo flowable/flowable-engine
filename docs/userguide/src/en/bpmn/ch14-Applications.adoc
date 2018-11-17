@@ -47,7 +47,7 @@ java -jar flowable-idm.war
 Usually, you will want to change the default H2 in-memory database configuration to a MySQL or Postgres (or other persistent database) configuration.
 You can do this per app by changing the application.properties file in the _WEB-INF/classes/_ directory of each app.
 However, it is easier to use the Spring Boot https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html[Externalized Configuration].
-An example configuration can be found on link:$$https://github.com/flowable/flowable-engine/blob/master/modules/flowable-ui-task/flowable-ui-task-app/src/main/resources/application.properties$$[Github]
+An example configuration can be found on link:$$https://github.com/flowable/flowable-engine/blob/master/modules/flowable-ui-task/flowable-ui-task-app/src/main/resources/flowable-default.properties$$[Github]
 To change the default configuration to MySQL the following changes are needed to the properties file:
 
 [source,linenums]
