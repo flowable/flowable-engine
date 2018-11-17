@@ -24,8 +24,6 @@ import org.flowable.identitylink.service.impl.persistence.entity.data.HistoricId
 import org.flowable.identitylink.service.impl.persistence.entity.data.IdentityLinkDataManager;
 import org.flowable.identitylink.service.impl.persistence.entity.data.impl.MybatisHistoricIdentityLinkDataManager;
 import org.flowable.identitylink.service.impl.persistence.entity.data.impl.MybatisIdentityLinkDataManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -34,8 +32,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class IdentityLinkServiceConfiguration extends AbstractServiceConfiguration {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(IdentityLinkServiceConfiguration.class);
-    
     // SERVICES
     // /////////////////////////////////////////////////////////////////
 
@@ -69,8 +65,8 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
     
     @Override
     public boolean isHistoryLevelAtLeast(HistoryLevel level) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Current history level: {}, level required: {}", historyLevel, level);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Current history level: {}, level required: {}", historyLevel, level);
         }
         // Comparing enums actually compares the location of values declared in the enum
         return historyLevel.isAtLeast(level);
@@ -78,8 +74,8 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
 
     @Override
     public boolean isHistoryEnabled() {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Current history level: {}", historyLevel);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Current history level: {}", historyLevel);
         }
         return historyLevel != HistoryLevel.NONE;
     }

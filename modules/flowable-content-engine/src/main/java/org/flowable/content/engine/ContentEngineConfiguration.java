@@ -49,12 +49,8 @@ import org.flowable.content.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.content.engine.impl.persistence.entity.TableDataManagerImpl;
 import org.flowable.content.engine.impl.persistence.entity.data.ContentItemDataManager;
 import org.flowable.content.engine.impl.persistence.entity.data.impl.MybatisContentItemDataManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ContentEngineConfiguration extends AbstractEngineConfiguration implements ContentEngineConfigurationApi {
-
-    protected static final Logger LOGGER = LoggerFactory.getLogger(ContentEngineConfiguration.class);
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/content/db/mapping/mappings.xml";
 
@@ -190,7 +186,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
             }
 
             if (contentRootFile != null && contentRootFile.exists()) {
-                LOGGER.info("Content file system root : {}", contentRootFile.getAbsolutePath());
+                logger.info("Content file system root : {}", contentRootFile.getAbsolutePath());
             }
 
             contentStorage = new SimpleFileSystemContentStorage(contentRootFile);

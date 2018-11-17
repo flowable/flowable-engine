@@ -391,8 +391,6 @@ import org.flowable.variable.service.impl.types.SerializableType;
 import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -402,8 +400,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfiguration implements
         ScriptingEngineAwareEngineConfiguration, HasExpressionManagerEngineConfiguration {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessEngineConfigurationImpl.class);
 
     public static final String DEFAULT_WS_SYNC_FACTORY = "org.flowable.engine.impl.webservice.CxfWebServiceClientFactory";
 
@@ -1834,7 +1830,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                     Class<?> handledType = defaultBpmnParseHandler.getHandledTypes().iterator().next();
                     if (customParseHandlerMap.containsKey(handledType)) {
                         BpmnParseHandler newBpmnParseHandler = customParseHandlerMap.get(handledType);
-                        LOGGER.info("Replacing default BpmnParseHandler {} with {}", defaultBpmnParseHandler.getClass().getName(), newBpmnParseHandler.getClass().getName());
+                        logger.info("Replacing default BpmnParseHandler {} with {}", defaultBpmnParseHandler.getClass().getName(), newBpmnParseHandler.getClass().getName());
                         bpmnParserHandlers.set(i, newBpmnParseHandler);
                     }
                 }
@@ -2425,7 +2421,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             flowable5CompatibilityHandler = flowable5CompatibilityHandlerFactory.createFlowable5CompatibilityHandler();
 
             if (flowable5CompatibilityHandler != null) {
-                LOGGER.info("Found compatibility handler instance : {}", flowable5CompatibilityHandler.getClass());
+                logger.info("Found compatibility handler instance : {}", flowable5CompatibilityHandler.getClass());
 
                 flowable5CompatibilityHandler.setFlowable6ProcessEngineConfiguration(this);
             }

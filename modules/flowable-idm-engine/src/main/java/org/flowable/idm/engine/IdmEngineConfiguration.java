@@ -87,12 +87,8 @@ import org.flowable.idm.engine.impl.persistence.entity.data.impl.MybatisPrivileg
 import org.flowable.idm.engine.impl.persistence.entity.data.impl.MybatisPropertyDataManager;
 import org.flowable.idm.engine.impl.persistence.entity.data.impl.MybatisTokenDataManager;
 import org.flowable.idm.engine.impl.persistence.entity.data.impl.MybatisUserDataManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class IdmEngineConfiguration extends AbstractEngineConfiguration implements IdmEngineConfigurationApi {
-
-    protected static final Logger LOGGER = LoggerFactory.getLogger(IdmEngineConfiguration.class);
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/idm/db/mapping/mappings.xml";
 
