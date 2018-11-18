@@ -18,12 +18,8 @@ import org.flowable.common.engine.impl.db.ServiceSqlScriptBasedDbSchemaManager;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.util.CommandContextUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class IdmDbSchemaManager extends ServiceSqlScriptBasedDbSchemaManager {
-    
-    private static final Logger LOGGER = LoggerFactory.getLogger(IdmDbSchemaManager.class);
     
     private static final String IDM_PROPERTY_TABLE = "ACT_ID_PROPERTY";
     private static final String VERSION_PROPERTY = "schema.version";
@@ -103,7 +99,7 @@ public class IdmDbSchemaManager extends ServiceSqlScriptBasedDbSchemaManager {
            }
        }
 
-       LOGGER.debug("flowable idm db schema check successful");
+       logger.debug("flowable idm db schema check successful");
    }
    
    protected String addMissingComponent(String missingComponents, String component) {

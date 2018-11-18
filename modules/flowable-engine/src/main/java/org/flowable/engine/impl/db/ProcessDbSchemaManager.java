@@ -25,12 +25,8 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.engine.impl.persistence.entity.PropertyEntityImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager {
-    
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessDbSchemaManager.class);
     
     protected static final Pattern CLEAN_VERSION_REGEX = Pattern.compile("\\d\\.\\d*");
     
@@ -67,7 +63,7 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
             }
         }
 
-        LOGGER.debug("flowable db schema check successful");
+        logger.debug("flowable db schema check successful");
     }
 
     protected String addMissingComponent(String missingComponents, String component) {
@@ -125,43 +121,43 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
             }
             
         } catch (Exception e) {
-            LOGGER.info("Error dropping engine tables", e);
+            logger.info("Error dropping engine tables", e);
         }
         
         try {
             getJobSchemaManager().schemaDrop();
         } catch (Exception e) {
-            LOGGER.info("Error dropping job tables", e);
+            logger.info("Error dropping job tables", e);
         }
      
         try {
             getVariableSchemaManager().schemaDrop();
         } catch (Exception e) {
-            LOGGER.info("Error dropping variable tables", e);
+            logger.info("Error dropping variable tables", e);
         }
         
         try {
             getTaskSchemaManager().schemaDrop();
         } catch (Exception e) {
-            LOGGER.info("Error dropping task tables", e);
+            logger.info("Error dropping task tables", e);
         }
         
         try {
             getIdentityLinkSchemaManager().schemaDrop();
         } catch (Exception e) {
-            LOGGER.info("Error dropping identity link tables", e);
+            logger.info("Error dropping identity link tables", e);
         }
         
         try {
             getEntityLinkSchemaManager().schemaDrop();
         } catch (Exception e) {
-            LOGGER.info("Error dropping entity link tables", e);
+            logger.info("Error dropping entity link tables", e);
         }
         
         try {
             getCommonSchemaManager().schemaDrop();
         } catch (Exception e) {
-            LOGGER.info("Error dropping common tables", e);
+            logger.info("Error dropping common tables", e);
         }
     }
 
@@ -281,7 +277,7 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
             throw new FlowableException("Version of flowable database (" + versionInDatabase + ") is more recent than the engine (" + ProcessEngine.VERSION + ")");
         } else if (cleanDbVersion.compareTo(cleanEngineVersion) == 0) {
             // Versions don't match exactly, possibly snapshot is being used
-            LOGGER.warn("Engine-version is the same, but not an exact match: {} vs. {}. Not performing database-upgrade.", versionInDatabase, ProcessEngine.VERSION);
+            logger.warn("Engine-version is the same, but not an exact match: {} vs. {}. Not performing database-upgrade.", versionInDatabase, ProcessEngine.VERSION);
             return false;
         }
         return true;
