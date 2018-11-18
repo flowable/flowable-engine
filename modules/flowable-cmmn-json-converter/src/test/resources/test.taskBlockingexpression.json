@@ -64,11 +64,60 @@
           "outgoing": [],
           "bounds": {
             "lowerRight": {
-              "x": 310,
+              "x": 235,
               "y": 130
             },
             "upperLeft": {
-              "x": 210,
+              "x": 135,
+              "y": 50
+            }
+          },
+          "dockers": []
+        },
+        {
+          "resourceId": "sid-3BC8C5F6-BA9F-4C4C-A699-B09CA392E277",
+          "properties": {
+            "overrideid": "",
+            "name": "shareniu_human_task",
+            "documentation": "",
+            "isblocking": true,
+            "isblockingexpression": "${shareniu_human_task}",
+            "usertaskassignment": {
+              "assignment": {
+                "type": "static",
+                "assignee": "shareniu"
+              }
+            },
+            "formkeydefinition": "",
+            "formreference": "",
+            "duedatedefinition": "",
+            "prioritydefinition": "",
+            "tasklisteners": "",
+            "isasync": "",
+            "isexclusive": "",
+            "requiredenabled": "",
+            "requiredrulecondition": "",
+            "repetitionenabled": "",
+            "repetitionrulecondition": "",
+            "repetitioncountervariablename": "",
+            "manualactivationenabled": "",
+            "manualactivationrulecondition": "",
+            "completionneutralenabled": "",
+            "completionneutralrulecondition": "",
+            "planitemlifecyclelisteners": ""
+          },
+          "stencil": {
+            "id": "HumanTask"
+          },
+          "childShapes": [],
+          "outgoing": [],
+          "bounds": {
+            "lowerRight": {
+              "x": 460,
+              "y": 130
+            },
+            "upperLeft": {
+              "x": 360,
               "y": 50
             }
           },

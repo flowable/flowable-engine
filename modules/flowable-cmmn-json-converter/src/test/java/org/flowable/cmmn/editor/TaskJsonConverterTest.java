@@ -12,7 +12,6 @@
  */
 package org.flowable.cmmn.editor;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter;
 import org.flowable.cmmn.model.*;
@@ -64,6 +63,18 @@ public class TaskJsonConverterTest  extends AbstractConverterTest{
         assertEquals("shareniu_task", task.getName());
         assertEquals("${shareniu_task}",task.getBlockingExpression());
 
+        PlanItem planItem2 = planModelStage.findPlanItemInPlanFragmentOrUpwards("planItem2");
+        assertNotNull(planItem2);
+        assertEquals("planItem2", planItem2.getId());
+        assertEquals("shareniu_human_task", planItem2.getName());
+
+        PlanItemDefinition planItemDefinition2 = planItem2.getPlanItemDefinition();
+        assertNotNull(planItemDefinition2);
+        assertTrue(planItemDefinition2 instanceof HumanTask);
+
+        HumanTask humanTask = (HumanTask) planItemDefinition2;
+        assertEquals("shareniu_human_task", humanTask.getName());
+        assertEquals("${shareniu_human_task}",humanTask.getBlockingExpression());
 
     }
 
