@@ -23,6 +23,8 @@ import org.flowable.engine.DynamicBpmnService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.impl.dynamic.DynamicEmbeddedSubProcessBuilder;
 import org.flowable.engine.impl.dynamic.DynamicUserTaskBuilder;
+import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
+import org.flowable.engine.migration.ProcessInstanceMigrationDocumentConverter;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,8 +114,7 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
         throw new FlowableIllegalArgumentException("Invalid action: '" + actionRequest.getAction() + "'.");
     }
 
-    @ApiOperation(value = "Change the state a process instance", tags = { "Process Instances" },
-            notes = "")
+    @ApiOperation(value = "Change the state a process instance", tags = { "Process Instances" }, notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the process instance was found and change state activity was executed."),
             @ApiResponse(code = 409, message = "Indicates the requested process instance action cannot be executed since the process-instance is already activated/suspended."),
@@ -140,6 +141,24 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
                 .changeState();
         }
         
+    }
+    
+    @ApiOperation(value = "Migrate process instance", tags = { "Process Instances" }, notes = "")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the process instance was found and migration was executed."),
+            @ApiResponse(code = 409, message = "Indicates the requested process instance action cannot be executed since the process-instance is already activated/suspended."),
+            @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
+    })
+    @PostMapping(value = "/runtime/process-instances/{processInstanceId}/migrate", produces = "application/json")
+    public void changeActivityState(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId,
+            @RequestBody String migrationDocumentJson, HttpServletRequest request) {
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.migrateProcessInstance(processInstanceId, migrationDocumentJson);
+        }
+
+        ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentConverter.convertFromJson(migrationDocumentJson);
+        runtimeService.migrateProcessInstance(processInstanceId, migrationDocument);
     }
     
     @ApiOperation(value = "Inject activity in a process instance", tags = { "Process Instances" },
