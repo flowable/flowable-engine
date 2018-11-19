@@ -174,11 +174,6 @@ public abstract class AbstractDynamicStateManager {
             }
         }
 
-        // Complete each moveExecutionEntityContainer to make the move for each target activity (get next flowElement, and other flags)
-        for (MoveExecutionEntityContainer moveExecutionEntityContainer : moveExecutionEntityContainerList) {
-            prepareMoveExecutionEntityContainer(moveExecutionEntityContainer, migrateToProcessDefinitionId, variables, commandContext);
-        }
-
         return moveExecutionEntityContainerList;
     }
 
@@ -249,8 +244,10 @@ public abstract class AbstractDynamicStateManager {
         return moveExecutionEntityContainer;
     }
 
-    protected void prepareMoveExecutionEntityContainer(MoveExecutionEntityContainer moveExecutionContainer, Optional<String> migrateToProcessDefinitionId, Map<String, Object> variables, CommandContext commandContext) {
+    protected void prepareMoveExecutionEntityContainer(MoveExecutionEntityContainer moveExecutionContainer, Optional<String> migrateToProcessDefinitionId, CommandContext commandContext) {
         ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager();
+
+        Optional<BpmnModel> bpmnModelToMigrateTo = migrateToProcessDefinitionId.map(ProcessDefinitionUtil::getBpmnModel);
         boolean canContainerDirectMigrate = (moveExecutionContainer.getMoveToActivityIds().size() == 1) && (moveExecutionContainer.getExecutions().size() == 1);
         for (String activityId : moveExecutionContainer.getMoveToActivityIds()) {
             FlowElement currentFlowElement;
@@ -262,29 +259,18 @@ public abstract class AbstractDynamicStateManager {
                 BpmnModel modelOfCallActivity = ProcessDefinitionUtil.getBpmnModel(moveExecutionContainer.getExecutions().get(0).getProcessDefinitionId());
                 currentActivityId = moveExecutionContainer.getExecutions().get(0).getCurrentActivityId();
                 currentFlowElement = resolveFlowElementFromBpmnModel(modelOfCallActivity, currentActivityId);
-                if (migrateToProcessDefinitionId.isPresent()) {
-                    bpmnModel = ProcessDefinitionUtil.getBpmnModel(migrateToProcessDefinitionId.get());
-                }
-                newFlowElement = resolveFlowElementFromBpmnModel(bpmnModel, activityId);
+                newFlowElement = resolveFlowElementFromBpmnModel(bpmnModelToMigrateTo.orElse(bpmnModel), activityId);
                 canContainerDirectMigrate = false;
             } else if (moveExecutionContainer.isMoveToSubProcessInstance()) {
                 //The subProcess model is defined in the callActivity of the current processDefinition or the migrateProcessDefinition if defined
                 ExecutionEntity firstExecution = moveExecutionContainer.getExecutions().get(0);
-                String processDefinitionIdOfCallActivity = firstExecution.getProcessDefinitionId();
                 BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(firstExecution.getProcessDefinitionId());
                 currentActivityId = firstExecution.getCurrentActivityId();
                 currentFlowElement = resolveFlowElementFromBpmnModel(bpmnModel, currentActivityId);
-                if (migrateToProcessDefinitionId.isPresent()) {
-                    processDefinitionIdOfCallActivity = migrateToProcessDefinitionId.get();
-                    bpmnModel = ProcessDefinitionUtil.getBpmnModel(migrateToProcessDefinitionId.get());
-                }
 
-                FlowElement callActivityElement = bpmnModel.getFlowElement(moveExecutionContainer.getCallActivityId());
-                if (callActivityElement == null) {
-                    throw new FlowableException("Call activity could not be found in process definition for id " + activityId);
-                }
+                String processDefinitionIdOfCallActivity = migrateToProcessDefinitionId.orElse(firstExecution.getProcessDefinitionId());
+                CallActivity callActivity = (CallActivity) resolveFlowElementFromBpmnModel(bpmnModelToMigrateTo.orElse(bpmnModel), moveExecutionContainer.getCallActivityId());
 
-                CallActivity callActivity = (CallActivity) callActivityElement;
                 moveExecutionContainer.setCallActivity(callActivity);
                 ProcessDefinition callActivityProcessDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionIdOfCallActivity);
                 String deploymentId = callActivityProcessDefinition.getDeploymentId();
@@ -295,11 +281,8 @@ public abstract class AbstractDynamicStateManager {
                     try {
                         calledProcessDefKey = expressionManager.createExpression(calledProcessDefKey).getValue(firstExecution.getProcessInstance()).toString();
                     } catch (FlowableException e) {
-                        if (variables != null) {
-                            calledProcessDefKey = variables.getOrDefault(calledProcessDefKey.substring(2, calledProcessDefKey.length() - 1), calledProcessDefKey).toString();
-                        }
+                        throw new FlowableException("Cannot resolve calledElement expression '" + calledProcessDefKey + "' of callActivity '" + callActivity.getId() + "'", e);
                     }
-
                 }
                 moveExecutionContainer.setSubProcessDefKey(calledProcessDefKey);
                 ProcessDefinition subProcessDefinition = resolveProcessDefinition(calledProcessDefKey, calledProcessVersion, tenantId, commandContext);
@@ -315,10 +298,7 @@ public abstract class AbstractDynamicStateManager {
                 BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(firstExecution.getProcessDefinitionId());
                 currentActivityId = firstExecution.getCurrentActivityId();
                 currentFlowElement = resolveFlowElementFromBpmnModel(bpmnModel, currentActivityId);
-                if (migrateToProcessDefinitionId.isPresent()) {
-                    bpmnModel = ProcessDefinitionUtil.getBpmnModel(migrateToProcessDefinitionId.get());
-                }
-                newFlowElement = resolveFlowElementFromBpmnModel(bpmnModel, activityId);
+                newFlowElement = resolveFlowElementFromBpmnModel(bpmnModelToMigrateTo.orElse(bpmnModel), activityId);
             }
 
             moveExecutionContainer.addMoveToFlowElement(activityId, currentFlowElement, newFlowElement);
@@ -331,7 +311,7 @@ public abstract class AbstractDynamicStateManager {
     protected FlowElement resolveFlowElementFromBpmnModel(BpmnModel bpmnModel, String activityId) {
         FlowElement flowElement = bpmnModel.getFlowElement(activityId);
         if (flowElement == null) {
-            throw new FlowableException("Cannot find activity '" + activityId + "' in process definition for with id '" + bpmnModel.getMainProcess().getId() + "'");
+            throw new FlowableException("Cannot find activity '" + activityId + "' in process definition with id '" + bpmnModel.getMainProcess().getId() + "'");
         }
         return flowElement;
     }
@@ -348,7 +328,7 @@ public abstract class AbstractDynamicStateManager {
         processInstanceExecution.setVariables(processInstanceChangeState.getProcessInstanceVariables());
 
         for (MoveExecutionEntityContainer moveExecutionContainer : processInstanceChangeState.getMoveExecutionEntityContainers()) {
-
+            prepareMoveExecutionEntityContainer(moveExecutionContainer, processInstanceChangeState.getProcessDefinitionToMigrateTo().map(ProcessDefinition::getId), commandContext);
             // Action the moves (changeState)
             if (moveExecutionContainer.isMoveToParentProcess()) {
                 String callActivityInstanceId = moveExecutionContainer.getExecutions().get(0).getProcessInstanceId();
@@ -402,30 +382,11 @@ public abstract class AbstractDynamicStateManager {
                 CallActivity callActivity = moveExecutionContainer.getCallActivity();
                 Process subProcess = moveExecutionContainer.getSubProcessModel().getProcessById(moveExecutionContainer.getSubProcessDefKey());
                 ExecutionEntity callActivityInstanceExecution = createCallActivityInstance(callActivity, moveExecutionContainer.getSubProcessDefinition(), newChildExecutions.get(0), subProcess.getInitialFlowElement().getId(), commandContext);
-
                 MoveExecutionEntityContainer subProcessMoveExecutionEntityContainer;
-                List<ExecutionEntity> moveExecutions;
-                if (processInstanceChangeState.isMigrateToProcessDefinition()) {
-                    moveExecutions = moveExecutionContainer.getExecutions();
-                    subProcessMoveExecutionEntityContainer = new MoveExecutionEntityContainer(moveExecutions, moveExecutionContainer.getMoveToActivityIds());
-                    moveExecutionContainer.getNewAssigneeId().ifPresent(subProcessMoveExecutionEntityContainer::setNewAssigneeId);
-                    subProcessMoveExecutionEntityContainer.setDirectExecutionMigration(moveExecutionContainer.isDirectExecutionMigration());
-                    subProcessMoveExecutionEntityContainer.addMoveToFlowElement(callActivity.getId(), callActivity); //Needed??
-                    moveExecutions.forEach(executionEntity -> subProcessMoveExecutionEntityContainer.addContinueParentExecution(executionEntity.getId(), callActivityInstanceExecution));
-
-                } else {
-                    ExecutionEntity subProcessChildExecution = createCallActivityInitialExecution(callActivityInstanceExecution, subProcess.getInitialFlowElement(), commandContext);
-                    moveExecutions = Collections.singletonList(subProcessChildExecution);
-                    subProcessMoveExecutionEntityContainer = new MoveExecutionEntityContainer(Collections.singletonList(subProcessChildExecution), moveExecutionContainer.getMoveToActivityIds());
-                    moveExecutionContainer.getNewAssigneeId().ifPresent(subProcessMoveExecutionEntityContainer::setNewAssigneeId);
-                    subProcessMoveExecutionEntityContainer.addMoveToFlowElement(callActivity.getId(), callActivity);
-
-                    ExecutionEntity continueParentExecution = deleteParentExecutions(subProcessChildExecution.getParentId(), moveExecutionContainer.getMoveToFlowElements(), commandContext);
-                    subProcessMoveExecutionEntityContainer.addContinueParentExecution(subProcessChildExecution.getId(), continueParentExecution);
-
-                    executionEntityManager.deleteExecutionAndRelatedData(subProcessChildExecution, "Change activity to " + printFlowElementIds(moveToFlowElements));
-
-                }
+                List<ExecutionEntity> moveExecutions = moveExecutionContainer.getExecutions();
+                subProcessMoveExecutionEntityContainer = new MoveExecutionEntityContainer(moveExecutions, moveExecutionContainer.getMoveToActivityIds());
+                moveExecutionContainer.getNewAssigneeId().ifPresent(subProcessMoveExecutionEntityContainer::setNewAssigneeId);
+                moveExecutions.forEach(executionEntity -> subProcessMoveExecutionEntityContainer.addContinueParentExecution(executionEntity.getId(), callActivityInstanceExecution));
                 newChildExecutions = createEmbeddedSubProcessAndExecutions(moveExecutionContainer.getMoveToFlowElements(), moveExecutions, subProcessMoveExecutionEntityContainer, new ProcessInstanceChangeState(), commandContext);
 
             }
@@ -621,7 +582,6 @@ public abstract class AbstractDynamicStateManager {
                 processInstanceChangeState.addPendingEventSubProcessStartEvent((StartEvent) newFlowElement, parentExecution);
             } else {
                 ExecutionEntity newChildExecution;
-                //TODO WIP - Here we should create specific MoveExecutionEntityContainers and not reuse the original one, here we are creating a side-effect in this method call
                 if (moveExecutionEntityContainer.isDirectExecutionMigration() && isDirectFlowElementExecutionMigration(flowElementMoveEntry.originalFlowElement, flowElementMoveEntry.newFlowElement)) {
                     newChildExecution = migrateExecutionEntity(parentExecution, movingExecutions.get(0), newFlowElement, commandContext);
                 } else {
@@ -852,16 +812,6 @@ public abstract class AbstractDynamicStateManager {
         }
 
         return subProcessInstance;
-    }
-
-    protected ExecutionEntity createCallActivityInitialExecution(ExecutionEntity subProcessExecutionInstance, FlowElement initialFlowElement, CommandContext commandContext) {
-        // Create the first execution that will visit all the process definition elements
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-        ExecutionEntity subProcessInitialExecution = executionEntityManager.createChildExecution(subProcessExecutionInstance);
-        subProcessInitialExecution.setCurrentFlowElement(initialFlowElement);
-        subProcessExecutionInstance.setStartActivityId(initialFlowElement.getId());
-        CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(subProcessInitialExecution);
-        return subProcessInitialExecution;
     }
 
     protected ExecutionEntity migrateExecutionEntity(ExecutionEntity parentExecutionEntity, ExecutionEntity childExecution, FlowElement newFlowElement, CommandContext commandContext) {

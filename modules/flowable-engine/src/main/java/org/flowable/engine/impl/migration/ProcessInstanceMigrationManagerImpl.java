@@ -167,7 +167,6 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         List<ExecutionEntity> activeMainProcessExecutions = executionEntityManager.findChildExecutionsByProcessInstanceId(processInstanceId);
 
         //For each "running" active activity of the processInstance, check that there's a mapping defined or if it can be found in the new definition (auto-mapped by activity id)
-        //TODO WIP - Validate auto-map by activity type and id?
         List<ExecutionEntity> mappableMainProcessExecutions = activeMainProcessExecutions.stream()
             .filter(executionHasCurrentActivityId)
             .filter(isActiveExecution)
@@ -193,7 +192,6 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                         childSubProcessExecutionActivityIds.removeAll(mappedSubProcessActivityIds);
                         boolean childrenFullyMapped = childSubProcessExecutionActivityIds.isEmpty();
 
-                        //TODO WIP - These check are the same whether or not is fullyMapped ... could be merged?
                         if (!childrenFullyMapped) {
                             FlowElement newModelFlowElement = newModel.getFlowElement(executionActivityId);
                             if (newModelFlowElement == null) {
@@ -264,7 +262,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                             ProcessDefinition mappingProcDef = resolveProcessDefinition(procDefKey, mapping.getCallActivityProcessDefinitionVersion(), document.getMigrateToProcessDefinitionTenantId(), commandContext);
                             mappingModel = ProcessDefinitionUtil.getBpmnModel(mappingProcDef.getId());
                         } catch (FlowableException e) {
-                            validationResult.addValidationMessage(e.getMessage()+ " for call activity element with id '" + mapping.getToCallActivityId() + "' in the process definition with id '" + mappingModel.getMainProcess().getId() + "'");
+                            validationResult.addValidationMessage(e.getMessage() + " for call activity element with id '" + mapping.getToCallActivityId() + "' in the process definition with id '" + mappingModel.getMainProcess().getId() + "'");
                             continue;
                         }
                     } else {
@@ -354,7 +352,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         LOGGER.debug("Updating Process definition reference of root execution with id:'" + processExecution.getId() + "' to '" + procDefToMigrateTo.getId() + "'");
         processExecution.setProcessDefinitionId(procDefToMigrateTo.getId());
 
-        LOGGER.debug("Migrating activity executions");
+        LOGGER.debug("Resolve activity executions to migrate");
         List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = new ArrayList<>();
         for (ChangeActivityStateBuilderImpl builder : changeActivityStateBuilders) {
             moveExecutionEntityContainerList.addAll(resolveMoveExecutionEntityContainers(builder, Optional.of(procDefToMigrateTo.getId()), document.getProcessInstanceVariables(), commandContext));
@@ -369,9 +367,10 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
 
         doMoveExecutionState(processInstanceChangeState, commandContext);
 
-        //TODO WIP - Could we capture these executions during ChangeStateBuilderPreparation and for processing instead of querying...?
         LOGGER.debug("Updating Process definition of call unchanged call activity");
-        List<ExecutionEntity> callActivities = executionEntityManager.findChildExecutionsByProcessInstanceId(processInstanceId).stream().filter(executionEntity -> executionEntity.getCurrentFlowElement() instanceof CallActivity).collect(Collectors.toList());
+        List<ExecutionEntity> callActivities = executionEntityManager.findChildExecutionsByProcessInstanceId(processInstanceId).stream()
+            .filter(executionEntity -> executionEntity.getCurrentFlowElement() instanceof CallActivity)
+            .collect(Collectors.toList());
         callActivities.forEach(executionEntity -> executionEntity.setProcessDefinitionId(procDefToMigrateTo.getId()));
 
         LOGGER.debug("Updating Process definition reference in history");
@@ -459,7 +458,6 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                 if (subProcessActivityMappingsByCallActivityIdAndFromActivityId.containsKey(executionActivityId)) {
                     Set<String> mappedSubProcessActivityIds = subProcessActivityMappingsByCallActivityIdAndFromActivityId.get(executionActivityId).keySet();
                     List<ExecutionEntity> callActivityExecutions = filteredExecutionsByActivityId.get(executionActivityId).stream().filter(ExecutionEntity::isActive).collect(Collectors.toList());
-                    //                    List<ExecutionEntity> callActivityExecutions = filteredExecutionsByActivityId.get(executionActivityId);
                     for (ExecutionEntity callActivityExecution : callActivityExecutions) { //parallel MultiInstance call activities
                         List<ExecutionEntity> subProcessChildExecutions = executionEntityManager.findChildExecutionsByProcessInstanceId(callActivityExecution.getSubProcessInstance().getId());
                         Set<String> childSubProcessExecutionActivityIds = subProcessChildExecutions.stream().map(Execution::getActivityId).collect(Collectors.toSet());
@@ -537,7 +535,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                 String toActivityId = ((ActivityMigrationMapping.OneToOneMapping) activityMapping).getToActivityId();
                 String newAssignee = ((ActivityMigrationMapping.OneToOneMapping) activityMapping).getWithNewAssignee();
                 String fromCallActivityId = activityMapping.getFromCallActivityId();
-                //TODO WIP - Confirm if we allow to mix mapping of the call activity with mapping of its subProcess activity
+
                 if (activityMapping.isToParentProcess() && !executionActivityIdsToMapExplicitly.contains(fromCallActivityId)) {
                     List<ExecutionEntity> callActivityExecutions = filteredExecutionsByActivityId.get(fromCallActivityId).stream().filter(ExecutionEntity::isActive).collect(Collectors.toList());
                     for (ExecutionEntity callActivityExecution : callActivityExecutions) {
@@ -613,11 +611,6 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         if (!executionActivityIdsToMapExplicitly.isEmpty()) {
             throw new FlowableException("Migration Activity mapping missing for activity definition Ids:'" + Arrays.toString(executionActivityIdsToMapExplicitly.toArray()) + "'");
         }
-
-        //TODO WIP - remove this commented lines
-        //Assign variables to the changeStateBuilder
-//        document.getActivitiesLocalVariables().forEach(mainProcessChangeActivityStateBuilder::localVariables);
-//        mainProcessChangeActivityStateBuilder.processVariables(document.getProcessInstanceVariables());
 
         return changeActivityStateBuilders;
     }

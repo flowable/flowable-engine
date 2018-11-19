@@ -215,7 +215,7 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
             processInstanceMigrationBuilder.migrate(processInstance.getId());
             fail("Migration should not be possible");
         } catch (FlowableException e) {
-            assertTextPresent("Cannot find activity 'wrongActivityId' in process definition for with id 'oneTaskProcess'", e.getMessage());
+            assertTextPresent("Cannot find activity 'wrongActivityId' in process definition with id 'oneTaskProcess'", e.getMessage());
         }
 
         completeProcessInstanceTasks(processInstance.getId());
@@ -251,7 +251,7 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
             processInstanceMigrationBuilder.migrate(processInstance.getId());
             fail("Migration should not be possible");
         } catch (FlowableException e) {
-            assertTextPresent("Call activity could not be found in process definition for id theTask", e.getMessage());
+            assertTextPresent("Cannot find activity 'wrongCallActivity' in process definition with id 'twoTasksParentProcess'", e.getMessage());
         }
 
         completeProcessInstanceTasks(processInstance.getId());
@@ -288,7 +288,7 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
             processInstanceMigrationBuilder.migrate(processInstance.getId());
             fail("Migration should not be possible");
         } catch (FlowableException e) {
-            assertTextPresent("Cannot find activity 'userTask1Id' in process definition for with id 'MP'", e.getMessage());
+            assertTextPresent("Cannot find activity 'userTask1Id' in process definition with id 'MP'", e.getMessage());
         }
 
         //Second migration attempt using and invalid "unExistent" version
@@ -303,7 +303,7 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
             processInstanceMigrationBuilder.migrate(processInstance.getId());
             fail("Migration should not be possible");
         } catch (FlowableException e) {
-            assertTextPresent("Cannot find activity 'userTask1Id' in process definition for with id 'MP'", e.getMessage());
+            assertTextPresent("Cannot find activity 'userTask1Id' in process definition with id 'MP'", e.getMessage());
         }
 
         //Second migration attempt specifies the version of the call activity subProcess
@@ -367,7 +367,7 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
             processInstanceMigrationBuilder.migrate(processInstance.getId());
             fail("Migration should not be possible");
         } catch (FlowableException e) {
-            assertTextPresent("no processes deployed with key '${simpleSubProcessExpression}", e.getMessage());
+            assertTextPresent("Cannot resolve calledElement expression '${simpleSubProcessExpression}' of callActivity 'callActivity'", e.getMessage());
         }
 
         //Now we do the migration specifying the process variable to resolve the calledElement
@@ -1397,7 +1397,7 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
     }
 
     @Test
-    @Disabled("WIP - Not supported yet")
+    @Disabled("WIP - Not supported, must use the actual callActivity when it is a MultiInstance activity @see testMigrateMovingParallelMultiInstanceCallActivityToSimpleActivity")
     public void testMigrateMovingActivityInParallelMultiInstanceCallActivityToSubProcessParent() {
         ProcessDefinition procDefWithCallActivity = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/parallel-multi-instance-call-activity.bpmn20.xml");
         ProcessDefinition procDefCallActivity = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml");
