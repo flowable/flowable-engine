@@ -68,7 +68,7 @@ angular.module('flowableModeler')
                 ignoreForPaletteDefinition = ['CasePlanModel'];
                 
             } else if (data.namespace == 'http://b3mn.org/stencilset/dmn1.2#') {
-                quickMenuDefinition = ['DecisionTableDecision', 'InformationRequirement', 'KnowledgeRequirement'];
+                quickMenuDefinition = ['DecisionTable', 'InformationRequirement', 'KnowledgeRequirement', 'TextAnnotation'];
                 ignoreForPaletteDefinition = [];
             } else {
                 quickMenuDefinition = ['UserTask', 'EndNoneEvent', 'ExclusiveGateway', 
@@ -170,6 +170,10 @@ angular.module('flowableModeler')
                       if (stencilRole === 'information_requirement_start') {
                           stencilItem.canConnect = true;
                       } else if (stencilRole === 'information_requirement_end') {
+                          stencilItem.canConnectTo = true;
+                      } else if (stencilRole === 'knowledge_requirement_start') {
+                          stencilItem.canConnectTo = true;
+                      } else if (stencilRole === 'knowledge_requirement_end') {
                           stencilItem.canConnectTo = true;
                       }
                   } else {
