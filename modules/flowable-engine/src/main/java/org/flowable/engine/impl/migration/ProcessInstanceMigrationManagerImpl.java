@@ -64,7 +64,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
     Predicate<ExecutionEntity> isSubProcessExecution = executionEntity -> executionEntity.getCurrentFlowElement() instanceof SubProcess;
     Predicate<ExecutionEntity> isBoundaryEventExecution = executionEntity -> executionEntity.getCurrentFlowElement() instanceof BoundaryEvent;
     Predicate<ExecutionEntity> isCallActivityExecution = executionEntity -> executionEntity.getCurrentFlowElement() instanceof CallActivity;
-    Predicate<ExecutionEntity> isActiveExecution = executionEntity -> executionEntity.isActive();
+    Predicate<ExecutionEntity> isActiveExecution = ExecutionEntity::isActive;
     Predicate<ExecutionEntity> executionHasCurrentActivityId = executionEntity -> executionEntity.getCurrentActivityId() != null;
 
     @Override
@@ -297,6 +297,12 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
 
     @Override
     public void migrateProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+        ExecutionEntity processExecution = executionEntityManager.findById(processInstanceId);
+        if (processExecution == null) {
+            throw new FlowableException("Cannot find the process to migrate, with id" + processInstanceId);
+        }
+
         ProcessDefinition processDefinition = resolveProcessDefinition(document, commandContext);
         if (processDefinition == null) {
             throw new FlowableException("Cannot find the process definition to migrate to, with " + printProcessDefinitionIdentifierMessage(document));
@@ -307,7 +313,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
             throw new FlowableException("Cannot find the Bpmn model of the process definition to migrate to, with " + printProcessDefinitionIdentifierMessage(document));
         }
 
-        doMigrateProcessInstance(processInstanceId, processDefinition, document, commandContext);
+        doMigrateProcessInstance(processExecution, processDefinition, document, commandContext);
     }
 
     @Override
@@ -335,22 +341,19 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         List<ProcessInstance> processInstances = executionEntityManager.findProcessInstanceByQueryCriteria(processInstanceQueryByProcessDefinitionId);
 
         for (ProcessInstance processInstance : processInstances) {
-            doMigrateProcessInstance(processInstance.getId(), processDefinition, document, commandContext);
+            doMigrateProcessInstance(processInstance, processDefinition, document, commandContext);
         }
 
     }
 
-    protected void doMigrateProcessInstance(String processInstanceId, ProcessDefinition procDefToMigrateTo, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
-        LOGGER.debug("Start migration of process instance with Id:'" + processInstanceId + "' to " + printProcessDefinitionIdentifierMessage(document));
+    protected void doMigrateProcessInstance(ProcessInstance processInstance, ProcessDefinition procDefToMigrateTo, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
+        LOGGER.debug("Start migration of process instance with Id:'" + processInstance.getId() + "' to " + printProcessDefinitionIdentifierMessage(document));
 
-        //Check processExecution and processDefinition tenant
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-        ExecutionEntity processExecution = executionEntityManager.findById(processInstanceId);
+        List<ChangeActivityStateBuilderImpl> changeActivityStateBuilders = prepareChangeStateBuilders((ExecutionEntity) processInstance, procDefToMigrateTo, document, commandContext);
 
-        List<ChangeActivityStateBuilderImpl> changeActivityStateBuilders = prepareChangeStateBuilders(processInstanceId, procDefToMigrateTo, document, commandContext);
-
-        LOGGER.debug("Updating Process definition reference of root execution with id:'" + processExecution.getId() + "' to '" + procDefToMigrateTo.getId() + "'");
-        processExecution.setProcessDefinitionId(procDefToMigrateTo.getId());
+        LOGGER.debug("Updating Process definition reference of process root execution with id:'" + processInstance.getId() + "' to '" + procDefToMigrateTo.getId() + "'");
+        ((ExecutionEntity) processInstance).setProcessDefinitionId(procDefToMigrateTo.getId());
 
         LOGGER.debug("Resolve activity executions to migrate");
         List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = new ArrayList<>();
@@ -359,7 +362,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         }
 
         ProcessInstanceChangeState processInstanceChangeState = new ProcessInstanceChangeState()
-            .setProcessInstanceId(processInstanceId)
+            .setProcessInstanceId(processInstance.getId())
             .setProcessDefinitionToMigrateTo(procDefToMigrateTo)
             .setMoveExecutionEntityContainers(moveExecutionEntityContainerList)
             .setProcessInstanceVariables(document.getProcessInstanceVariables())
@@ -368,15 +371,15 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         doMoveExecutionState(processInstanceChangeState, commandContext);
 
         LOGGER.debug("Updating Process definition of call unchanged call activity");
-        List<ExecutionEntity> callActivities = executionEntityManager.findChildExecutionsByProcessInstanceId(processInstanceId).stream()
+        List<ExecutionEntity> callActivities = executionEntityManager.findChildExecutionsByProcessInstanceId(processInstance.getId()).stream()
             .filter(executionEntity -> executionEntity.getCurrentFlowElement() instanceof CallActivity)
             .collect(Collectors.toList());
         callActivities.forEach(executionEntity -> executionEntity.setProcessDefinitionId(procDefToMigrateTo.getId()));
 
         LOGGER.debug("Updating Process definition reference in history");
-        changeProcessDefinitionReferenceOfHistory(processExecution, procDefToMigrateTo, commandContext);
+        changeProcessDefinitionReferenceOfHistory(processInstance, procDefToMigrateTo, commandContext);
 
-        LOGGER.debug("Process migration ended for process instance with Id:'" + processInstanceId + "'");
+        LOGGER.debug("Process migration ended for process instance with Id:'" + processInstance.getId() + "'");
     }
 
     @Override
@@ -393,25 +396,22 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
             (((Task) newFlowElement).getLoopCharacteristics() == null && !getFlowElementMultiInstanceParentId(newFlowElement).isPresent());
     }
 
-    protected List<ChangeActivityStateBuilderImpl> prepareChangeStateBuilders(String processInstanceId, ProcessDefinition procDefToMigrateTo, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
-        LOGGER.debug("Start migration of process instance with Id:'" + processInstanceId + "' to " + printProcessDefinitionIdentifierMessage(document));
-
-        //Check processExecution and processDefinition tenant
+    protected List<ChangeActivityStateBuilderImpl> prepareChangeStateBuilders(ExecutionEntity processInstanceExecution, ProcessDefinition procDefToMigrateTo, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-        ExecutionEntity processExecution = executionEntityManager.findById(processInstanceId);
 
+        //Check processDefinition tenant
         String procDefTenantId = procDefToMigrateTo.getTenantId();
-        if (!isSameTenant(processExecution.getTenantId(), procDefTenantId)) {
-            throw new FlowableException("Tenant mismatch between Process Instance ('" + processExecution.getTenantId() + "') and Process Definition ('" + procDefTenantId + "') to migrate to");
+        if (!isSameTenant(processInstanceExecution.getTenantId(), procDefTenantId)) {
+            throw new FlowableException("Tenant mismatch between Process Instance ('" + processInstanceExecution.getTenantId() + "') and Process Definition ('" + procDefTenantId + "') to migrate to");
         }
 
         List<ChangeActivityStateBuilderImpl> changeActivityStateBuilders = new ArrayList<>();
         ChangeActivityStateBuilderImpl mainProcessChangeActivityStateBuilder = new ChangeActivityStateBuilderImpl();
-        mainProcessChangeActivityStateBuilder.processInstanceId(processInstanceId);
+        mainProcessChangeActivityStateBuilder.processInstanceId(processInstanceExecution.getId());
         changeActivityStateBuilders.add(mainProcessChangeActivityStateBuilder);
 
         //Current executions to migrate...
-        Map<String, List<ExecutionEntity>> filteredExecutionsByActivityId = executionEntityManager.findChildExecutionsByProcessInstanceId(processInstanceId)
+        Map<String, List<ExecutionEntity>> filteredExecutionsByActivityId = executionEntityManager.findChildExecutionsByProcessInstanceId(processInstanceExecution.getId())
             .stream()
             .filter(executionEntity -> executionEntity.getCurrentActivityId() != null)
             .filter(executionEntity -> !(executionEntity.getCurrentFlowElement() instanceof SubProcess))
@@ -444,7 +444,6 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         List<String> executionActivityIdsToMapExplicitly = partitionedExecutionActivityIds.get(true);
 
         BpmnModel newModel = ProcessDefinitionUtil.getBpmnModel(procDefToMigrateTo.getId());
-        ExecutionEntity processInstanceExecution = executionEntityManager.findById(processInstanceId);
         BpmnModel currentModel = ProcessDefinitionUtil.getBpmnModel(processInstanceExecution.getProcessDefinitionId());
 
         //Auto Mapping
@@ -496,7 +495,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                     executionActivityIdsToMapExplicitly.add(flowElementMultiInstanceParentId.get());
                 }
                 //The root executions are the ones to migrate and are explicitly mapped
-                List<ExecutionEntity> miRootExecutions = (List<ExecutionEntity>) executionEntityManager.findInactiveExecutionsByActivityIdAndProcessInstanceId(flowElementMultiInstanceParentId.get(), processInstanceId);
+                List<ExecutionEntity> miRootExecutions = (List<ExecutionEntity>) executionEntityManager.findInactiveExecutionsByActivityIdAndProcessInstanceId(flowElementMultiInstanceParentId.get(), processInstanceExecution.getId());
                 filteredExecutionsByActivityId.put(flowElementMultiInstanceParentId.get(), miRootExecutions);
             } else {
                 LOGGER.debug("Checking execution(s) - activityId:'" + executionActivityId);

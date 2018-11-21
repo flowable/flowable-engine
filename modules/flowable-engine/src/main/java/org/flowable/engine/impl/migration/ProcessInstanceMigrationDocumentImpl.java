@@ -157,12 +157,6 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
 
     @Override
     public String toString() {
-        return "ProcessInstanceMigrationDocumentImpl{" +
-            "migrateToProcessDefinitionId='" + migrateToProcessDefinitionId + '\'' +
-            ", migrateToProcessDefinitionKey='" + migrateToProcessDefinitionKey + '\'' +
-            ", migrateToProcessDefinitionVersion='" + migrateToProcessDefinitionVersion + '\'' +
-            ", migrateToProcessDefinitionTenantId='" + migrateToProcessDefinitionTenantId + '\'' +
-            ", activityMigrationMappings=" + activityMigrationMappings +
-            '}';
+        return ProcessInstanceMigrationDocumentConverter.convertToJsonString(this);
     }
 }
