@@ -105,6 +105,7 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_AUTO_COMPLETE_CONDITION = "autoCompleteCondition";
 
     String ATTRIBUTE_DISPLAY_ORDER = "displayOrder";
+    String ATTRIBUTE_INCLUDE_IN_STAGE_OVERVIEW = "includeInStageOverview";
 
     String ATTRIBUTE_CASE_REF = "caseRef";
     String ATTRIBUTE_PROCESS_REF = "processRef";
