@@ -63,6 +63,9 @@ public class StageExport extends AbstractPlanItemDefinitionExport<Stage> {
         if (stage.getDisplayOrder() != null) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_DISPLAY_ORDER, String.valueOf(stage.getDisplayOrder()));
         }
+        if (!stage.isIncludeInStageOverview()) { // if it's missing, it's true by default
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_INCLUDE_IN_STAGE_OVERVIEW, "false");
+        }
     }
 
     @Override

@@ -22,9 +22,12 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.task.api.Task;
 import org.junit.Test;
@@ -260,6 +263,50 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
         } catch (FlowableIllegalArgumentException e) {
             assertEquals("Can only enable a plan item instance which is in state ENABLED", e.getMessage());
         }
+    }
+
+    // Test specifically made for testing a plan item instance caching issue
+    @Test
+    @CmmnDeployment
+    public void testCompleteManualActivatedTaskWithCustomCommand() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testManualActivation")
+            .variable("initiator", "test123")
+            .start();
+
+        Task taskA = cmmnTaskService.createTaskQuery().singleResult();
+        assertEquals("A", taskA.getName());
+        cmmnTaskService.complete(taskA.getId());
+
+        final PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceState(PlanItemInstanceState.ENABLED).singleResult();
+        assertEquals("B", planItemInstance.getName());
+
+        cmmnEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+            @Override
+            public Void execute(CommandContext commandContext) {
+
+                // Fetch the plan item instance before the next command (already putting it in the cache)
+                // to trigger the caching issue (when eagerly fetching plan items the old state was being overwritten)
+                PlanItemInstance p = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceId(planItemInstance.getId()).singleResult();
+                assertNotNull(p);
+
+                cmmnRuntimeService.startPlanItemInstance(planItemInstance.getId());
+
+                return null;
+            }
+        });
+
+        Task taskB = cmmnTaskService.createTaskQuery().singleResult();
+        assertEquals("B", taskB.getName());
+        PlanItemInstance planItemInstanceAfterCommand = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceId(planItemInstance.getId()).singleResult();
+        assertEquals(PlanItemInstanceState.ACTIVE, planItemInstanceAfterCommand.getState());
+
+        cmmnTaskService.complete(taskB.getId());
+        Task taskC = cmmnTaskService.createTaskQuery().singleResult();
+        assertEquals("C", taskC.getName());
+
+        cmmnTaskService.complete(taskC.getId());
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
     }
     
 }

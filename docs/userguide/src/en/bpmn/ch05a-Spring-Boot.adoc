@@ -581,6 +581,8 @@ Flowable provides a Spring Boot Actuator Endpoint that exposes information for t
 By default the `flowable` endpoint is mapped to `/actuator/flowable`.
 Spring Boot by default only exposes the `info` and `health` endpoints. In order to enable the `flowable` endpoint you need to add `management.endpoint.flowable.enabled=true` to your `application.properties`.
 
+In order to make enable Actuator endpoints you need to add a dependency on Actuator, e.g. by using {sc-flowable-starter}/flowable-spring-boot-starter-actuator/pom.xml[flowable-spring-boot-starter-actuator].
+
 `curl http://localhost:8080/actuator/flowable`
 
 [source,json]
