@@ -988,5 +988,18 @@
     "PROPERTY.CASEREFERENCE.TITLE" : "Case model reference",
     "PROPERTY.CASEREFERENCE.ERROR.FORM" : "There was an error loading the case models. Try again later",
     "PROPERTY.CASEREFERENCE.CASE.LOADING" : "Loading case models...",
-    "PROPERTY.CASEREFERENCE.CASE.EMPTY" : "This folder contains no case models"
+    "PROPERTY.CASEREFERENCE.CASE.EMPTY" : "This folder contains no case models",
+
+    "PROPERTY.FORMALPARAMETERS.VALUE" : "{{length}} parameters",
+    "PROPERTY.FORMALPARAMETERS.EMPTY" : "No parameters selected",
+    "PROPERTY.FORMALPARAMETERS.NAME" : "Name",
+    "PROPERTY.FORMALPARAMETERS.NAME.PLACEHOLDER" : "Enter a name",
+    "PROPERTY.FORMALPARAMETERS.TYPE" : "Type",
+
+    "PROPERTY.INVOCATIONBINDING.VALUE" : "{{length}} bindings",
+    "PROPERTY.INVOCATIONBINDING.EMPTY" : "No bindings selected",
+    "PROPERTY.INVOCATIONBINDING.PARAMETER" : "Parameter",
+    "PROPERTY.INVOCATIONBINDING.PARAMETER.PLACEHOLDER" : "Enter a parameter",
+    "PROPERTY.INVOCATIONBINDING.EXPRESSION" : "Expression",
+    "PROPERTY.INVOCATIONBINDING.EXPRESSION.PLACEHOLDER" : "Enter an expression"
 }

@@ -31,6 +31,17 @@
       ]
     },
     {
+      "name" : "descriptionpackage",
+      "properties" : [ {
+        "id" : "description",
+        "type" : "Text",
+        "title" : "Description",
+        "value" : "",
+        "description" : "The description of a DRG element.",
+        "popular" : true
+      } ]
+    },
+    {
       "name": "decisiondecisiontablereferencepackage",
       "properties": [
         {
@@ -94,6 +105,28 @@
           "popular": true
         }
       ]
+    },
+    {
+      "name" : "formalparameterspackage",
+      "properties" : [ {
+        "id" : "formalparameters",
+        "type" : "Complex",
+        "title" : "Formal parameters",
+        "value" : "",
+        "description" : "Definition of the form with a list of formal parameters",
+        "popular" : true
+      } ]
+    },
+    {
+      "name" : "invocationbindingspackage",
+      "properties" : [ {
+        "id" : "invocationbindings",
+        "type" : "Complex",
+        "title" : "Bindings",
+        "value" : "",
+        "description" : "Definition of the form with a list of formal parameters",
+        "popular" : true
+      } ]
     }
   ],
   "stencils": [
@@ -111,7 +144,8 @@
       "hide": true,
       "propertyPackages": [
         "overrideidpackage",
-        "namepackage"
+        "namepackage",
+        "descriptionpackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": []
@@ -129,7 +163,8 @@
       "propertyPackages": [
         "overrideidpackage",
         "namepackage",
-        "decisiondecisiontablereferencepackage"
+        "decisiondecisiontablereferencepackage",
+        "descriptionpackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": [
@@ -151,6 +186,7 @@
       "propertyPackages": [
         "overrideidpackage",
         "namepackage",
+        "descriptionpackage",
         "scriptformatpackage",
         "scripttextpackage"
       ],
@@ -174,6 +210,7 @@
       "propertyPackages": [
         "overrideidpackage",
         "namepackage",
+        "descriptionpackage",
         "decisionexpressionpackage"
       ],
       "hiddenPropertyPackages": [],
@@ -196,6 +233,7 @@
       "propertyPackages": [
         "overrideidpackage",
         "namepackage",
+        "descriptionpackage",
         "decisionclasspackage"
       ],
       "hiddenPropertyPackages": [],
@@ -219,21 +257,22 @@
       "propertyPackages": [
         "overrideidpackage",
         "namepackage",
-        "decisiondecisiontablereferencepackage"
+        "descriptionpackage",
+        "invocationbindingspackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": [
         "information_requirement_start",
         "information_requirement_end",
-        "knowledge_requirement_start",
+        "knowledge_requirement_end",
         "all"
       ]
     },
     {
       "type": "node",
-      "id": "DecisionTableBKM",
-      "title": "Decision Table BKM",
-      "description": "A decision table Business Knowledge Model",
+      "id": "BusinessKnowledgeModel",
+      "title": "Business Knowledge Model",
+      "description": "A Business Knowledge Model",
       "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"102\" height=\"82\" version=\"1.0\">\n\t<defs>\n\t</defs>\n\t<magnets>\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n\t</magnets>\n\t<g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n        <polygon id=\"text_frame\" oryx:anchors=\"bottom top right left\" points=\"0 25.8245245 21.9513905 0 99.57761 0 99.57761 25.6615942 78.1109468 50.915862 5.53367672e-14 50.915862\"></polygon>\n        <polygon id=\"bg_frame\" oryx:resize=\"vertical horizontal\" stroke=\"#BBBBBB\" fill=\"#F9F9F9\" points=\"0 25.8245245 21.9513905 0 99.57761 0 99.57761 25.6615942 78.1109468 50.915862 5.53367672e-14 50.915862\"></polygon>\n\t\t<text font-size=\"12\" id=\"text_name\" x=\"50\" y=\"25\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"#373e48\">\n\t\t</text>\n\t</g>\n</svg>\n    ",
       "icon": "activity/list/type.decision.png",
       "groups": [
@@ -242,75 +281,13 @@
       "propertyPackages": [
         "overrideidpackage",
         "namepackage",
-        "decisiondecisiontablereferencepackage"
+        "descriptionpackage",
+        "decisiondecisiontablereferencepackage",
+        "formalparameterspackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": [
-        "knowledge_requirement_end",
-        "all"
-      ]
-    },
-    {
-      "type": "node",
-      "id": "ScriptBKM ",
-      "title": "Script BKM",
-      "description": "A script Business Knowledge Model",
-      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"102\" height=\"82\" version=\"1.0\">\n\t<defs>\n\t</defs>\n\t<magnets>\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n\t</magnets>\n\t<g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n        <polygon id=\"text_frame\" oryx:anchors=\"bottom top right left\" points=\"0 25.8245245 21.9513905 0 99.57761 0 99.57761 25.6615942 78.1109468 50.915862 5.53367672e-14 50.915862\"></polygon>\n        <polygon id=\"bg_frame\" oryx:resize=\"vertical horizontal\" stroke=\"#BBBBBB\" fill=\"#F9F9F9\" points=\"0 25.8245245 21.9513905 0 99.57761 0 99.57761 25.6615942 78.1109468 50.915862 5.53367672e-14 50.915862\"></polygon>\n\t\t<text font-size=\"12\" id=\"text_name\" x=\"50\" y=\"25\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"#373e48\">\n\t\t</text>\n\t</g>\n</svg>\n    ",
-      "icon": "activity/list/type.script.png",
-      "groups": [
-        "Business Knowledge Models"
-      ],
-      "propertyPackages": [
-        "overrideidpackage",
-        "namepackage",
-        "scriptformatpackage",
-        "scripttextpackage"
-      ],
-      "hiddenPropertyPackages": [],
-      "roles": [
-        "knowledge_requirement_end",
-        "all"
-      ]
-    },
-    {
-      "type": "node",
-      "id": "ExpressionBKM",
-      "title": "Expression BKM",
-      "description": "A expression Business Knowledge Model",
-      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"102\" height=\"82\" version=\"1.0\">\n\t<defs>\n\t</defs>\n\t<magnets>\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n\t</magnets>\n\t<g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n        <polygon id=\"text_frame\" oryx:anchors=\"bottom top right left\" points=\"0 25.8245245 21.9513905 0 99.57761 0 99.57761 25.6615942 78.1109468 50.915862 5.53367672e-14 50.915862\"></polygon>\n        <polygon id=\"bg_frame\" oryx:resize=\"vertical horizontal\" stroke=\"#BBBBBB\" fill=\"#F9F9F9\" points=\"0 25.8245245 21.9513905 0 99.57761 0 99.57761 25.6615942 78.1109468 50.915862 5.53367672e-14 50.915862\"></polygon>\n\t\t<text font-size=\"12\" id=\"text_name\" x=\"50\" y=\"25\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"#373e48\">\n\t\t</text>\n\t</g>\n</svg>\n    ",
-      "icon": "activity/task.png",
-      "groups": [
-        "Business Knowledge Models"
-      ],
-      "propertyPackages": [
-        "overrideidpackage",
-        "namepackage",
-        "decisionexpressionpackage"
-      ],
-      "hiddenPropertyPackages": [],
-      "roles": [
-        "knowledge_requirement_end",
-        "all"
-      ]
-    },
-    {
-      "type": "node",
-      "id": "JavaBKM",
-      "title": "Java BKM",
-      "description": "A Java Business Knowledge Model",
-      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"102\" height=\"82\" version=\"1.0\">\n\t<defs>\n\t</defs>\n\t<magnets>\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n\t</magnets>\n\t<g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n        <polygon id=\"text_frame\" oryx:anchors=\"bottom top right left\" points=\"0 25.8245245 21.9513905 0 99.57761 0 99.57761 25.6615942 78.1109468 50.915862 5.53367672e-14 50.915862\"></polygon>\n        <polygon id=\"bg_frame\" oryx:resize=\"vertical horizontal\" stroke=\"#BBBBBB\" fill=\"#F9F9F9\" points=\"0 25.8245245 21.9513905 0 99.57761 0 99.57761 25.6615942 78.1109468 50.915862 5.53367672e-14 50.915862\"></polygon>\n\t\t<text font-size=\"12\" id=\"text_name\" x=\"50\" y=\"25\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"#373e48\">\n\t\t</text>\n\t</g>\n</svg>\n    ",
-      "icon": "activity/list/type.service.png",
-      "groups": [
-        "Business Knowledge Models"
-      ],
-      "propertyPackages": [
-        "overrideidpackage",
-        "namepackage",
-        "decisionclasspackage"
-      ],
-      "hiddenPropertyPackages": [],
-      "roles": [
-        "knowledge_requirement_end",
+        "knowledge_requirement_start",
         "all"
       ]
     },
@@ -326,7 +303,8 @@
       ],
       "propertyPackages": [
         "overrideidpackage",
-        "namepackage"
+        "namepackage",
+        "descriptionpackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": [
@@ -345,7 +323,8 @@
       ],
       "propertyPackages": [
         "overrideidpackage",
-        "namepackage"
+        "namepackage",
+        "descriptionpackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": [
@@ -365,7 +344,8 @@
       ],
       "propertyPackages": [
         "overrideidpackage",
-        "namepackage"
+        "namepackage",
+        "descriptionpackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": [
@@ -383,7 +363,8 @@
       ],
       "propertyPackages": [
         "overrideidpackage",
-        "namepackage"
+        "namepackage",
+        "descriptionpackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": [
@@ -403,6 +384,7 @@
       "propertyPackages": [
         "overrideidpackage",
         "namepackage",
+        "descriptionpackage",
         "documentationpackage",
         "textpackage"
       ],
@@ -448,7 +430,8 @@
           "type": "layout.bpmn2_0.sequenceflow"
         }
       ],
-      "propertyPackages": [],
+      "propertyPackages": [
+      ],
       "hiddenPropertyPackages": [],
       "roles": [
         "ConnectingObjectsMorph",
