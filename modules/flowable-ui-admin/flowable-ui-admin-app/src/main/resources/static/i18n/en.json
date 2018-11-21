@@ -12,6 +12,7 @@
             "CLEAR-FILTERS": "Clear filters",
             "CANCEL-AND-CLOSE": "Cancel and Close",
             "CANCEL": "Cancel",
+            "OK": "Ok",
             "NEXT": "Next",
             "PREVIOUS": "Previous",
             "CLOSE": "Close",
@@ -92,6 +93,12 @@
             },
             "SHOW-PROCESS-MODEL": {
                 "TITLE": "Process diagram"
+            },
+            "MIGRATE": {
+                "TITLE": "Migrate process instance",
+                "MESSAGE": "Migrate the process instance to another version of the process definition and define activity mappings.",
+                "CURRENT-DEFINITION": "Current process definition",
+                "TARGET-DEFINITION": "Target process definition"
             }
         }
     },
@@ -177,6 +184,7 @@
             "SHOW-ALL-JOBS": "Show all jobs",
             "SHOW-ALL-SUBPROCESSES": "Show all subprocesses",
             "SHOW-DIAGRAM": "Show process diagram",
+            "MIGRATE-PROCESSINSTANCE": "Migrate process instance",
             "TITLE-VARIABLES": "Actions on selected variable",
             "DELETE-VARIABLE": "Delete the variable",
             "UPDATE-VALUE": "Update variable",

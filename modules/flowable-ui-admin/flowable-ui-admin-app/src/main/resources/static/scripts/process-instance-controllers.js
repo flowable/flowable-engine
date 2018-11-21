@@ -92,6 +92,49 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
                 }
             });
         };
+        
+        $scope.showMigrateProcessDialog = function () {
+            $scope.migrationScope = {
+                targetProcessDefinition: undefined
+            };
+            var modalInstance = $modal.open({
+                templateUrl: 'views/process-instance-migration-popup.html', 
+                controller: 'ShowProcessInstanceMigrationPopupCtrl',
+                resolve: {
+                    process: function () {
+                        return $scope.process;
+                    },
+                    processDefinition: function() {
+                        return $scope.definition;
+                    },
+                    migrationScope: function() {
+                        return $scope.migrationScope;
+                    }
+                }
+            });
+            
+            modalInstance.result.then(function (migrateProcessInstance) {
+                if (migrateProcessInstance) {
+                    var migrationModalInstance = $modal.open({
+                        templateUrl: 'views/process-instance-migration-diagram-popup.html',
+                        windowClass: 'modal modal-full-width',
+                        controller: 'ShowProcessInstanceMigrationDiagramPopupCtrl',
+                        resolve: {
+                            process: function () {
+                                return $scope.process;
+                            },
+                            migrationScope: function () {
+                                return $scope.migrationScope;
+                            }
+                        }
+                    });
+                    
+                    migrationModalInstance.result.then(function (result) {
+                        $scope.loadProcessInstance();
+                    });
+                }
+            });
+        };
 
         $scope.openDecisionTable = function (decisionTable) {
             if (decisionTable && decisionTable.getProperty('id')) {
@@ -509,7 +552,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
     }]);
 
 flowableAdminApp.controller('DeleteProcessModalInstanceCtrl',
-    ['$rootScope', '$scope', '$modalInstance', '$http', 'process', 'action', function ($rootScope, $scope, $modalInstance, $http, process, action) {
+    ['$rootScope', '$scope', '$modalInstance', '$http', 'process', function ($rootScope, $scope, $modalInstance, $http, process, action) {
 
         $scope.process = process;
         $scope.action = action;
@@ -565,6 +608,81 @@ flowableAdminApp.controller('ShowProcessInstanceDiagramPopupCtrl',
             if (process.endTime != undefined) {
                 $("#bpmnModel").attr("data-history-id", process.id);
             }
+            $("#bpmnModel").load("./display/displaymodel.html?instanceId=" + process.id);
+        }, 200);
+
+
+    }]);
+    
+flowableAdminApp.controller('ShowProcessInstanceMigrationPopupCtrl',
+    ['$rootScope', '$scope', '$modalInstance', '$http', 'process', 'processDefinition', 'migrationScope', 
+    function ($rootScope, $scope, $modalInstance, $http, process, processDefinition, migrationScope) {
+
+        $scope.process = process;
+        $scope.processDefinition = processDefinition;
+        $scope.status = {loading: false};
+        $scope.model = {
+            targetNotSelected: true,
+            currentDefinitionId: processDefinition.id
+        };
+        
+        $http({
+            method: 'GET',
+            url: '/app/rest/admin/process-definitions?key=' + $scope.processDefinition.key
+        }).success(function (response, status, headers, config) {
+            var definitionList = response.data;
+            var finalResult = [];
+            for (var i = 0; i < definitionList.length; i++) {
+                if (definitionList[i].id !== processDefinition.id) {
+                    finalResult.push(definitionList[i]);
+                }
+            }
+            $scope.filteredProcessDefinitions = finalResult;
+            
+        }).error(function (data, status, headers, config) {
+        });
+        
+        $scope.targetProcessDefinitionChanged = function () {
+            if ($scope.model.newProcessDefinition && $scope.model.newProcessDefinition.length > 0) {
+                migrationScope.targetProcessDefinition = $scope.model.newProcessDefinition;
+                $scope.model.targetNotSelected = false;
+            }
+        };
+        
+        $scope.ok = function () {
+            $modalInstance.close(true);
+        };
+
+        $scope.cancel = function () {
+            if (!$scope.status.loading) {
+                $modalInstance.dismiss('cancel');
+            }
+        };
+    }]);
+    
+flowableAdminApp.controller('ShowProcessInstanceMigrationDiagramPopupCtrl',
+    ['$rootScope', '$scope', '$modalInstance', '$http', 'process', 'migrationScope', '$timeout',
+    function ($rootScope, $scope, $modalInstance, $http, process, migrationScope, $timeout) {
+
+        $scope.model = {
+            id: process.id,
+            name: process.name
+        };
+
+        $scope.status = {loading: false};
+
+        $scope.cancel = function () {
+            if (!$scope.status.loading) {
+                $modalInstance.close(true);
+            }
+        };
+
+        $timeout(function () {
+            $("#bpmnModel").attr("data-instance-id", process.id);
+            $("#bpmnModel").attr("data-definition-id", process.processDefinitionId);
+            $("#bpmnModel").attr("data-server-id", $rootScope.activeServers['process'].id);
+            $("#targetModel").attr("data-migration-definition-id", migrationScope.targetProcessDefinition);
+            
             $("#bpmnModel").load("./display/displaymodel.html?instanceId=" + process.id);
         }, 200);
 

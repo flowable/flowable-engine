@@ -431,7 +431,20 @@ public abstract class AbstractDynamicStateManager {
                     ExecutionEntity execution = newChildExecutionsIterator.next();
                     while (execution != null) {
                         if (execution.getActivityId() != null && localVariables.containsKey(execution.getActivityId())) {
-                            execution.setVariablesLocal(localVariables.get(execution.getActivityId()));
+                            if (execution.isScope() || execution.getCurrentFlowElement() instanceof UserTask) {
+                                execution.setVariablesLocal(localVariables.get(execution.getActivityId()));
+                            } else {
+                                ExecutionEntity scopedExecutionCandidate = execution;
+                                while (scopedExecutionCandidate.getParent() != null) {
+                                    ExecutionEntity parentExecution = scopedExecutionCandidate.getParent();
+                                    if (parentExecution.isScope()) {
+                                        parentExecution.setVariablesLocal(localVariables.get(execution.getActivityId()));
+                                        break;
+                                    }
+                                    
+                                    scopedExecutionCandidate = scopedExecutionCandidate.getParent();
+                                }
+                            }
                         }
                         execution = execution.getParent();
                     }
