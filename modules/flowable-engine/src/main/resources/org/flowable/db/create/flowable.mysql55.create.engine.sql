@@ -297,7 +297,7 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
     
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.4.1.0', 1);   
+values ('schema.version', '6.4.1.1', 1);   
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.4.1.0)', 1);  
+values ('schema.history', 'create(6.4.1.1)', 1);  
