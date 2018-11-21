@@ -60,7 +60,7 @@ public class HistoricDetailEntityManagerImpl extends AbstractEntityManager<Histo
             activityInstanceId = activityInstances.get(0).getId();
         } else {
             getActivityInstanceEntityManager().recordActivityStart(execution);
-            activityInstanceId = getHistoryManager().findHistoricActivityInstance(execution, true).getId();
+            activityInstanceId = getActivityInstanceEntityManager().findUnfinishedActivityInstancesByExecutionAndActivityId(execution.getId(), execution.getActivityId()).get(0).getId();
         }
         historicFormPropertyEntity.setActivityInstanceId(activityInstanceId);
 

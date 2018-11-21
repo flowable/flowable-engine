@@ -96,7 +96,9 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
     @Override
     public void recordActivityStart(ExecutionEntity executionEntity) {
         ActivityInstance activityInstance = recordRuntimeActivityStart(executionEntity);
-        getHistoryManager().recordActivityStart(activityInstance);
+        if (activityInstance != null) {
+            getHistoryManager().recordActivityStart(activityInstance);
+        }
     }
 
     @Override
@@ -110,9 +112,11 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
         ActivityInstanceEntity activityInstance = findActivityInstance(parentExecution, true);
         if (activityInstance != null) {
             activityInstance.setCalledProcessInstanceId(subProcessInstance.getProcessInstanceId());
+            HistoricActivityInstanceEntity historicActivityInstanceEntity = getHistoricActivityInstanceEntityManager().findById(activityInstance.getId());
+            historicActivityInstanceEntity.setCalledProcessInstanceId(activityInstance.getCalledProcessInstanceId());
         }
 
-        getHistoryManager().recordSubProcessInstanceStart(parentExecution, subProcessInstance);
+        getHistoryManager().recordProcessInstanceStart(subProcessInstance);
     }
 
     @Override
@@ -168,11 +172,11 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
         if (executionEntity.getActivityId() != null && executionEntity.getCurrentFlowElement() != null) {
             activityInstance = findActivityInstance(executionEntity,  true);
             if (activityInstance == null) {
-                activityInstance = createActivityInstance(executionEntity);
+                return createActivityInstance(executionEntity);
             }
         }
 
-        return activityInstance;
+        return null;
     }
 
     protected ActivityInstance createActivityInstance(ExecutionEntity executionEntity) {
@@ -184,6 +188,9 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
             activityInstance = getActivityInstanceFromCache(executionEntity.getId(), executionEntity.getActivityId(), true);
             if (activityInstance  == null) {
                 activityInstance = createActivityInstanceEntity(executionEntity);
+            } else {
+                // activityInstance is not null only on its creation time
+                activityInstance = null;
             }
         }
         return activityInstance;

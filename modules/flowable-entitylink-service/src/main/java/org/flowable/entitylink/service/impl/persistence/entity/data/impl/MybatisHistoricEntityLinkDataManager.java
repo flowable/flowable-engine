@@ -50,7 +50,7 @@ public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<Hi
         parameters.put("linkType", linkType);
         return (List) getList("selectHistoricEntityLinksByScopeIdAndType", parameters, historicEntityLinksByScopeIdAndTypeMatcher, true);
     }
-    
+
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoricEntityLink> findHistoricEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType, String linkType) {

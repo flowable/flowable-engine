@@ -213,7 +213,7 @@
   <!-- ACTIVITY INSTANCE SELECT -->
   
   <select id="selectActivityInstance" resultMap="ActivityInstanceResultMap">
-    select * from ${prefix}ACT_RU_ACTINST where ACT_ID_ = #{activityId} and PROC_INST_ID_ = #{processInstanceId}
+    select * from ${prefix}ACT_RU_ACTINST where ID_ = #{id}
   </select>
 
   <select id="selectActivityInstancesByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricActivityInstanceQueryImpl" resultMap="ActivityInstanceResultMap">
