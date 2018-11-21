@@ -12,9 +12,6 @@
  */
 package org.flowable.ui.admin.rest.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.admin.service.engine.ProcessInstanceService;
@@ -31,6 +28,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * REST controller for managing the current user's account.
@@ -156,6 +156,18 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
             clientService.changeActivityState(serverConfig, processInstanceId, changeStateBody);
         } catch (FlowableServiceException e) {
             LOGGER.error("Error changing activity state for process instance {}", processInstanceId, e);
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+    
+    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/migrate", method = RequestMethod.POST)
+    @ResponseStatus(value = HttpStatus.OK)
+    public void migrateProcessInstance(@PathVariable String processInstanceId, @RequestBody String migrationDocument) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            clientService.migrateProcessInstance(serverConfig, processInstanceId, migrationDocument);
+        } catch (FlowableServiceException e) {
+            LOGGER.error("Error migrating process instance {}", processInstanceId, e);
             throw new BadRequestException(e.getMessage());
         }
     }

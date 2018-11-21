@@ -10,20 +10,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var NORMAL_STROKE = 1;
-var SEQUENCEFLOW_STROKE = 1.5;
+var NORMAL_STROKE = 2;
+var SEQUENCEFLOW_STROKE = 2;
 var ASSOCIATION_STROKE = 2;
-var TASK_STROKE = 1;
-var TASK_HIGHLIGHT_STROKE = 2;
-var CALL_ACTIVITY_STROKE = 2;
-var ENDEVENT_STROKE = 3;
+var TASK_STROKE = 2;
+var TASK_HIGHLIGHT_STROKE = 4;
+var CALL_ACTIVITY_STROKE = 4;
+var ENDEVENT_STROKE = 4;
 
 var COMPLETED_COLOR = "#2632aa";
 var TEXT_COLOR = "#373e48";
 var CURRENT_COLOR = "#017501";
 var HOVER_COLOR = "#666666";
-var ACTIVITY_STROKE_COLOR = "#bbbbbb";
-var ACTIVITY_FILL_COLOR = "#f9f9f9";
+var ACTIVITY_STROKE_COLOR = "#000000";
+var ACTIVITY_FILL_COLOR = "#ffffff";
 var MAIN_STROKE_COLOR = "#585858";
 
 var TEXT_PADDING = 3;
