@@ -148,10 +148,12 @@ So, by just adding the dependency to the classpath and using the _@SpringBootApl
 
 Also:
 
-* Any BPMN 2.0 process definitions in the _processes_ folder will be automatically deployed. Create a folder _processes_ and add a dummy process definition (named _one-task-process.bpmn20.xml_) to this folder.
+* Any BPMN 2.0 process definitions in the _processes_ folder will be automatically deployed. Create a folder _processes_ and add a dummy process definition (named _one-task-process.bpmn20.xml_) to this folder. The content of this file is shown below.
 * Any CMMN 1.1 case definitions in the _cases_ folder will be automatically deployed.
 * Any DMN 1.1 dmn definitions in the _dmn_ folder will be automatically deployed.
 * Any Form definitions in the _forms_ folder will be automatically deployed.
+
+The XML content of the process definition is shown below. Notice that, for the moment, we are hard-coding an assignee called "kermit" to the user task. We'll come back to this later.
 
 [source,xml,linenums]
 ----
@@ -164,7 +166,7 @@ Also:
     <process id="oneTaskProcess" name="The One Task Process">
         <startEvent id="theStart" />
         <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
-        <userTask id="theTask" name="my task" />
+        <userTask id="theTask" name="my task" assignee="kermit" />
         <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd" />
         <endEvent id="theEnd" />
     </process>
@@ -353,6 +355,7 @@ curl http://localhost:8080/tasks?assignee=kermit
 [{"id":"10004","name":"my task"}]
 ----
 
+As can be seen, we are referring to the assignee, "kermit", which was hard-coded into the process definition XML earlier. We'll change this later on to allow the assignee to be set when the workflow instance is started.
 
 ==== JPA support
 
@@ -559,6 +562,8 @@ And finally, to try out the Spring-JPA-Flowable integration, we assign the task 
 ----
 <userTask id="theTask" name="my task" flowable:assignee="${person.id}"/>
 ----
+
+This replaces the hard-coded recipient, "kermit", which we had initially set.
 
 We can now start a new process instance, providing the user name in the POST body:
 
