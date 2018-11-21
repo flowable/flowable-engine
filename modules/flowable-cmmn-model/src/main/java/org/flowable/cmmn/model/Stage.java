@@ -28,6 +28,7 @@ public class Stage extends PlanFragment implements HasExitCriteria {
     protected String autoCompleteCondition;
     protected String formKey; // For the start form of the plan model. Null otherwise
     protected Integer displayOrder;
+    protected boolean includeInStageOverview;
     protected Map<String, PlanItemDefinition> planItemDefinitionMap = new LinkedHashMap<>();
 
     public void addPlanItemDefinition(PlanItemDefinition planItemDefinition) {
@@ -146,6 +147,14 @@ public class Stage extends PlanFragment implements HasExitCriteria {
 
     public void setDisplayOrder(Integer displayOrder) {
         this.displayOrder = displayOrder;
+    }
+
+    public  boolean isIncludeInStageOverview() {
+        return includeInStageOverview;
+    }
+
+    public void setIncludeInStageOverview(boolean includeInStageOverview) {
+        this.includeInStageOverview = includeInStageOverview;
     }
 
     @Override
