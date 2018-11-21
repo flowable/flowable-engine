@@ -237,6 +237,11 @@ public final class CmmnRestUrls {
     public static final String[] URL_CASE_INSTANCE_VARIABLE_DATA = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_CASE_INSTANCE_RESOURCE, "{0}", SEGMENT_VARIABLES, "{1}", SEGMENT_VARIABLE_DATA };
 
     /**
+     * URL template for a single case instance stage overview: <i>cmmn-runtime/case-instances/{0:caseInstanceId}/stage-overview</i>
+     */
+    public static final String[] URL_CASE_INSTANCE_STAGE_OVERVIEW = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_CASE_INSTANCE_RESOURCE, "{0}", SEGMENT_STAGE_OVERVIEW};
+
+    /**
      * URL template for a case instance's identity links: <i>cmmn-runtime/case-instances/{0:caseInstanceId}/identitylinks</i>
      */
     public static final String[] URL_CASE_INSTANCE_IDENTITYLINKS_COLLECTION = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_CASE_INSTANCE_RESOURCE, "{0}", SEGMENT_IDENTITYLINKS };
