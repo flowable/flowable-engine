@@ -181,9 +181,20 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
     }
 
     protected Optional<PlanItemInstance> getPlanItemInstance(List<PlanItemInstance> stagePlanItemInstances, Stage stage) {
-        return stagePlanItemInstances.stream()
-            .filter(s -> s.getPlanItemDefinitionId().equals(stage.getId()))
-            .findFirst();
+        PlanItemInstance planItemInstance = null;
+        for (PlanItemInstance p : stagePlanItemInstances) {
+            if (p.getPlanItemDefinitionId().equals(stage.getId())) {
+                if (p.getEndedTime() == null) {
+                    planItemInstance = p; // one that's not ended yet has precedence
+                } else {
+                    if (planItemInstance == null) {
+                        planItemInstance = p;
+                    }
+                }
+
+            }
+        }
+        return Optional.ofNullable(planItemInstance);
     }
 
 }
