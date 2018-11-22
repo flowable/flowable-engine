@@ -62,12 +62,11 @@ public interface ProcessInstanceMigrationBuilder {
     ProcessInstanceMigrationBuilder migrateToProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId);
 
     /**
-     * Specifies the tenantId of the process definition to migrate to. <b>Deprecated</b> use migrateToProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId) instead
+     * Specifies the tenantId of the process definition to migrate to
      *
      * @param processDefinitionTenantId
      * @return
      */
-    @Deprecated
     ProcessInstanceMigrationBuilder withMigrateToProcessDefinitionTenantId(String processDefinitionTenantId);
 
     /**
