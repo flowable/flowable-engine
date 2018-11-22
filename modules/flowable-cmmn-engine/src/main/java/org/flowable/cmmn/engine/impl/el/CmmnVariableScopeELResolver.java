@@ -42,11 +42,17 @@ public class CmmnVariableScopeELResolver extends VariableContainerELResolver {
                 context.setPropertyResolved(true);
                 return variableContainer;
 
-            } else if (CASE_INSTANCE_KEY.equals(property) && variableContainer instanceof PlanItemInstanceEntity) {
+            } else if ((CASE_INSTANCE_KEY.equals(property) && variableContainer instanceof PlanItemInstanceEntity)) {
                 context.setPropertyResolved(true);
-                String caseInstanceId =  ((PlanItemInstanceEntity) variableContainer).getCaseInstanceId();
+                String caseInstanceId = ((PlanItemInstanceEntity) variableContainer).getCaseInstanceId();
                 return CommandContextUtil.getCaseInstanceEntityManager().findById(caseInstanceId);
-                
+
+            } else if (PLAN_ITEM_INSTANCE_KEY.equals(property) && variableContainer instanceof CaseInstanceEntity) {
+                // Special case: using planItemInstance as key, but only a caseInstance available
+                // (Happens for example for cross boundary plan items)
+                context.setPropertyResolved(true);
+                return variableContainer;
+
             } else {
                 return super.getValue(context, base, property);
             }
