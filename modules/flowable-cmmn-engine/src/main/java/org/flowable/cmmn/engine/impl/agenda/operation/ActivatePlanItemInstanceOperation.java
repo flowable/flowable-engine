@@ -89,7 +89,7 @@ public class ActivatePlanItemInstanceOperation extends AbstractPlanItemInstanceO
             stringBuilder.append(planItem.getName());
             stringBuilder.append(" (");
             stringBuilder.append(planItem.getId());
-            stringBuilder.append(")");
+            stringBuilder.append(") ");
         } else {
             stringBuilder.append(planItem.getId());
         }

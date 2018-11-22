@@ -123,7 +123,14 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
                 for (PlanItemInstanceEntity planItemInstanceEntity : allPlanItemInstances) {
                     if (planItemInstanceEntity.getStageInstanceId() != null) {
                         PlanItemInstanceEntity parentPlanItemInstanceEntity = planItemInstanceMap.get(planItemInstanceEntity.getStageInstanceId());
-                        parentPlanItemInstanceEntity.getChildPlanItemInstances().add(planItemInstanceMap.get(planItemInstanceEntity.getId()));
+
+                        // It can happen the parent plan item instance does not exist:
+                        // For example when a nested B is nested in a stage A and both are repeating.
+                        // The wait_for_repetition of B has the old stage A plan item instance as parent,
+                        // and it won't be returned by the eager fetch query
+                        if (parentPlanItemInstanceEntity != null) {
+                            parentPlanItemInstanceEntity.getChildPlanItemInstances().add(planItemInstanceMap.get(planItemInstanceEntity.getId()));
+                        }
                     }
                 }
             }

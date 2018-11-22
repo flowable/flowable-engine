@@ -17,8 +17,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.sql.SQLException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
@@ -234,6 +237,27 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
 
         assertNotNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult());
         assertNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult());
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testRepeatingCrossBoundary() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testRepeatingCrossBoundary")
+            .variable("goIntoB", true)
+            .variable("goIntoC", true)
+            .start();
+
+        // Complete B once, will terminate Stage B and C
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("A", "B");
+        cmmnTaskService.complete(tasks.get(1).getId());
+
+        // Completing A should again reactivate task B and thus also Stage B and C
+        cmmnTaskService.complete(tasks.get(0).getId());
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getName()).isEqualTo("B");
     }
 
 }
