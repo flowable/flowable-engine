@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
+import org.flowable.cmmn.editor.json.converter.util.ListenerConverterUtil;
 import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseElement;
@@ -68,13 +69,20 @@ public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter implements 
             }
         }
 
-        boolean decisionTableThrowErrorOnNoHitsNode = CmmnJsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS, elementNode);
-        FieldExtension decisionTableThrowErrorOnNoHitsField = new FieldExtension();
-        decisionTableThrowErrorOnNoHitsField.setFieldName(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY);
-        decisionTableThrowErrorOnNoHitsField.setStringValue(decisionTableThrowErrorOnNoHitsNode ? "true" : "false");
-        decisionTask.getFieldExtensions().add(decisionTableThrowErrorOnNoHitsField);
+        addBooleanField(elementNode, decisionTask, PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS, PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY);
+        addBooleanField(elementNode, decisionTask, PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT, PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT_KEY);
+
+        ListenerConverterUtil.convertJsonToLifeCycleListeners(elementNode, decisionTask);
 
         return decisionTask;
+    }
+
+    protected void addBooleanField(JsonNode elementNode, DecisionTask decisionTask, String propertyName, String fieldName) {
+        boolean decisionTableThrowErrorOnNoHitsNode = CmmnJsonConverterUtil.getPropertyValueAsBoolean(propertyName, elementNode);
+        FieldExtension decisionTableThrowErrorOnNoHitsField = new FieldExtension();
+        decisionTableThrowErrorOnNoHitsField.setFieldName(fieldName);
+        decisionTableThrowErrorOnNoHitsField.setStringValue(decisionTableThrowErrorOnNoHitsNode ? "true" : "false");
+        decisionTask.getFieldExtensions().add(decisionTableThrowErrorOnNoHitsField);
     }
 
     @Override
@@ -95,7 +103,12 @@ public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter implements 
             if (PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY.equals(fieldExtension.getFieldName())) {
                 propertiesNode.put(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS, Boolean.parseBoolean(fieldExtension.getStringValue()));
             }
+            if (PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT_KEY.equals(fieldExtension.getFieldName())) {
+                propertiesNode.put(PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT, Boolean.parseBoolean(fieldExtension.getStringValue()));
+            }
         }
+
+        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, decisionTask);
     }
 
     @Override

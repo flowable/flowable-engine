@@ -5,6 +5,7 @@
         <link type="text/css" rel="stylesheet" href="display/jquery.growl.css" />
         <link type="text/css" rel="stylesheet" href="display/jquery-confirm.min.css" />
         <link type="text/css" rel="stylesheet" href="display/displaymodel.css" />
+        <script type="text/javascript" src="display/jquery-1.12.4.min.js"></script>
         <script type="text/javascript" src="display/jquery.qtip.min.js"></script>
         <script type="text/javascript" src="display/jquery.growl.js"></script>
         <script type="text/javascript" src="display/jquery-confirm.min.js"></script>
@@ -13,23 +14,23 @@
         <script type="text/javascript" src="display/bpmn-icons.js"></script>
         <script type="text/javascript" src="display/Polyline.js"></script>
         <script type="text/javascript">
-        	var NORMAL_STROKE = 1;
-        	var SEQUENCEFLOW_STROKE = 1.5;
-        	var TASK_STROKE = 1;
-        	var CALL_ACTIVITY_STROKE = 2;
-        	var ENDEVENT_STROKE = 3;
-        	var CURRENT_ACTIVITY_STROKE = 2;
+        	var NORMAL_STROKE = 2;
+        	var SEQUENCEFLOW_STROKE = 2;
+        	var TASK_STROKE = 2;
+        	var CALL_ACTIVITY_STROKE = 4;
+        	var ENDEVENT_STROKE = 4;
+        	var CURRENT_ACTIVITY_STROKE = 4;
         	
         	var COMPLETED_COLOR= "#2674aa";
         	var TEXT_COLOR= "#373e48";
         	var CURRENT_COLOR= "#66AA66";
-        	var HOVER_COLOR= "#666666";
-        	var ACTIVITY_STROKE_COLOR = "#bbbbbb";
-        	var ACTIVITY_FILL_COLOR = "#f9f9f9";
+        	var HOVER_COLOR= "#d5bc01";
+        	var ACTIVITY_STROKE_COLOR = "#000000";
+        	var ACTIVITY_FILL_COLOR = "#ffffff";
         	var MAIN_STROKE_COLOR = "#585858";
         	
         	var TEXT_PADDING = 3;
-        	var ARROW_WIDTH = 4;
+        	var ARROW_WIDTH = 6;
         	var MARKER_WIDTH = 12;
         	
         	var TASK_FONT = {font: "11px Arial", opacity: 1, fill: Raphael.rgb(0, 0, 0)};
@@ -42,6 +43,7 @@
         	var INITIAL_CANVAS_HEIGHT;
         	
         	var paper;
+        	var migrationPaper;
         	var viewBox;
         	var viewBoxWidth;
         	var viewBoxHeight;
@@ -50,9 +52,11 @@
         	var canvasHeight;
         	
         	var definitionId = $('#bpmnModel').attr('data-definition-id');
-        	var instanceId = $('#bpmnModel').attr('data-instance-id');
-        	var historyInstanceId = $('#bpmnModel').attr('data-history-id');
-        	var serverId = $('#bpmnModel').attr('data-server-id');
+            var instanceId = $('#bpmnModel').attr('data-instance-id');
+            var historyInstanceId = $('#bpmnModel').attr('data-history-id');
+            var serverId = $('#bpmnModel').attr('data-server-id');
+        	
+        	var migrationDefinitionId = $('#targetModel').attr('data-migration-definition-id');
          
             var elementsAdded = new Array();
             var elementsRemoved = new Array();
@@ -63,28 +67,28 @@
             var changeStateEndElements = new Array();
             var changeStateEndGlowElements = new Array();
             
+            var migrationMappedElements = new Array();
+            var migrationMappedElementsText = new Array();
+            
             var collapsedItemNavigation = new Array();
             var bpmnData;
+            var migrationData;
         	
-        	function _showTip(htmlNode, element)
-          	{
+        	function _showTip(htmlNode, element) {
+        	    if (migrationDefinitionId && migrationDefinitionId.length > 0) return;
         		var documentation = "";
-        		if (element.name && element.name.length > 0)
-        		{
+        		if (element.name && element.name.length > 0) {
         			documentation += "<b>Name</b>: <i>" + element.name + "</i><br/><br/>";
         		}
         		
         		var text;
-        		if (element.name && element.name.length > 0)
-        		{
+        		if (element.name && element.name.length > 0) {
         			text = element.name;
-        		}
-        		else
-        		{
+        		} else {
         			text = element.id;
         		}
         		
-          		htmlNode.qtip({ 
+        		htmlNode.qtip({ 
                 	content: {
                   		text: documentation,
                   		title: {
@@ -219,113 +223,171 @@
                 $('#navigationTree').html(navigationUrl);
             }
         	
-        	function _addHoverLogic(element, type, defaultColor)
-        	{
+        	function _addHoverLogic(element, type, defaultColor, isMigrationModelElement, currentPaper) {
         	    var strokeColor = _bpmnGetColor(element, defaultColor);
-        		var topBodyRect;
-        		if (type === "rect") {
-        			topBodyRect = paper.rect(element.x, element.y, element.width, element.height);
-        			
-        		} else if (type === "circle") {
-        			var x = element.x + (element.width / 2);
-        			var y = element.y + (element.height / 2);
-        			topBodyRect = paper.circle(x, y, 15);
-        			
-        		} else if (type === "rhombus") {
-        			topBodyRect = paper.path("M" + element.x + " " + (element.y + (element.height / 2)) + 
-       					"L" + (element.x + (element.width / 2)) + " " + (element.y + element.height) + 
-       					"L" + (element.x + element.width) + " " + (element.y + (element.height / 2)) +
-       					"L" + (element.x + (element.width / 2)) + " " + element.y + "z"
-       				);
-        		}
-        		
-        		var opacity = 0;
-        		var fillColor = "#ffffff";
-        		if ($.inArray(element.id, elementsAdded) >= 0) {
-        			opacity = 0.2;
-            		fillColor = "green";
-        		}
-        		
-        		if ($.inArray(element.id, elementsRemoved) >= 0) {
-        			opacity = 0.2;
-            		fillColor = "red";
-        		}
-        		
-          		topBodyRect.attr({
-          			"opacity": opacity,
-	                "stroke" : "none",
-	                "fill" : fillColor
-	          	});
-          		_showTip($(topBodyRect.node), element);
+                var topBodyRect;
+                if (type === "rect") {
+                    topBodyRect = currentPaper.rect(element.x, element.y, element.width, element.height);
+                    
+                } else if (type === "circle") {
+                    var x = element.x + (element.width / 2);
+                    var y = element.y + (element.height / 2);
+                    topBodyRect = currentPaper.circle(x, y, 15);
+                    
+                } else if (type === "rhombus") {
+                    topBodyRect = currentPaper.path("M" + element.x + " " + (element.y + (element.height / 2)) + 
+                        "L" + (element.x + (element.width / 2)) + " " + (element.y + element.height) + 
+                        "L" + (element.x + element.width) + " " + (element.y + (element.height / 2)) +
+                        "L" + (element.x + (element.width / 2)) + " " + element.y + "z"
+                    );
+                }
+                
+        	    if (isMigrationModelElement) {
+        	    
+        	        topBodyRect.attr({
+                        "opacity": 0,
+                        "stroke" : "none",
+                        "fill" : "#ffffff"
+                    });
+        	    
+        	        topBodyRect.click(function() {
+                        var endElementIndex = $.inArray(element.id, changeStateEndElementIds);
+                        if (endElementIndex >= 0) {
+                        
+                            var glowElement = changeStateEndGlowElements[endElementIndex];
+                            glowElement.remove();
+                            
+                            changeStateEndGlowElements.splice(endElementIndex, 1);
+                            changeStateEndElementIds.splice(endElementIndex, 1);
+                            changeStateEndElements.splice(endElementIndex, 1);
+                            
+                        } else {
+                            var endGlowElement = topBodyRect.glow({'color': 'red'});
+                            changeStateEndGlowElements.push(endGlowElement);
+                            changeStateEndElementIds.push(element.id);
+                            changeStateEndElements.push(element);
+                        }
+                        
+                        if (changeStateStartElements.length > 0 && changeStateEndElements.length > 0) {
+                           $('#addMappingButton').show();
+    
+                        } else {
+                           $('#addMappingButton').hide();
+                        }
+                    });
+        	    
+        	    } else {
+            		var opacity = 0;
+            		var fillColor = "#ffffff";
+            		if ($.inArray(element.id, elementsAdded) >= 0) {
+            			opacity = 0.2;
+                		fillColor = "green";
+            		}
+            		
+            		if ($.inArray(element.id, elementsRemoved) >= 0) {
+            			opacity = 0.2;
+                		fillColor = "red";
+            		}
+            		
+              		topBodyRect.attr({
+              			"opacity": opacity,
+    	                "stroke" : "none",
+    	                "fill" : fillColor
+    	          	});
+              		_showTip($(topBodyRect.node), element);
+              		
+              		topBodyRect.click(function() {
+              		    if (migrationDefinitionId && migrationDefinitionId.length > 0) {
+              		        var startElementIndex = $.inArray(element.id, changeStateStartElementIds);
+                            if (startElementIndex >= 0) {
+                            
+                                var glowElement = changeStateStartGlowElements[startElementIndex];
+                                glowElement.remove();
+                                
+                                changeStateStartGlowElements.splice(startElementIndex, 1);
+                                changeStateStartElementIds.splice(startElementIndex, 1);
+                                changeStateStartElements.splice(startElementIndex, 1);
+                                
+                            } else {
+                                var startGlowElement = topBodyRect.glow({'color': 'blue'});
+                                changeStateStartGlowElements.push(startGlowElement);
+                                changeStateStartElementIds.push(element.id);
+                                changeStateStartElements.push(element);
+                            }
+                            
+                            if (changeStateStartElements.length > 0 && changeStateEndElements.length > 0) {
+                               $('#addMappingButton').show();
+        
+                            } else {
+                               $('#addMappingButton').hide();
+                            }
+                            
+              		    } else {
+                            var startElementIndex = $.inArray(element.id, changeStateStartElementIds);
+                            var endElementIndex = $.inArray(element.id, changeStateEndElementIds);
+                            if (startElementIndex >= 0) {
+                                
+                                var glowElement = changeStateStartGlowElements[startElementIndex];
+                                glowElement.remove();
+                                
+                                changeStateStartGlowElements.splice(startElementIndex, 1);
+                                changeStateStartElementIds.splice(startElementIndex, 1);
+                                changeStateStartElements.splice(startElementIndex, 1);
+                                
+                            } else if (endElementIndex >= 0) {
+                            
+                                var glowElement = changeStateEndGlowElements[endElementIndex];
+                                glowElement.remove();
+                                
+                                changeStateEndGlowElements.splice(endElementIndex, 1);
+                                changeStateEndElementIds.splice(endElementIndex, 1);
+                                changeStateEndElements.splice(endElementIndex, 1);
+                                
+                            } else {
+                                if (element.current) {
+                                   var startGlowElement = topBodyRect.glow({'color': 'blue'});
+                                   changeStateStartGlowElements.push(startGlowElement);
+                                   changeStateStartElementIds.push(element.id);
+                                   changeStateStartElements.push(element);
+                                   
+                                } else {
+                                   var endGlowElement = topBodyRect.glow({'color': 'red'});
+                                   changeStateEndGlowElements.push(endGlowElement);
+                                   changeStateEndElementIds.push(element.id);
+                                   changeStateEndElements.push(element);
+                                }
+                            }
+                            
+                            if (changeStateStartElements.length > 0 && changeStateEndElements.length > 0) {
+                               $('#changeStateButton').show();
+                            } else {
+                               $('#changeStateButton').hide();
+                            }
+                        }
+                    });
+          		}
           		
           		topBodyRect.mouseover(function() {
-          			paper.getById(element.id).attr({"stroke": HOVER_COLOR});
+          			currentPaper.getById(element.id).attr({"stroke": HOVER_COLOR});
           		});
           		
           		topBodyRect.mouseout(function() {
-          			paper.getById(element.id).attr({"stroke": strokeColor});
-          		});
-          		
-          		topBodyRect.click(function() {
-          		    var startElementIndex = $.inArray(element.id, changeStateStartElementIds);
-          		    var endElementIndex = $.inArray(element.id, changeStateEndElementIds);
-          		    if (startElementIndex >= 0) {
-          		        
-          		        var glowElement = changeStateStartGlowElements[startElementIndex];
-          				glowElement.remove();
-          				
-          				changeStateStartGlowElements.splice(startElementIndex, 1);
-          				changeStateStartElementIds.splice(startElementIndex, 1);
-                        changeStateStartElements.splice(startElementIndex, 1);
-          				
-          			} else if (endElementIndex >= 0) {
-          			
-          			    var glowElement = changeStateEndGlowElements[endElementIndex];
-                        glowElement.remove();
-                        
-                        changeStateEndGlowElements.splice(endElementIndex, 1);
-                        changeStateEndElementIds.splice(endElementIndex, 1);
-                        changeStateEndElements.splice(endElementIndex, 1);
-          				
-          			} else {
-          			    if (element.current) {
-          			       var startGlowElement = topBodyRect.glow({'color': 'blue'});
-          			       changeStateStartGlowElements.push(startGlowElement);
-          			       changeStateStartElementIds.push(element.id);
-          			       changeStateStartElements.push(element);
-                           
-          			    } else {
-          			       var endGlowElement = topBodyRect.glow({'color': 'red'});
-          			       changeStateEndGlowElements.push(endGlowElement);
-                           changeStateEndElementIds.push(element.id);
-                           changeStateEndElements.push(element);
-          			    }
-					}
-					
-					if (changeStateStartElements.length > 0 && changeStateEndElements.length > 0) {
-					   $('#changeStateButton').show();
-					} else {
-					   $('#changeStateButton').hide();
-					}
+          			currentPaper.getById(element.id).attr({"stroke": strokeColor});
           		});
         	}
         	
         	function _zoom(zoomIn)
         	{
         		var tmpCanvasWidth, tmpCanvasHeight;
-                if (zoomIn) 
-                {
+                if (zoomIn) {
                 	tmpCanvasWidth = canvasWidth * (1.0/0.90);
                 	tmpCanvasHeight = canvasHeight * (1.0/0.90);
-                }
-                else 
-                {
+                } else {
                 	tmpCanvasWidth = canvasWidth * (1.0/1.10);
                 	tmpCanvasHeight = canvasHeight * (1.0/1.10);
                 }
                 
-                if (tmpCanvasWidth != canvasWidth || tmpCanvasHeight != canvasHeight)
-                {
+                if (tmpCanvasWidth != canvasWidth || tmpCanvasHeight != canvasHeight) {
                 	canvasWidth = tmpCanvasWidth;
                 	canvasHeight = tmpCanvasHeight;
                 	paper.setSize(canvasWidth, canvasHeight);
@@ -333,11 +395,11 @@
         	}
         	
         	function _showProcessDiagram() {
-	        	var request;
+        	    var request;
 	        	if (historyInstanceId != null) {
 	        	   request = $.ajax({
                         type: 'get',
-                        url: './app/rest/admin/process-instances/' + instanceId + '/history-model-json?processDefinitionId=' + definitionId + '&nocaching=' + new Date().getTime()
+                        url: './app/rest/admin/process-instances/' + historyInstanceId + '/history-model-json?processDefinitionId=' + definitionId + '&nocaching=' + new Date().getTime()
                     });
                     
 	        	} else if (instanceId != null) {
@@ -365,45 +427,41 @@
 					viewBoxHeight = INITIAL_CANVAS_HEIGHT;
 					
 					var x = 0;
-					if ($(window).width() > canvasWidth)
-					{
+					if ($(window).width() > canvasWidth) {
 						x = ($(window).width() - canvasWidth) / 2 - (data.diagramBeginX / 2);
 					}
 					
-					$('#bpmnModel').width(INITIAL_CANVAS_WIDTH);
-					$('#bpmnModel').height(INITIAL_CANVAS_HEIGHT);
-					paper = Raphael(document.getElementById('bpmnModel'), canvasWidth, canvasHeight);
+					var canvasValue = 'bpmnModel';
+					
+					$('#' + canvasValue).width(INITIAL_CANVAS_WIDTH);
+					$('#' + canvasValue).height(INITIAL_CANVAS_HEIGHT);
+					paper = Raphael(document.getElementById(canvasValue), canvasWidth, canvasHeight);
 					paper.setViewBox(0, 0, viewBoxWidth, viewBoxHeight, false);
 	          		paper.renderfix();
 	          		
-	          		if (data.pools)
-	          		{
-	          			for (var i = 0; i < data.pools.length; i++)
-					    {
+	          		if (data.pools) {
+	          			for (var i = 0; i < data.pools.length; i++) {
 					    	var pool = data.pools[i];
-					    	_drawPool(pool);
+					    	_drawPool(pool, false, paper);
 					    }
 	          		}
 	          		
 				    var modelElements = data.elements;
-				    for (var i = 0; i < modelElements.length; i++)
-				    {
+				    for (var i = 0; i < modelElements.length; i++) {
 				    	var element = modelElements[i];
 				    	try {
 				    		//console.log(element.type);
 				    		var drawFunction = eval("_draw" + element.type);
-				    		drawFunction(element);
+				    		drawFunction(element, false, paper);
 				    	} catch (err) {
 							console.warn(err);
 						}
 				    }
 				    
-				    if (data.flows)
-				    {
-					    for (var i = 0; i < data.flows.length; i++)
-					    {
+				    if (data.flows) {
+					    for (var i = 0; i < data.flows.length; i++) {
 					    	var flow = data.flows[i];
-					    	_drawFlow(flow);
+					    	_drawFlow(flow, paper);
 					    }
 				    }
 				    
@@ -413,10 +471,68 @@
 				request.error(function(jqXHR, textStatus, errorThrown) {
 				    alert("error");
 				});
+				
+				if (migrationDefinitionId && migrationDefinitionId.length > 0) {
+                  migrationRequest = $.ajax({
+                        type: 'get',
+                        url: './app/rest/admin/process-definitions/' + migrationDefinitionId + '/model-json?nocaching=' + new Date().getTime()
+                  });
+                  
+                  migrationRequest.success(function(data, textStatus, jqXHR) {
+                    
+                    if (!data.elements || data.elements.length == 0) return;
+                    
+                    INITIAL_CANVAS_WIDTH = data.diagramWidth + 20;
+                    INITIAL_CANVAS_HEIGHT = data.diagramHeight + 50;
+                    canvasWidth = INITIAL_CANVAS_WIDTH;
+                    canvasHeight = INITIAL_CANVAS_HEIGHT;
+                    viewBoxWidth = INITIAL_CANVAS_WIDTH;
+                    viewBoxHeight = INITIAL_CANVAS_HEIGHT;
+                    
+                    var x = 0;
+                    if ($(window).width() > canvasWidth) {
+                        x = ($(window).width() - canvasWidth) / 2 - (data.diagramBeginX / 2);
+                    }
+                    
+                    var canvasValue = 'targetModel';
+                    
+                    $('#' + canvasValue).width(INITIAL_CANVAS_WIDTH);
+                    $('#' + canvasValue).height(INITIAL_CANVAS_HEIGHT);
+                    migrationPaper = Raphael(document.getElementById(canvasValue), canvasWidth, canvasHeight);
+                    migrationPaper.setViewBox(0, 0, viewBoxWidth, viewBoxHeight, false);
+                    migrationPaper.renderfix();
+                    
+                    if (data.pools) {
+                        for (var i = 0; i < data.pools.length; i++) {
+                            var pool = data.pools[i];
+                            _drawPool(pool, true, migrationPaper);
+                        }
+                    }
+                    
+                    var modelElements = data.elements;
+                    for (var i = 0; i < modelElements.length; i++) {
+                        var element = modelElements[i];
+                        try {
+                            var drawFunction = eval("_draw" + element.type);
+                            drawFunction(element, true, migrationPaper);
+                        } catch (err) {
+                            console.warn(err);
+                        }
+                    }
+                    
+                    if (data.flows) {
+                        for (var i = 0; i < data.flows.length; i++) {
+                            var flow = data.flows[i];
+                            _drawFlow(flow, migrationPaper);
+                        }
+                    }
+                    
+                    migrationData = data;
+                  });
+                }
 			}
 			
 			$(document).ready(function () {
-			 
 			     $(document).on('click', '#changeStateButton', function(e) {
                     e.preventDefault();
                     
@@ -452,6 +568,117 @@
                                     }),
                                     success: function() {
                                         paper.clear();
+                                        _showProcessDiagram();
+                                    }
+                                });
+                            },
+                            cancel: function () {
+                                
+                            }
+                        }
+                    });
+                 });
+                 
+                 $(document).on('click', '#addMappingButton', function(e) {
+                    e.preventDefault();
+                    
+                    var fromActivityIds = new Array();
+                    var startElementText = '';
+                    for (var i = 0; i < changeStateStartElements.length; i++) {
+                        if (startElementText.length > 0) {
+                            startElementText += ', ';
+                        }
+                        
+                        startElementText += changeStateStartElements[i].name;
+                        fromActivityIds.push(changeStateStartElements[i].id);
+                    }
+                    
+                    var toActivityIds = new Array();
+                    var endElementText = '';
+                    for (var i = 0; i < changeStateEndElements.length; i++) {
+                        if (endElementText.length > 0) {
+                            endElementText += ', ';
+                        }
+                        endElementText += changeStateEndElements[i].name
+                        toActivityIds.push(changeStateEndElements[i].id);
+                    }
+                    
+                    migrationMappedElements.push({
+                        fromActivityIds: fromActivityIds,
+                        toActivityIds: toActivityIds
+                    });
+                    
+                    migrationMappedElementsText.push({
+                        startElementText: startElementText,
+                        endElementText: endElementText
+                    });
+                    
+                    var mappingValuesText = '';
+                    var counter = 1;
+                    for (var i = 0; i < migrationMappedElementsText.length; i++) {
+                        if (mappingValuesText.length > 0) {
+                            mappingValuesText += '  -  ';
+                        }
+                        mappingValuesText += 'Mapping ' + counter + ' from (' + migrationMappedElementsText[i].startElementText + ') to (' + 
+                            migrationMappedElementsText[i].endElementText + ')';
+                        
+                        counter++;
+                    }
+                    $('#currentMappingValues').text(mappingValuesText);
+                    
+                    $('#executeMigrationDocument').show();
+                    $('#addMappingButton').hide();
+                    
+                 });
+                 
+                 $(document).on('click', '#executeMigrationDocument', function(e) {
+                    e.preventDefault();
+                    
+                    var migrationDocumentPayload = {
+                        toProcessDefinitionId: migrationDefinitionId
+                    };
+                    
+                    var mappingPayload = new Array();
+                    for (var i = 0; i < migrationMappedElements.length; i++) {
+                        var mappedElement = migrationMappedElements[i];
+                        var mappingValue = {};
+                        if (mappedElement.fromActivityIds.length == 1) {
+                            mappingValue.fromActivityId = mappedElement.fromActivityIds[0];
+                        } else {
+                            mappingValue.fromActivityIds = mappedElement.fromActivityIds;
+                        }
+                        
+                        if (mappedElement.toActivityIds.length == 1) {
+                            mappingValue.toActivityId = mappedElement.toActivityIds[0];
+                        } else {
+                            mappingValue.toActivityIds = mappedElement.toActivityIds;
+                        }
+                        
+                        mappingPayload.push(mappingValue);
+                    }
+                    
+                    migrationDocumentPayload.activityMappings = mappingPayload;
+                    
+                    $.confirm({
+                        title: 'Migrate process instance',
+                        content: 'Are you sure you want to migrate the process instance with the defined mappings',
+                        buttons: {
+                            confirm: function () {
+                                $.ajax({
+                                    type: 'post',
+                                    url: './app/rest/admin/process-instances/' + instanceId + '/migrate',
+                                    contentType: 'application/json; charset=utf-8',
+                                    data: JSON.stringify(migrationDocumentPayload),
+                                    success: function() {
+                                        paper.clear();
+                                        migrationPaper.clear();
+                                        $('#targetModel').removeAttr('data-migration-definition-id');
+                                        definitionId = migrationDefinitionId;
+                                        migrationDefinitionId = undefined;
+                                        migrationMappedElementsText = new Array();
+                                        migrationMappedElements = new Array();
+                                        $('#targetModel').hide();
+                                        $('#migrationDivider').hide();
                                         _showProcessDiagram();
                                     }
                                 });

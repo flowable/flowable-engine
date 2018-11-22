@@ -42,7 +42,7 @@ public class MybatisPropertyDataManager extends AbstractIdmDataManager<IdmProper
     @Override
     @SuppressWarnings("unchecked")
     public List<IdmPropertyEntity> findAll() {
-        return getDbSqlSession().selectList("selectProperties");
+        return getDbSqlSession().selectList("selectIdmProperties");
     }
 
 }

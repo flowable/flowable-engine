@@ -15,9 +15,14 @@ The Spring Boot - Flowable integration has been developed together with Spring c
 Flowable supports both Spring Boot 2.0 and 1.5 with the same starters. The base support is for Spring Boot 2.0, which means that the actuator endpoints are only supported on 2.0.
 The Flowable starters are also puling spring boot starter transitively, which means that users will have to define the 1.5 version of the spring boot starters in their own build files.
 
+[[springSpringBootGettingStarted]]
 ==== Getting started
 
-Spring Boot is all about convention over configuration. To get started, simply add the _flowable-spring-boot-starter_ or _flowable-spring-boot-starter-rest_ dependency to your Spring Boot project.
+Spring Boot is all about convention over configuration.
+To get started, you would need to create a Spring Boot project.
+The easiest way to do this would be to create a project via link:$$https://start.spring.io/$$[start.spring.io].
+For example create a project with web and h2 dependencies.
+Then in the created project simply add the _flowable-spring-boot-starter_ or _flowable-spring-boot-starter-rest_ dependency.
 In case you don't need all the engines see the other <<springBootFlowableStarter, Flowable starters>>.
 For example for Maven:
 
@@ -31,7 +36,8 @@ For example for Maven:
 </dependency>
 ----
 
-That's all that's needed. This dependency will transitively add the correct Flowable and Spring dependencies to the classpath. You can now write the Spring Boot application:
+That's all that's needed. This dependency will transitively add the correct Flowable dependencies to the classpath.
+You can now run your Spring Boot application:
 
 [source,java,,linenums]
 ----
@@ -48,18 +54,8 @@ public class MyApplication {
 }
 ----
 
-Flowable needs a database to store its data. If you run the code above, it will give you an informative exception message that you need to add a database driver dependency to the classpath. For now, add the H2 database dependency:
 
-[source,xml,linenums]
-----
-<dependency>
-	<groupId>com.h2database</groupId>
-	<artifactId>h2</artifactId>
-	<version>1.4.197</version>
-</dependency>
-----
-
-The application can now be started. You will see output like this:
+You will see an output like this:
 
 ----
   .   ____          _            __ _ _
@@ -152,10 +148,12 @@ So, by just adding the dependency to the classpath and using the _@SpringBootApl
 
 Also:
 
-* Any BPMN 2.0 process definitions in the _processes_ folder will be automatically deployed. Create a folder _processes_ and add a dummy process definition (named _one-task-process.bpmn20.xml_) to this folder.
+* Any BPMN 2.0 process definitions in the _processes_ folder will be automatically deployed. Create a folder _processes_ and add a dummy process definition (named _one-task-process.bpmn20.xml_) to this folder. The content of this file is shown below.
 * Any CMMN 1.1 case definitions in the _cases_ folder will be automatically deployed.
 * Any DMN 1.1 dmn definitions in the _dmn_ folder will be automatically deployed.
 * Any Form definitions in the _forms_ folder will be automatically deployed.
+
+The XML content of the process definition is shown below. Notice that, for the moment, we are hard-coding an assignee called "kermit" to the user task. We'll come back to this later.
 
 [source,xml,linenums]
 ----
@@ -168,7 +166,7 @@ Also:
     <process id="oneTaskProcess" name="The One Task Process">
         <startEvent id="theStart" />
         <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
-        <userTask id="theTask" name="my task" />
+        <userTask id="theTask" name="my task" assignee="kermit" />
         <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd" />
         <endEvent id="theEnd" />
     </process>
@@ -357,6 +355,7 @@ curl http://localhost:8080/tasks?assignee=kermit
 [{"id":"10004","name":"my task"}]
 ----
 
+As can be seen, we are referring to the assignee, "kermit", which was hard-coded into the process definition XML earlier. We'll change this later on to allow the assignee to be set when the workflow instance is started.
 
 ==== JPA support
 
@@ -564,6 +563,8 @@ And finally, to try out the Spring-JPA-Flowable integration, we assign the task 
 <userTask id="theTask" name="my task" flowable:assignee="${person.id}"/>
 ----
 
+This replaces the hard-coded recipient, "kermit", which we had initially set.
+
 We can now start a new process instance, providing the user name in the POST body:
 
 ----
@@ -584,6 +585,8 @@ curl http://localhost:8080/tasks?assignee=1
 Flowable provides a Spring Boot Actuator Endpoint that exposes information for the Processes that are running.
 By default the `flowable` endpoint is mapped to `/actuator/flowable`.
 Spring Boot by default only exposes the `info` and `health` endpoints. In order to enable the `flowable` endpoint you need to add `management.endpoint.flowable.enabled=true` to your `application.properties`.
+
+In order to make enable Actuator endpoints you need to add a dependency on Actuator, e.g. by using {sc-flowable-starter}/flowable-spring-boot-starter-actuator/pom.xml[flowable-spring-boot-starter-actuator].
 
 `curl http://localhost:8080/actuator/flowable`
 

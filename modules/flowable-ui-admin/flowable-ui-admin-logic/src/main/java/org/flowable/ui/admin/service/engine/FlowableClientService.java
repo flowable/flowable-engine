@@ -14,7 +14,10 @@ package org.flowable.ui.admin.service.engine;
 
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Base64;
+import java.util.Collections;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
@@ -22,7 +25,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
+import org.apache.http.auth.AUTH;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -40,6 +45,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.admin.service.AttachmentResponseInfo;
@@ -48,6 +54,7 @@ import org.flowable.ui.admin.service.engine.exception.FlowableServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -72,6 +79,9 @@ public class FlowableClientService {
 
     @Autowired
     protected ObjectMapper objectMapper;
+
+    @Value("${flowable.admin.app.security.preemptive-basic-authentication:false}")
+    boolean preemptiveBasicAuthentication;
 
     public CloseableHttpClient getHttpClient(ServerConfig serverConfig) {
         return getHttpClient(serverConfig.getUserName(), serverConfigService.decrypt(serverConfig.getPassword()));
@@ -98,6 +108,12 @@ public class FlowableClientService {
 
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
         httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+        if (preemptiveBasicAuthentication) {
+            String auth = userName + ":" + password;
+            httpClientBuilder.setDefaultHeaders(Collections.singletonList(
+                new BasicHeader(AUTH.WWW_AUTH_RESP, "Basic " + Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8)))
+            ));
+        }
 
         if (sslsf != null) {
             httpClientBuilder.setSSLSocketFactory(sslsf);

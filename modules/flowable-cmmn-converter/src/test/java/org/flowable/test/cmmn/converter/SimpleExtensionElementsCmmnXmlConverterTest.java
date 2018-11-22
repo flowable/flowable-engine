@@ -61,7 +61,7 @@ public class SimpleExtensionElementsCmmnXmlConverterTest extends AbstractConvert
         assertEquals("My CasePlanModel", planModel.getName());
         assertEquals("formKey", planModel.getFormKey());
 
-        Task task = (Task) planModel.findPlanItemDefinition("taskA");
+        Task task = (Task) planModel.findPlanItemDefinitionInStageOrUpwards("taskA");
         assertEquals(1, task.getExtensionElements().size());
         List<ExtensionElement> extensionElements = task.getExtensionElements().get("taskTest");
         assertEquals(1, extensionElements.size());
@@ -69,7 +69,7 @@ public class SimpleExtensionElementsCmmnXmlConverterTest extends AbstractConvert
         assertEquals("taskTest", extensionElement.getName());
         assertEquals("hello", extensionElement.getElementText());
         
-        Milestone milestone = (Milestone) planModel.findPlanItemDefinition("mileStoneOne");
+        Milestone milestone = (Milestone) planModel.findPlanItemDefinitionInStageOrUpwards("mileStoneOne");
         assertEquals(1, milestone.getExtensionElements().size());
         extensionElements = milestone.getExtensionElements().get("milestoneTest");
         assertEquals(1, extensionElements.size());

@@ -56,6 +56,21 @@ public interface EntityLink {
      * A scope definition id for the referenced entity
      */
     String getReferenceScopeDefinitionId();
+
+    /**
+     * Returns the scope id of the root entity
+     */
+    String getRootScopeId();
+
+    /**
+     * The scope type associated with the root entity
+     */
+    String getRootScopeType();
+
+    /**
+     * A scope definition id for the root entity
+     */
+    String getRootScopeDefinitionId();
     
     /**
      * The create time for the entity link

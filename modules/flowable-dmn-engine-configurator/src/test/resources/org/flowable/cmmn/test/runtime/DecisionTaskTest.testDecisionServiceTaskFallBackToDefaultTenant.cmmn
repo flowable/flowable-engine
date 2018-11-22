@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="myCase">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+
+            <planItem id="planItem1" name="Task One" definitionRef="decisionTask" />
+            <planItem id="planItem2" name="The Case" definitionRef="task">
+                <entryCriterion sentryRef="sentry1" />
+            </planItem>
+
+            <sentry id="sentry1">
+                <planItemOnPart sourceRef="planItem1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <decisionTask id="decisionTask" name="dmn" isBlocking="false" decisionRef="decisionTableInternal">
+                <extensionElements>
+                    <flowable:field name="fallbackToDefaultTenant">
+                        <flowable:string><![CDATA[true]]></flowable:string>
+                    </flowable:field>
+                </extensionElements>
+            </decisionTask>
+
+            <task id="task" name="The Task" isBlocking="true" />
+
+        </casePlanModel>
+    </case>
+
+    <decision id="decisionTableInternal" name="Simple decision table" externalRef="decisionTable"/>
+
+</definitions>

@@ -30,6 +30,11 @@ public class SentryExport implements CmmnXmlConstants {
             xtw.writeAttribute(ATTRIBUTE_NAME, sentry.getName());
         }
 
+        if (StringUtils.isNotEmpty(sentry.getTriggerMode())
+                && !Sentry.TRIGGER_MODE_DEFAULT.equals(sentry.getTriggerMode())) { // default is not exported. If missing, default is assumed
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_TRIGGER_MODE, sentry.getTriggerMode());
+        }
+
         for (SentryOnPart sentryOnPart : sentry.getOnParts()) {
             // start sentry on part element
             xtw.writeStartElement(ELEMENT_PLAN_ITEM_ON_PART);

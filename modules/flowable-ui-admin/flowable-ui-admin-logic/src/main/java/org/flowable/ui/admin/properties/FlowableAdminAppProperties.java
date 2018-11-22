@@ -103,8 +103,22 @@ public class FlowableAdminAppProperties implements InitializingBean {
         @NestedConfigurationProperty
         private final Encryption encryption = new Encryption();
 
+        /**
+         * Perform a preemptive basic authentication when issuing requests to the flowable REST API.
+         * This is an experimental property and might be removed without notice.
+         */
+        private boolean preemptiveBasicAuthentication = false;
+
         public Encryption getEncryption() {
             return encryption;
+        }
+
+        public boolean isPreemptiveBasicAuthentication() {
+            return preemptiveBasicAuthentication;
+        }
+
+        public void setPreemptiveBasicAuthentication(boolean preemptiveBasicAuthentication) {
+            this.preemptiveBasicAuthentication = preemptiveBasicAuthentication;
         }
     }
 

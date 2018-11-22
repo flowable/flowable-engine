@@ -29,16 +29,12 @@ import org.flowable.variable.service.impl.persistence.entity.data.VariableInstan
 import org.flowable.variable.service.impl.persistence.entity.data.impl.MybatisHistoricVariableInstanceDataManager;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.MybatisVariableByteArrayDataManager;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.MybatisVariableInstanceDataManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Tijs Rademakers
  */
 public class VariableServiceConfiguration extends AbstractServiceConfiguration {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(VariableServiceConfiguration.class);
-    
     public static final int DEFAULT_GENERIC_MAX_LENGTH_STRING = 4000;
     public static final int DEFAULT_ORACLE_MAX_LENGTH_STRING = 2000;
 

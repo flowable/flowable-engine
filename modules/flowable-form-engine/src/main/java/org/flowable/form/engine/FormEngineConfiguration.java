@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
@@ -69,23 +67,15 @@ import org.flowable.form.engine.impl.persistence.entity.data.impl.MybatisFormDef
 import org.flowable.form.engine.impl.persistence.entity.data.impl.MybatisFormDeploymentDataManager;
 import org.flowable.form.engine.impl.persistence.entity.data.impl.MybatisFormInstanceDataManager;
 import org.flowable.form.engine.impl.persistence.entity.data.impl.MybatisFormResourceDataManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import liquibase.Liquibase;
 import liquibase.database.Database;
-import liquibase.database.DatabaseConnection;
-import liquibase.database.DatabaseFactory;
-import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.DatabaseException;
-import liquibase.resource.ClassLoaderResourceAccessor;
 
 public class FormEngineConfiguration extends AbstractEngineConfiguration
         implements FormEngineConfigurationApi, HasExpressionManagerEngineConfiguration {
-
-    protected static final Logger LOGGER = LoggerFactory.getLogger(FormEngineConfiguration.class);
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/form/db/mapping/mappings.xml";
 
@@ -285,7 +275,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
                 try {
                     database.close();
                 } catch (DatabaseException e) {
-                    LOGGER.warn("Error closing database", e);
+                    logger.warn("Error closing database", e);
                 }
             }
         }

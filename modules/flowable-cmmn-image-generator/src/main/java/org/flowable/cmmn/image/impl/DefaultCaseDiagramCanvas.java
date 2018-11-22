@@ -323,6 +323,10 @@ public class DefaultCaseDiagramCanvas {
         g.fill(arrowHead);
         g.setTransform(originalTransformation);
     }
+    
+    public void drawGenericEventListener(GraphicInfo graphicInfo, double scaleFactor) {
+        drawEventListener(graphicInfo, null, scaleFactor);
+    }
 
     public void drawTimerEventListener(GraphicInfo graphicInfo, double scaleFactor) {
         drawEventListener(graphicInfo, TIMER_IMAGE, scaleFactor);

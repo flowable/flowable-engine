@@ -28,13 +28,14 @@ public class Stage extends PlanFragment implements HasExitCriteria {
     protected String autoCompleteCondition;
     protected String formKey; // For the start form of the plan model. Null otherwise
     protected Integer displayOrder;
+    protected boolean includeInStageOverview;
     protected Map<String, PlanItemDefinition> planItemDefinitionMap = new LinkedHashMap<>();
 
     public void addPlanItemDefinition(PlanItemDefinition planItemDefinition) {
         planItemDefinitionMap.put(planItemDefinition.getId(), planItemDefinition);
     }
 
-    public PlanItemDefinition findPlanItemDefinition(String planItemDefinitionId) {
+    public PlanItemDefinition findPlanItemDefinitionInStageOrUpwards(String planItemDefinitionId) {
         if (id != null && id.equals(planItemDefinitionId)) {
             return this;
         }
@@ -45,7 +46,29 @@ public class Stage extends PlanFragment implements HasExitCriteria {
 
         Stage parentStage = getParentStage();
         if (parentStage != null) {
-            return parentStage.findPlanItemDefinition(planItemDefinitionId);
+            return parentStage.findPlanItemDefinitionInStageOrUpwards(planItemDefinitionId);
+        }
+
+        return null;
+    }
+
+    public PlanItemDefinition findPlanItemDefinitionInStageOrDownwards(String planItemDefinitionId) {
+        if (id != null && id.equals(planItemDefinitionId)) {
+            return this;
+        }
+
+        if (planItemDefinitionMap.containsKey(planItemDefinitionId)) {
+            return planItemDefinitionMap.get(planItemDefinitionId);
+        }
+
+        for (String key : planItemDefinitionMap.keySet()) {
+            PlanItemDefinition planItemDefinition = planItemDefinitionMap.get(key);
+            if (planItemDefinition instanceof Stage) {
+                PlanItemDefinition p = ((Stage) planItemDefinition).findPlanItemDefinitionInStageOrDownwards(planItemDefinitionId);
+                if (p != null) {
+                    return p;
+                }
+            }
         }
 
         return null;
@@ -124,6 +147,14 @@ public class Stage extends PlanFragment implements HasExitCriteria {
 
     public void setDisplayOrder(Integer displayOrder) {
         this.displayOrder = displayOrder;
+    }
+
+    public  boolean isIncludeInStageOverview() {
+        return includeInStageOverview;
+    }
+
+    public void setIncludeInStageOverview(boolean includeInStageOverview) {
+        this.includeInStageOverview = includeInStageOverview;
     }
 
     @Override

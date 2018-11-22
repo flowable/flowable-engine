@@ -580,7 +580,7 @@ Properties:
 * *name*: task attribute to indicate the name of the task
 * *type*: task attribute whose value must be "script" to indicate the type of task
 * *scriptFormat*: extended attribute that indicate the language of the script (for example, javascript, groovy)
-* *script*: the script to execute, defined as a string in a extension field element named "script"
+* *script*: the script to execute, defined as a string in a field element named "script"
 * *autoStoreVariables*: optional task attribute flag (default: false) that indicates whether or not variables defined in the script will be stored in the Plan Item Instance context (see note below)
 * *resultVariableName*: optional task attribute that when present will store a variable with the specified name in the Plan Item instance context with the script evaluation result (see note below)
 
@@ -633,7 +633,7 @@ All case variables that are accessible through the PlanItem instance that arrive
 </flowable:field>
 ----
 
-*Note*: It's also possible to set process variables in a script, simply by calling _planItemInstance.setVariable("variableName", variableValue)_. By default, no variables are stored automatically. It's possible to automatically store any variable defined in the script (for example, __sum__ in the example above) by setting the property ++autoStoreVariables++ on the ++scriptTask++ to ++true++. However, *the best practice is not to do this and use an explicit execution.setVariable() call*, as with some recent versions of the JDK, auto storing of variables does not work for some scripting languages. See link:$$http://www.jorambarrez.be/blog/2013/03/25/bug-on-jdk-1-7-0_17-when-using-scripttask-in-activiti/$$[this link] for more details.
+*Note*: It's also possible to set plan item instance variables in a script, simply by calling _planItemInstance.setVariable("variableName", variableValue)_. By default, no variables are stored automatically. It's possible to automatically store any variable defined in the script (for example, __sum__ in the example above) by setting the property ++autoStoreVariables++ on the ++scriptTask++ to ++true++. However, *the best practice is not to do this and use an explicit planItemInstance.setVariable() call*, as with some recent versions of the JDK, auto storing of variables does not work for some scripting languages. See link:$$http://www.jorambarrez.be/blog/2013/03/25/bug-on-jdk-1-7-0_17-when-using-scripttask-in-activiti/$$[this link] for more details.
 
 [source,xml,linenums]
 ----
@@ -656,7 +656,7 @@ Here's an example of how to set a variable in a script:
 
 The following names are reserved and *cannot be used* as variable names: *out, out:print, lang:import, context, elcontext*.
 
-*Note* The return value of a script task can be assigned to an already existing or new process variable by specifying its name as a literal value for the _'flowable:resultVariable'_ attribute of a script task definition. Any existing value for a specific process variable will be overwritten by the result value of the script execution. When a result variable name is not specified, the script result value gets ignored.
+*Note* The return value of a script task can be assigned to an already existing or new plan item instance variable by specifying its name as a literal value for the _'flowable:resultVariable'_ attribute of a script task definition. Any existing value for a specific plan item instance variable will be overwritten by the result value of the script execution. When a result variable name is not specified, the script result value gets ignored.
 
 [source,xml,linenums]
 ----
@@ -720,7 +720,7 @@ image::images/cmmn.processtask.png[align="center"]
 
 ==== Criteria
 
-===== Entry criterion
+===== Entry criterion (entry sentry)
 
 Entry criteria form a sentry for a given plan item instance. They consist of two parts:
 
@@ -728,14 +728,15 @@ Entry criteria form a sentry for a given plan item instance. They consist of two
 * One optional _if part_ or _condition_: this is an expression that allows the definition of a complex condition
 
 A sentry is satisfied when all its criteria are resolved to _true_. When a criterion evaluates to true, this is stored and remembered for future evaluations. Note that entry criteria of all plan item instances in the _available_ state are evaluated whenever something changes in the case instance.
-
 Multiple sentries are possible on a plan item. However, when one is satisfied, the plan item moves from state _available_ to _active_.
+
+See <<cmmn_sentry_evaluation,the section on sentry evaluation>> for more information.
 
 An entry criterion is visualized as a diamond shape (white color inside) on the border of a plan item:
 
 image::images/cmmn.entrycriteria.png[align="center"]
 
-===== Exit criterion
+===== Exit criterion (exit sentry)
 
 Exit criteria form a sentry for a given plan item instance. They consist of two parts:
 
@@ -743,8 +744,9 @@ Exit criteria form a sentry for a given plan item instance. They consist of two 
 * One optional _if part_ or _condition_: this is an expression that allows a complex condition to be defined
 
 A sentry is satisfied when all its criteria are resolved to _true_. When a criterion evaluates to true, this is stored and remembered for future evaluations. Note that exit criteria of all plan item instances in the _active_ state are evaluated whenever something changes in the case instance.
-
 Multiple sentries are possible on a plan item. However, when one is satisfied, the plan item moves from state _active_ to _exit_.
+
+See <<cmmn_sentry_evaluation,the section on sentry evaluation>> for more information.
 
 An exit criterion is visualized as a diamond shape (white color inside) on the border of a plan item:
 
@@ -777,7 +779,9 @@ image::images/cmmn.timereventlistener.png[align="center"]
 ===== User Event Listener
 
 A user event listener can be used when needing to capture a user interaction that directly influences a case state,
-instead of indirectly via impacting variables or information in the case. When the event is captured an Occur transition is triggered on the event listener.
+instead of indirectly via impacting variables or information in the case.
+A typical use case for a user event listener are buttons in a UI that a user can click to drive the state of the case instance.
+When the event is triggered an _Occur_ event is thrown to which sentries can listener to.
 Like timer event listeners, it has a much simpler lifecycle that a _task_.
 
 image::images/cmmn.usereventlistener.png[align="center"]
@@ -785,6 +789,36 @@ image::images/cmmn.usereventlistener.png[align="center"]
 User event listeners can be queried using the _org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery_. Such a query can be created by calling the _cmmnRuntimeService.createUserEventListenerInstanceQuery()_ method. Note that a user event listener is also a plan item instance, which means it can also be queried through the _org.flowable.cmmn.api.runtime.PlanItemInstanceQuery_ API.
 
 A user event listener can be completed by calling the _cmmnRuntimeService.completeUserEventListenerInstance(id)_ method.
+
+===== Automatic removal of event listeners
+
+The engine will automatically detect when event listeners (user or timer) are not useful anymore.
+Take for example the following case definition:
+
+image::images/cmmn.user-event-listener-removal-1.png[align="center"]
+
+Here, the _First stage_ contains two human tasks (A and B) and it can be exited by a user when the _Stop first stage_ user event is triggered.
+However, when both taks A and B are completed, the stage will also complete. If now the user event listener would be triggered, there is nothing that listens to this event anymore.
+The engine will detect this and terminate the user event automatically.
+
+The same mechanism also works for event listeners that are referenced by entry sentries:
+
+image::images/cmmn.user-event-listener-removal-2.png[align="center"]
+
+In this case, in the case that _EventListenerA_ would be triggered, _EventListenerB_ is terminated (as nothing is listening to its occurrence anymore).
+
+Or, when timer and user event listeners are mixed, the one that is triggered first will also cause the removal of others (when they are not referenced somewhere else):
+
+image::images/cmmn.user-event-listener-removal-3.png[align="center"]
+
+Here, the timer will be removed in case the user event is triggered first (and vice versa).
+
+The detection also takes in account plan items that have not yet been created. Take for example the following case definition:
+
+image::images/cmmn.user-event-listener-removal-4.png[align="center"]
+
+Here, human task _C_ is not yet created when a case instance is started for this case definition. The user event listener will not be removed as long that _C_ has a parent stage that is in a non-terminal state, as this means that the event could still be listened to in the future.
+
 
 ==== Item control: Repetition Rule
 
@@ -908,3 +942,102 @@ To summarize:
     1. It contains no plan items or all child plan items are in a _Terminal_ or _Semi-terminal_ state (CLOSED, COMPLETED, DISABLED, FAILED)
     2. It is not marked as _autoComplete_ and all remaining child plan items are in *AVAILABLE* state and are _completionNeutral_ and not _required_
     3. It is _autoComplete_ and all remaining plan items are _not required_ in *ENABLED* or *AVAILABLE* state (regardless of its completion neutrality, as required rule gets precedence)
+
+[[cmmn_sentry_evaluation]]
+=== Sentry evaluation
+
+Sentries play a big role in any case definition as they offer a powerful way of configuring in a declarative way when certain plan item instances activate or when they are automatically stopped.
+As such, one of the most important parts of the Flowable CMMN engine core logic is to evaluate the sentries to see what state changes happen in a case instance.
+
+==== When are sentries evaluated?
+
+Sentries are evaluated whenever state changes happen in the case instance or new events happen. Concretely this means:
+
+* When a case instance is started.
+* When a wait state plan item such as a human task is triggered to continue.
+* When variables related to the case instance change (added, updated or deleted).
+* When the state of a plan item instance is changed (e.g. terminated through RuntimeService, a manual plan item instance is started, etc.).
+* When manually triggered through the RuntimeService#evaluateCriteria method.
+
+The engine will continue to plan new evaluations of all currently active sentries as long as changes keep happening.
+For example, suppose the completion of a human task satisfies the exit sentry of another human task. The state change of the second human task will again schedule a new evaluation of all active sentries with this new information. When no changes have happened during the last evaluation, the engine deems the state stable and evaluation is stopped.
+
+==== Concepts
+
+Sentries consist of two parts:
+
+- One or more _onParts_ that reference lifecycle events from other plan items
+- Zero or one ifPart with a condition
+
+Take for example the following case definition:
+
+image::images/cmmn.sentry-eval-01.png[align="center"]
+
+Assume (not shown in the diagram here)
+
+* The entry sentry on task C listens to the _complete_ event from task A and B.
+* The exit sentry listens to the _occur_ event of the user event listener _'Stop  C'_
+* The entry sentry has a condition expression set to _${var:eq(myVar, 'hello world')}_
+
+In this simple example, the _entry sentry_ has two onParts and one ifPart. The _exit sentry_ only has onPart.
+
+When the case instance is started, human tasks A and B are created (as they have no entry sentry) and move immediately to state _active_. C is not _active_, but _available_ as the sentry has not yet been satisfied. The user event listener _'Stop C'_ is also _available_ from the start and it can thus be triggered.
+
+When both task A and B have been completed and the variable _myVar_ is set to _'hello world'_, the entry sentry is satisfied and fires. The plan item instance behind C is moved to the _active_ state and as a side-effect the human task C is created (it can now be queried through the _TaskService_ for example).
+When _'Stop C'_ is triggered (through the _CmmnRuntimeService#completeUserEventListenerInstance_ method, the exit sentry for C is satisfied and C is terminated.
+
+If _'Stop C'_ would be triggered before C moves to _active_, its plan item instance would be terminated and the entry sentry won't be listening anymore to anything.
+
+==== Default behavior
+
+When the case instance is started
+
+----
+CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+    .caseDefinitionKey("myCase")
+    .start();
+----
+
+the condition on the entry sentry is immediately evaluated, as a regular evaluation cycle happens on case instance start.
+
+Note that, if an expression for the condition like _${myVar == 'hello world'}_ would be used this would not work. The engine would throw a _PropertyNotFound_ exception as it doesn't know the _myVar_ variable.
+
+To solve this:
+
+ * pass a variable value for _myVar_ on case instance start
+ * do a null check in the expression, like _${planItemInstance.getVariable('myVar') != null && planItemInstance.getVariable('myVar') == 'hello world'}_
+ * or (and probably easiest), check <<cmmnExpressionsFunctions,expression functions>> to use a function such as _${var:eq(myVar, 'hello world')}_ which takes in account the fact the variable might not exist.
+
+*The default evaluation logic has "memory", which means that when a part of a sentry is satisfied the engine will store and "remember" this in subsequent evaluations.*
+
+This means that, from the moment a part (an onPart or ifPart of the sentry) is satisfied, that particular part is not evaluated anymore in next evaluations and it is deemed true.
+
+In the example above, this is needed as task A will typically be completed at another point in time than task B. For example if task A is completed, the part of the sentry on task C that says "i'm listening to the complete event of task A" is now satisfied and this fact is remembered for the future. If now B completes, this is also stored. If now the _myVar_ variable gets the right value, the ifPart also fires and the whole sentry fires and task C gets activated. Of course, it could also be that the variable value is satisfied first and the tasks after. The point is that it doesn't matter as the engine will remember the parts that were satisfied in the past.
+
+This behavior "with memory" is the default behavior of the engine and is covered by setting the _triggerMode_ of a sentry to *default*. This is automatically set in the Flowable Modeler when adding a new plan item. When no value has been set (for example when importing a case model from another tool), the _triggerMode_ is assumed to be _default_.
+
+==== Trigger mode "onEvent"
+
+The default behavior (see previous section) will remember which parts have been satisfied previously. This is the most used and safest approach (and also what is typically expected when reasoning about sentries).
+
+There is an alternative mode of sentry triggering that is called *"onEvent"*. In this mode, the engine will have memory with regards to parts of the sentry and will *not remember* any part that was satisfied in the past. This is sometimes needed in advanced use cases. Take for example the following example:
+
+image::images/cmmn.sentry-eval-02.png[align="center"]
+
+Here, the case model has a stage with with three substages. All substage are repeating. Substage B and C have an entry sentry for the completion of stage B. Also (not visually shown), both sentries have a condition that depends on a variable.
+
+In advanced use cases, it could be wanted or needed that that the sentry parts (and especially the ifPart containing the condition) are evaluated only _when the lifecycle event of the dependent plan item_ happens. In this case, this is the _complete_ event of _Stage A_. For these use cases, the _triggerMode_ of the sentry can be set to _onEvent_. As the name imples, this means that the sentry evaluation only happens when a referenced event happens and no memory of past things are taken into account.
+
+Concretely, in the example here, the condition of the entry sentries will be evaluated *only* when Stage A completed (and on no other moment). This is very different from the general evaluation rules. In this particular example, it does make managing the variables easier as the conditions are only evaluated on one precise moment and there needs to be no fear of some sentry part being fired due to a variable having a value at a certain point in time. Especially as in the example here all substages are repeating, this would be a lot of work to do. This is a powerful mechanism, but meant for advanced modelers that have an intrinsic knowledge of the case model and the semantics of this triggerMode.
+
+Do note that the engine deems all events to happen simultaneously when it comes to evaluating sentries. Take the following case definition:
+
+image::images/cmmn.sentry-eval-03.png[align="center"]
+
+Assume that all sentries use the _triggerMode onEvent_ setting. If task A is completed, this exits task B. Task C will now exit too. So, even though there are two distinct lifecycle events (A being completed and B being exited) and one might assume that _onEvent_ literally means that there are two distinct evaluations happening where the memory of the other part of the exit sentry on task C is forgotten, the engine is smart enough to see that they are part of the same evaluation cycle and task C will be exited too.
+
+Technically spoken: there is _some_ memory for the _onEvent_ sentry, more specifically for evaluations that happen during the same API call (or transaction, lower-level spoken).
+
+*Important: onEvent is a powerful mechanism and should only be used when the semantics are well understood. It's possible to create a case model that gets stuck due to not having the correct sentry configuration if the use case is not carefully examined.*
+
+(For example, suppose a sentry has an onPart listening to the completion of a plan item and an ifPart with a condition. If the plan item completes - thus triggering the onPart - but a variable used in the condition is missing for some reason ... the ifPart would never fire and the case instance might get stuck in an unwanted state).

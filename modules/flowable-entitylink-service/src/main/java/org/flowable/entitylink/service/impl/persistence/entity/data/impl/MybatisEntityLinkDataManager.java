@@ -55,10 +55,10 @@ public class MybatisEntityLinkDataManager extends AbstractDataManager<EntityLink
     
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public List<EntityLink> findEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String scopeType, String linkType) {
+    public List<EntityLink> findEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String referenceScopeType, String linkType) {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("referenceScopeId", referenceScopeId);
-        parameters.put("referenceScopeType", scopeType);
+        parameters.put("referenceScopeType", referenceScopeType);
         parameters.put("linkType", linkType);
         return (List) getList("selectEntityLinksByReferenceScopeIdAndType", parameters, entityLinksByReferenceScopeIdAndTypeMatcher, true);
     }

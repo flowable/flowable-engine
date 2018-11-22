@@ -20,6 +20,7 @@ import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
+import org.flowable.cmmn.api.runtime.GenericEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery;
@@ -48,6 +49,7 @@ import org.flowable.cmmn.engine.impl.cmd.SetLocalVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetLocalVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetVariablesCmd;
+import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceAsyncCmd;
 import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceWithFormCmd;
 import org.flowable.cmmn.engine.impl.cmd.StartPlanItemInstanceCmd;
@@ -77,6 +79,10 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
         return commandExecutor.execute(new StartCaseInstanceCmd(caseInstanceBuilder));
     }
     
+    public CaseInstance startCaseInstanceAsync(CaseInstanceBuilder caseInstanceBuilder) {
+        return commandExecutor.execute(new StartCaseInstanceAsyncCmd(caseInstanceBuilder));
+    }
+
     public CaseInstance startCaseInstanceWithForm(CaseInstanceBuilder caseInstanceBuilder) {
         return commandExecutor.execute(new StartCaseInstanceWithFormCmd(caseInstanceBuilder));
     }
@@ -133,6 +139,11 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     @Override
     public void evaluateCriteria(String caseInstanceId) {
         commandExecutor.execute(new EvaluateCriteriaCmd(caseInstanceId));
+    }
+    
+    @Override
+    public void completeGenericEventListenerInstance(String genericEventListenerInstanceId) {
+        commandExecutor.execute(new TriggerPlanItemInstanceCmd(genericEventListenerInstanceId));
     }
 
     @Override
@@ -223,6 +234,11 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     @Override
     public MilestoneInstanceQuery createMilestoneInstanceQuery() {
         return configuration.getMilestoneInstanceEntityManager().createMilestoneInstanceQuery();
+    }
+    
+    @Override
+    public GenericEventListenerInstanceQuery createGenericEventListenerInstanceQuery() {
+        return new GenericEventListenerInstanceQueryImpl(configuration.getCommandExecutor());
     }
 
     @Override

@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.impl.listener.PlanItemLifeCycleListenerUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItemTransition;
@@ -42,9 +43,21 @@ public class EnablePlanItemInstanceOperation extends AbstractChangePlanItemInsta
     
     @Override
     protected void internalExecute() {
+
+        // Sentries are not needed to be kept around, as the plan item is being enabled
+        removeSentryRelatedData();
+
         planItemInstanceEntity.setEntryCriterionId(entryCriterionId);
         planItemInstanceEntity.setLastEnabledTime(getCurrentTime(commandContext));
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceEnabled(planItemInstanceEntity);
     }
-    
+
+    @Override
+    public void beforeLifecycleListenersExecution() {
+        // Special case: when there is a cross-border plan item instance activation, it goes from nothing to active immediately.
+        // This makes sure any 'nothing -> available' life cycle listener is also called
+        if (planItemInstanceEntity.getState() == null) {
+            PlanItemLifeCycleListenerUtil.callLifecycleListeners(commandContext, planItemInstanceEntity, PlanItemInstanceState.AVAILABLE, getNewState());
+        }
+    }
 }

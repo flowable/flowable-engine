@@ -12,14 +12,18 @@
  */
 package org.flowable.cmmn.editor.json.converter;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Map;
+
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
+import org.flowable.cmmn.editor.json.converter.util.ListenerConverterUtil;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.UserEventListener;
 
-import java.util.Map;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Dennis Federico
@@ -43,12 +47,14 @@ public class UserEventListenerJsonConverter extends BaseCmmnJsonConverter {
 
     @Override
     protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement, CmmnModel cmmnModel) {
-        //Standad properties only so far (documentation, id, name)
+        PlanItemDefinition planItemDefinition = ((PlanItem) baseElement).getPlanItemDefinition();
+        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, planItemDefinition);
     }
 
     @Override
     protected BaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnJsonConverter.CmmnModelIdHelper cmmnModelIdHelper) {
         UserEventListener userEventListener = new UserEventListener();
+        ListenerConverterUtil.convertJsonToLifeCycleListeners(elementNode, userEventListener);
         return userEventListener;
     }
 

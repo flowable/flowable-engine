@@ -17,6 +17,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
+import org.flowable.cmmn.editor.json.converter.util.ListenerConverterUtil;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanItem;
@@ -62,6 +63,8 @@ public class TimerEventListenerJsonConverter extends BaseCmmnJsonConverter {
             startTriggerPlanItemNode.put("id", timerEventListener.getTimerStartTriggerSourceRef());
             propertiesNode.put(PROPERTY_TIMER_START_TRIGGER_STANDARD_EVENT, timerEventListener.getTimerStartTriggerStandardEvent());
         }
+
+        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, timerEventListener);
     }
 
     @Override
@@ -84,6 +87,8 @@ public class TimerEventListenerJsonConverter extends BaseCmmnJsonConverter {
                 timerEventListener.setTimerStartTriggerStandardEvent(CmmnJsonConverterUtil.getPropertyValueAsString(CmmnStencilConstants.PROPERTY_TIMER_START_TRIGGER_STANDARD_EVENT, elementNode));
             }
         }
+
+        ListenerConverterUtil.convertJsonToLifeCycleListeners(elementNode, timerEventListener);
         
         return timerEventListener;
         

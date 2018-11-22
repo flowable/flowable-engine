@@ -23,7 +23,7 @@
 		<jackson.version>2.9.7</jackson.version>
 		<mule.version>3.8.0</mule.version>
         <camel.version>2.22.0</camel.version>
-		<cxf.version>3.2.6</cxf.version>
+		<cxf.version>3.2.7</cxf.version>
 		<slf4j.version>1.7.25</slf4j.version>
 		<spring.boot.version>2.0.6.RELEASE</spring.boot.version>
 
@@ -696,7 +696,7 @@
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
 				<artifactId>groovy-jsr223</artifactId>
-				<version>2.5.3</version>
+				<version>2.5.4</version>
 			</dependency>
 			<dependency>
 				<groupId>org.drools</groupId>
@@ -902,7 +902,7 @@
 			<dependency>
 				<groupId>joda-time</groupId>
 				<artifactId>joda-time</artifactId>
-				<version>2.10</version>
+				<version>2.10.1</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>

@@ -12,11 +12,14 @@
  */
 package org.flowable.cmmn.converter.export;
 
-import org.apache.commons.lang3.StringUtils;
-import org.flowable.cmmn.model.HumanTask;
+import java.util.List;
 
 import javax.xml.stream.XMLStreamWriter;
-import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.converter.CmmnXmlConstants;
+import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.HumanTask;
 
 public class HumanTaskExport extends AbstractPlanItemDefinitionExport<HumanTask> {
 
@@ -46,6 +49,7 @@ public class HumanTaskExport extends AbstractPlanItemDefinitionExport<HumanTask>
     @Override
     protected void writePlanItemDefinitionSpecificAttributes(HumanTask humanTask, XMLStreamWriter xtw) throws Exception {
         super.writePlanItemDefinitionSpecificAttributes(humanTask, xtw);
+
         TaskExport.writeCommonTaskAttributes(humanTask, xtw);
         if (StringUtils.isNotEmpty(humanTask.getAssignee())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_ASSIGNEE, humanTask.getAssignee());
@@ -69,4 +73,11 @@ public class HumanTaskExport extends AbstractPlanItemDefinitionExport<HumanTask>
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORM_KEY, humanTask.getFormKey());
         }
     }
+
+    @Override
+    protected boolean writePlanItemDefinitionExtensionElements(CmmnModel model, HumanTask humanTask, boolean didWriteExtensionElement, XMLStreamWriter xtw) throws Exception {
+        boolean extensionElementsWritten = super.writePlanItemDefinitionExtensionElements(model, humanTask, didWriteExtensionElement, xtw);
+        return FlowableListenerExport.writeFlowableListeners(xtw, CmmnXmlConstants.ELEMENT_TASK_LISTENER, humanTask.getTaskListeners(), extensionElementsWritten);
+    }
+
 }

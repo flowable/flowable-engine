@@ -31,6 +31,7 @@ import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.DecisionTask;
+import org.flowable.cmmn.model.GenericEventListener;
 import org.flowable.cmmn.model.GraphicInfo;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.Milestone;
@@ -58,6 +59,15 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
     // The instructions on how to draw a certain construct is
     // created statically and stored in a map for performance.
     public DefaultCaseDiagramGenerator(final double scaleFactor) {
+        // generic event listener
+        activityDrawInstructions.put(GenericEventListener.class, new ActivityDrawInstruction() {
+            @Override
+            public void draw(DefaultCaseDiagramCanvas caseDiagramCanvas, CmmnModel cmmnModel, CaseElement caseElement) {
+                GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(caseElement.getId());
+                caseDiagramCanvas.drawGenericEventListener(graphicInfo, scaleFactor);
+            }
+        });
+        
         // timer event listener
         activityDrawInstructions.put(TimerEventListener.class, new ActivityDrawInstruction() {
 

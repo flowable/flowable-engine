@@ -36,6 +36,7 @@ public class SentryXmlConverter extends CaseElementXmlConverter {
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         Sentry sentry = new Sentry();
         sentry.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
+        sentry.setTriggerMode(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_TRIGGER_MODE));
         
         conversionHelper.addSentryToCurrentPlanFragment(sentry);
         

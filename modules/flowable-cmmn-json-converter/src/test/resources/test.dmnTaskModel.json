@@ -38,7 +38,8 @@
             "name": "dmnTask",
             "documentation": "dmnTaskDocumentation",
             "decisiontaskdecisiontablereference": "dmnTableReference",
-            "decisiontaskthrowerroronnohits": false
+            "decisiontaskthrowerroronnohits": false,
+            "decisiontaskfallbacktodefaulttenant": true
           },
           "stencil": {
             "id": "DecisionTask"

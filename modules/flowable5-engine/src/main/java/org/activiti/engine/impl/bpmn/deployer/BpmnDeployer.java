@@ -304,7 +304,7 @@ public class BpmnDeployer implements Deployer {
                 try {
                     infoNode = (ObjectNode) objectMapper.readTree(infoBytes);
                 } catch (Exception e) {
-                    throw new ActivitiException("Error deserializing json info for process definition " + processDefinition.getId());
+                    throw new ActivitiException("Error deserializing json info for process definition " + processDefinition.getId(), e);
                 }
             }
         }

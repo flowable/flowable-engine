@@ -36,6 +36,7 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     protected String callbackType;
     protected String callbackId;
     protected String parentId;
+    protected boolean fallbackToDefaultTenant;
 
     public CaseInstanceBuilderImpl() {
         
@@ -140,10 +141,21 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     }
 
     @Override
+    public CaseInstanceBuilder fallbackToDefaultTenant() {
+        this.fallbackToDefaultTenant = true;
+        return this;
+    }
+
+    @Override
     public CaseInstance start() {
         return cmmnRuntimeService.startCaseInstance(this);
     }
     
+    @Override
+    public CaseInstance startAsync() {
+        return cmmnRuntimeService.startCaseInstanceAsync(this);
+    }
+
     @Override
     public CaseInstance startWithForm() {
         return cmmnRuntimeService.startCaseInstanceWithForm(this);
@@ -202,6 +214,11 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     @Override
     public String getParentId() {
         return this.parentId;
+    }
+
+    @Override
+    public boolean isFallbackToDefaultTenant() {
+        return this.fallbackToDefaultTenant;
     }
 
 }

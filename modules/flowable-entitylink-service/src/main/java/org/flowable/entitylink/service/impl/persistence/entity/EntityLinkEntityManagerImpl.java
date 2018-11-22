@@ -53,8 +53,8 @@ public class EntityLinkEntityManagerImpl extends AbstractEntityManager<EntityLin
     }
     
     @Override
-    public List<EntityLink> findEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String scopeType, String linkType) {
-        return entityLinkDataManager.findEntityLinksByReferenceScopeIdAndType(referenceScopeId, scopeType, linkType);
+    public List<EntityLink> findEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String referenceScopeType, String linkType) {
+        return entityLinkDataManager.findEntityLinksByReferenceScopeIdAndType(referenceScopeId, referenceScopeType, linkType);
     }
 
     @Override

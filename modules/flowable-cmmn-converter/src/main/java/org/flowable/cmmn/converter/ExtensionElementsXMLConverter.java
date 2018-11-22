@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.exception.XMLException;
 import org.flowable.cmmn.converter.util.CmmnXmlUtil;
+import org.flowable.cmmn.converter.util.ListenerXmlConverterUtil;
 import org.flowable.cmmn.model.AbstractFlowableHttpHandler;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CmmnElement;
@@ -33,17 +34,21 @@ import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.FlowableHttpRequestHandler;
 import org.flowable.cmmn.model.FlowableHttpResponseHandler;
+import org.flowable.cmmn.model.FlowableListener;
 import org.flowable.cmmn.model.HttpServiceTask;
+import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.PlanItemControl;
+import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.cmmn.model.ServiceTask;
-import org.flowable.cmmn.model.TaskWithFieldExtensions;
+import org.flowable.common.engine.api.FlowableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @auther Tijs Rademakers
+ * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
 
@@ -86,13 +91,22 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
                     } else if (CmmnXmlConstants.ELEMENT_PROCESS_TASK_OUT_PARAMETERS.equals(xtr.getLocalName())) {
                         readIOParameter(xtr, false, conversionHelper);
                         
+                    } else if (CmmnXmlConstants.ELEMENT_TASK_LISTENER.equals(xtr.getLocalName())) {
+                        readTaskListener(xtr, conversionHelper);
+
+                    } else if (CmmnXmlConstants.ELEMENT_PLAN_ITEM_LIFECYCLE_LISTENER.equals(xtr.getLocalName())) {
+                        readLifecycleListener(xtr, conversionHelper);
+
                     } else {
                         ExtensionElement extensionElement = CmmnXmlUtil.parseExtensionElement(xtr);
                         conversionHelper.getCurrentCmmnElement().addExtensionElement(extensionElement);
                     }
                     
                 } else if (xtr.isEndElement()) {
-                    if (CmmnXmlConstants.ELEMENT_EXTENSION_ELEMENTS.equalsIgnoreCase(xtr.getLocalName())) {
+                    if (CmmnXmlConstants.ELEMENT_TASK_LISTENER.equalsIgnoreCase(xtr.getLocalName())
+                        || CmmnXmlConstants.ELEMENT_PLAN_ITEM_LIFECYCLE_LISTENER.equalsIgnoreCase(xtr.getLocalName())) {
+                        conversionHelper.removeCurrentCmmnElement();
+                    } else if (CmmnXmlConstants.ELEMENT_EXTENSION_ELEMENTS.equalsIgnoreCase(xtr.getLocalName())) {
                         readyWithChildElements = true;
                     }
                 }
@@ -145,12 +159,7 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
     }
     
     protected void readFieldExtension(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        CmmnElement cmmnElement = conversionHelper.getCurrentCmmnElement();
-        if (!(cmmnElement instanceof ServiceTask || cmmnElement instanceof DecisionTask)) {
-            return;
-        }
-
-        TaskWithFieldExtensions serviceTask = (TaskWithFieldExtensions) cmmnElement;
+        BaseElement cmmnElement = conversionHelper.getCurrentCmmnElement();
 
         FieldExtension extension = new FieldExtension();
         extension.setFieldName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
@@ -183,11 +192,23 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
             }
         }
 
-        serviceTask.getFieldExtensions().add(extension);
+        CmmnElement currentCmmnElement = conversionHelper.getCurrentCmmnElement();
+        if (currentCmmnElement instanceof ServiceTask) {
+            ((ServiceTask) currentCmmnElement).getFieldExtensions().add(extension);
+
+        } else if (currentCmmnElement instanceof DecisionTask) {
+            ((DecisionTask) currentCmmnElement).getFieldExtensions().add(extension);
+        } else if (currentCmmnElement instanceof FlowableListener) {
+            ((FlowableListener) currentCmmnElement).getFieldExtensions().add(extension);
+
+        } else {
+            throw new FlowableException("Programmatic error: field added to unkown element " + currentCmmnElement);
+
+        }
     }
     
     protected void readHttpRequestHandler(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        CmmnElement cmmnElement = conversionHelper.getCurrentCmmnElement();
+        BaseElement cmmnElement = conversionHelper.getCurrentCmmnElement();
         if (!(cmmnElement instanceof HttpServiceTask)) {
             return;
         }
@@ -199,7 +220,7 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
     }
     
     protected void readHttpResponseHandler(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        CmmnElement cmmnElement = conversionHelper.getCurrentCmmnElement();
+        BaseElement cmmnElement = conversionHelper.getCurrentCmmnElement();
         if (!(cmmnElement instanceof HttpServiceTask)) {
             return;
         }
@@ -240,6 +261,39 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
         } else {
             processTask.getOutParameters().add(parameter);
         }
+    }
+
+    protected void readTaskListener(XMLStreamReader xtr, ConversionHelper conversionHelper) {
+        BaseElement currentCmmnElement = conversionHelper.getCurrentCmmnElement(); // needs to be captured before setting the flowable listeners as this will change the current element
+
+        FlowableListener flowableListener = ListenerXmlConverterUtil.convertToListener(xtr);
+        if (flowableListener != null) {
+            if (currentCmmnElement instanceof HumanTask) {
+                HumanTask humanTask = (HumanTask) currentCmmnElement;
+                humanTask.getTaskListeners().add(flowableListener);
+            } else {
+                throw new FlowableException("Programmatic error: task listener added to an element that's not a human task, but a" + currentCmmnElement.getClass());
+            }
+        }
+
+        conversionHelper.setCurrentCmmnElement(flowableListener);
+    }
+
+    protected void readLifecycleListener(XMLStreamReader xtr, ConversionHelper conversionHelper) {
+        BaseElement currentCmmnElement = conversionHelper.getCurrentCmmnElement(); // needs to be captured before setting the flowable listeners as this will change the current element
+
+        FlowableListener flowableListener = ListenerXmlConverterUtil.convertToListener(xtr);
+        if (flowableListener != null) {
+            if (currentCmmnElement instanceof PlanItemDefinition) {
+                PlanItemDefinition planItemDefinition = (PlanItemDefinition) currentCmmnElement;
+                planItemDefinition.getLifecycleListeners().add(flowableListener);
+            } else {
+                throw new FlowableException("Programmatic error: task listener added to an element that's not a plan item definition, but a " + currentCmmnElement.getClass());
+            }
+        }
+
+        conversionHelper.setCurrentCmmnElement(flowableListener);
+
     }
     
     protected void setImplementation(XMLStreamReader xtr, AbstractFlowableHttpHandler handler) {

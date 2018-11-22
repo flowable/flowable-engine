@@ -334,7 +334,7 @@ public class BpmnParse implements BpmnXMLConstants {
                     this.importers.put(theImport.getImportType(), newInstance);
                     return newInstance;
                 } catch (Exception e) {
-                    throw new ActivitiException("Could not find importer for type " + theImport.getImportType());
+                    throw new ActivitiException("Could not find importer for type " + theImport.getImportType(), e);
                 }
             }
             return null;

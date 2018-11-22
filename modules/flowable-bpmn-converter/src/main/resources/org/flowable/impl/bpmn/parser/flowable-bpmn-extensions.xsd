@@ -761,6 +761,14 @@
 
   </attribute>
 
+  <attribute name="fallbackToDefaultTenant" type="boolean">
+    <annotation>
+      <documentation>
+		To be used on the callActivity element to search for process definition in the default tenant in the case when no definition was found in the current tenant
+      </documentation>
+    </annotation>
+  </attribute>
+
   <attribute name="businessKey" type="tns:tExpression">
     <annotation>
       <documentation>
@@ -791,4 +799,13 @@
       <attribute name="name" type="string" use="required" />
     </complexType>
   </element>
+
+  <attribute name="autoStoreVariables" type="boolean" default="false">
+    <annotation>
+      <documentation>
+        Optional script task attribute flag (default: false) that indicates whether or not variables defined in the script will be stored
+        in the Execution instance context.
+      </documentation>
+    </annotation>
+  </attribute>
 </schema>

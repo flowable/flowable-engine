@@ -23,6 +23,7 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseInstanceDataManager;
@@ -92,11 +93,20 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
             // Map all plan item instances to its id
             for (PlanItemInstanceEntity planItemInstanceEntity : allPlanItemInstances) {
 
-                // Mapping
-                planItemInstanceMap.put(planItemInstanceEntity.getId(), planItemInstanceEntity);
+                // If it's already in the cache, it has precedence on the fetched one
+                PlanItemInstanceEntity planItemInstanceFromCache = entityCache.findInCache(PlanItemInstanceEntityImpl.class, planItemInstanceEntity.getId());
+                if (planItemInstanceFromCache != null) {
+                    // Mapping
+                    planItemInstanceMap.put(planItemInstanceFromCache.getId(), planItemInstanceFromCache);
 
-                // Cache
-                entityCache.put(planItemInstanceEntity, true);
+                } else {
+                    // Mapping
+                    planItemInstanceMap.put(planItemInstanceEntity.getId(), planItemInstanceEntity);
+
+                    // Cache
+                    entityCache.put(planItemInstanceEntity, true);
+
+                }
 
                 // plan items of case plan model
                 if (planItemInstanceEntity.getStageInstanceId() == null) {
@@ -113,7 +123,7 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
                 for (PlanItemInstanceEntity planItemInstanceEntity : allPlanItemInstances) {
                     if (planItemInstanceEntity.getStageInstanceId() != null) {
                         PlanItemInstanceEntity parentPlanItemInstanceEntity = planItemInstanceMap.get(planItemInstanceEntity.getStageInstanceId());
-                        parentPlanItemInstanceEntity.getChildPlanItemInstances().add(planItemInstanceEntity);
+                        parentPlanItemInstanceEntity.getChildPlanItemInstances().add(planItemInstanceMap.get(planItemInstanceEntity.getId()));
                     }
                 }
             }
