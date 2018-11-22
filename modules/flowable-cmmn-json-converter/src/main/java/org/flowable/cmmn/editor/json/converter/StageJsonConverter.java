@@ -17,6 +17,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
+import org.flowable.cmmn.editor.json.converter.util.ListenerConverterUtil;
 import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseElement;
@@ -71,6 +72,9 @@ public class StageJsonConverter extends BaseCmmnJsonConverter implements FormAwa
         if (stage.getDisplayOrder() != null) {
             propertiesNode.put(PROPERTY_DISPLAY_ORDER, stage.getDisplayOrder());
         }
+        if (stage.isIncludeInStageOverview())  {
+            propertiesNode.put(PROPERTY_INCLUDE_IN_STAGE_OVERVIEW, true);
+        }
 
         GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(planItem.getId());
         ArrayNode subProcessShapesArrayNode = objectMapper.createArrayNode();
@@ -78,6 +82,8 @@ public class StageJsonConverter extends BaseCmmnJsonConverter implements FormAwa
         processor.processPlanItems(stage, cmmnModel, subProcessShapesArrayNode, formKeyMap, decisionTableKeyMap, graphicInfo.getX(), graphicInfo.getY());
         
         elementNode.set("childShapes", subProcessShapesArrayNode);
+
+        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, stage);
     }
     
     @Override
@@ -92,7 +98,10 @@ public class StageJsonConverter extends BaseCmmnJsonConverter implements FormAwa
             stage.setAutoCompleteCondition(autoCompleteCondition);
         }
 
-        stage.setDisplayOrder(CmmnJsonConverterUtil.getPropertyValueAsInteger(CmmnStencilConstants.PROPERTY_DISPLAY_ORDER, elementNode));
+        stage.setDisplayOrder(CmmnJsonConverterUtil
+            .getPropertyValueAsInteger(CmmnStencilConstants.PROPERTY_DISPLAY_ORDER, elementNode));
+        stage.setIncludeInStageOverview(CmmnJsonConverterUtil
+            .getPropertyValueAsBoolean(CmmnStencilConstants.PROPERTY_INCLUDE_IN_STAGE_OVERVIEW, elementNode, true));
 
         JsonNode childShapesArray = elementNode.get(EDITOR_CHILD_SHAPES);
         processor.processJsonElements(childShapesArray, modelNode, stage, shapeMap, formMap, decisionTableMap, 
@@ -100,6 +109,8 @@ public class StageJsonConverter extends BaseCmmnJsonConverter implements FormAwa
         
         Stage parentStage = (Stage) parentElement;
         stage.setParent(parentStage);
+
+        ListenerConverterUtil.convertJsonToLifeCycleListeners(elementNode, stage);
 
         return stage;
     }

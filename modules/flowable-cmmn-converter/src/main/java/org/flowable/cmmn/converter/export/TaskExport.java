@@ -16,7 +16,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.Task;
 import org.flowable.cmmn.model.TaskWithFieldExtensions;
 
@@ -24,29 +23,7 @@ public class TaskExport extends AbstractPlanItemDefinitionExport<Task> {
 
 
     protected static <T extends TaskWithFieldExtensions> boolean writeTaskFieldExtensions(T task, boolean didWriteExtensionElement, XMLStreamWriter xtw) throws XMLStreamException {
-        if (task.getFieldExtensions().size() > 0) {
-            if (!didWriteExtensionElement) {
-                xtw.writeStartElement(ELEMENT_EXTENSION_ELEMENTS);
-                didWriteExtensionElement = true;
-            }
-
-            for (FieldExtension fieldExtension : task.getFieldExtensions()) {
-                xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_FIELD, FLOWABLE_EXTENSIONS_NAMESPACE);
-                xtw.writeAttribute(ATTRIBUTE_NAME, fieldExtension.getFieldName());
-
-                if (StringUtils.isNotEmpty(fieldExtension.getStringValue())) {
-                    xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_FIELD_STRING, FLOWABLE_EXTENSIONS_NAMESPACE);
-                    xtw.writeCData(fieldExtension.getStringValue());
-                } else {
-                    xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ATTRIBUTE_FIELD_EXPRESSION, FLOWABLE_EXTENSIONS_NAMESPACE);
-                    xtw.writeCData(fieldExtension.getExpression());
-                }
-                xtw.writeEndElement();
-                xtw.writeEndElement();
-            }
-        }
-        
-        return didWriteExtensionElement;
+        return FieldExport.writeFieldExtensions(task.getFieldExtensions(), didWriteExtensionElement, xtw);
     }
 
     protected static <T extends Task> void writeCommonTaskAttributes(T task, XMLStreamWriter xtw) throws Exception {

@@ -40,9 +40,6 @@ public class ActivatePlanItemInstanceOperation extends AbstractPlanItemInstanceO
         if (isAsync() && !PlanItemInstanceState.ASYNC_ACTIVE.equals(planItemInstanceEntity.getState())) {
             CommandContextUtil.getAgenda(commandContext).planActivateAsyncPlanItemInstanceOperation(planItemInstanceEntity, entryCriterionId);
         } else {
-            // Sentries are not needed to be kept around, as the plan item is being enabled
-            deleteSentryPartInstances();
-
             if (entryCriterionId != null) {
                 planItemInstanceEntity.setEntryCriterionId(entryCriterionId);
             }

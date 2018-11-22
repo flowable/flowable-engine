@@ -50,9 +50,21 @@ public interface CmmnXmlConstants {
     String ELEMENT_DECISION_TASK = "decisionTask";
     String ELEMENT_TIMER_EVENT_LISTENER = "timerEventListener";
     String ELEMENT_USER_EVENT_LISTENER = "userEventListener";
+    String ELEMENT_GENERIC_EVENT_LISTENER = "eventListener";
     String ELEMENT_PLAN_ITEM = "planItem";
     String ELEMENT_ITEM_CONTROL = "itemControl";
     String ELEMENT_DEFAULT_CONTROL = "defaultControl";
+
+    String ELEMENT_TASK_LISTENER = "taskListener";
+    String ELEMENT_PLAN_ITEM_LIFECYCLE_LISTENER = "planItemLifecycleListener";
+    public static final String ATTRIBUTE_LISTENER_CLASS = "class";
+    public static final String ATTRIBUTE_LISTENER_EXPRESSION = "expression";
+    public static final String ATTRIBUTE_LISTENER_DELEGATEEXPRESSION = "delegateExpression";
+    public static final String ATTRIBUTE_LISTENER_EVENT = "event";
+    public static final String ATTRIBUTE_LISTENER_SOURCE_STATE = "sourceState";
+    public static final String ATTRIBUTE_LISTENER_TARGET_STATE = "targetState";
+    public static final String ATTRIBUTE_LISTENER_ON_TRANSACTION = "onTransaction";
+
     String ELEMENT_SENTRY = "sentry";
     String ELEMENT_PLAN_ITEM_ON_PART = "planItemOnPart";
     String ELEMENT_STANDARD_EVENT = "standardEvent";
@@ -62,6 +74,8 @@ public interface CmmnXmlConstants {
     String ELEMENT_EXTENSION_ELEMENTS = "extensionElements";
     String ELEMENT_HTTP_RESPONSE_HANDLER = "httpResponseHandler";
     String ELEMENT_HTTP_REQUEST_HANDLER = "httpRequestHandler";
+
+    String ATTRIBUTE_TRIGGER_MODE = "triggerMode";
 
     String ELEMENT_REQUIRED_RULE = "requiredRule";
     String ELEMENT_MANUAL_ACTIVATION_RULE = "manualActivationRule";
@@ -91,10 +105,12 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_AUTO_COMPLETE_CONDITION = "autoCompleteCondition";
 
     String ATTRIBUTE_DISPLAY_ORDER = "displayOrder";
+    String ATTRIBUTE_INCLUDE_IN_STAGE_OVERVIEW = "includeInStageOverview";
 
     String ATTRIBUTE_CASE_REF = "caseRef";
     String ATTRIBUTE_PROCESS_REF = "processRef";
     String ATTRIBUTE_DECISION_REF = "decisionRef";
+    String ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT = "fallbackToDefaultTenant";
 
     String ELEMENT_PROCESS_REF_EXPRESSION = "processRefExpression";
     String ELEMENT_DECISION_REF_EXPRESSION = "decisionRefExpression";

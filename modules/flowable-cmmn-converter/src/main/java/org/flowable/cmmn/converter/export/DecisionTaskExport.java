@@ -38,7 +38,8 @@ public class DecisionTaskExport extends AbstractPlanItemDefinitionExport<Decisio
     
     @Override
     protected boolean writePlanItemDefinitionExtensionElements(CmmnModel model, DecisionTask decisionTask, boolean didWriteExtensionElement, XMLStreamWriter xtw) throws Exception {
-        return TaskExport.writeTaskFieldExtensions(decisionTask, didWriteExtensionElement, xtw);
+        boolean extensionElementWritten = super.writePlanItemDefinitionExtensionElements(model, decisionTask, didWriteExtensionElement, xtw);
+        return TaskExport.writeTaskFieldExtensions(decisionTask, extensionElementWritten, xtw);
     }
 
     @Override

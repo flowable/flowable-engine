@@ -86,6 +86,10 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
             assertResultsPresentInDataResponse(url + "?caseInstanceId=" + caseInstance.getId(), 2, task.getId());
     
             assertResultsPresentInDataResponse(url + "?caseInstanceId=" + caseInstance2.getId(), 1, task2.getId());
+            
+            assertResultsPresentInDataResponse(url + "?caseInstanceIdWithChildren=" + caseInstance.getId(), 2, task.getId());
+            
+            assertResultsPresentInDataResponse(url + "?caseInstanceIdWithChildren=nonexisting", 0);
     
             assertResultsPresentInDataResponse(url + "?taskAssignee=kermit", 2, task2.getId());
     

@@ -12,15 +12,13 @@
  */
 package org.flowable.cmmn.editor.json.converter;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
+import org.flowable.cmmn.editor.json.converter.util.ListenerConverterUtil;
 import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CmmnModel;
@@ -31,6 +29,9 @@ import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ScriptServiceTask;
 import org.flowable.cmmn.model.ServiceTask;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
@@ -82,6 +83,7 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
                     BaseElement baseElement, CmmnModel cmmnModel) {
 
         ServiceTask serviceTask = (ServiceTask) ((PlanItem) baseElement).getPlanItemDefinition();
+        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, serviceTask);
 
         if (HttpServiceTask.HTTP_TASK.equalsIgnoreCase(serviceTask.getType())) {
             if (StringUtils.isNotEmpty(serviceTask.getImplementation())) {
@@ -174,6 +176,8 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
                 }
             }
         }
+
+        ListenerConverterUtil.convertJsonToLifeCycleListeners(elementNode, task);
 
         return task;
     }

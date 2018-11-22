@@ -61,7 +61,7 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
         try {
             bytes = IOUtils.toByteArray(inputStream);
         } catch (Exception e) {
-            throw new FlowableException("could not get byte array from resource '" + resourceName + "'");
+            throw new FlowableException("could not get byte array from resource '" + resourceName + "'", e);
         }
 
         if (bytes == null) {

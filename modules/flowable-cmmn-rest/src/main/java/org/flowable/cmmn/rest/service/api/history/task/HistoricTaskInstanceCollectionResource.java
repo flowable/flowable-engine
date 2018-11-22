@@ -43,6 +43,7 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
     @ApiImplicitParams({
             @ApiImplicitParam(name = "taskId", dataType = "string", value = "An id of the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "caseInstanceId", dataType = "string", value = "The case instance id of the historic task instance.", paramType = "query"),
+            @ApiImplicitParam(name = "caseInstanceIdWithChildren", dataType = "string", value = "Selects the historic task instance of a case instance and its children.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "The case definition id of the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "taskDefinitionKey", dataType = "string", value = "The task definition key for tasks part of a process", paramType = "query"),
             @ApiImplicitParam(name = "taskName", dataType = "string", value = "The task name of the historic task instance.", paramType = "query"),
@@ -91,6 +92,10 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
 
         if (allRequestParams.get("caseInstanceId") != null) {
             queryRequest.setCaseInstanceId(allRequestParams.get("caseInstanceId"));
+        }
+        
+        if (allRequestParams.get("caseInstanceIdWithChildren") != null) {
+            queryRequest.setCaseInstanceIdWithChildren(allRequestParams.get("caseInstanceIdWithChildren"));
         }
 
         if (allRequestParams.get("caseDefinitionId") != null) {

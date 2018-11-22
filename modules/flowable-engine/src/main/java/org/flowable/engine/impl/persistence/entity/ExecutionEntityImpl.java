@@ -287,8 +287,10 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         this.currentFlowElement = currentFlowElement;
         if (currentFlowElement != null) {
             this.activityId = currentFlowElement.getId();
+            this.activityName = currentFlowElement.getName();
         } else {
             this.activityId = null;
+            this.activityName = null;
         }
     }
 
@@ -1086,6 +1088,10 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     }
 
     public String getActivityName() {
+        return activityName;
+    }
+
+    public String getCurrentActivityName() {
         return activityName;
     }
 

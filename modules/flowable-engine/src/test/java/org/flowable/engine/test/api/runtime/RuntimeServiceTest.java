@@ -15,6 +15,7 @@ package org.flowable.engine.test.api.runtime;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
@@ -37,6 +38,7 @@ import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
+import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
@@ -94,7 +96,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
             runtimeService.startProcessInstanceByKey("unexistingkey");
             fail("ActivitiException expected");
         } catch (FlowableObjectNotFoundException ae) {
-            assertTextPresent("no processes deployed with key", ae.getMessage());
+            assertTextPresent("No process definition found for key 'unexistingkey'", ae.getMessage());
             assertEquals(ProcessDefinition.class, ae.getObjectClass());
         }
     }
@@ -115,7 +117,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
             runtimeService.startProcessInstanceById("unexistingId");
             fail("ActivitiException expected");
         } catch (FlowableObjectNotFoundException ae) {
-            assertTextPresent("no deployed process definition found with id", ae.getMessage());
+            assertTextPresent("No process definition found for id = 'unexistingId'", ae.getMessage());
             assertEquals(ProcessDefinition.class, ae.getObjectClass());
         }
     }
@@ -207,6 +209,73 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testStartProcessInstanceByProcessInstanceBuilderAsync() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+
+        ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
+
+        // by key
+        ProcessInstance processInstance = processInstanceBuilder.processDefinitionKey("oneTaskProcess").businessKey("123").startAsync();
+        assertNotNull(processInstance);
+        assertEquals("123", processInstance.getBusinessKey());
+        assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+        assertEquals("Process is started, but its execution waits on the job",
+            0, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 2000, 200);
+        assertEquals("The task is created from the job execution",
+            1, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testStartProcessInstanceByProcessInstanceBuilderAsyncWithDefinitionId() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+
+        ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
+
+        // by definitionId
+        ProcessInstance processInstance = processInstanceBuilder.processDefinitionId(processDefinition.getId()).businessKey("123").startAsync();
+        assertNotNull(processInstance);
+        assertEquals("123", processInstance.getBusinessKey());
+        assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+        assertEquals("Process is started, but its execution waits on the job",
+            0, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 2000, 200);
+        assertEquals("The task is created from the job execution",
+            1, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+    }
+
+    @Test
+    public void testStartProcessInstanceByProcessInstanceBuilderAsyncWithoutKeyAndDefinitionId() {
+        ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
+
+        assertThatThrownBy(() -> processInstanceBuilder.startAsync())
+            .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+            .hasMessage("No processDefinitionId, processDefinitionKey provided");
+    }
+
+    @Test
+    public void testStartProcessInstanceByProcessInstanceBuilderAsyncWithNonExistingDefKey() {
+        ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
+
+        assertThatThrownBy(() -> processInstanceBuilder.processDefinitionKey("nonExistingKey").startAsync())
+            .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
+            .hasMessage("No process definition found for key 'nonExistingKey'");
+    }
+
+    @Test
+    public void testStartProcessInstanceByProcessInstanceBuilderAsyncWithNonExistingDefId() {
+        ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
+
+        assertThatThrownBy(() -> processInstanceBuilder.processDefinitionId("nonExistingDefinitionId").startAsync())
+            .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
+            .hasMessage("No process definition found for id = 'nonExistingDefinitionId'");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testProcessInstanceDefinitionInformation() {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
         ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
@@ -242,56 +311,56 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
     }
-    
+
     @Test
     public void testStartProcessInstanceByProcessInstanceBuilderWithOverrideTenantId() {
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment()
-                        .addClasspathResource("org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
-                        .tenantId("flowable")
-                        .deploy();
-        
+            .addClasspathResource("org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+            .tenantId("flowable")
+            .deploy();
+
         try {
             ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
 
             ProcessInstance processInstance = processInstanceBuilder.processDefinitionKey("oneTaskProcess")
-                            .businessKey("123")
-                            .tenantId("flowable")
-                            .overrideProcessDefinitionTenantId("customTenant")
-                            .start();
-            
+                .businessKey("123")
+                .tenantId("flowable")
+                .overrideProcessDefinitionTenantId("customTenant")
+                .start();
+
             assertNotNull(processInstance);
             assertEquals("123", processInstance.getBusinessKey());
             assertEquals("customTenant", processInstance.getTenantId());
 
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             assertThat(task.getTenantId(), is("customTenant"));
-            
+
         } finally {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
     }
-    
+
     @Test
     public void testStartProcessInstanceByProcessInstanceBuilderWithDefaultDefinitionTenantId() {
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment()
-                        .addClasspathResource("org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
-                        .deploy();
-        
+            .addClasspathResource("org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+            .deploy();
+
         try {
             ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
 
             ProcessInstance processInstance = processInstanceBuilder.processDefinitionKey("oneTaskProcess")
-                            .businessKey("123")
-                            .overrideProcessDefinitionTenantId("customTenant")
-                            .start();
-            
+                .businessKey("123")
+                .overrideProcessDefinitionTenantId("customTenant")
+                .start();
+
             assertNotNull(processInstance);
             assertEquals("123", processInstance.getBusinessKey());
             assertEquals("customTenant", processInstance.getTenantId());
 
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             assertThat(task.getTenantId(), is("customTenant"));
-            
+
         } finally {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
@@ -1215,4 +1284,93 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertThat(processInstance.getCallbackId(), is("nonExistingCase"));
         assertThat(processInstance.getCallbackType(), is(CallbackTypes.CASE_ADHOC_CHILD));
     }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testStartByProcessInstanceBuilderWithFallbackToDefaultTenant() {
+        ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
+
+        ProcessInstance processInstance = processInstanceBuilder.processDefinitionKey("oneTaskProcess").
+            tenantId("flowable").
+            fallbackToDefaultTenant().
+            start();
+
+        assertThat(processInstance, is(notNullValue()));
+    }
+
+    @Test
+    public void testStartByProcessInstanceBuilderWithFallbackToDefaultTenant_definitionNotFound() {
+        ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
+
+        assertThatThrownBy(
+            () -> processInstanceBuilder.processDefinitionKey("nonExistingDefinition").
+                tenantId("flowable").
+                fallbackToDefaultTenant().
+                start()
+        ).
+            isExactlyInstanceOf(FlowableObjectNotFoundException.class).
+            hasMessage("No process definition found for key 'nonExistingDefinition'. Fallback to default tenant was also applied.");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" },
+        tenantId = "nonDefaultTenant"
+    )
+    public void testStartByProcessInstanceBuilderWithFallbackToDefaultTenant_definitionNotFoundInNonDefaultTenant() {
+        ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
+
+        assertThatThrownBy(
+            () -> processInstanceBuilder.processDefinitionKey("oneTaskProcess").
+                tenantId("flowable").
+                fallbackToDefaultTenant().
+                start()
+        ).
+            isExactlyInstanceOf(FlowableObjectNotFoundException.class).
+            hasMessage("No process definition found for key 'oneTaskProcess'. Fallback to default tenant was also applied.");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testStartAsyncWithFallbackToDefaultTenant() {
+        ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
+
+        ProcessInstance processInstance = processInstanceBuilder.processDefinitionKey("oneTaskProcess").
+            tenantId("flowable").
+            fallbackToDefaultTenant().
+            startAsync();
+
+        assertThat(processInstance, is(notNullValue()));
+    }
+
+    @Test
+    public void testStartAsyncWithFallbackToDefaultTenant_definitionNotFound() {
+        ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
+
+        assertThatThrownBy(
+            () -> processInstanceBuilder.processDefinitionKey("nonExistingDefinition").
+                tenantId("flowable").
+                fallbackToDefaultTenant().
+                startAsync()
+        ).
+            isExactlyInstanceOf(FlowableObjectNotFoundException.class).
+            hasMessage("No process definition found for key 'nonExistingDefinition'. Fallback to default tenant was also applied.");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" },
+        tenantId = "nonDefaultTenant"
+    )
+    public void testStartAsyncWithFallbackToDefaultTenant_definitionNotFoundInNonDefaultTenant() {
+        ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
+
+        assertThatThrownBy(
+            () -> processInstanceBuilder.processDefinitionKey("oneTaskProcess").
+                tenantId("flowable").
+                fallbackToDefaultTenant().
+                startAsync()
+        ).
+            isExactlyInstanceOf(FlowableObjectNotFoundException.class).
+            hasMessage("No process definition found for key 'oneTaskProcess'. Fallback to default tenant was also applied.");
+    }
+
 }

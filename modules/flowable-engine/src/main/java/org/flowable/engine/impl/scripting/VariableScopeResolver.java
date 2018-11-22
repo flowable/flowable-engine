@@ -13,7 +13,9 @@
 package org.flowable.engine.impl.scripting;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -43,9 +45,9 @@ public class VariableScopeResolver implements Resolver {
     protected static final String formServiceKey = "formService";
     protected static final String identityServiceKey = "identityServiceKey";
 
-    protected static final List<String> KEYS = Arrays.asList(
-            processEngineConfigurationKey, runtimeServiceKey, taskServiceKey,
-            repositoryServiceKey, managementServiceKey, historyServiceKey, formServiceKey, identityServiceKey);
+    protected static final Set<String> KEYS = new HashSet<>(Arrays.asList(
+        processEngineConfigurationKey, runtimeServiceKey, taskServiceKey,
+        repositoryServiceKey, managementServiceKey, historyServiceKey, formServiceKey, identityServiceKey));
 
     public VariableScopeResolver(ProcessEngineConfigurationImpl processEngineConfiguration, VariableScope variableScope) {
 

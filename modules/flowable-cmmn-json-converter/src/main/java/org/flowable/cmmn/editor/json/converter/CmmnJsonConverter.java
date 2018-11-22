@@ -479,7 +479,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
                 // The modeler json has referenced the plan item definition. Swapping it with the plan item id when found.
                 String startTriggerSourceRef = timerEventListener.getTimerStartTriggerSourceRef();
                 if (StringUtils.isNotEmpty(startTriggerSourceRef)) {
-                    PlanItemDefinition referencedPlanItemDefinition = parentStage.findPlanItemDefinition(startTriggerSourceRef);
+                    PlanItemDefinition referencedPlanItemDefinition = parentStage.findPlanItemDefinitionInStageOrUpwards(startTriggerSourceRef);
                     timerEventListener.setTimerStartTriggerSourceRef(referencedPlanItemDefinition.getPlanItemRef());
                 }
             }

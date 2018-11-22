@@ -7,7 +7,7 @@
    <!-- INSERT HISTORIC ENTITY LINK -->
   
   <insert id="insertHistoricEntityLink" parameterType="org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntityImpl">
-    insert into ${prefix}ACT_HI_ENTITYLINK (ID_, LINK_TYPE_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_, CREATE_TIME_)
+    insert into ${prefix}ACT_HI_ENTITYLINK (ID_, LINK_TYPE_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_, CREATE_TIME_, ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_, ROOT_SCOPE_DEFINITION_ID_)
     values (#{id, jdbcType=VARCHAR},
             #{linkType, jdbcType=VARCHAR},
             #{scopeId, jdbcType=VARCHAR},
@@ -16,11 +16,14 @@
             #{referenceScopeId, jdbcType=VARCHAR},
             #{referenceScopeType, jdbcType=VARCHAR},
             #{referenceScopeDefinitionId, jdbcType=VARCHAR},
-            #{createTime, jdbcType=TIMESTAMP})
+            #{createTime, jdbcType=TIMESTAMP},
+            #{rootScopeId, jdbcType=VARCHAR},
+            #{rootScopeType, jdbcType=VARCHAR},
+            #{rootScopeDefinitionId, jdbcType=VARCHAR})
   </insert>
   
   <insert id="bulkInsertHistoricEntityLink" parameterType="java.util.List">
-    insert into ${prefix}ACT_HI_ENTITYLINK (ID_, LINK_TYPE_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_, CREATE_TIME_)
+    insert into ${prefix}ACT_HI_ENTITYLINK (ID_, LINK_TYPE_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_, CREATE_TIME_, ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_, ROOT_SCOPE_DEFINITION_ID_)
     values 
       <foreach collection="list" item="historicEntityLink" index="index" separator=",">
         (#{historicEntityLink.id, jdbcType=VARCHAR},
@@ -31,14 +34,17 @@
          #{historicEntityLink.referenceScopeId, jdbcType=VARCHAR},
          #{historicEntityLink.referenceScopeType, jdbcType=VARCHAR},
          #{historicEntityLink.referenceScopeDefinitionId, jdbcType=VARCHAR},
-         #{historicEntityLink.createTime, jdbcType=TIMESTAMP})
+         #{historicEntityLink.createTime, jdbcType=TIMESTAMP},
+         #{historicEntityLink.rootScopeId, jdbcType=VARCHAR},
+         #{historicEntityLink.rootScopeType, jdbcType=VARCHAR},
+         #{historicEntityLink.rootScopeDefinitionId, jdbcType=VARCHAR})
       </foreach>
   </insert>
   
   <insert id="bulkInsertHistoricEntityLink" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL 
       <foreach collection="list" item="historicEntityLink" index="index">
-        INTO ${prefix}ACT_HI_ENTITYLINK (ID_, LINK_TYPE_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_, CREATE_TIME_) VALUES 
+        INTO ${prefix}ACT_HI_ENTITYLINK (ID_, LINK_TYPE_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_, CREATE_TIME_, ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_, ROOT_SCOPE_DEFINITION_ID_) VALUES
           (#{historicEntityLink.id, jdbcType=VARCHAR},
            #{historicEntityLink.linkType, jdbcType=VARCHAR},
            #{historicEntityLink.scopeId, jdbcType=VARCHAR},
@@ -47,7 +53,10 @@
            #{historicEntityLink.referenceScopeId, jdbcType=VARCHAR},
            #{historicEntityLink.referenceScopeType, jdbcType=VARCHAR},
            #{historicEntityLink.referenceScopeDefinitionId, jdbcType=VARCHAR},
-           #{historicEntityLink.createTime, jdbcType=TIMESTAMP})
+           #{historicEntityLink.createTime, jdbcType=TIMESTAMP},
+           #{historicEntityLink.rootScopeId, jdbcType=VARCHAR},
+           #{historicEntityLink.rootScopeType, jdbcType=VARCHAR},
+           #{historicEntityLink.rootScopeDefinitionId, jdbcType=VARCHAR})
       </foreach>
     SELECT * FROM dual
   </insert>
@@ -84,7 +93,10 @@
     <result property="referenceScopeId" column="REF_SCOPE_ID_" jdbcType="VARCHAR"/>
     <result property="referenceScopeType" column="REF_SCOPE_TYPE_" jdbcType="VARCHAR"/>
     <result property="referenceScopeDefinitionId" column="REF_SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
-    <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />       
+    <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
+    <result property="rootScopeId" column="ROOT_SCOPE_ID_" jdbcType="VARCHAR"/>
+    <result property="rootScopeType" column="ROOT_SCOPE_TYPE_" jdbcType="VARCHAR"/>
+    <result property="rootScopeDefinitionId" column="ROOT_SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!-- HISTORIC ENTITY LINK SELECT -->
@@ -92,11 +104,15 @@
   <select id="selectHistoricEntityLink" parameterType="string" resultMap="historicEntityLinkResultMap">
     select * from ${prefix}ACT_HI_ENTITYLINK where ID_ = #{id, jdbcType=VARCHAR}
   </select>
-  
+
   <select id="selectHistoricEntityLinksByScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicEntityLinkResultMap">
     select * from ${prefix}ACT_HI_ENTITYLINK where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType}
   </select>
-  
+
+  <select id="selectHistoricEntityLinksByReferenceScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicEntityLinkResultMap">
+    select * from ${prefix}ACT_HI_ENTITYLINK where REF_SCOPE_ID_ = #{parameter.referenceScopeId} and REF_SCOPE_TYPE_ = #{parameter.referenceScopeType} and LINK_TYPE_ = #{parameter.linkType}
+  </select>
+
   <select id="selectHistoricEntityLinksByScopeDefinitionIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicEntityLinkResultMap">
     select * from ${prefix}ACT_HI_ENTITYLINK where SCOPE_DEFINITION_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType}
   </select>

@@ -45,6 +45,7 @@ public class TaskQueryRequest extends PaginateRequest {
     private List<String> candidateGroupIn;
     private String involvedUser;
     private String caseInstanceId;
+    private String caseInstanceIdWithChildren;
     private String caseDefinitionId;
     private Date createdOn;
     private Date createdBefore;
@@ -256,6 +257,14 @@ public class TaskQueryRequest extends PaginateRequest {
 
     public void setCaseInstanceId(String caseInstanceId) {
         this.caseInstanceId = caseInstanceId;
+    }
+
+    public String getCaseInstanceIdWithChildren() {
+        return caseInstanceIdWithChildren;
+    }
+
+    public void setCaseInstanceIdWithChildren(String caseInstanceIdWithChildren) {
+        this.caseInstanceIdWithChildren = caseInstanceIdWithChildren;
     }
 
     public String getCaseDefinitionId() {

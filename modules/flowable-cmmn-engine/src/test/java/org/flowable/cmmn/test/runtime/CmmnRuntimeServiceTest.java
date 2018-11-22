@@ -1,5 +1,6 @@
 package org.flowable.cmmn.test.runtime;
 
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
@@ -10,12 +11,20 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.impl.runtime.CmmnRuntimeServiceImpl;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * This class tests {@link CmmnRuntimeServiceImpl} implementation
  */
 public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
@@ -79,4 +88,96 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
         caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(caseInstance.getName(), nullValue());
     }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
+    public void createCaseInstanceAsync() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            startAsync();
+
+        assertThat(caseInstance, is(notNullValue()));
+        assertThat("Plan items are created asynchronously", this.cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count(), is(0l));
+
+        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 1000, 100, true);
+        assertThat(this.cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count(), is(1l));
+    }
+
+    @Test
+    public void createCaseInstanceAsyncWithoutDef() {
+        expectedException.expect(FlowableIllegalArgumentException.class);
+        expectedException.expectMessage("caseDefinitionKey and caseDefinitionId are null");
+
+        cmmnRuntimeService.createCaseInstanceBuilder().
+            startAsync();
+    }
+
+    @Test
+    public void createCaseInstanceAsyncWithNonExistingDefKey() {
+        expectedException.expect(FlowableObjectNotFoundException.class);
+        expectedException.expectMessage("No case definition found for key nonExistingDefinition");
+
+        cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("nonExistingDefinition").
+            startAsync();
+    }
+
+    @Test
+    public void createCaseInstanceAsyncWithNonExistingDefId() {
+        expectedException.expect(FlowableObjectNotFoundException.class);
+        expectedException.expectMessage("No case definition found for id nonExistingDefinition");
+
+        cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionId("nonExistingDefinition").
+            startAsync();
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
+    public void createCaseInstanceWithFallBack() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            tenantId("flowable").
+            fallbackToDefaultTenant().
+            start();
+
+        assertThat(caseInstance, is(notNullValue()));
+    }
+
+    @Test
+    public void createCaseInstanceWithFallBack_DefinitionNotFound() {
+        this.expectedException.expect(FlowableObjectNotFoundException.class);
+        this.expectedException.expectMessage("Case definition was not found by key 'oneTaskCase'. Fallback to default tenant was also used.");
+
+        cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            tenantId("flowable").
+            fallbackToDefaultTenant().
+            start();
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
+    public void createCaseInstanceAsyncWithFallBack() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            tenantId("flowable").
+            fallbackToDefaultTenant().
+            startAsync();
+
+        assertThat(caseInstance, is(notNullValue()));
+    }
+
+    @Test
+    public void createCaseInstanceAsyncWithFallBack_DefinitionNotFound() {
+        this.expectedException.expect(FlowableObjectNotFoundException.class);
+        this.expectedException.expectMessage("Case definition was not found by key 'oneTaskCase'. Fallback to default tenant was also used.");
+
+        cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            tenantId("flowable").
+            fallbackToDefaultTenant().
+            startAsync();
+    }
+
 }

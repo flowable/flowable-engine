@@ -85,6 +85,7 @@ public interface CmmnStencilConstants {
     String PROPERTY_COMPLETION_NEUTRAL_RULE_CONDITION = "completionneutralrulecondition";
 
     String PROPERTY_DISPLAY_ORDER = "displayorder";
+    String PROPERTY_INCLUDE_IN_STAGE_OVERVIEW  = "includeinstageoverview";
 
     String PROPERTY_USERTASK_ASSIGNMENT = "usertaskassignment";
     String PROPERTY_USERTASK_PRIORITY = "prioritydefinition";
@@ -94,6 +95,22 @@ public interface CmmnStencilConstants {
     String PROPERTY_USERTASK_CANDIDATE_USERS = "candidateUsers";
     String PROPERTY_USERTASK_CANDIDATE_GROUPS = "candidateGroups";
     String PROPERTY_USERTASK_CATEGORY = "categorydefinition";
+
+    String PROPERTY_USERTASK_LISTENERS = "tasklisteners";
+    String PROPERTY_LISTENER_EVENT = "event";
+    String PROPERTY_LISTENER_CLASS_NAME = "className";
+    String PROPERTY_LISTENER_EXPRESSION = "expression";
+    String PROPERTY_LISTENER_DELEGATE_EXPRESSION = "delegateExpression";
+    String PROPERTY_LISTENER_FIELDS = "fields";
+
+    String PROPERTY_LIFECYCLE_LISTENERS = "planitemlifecyclelisteners";
+    String PROPERTY_LISTENER_SOURCE_STATE = "sourceState";
+    String PROPERTY_LISTENER_TARGET_STATE = "targetState";
+
+    String PROPERTY_FIELD_NAME = "name";
+    String PROPERTY_FIELD_STRING_VALUE = "stringValue";
+    String PROPERTY_FIELD_EXPRESSION = "expression";
+    String PROPERTY_FIELD_STRING = "string";
 
     String PROPERTY_SERVICETASK_CLASS = "servicetaskclass";
     String PROPERTY_SERVICETASK_EXPRESSION = "servicetaskexpression";
@@ -114,17 +131,21 @@ public interface CmmnStencilConstants {
     String PROPERTY_DECISIONTABLE_REFERENCE_KEY = "decisionTableReferenceKey";
     String PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS = "decisiontaskthrowerroronnohits";
     String PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY = "decisionTaskThrowErrorOnNoHits";
+    String PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT = "decisiontaskfallbacktodefaulttenant";
+    String PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT_KEY = "fallbackToDefaultTenant";
 
     String PROPERTY_CASE_REFERENCE = "casetaskcasereference";
 
     String PROPERTY_PROCESS_REFERENCE = "processtaskprocessreference";
     String PROPERTY_PROCESS_IN_PARAMETERS = "processtaskinparameters";
     String PROPERTY_PROCESS_OUT_PARAMETERS = "processtaskoutparameters";
+    String PROPERTY_FALLBACK_TO_DEFAULT_TENANT = "fallbacktodefaulttenant";
 
     String PROPERTY_IN_PARAMETERS = "inParameters";
     String PROPERTY_OUT_PARAMETERS = "outParameters";
 
     String PROPERTY_IF_PART_CONDITION = "ifpartcondition";
+    String PROPERTY_TRIGGER_MODE = "triggermode";
 
     String PROPERTY_TRANSITION_EVENT = "transitionevent";
 

@@ -29,6 +29,7 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
 
     private String taskId;
     private String caseInstanceId;
+    private String caseInstanceIdWithChildren;
     private String caseDefinitionId;
     private String taskName;
     private String taskNameLike;
@@ -81,6 +82,14 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
 
     public void setCaseInstanceId(String caseInstanceId) {
         this.caseInstanceId = caseInstanceId;
+    }
+
+    public String getCaseInstanceIdWithChildren() {
+        return caseInstanceIdWithChildren;
+    }
+
+    public void setCaseInstanceIdWithChildren(String caseInstanceIdWithChildren) {
+        this.caseInstanceIdWithChildren = caseInstanceIdWithChildren;
     }
 
     public String getCaseDefinitionId() {

@@ -15,6 +15,7 @@ package org.flowable.cmmn.editor.json.converter;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.model.Association;
 import org.flowable.cmmn.model.BaseElement;
@@ -33,6 +34,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class CriterionJsonConverter extends BaseCmmnJsonConverter {
 
@@ -91,10 +93,15 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
         }
 
         // set properties
-        putProperty(propertiesNode, "name", criterion.getSentry().getName());
-        putProperty(propertiesNode, "documentation", criterion.getSentry().getDocumentation());
+        putProperty(propertiesNode, PROPERTY_NAME, criterion.getSentry().getName());
+        putProperty(propertiesNode, PROPERTY_DOCUMENTATION, criterion.getSentry().getDocumentation());
+
         if (criterion.getSentry() != null && criterion.getSentry().getSentryIfPart() != null) {
-            putProperty(propertiesNode,"ifpartcondition", criterion.getSentry().getSentryIfPart().getCondition());
+            putProperty(propertiesNode, PROPERTY_IF_PART_CONDITION, criterion.getSentry().getSentryIfPart().getCondition());
+        }
+
+        if (criterion.getSentry() != null && criterion.getSentry().getTriggerMode() != null) {
+            putProperty(propertiesNode, PROPERTY_TRIGGER_MODE, criterion.getSentry().getTriggerMode());
         }
     }
 
@@ -153,6 +160,7 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
         sentry.setId("sentry" + cmmnModelIdHelper.nextSentryId());
         sentry.setName(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_NAME, elementNode));
         sentry.setDocumentation(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_DOCUMENTATION, elementNode));
+        sentry.setTriggerMode(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_TRIGGER_MODE, elementNode));
 
         String ifPartCondition = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_IF_PART_CONDITION, elementNode);
         if (StringUtils.isNotBlank(ifPartCondition)) {

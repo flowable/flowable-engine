@@ -73,7 +73,8 @@ public abstract class AbstractServiceTaskExport<T extends ServiceTask> extends A
     
     @Override
     protected boolean writePlanItemDefinitionExtensionElements(CmmnModel model, ServiceTask serviceTask, boolean didWriteExtensionElement, XMLStreamWriter xtw) throws Exception {
-        return TaskExport.writeTaskFieldExtensions(serviceTask, didWriteExtensionElement, xtw);
+        boolean extensionElementWritten = super.writePlanItemDefinitionExtensionElements(model, serviceTask, didWriteExtensionElement, xtw);
+        return TaskExport.writeTaskFieldExtensions(serviceTask, extensionElementWritten, xtw);
     }
 
     @Override

@@ -608,6 +608,28 @@
           "description": "Checks the version of the DB schema against the library when the engine(s) is(are) being created and throws an exception if the versions don't match."
         }
       ]
+    },
+    {
+      "name": "flowable.idm.password-encoder",
+      "values": [
+        {
+          "value": "spring_bcrypt",
+          "description": "Use the Spring security BCryptPasswordEncoder. This is for backwards compatibility. It is advised to use spring_delegating with Spring Security 5."
+        },
+        {
+          "value": "spring_delegating",
+          "description": "Use the Spring Security 5 PasswordEncoderFactories.createDelegatingPasswordEncoder(). This is the recommended for new projects."
+        },
+        {
+          "value": "spring_delegating_bcrypt",
+          "description": "Use the Spring Security 5 PasswordEncoderFactories.createDelegatingPasswordEncoder(). With BCryptPasswordEncoder as the default password encoder for matches. This should be used for backwards compatibility with older versions."
+        },
+        {
+          "value": "spring_delegating_noop",
+          "description": "Use the Spring Security 5 PasswordEncoderFactories.createDelegatingPasswordEncoder(). With NoopPasswordEncoder as the default password encoder for matches. This should be used for backwards compatibility with older versions."
+        }
+
+      ]
     }
   ]
 }

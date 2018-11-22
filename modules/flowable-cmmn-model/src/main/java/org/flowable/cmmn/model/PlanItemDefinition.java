@@ -12,6 +12,9 @@
  */
 package org.flowable.cmmn.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Joram Barrez
  */
@@ -19,6 +22,7 @@ public class PlanItemDefinition extends CaseElement {
     
     protected String planItemRef;
     protected PlanItemControl defaultControl;
+    protected List<FlowableListener> lifecycleListeners = new ArrayList<>();
 
     public String getPlanItemRef() {
         return planItemRef;
@@ -34,6 +38,14 @@ public class PlanItemDefinition extends CaseElement {
 
     public void setDefaultControl(PlanItemControl defaultControl) {
         this.defaultControl = defaultControl;
+    }
+
+    public List<FlowableListener> getLifecycleListeners() {
+        return lifecycleListeners;
+    }
+
+    public void setLifecycleListeners(List<FlowableListener> lifecycleListeners) {
+        this.lifecycleListeners = lifecycleListeners;
     }
 
     public void setValues(PlanItemDefinition otherElement) {

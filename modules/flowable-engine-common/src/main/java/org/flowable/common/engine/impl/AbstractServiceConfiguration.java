@@ -30,7 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public abstract class AbstractServiceConfiguration {
     
-    protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractServiceConfiguration.class);
+    protected final Logger logger = LoggerFactory.getLogger(AbstractServiceConfiguration.class);
     
     /** The tenant id indicating 'no tenant' */
     public static final String NO_TENANT_ID = "";
@@ -48,16 +48,16 @@ public abstract class AbstractServiceConfiguration {
     protected Clock clock;
     
     public boolean isHistoryLevelAtLeast(HistoryLevel level) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Current history level: {}, level required: {}", historyLevel, level);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Current history level: {}, level required: {}", historyLevel, level);
         }
         // Comparing enums actually compares the location of values declared in the enum
         return historyLevel.isAtLeast(level);
     }
 
     public boolean isHistoryEnabled() {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Current history level: {}", historyLevel);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Current history level: {}", historyLevel);
         }
         return historyLevel != HistoryLevel.NONE;
     }

@@ -25,6 +25,7 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskInfo;
+import org.flowable.task.service.delegate.TaskListener;
 import org.flowable.task.service.event.impl.FlowableTaskEventBuilder;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
@@ -70,6 +71,12 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
             CommandContextUtil.getTaskService().updateTask(task, true);
             
             if (!StringUtils.equals(originalAssignee, task.getAssignee())) {
+
+                if (originalTaskEntity instanceof TaskEntity) {
+                    CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper()
+                        .executeTaskListeners((TaskEntity) originalTaskEntity, TaskListener.EVENTNAME_ASSIGNMENT);
+                }
+
                 if (CommandContextUtil.getEventDispatcher() != null && CommandContextUtil.getEventDispatcher().isEnabled()) {
                     CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, task));
                 }

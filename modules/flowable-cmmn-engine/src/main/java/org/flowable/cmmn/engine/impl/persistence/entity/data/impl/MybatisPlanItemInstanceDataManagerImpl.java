@@ -13,13 +13,14 @@
 package org.flowable.cmmn.engine.impl.persistence.entity.data.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl;
-import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.PlanItemInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl;
@@ -33,6 +34,9 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
     
     protected PlanItemInstanceByCaseInstanceIdCachedEntityMatcher planItemInstanceByCaseInstanceIdCachedEntityMatcher =
             new PlanItemInstanceByCaseInstanceIdCachedEntityMatcher();
+
+    protected PlanItemInstanceByCaseInstanceIdAndPlanItemIdCachedEntityMatcher planItemInstanceByCaseInstanceIdAndPlanItemIdCachedEntityMatcher =
+        new PlanItemInstanceByCaseInstanceIdAndPlanItemIdCachedEntityMatcher();
     
     public MybatisPlanItemInstanceDataManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration) {
         super(cmmnEngineConfiguration);
@@ -50,6 +54,7 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
         // Avoid queries being done for new instance
         planItemInstanceEntityImpl.setChildPlanItemInstances(new ArrayList<>(1));
         planItemInstanceEntityImpl.setSatisfiedSentryPartInstances(new ArrayList<>(1));
+        planItemInstanceEntityImpl.internalSetVariableInstances(new HashMap<>());
         
         return planItemInstanceEntityImpl;
     }
@@ -68,6 +73,14 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
         // the plan item instance will be in the cache now due to fetching the case instance,
         // no need to do anything extra, the findById of the super class will look into the cache
         return super.findById(planItemInstanceId);
+    }
+
+    @Override
+    public List<PlanItemInstanceEntity> findByCaseInstanceIdAndPlanItemId(String caseInstanceId, String planitemId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("caseInstanceId", caseInstanceId);
+        params.put("planItemId", planitemId);
+        return getList("selectPlanItemInstanceByCaseInstanceIdAndPlanItemId", params, planItemInstanceByCaseInstanceIdAndPlanItemIdCachedEntityMatcher);
     }
 
     @Override
@@ -110,6 +123,18 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
             return caseInstanceId.equals(entity.getCaseInstanceId());
         }
         
+    }
+
+    public static class PlanItemInstanceByCaseInstanceIdAndPlanItemIdCachedEntityMatcher extends CachedEntityMatcherAdapter<PlanItemInstanceEntity> {
+
+        @Override
+        public boolean isRetained(PlanItemInstanceEntity entity, Object param) {
+            Map<String, Object> map = (Map<String, Object>) param;
+            String caseInstanceId = (String) map.get("caseInstanceId");
+            String planItemId = (String) map.get("planItemId");
+            return caseInstanceId.equals(entity.getCaseInstanceId()) && planItemId.equals(entity.getPlanItem().getId());
+        }
+
     }
     
 }

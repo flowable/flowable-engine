@@ -36,5 +36,11 @@ public interface HistoricEntityLinkEntity extends HistoricEntityLink, Entity {
     
     void setReferenceScopeDefinitionId(String referenceScopeDefinitionId);
 
+    void setRootScopeId(String scopeId);
+
+    void setRootScopeType(String scopeType);
+
+    void setRootScopeDefinitionId(String scopeDefinitionId);
+
     void setCreateTime(Date createTime);
 }

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="testGenericEventListenerInstanceQuery" name="testTerminateTaskEventListener">
+        <casePlanModel id="casePlanModel">
+
+            <planItem id="planItemStageOne" name="Stage One" definitionRef="stage1"/>
+            <planItem id="planItemStageTwo" name="Stage Two" definitionRef="stage2"/>
+
+            <planItem id="caseEventListenerTwo" name="myCaseUEL2" definitionRef="caseUEL2"/>
+            <planItem id="caseEventListenerOne" name="myCaseUEL1" definitionRef="caseUEL1"/>
+
+            <stage id="stage1" name="Stage One">
+                <planItem id="stageOneEventListenerOne" name="myStage1UEL1" definitionRef="stage1UEL1"/>
+                <planItem id="stageOneEventListenerTwo" name="myStage1UEL2" definitionRef="stage1UEL2"/>
+
+                <eventListener id="stage1UEL1" name="myStageUEL2"/>
+                <eventListener id="stage1UEL2" name="myStageUEL1"/>
+            </stage>
+
+            <stage id="stage2" name="Stage Two">
+                <planItem id="stageTwoEventListenerTwo" name="myStage2UEL2" definitionRef="caseUEL2"/>
+                <planItem id="stageTwoEventListenerOne" name="myStage2UEL1" definitionRef="caseUEL1"/>
+            </stage>
+
+            <eventListener id="caseUEL2"/>
+            <eventListener id="caseUEL1"/>
+
+        </casePlanModel>
+    </case>
+</definitions>

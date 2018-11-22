@@ -31,6 +31,9 @@ public class HistoricEntityLinkEntityImpl extends AbstractEntityLinkServiceNoRev
     protected String referenceScopeId;
     protected String referenceScopeType;
     protected String referenceScopeDefinitionId;
+    protected String rootScopeId;
+    protected String rootScopeType;
+    protected String rootScopeDefinitionId;
     protected Date createTime;
 
     public HistoricEntityLinkEntityImpl() {
@@ -48,6 +51,9 @@ public class HistoricEntityLinkEntityImpl extends AbstractEntityLinkServiceNoRev
         persistentState.put("referenceScopeId", this.referenceScopeId);
         persistentState.put("referenceScopeType", this.referenceScopeType);
         persistentState.put("referenceScopeDefinitionId", this.referenceScopeDefinitionId);
+        persistentState.put("rootScopeId", this.rootScopeId);
+        persistentState.put("rootScopeType", this.rootScopeType);
+        persistentState.put("rootScopeDefinitionId", this.rootScopeDefinitionId);
         persistentState.put("createTime", this.createTime);
 
         return persistentState;
@@ -130,5 +136,30 @@ public class HistoricEntityLinkEntityImpl extends AbstractEntityLinkServiceNoRev
     
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    @Override
+    public String getRootScopeId() {
+        return rootScopeId;
+    }
+    @Override
+    public void setRootScopeId(String rootScopeId) {
+        this.rootScopeId = rootScopeId;
+    }
+    @Override
+    public String getRootScopeType() {
+        return rootScopeType;
+    }
+    @Override
+    public void setRootScopeType(String rootScopeType) {
+        this.rootScopeType = rootScopeType;
+    }
+    @Override
+    public String getRootScopeDefinitionId() {
+        return rootScopeDefinitionId;
+    }
+    @Override
+    public void setRootScopeDefinitionId(String rootScopeDefinitionId) {
+        this.rootScopeDefinitionId = rootScopeDefinitionId;
     }
 }

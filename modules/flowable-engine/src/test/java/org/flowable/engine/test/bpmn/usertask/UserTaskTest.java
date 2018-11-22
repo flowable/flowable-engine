@@ -17,11 +17,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.entitylink.api.EntityLink;
+import org.flowable.entitylink.api.EntityLinkService;
+import org.flowable.entitylink.api.EntityLinkType;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
@@ -53,6 +59,35 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             assertEquals(0, taskService.getTaskEvents(task.getId()).size());
         }
+    }
+
+    @Test
+    @Deployment
+    public void testEntityLinkCreated() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+        assertNotNull(task.getId());
+        assertEquals("my task", task.getName());
+        assertEquals("Very important", task.getDescription());
+        assertTrue(task.getPriority() > 0);
+        assertEquals("kermit", task.getAssignee());
+        assertEquals(processInstance.getId(), task.getProcessInstanceId());
+        assertNotNull(task.getProcessDefinitionId());
+        assertNotNull(task.getTaskDefinitionKey());
+        assertNotNull(task.getCreateTime());
+
+        CommandExecutor commandExecutor = processEngine.getProcessEngineConfiguration().getCommandExecutor();
+
+        List<EntityLink> entityLinksByScopeIdAndType = commandExecutor.execute(commandContext -> {
+            EntityLinkService entityLinkService = CommandContextUtil.getEntityLinkService(commandContext);
+
+            return entityLinkService.findEntityLinksByScopeIdAndType(processInstance.getId(), ScopeTypes.BPMN, EntityLinkType.CHILD);
+        });
+
+        assertEquals(1, entityLinksByScopeIdAndType.size());
+        assertEquals(processInstance.getId(), entityLinksByScopeIdAndType.get(0).getRootScopeId());
+        assertEquals(ScopeTypes.BPMN, entityLinksByScopeIdAndType.get(0).getRootScopeType());
     }
 
     @Test

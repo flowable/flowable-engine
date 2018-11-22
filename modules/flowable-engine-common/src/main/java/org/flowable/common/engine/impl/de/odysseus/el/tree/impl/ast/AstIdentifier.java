@@ -173,7 +173,7 @@ public class AstIdentifier extends AstNode implements IdentifierNode {
 					try {
 						return method.invoke(null, params);
 					} catch (IllegalAccessException e) {
-						throw new ELException(LocalMessages.get("error.identifier.method.access", name));
+						throw new ELException(LocalMessages.get("error.identifier.method.access", name), e);
 					} catch (IllegalArgumentException e) {
 						throw new ELException(LocalMessages.get("error.identifier.method.invocation", name, e));
 					} catch (InvocationTargetException e) {

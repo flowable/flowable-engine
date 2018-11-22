@@ -13,6 +13,7 @@
 package org.flowable.test.spring.boot.idm;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 import static org.flowable.test.spring.boot.util.DeploymentCleanerUtil.deleteDeployments;
 
@@ -31,6 +32,7 @@ import org.flowable.engine.impl.util.EngineServiceUtil;
 import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
+import org.flowable.idm.spring.authentication.SpringEncoder;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
@@ -45,6 +47,10 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.ApplicationContext;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * @author Filip Hrisafov
@@ -73,6 +79,7 @@ public class IdmEngineAutoConfigurationTest {
             assertAllServicesPresent(context, idmEngine);
 
             assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
+                .hasSingleBean(PasswordEncoder.class)
                 .getBean(CustomUserEngineConfigurerConfiguration.class)
                 .satisfies(configuration -> {
                     assertThat(configuration.getInvokedConfigurations())
@@ -80,8 +87,126 @@ public class IdmEngineAutoConfigurationTest {
                             SpringIdmEngineConfiguration.class
                         );
                 });
+
+            org.flowable.idm.api.PasswordEncoder flowablePasswordEncoder = idmEngine.getIdmEngineConfiguration().getPasswordEncoder();
+            PasswordEncoder passwordEncoder = context.getBean(PasswordEncoder.class);
+            assertThat(flowablePasswordEncoder)
+                .isInstanceOfSatisfying(SpringEncoder.class, springEncoder -> {
+                    assertThat(springEncoder.getSpringEncodingProvider()).isEqualTo(passwordEncoder);
+                });
+            assertThat(passwordEncoder).isInstanceOf(NoOpPasswordEncoder.class);
         });
     }
+
+    @Test
+    public void standaloneIdmEngineWithBCryptPasswordEncoder() {
+        contextRunner
+            .withPropertyValues("flowable.idm.password-encoder=spring_bcrypt")
+            .run(context -> {
+                IdmEngine idmEngine = context.getBean(IdmEngine.class);
+
+                assertThat(context).hasSingleBean(PasswordEncoder.class);
+
+                org.flowable.idm.api.PasswordEncoder flowablePasswordEncoder = idmEngine.getIdmEngineConfiguration().getPasswordEncoder();
+                PasswordEncoder passwordEncoder = context.getBean(PasswordEncoder.class);
+                assertThat(flowablePasswordEncoder)
+                    .isInstanceOfSatisfying(SpringEncoder.class, springEncoder -> {
+                        assertThat(springEncoder.getSpringEncodingProvider()).isEqualTo(passwordEncoder);
+                    });
+                assertThat(passwordEncoder).isInstanceOf(BCryptPasswordEncoder.class);
+            });
+    }
+
+    @Test
+    public void standaloneIdmEngineWithDelegatingPasswordEncoder() {
+        contextRunner
+            .withPropertyValues("flowable.idm.password-encoder=spring_delegating")
+            .run(context -> {
+                IdmEngine idmEngine = context.getBean(IdmEngine.class);
+
+                assertThat(context).hasSingleBean(PasswordEncoder.class);
+
+                org.flowable.idm.api.PasswordEncoder flowablePasswordEncoder = idmEngine.getIdmEngineConfiguration().getPasswordEncoder();
+                PasswordEncoder passwordEncoder = context.getBean(PasswordEncoder.class);
+                assertThat(flowablePasswordEncoder)
+                    .isInstanceOfSatisfying(SpringEncoder.class, springEncoder -> {
+                        assertThat(springEncoder.getSpringEncodingProvider()).isEqualTo(passwordEncoder);
+                    });
+                assertThat(passwordEncoder).isInstanceOf(DelegatingPasswordEncoder.class);
+
+                assertThat(flowablePasswordEncoder.encode("test", null))
+                    .as("encoded password")
+                    .startsWith("{bcrypt}");
+
+                assertThatThrownBy(() -> flowablePasswordEncoder.isMatches("test", "test", null))
+                    .as("encoder matches password")
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("There is no PasswordEncoder mapped for the id \"null\"");
+            });
+    }
+
+    @Test
+    public void standaloneIdmEngineWithDelegatingBCryptDefaultPasswordEncoder() {
+        contextRunner
+            .withPropertyValues("flowable.idm.password-encoder=spring_delegating_bcrypt")
+            .run(context -> {
+                IdmEngine idmEngine = context.getBean(IdmEngine.class);
+
+                assertThat(context).hasSingleBean(PasswordEncoder.class);
+
+                org.flowable.idm.api.PasswordEncoder flowablePasswordEncoder = idmEngine.getIdmEngineConfiguration().getPasswordEncoder();
+                PasswordEncoder passwordEncoder = context.getBean(PasswordEncoder.class);
+                assertThat(flowablePasswordEncoder)
+                    .isInstanceOfSatisfying(SpringEncoder.class, springEncoder -> {
+                        assertThat(springEncoder.getSpringEncodingProvider()).isEqualTo(passwordEncoder);
+                    });
+                assertThat(passwordEncoder).isInstanceOf(DelegatingPasswordEncoder.class);
+
+                assertThat(flowablePasswordEncoder.encode("test", null))
+                    .as("encoded password")
+                    .startsWith("{bcrypt}");
+
+                assertThat(flowablePasswordEncoder.isMatches("test", "test", null))
+                    .as("encoder matchers clear text password")
+                    .isFalse();
+
+                assertThat(flowablePasswordEncoder.isMatches("test", new BCryptPasswordEncoder().encode("test"), null))
+                    .as("encoder matchers only bcrypt text password")
+                    .isTrue();
+            });
+    }
+
+    @Test
+    public void standaloneIdmEngineWithDelegatingNoopDefaultPasswordEncoder() {
+        contextRunner
+            .withPropertyValues("flowable.idm.password-encoder=spring_delegating_noop")
+            .run(context -> {
+                IdmEngine idmEngine = context.getBean(IdmEngine.class);
+
+                assertThat(context).hasSingleBean(PasswordEncoder.class);
+
+                org.flowable.idm.api.PasswordEncoder flowablePasswordEncoder = idmEngine.getIdmEngineConfiguration().getPasswordEncoder();
+                PasswordEncoder passwordEncoder = context.getBean(PasswordEncoder.class);
+                assertThat(flowablePasswordEncoder)
+                    .isInstanceOfSatisfying(SpringEncoder.class, springEncoder -> {
+                        assertThat(springEncoder.getSpringEncodingProvider()).isEqualTo(passwordEncoder);
+                    });
+                assertThat(passwordEncoder).isInstanceOf(DelegatingPasswordEncoder.class);
+
+                assertThat(flowablePasswordEncoder.encode("test", null))
+                    .as("encoded password")
+                    .startsWith("{bcrypt}");
+
+                assertThat(flowablePasswordEncoder.isMatches("test", "test", null))
+                    .as("encoder matchers clear text password")
+                    .isTrue();
+
+                assertThat(flowablePasswordEncoder.isMatches("test", new BCryptPasswordEncoder().encode("test"), null))
+                    .as("encoder matchers only bcrypt text password")
+                    .isFalse();
+            });
+    }
+
 
     @Test
     public void idmEngineWithBasicDataSourceAndProcessEngine() {

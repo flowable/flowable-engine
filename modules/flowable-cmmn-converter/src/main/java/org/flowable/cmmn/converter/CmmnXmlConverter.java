@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.xml.XMLConstants;
@@ -41,6 +42,7 @@ import org.flowable.cmmn.converter.export.CaseExport;
 import org.flowable.cmmn.converter.export.CmmnDIExport;
 import org.flowable.cmmn.converter.export.DefinitionsRootExport;
 import org.flowable.cmmn.converter.export.StageExport;
+import org.flowable.cmmn.converter.util.PlanItemDependencyUtil;
 import org.flowable.cmmn.model.Association;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.Case;
@@ -106,6 +108,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new ProcessTaskXmlConverter());
         addElementConverter(new DecisionXmlConverter());
         addElementConverter(new DecisionTaskXmlConverter());
+        addElementConverter(new GenericEventListenerXmlConverter());
         addElementConverter(new TimerEventListenerXmlConverter());
         addElementConverter(new UserEventListenerXmlConverter());
         addElementConverter(new PlanItemStartTriggerXmlConverter());
@@ -342,6 +345,28 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             }
         }
 
+        // Now everything has an id, the sentry onParts are filled to have source PlanItems,
+        // this is used later when determining the dependency information
+        for (SentryOnPart sentryOnPart : conversionHelper.getSentryOnParts()) {
+            Optional<PlanItem> planItem = conversionHelper.findPlanItem(sentryOnPart.getSourceRef());
+            if (planItem.isPresent()) {
+                sentryOnPart.setSource(planItem.get());
+            }
+        }
+
+        // Now all sentries have a source, the plan items can be enriched with dependency information
+        for (PlanItem planItem : conversionHelper.getPlanItems()) {
+
+            // Dependencies
+            planItem.getEntryDependencies().addAll(PlanItemDependencyUtil.getEntryDependencies(planItem));
+            planItem.getExitDependencies().addAll(PlanItemDependencyUtil.getExitDependencies(planItem));
+
+            // Dependents
+            planItem.getEntryDependencies().forEach(entryDependency -> entryDependency.addEntryDependentPlanItem(planItem));
+            planItem.getExitDependencies().forEach(exitDependency -> exitDependency.addExitDependentPlanItem(planItem));
+        }
+
+
         // set DI elements
         for (CmmnDiShape diShape : conversionHelper.getDiShapes()) {
             cmmnModel.addGraphicInfo(diShape.getCmmnElementRef(), diShape.getGraphicInfo());
@@ -401,8 +426,9 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
     protected void processPlanItems(CmmnModel cmmnModel, PlanFragment planFragment) {
         for (PlanItem planItem : planFragment.getPlanItems()) {
 
+            // Plan items are defined on the same level or in a higher parent stage, never in a child stage.
             Stage parentStage = planItem.getParentStage();
-            PlanItemDefinition planItemDefinition = parentStage.findPlanItemDefinition(planItem.getDefinitionRef());
+            PlanItemDefinition planItemDefinition = parentStage.findPlanItemDefinitionInStageOrUpwards(planItem.getDefinitionRef());
             if (planItemDefinition == null) {
                 throw new FlowableException("No matching plan item definition found for reference "
                         + planItem.getDefinitionRef() + " of plan item " + planItem.getId());
@@ -431,7 +457,9 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             }
 
             if (planItemDefinition instanceof PlanFragment) {
-                processPlanFragment(cmmnModel, (PlanFragment) planItemDefinition);
+                PlanFragment planItemPlanFragment = (PlanFragment) planItemDefinition;
+                planItemPlanFragment.setPlanItem(planItem);
+                processPlanFragment(cmmnModel, planItemPlanFragment);
 
             } else if (planItemDefinition instanceof ProcessTask) {
                 ProcessTask processTask = (ProcessTask) planItemDefinition;

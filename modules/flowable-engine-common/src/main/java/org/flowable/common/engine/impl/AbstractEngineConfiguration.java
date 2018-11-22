@@ -81,7 +81,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractEngineConfiguration {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractEngineConfiguration.class);
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     /** The tenant id indicating 'no tenant' */
     public static final String NO_TENANT_ID = "";
@@ -337,13 +337,13 @@ public abstract class AbstractEngineConfiguration {
                     throw new FlowableException("DataSource or JDBC properties have to be specified in a process engine configuration");
                 }
 
-                LOGGER.debug("initializing datasource to db: {}", jdbcUrl);
+                logger.debug("initializing datasource to db: {}", jdbcUrl);
 
-                if (LOGGER.isInfoEnabled()) {
-                    LOGGER.info("Configuring Datasource with following properties (omitted password for security)");
-                    LOGGER.info("datasource driver : {}", jdbcDriver);
-                    LOGGER.info("datasource url : {}", jdbcUrl);
-                    LOGGER.info("datasource user name : {}", jdbcUsername);
+                if (logger.isInfoEnabled()) {
+                    logger.info("Configuring Datasource with following properties (omitted password for security)");
+                    logger.info("datasource driver : {}", jdbcDriver);
+                    logger.info("datasource url : {}", jdbcUrl);
+                    logger.info("datasource user name : {}", jdbcUsername);
                 }
 
                 PooledDataSource pooledDataSource = new PooledDataSource(this.getClass().getClassLoader(), jdbcDriver, jdbcUrl, jdbcUsername, jdbcPassword);
@@ -391,22 +391,22 @@ public abstract class AbstractEngineConfiguration {
             connection = dataSource.getConnection();
             DatabaseMetaData databaseMetaData = connection.getMetaData();
             String databaseProductName = databaseMetaData.getDatabaseProductName();
-            LOGGER.debug("database product name: '{}'", databaseProductName);
+            logger.debug("database product name: '{}'", databaseProductName);
             databaseType = databaseTypeMappings.getProperty(databaseProductName);
             if (databaseType == null) {
                 throw new FlowableException("couldn't deduct database type from database product name '" + databaseProductName + "'");
             }
-            LOGGER.debug("using database type: {}", databaseType);
+            logger.debug("using database type: {}", databaseType);
 
         } catch (SQLException e) {
-            LOGGER.error("Exception while initializing Database connection", e);
+            logger.error("Exception while initializing Database connection", e);
         } finally {
             try {
                 if (connection != null) {
                     connection.close();
                 }
             } catch (SQLException e) {
-                LOGGER.error("Exception while closing the Database connection", e);
+                logger.error("Exception while closing the Database connection", e);
             }
         }
 
@@ -808,7 +808,7 @@ public abstract class AbstractEngineConfiguration {
             }
 
             if (nrOfServiceLoadedConfigurators > 0) {
-                LOGGER.info("Found {} auto-discoverable Process Engine Configurator{}", nrOfServiceLoadedConfigurators++, nrOfServiceLoadedConfigurators > 1 ? "s" : "");
+                logger.info("Found {} auto-discoverable Process Engine Configurator{}", nrOfServiceLoadedConfigurators++, nrOfServiceLoadedConfigurators > 1 ? "s" : "");
             }
 
             if (!allConfigurators.isEmpty()) {
@@ -831,9 +831,9 @@ public abstract class AbstractEngineConfiguration {
                 });
 
                 // Execute the configurators
-                LOGGER.info("Found {} Engine Configurators in total:", allConfigurators.size());
+                logger.info("Found {} Engine Configurators in total:", allConfigurators.size());
                 for (EngineConfigurator configurator : allConfigurators) {
-                    LOGGER.info("{} (priority:{})", configurator.getClass(), configurator.getPriority());
+                    logger.info("{} (priority:{})", configurator.getClass(), configurator.getPriority());
                 }
 
             }
@@ -848,14 +848,14 @@ public abstract class AbstractEngineConfiguration {
 
     public void configuratorsBeforeInit() {
         for (EngineConfigurator configurator : allConfigurators) {
-            LOGGER.info("Executing beforeInit() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
+            logger.info("Executing beforeInit() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
             configurator.beforeInit(this);
         }
     }
     
     public void configuratorsAfterInit() {
         for (EngineConfigurator configurator : allConfigurators) {
-            LOGGER.info("Executing configure() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
+            logger.info("Executing configure() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
             configurator.configure(this);
         }
     }    

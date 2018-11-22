@@ -138,6 +138,14 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         requestNode = objectMapper.createObjectNode();
         requestNode.put("caseInstanceId", caseInstance2.getId());
         assertResultsPresentInPostDataResponse(url, requestNode, 1, task2.getId());
+        
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseInstanceIdWithChildren", caseInstance.getId());
+        assertResultsPresentInPostDataResponse(url, requestNode, 2, task.getId());
+        
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseInstanceIdWithChildren", "nonexisting");
+        assertResultsPresentInPostDataResponse(url, requestNode, 0);
 
         requestNode = objectMapper.createObjectNode();
         requestNode.put("taskAssignee", "kermit");

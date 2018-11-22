@@ -8,6 +8,9 @@ create table ACT_HI_ENTITYLINK (
     REF_SCOPE_ID_ varchar(255),
     REF_SCOPE_TYPE_ varchar(255),
     REF_SCOPE_DEFINITION_ID_ varchar(255),
+    ROOT_SCOPE_ID_ varchar(255),
+    ROOT_SCOPE_TYPE_ varchar(255),
+    ROOT_SCOPE_DEFINITION_ID_ varchar(255),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

@@ -30,15 +30,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.core.Is.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
  * @author Dennis Federico
+ * @author Joram Barrez
  */
 public class UserEventListenerTest extends FlowableCmmnTestCase {
 
@@ -287,19 +287,10 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
         //Complete the Task
         cmmnRuntimeService.triggerPlanItemInstance(task.getId());
 
-        //Listener should still be available and Stage active
+        //Listener should be deleted as it's an orphan
         planItems = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .list().stream().collect(Collectors.groupingBy(PlanItemInstance::getPlanItemDefinitionType));
-        assertEquals(2, planItems.size());
-        assertEquals(1, planItems.getOrDefault(PlanItemDefinitionType.USER_EVENT_LISTENER, Collections.emptyList()).size());
-        PlanItemInstance listener = planItems.get(PlanItemDefinitionType.USER_EVENT_LISTENER).get(0);
-        assertEquals(PlanItemInstanceState.AVAILABLE, listener.getState());
-        assertEquals(1, planItems.getOrDefault(PlanItemDefinitionType.STAGE, Collections.emptyList()).size());
-        stage = planItems.get(PlanItemDefinitionType.STAGE).get(0);
-        assertEquals(PlanItemInstanceState.ACTIVE, stage.getState());
-
-        //Trigger the listener should end the case
-        cmmnRuntimeService.triggerPlanItemInstance(listener.getId());
+        assertEquals(0, planItems.size());
 
         //Stage and case instance should have ended...
         assertCaseInstanceEnded(caseInstance);
@@ -339,17 +330,10 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
         //Complete the Task
         cmmnRuntimeService.triggerPlanItemInstance(task.getId());
 
-        //Listener should still be available but Stage close/terminated
+        //Listener should be terminated as it's orphaned
         planItems = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .list().stream().collect(Collectors.groupingBy(PlanItemInstance::getPlanItemDefinitionType));
-        assertEquals(1, planItems.size());
-        assertEquals(1, planItems.getOrDefault(PlanItemDefinitionType.USER_EVENT_LISTENER, Collections.emptyList()).size());
-        listener = planItems.get(PlanItemDefinitionType.USER_EVENT_LISTENER).get(0);
-
-        //Trigger the listener should end the case
-        cmmnRuntimeService.triggerPlanItemInstance(listener.getId());
-
-        //Stage and case instance should have ended...
+        assertEquals(0, planItems.size());
         assertCaseInstanceEnded(caseInstance);
     }
 
@@ -431,10 +415,221 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
         List<String> names = events.stream().map(UserEventListenerInstance::getName).sorted(Comparator.reverseOrder()).collect(Collectors.toList());
         List<String> namesDesc = cmmnRuntimeService.createUserEventListenerInstanceQuery()
                 .stateAvailable().orderByName().desc().list().stream().map(UserEventListenerInstance::getName).collect(Collectors.toList());
-        assertThat(names, is(namesDesc));
+        assertThat(names).isEqualTo(namesDesc);
 
         //TODO suspended state query (need to suspend the parent stage)
 
     }
+
+    @Test
+    @CmmnDeployment
+    public void testUserEventInstanceDeletedWhenNotReferencedByExitSentry() {
+
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testUserEvent").start();
+        assertNotNull(cmmnRuntimeService.createUserEventListenerInstanceQuery().singleResult());
+
+        // Completing task A and B completes Stage A.
+        // This should also remove the user event listener, as nothing is referencing it anymore
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery().list();
+        assertEquals(2, tasks.size());
+        tasks.forEach(t -> cmmnTaskService.complete(t.getId()));
+
+        assertNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage A").singleResult());
+        assertNotNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage A").includeEnded().singleResult());
+        assertNull(cmmnRuntimeService.createUserEventListenerInstanceQuery().singleResult());
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testOrphanEventListenerMultipleSentries() {
+
+        // The model here has one user event listener that will trigger the exit of two tasks (A and C) and trigger the activation of task B
+
+        // Verify the model setup
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testOrphanEventListenerMultipleSentries").start();
+        assertNotNull(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult());
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertEquals(2, tasks.size());
+        assertEquals("A", tasks.get(0).getName());
+        assertEquals("C", tasks.get(1).getName());
+
+        // Completing one tasks should not have impact on the user event listener
+        cmmnTaskService.complete(tasks.get(0).getId());
+        assertNotNull(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult());
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertEquals(1, tasks.size());
+        assertEquals("C", tasks.get(0).getName());
+
+        // Completing the other task with the exit sentry should still keep the user event, as it's reference by the entry of B
+        cmmnTaskService.complete(tasks.get(0).getId());
+        assertNotNull(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult());
+        assertEquals(0, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+
+        // Firing the user event listener should start B
+        cmmnRuntimeService.completeUserEventListenerInstance(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getId());
+        assertNull(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult());
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testOrphanEventListenerMultipleSentries2() {
+
+        // Firing the event listener should exit A and C, and activate B
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testOrphanEventListenerMultipleSentries").start();
+        cmmnRuntimeService.completeUserEventListenerInstance(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getId());
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertEquals("B", task.getName());
+
+        cmmnTaskService.complete(task.getId());
+        assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testMultipleEventListenersAsEntry() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testMultipleEventListenersAsEntry").start();
+        assertEquals(0, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+
+        List<UserEventListenerInstance> userEventListenerInstances = cmmnRuntimeService.createUserEventListenerInstanceQuery()
+            .caseInstanceId(caseInstance.getId()).orderByName().asc().list();
+        assertThat(userEventListenerInstances).extracting(UserEventListenerInstance::getName).containsExactly("A", "B", "C");
+
+        // Completing A should change nothing
+        cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstances.get(0).getId());
+        assertEquals(0, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        userEventListenerInstances = cmmnRuntimeService.createUserEventListenerInstanceQuery()
+            .caseInstanceId(caseInstance.getId()).orderByName().asc().list();
+        assertThat(userEventListenerInstances).extracting(UserEventListenerInstance::getName).containsExactly("B", "C");
+
+        // Completing B should activate the stage and remove the orphan event listener C
+        cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstances.get(0).getId());
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        assertEquals(0, cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testMultipleEventListenersAsExit() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testMultipleEventListenersAsExit").start();
+        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+
+        List<UserEventListenerInstance> userEventListenerInstances = cmmnRuntimeService.createUserEventListenerInstanceQuery()
+            .caseInstanceId(caseInstance.getId()).orderByName().asc().list();
+        assertThat(userEventListenerInstances).extracting(UserEventListenerInstance::getName).containsExactly("A", "B", "C");
+
+        // Completing C should also remove A and B
+        cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstances.get(2).getId());
+        assertEquals(0, cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+        assertEquals("Outside stage", cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult().getName());
+
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testMultipleEventListenersMixed() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testMultipleEventListenersMixed").start();
+        List<UserEventListenerInstance> userEventListenerInstances = cmmnRuntimeService.createUserEventListenerInstanceQuery()
+            .caseInstanceId(caseInstance.getId()).orderByName().asc().list();
+        assertThat(userEventListenerInstances).extracting(UserEventListenerInstance::getName).containsExactly("A", "B", "C");
+        assertNull(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("The task").singleResult());
+
+        // Completing C should make The task active
+        cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstances.get(2).getId());
+        assertNotNull(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("The task").singleResult());
+
+        userEventListenerInstances = cmmnRuntimeService.createUserEventListenerInstanceQuery()
+            .caseInstanceId(caseInstance.getId()).orderByName().asc().list();
+        assertThat(userEventListenerInstances).extracting(UserEventListenerInstance::getName).containsExactly("A", "B");
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testTimerAndUserEventListenerForEntry() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTimerAndUserEventListenerForEntry").start();
+        assertEquals(4, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+        assertNotNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER).singleResult());
+        assertNull(cmmnTaskService.createTaskQuery().taskName("A").singleResult());
+        assertNotNull(cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).singleResult());
+
+        // Completing the user event listener should terminate the timer event listener
+        UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId());
+        assertEquals(2, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+        assertNotNull(cmmnTaskService.createTaskQuery().taskName("A").singleResult());
+
+        assertNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).singleResult());
+        assertNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER).singleResult());
+        assertNull(cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).singleResult());
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testUserEventNotUsedForExit() {
+
+        // This case definition has a stage with two tasks. An exit sentry with a user event exists for that stage.
+        // This tests checks that, if the stage completes normally, the user event listener is removed as it becomes an orphan
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testUserEventNotUsedForExit").start();
+        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("A", "B");
+        tasks.forEach(task -> cmmnTaskService.complete(task.getId()));
+
+        Task taskC = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(taskC.getName()).isEqualTo("C");
+
+        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testNestedUserEventListener() {
+
+        // This case definition has user event listener connected to a task on the same level and a deeply nested task.
+        // The deeply nested task hasn't been made available yet, but the event listener should not be deleted as it could still be made active later
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testNestedUserEventListener").start();
+        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("D");
+
+        // Complete the task on the same level should not trigger the deletion of the user event listener
+        cmmnTaskService.complete(tasks.get(0).getId());
+        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
+        // Setting the variable that guards the stage will make the nested task active
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "activateStage", true);
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("A", "B", "C");
+
+        // Completing task C should remove the user event listener
+        cmmnTaskService.complete(tasks.get(2).getId());
+        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testUserEventListenerForEntryAndExit() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testUserEventListenerForEntryAndExit").start();
+        List<UserEventListenerInstance> userEventListenerInstances = cmmnRuntimeService.createUserEventListenerInstanceQuery()
+            .caseInstanceId(caseInstance.getId()).orderByName().asc().list();
+        assertThat(userEventListenerInstances).extracting(UserEventListenerInstance::getName).containsExactly("EventListenerA", "EventListenerB");
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).isEmpty();
+
+        // Completing event listener A will activate task A and task B. User event listener B becomes obsolete is gets removed.
+        cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstances.get(0).getId());
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("Task A", "Task B");
+        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).list()).isEmpty();
+    }
+
 }
 

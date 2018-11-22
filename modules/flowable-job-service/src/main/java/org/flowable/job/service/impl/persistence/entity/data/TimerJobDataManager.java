@@ -38,6 +38,8 @@ public interface TimerJobDataManager extends DataManager<TimerJobEntity> {
 
     List<TimerJobEntity> findJobsByProcessInstanceId(String processInstanceId);
 
+    List<TimerJobEntity> findJobsByScopeIdAndSubScopeId(String scopeId, String subScopeId);
+
     List<Job> findJobsByQueryCriteria(TimerJobQueryImpl jobQuery);
 
     long findJobCountByQueryCriteria(TimerJobQueryImpl jobQuery);

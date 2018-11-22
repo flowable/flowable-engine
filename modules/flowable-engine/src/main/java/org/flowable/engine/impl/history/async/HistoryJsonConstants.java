@@ -202,6 +202,12 @@ public interface HistoryJsonConstants {
     
     String REF_SCOPE_DEFINITION_ID = "referenceScopeDefinitionId";
 
+    String ROOT_SCOPE_ID = "rootScopeId";
+
+    String ROOT_SCOPE_TYPE = "rootScopeType";
+
+    String ROOT_SCOPE_DEFINITION_ID = "rootScopeDefinitionId";
+
     String TIMESTAMP = "__timeStamp"; // Two underscores to avoid clashes with other fields
     
 }

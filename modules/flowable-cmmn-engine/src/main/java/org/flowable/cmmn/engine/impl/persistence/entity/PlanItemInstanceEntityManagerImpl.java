@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.List;
 
+import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -28,6 +29,8 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityManager;
 
@@ -125,6 +128,11 @@ public class PlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager
     }
 
     @Override
+    public List<PlanItemInstanceEntity> findByCaseInstanceIdAndPlanItemId(String caseInstanceId, String planitemId) {
+        return planItemInstanceDataManager.findByCaseInstanceIdAndPlanItemId(caseInstanceId, planitemId);
+    }
+
+    @Override
     public void delete(PlanItemInstanceEntity planItemInstanceEntity, boolean fireEvent) {
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         
@@ -146,6 +154,15 @@ public class PlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager
                 for (PlanItemInstanceEntity childPlanItem : planItemInstanceEntity.getChildPlanItemInstances()) {
                     delete(childPlanItem, fireEvent);
                 }
+            }
+        }
+
+        if (planItemInstanceEntity.getPlanItemDefinitionType().equals(PlanItemDefinitionType.TIMER_EVENT_LISTENER)) {
+            TimerJobEntityManager timerJobEntityManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getJobServiceConfiguration().getTimerJobEntityManager();
+            List<TimerJobEntity> timerJobsEntities = timerJobEntityManager
+                .findJobsByScopeIdAndSubScopeId(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId());
+            for (TimerJobEntity timerJobEntity : timerJobsEntities) {
+                timerJobEntityManager.delete(timerJobEntity);
             }
         }
         

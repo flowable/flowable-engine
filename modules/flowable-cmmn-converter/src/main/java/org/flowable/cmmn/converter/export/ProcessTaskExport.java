@@ -37,17 +37,23 @@ public class ProcessTaskExport extends AbstractPlanItemDefinitionExport<ProcessT
     protected void writePlanItemDefinitionSpecificAttributes(ProcessTask processTask, XMLStreamWriter xtw) throws Exception {
         super.writePlanItemDefinitionSpecificAttributes(processTask, xtw);
         TaskExport.writeCommonTaskAttributes(processTask, xtw);
+        // fallback to default tenant
+        if (processTask.isFallbackToDefaultTenant()) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT, String.valueOf(processTask.isFallbackToDefaultTenant()));
+        }
     }
     
 
     @Override
     protected boolean writePlanItemDefinitionExtensionElements(CmmnModel model, ProcessTask processTask, boolean didWriteExtensionElement, XMLStreamWriter xtw) throws Exception {
-        didWriteExtensionElement = writeIOParameters(ELEMENT_PROCESS_TASK_IN_PARAMETERS,
-                processTask.getInParameters(), didWriteExtensionElement, xtw);
-        didWriteExtensionElement = writeIOParameters(ELEMENT_PROCESS_TASK_OUT_PARAMETERS,
-                processTask.getOutParameters(), didWriteExtensionElement, xtw);
+        boolean extensionElementWritten = super.writePlanItemDefinitionExtensionElements(model, processTask, didWriteExtensionElement, xtw);
+
+        extensionElementWritten = writeIOParameters(ELEMENT_PROCESS_TASK_IN_PARAMETERS,
+                processTask.getInParameters(), extensionElementWritten, xtw);
+        extensionElementWritten = writeIOParameters(ELEMENT_PROCESS_TASK_OUT_PARAMETERS,
+                processTask.getOutParameters(), extensionElementWritten, xtw);
         
-        return didWriteExtensionElement;
+        return extensionElementWritten;
     }
 
     @Override

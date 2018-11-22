@@ -16,9 +16,11 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
+import org.flowable.cmmn.editor.json.converter.util.ListenerConverterUtil;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.ScriptServiceTask;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -53,13 +55,16 @@ public class ScriptTaskJsonConverter extends BaseCmmnJsonConverter {
         if (StringUtils.isNotEmpty(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_SERVICETASK_RESULT_VARIABLE, elementNode))) {
             scriptServiceTask.setResultVariableName(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_SERVICETASK_RESULT_VARIABLE, elementNode));
         }
-        
+
+        ListenerConverterUtil.convertJsonToLifeCycleListeners(elementNode, scriptServiceTask);
+
         return scriptServiceTask;
     }
 
     @Override
     protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement, CmmnModel cmmnModel) {
         // Done in service task converter
+        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, ((PlanItem) baseElement).getPlanItemDefinition());
     }
 
 }

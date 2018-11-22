@@ -28,6 +28,7 @@ public class HumanTask extends Task {
     protected String category;
     protected List<String> candidateUsers = new ArrayList<>();
     protected List<String> candidateGroups = new ArrayList<>();
+    protected List<FlowableListener> taskListeners = new ArrayList<>();
 
     public String getAssignee() {
         return assignee;
@@ -91,6 +92,14 @@ public class HumanTask extends Task {
 
     public void setCandidateGroups(List<String> candidateGroups) {
         this.candidateGroups = candidateGroups;
+    }
+
+    public List<FlowableListener> getTaskListeners() {
+        return taskListeners;
+    }
+
+    public void setTaskListeners(List<FlowableListener> taskListeners) {
+        this.taskListeners = taskListeners;
     }
 
     @Override

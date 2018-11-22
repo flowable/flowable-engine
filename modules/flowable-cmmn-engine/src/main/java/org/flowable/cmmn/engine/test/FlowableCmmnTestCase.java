@@ -103,6 +103,11 @@ public abstract class FlowableCmmnTestCase {
                 .getId();
     }
 
+    protected CaseInstance deployAndStartOneHumanTaskCaseModel() {
+        deployOneHumanTaskCaseModel();
+        return cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
+    }
+
     protected void deployOneTaskCaseModel() {
         deploymentId = cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/one-task-model.cmmn")
