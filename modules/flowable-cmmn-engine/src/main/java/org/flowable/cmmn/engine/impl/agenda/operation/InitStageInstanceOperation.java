@@ -43,7 +43,7 @@ public class InitStageInstanceOperation extends AbstractPlanItemInstanceOperatio
                 stage.getPlanItems(), 
                 planItemInstanceEntity.getCaseDefinitionId(), 
                 planItemInstanceEntity.getCaseInstanceId(), 
-                planItemInstanceEntity.getId(), 
+                planItemInstanceEntity,
                 planItemInstanceEntity.getTenantId());
 
         planItemInstanceEntity.setLastStartedTime(getCurrentTime(commandContext));

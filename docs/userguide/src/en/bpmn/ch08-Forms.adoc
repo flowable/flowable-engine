@@ -89,7 +89,7 @@ or
 TaskFormdata FormService.getTaskFormData(String taskId)
 ----
 
-By default, the build-in form engines, 'sees' the properties as well as the process variables.  So there is no need to declare task form properties if they match 1-1 with the process variables.  For example, with the following declaration:
+By default, the built-in form engine 'sees' the properties as well as the process variables.  So there is no need to declare task form properties if they match 1-1 with the process variables.  For example, with the following declaration:
 
 [source,xml,linenums]
 ----

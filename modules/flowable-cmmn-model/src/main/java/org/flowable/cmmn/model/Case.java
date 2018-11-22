@@ -26,13 +26,6 @@ public class Case extends CmmnElement {
     protected List<String> candidateStarterGroups = new ArrayList<>();
     protected Map<String, CaseElement> allCaseElements = new HashMap<>();
 
-    public Stage findStage(String stageId) {
-        if (planModel.getId().equals(stageId)) {
-            return planModel;
-        }
-        return (Stage) planModel.findPlanItemDefinition(stageId);
-    }
-
     public String getName() {
         return name;
     }

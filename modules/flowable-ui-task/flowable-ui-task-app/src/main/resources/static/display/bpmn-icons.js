@@ -18,7 +18,7 @@ function _drawUserTaskIcon(paper, startX, startY)
 	path1.attr({
 		"opacity": 1,
 		"stroke": "none",
-		"fill": "#d1b575"
+		"fill": "#000000"
  	});
 
 	var userTaskIcon = paper.set();
@@ -33,7 +33,7 @@ function _drawServiceTaskIcon(paper, startX, startY)
 	path1.attr({
 		"opacity": 1,
 		"stroke": "none",
-		"fill": "#72a7d0"
+		"fill": "#000000"
  	});
 
 	var serviceTaskIcon = paper.set();
@@ -48,7 +48,7 @@ function _drawScriptTaskIcon(paper, startX, startY)
 	path1.attr({
 		"opacity": 1,
 		"stroke": "none",
-		"fill": "#72a7d0"
+		"fill": "#000000"
  	});
 
 	var scriptTaskIcon = paper.set();
@@ -62,7 +62,7 @@ function _drawBusinessRuleTaskIcon(paper, startX, startY)
 	var path1 = paper.path("m 1,2 0,14 16,0 0,-14 z m 1.45458,5.6000386 2.90906,0 0,2.7999224 -2.90906,0 z m 4.36364,0 8.72718,0 0,2.7999224 -8.72718,0 z m -4.36364,4.1998844 2.90906,0 0,2.800116 -2.90906,0 z m 4.36364,0 8.72718,0 0,2.800116 -8.72718,0 z");
 	path1.attr({
 		"stroke": "none",
-		"fill": "#72a7d0"
+		"fill": "#000000"
  	});
 
 	var businessRuleTaskIcon = paper.set();
@@ -76,7 +76,7 @@ function _drawSendTaskIcon(paper, startX, startY)
 	var path1 = paper.path("M 1 3 L 9 11 L 17 3 L 1 3 z M 1 5 L 1 13 L 5 9 L 1 5 z M 17 5 L 13 9 L 17 13 L 17 5 z M 6 10 L 1 15 L 17 15 L 12 10 L 9 13 L 6 10 z");
 	path1.attr({
 		"stroke": "none",
-		"fill": "#16964d"
+		"fill": "#000000"
  	});
 
 	var sendTaskIcon = paper.set();
@@ -91,7 +91,7 @@ function _drawManualTaskIcon(paper, startX, startY)
 	path1.attr({
 		"opacity": 1,
 		"stroke": "none",
-		"fill": "#d1b575"
+		"fill": "#000000"
  	});
 
 	var manualTaskIcon = paper.set();
@@ -106,7 +106,7 @@ function _drawReceiveTaskIcon(paper, startX, startY)
 	path.attr({
 		"opacity": 1,
 		"stroke": "none",
-		"fill": "#16964d"
+		"fill": "#000000"
  	});
 
 	startX += 4;
@@ -122,7 +122,7 @@ function _drawCamelTaskIcon(paper, startX, startY)
 	path.attr({
 		"opacity": 1,
 		"stroke": "none",
-		"fill": "#bd4848"
+		"fill": "#000000"
  	});
 
 	startX += 4;
@@ -138,7 +138,7 @@ function _drawMuleTaskIcon(paper, startX, startY)
 	path.attr({
 		"opacity": 1,
 		"stroke": "none",
-		"fill": "#bd4848"
+		"fill": "#000000"
  	});
 
 	startX += 4;
@@ -196,7 +196,7 @@ function _drawHttpTaskIcon(paper, startX, startY)
     path.attr({
         "opacity": 1,
         "stroke": "none",
-        "fill": "#16964d"
+        "fill": "#000000"
     });
 
     startX += -2;
@@ -211,11 +211,11 @@ function _drawShellTaskIcon(paper, startX, startY) {
     path.attr({
         "opacity": 1,
         "stroke": "none",
-        "fill": "#16964d"
+        "fill": "#000000"
     });
     var text = paper.text(3, 9, ">_").attr({
         "font-size": "5px",
-        "fill": "#16964d"
+        "fill": "#000000"
     });
 
     startY += -2;
@@ -228,7 +228,7 @@ function _drawBusinessRuleTaskIcon(paper, startX, startY) {
     var path1 = paper.path("m 1,2 0,14 16,0 0,-14 z m 1.45458,5.6000386 2.90906,0 0,2.7999224 -2.90906,0 z m 4.36364,0 8.72718,0 0,2.7999224 -8.72718,0 z m -4.36364,4.1998844 2.90906,0 0,2.800116 -2.90906,0 z m 4.36364,0 8.72718,0 0,2.800116 -8.72718,0 z");
     path1.attr({
         "stroke": "none",
-        "fill": "#72a7d0"
+        "fill": "#000000"
     });
 
     var businessRuleTaskIcon = paper.set();

@@ -40,6 +40,7 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
             }
         }
 
+        beforeLifecycleListenersExecution();
         String oldState = planItemInstanceEntity.getState();
         String newState = getNewState();
         planItemInstanceEntity.setState(newState);
@@ -47,6 +48,10 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
 
         CommandContextUtil.getAgenda(commandContext).planEvaluateCriteriaOperation(planItemInstanceEntity.getCaseInstanceId(), createPlanItemLifeCycleEvent());
         internalExecute();
+    }
+
+    public void beforeLifecycleListenersExecution() {
+
     }
     
     protected abstract void internalExecute();

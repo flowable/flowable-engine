@@ -327,7 +327,7 @@ alter table ACT_RU_ACTINST
     add constraint ACT_FK_RU_ACTINST_PROCINST
     foreign key (PROC_INST_ID_)
     references ACT_RU_EXECUTION (ID_);
-    
+
 insert into ACT_GE_PROPERTY
 values ('schema.version', '6.4.1.1', 1);
 

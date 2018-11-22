@@ -21,6 +21,7 @@ import java.util.List;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExclusiveGateway;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.InclusiveGateway;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.junit.Test;
 
@@ -40,14 +41,26 @@ public class FlowNodeConverterTest extends AbstractConverterTest {
         FlowElement flowElement = model.getMainProcess().getFlowElement("sid-B074A0DD-934A-4053-A537-20ADF0781023", true);
         assertNotNull(flowElement);
         assertTrue(flowElement instanceof ExclusiveGateway);
-        ExclusiveGateway gateway = (ExclusiveGateway) flowElement;
-        List<SequenceFlow> sequenceFlows = gateway.getOutgoingFlows();
+        ExclusiveGateway exclusiveGateway = (ExclusiveGateway) flowElement;
+        List<SequenceFlow> sequenceFlows = exclusiveGateway.getOutgoingFlows();
         assertEquals(2, sequenceFlows.size());
         assertTrue(sequenceFlows.get(0).getId().equals("sid-07A7E174-8857-4DE9-A7CD-A041706D79C3") || sequenceFlows.get(0).getId().equals("sid-C2068B1E-9A82-41C9-B876-C58E2736C186"));
         assertTrue(sequenceFlows.get(1).getId().equals("sid-07A7E174-8857-4DE9-A7CD-A041706D79C3") || sequenceFlows.get(1).getId().equals("sid-C2068B1E-9A82-41C9-B876-C58E2736C186"));
         assertEquals("sid-B074A0DD-934A-4053-A537-20ADF0781023", sequenceFlows.get(0).getSourceRef());
         assertEquals("sid-B074A0DD-934A-4053-A537-20ADF0781023", sequenceFlows.get(1).getSourceRef());
-        assertEquals("sid-07A7E174-8857-4DE9-A7CD-A041706D79C3", gateway.getDefaultFlow());
+        assertEquals("sid-07A7E174-8857-4DE9-A7CD-A041706D79C3", exclusiveGateway.getDefaultFlow());
+
+        flowElement = model.getMainProcess().getFlowElement("sid-F9AABCC8-8E36-428F-A4C3-32DC991E64F5", true);
+        assertNotNull(flowElement);
+        assertTrue(flowElement instanceof InclusiveGateway);
+        InclusiveGateway inclusiveGateway = (InclusiveGateway) flowElement;
+        sequenceFlows = inclusiveGateway.getOutgoingFlows();
+        assertEquals(2, sequenceFlows.size());
+        assertTrue(sequenceFlows.get(0).getId().equals("sid-849DE573-3063-4DFB-A729-39DFBF3DFB35") || sequenceFlows.get(0).getId().equals("sid-10913B58-DFB0-462B-B0EE-0EC4118D70A5"));
+        assertTrue(sequenceFlows.get(1).getId().equals("sid-849DE573-3063-4DFB-A729-39DFBF3DFB35") || sequenceFlows.get(1).getId().equals("sid-10913B58-DFB0-462B-B0EE-0EC4118D70A5"));
+        assertEquals("sid-F9AABCC8-8E36-428F-A4C3-32DC991E64F5", sequenceFlows.get(0).getSourceRef());
+        assertEquals("sid-F9AABCC8-8E36-428F-A4C3-32DC991E64F5", sequenceFlows.get(1).getSourceRef());
+        assertEquals("sid-849DE573-3063-4DFB-A729-39DFBF3DFB35", inclusiveGateway.getDefaultFlow());
     }
 
     @Override

@@ -51,6 +51,16 @@ public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<Hi
         return (List) getList("selectHistoricEntityLinksByScopeIdAndType", parameters, historicEntityLinksByScopeIdAndTypeMatcher, true);
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
+    public List<HistoricEntityLink> findHistoricEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String scopeType, String linkType) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("referenceScopeId", referenceScopeId);
+        parameters.put("referenceScopeType", scopeType);
+        parameters.put("linkType", linkType);
+        return (List) getList("selectHistoricEntityLinksByReferenceScopeIdAndType", parameters, historicEntityLinksByScopeIdAndTypeMatcher, true);
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoricEntityLink> findHistoricEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType, String linkType) {
@@ -58,7 +68,7 @@ public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<Hi
         parameters.put("scopeDefinitionId", scopeDefinitionId);
         parameters.put("scopeType", scopeType);
         parameters.put("linkType", linkType);
-        return getDbSqlSession().selectList("selectHistoricEntityLinksByScopeIdAndType", parameters);
+        return getDbSqlSession().selectList("selectHistoricEntityLinksByScopeDefinitionIdAndType", parameters);
     }
     
     @Override

@@ -46,7 +46,7 @@ public class CompletionNeutralConverterTest extends AbstractConverterTest {
                 assertEquals("${" + planItem.getId() + "}", planItem.getItemControl().getCompletionNeutralRule().getCondition());
             });
 
-            Stage stageOne = cmmnModel.getPrimaryCase().findStage("stageOne");
+            Stage stageOne = (Stage) cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionInStageOrDownwards("stageOne");
             List<PlanItem> planItems1 = stageOne.getPlanItems();
             assertEquals(1, planItems1.size());
             PlanItem planItem = planItems1.get(0);

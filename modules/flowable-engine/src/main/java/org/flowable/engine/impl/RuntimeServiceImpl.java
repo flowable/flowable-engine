@@ -46,6 +46,9 @@ import org.flowable.engine.impl.cmd.GetDataObjectCmd;
 import org.flowable.engine.impl.cmd.GetDataObjectsCmd;
 import org.flowable.engine.impl.cmd.GetEnabledActivitiesForAdhocSubProcessCmd;
 import org.flowable.engine.impl.cmd.GetEntityLinkChildrenForProcessInstanceCmd;
+import org.flowable.engine.impl.cmd.GetEntityLinkChildrenForTaskCmd;
+import org.flowable.engine.impl.cmd.GetEntityLinkParentForProcessInstanceCmd;
+import org.flowable.engine.impl.cmd.GetEntityLinkParentForTaskCmd;
 import org.flowable.engine.impl.cmd.GetExecutionVariableCmd;
 import org.flowable.engine.impl.cmd.GetExecutionVariableInstanceCmd;
 import org.flowable.engine.impl.cmd.GetExecutionVariableInstancesCmd;
@@ -485,6 +488,21 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     @Override
     public List<EntityLink> getEntityLinkChildrenForProcessInstance(String processInstanceId) {
         return commandExecutor.execute(new GetEntityLinkChildrenForProcessInstanceCmd(processInstanceId));
+    }
+
+    @Override
+    public List<EntityLink> getEntityLinkChildrenForTask(String taskId) {
+        return commandExecutor.execute(new GetEntityLinkChildrenForTaskCmd(taskId));
+    }
+
+    @Override
+    public List<EntityLink> getEntityLinkParentForProcessInstance(String processInstanceId) {
+        return commandExecutor.execute(new GetEntityLinkParentForProcessInstanceCmd(processInstanceId));
+    }
+
+    @Override
+    public List<EntityLink> getEntityLinkParentForTask(String taskId) {
+        return commandExecutor.execute(new GetEntityLinkParentForTaskCmd(taskId));
     }
 
     @Override

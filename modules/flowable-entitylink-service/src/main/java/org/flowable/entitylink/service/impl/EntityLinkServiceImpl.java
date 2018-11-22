@@ -41,8 +41,8 @@ public class EntityLinkServiceImpl extends CommonServiceImpl<EntityLinkServiceCo
     }
     
     @Override
-    public List<EntityLink> findEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String scopeType, String linkType) {
-        return getEntityLinkEntityManager().findEntityLinksByReferenceScopeIdAndType(referenceScopeId, scopeType, linkType);
+    public List<EntityLink> findEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String referenceScopeType, String linkType) {
+        return getEntityLinkEntityManager().findEntityLinksByReferenceScopeIdAndType(referenceScopeId, referenceScopeType, linkType);
     }
     
     @Override
