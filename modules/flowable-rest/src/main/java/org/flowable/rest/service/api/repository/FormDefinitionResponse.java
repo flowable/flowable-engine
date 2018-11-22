@@ -30,6 +30,9 @@ public class FormDefinitionResponse {
     protected String deploymentId;
     protected String tenantId;
 
+    public FormDefinitionResponse() {
+    }
+
     public FormDefinitionResponse(FormDefinition formDefinition) {
         setId(formDefinition.getId());
         setCategory(formDefinition.getCategory());
