@@ -285,6 +285,71 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             }
         }
     }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/ProcessTaskTest.testOneTaskProcessBlocking.cmmn")
+    public void testTwoTaskProcessBlocking() {
+        try {
+            if (processEngineRepositoryService.createDeploymentQuery().count() == 1) {
+                Deployment deployment = processEngineRepositoryService.createDeploymentQuery().singleResult();
+                processEngineRepositoryService.deleteDeployment(deployment.getId());
+            }
+            processEngineRepositoryService.createDeployment().
+                    addClasspathResource("org/flowable/cmmn/test/twoTaskProcess.bpmn20.xml").
+                    deploy();
+
+            CaseInstance caseInstance = startCaseInstanceWithOneTaskProcess();
+
+            Task task = processEngineTaskService.createTaskQuery().singleResult();
+            assertEquals("my task", task.getName());
+            
+            EntityLink taskEntityLink = null;
+            List<EntityLink> entityLinks = cmmnRuntimeService.getEntityLinkChildrenForCaseInstance(caseInstance.getId());
+            for (EntityLink entityLink : entityLinks) {
+                if (task.getId().equals(entityLink.getReferenceScopeId())) {
+                    taskEntityLink = entityLink;
+                }
+            }
+            
+            assertNotNull(taskEntityLink);
+            assertEquals(task.getId(), taskEntityLink.getReferenceScopeId());
+            assertEquals(ScopeTypes.TASK, taskEntityLink.getReferenceScopeType());
+            
+            processEngineTaskService.complete(task.getId());
+            
+            Task task2 = processEngineTaskService.createTaskQuery().singleResult();
+            assertEquals("my task2", task2.getName());
+            
+            EntityLink taskEntityLink2 = null;
+            entityLinks = cmmnRuntimeService.getEntityLinkChildrenForCaseInstance(caseInstance.getId());
+            for (EntityLink entityLink : entityLinks) {
+                if (task2.getId().equals(entityLink.getReferenceScopeId())) {
+                    taskEntityLink2 = entityLink;
+                }
+            }
+            
+            assertNotNull(taskEntityLink2);
+            assertEquals(task2.getId(), taskEntityLink2.getReferenceScopeId());
+            assertEquals(ScopeTypes.TASK, taskEntityLink2.getReferenceScopeType());
+            
+            processEngineTaskService.complete(task2.getId());
+            
+            List<ProcessInstance> processInstances = processEngineRuntimeService.createProcessInstanceQuery().processDefinitionKey("oneTask").list();
+            assertEquals(0, processInstances.size());
+
+            this.cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+            
+        } finally {
+            if (processEngineRepositoryService.createDeploymentQuery().count() == 1) {
+                Deployment deployment = processEngineRepositoryService.createDeploymentQuery().singleResult();
+                processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+            }
+            if (processEngine.getProcessEngineConfiguration().getHistoryService().createHistoricTaskInstanceQuery().count() == 1) {
+                HistoricTaskInstance historicTaskInstance = processEngine.getProcessEngineConfiguration().getHistoryService().createHistoricTaskInstanceQuery().singleResult();
+                processEngine.getProcessEngineConfiguration().getHistoryService().deleteHistoricTaskInstance(historicTaskInstance.getId());
+            }
+        }
+    }
 
     @Test
     @CmmnDeployment
