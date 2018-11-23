@@ -24,6 +24,7 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.event.impl.FlowableTaskEventBuilder;
+import org.flowable.task.service.event.impl.FlowableUserTaskAssigneeChangedEvent;
 import org.flowable.task.service.event.impl.FlowableUserTaskCreatedEvent;
 import org.flowable.task.service.impl.TaskQueryImpl;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
@@ -122,13 +123,18 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     public void changeTaskAssignee(TaskEntity taskEntity, String assignee) {
         if ((taskEntity.getAssignee() != null && !taskEntity.getAssignee().equals(assignee))
                 || (taskEntity.getAssignee() == null && assignee != null)) {
-            
+
             taskEntity.setAssignee(assignee);
             
             if (taskEntity.getId() != null) {
                 getTaskServiceConfiguration().getInternalHistoryTaskManager().recordTaskInfoChange(taskEntity);
                 update(taskEntity);
             }
+
+            if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
+                getEventDispatcher().dispatchEvent(new FlowableUserTaskAssigneeChangedEvent(taskEntity));
+            }
+
         }
     }
 

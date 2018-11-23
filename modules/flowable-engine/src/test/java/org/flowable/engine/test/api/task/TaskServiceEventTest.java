@@ -135,8 +135,53 @@ public class TaskServiceEventTest {
 
     @Test
     public void deleteNonExistingTaskEventLogEntry(TaskService taskService) {
+        task = taskService.createTaskBuilder().
+            create();
         // non existing log entry delete should be successful
         taskService.deleteTaskLogEntry(Long.MIN_VALUE);
+
+        assertThat(taskService.getTaskLogEntriesByTaskInstanceId(task.getId())).size().isEqualTo(1);
+    }
+
+    @Test
+    public void taskAssigneeEvent(TaskService taskService) {
+        task = taskService.createTaskBuilder().
+            assignee("initialAssignee").
+            create();
+
+        taskService.setAssignee(task.getId(), "newAssignee");
+        List<TaskLogEntry> taskLogEntries = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
+
+        assertThat(taskLogEntries).size().isEqualTo(2);
+        assertThat(taskLogEntries.get(1)).
+            extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
+            isEqualTo("{\"newAssigneeId\":\"newAssignee\"}");
+        assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTimeStamp).isNotNull();
+        assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTaskId).isEqualTo(task.getId());
+        assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getUserId).isNull();
+        assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_ASSIGNEE_CHANGED");
+    }
+
+    @Test
+    public void changeAssigneeTaskEventAsAuthenticatedUser(TaskService taskService) {
+        String previousUserId = Authentication.getAuthenticatedUserId();
+        task = taskService.createTaskBuilder().
+            assignee("testAssignee").
+            create();
+        Authentication.setAuthenticatedUserId("testUser");
+        try {
+            taskService.setAssignee(task.getId(), "newAssignee");
+
+            List<TaskLogEntry> taskLogsByTaskInstanceId = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
+            assertThat(
+                taskLogsByTaskInstanceId
+            ).size().isEqualTo(2);
+
+            assertThat(taskLogsByTaskInstanceId.get(1)).
+                extracting(TaskLogEntry::getUserId).isEqualTo("testUser");
+        } finally {
+            Authentication.setAuthenticatedUserId(previousUserId);
+        }
     }
 
 }

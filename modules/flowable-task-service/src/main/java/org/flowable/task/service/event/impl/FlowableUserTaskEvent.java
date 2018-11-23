@@ -13,23 +13,20 @@
 package org.flowable.task.service.event.impl;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
-import org.flowable.common.engine.api.delegate.event.FlowableEventType;
-import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.task.api.Task;
 
 /**
  * @author martin.grofcik
  */
-public class FlowableUserTaskCreatedEvent extends FlowableUserTaskEvent {
+public abstract class FlowableUserTaskEvent implements FlowableEvent {
 
-    public static final String USER_TASK_CREATED_TYPE = "USER_TASK_CREATED";
+    protected Task task;
 
-    public FlowableUserTaskCreatedEvent(TaskEntity task) {
-        super(task);
+    public FlowableUserTaskEvent(Task task) {
+        this.task = task;
     }
 
-    @Override
-    public FlowableEventType getType() {
-        return () -> USER_TASK_CREATED_TYPE;
+    public Task getTask() {
+        return task;
     }
-
 }

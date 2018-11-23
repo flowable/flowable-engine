@@ -12,24 +12,22 @@
  */
 package org.flowable.task.service.event.impl;
 
-import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventType;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author martin.grofcik
  */
-public class FlowableUserTaskCreatedEvent extends FlowableUserTaskEvent {
+public class FlowableUserTaskAssigneeChangedEvent extends FlowableUserTaskEvent {
 
-    public static final String USER_TASK_CREATED_TYPE = "USER_TASK_CREATED";
+    public static final String USER_TASK_ASSIGNEE_CHANGED = "USER_TASK_ASSIGNEE_CHANGED";
 
-    public FlowableUserTaskCreatedEvent(TaskEntity task) {
+    public FlowableUserTaskAssigneeChangedEvent(TaskEntity task) {
         super(task);
     }
 
     @Override
     public FlowableEventType getType() {
-        return () -> USER_TASK_CREATED_TYPE;
+        return () -> USER_TASK_ASSIGNEE_CHANGED;
     }
-
 }
