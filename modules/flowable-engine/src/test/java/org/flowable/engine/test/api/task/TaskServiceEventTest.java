@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.test.ConfigurationResource;
 import org.flowable.engine.test.FlowableTest;
@@ -61,6 +62,29 @@ public class TaskServiceEventTest {
             extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_CREATED");
         assertThat(taskLogsByTaskInstanceId.get(0)).
             extracting(TaskLogEntry::getTimeStamp).isEqualTo(task.getCreateTime());
+        assertThat(taskLogsByTaskInstanceId.get(0)).
+            extracting(TaskLogEntry::getUserId).isNull();
+    }
+
+    @Test
+    public void createTaskEventAsAuthenticatedUser(TaskService taskService) {
+        String previousUserId = Authentication.getAuthenticatedUserId();
+        Authentication.setAuthenticatedUserId("testUser");
+        try {
+            task = taskService.createTaskBuilder().
+                assignee("testAssignee").
+                create();
+
+            List<TaskLogEntry> taskLogsByTaskInstanceId = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
+            assertThat(
+                taskLogsByTaskInstanceId
+            ).size().isEqualTo(1);
+
+            assertThat(taskLogsByTaskInstanceId.get(0)).
+                extracting(TaskLogEntry::getUserId).isEqualTo("testUser");
+        } finally {
+            Authentication.setAuthenticatedUserId(previousUserId);
+        }
     }
 
     @Test

@@ -15,6 +15,7 @@ package org.flowable.task.service.impl.event;
 
 import org.flowable.common.engine.api.delegate.event.AbstractFlowableEventListener;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.task.service.event.impl.FlowableUserTaskCreatedEvent;
 import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntity;
 import org.flowable.task.service.impl.util.CommandContextUtil;
@@ -32,6 +33,7 @@ public class UserTaskDbEventLogger extends AbstractFlowableEventListener {
             taskLogEntity.setTaskId(userTaskCreatedEvent.getTask().getId());
             taskLogEntity.setTimeStamp(userTaskCreatedEvent.getTask().getCreateTime());
             taskLogEntity.setType(userTaskCreatedEvent.getType().name());
+            taskLogEntity.setUserId(Authentication.getAuthenticatedUserId());
             CommandContextUtil.getTaskLogEntryEntityManager().insert(taskLogEntity);
         }
     }
