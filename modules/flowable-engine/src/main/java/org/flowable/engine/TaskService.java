@@ -848,4 +848,10 @@ public interface TaskService {
      */
     List<TaskLogEntry> getTaskLogEntriesByTaskInstanceId(String taskId);
 
+    /**
+     * Deletes user task log entry by its log number
+     *
+     * @param logNumber user task log entry identifier
+     */
+    void deleteTaskLogEntry(long logNumber);
 }

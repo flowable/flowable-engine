@@ -74,9 +74,13 @@
   <!-- SELECTS -->
 
   <select id="selectTaskLogEntriesByTaskInstanceId" parameterType="string" resultMap="taskLogResultMap">
-    select * from ${prefix}FLW_TSK_LOG 
-    WHERE TASK_ID_ = #{parameter.taskInstanceId}
-    ORDER BY LOG_NR_ 
+    select * from ${prefix}FLW_TSK_LOG
+    <where>
+      <if test="parameter.taskInstanceId != null">
+        TASK_ID_ = #{parameter.taskInstanceId}
+      </if>
+    </where>
+    ORDER BY LOG_NR_
   </select>
   
   <!-- DELETE -->

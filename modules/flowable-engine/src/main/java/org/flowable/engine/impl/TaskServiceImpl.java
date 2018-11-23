@@ -36,6 +36,7 @@ import org.flowable.engine.impl.cmd.DeleteAttachmentCmd;
 import org.flowable.engine.impl.cmd.DeleteCommentCmd;
 import org.flowable.engine.impl.cmd.DeleteIdentityLinkCmd;
 import org.flowable.engine.impl.cmd.DeleteTaskCmd;
+import org.flowable.engine.impl.cmd.DeleteTaskLogEntryByLogNumberCmd;
 import org.flowable.engine.impl.cmd.GetAttachmentCmd;
 import org.flowable.engine.impl.cmd.GetAttachmentContentCmd;
 import org.flowable.engine.impl.cmd.GetCommentCmd;
@@ -583,5 +584,10 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
     @Override
     public List<TaskLogEntry> getTaskLogEntriesByTaskInstanceId(String taskId) {
         return commandExecutor.execute(new GetTaskLogEntriesByTaskInstanceIdCmd(taskId));
+    }
+
+    @Override
+    public void deleteTaskLogEntry(long logNumber) {
+        commandExecutor.execute(new DeleteTaskLogEntryByLogNumberCmd(logNumber));
     }
 }
