@@ -16,9 +16,12 @@ package org.flowable.task.service.event.impl;
 import java.util.Collections;
 
 import org.flowable.common.engine.api.delegate.event.AbstractFlowableEventListener;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.runtime.ClockReader;
+import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntity;
 import org.flowable.task.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
@@ -64,6 +67,17 @@ public class UserTaskDbEventLogger extends AbstractFlowableEventListener {
                     )
                 );
             }
+            CommandContextUtil.getTaskLogEntryEntityManager().insert(taskLogEntry);
+        }
+
+        if (FlowableEngineEventType.TASK_COMPLETED.equals(event.getType())) {
+            FlowableEntityEvent entityEvent = (FlowableEntityEvent) event;
+            Task task = (Task) entityEvent.getEntity();
+            TaskLogEntryEntity taskLogEntry = CommandContextUtil.getTaskLogEntryEntityManager().create();
+            taskLogEntry.setTaskId(task.getId());
+            taskLogEntry.setTimeStamp(clock.getCurrentTime());
+            taskLogEntry.setType(FlowableEngineEventType.TASK_COMPLETED.name());
+            taskLogEntry.setUserId(Authentication.getAuthenticatedUserId());
             CommandContextUtil.getTaskLogEntryEntityManager().insert(taskLogEntry);
         }
     }

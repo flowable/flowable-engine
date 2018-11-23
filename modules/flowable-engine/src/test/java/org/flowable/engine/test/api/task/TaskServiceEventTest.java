@@ -225,4 +225,41 @@ public class TaskServiceEventTest {
         }
     }
 
+    @Test
+    public void claimTaskEvent(TaskService taskService) {
+        task = taskService.createTaskBuilder().
+            create();
+
+        taskService.claim(task.getId(), "testUser");
+
+        List<TaskLogEntry> taskLogEntries = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
+        assertThat(taskLogEntries).size().isEqualTo(2);
+        assertThat(taskLogEntries.get(1)).
+            extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
+            isEqualTo("{\"newAssigneeId\":\"testUser\"}");
+        assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTimeStamp).isNotNull();
+        assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTaskId).isEqualTo(task.getId());
+        assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getUserId).isNull();
+        assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_ASSIGNEE_CHANGED");
+    }
+
+    @Test
+    public void unClaimTaskEvent(TaskService taskService) {
+        task = taskService.createTaskBuilder().
+            assignee("initialAssignee").
+            create();
+
+        taskService.unclaim(task.getId());
+
+        List<TaskLogEntry> taskLogEntries = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
+        assertThat(taskLogEntries).size().isEqualTo(2);
+        assertThat(taskLogEntries.get(1)).
+            extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
+            isEqualTo("{\"newAssigneeId\":null}");
+        assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTimeStamp).isNotNull();
+        assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTaskId).isEqualTo(task.getId());
+        assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getUserId).isNull();
+        assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_ASSIGNEE_CHANGED");
+    }
+
 }
