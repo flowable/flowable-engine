@@ -44,6 +44,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkType;
+import org.flowable.entitylink.api.HierarchyType;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
@@ -122,6 +123,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertNull(entityLinkSubProcess.getReferenceScopeDefinitionId());
         assertEquals(EntityLinkType.CHILD, entityLinkSubProcess.getLinkType());
         assertNotNull(entityLinkSubProcess.getCreateTime());
+        assertEquals(HierarchyType.ROOT, entityLinkSubProcess.getHierarchyType());
         
         assertEquals(processInstance.getId(), entityLinkTask.getScopeId());
         assertEquals(ScopeTypes.BPMN, entityLinkTask.getScopeType());
@@ -131,6 +133,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertNull(entityLinkTask.getReferenceScopeDefinitionId());
         assertEquals(EntityLinkType.CHILD, entityLinkTask.getLinkType());
         assertNotNull(entityLinkTask.getCreateTime());
+        assertEquals(HierarchyType.ROOT, entityLinkTask.getHierarchyType());
         
         assertEquals(processInstance.getId(), entityLinkSubTask.getScopeId());
         assertEquals(ScopeTypes.BPMN, entityLinkSubTask.getScopeType());
@@ -140,6 +143,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertNull(entityLinkSubTask.getReferenceScopeDefinitionId());
         assertEquals(EntityLinkType.CHILD, entityLinkSubTask.getLinkType());
         assertNotNull(entityLinkSubTask.getCreateTime());
+        assertEquals(HierarchyType.ROOT, entityLinkSubTask.getHierarchyType());
         
         entityLinks = runtimeService.getEntityLinkChildrenForProcessInstance(execution.getProcessInstanceId());
         assertEquals(1, entityLinks.size());
@@ -153,6 +157,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertNull(entityLink.getReferenceScopeDefinitionId());
         assertEquals(EntityLinkType.CHILD, entityLink.getLinkType());
         assertNotNull(entityLink.getCreateTime());
+        assertEquals(HierarchyType.PARENT, entityLink.getHierarchyType());
         
         childTask = taskService.createTaskQuery().processInstanceIdWithChildren(processInstance.getId()).singleResult();
         assertEquals(taskInSubProcess.getId(), childTask.getId());
@@ -236,6 +241,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
                 assertNull(historicEntityLinkSubProcess.getReferenceScopeDefinitionId());
                 assertEquals(EntityLinkType.CHILD, historicEntityLinkSubProcess.getLinkType());
                 assertNotNull(historicEntityLinkSubProcess.getCreateTime());
+                assertEquals(HierarchyType.ROOT, historicEntityLinkSubProcess.getHierarchyType());
                 
                 assertEquals(processInstance.getId(), historicEntityLinkTask.getScopeId());
                 assertEquals(ScopeTypes.BPMN, historicEntityLinkTask.getScopeType());
@@ -245,6 +251,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
                 assertNull(historicEntityLinkTask.getReferenceScopeDefinitionId());
                 assertEquals(EntityLinkType.CHILD, historicEntityLinkTask.getLinkType());
                 assertNotNull(historicEntityLinkTask.getCreateTime());
+                assertEquals(HierarchyType.ROOT, historicEntityLinkTask.getHierarchyType());
                 
                 assertEquals(processInstance.getId(), historicEntityLinkSubTask.getScopeId());
                 assertEquals(ScopeTypes.BPMN, historicEntityLinkSubTask.getScopeType());
@@ -254,6 +261,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
                 assertNull(historicEntityLinkSubTask.getReferenceScopeDefinitionId());
                 assertEquals(EntityLinkType.CHILD, historicEntityLinkSubTask.getLinkType());
                 assertNotNull(historicEntityLinkSubTask.getCreateTime());
+                assertEquals(HierarchyType.ROOT, historicEntityLinkSubTask.getHierarchyType());
                 
                 assertEquals(processInstance.getId(), historicEntityLinkAfterTask.getScopeId());
                 assertEquals(ScopeTypes.BPMN, historicEntityLinkAfterTask.getScopeType());
@@ -263,6 +271,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
                 assertNull(historicEntityLinkAfterTask.getReferenceScopeDefinitionId());
                 assertEquals(EntityLinkType.CHILD, historicEntityLinkAfterTask.getLinkType());
                 assertNotNull(historicEntityLinkAfterTask.getCreateTime());
+                assertEquals(HierarchyType.ROOT, historicEntityLinkAfterTask.getHierarchyType());
                 
                 historicEntityLinks = historyService.getHistoricEntityLinkChildrenForProcessInstance(execution.getProcessInstanceId());
                 assertEquals(1, historicEntityLinks.size());
@@ -276,6 +285,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
                 assertNull(historicEntityLink.getReferenceScopeDefinitionId());
                 assertEquals(EntityLinkType.CHILD, historicEntityLink.getLinkType());
                 assertNotNull(historicEntityLink.getCreateTime());
+                assertEquals(HierarchyType.PARENT, historicEntityLink.getHierarchyType());
                 
                 List<HistoricTaskInstance> childHistoricTasks = historyService.createHistoricTaskInstanceQuery()
                                 .processInstanceIdWithChildren(processInstance.getId())

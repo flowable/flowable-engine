@@ -478,9 +478,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             historicEntityLinkEntity.setReferenceScopeId(entityLink.getReferenceScopeId());
             historicEntityLinkEntity.setReferenceScopeType(entityLink.getReferenceScopeType());
             historicEntityLinkEntity.setReferenceScopeDefinitionId(entityLink.getReferenceScopeDefinitionId());
-            historicEntityLinkEntity.setRootScopeId(entityLink.getRootScopeId());
-            historicEntityLinkEntity.setRootScopeType(entityLink.getRootScopeType());
-            historicEntityLinkEntity.setRootScopeDefinitionId(entityLink.getRootScopeDefinitionId());
+            historicEntityLinkEntity.setHierarchyType(entityLink.getHierarchyType());
             historicEntityLinkService.insertHistoricEntityLink(historicEntityLinkEntity, false);
         }
     }

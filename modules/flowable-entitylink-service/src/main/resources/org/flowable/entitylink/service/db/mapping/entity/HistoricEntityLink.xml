@@ -7,7 +7,7 @@
    <!-- INSERT HISTORIC ENTITY LINK -->
   
   <insert id="insertHistoricEntityLink" parameterType="org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntityImpl">
-    insert into ${prefix}ACT_HI_ENTITYLINK (ID_, LINK_TYPE_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_, CREATE_TIME_, ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_, ROOT_SCOPE_DEFINITION_ID_)
+    insert into ${prefix}ACT_HI_ENTITYLINK (ID_, LINK_TYPE_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_, CREATE_TIME_, HIERARCHY_TYPE_)
     values (#{id, jdbcType=VARCHAR},
             #{linkType, jdbcType=VARCHAR},
             #{scopeId, jdbcType=VARCHAR},
@@ -17,13 +17,11 @@
             #{referenceScopeType, jdbcType=VARCHAR},
             #{referenceScopeDefinitionId, jdbcType=VARCHAR},
             #{createTime, jdbcType=TIMESTAMP},
-            #{rootScopeId, jdbcType=VARCHAR},
-            #{rootScopeType, jdbcType=VARCHAR},
-            #{rootScopeDefinitionId, jdbcType=VARCHAR})
+            #{hierarchyType, jdbcType=VARCHAR})
   </insert>
   
   <insert id="bulkInsertHistoricEntityLink" parameterType="java.util.List">
-    insert into ${prefix}ACT_HI_ENTITYLINK (ID_, LINK_TYPE_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_, CREATE_TIME_, ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_, ROOT_SCOPE_DEFINITION_ID_)
+    insert into ${prefix}ACT_HI_ENTITYLINK (ID_, LINK_TYPE_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_, CREATE_TIME_, HIERARCHY_TYPE_)
     values 
       <foreach collection="list" item="historicEntityLink" index="index" separator=",">
         (#{historicEntityLink.id, jdbcType=VARCHAR},
@@ -35,16 +33,14 @@
          #{historicEntityLink.referenceScopeType, jdbcType=VARCHAR},
          #{historicEntityLink.referenceScopeDefinitionId, jdbcType=VARCHAR},
          #{historicEntityLink.createTime, jdbcType=TIMESTAMP},
-         #{historicEntityLink.rootScopeId, jdbcType=VARCHAR},
-         #{historicEntityLink.rootScopeType, jdbcType=VARCHAR},
-         #{historicEntityLink.rootScopeDefinitionId, jdbcType=VARCHAR})
+         #{historicEntityLink.hierarchyType, jdbcType=VARCHAR})
       </foreach>
   </insert>
   
   <insert id="bulkInsertHistoricEntityLink" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL 
       <foreach collection="list" item="historicEntityLink" index="index">
-        INTO ${prefix}ACT_HI_ENTITYLINK (ID_, LINK_TYPE_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_, CREATE_TIME_, ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_, ROOT_SCOPE_DEFINITION_ID_) VALUES
+        INTO ${prefix}ACT_HI_ENTITYLINK (ID_, LINK_TYPE_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_, CREATE_TIME_, HIERARCHY_TYPE_) VALUES
           (#{historicEntityLink.id, jdbcType=VARCHAR},
            #{historicEntityLink.linkType, jdbcType=VARCHAR},
            #{historicEntityLink.scopeId, jdbcType=VARCHAR},
@@ -54,9 +50,7 @@
            #{historicEntityLink.referenceScopeType, jdbcType=VARCHAR},
            #{historicEntityLink.referenceScopeDefinitionId, jdbcType=VARCHAR},
            #{historicEntityLink.createTime, jdbcType=TIMESTAMP},
-           #{historicEntityLink.rootScopeId, jdbcType=VARCHAR},
-           #{historicEntityLink.rootScopeType, jdbcType=VARCHAR},
-           #{historicEntityLink.rootScopeDefinitionId, jdbcType=VARCHAR})
+           #{historicEntityLink.hierarchyType, jdbcType=VARCHAR})
       </foreach>
     SELECT * FROM dual
   </insert>
@@ -94,9 +88,7 @@
     <result property="referenceScopeType" column="REF_SCOPE_TYPE_" jdbcType="VARCHAR"/>
     <result property="referenceScopeDefinitionId" column="REF_SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
     <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
-    <result property="rootScopeId" column="ROOT_SCOPE_ID_" jdbcType="VARCHAR"/>
-    <result property="rootScopeType" column="ROOT_SCOPE_TYPE_" jdbcType="VARCHAR"/>
-    <result property="rootScopeDefinitionId" column="ROOT_SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
+    <result property="hierarchyType" column="HIERARCHY_TYPE_" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!-- HISTORIC ENTITY LINK SELECT -->

@@ -28,6 +28,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkService;
 import org.flowable.entitylink.api.EntityLinkType;
+import org.flowable.entitylink.api.HierarchyType;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
@@ -86,8 +87,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         });
 
         assertEquals(1, entityLinksByScopeIdAndType.size());
-        assertEquals(processInstance.getId(), entityLinksByScopeIdAndType.get(0).getRootScopeId());
-        assertEquals(ScopeTypes.BPMN, entityLinksByScopeIdAndType.get(0).getRootScopeType());
+        assertEquals(HierarchyType.ROOT, entityLinksByScopeIdAndType.get(0).getHierarchyType());
     }
 
     @Test
