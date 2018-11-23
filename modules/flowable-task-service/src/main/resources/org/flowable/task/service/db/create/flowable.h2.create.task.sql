@@ -31,9 +31,23 @@ create table ACT_RU_TASK (
     primary key (ID_)
 );
 
+create table FLW_TSK_LOG (
+    LOG_NR_ identity,
+    TYPE_ varchar(64),
+    TASK_ID_ varchar(64),
+    TIME_STAMP_ timestamp not null,
+    USER_ID_ varchar(255),
+    DATA_ longvarbinary,
+    LOCK_OWNER_ varchar(255),
+    LOCK_TIME_ timestamp,
+    IS_PROCESSED_ bit default 0
+);
+
 create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
 create index ACT_IDX_TASK_SCOPE on ACT_RU_TASK(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SUB_SCOPE on ACT_RU_TASK(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SCOPE_DEF on ACT_RU_TASK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
-insert into ACT_GE_PROPERTY values ('task.schema.version', '6.4.1.0', 1);
+create index FLW_IDX_TASK_LOG_NUMBER on FLW_TSK_LOG(LOG_NR_);
+
+insert into ACT_GE_PROPERTY values ('task.schema.version', '6.4.1.1', 1);

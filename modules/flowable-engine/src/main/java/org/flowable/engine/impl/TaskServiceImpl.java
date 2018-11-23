@@ -51,6 +51,7 @@ import org.flowable.engine.impl.cmd.GetTaskDataObjectsCmd;
 import org.flowable.engine.impl.cmd.GetTaskEventCmd;
 import org.flowable.engine.impl.cmd.GetTaskEventsCmd;
 import org.flowable.engine.impl.cmd.GetTaskFormModelCmd;
+import org.flowable.engine.impl.cmd.GetTaskLogEntriesByTaskInstanceIdCmd;
 import org.flowable.engine.impl.cmd.GetTaskVariableCmd;
 import org.flowable.engine.impl.cmd.GetTaskVariableInstanceCmd;
 import org.flowable.engine.impl.cmd.GetTaskVariableInstancesCmd;
@@ -78,6 +79,7 @@ import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.NativeTaskQuery;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
+import org.flowable.task.api.TaskLogEntry;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.impl.NativeTaskQueryImpl;
 import org.flowable.task.service.impl.TaskQueryImpl;
@@ -576,5 +578,10 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
     @Override
     public TaskBuilder createTaskBuilder() {
         return new TaskBuilderImpl(commandExecutor);
+    }
+
+    @Override
+    public List<TaskLogEntry> getTaskLogEntriesByTaskInstanceId(String taskId) {
+        return commandExecutor.execute(new GetTaskLogEntriesByTaskInstanceIdCmd(taskId));
     }
 }

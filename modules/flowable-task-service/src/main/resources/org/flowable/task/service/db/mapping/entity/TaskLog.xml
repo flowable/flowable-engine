@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.flowable.engine.impl.persistence.entity.EvenLogEntryEntityImpl">
+
+  <!-- INSERT -->
+
+  <insert id="insertTaskLogEntry" parameterType="org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntityImpl">
+    insert into ${prefix}FLW_TSK_LOG(TYPE_, TASK_ID_, TIME_STAMP_, USER_ID_, DATA_)
+    values (
+      #{type, jdbcType=VARCHAR}, 
+      #{taskId, jdbcType=VARCHAR},
+      #{timeStamp, jdbcType=TIMESTAMP}, 
+      #{userId, jdbcType=VARCHAR},
+      #{data, jdbcType=${blobType}},
+    )
+  </insert>
+  
+  <insert id="bulkInsertTaskLogEntry" parameterType="java.util.List">
+    insert into ${prefix}FLW_TSK_LOG(TYPE_, TASK_ID_, TIME_STAMP_, USER_ID_, DATA_)
+    values 
+      <foreach collection="list" item="taskLog" index="index" separator=",">
+        (#{taskLog.type, jdbcType=VARCHAR},
+         #{taskLog.taskId, jdbcType=VARCHAR},
+         #{taskLog.timeStamp, jdbcType=TIMESTAMP},
+         #{taskLog.userId, jdbcType=VARCHAR},
+         #{taskLog.data, jdbcType=${blobType}},
+      </foreach>
+  </insert>
+
+  <insert id="insertTaskLogEntry" databaseId="oracle" parameterType="org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntityImpl">
+    insert into ${prefix}FLW_TSK_LOG(LOG_NR_, TYPE_, TASK_ID_, TIME_STAMP_, USER_ID_, DATA_)
+    values (
+      ${prefix}FLW_TSK_LOG_seq.nextVal,
+      #{type, jdbcType=VARCHAR}, 
+      #{taskId, jdbcType=VARCHAR},
+      #{timeStamp, jdbcType=TIMESTAMP}, 
+      #{userId, jdbcType=VARCHAR},
+      #{data, jdbcType=${blobType}},
+      #{lockOwner, jdbcType=VARCHAR},
+      #{lockTime, jdbcType=TIMESTAMP},
+      #{isProcessed, jdbcType=INTEGER} 
+    )  
+  </insert>
+
+  <insert id="bulkInsertTaskLogEntry" databaseId="oracle" parameterType="java.util.List">
+    INSERT ALL 
+      <foreach collection="list" item="taskLog" index="index">
+        into ${prefix}FLW_TSK_LOG(LOG_NR_, TYPE_, TASK_ID_,
+        TIME_STAMP_, USER_ID_, DATA_, LOCK_OWNER_, LOCK_TIME_, IS_PROCESSED_) VALUES 
+            (${prefix}FLW_TSK_LOG_seq.nextVal,
+             #{taskLog.type, jdbcType=VARCHAR},
+             #{taskLog.taskId, jdbcType=VARCHAR},
+             #{taskLog.timeStamp, jdbcType=TIMESTAMP},
+             #{taskLog.userId, jdbcType=VARCHAR},
+             #{taskLog.data, jdbcType=${blobType}},
+      </foreach>
+    SELECT * FROM dual
+  </insert>
+  
+  <!-- RESULTMAP -->
+  
+  <resultMap id="taskLogResultMap" type="org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntityImpl">
+    <id property="logNumber" column="LOG_NR_" jdbcType="BIGINT" />
+    <result property="id" column="LOG_NR_" jdbcType="BIGINT" />
+    <result property="type" column="TYPE_" jdbcType="VARCHAR"/>
+    <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR"/>
+    <result property="timeStamp" column="TIME_STAMP_" jdbcType="TIMESTAMP"/>
+    <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
+    <result property="data" column="DATA_" jdbcType="${blobType}"/>
+  </resultMap>
+  
+  <!-- SELECTS -->
+
+  <select id="selectTaskLogEntriesByTaskInstanceId" parameterType="string" resultMap="taskLogResultMap">
+    select * from ${prefix}FLW_TSK_LOG 
+    WHERE TASK_ID_ = #{parameter.taskInstanceId}
+    ORDER BY LOG_NR_ 
+  </select>
+  
+  <!-- DELETE -->
+  <delete id="deleteTaskLogEntryByLogNumber" parameterType="long">
+    delete from ${prefix}FLW_TSK_LOG where LOG_NR_ = #{logNr}
+  </delete>
+
+</mapper>

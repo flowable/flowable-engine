@@ -17,11 +17,13 @@ import java.util.List;
 import org.flowable.common.engine.impl.service.CommonServiceImpl;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
+import org.flowable.task.api.TaskLogEntry;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityManager;
+import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntityManager;
 
 /**
  * @author Tom Baeyens
@@ -115,5 +117,19 @@ public class TaskServiceImpl extends CommonServiceImpl<TaskServiceConfiguration>
     @Override
     public Task createTask(TaskBuilder taskBuilder) {
         return getTaskEntityManager().createTask(taskBuilder);
+    }
+
+    @Override
+    public List<TaskLogEntry> findTaskLogEntries(String taskInstanceId) {
+        return getTaskLogEntryEntityManager().findTaskLogEntriesByTaskInstanceId(taskInstanceId);
+    }
+
+    @Override
+    public void deleteTaskLogEntry(long logNumber) {
+        getTaskLogEntryEntityManager().deleteTaskLogEntry(logNumber);
+    }
+
+    protected TaskLogEntryEntityManager getTaskLogEntryEntityManager() {
+        return configuration.getTaskLogEntryEntityManager();
     }
 }

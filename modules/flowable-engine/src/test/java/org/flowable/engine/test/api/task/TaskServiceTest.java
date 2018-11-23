@@ -79,6 +79,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
     @AfterEach
     public void tearDown() throws Exception {
         if (task != null) {
+            assertThat("user task event logging is switched off in configuration",
+                taskService.getTaskLogEntriesByTaskInstanceId(task.getId()), is(Collections.emptyList()));
             taskService.deleteTask(task.getId(), true);
         }
     }

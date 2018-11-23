@@ -48,6 +48,7 @@
     <!-- Task support -->
     <mapper resource="org/flowable/task/service/db/mapping/common.xml" />
     <mapper resource="org/flowable/task/service/db/mapping/entity/Task.xml" />
+    <mapper resource="org/flowable/task/service/db/mapping/entity/TaskLogEntry.xml" />
     <mapper resource="org/flowable/task/service/db/mapping/entity/HistoricTaskInstance.xml" />
     
     <!-- Job Support -->

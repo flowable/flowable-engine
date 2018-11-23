@@ -24,12 +24,17 @@ import org.flowable.task.api.history.HistoricTaskQueryInterceptor;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
 import org.flowable.task.service.impl.HistoricTaskServiceImpl;
 import org.flowable.task.service.impl.TaskServiceImpl;
+import org.flowable.task.service.impl.event.UserTaskDbEventLogger;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityManager;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityManagerImpl;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityManager;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityManagerImpl;
+import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntityManager;
+import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntityManagerImpl;
 import org.flowable.task.service.impl.persistence.entity.data.HistoricTaskInstanceDataManager;
 import org.flowable.task.service.impl.persistence.entity.data.TaskDataManager;
+import org.flowable.task.service.impl.persistence.entity.data.TaskLogEntryDataManager;
+import org.flowable.task.service.impl.persistence.entity.data.impl.MyBatisTaskLogEntryDataManager;
 import org.flowable.task.service.impl.persistence.entity.data.impl.MybatisHistoricTaskInstanceDataManager;
 import org.flowable.task.service.impl.persistence.entity.data.impl.MybatisTaskDataManager;
 import org.slf4j.Logger;
@@ -53,11 +58,14 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
 
     protected TaskDataManager taskDataManager;
     protected HistoricTaskInstanceDataManager historicTaskInstanceDataManager;
+    protected TaskLogEntryDataManager taskLogDataManager;
+
 
     // ENTITY MANAGERS /////////////////////////////////////////////////
     protected TaskEntityManager taskEntityManager;
     protected HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager;
-    
+    protected TaskLogEntryEntityManager taskLogEntityManager;
+
     protected InternalTaskVariableScopeResolver internalTaskVariableScopeResolver;
     protected InternalHistoryTaskManager internalHistoryTaskManager;
     protected InternalTaskLocalizationManager internalTaskLocalizationManager;
@@ -73,6 +81,9 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
 
     protected TaskPostProcessor taskPostProcessor;
 
+    // Events
+    protected boolean enableDatabaseEventLogging;
+
     // init
     // /////////////////////////////////////////////////////////////////////
 
@@ -80,6 +91,7 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         initDataManagers();
         initEntityManagers();
         initTaskPostProcessor();
+        initDatabaseEventLogging();
     }
 
     // Data managers
@@ -92,6 +104,9 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         if (historicTaskInstanceDataManager == null) {
             historicTaskInstanceDataManager = new MybatisHistoricTaskInstanceDataManager();
         }
+        if (taskLogDataManager == null) {
+            taskLogDataManager = new MyBatisTaskLogEntryDataManager();
+        }
     }
 
     public void initEntityManagers() {
@@ -101,11 +116,20 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         if (historicTaskInstanceEntityManager == null) {
             historicTaskInstanceEntityManager = new HistoricTaskInstanceEntityManagerImpl(this, historicTaskInstanceDataManager);
         }
+        if (taskLogEntityManager == null) {
+            taskLogEntityManager = new TaskLogEntryEntityManagerImpl(this, taskLogDataManager);
+        }
     }
 
     public void initTaskPostProcessor() {
         if (taskPostProcessor == null) {
             taskPostProcessor = taskBuilder -> taskBuilder;
+        }
+    }
+
+    public void initDatabaseEventLogging() {
+        if (enableDatabaseEventLogging) {
+            getEventDispatcher().addEventListener(new UserTaskDbEventLogger());
         }
     }
 
@@ -172,6 +196,15 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
 
     public TaskServiceConfiguration setHistoricTaskInstanceEntityManager(HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager) {
         this.historicTaskInstanceEntityManager = historicTaskInstanceEntityManager;
+        return this;
+    }
+
+    public TaskLogEntryEntityManager getTaskLogEntryEntityManager() {
+        return taskLogEntityManager;
+    }
+
+    public TaskServiceConfiguration setTaskLogEntryEntityManager(TaskLogEntryEntityManager taskLogEntityManager) {
+        this.taskLogEntityManager = taskLogEntityManager;
         return this;
     }
 
@@ -258,6 +291,15 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
 
     public TaskServiceConfiguration setHistoricTaskQueryLimit(int historicTaskQueryLimit) {
         this.historicTaskQueryLimit = historicTaskQueryLimit;
+        return this;
+    }
+
+    public boolean isEnableDatabaseEventLogging() {
+        return enableDatabaseEventLogging;
+    }
+
+    public TaskServiceConfiguration setEnableDatabaseEventLogging(boolean enableDatabaseEventLogging) {
+        this.enableDatabaseEventLogging = enableDatabaseEventLogging;
         return this;
     }
 

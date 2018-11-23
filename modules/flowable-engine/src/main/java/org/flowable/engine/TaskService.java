@@ -33,6 +33,7 @@ import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.NativeTaskQuery;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
+import org.flowable.task.api.TaskLogEntry;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
@@ -838,4 +839,13 @@ public interface TaskService {
 
     /** The list of subtasks for this parent task */
     List<Task> getSubTasks(String parentTaskId);
+
+    /**
+     * Returns a list of task log entries for a specific task instance id. Note that the user task event logging must be specifically enabled
+     * in the process engine configuration.
+     *
+     * Passing null as arguments will effectively fetch ALL event log entries. Be careful, as this list might be huge!
+     */
+    List<TaskLogEntry> getTaskLogEntriesByTaskInstanceId(String taskId);
+
 }

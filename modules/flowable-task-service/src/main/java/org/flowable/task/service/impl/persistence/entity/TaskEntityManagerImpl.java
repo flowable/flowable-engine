@@ -24,6 +24,7 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.event.impl.FlowableTaskEventBuilder;
+import org.flowable.task.service.event.impl.FlowableUserTaskCreatedEvent;
 import org.flowable.task.service.impl.TaskQueryImpl;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.data.TaskDataManager;
@@ -101,6 +102,17 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
 
         return enrichedTaskEntity;
     }
+
+
+    @Override
+    public void insert(TaskEntity task, boolean fireCreateEvent) {
+        super.insert(task, fireCreateEvent);
+
+        if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(new FlowableUserTaskCreatedEvent(task));
+        }
+    }
+
 
     protected IdentityLinkService getIdentityLinkService() {
         return CommandContextUtil.getIdentityLinkServiceConfiguration().getIdentityLinkService();
