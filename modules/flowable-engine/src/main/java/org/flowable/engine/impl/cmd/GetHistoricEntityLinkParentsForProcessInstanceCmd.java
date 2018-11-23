@@ -26,12 +26,12 @@ import org.flowable.entitylink.api.history.HistoricEntityLink;
 /**
  * @author Javier Casal
  */
-public class GetHistoricEntityLinkParentForProcessInstanceCmd implements Command<List<HistoricEntityLink>>, Serializable {
+public class GetHistoricEntityLinkParentsForProcessInstanceCmd implements Command<List<HistoricEntityLink>>, Serializable {
 
     private static final long serialVersionUID = 1L;
     protected String processInstanceId;
 
-    public GetHistoricEntityLinkParentForProcessInstanceCmd(String processInstanceId) {
+    public GetHistoricEntityLinkParentsForProcessInstanceCmd(String processInstanceId) {
         if (processInstanceId == null) {
             throw new FlowableIllegalArgumentException("processInstanceId is required");
         }

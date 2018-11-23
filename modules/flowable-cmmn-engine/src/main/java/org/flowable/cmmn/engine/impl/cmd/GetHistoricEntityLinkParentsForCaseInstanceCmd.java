@@ -10,35 +10,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.cmd;
+package org.flowable.cmmn.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.List;
 
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkType;
-import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.entitylink.api.history.HistoricEntityLink;
 
 /**
  * @author Javier Casal
  */
-public class GetEntityLinkParentForTaskCmd implements Command<List<EntityLink>>, Serializable {
+public class GetHistoricEntityLinkParentsForCaseInstanceCmd implements Command<List<HistoricEntityLink>>, Serializable {
 
     private static final long serialVersionUID = 1L;
-    protected String taskId;
+    protected String caseInstanceId;
 
-    public GetEntityLinkParentForTaskCmd(String taskId) {
-        this.taskId = taskId;
+    public GetHistoricEntityLinkParentsForCaseInstanceCmd(String caseInstanceId) {
+        if (caseInstanceId == null) {
+            throw new FlowableIllegalArgumentException("caseInstanceId is required");
+        }
+        this.caseInstanceId = caseInstanceId;
     }
 
     @Override
-    public List<EntityLink> execute(CommandContext commandContext) {
-        TaskEntity task = CommandContextUtil.getTaskService().getTask(taskId);
-        return CommandContextUtil.getEntityLinkService().findEntityLinksByReferenceScopeIdAndType(task.getId(), ScopeTypes.TASK, EntityLinkType.CHILD);
+    public List<HistoricEntityLink> execute(CommandContext commandContext) {
+        return CommandContextUtil.getHistoricEntityLinkService().findHistoricEntityLinksByReferenceScopeIdAndType(
+                        caseInstanceId, ScopeTypes.CMMN, EntityLinkType.CHILD);
     }
 
 }

@@ -66,5 +66,5 @@ public interface CmmnHistoryService {
     /**
      * Retrieves the {@link HistoricEntityLink}s where the given case instance is referenced.
      */
-    List<HistoricEntityLink> getHistoricEntityLinkParentForCaseInstance(String caseInstanceId);
+    List<HistoricEntityLink> getHistoricEntityLinkParentsForCaseInstance(String caseInstanceId);
 }
