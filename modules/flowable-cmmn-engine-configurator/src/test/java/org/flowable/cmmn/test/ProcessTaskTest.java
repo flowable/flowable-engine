@@ -41,6 +41,7 @@ import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkType;
+import org.flowable.entitylink.api.HierarchyType;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -139,6 +140,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             assertEquals(processInstance.getId(), processEntityLink.getReferenceScopeId());
             assertEquals(ScopeTypes.BPMN, processEntityLink.getReferenceScopeType());
             assertNull(processEntityLink.getReferenceScopeDefinitionId());
+            assertEquals(HierarchyType.ROOT, processEntityLink.getHierarchyType());
             
             assertEquals(EntityLinkType.CHILD, subProcessEntityLink.getLinkType());
             assertNotNull(subProcessEntityLink.getCreateTime());
@@ -148,6 +150,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             assertEquals(subProcessInstanceId, subProcessEntityLink.getReferenceScopeId());
             assertEquals(ScopeTypes.BPMN, subProcessEntityLink.getReferenceScopeType());
             assertNull(subProcessEntityLink.getReferenceScopeDefinitionId());
+            assertEquals(HierarchyType.ROOT, subProcessEntityLink.getHierarchyType());
             
             assertEquals(EntityLinkType.CHILD, taskEntityLink.getLinkType());
             assertNotNull(taskEntityLink.getCreateTime());
@@ -157,6 +160,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             assertEquals(processTasks.get(0).getId(), taskEntityLink.getReferenceScopeId());
             assertEquals(ScopeTypes.TASK, taskEntityLink.getReferenceScopeType());
             assertNull(taskEntityLink.getReferenceScopeDefinitionId());
+            assertEquals(HierarchyType.ROOT, taskEntityLink.getHierarchyType());
             
             entityLinks = processEngine.getRuntimeService().getEntityLinkChildrenForProcessInstance(processInstance.getId());
             assertEquals(2, entityLinks.size());
@@ -172,14 +176,13 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             assertEquals(processTasks.get(0).getId(), entityLink.getReferenceScopeId());
             assertEquals(ScopeTypes.TASK, entityLink.getReferenceScopeType());
             assertNull(entityLink.getReferenceScopeDefinitionId());
+            assertEquals(HierarchyType.PARENT, entityLink.getHierarchyType());
 
             entityLinks = processEngine.getRuntimeService().getEntityLinkParentForTask(processTask.getId());
             assertEquals(3, entityLinks.size());
             entityLink = entityLinks.get(0);
             assertEquals(EntityLinkType.CHILD, entityLink.getLinkType());
             assertNotNull(entityLink.getCreateTime());
-            assertEquals(caseInstance.getId(), entityLink.getRootScopeId());
-            assertEquals(ScopeTypes.CMMN, entityLink.getRootScopeType());
 
             processEngine.getTaskService().complete(processTasks.get(0).getId());
             assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
@@ -192,8 +195,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             
             historicEntityLinks = processEngine.getHistoryService().getHistoricEntityLinkChildrenForProcessInstance(subProcessInstanceId);
             assertEquals(1, historicEntityLinks.size());
-            assertEquals(ScopeTypes.CMMN, historicEntityLinks.get(0).getRootScopeType());
-            assertEquals(caseInstance.getId(), historicEntityLinks.get(0).getRootScopeId());
+            assertEquals(HierarchyType.PARENT, historicEntityLinks.get(0).getHierarchyType());
 
             historicEntityLinks = processEngine.getHistoryService().getHistoricEntityLinkParentForTask(processTasks.get(0).getId());
             assertEquals(3, historicEntityLinks.size());
@@ -314,6 +316,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             assertNotNull(taskEntityLink);
             assertEquals(task.getId(), taskEntityLink.getReferenceScopeId());
             assertEquals(ScopeTypes.TASK, taskEntityLink.getReferenceScopeType());
+            assertEquals(HierarchyType.ROOT, taskEntityLink.getHierarchyType());
             
             processEngineTaskService.complete(task.getId());
             
@@ -331,6 +334,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             assertNotNull(taskEntityLink2);
             assertEquals(task2.getId(), taskEntityLink2.getReferenceScopeId());
             assertEquals(ScopeTypes.TASK, taskEntityLink2.getReferenceScopeType());
+            assertEquals(HierarchyType.ROOT, taskEntityLink2.getHierarchyType());
             
             processEngineTaskService.complete(task2.getId());
             

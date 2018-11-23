@@ -30,6 +30,7 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkType;
+import org.flowable.entitylink.api.HierarchyType;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -190,6 +191,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         assertEquals(planItemInstances.get(1).getCaseInstanceId(), entityLink.getReferenceScopeId());
         assertEquals(ScopeTypes.CMMN, entityLink.getReferenceScopeType());
         assertNull(entityLink.getReferenceScopeDefinitionId());
+        assertEquals(HierarchyType.ROOT, entityLink.getHierarchyType());
 
         // Triggering the task from the child case instance should complete the child case instance
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(1).getId());
@@ -219,6 +221,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         assertEquals(planItemInstances.get(1).getCaseInstanceId(), historicEntityLink.getReferenceScopeId());
         assertEquals(ScopeTypes.CMMN, historicEntityLink.getReferenceScopeType());
         assertNull(historicEntityLink.getReferenceScopeDefinitionId());
+        assertEquals(HierarchyType.ROOT, historicEntityLink.getHierarchyType());
     }
 
     // Same as testBasicBlocking(), but now with a non-blocking case task

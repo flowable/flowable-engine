@@ -55,9 +55,7 @@ public class EntityLinkCreatedHistoryJsonTransformer extends AbstractHistoryJson
         historicEntityLinkEntity.setReferenceScopeId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_REF_SCOPE_ID));
         historicEntityLinkEntity.setReferenceScopeType(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_REF_SCOPE_TYPE));
         historicEntityLinkEntity.setReferenceScopeDefinitionId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_REF_SCOPE_DEFINITION_ID));
-        historicEntityLinkEntity.setRootScopeId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_ROOT_SCOPE_ID));
-        historicEntityLinkEntity.setRootScopeType(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_ROOT_SCOPE_TYPE));
-        historicEntityLinkEntity.setRootScopeDefinitionId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_ROOT_SCOPE_DEFINITION_ID));
+        historicEntityLinkEntity.setHierarchyType(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_HIERARCHY_TYPE));
         
         historicEntityLinkService.insertHistoricEntityLink(historicEntityLinkEntity, false);
     }

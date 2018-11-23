@@ -131,9 +131,7 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_REF_SCOPE_ID = "refScopeId";
     String FIELD_REF_SCOPE_DEFINITION_ID = "refScopeDefinitionId";
     String FIELD_REF_SCOPE_TYPE = "refScopeType";
-    String FIELD_ROOT_SCOPE_ID = "rootScopeId";
-    String FIELD_ROOT_SCOPE_DEFINITION_ID = "rootScopeDefinitionId";
-    String FIELD_ROOT_SCOPE_TYPE = "rootScopeType";
+    String FIELD_HIERARCHY_TYPE = "hierarchyType";
     String FIELD_STAGE_INSTANCE_ID = "stageInstanceId";
     String FIELD_START_TIME = "startTime";
     String FIELD_START_USER_ID = "startUserId";
