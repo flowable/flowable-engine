@@ -57,6 +57,12 @@ public class UserTaskDbEventLogger extends AbstractFlowableEventListener {
                         Collections.singletonMap("newAssigneeId", userTaskEvent.getTask().getAssignee())
                     )
                 );
+            } else if (event instanceof FlowableUserTaskOwnerChangedEvent) {
+                taskLogEntry.setData(
+                    serializeLogEntryData(
+                        Collections.singletonMap("newOwnerId", userTaskEvent.getTask().getOwner())
+                    )
+                );
             }
             CommandContextUtil.getTaskLogEntryEntityManager().insert(taskLogEntry);
         }

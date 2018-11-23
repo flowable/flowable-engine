@@ -184,4 +184,45 @@ public class TaskServiceEventTest {
         }
     }
 
+    @Test
+    public void taskOwnerEvent(TaskService taskService) {
+        task = taskService.createTaskBuilder().
+            assignee("initialAssignee").
+            create();
+
+        taskService.setOwner(task.getId(), "newOwner");
+        List<TaskLogEntry> taskLogEntries = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
+
+        assertThat(taskLogEntries).size().isEqualTo(2);
+        assertThat(taskLogEntries.get(1)).
+            extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
+            isEqualTo("{\"newOwnerId\":\"newOwner\"}");
+        assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTimeStamp).isNotNull();
+        assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTaskId).isEqualTo(task.getId());
+        assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getUserId).isNull();
+        assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_OWNER_CHANGED");
+    }
+
+    @Test
+    public void changeOwnerTaskEventAsAuthenticatedUser(TaskService taskService) {
+        String previousUserId = Authentication.getAuthenticatedUserId();
+        task = taskService.createTaskBuilder().
+            assignee("testAssignee").
+            create();
+        Authentication.setAuthenticatedUserId("testUser");
+        try {
+            taskService.setOwner(task.getId(), "newOwner");
+
+            List<TaskLogEntry> taskLogsByTaskInstanceId = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
+            assertThat(
+                taskLogsByTaskInstanceId
+            ).size().isEqualTo(2);
+
+            assertThat(taskLogsByTaskInstanceId.get(1)).
+                extracting(TaskLogEntry::getUserId).isEqualTo("testUser");
+        } finally {
+            Authentication.setAuthenticatedUserId(previousUserId);
+        }
+    }
+
 }
