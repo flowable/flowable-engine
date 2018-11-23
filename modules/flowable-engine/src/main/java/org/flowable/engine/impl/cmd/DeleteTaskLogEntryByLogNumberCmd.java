@@ -14,7 +14,7 @@ package org.flowable.engine.impl.cmd;
 
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.task.service.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author martin.grofcik
@@ -29,7 +29,7 @@ public class DeleteTaskLogEntryByLogNumberCmd implements Command<Void> {
 
     @Override
     public Void execute(CommandContext commandContext) {
-        CommandContextUtil.getTaskLogEntryEntityManager().deleteTaskLogEntry(logNumber);
+        CommandContextUtil.getTaskService(commandContext).deleteTaskLogEntry(logNumber);
         return null;
     }
 }
