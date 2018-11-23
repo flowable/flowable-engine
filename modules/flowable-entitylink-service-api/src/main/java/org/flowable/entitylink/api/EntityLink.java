@@ -58,19 +58,9 @@ public interface EntityLink {
     String getReferenceScopeDefinitionId();
 
     /**
-     * Returns the scope id of the root entity
+     * Returns the hierarchy type for the entity link e.g. root, parent or empty
      */
-    String getRootScopeId();
-
-    /**
-     * The scope type associated with the root entity
-     */
-    String getRootScopeType();
-
-    /**
-     * A scope definition id for the root entity
-     */
-    String getRootScopeDefinitionId();
+    String getHierarchyType();
     
     /**
      * The create time for the entity link

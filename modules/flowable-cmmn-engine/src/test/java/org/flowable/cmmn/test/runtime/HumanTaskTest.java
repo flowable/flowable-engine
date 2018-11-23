@@ -30,6 +30,7 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkType;
+import org.flowable.entitylink.api.HierarchyType;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
@@ -68,6 +69,7 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
         assertEquals(task.getId(), entityLink.getReferenceScopeId());
         assertEquals(ScopeTypes.TASK, entityLink.getReferenceScopeType());
         assertNull(entityLink.getReferenceScopeDefinitionId());
+        assertEquals(HierarchyType.ROOT, entityLink.getHierarchyType());
 
         cmmnTaskService.complete(task.getId());
 
@@ -112,6 +114,7 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
                 
                 assertEquals(ScopeTypes.TASK, historicEntityLink.getReferenceScopeType());
                 assertNull(historicEntityLink.getReferenceScopeDefinitionId());
+                assertEquals(HierarchyType.ROOT, entityLink.getHierarchyType());
             }
             
             assertTrue(hasTask1);

@@ -31,7 +31,7 @@ public class HistoricEntityLinkEntityImpl extends AbstractEntityLinkServiceNoRev
     protected String referenceScopeId;
     protected String referenceScopeType;
     protected String referenceScopeDefinitionId;
-    protected String rootScopeId;
+    protected String hierarchyType;
     protected String rootScopeType;
     protected String rootScopeDefinitionId;
     protected Date createTime;
@@ -51,9 +51,7 @@ public class HistoricEntityLinkEntityImpl extends AbstractEntityLinkServiceNoRev
         persistentState.put("referenceScopeId", this.referenceScopeId);
         persistentState.put("referenceScopeType", this.referenceScopeType);
         persistentState.put("referenceScopeDefinitionId", this.referenceScopeDefinitionId);
-        persistentState.put("rootScopeId", this.rootScopeId);
-        persistentState.put("rootScopeType", this.rootScopeType);
-        persistentState.put("rootScopeDefinitionId", this.rootScopeDefinitionId);
+        persistentState.put("hierarchyType", this.hierarchyType);
         persistentState.put("createTime", this.createTime);
 
         return persistentState;
@@ -139,27 +137,13 @@ public class HistoricEntityLinkEntityImpl extends AbstractEntityLinkServiceNoRev
     }
 
     @Override
-    public String getRootScopeId() {
-        return rootScopeId;
+    public String getHierarchyType() {
+        return hierarchyType;
     }
+
     @Override
-    public void setRootScopeId(String rootScopeId) {
-        this.rootScopeId = rootScopeId;
+    public void setHierarchyType(String hierarchyType) {
+        this.hierarchyType = hierarchyType;
     }
-    @Override
-    public String getRootScopeType() {
-        return rootScopeType;
-    }
-    @Override
-    public void setRootScopeType(String rootScopeType) {
-        this.rootScopeType = rootScopeType;
-    }
-    @Override
-    public String getRootScopeDefinitionId() {
-        return rootScopeDefinitionId;
-    }
-    @Override
-    public void setRootScopeDefinitionId(String rootScopeDefinitionId) {
-        this.rootScopeDefinitionId = rootScopeDefinitionId;
-    }
+    
 }
