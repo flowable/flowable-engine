@@ -536,12 +536,12 @@ public interface RuntimeService {
     /**
      * Retrieves the {@link EntityLink}s where the given process instance is referenced.
      */
-    List<EntityLink> getEntityLinkParentForProcessInstance(String instanceId);
+    List<EntityLink> getEntityLinkParentsForProcessInstance(String instanceId);
 
     /**
      * Retrieves the {@link EntityLink}s where the given task is referenced.
      */
-    List<EntityLink> getEntityLinkParentForTask(String taskId);
+    List<EntityLink> getEntityLinkParentsForTask(String taskId);
 
     // Variables
     // ////////////////////////////////////////////////////////////////////
