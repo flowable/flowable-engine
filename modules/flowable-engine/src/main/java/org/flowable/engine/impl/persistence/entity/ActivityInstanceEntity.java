@@ -14,13 +14,42 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
+import java.util.Date;
+
 import org.flowable.common.engine.impl.db.HasRevision;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.engine.runtime.ActivityInstance;
 
 /**
  * @author martin.grofcik
  */
-public interface ActivityInstanceEntity extends ActivityInstance, ScopeInstanceEntity, HasRevision {
+public interface ActivityInstanceEntity extends ActivityInstance, Entity, HasRevision {
+
+    void markEnded(String deleteReason);
+
+    String getProcessInstanceId();
+
+    String getProcessDefinitionId();
+
+    Date getStartTime();
+
+    Date getEndTime();
+
+    Long getDurationInMillis();
+
+    void setProcessInstanceId(String processInstanceId);
+
+    void setProcessDefinitionId(String processDefinitionId);
+
+    void setStartTime(Date startTime);
+
+    void setEndTime(Date endTime);
+
+    void setDurationInMillis(Long durationInMillis);
+
+    String getDeleteReason();
+
+    void setDeleteReason(String deleteReason);
 
     void setActivityId(String activityId);
 

@@ -14,18 +14,27 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author martin.grofcik
  */
-public class ActivityInstanceEntityImpl extends ScopeInstanceEntityImpl implements ActivityInstanceEntity {
+public class ActivityInstanceEntityImpl extends AbstractBpmnEngineEntity implements ActivityInstanceEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    protected String processInstanceId;
+    protected String processDefinitionId;
+    protected Date startTime;
+    protected Date endTime;
+    protected Long durationInMillis;
+    protected String deleteReason;
 
     protected String activityId;
     protected String activityName;
@@ -55,7 +64,78 @@ public class ActivityInstanceEntityImpl extends ScopeInstanceEntityImpl implemen
         return persistentState;
     }
 
-    // getters and setters //////////////////////////////////////////////////////
+    @Override
+    public void markEnded(String deleteReason) {
+        if (this.endTime == null) {
+            this.deleteReason = deleteReason;
+            this.endTime = CommandContextUtil.getProcessEngineConfiguration().getClock().getCurrentTime();
+            if (endTime != null && startTime != null) {
+                this.durationInMillis = endTime.getTime() - startTime.getTime();
+            }
+        }
+    }
+
+    // getters and setters ////////////////////////////////////////////////////////
+
+    @Override
+    public String getProcessInstanceId() {
+        return processInstanceId;
+    }
+
+    @Override
+    public String getProcessDefinitionId() {
+        return processDefinitionId;
+    }
+
+    @Override
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    @Override
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    @Override
+    public Long getDurationInMillis() {
+        return durationInMillis;
+    }
+
+    @Override
+    public void setProcessInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
+
+    @Override
+    public void setProcessDefinitionId(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+    }
+
+    @Override
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    @Override
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    @Override
+    public void setDurationInMillis(Long durationInMillis) {
+        this.durationInMillis = durationInMillis;
+    }
+
+    @Override
+    public String getDeleteReason() {
+        return deleteReason;
+    }
+
+    @Override
+    public void setDeleteReason(String deleteReason) {
+        this.deleteReason = deleteReason;
+    }
 
     @Override
     public String getActivityId() {
