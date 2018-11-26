@@ -260,4 +260,68 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
         assertThat(task.getName()).isEqualTo("B");
     }
 
+    @Test
+    @CmmnDeployment
+    public void testRepeatingCrossBoundary2() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCrossBoundaryWithRepetition").start();
+
+        // Completing A will make B active. Task A is repeating.
+        Task taskA =  cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(taskA.getId());
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("A", "B", "C");
+
+        // Completing B should keep a plan item instance for B with 'repeating'
+        cmmnTaskService.complete(tasks.get(1).getId());
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("A", "C");
+
+        PlanItemInstance planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
+        assertThat(planItemInstanceB.getState()).isEqualTo(PlanItemInstanceState.WAITING_FOR_REPETITION);
+
+        // When setting the variables, stage 2 and 3 should be activated. Task B should be activated and a new plan item instance for the repeat for B should be created
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("stageTwo", true);
+        vars.put("stageThree", true);
+        cmmnRuntimeService.setVariables(caseInstance.getId(), vars);
+
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("A", "B", "C");
+
+        PlanItemInstance planItemInstanceB2 = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").planItemInstanceState(PlanItemInstanceState.WAITING_FOR_REPETITION).singleResult();
+        assertThat(planItemInstanceB.getId()).isNotEqualTo(planItemInstanceB2.getId());
+        assertThat(planItemInstanceB2.getState()).isEqualTo(PlanItemInstanceState.WAITING_FOR_REPETITION);
+
+        // Completing A again should again activate B each time
+        for (int i = 0; i < 9; i++) {
+            cmmnTaskService.complete(tasks.get(0).getId());
+            tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        }
+
+        assertThat(tasks).extracting(Task::getName).containsExactly("A", "B", "B", "B", "B", "B", "B", "B", "B", "B", "B", "C"); // 9 + 1 already created before
+
+        PlanItemInstance planItemInstanceB3 = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").planItemInstanceState(PlanItemInstanceState.WAITING_FOR_REPETITION).singleResult();
+        assertThat(planItemInstanceB.getId()).isNotEqualTo(planItemInstanceB3.getId());
+        assertThat(planItemInstanceB2.getId()).isNotEqualTo(planItemInstanceB3.getId());
+        assertThat(planItemInstanceB3.getState()).isEqualTo(PlanItemInstanceState.WAITING_FOR_REPETITION);
+
+        // Completing all instances of B and C should leave A only
+        for (int i = 1; i < tasks.size(); i++) { // all except A
+            cmmnTaskService.complete(tasks.get(i).getId());
+        }
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("A");
+
+        // Completing A should again reactivate B and the parent stages
+        cmmnTaskService.complete(tasks.get(0).getId());
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("A", "B", "C");
+
+        PlanItemInstance planItemInstanceStageTwo = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage Two").singleResult();
+        assertThat(planItemInstanceStageTwo.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
+
+        PlanItemInstance planItemInstanceStageThree = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage Three").singleResult();
+        assertThat(planItemInstanceStageThree.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
+    }
+
 }

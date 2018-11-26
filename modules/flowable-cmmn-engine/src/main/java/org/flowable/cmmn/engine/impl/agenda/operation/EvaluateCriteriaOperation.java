@@ -117,8 +117,9 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
         // Check the existing plan item instances: this means the plan items that have been created and became available.
         // This does not include the plan items which haven't been created (for example because they're part of a stage which isn't active yet).
-        for (PlanItemInstanceEntity planItemInstanceEntity : planItemInstances) {
+        for (int planItemInstanceIndex = 0; planItemInstanceIndex < planItemInstances.size(); planItemInstanceIndex++) {
 
+            PlanItemInstanceEntity planItemInstanceEntity = planItemInstances.get(planItemInstanceIndex);
             PlanItem planItem = planItemInstanceEntity.getPlanItem();
             String state = planItemInstanceEntity.getState();
 
@@ -131,19 +132,12 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                         boolean isRepeating = evaluateRepetitionRule(planItemInstanceEntity);
                         if (isRepeating) {
 
-                            PlanItemInstanceEntity childPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false);
-
-                            String oldState = childPlanItemInstanceEntity.getState();
-                            String newState = PlanItemInstanceState.WAITING_FOR_REPETITION;
-                            childPlanItemInstanceEntity.setState(newState);
-                            PlanItemLifeCycleListenerUtil.callLifecycleListeners(commandContext, planItemInstanceEntity, oldState, newState);
+                            PlanItemInstanceEntity childPlanItemInstanceEntity = createPlanItemInstanceDuplicateForRepetition(planItemInstanceEntity);
 
                             if (newChildPlanItemInstances == null) {
                                 newChildPlanItemInstances = new ArrayList<>(1);
                             }
                             newChildPlanItemInstances.add(childPlanItemInstanceEntity);
-                            // createPlanItemInstance operations will also sync planItemInstance history
-                            CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceForRepetitionOperation(childPlanItemInstanceEntity);
 
                         } else {
                             activatePlanItemInstance = false;
@@ -517,6 +511,8 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                                     true);
                                 parentPlanItemInstancesToActivate.add(parentPlanItemInstance);
 
+                                previousParentPlanItemInstance = parentPlanItemInstance;
+
                             } else {
 
                                 for (PlanItemInstanceEntity parentPlanItemInstance : parentPlanItemInstances) {
@@ -525,9 +521,10 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                                     }
                                 }
 
-                                previousParentPlanItemInstance = parentPlanItemInstances.get(0);
+                                previousParentPlanItemInstance = parentPlanItemInstances.get(0); // in case there are multiple parent plan item instances, select the first
 
                             }
+
                         }
 
                         // Creating plan item instance for the activated plan item
@@ -540,6 +537,13 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                             caseInstanceEntity.getTenantId(),
                             true);
                         CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(entryDependentPlanItemInstance);
+
+                        // Special care needed in case the plan item instance is repeating
+                        if (!entryDependentPlanItem.getEntryCriteria().isEmpty() && hasRepetitionRule(entryDependentPlanItemInstance)) {
+                            if (evaluateRepetitionRule(entryDependentPlanItemInstance)) {
+                                createPlanItemInstanceDuplicateForRepetition(entryDependentPlanItemInstance);
+                            }
+                        }
 
                         // All plan item instances are created. Now activate them.
                         CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(entryDependentPlanItemInstance, satisfiedCriterion);
@@ -589,6 +593,19 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         }
 
         return null;
+    }
+
+    protected PlanItemInstanceEntity createPlanItemInstanceDuplicateForRepetition(PlanItemInstanceEntity planItemInstanceEntity) {
+        PlanItemInstanceEntity childPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false);
+
+        String oldState = childPlanItemInstanceEntity.getState();
+        String newState = PlanItemInstanceState.WAITING_FOR_REPETITION;
+        childPlanItemInstanceEntity.setState(newState);
+        PlanItemLifeCycleListenerUtil.callLifecycleListeners(commandContext, planItemInstanceEntity, oldState, newState);
+
+        // createPlanItemInstance operations will also sync planItemInstance history
+        CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceForRepetitionOperation(childPlanItemInstanceEntity);
+        return childPlanItemInstanceEntity;
     }
 
     protected boolean planItemsShareDirectParentStage(PlanItem planItemOne, PlanItem planItemTwo) {
