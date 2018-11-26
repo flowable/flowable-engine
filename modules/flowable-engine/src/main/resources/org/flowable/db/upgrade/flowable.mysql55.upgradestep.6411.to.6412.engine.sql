@@ -10,8 +10,8 @@ create table ACT_RU_ACTINST (
     ACT_NAME_ varchar(255),
     ACT_TYPE_ varchar(255) not null,
     ASSIGNEE_ varchar(255),
-    START_TIME_ datetime(3) not null,
-    END_TIME_ datetime(3),
+    START_TIME_ datetime not null,
+    END_TIME_ datetime,
     DURATION_ bigint,
     DELETE_REASON_ varchar(4000),
     TENANT_ID_ varchar(255) default '',
@@ -29,4 +29,4 @@ alter table ACT_RU_ACTINST
     foreign key (PROC_INST_ID_)
     references ACT_RU_EXECUTION (ID_);
 
-update ACT_GE_PROPERTY set VALUE_ = '6.4.1.1' where NAME_ = 'schema.version';
+update ACT_GE_PROPERTY set VALUE_ = '6.4.1.2' where NAME_ = 'schema.version';

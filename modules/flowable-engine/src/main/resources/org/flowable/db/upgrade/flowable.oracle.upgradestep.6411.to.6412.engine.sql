@@ -29,4 +29,4 @@ alter table ACT_RU_ACTINST
     foreign key (PROC_INST_ID_)
     references ACT_RU_EXECUTION (ID_);
 
-update ACT_GE_PROPERTY set VALUE_ = '6.4.1.1' where NAME_ = 'schema.version';
+update ACT_GE_PROPERTY set VALUE_ = '6.4.1.2' where NAME_ = 'schema.version';

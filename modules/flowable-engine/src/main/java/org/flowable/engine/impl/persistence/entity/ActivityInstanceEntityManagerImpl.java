@@ -223,7 +223,7 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
     public ActivityInstanceEntity findActivityInstance(ExecutionEntity execution, boolean endTimeMustBeNull) {
         String activityId = getActivityIdForExecution(execution);
         if (activityId != null) {
-            // No use looking for the HistoricActivityInstance when no activityId is provided.
+            // No use looking for the ActivityInstance when no activityId is provided.
             if (activityId == null) {
                 return null;
             }
