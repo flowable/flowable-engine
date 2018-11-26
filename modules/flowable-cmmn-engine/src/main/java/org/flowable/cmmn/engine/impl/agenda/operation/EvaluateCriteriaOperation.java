@@ -488,7 +488,8 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                     .findByCaseInstanceIdAndPlanItemId(caseInstanceEntity.getId(), entryDependentPlanItem.getId());
 
                 if (childPlanItemInstances.isEmpty() // runtime state
-                        && potentialTerminatedPlanItemInstances.isEmpty()) { // (terminated state) the plan item instance should not have been created anytime before
+                        && (potentialTerminatedPlanItemInstances.isEmpty()
+                            || (hasRepetitionRule(entryDependentPlanItem) && evaluateRepetitionRule(caseInstanceEntity, entryDependentPlanItem.getItemControl().getRepetitionRule().getCondition())))) { // (terminated state) the plan item instance should not have been created anytime before
 
                     // If the sentry satisfied, the plan item becomes active and all parent stages that are not yet activate are made active
                     String satisfiedCriterion = evaluateDependentPlanItemEntryCriteria(entryDependentPlanItem);
@@ -538,11 +539,16 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                             // previous is closest parent stage plan item instance
                             caseInstanceEntity.getTenantId(),
                             true);
+                        CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(entryDependentPlanItemInstance);
 
                         // All plan item instances are created. Now activate them.
                         CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(entryDependentPlanItemInstance, satisfiedCriterion);
                         for (int i = parentPlanItemInstancesToActivate.size() - 1; i >= 0; i--) {
-                            CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(parentPlanItemInstancesToActivate.get(i), null); // null -> no sentry satisfied, activation is because of child activation
+                            PlanItemInstanceEntity parentPlanItemInstance = parentPlanItemInstancesToActivate.get(i);
+                            if (parentPlanItemInstance == null) { // newly created one
+                                CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(parentPlanItemInstance);
+                            }
+                            CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(parentPlanItemInstance, null); // null -> no sentry satisfied, activation is because of child activation
                         }
                     }
 

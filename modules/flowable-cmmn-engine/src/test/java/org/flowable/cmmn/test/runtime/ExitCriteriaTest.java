@@ -211,5 +211,16 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
         cmmnTaskService.complete(tasks.get(2).getId());
         assertCaseInstanceEnded(caseInstance);
     }
-    
+
+    @Test
+    @CmmnDeployment
+    public void testExitPlanModelWithExpression() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("minimalCase").start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+
+        // Completing the task should satisfy the exit criteria with the expression
+        cmmnTaskService.complete(task.getId());
+        assertCaseInstanceEnded(caseInstance);
+    }
+
 }

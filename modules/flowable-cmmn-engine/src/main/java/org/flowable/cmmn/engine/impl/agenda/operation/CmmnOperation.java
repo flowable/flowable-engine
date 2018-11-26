@@ -28,6 +28,7 @@ import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
@@ -136,29 +137,36 @@ public abstract class CmmnOperation implements Runnable {
     }
 
     protected boolean hasRepetitionRule(PlanItemInstanceEntity planItemInstanceEntity) {
-        return Optional.ofNullable(planItemInstanceEntity)
-                .map(DelegatePlanItemInstance::getPlanItem)
-                .map(PlanItem::getItemControl)
-                .map(PlanItemControl::getRepetitionRule)
-                .isPresent();
+        if (planItemInstanceEntity != null && planItemInstanceEntity.getPlanItem() != null) {
+            return hasRepetitionRule(planItemInstanceEntity.getPlanItem());
+        }
+        return false;
+    }
 
+    protected boolean hasRepetitionRule(PlanItem planItem) {
+        return planItem.getItemControl() != null
+            && planItem.getItemControl().getRepetitionRule() != null;
     }
 
     protected boolean evaluateRepetitionRule(PlanItemInstanceEntity planItemInstanceEntity) {
         if (hasRepetitionRule(planItemInstanceEntity)) {
             String repetitionCondition = planItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule().getCondition();
-            if (StringUtils.isNotEmpty(repetitionCondition)) {
-                return evaluateBooleanExpression(commandContext, planItemInstanceEntity, repetitionCondition);
-            } else {
-                return true; // no condition set, but a repetition rule defined is assumed to be defaulting to true
-            }
+            return evaluateRepetitionRule(planItemInstanceEntity, repetitionCondition);
         }
         return false;
     }
 
-    protected boolean evaluateBooleanExpression(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, String condition) {
+    protected boolean evaluateRepetitionRule(VariableContainer variableContainer, String repetitionCondition) {
+        if (StringUtils.isNotEmpty(repetitionCondition)) {
+            return evaluateBooleanExpression(commandContext, variableContainer, repetitionCondition);
+        } else {
+            return true; // no condition set, but a repetition rule defined is assumed to be defaulting to true
+        }
+    }
+
+    protected boolean evaluateBooleanExpression(CommandContext commandContext, VariableContainer variableContainer, String condition) {
         Expression expression = CommandContextUtil.getExpressionManager(commandContext).createExpression(condition);
-        Object evaluationResult = expression.getValue(planItemInstanceEntity);
+        Object evaluationResult = expression.getValue(variableContainer);
         if (evaluationResult instanceof Boolean) {
             return (boolean) evaluationResult;
         } else if (evaluationResult instanceof String) {
