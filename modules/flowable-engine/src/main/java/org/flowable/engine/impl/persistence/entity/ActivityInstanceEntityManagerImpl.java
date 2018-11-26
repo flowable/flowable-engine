@@ -104,7 +104,11 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
     @Override
     public void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason) {
         ActivityInstance activityInstance = recordActivityInstanceEnd(executionEntity, deleteReason);
-        getHistoryManager().recordActivityEnd(activityInstance);
+        if (activityInstance == null) {
+            getHistoryManager().recordActivityEnd(executionEntity, deleteReason);
+        } else {
+            getHistoryManager().recordActivityEnd(activityInstance);
+        }
     }
 
     @Override
@@ -130,6 +134,7 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
             ActivityInstanceEntity activityInstance = findActivityInstance(execution, true);
             if (activityInstance != null) {
                 activityInstance.setTaskId(task.getId());
+                getHistoryManager().updateHistoricActivityInstance(activityInstance);
             }
         }
     }
@@ -158,11 +163,14 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
     }
 
     protected void recordActivityTaskInfoChange(TaskEntity taskEntity) {
+        ActivityInstanceEntity activityInstance;
         ExecutionEntity executionEntity = getExecutionEntityManager().findById(taskEntity.getExecutionId());
         if (executionEntity != null) {
-            ActivityInstanceEntity activityInstance = findActivityInstance(executionEntity, true);
+            activityInstance = findActivityInstance(executionEntity, true);
             if (activityInstance != null && !Objects.equals(activityInstance.getAssignee(), taskEntity.getAssignee())) {
                 activityInstance.setAssignee(taskEntity.getAssignee());
+                CommandContextUtil.getHistoricTaskService().recordTaskInfoChange(taskEntity);
+                getHistoryManager().updateHistoricActivityInstance(activityInstance);
             }
         }
     }
@@ -201,7 +209,7 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
         if (activityInstance != null) {
             activityInstance.markEnded(deleteReason);
         } else {
-            // in the case of upgrade from 6.4.0 to 6.4.1 we have to create activityInstance for all already unfinished historicActivities
+            // in the case of upgrade from 6.4.1.1 to 6.4.1.2 we have to create activityInstance for all already unfinished historicActivities
             // which are going to be ended
             HistoricActivityInstanceEntity historicActivityInstance = getHistoryManager().findHistoricActivityInstance(executionEntity, true);
             if (historicActivityInstance != null) {

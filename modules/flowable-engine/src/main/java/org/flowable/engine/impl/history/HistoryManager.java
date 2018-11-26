@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -92,6 +93,11 @@ public interface HistoryManager {
      * @param activityInstance activity instance template
      */
     void recordActivityEnd(ActivityInstance activityInstance);
+
+    /**
+     * Record activity end in the case when runtime activity instance does not exist.
+     */
+    void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason);
 
     /**
      * Finds the {@link HistoricActivityInstanceEntity} that is active in the given execution.
@@ -220,4 +226,5 @@ public interface HistoryManager {
      */
     void syncUserTaskExecution(ExecutionEntity executionEntity, String oldActivityId, FlowElement newFlowElement, TaskEntity task);
 
+    void updateHistoricActivityInstance(ActivityInstanceEntity activityInstance);
 }

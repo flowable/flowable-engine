@@ -28,6 +28,7 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.AbstractHistoryManager;
 import org.flowable.engine.impl.history.async.json.transformer.ProcessInstancePropertyChangedHistoryJsonTransformer;
+import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -176,6 +177,41 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
                 }
 
                 getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_ACTIVITY_START, data, activityInstance.getTenantId());
+            }
+        }
+    }
+
+    @Override
+    public void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason) {
+        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, executionEntity.getProcessDefinitionId())) {
+            String activityId = getActivityIdForExecution(executionEntity);
+            if (StringUtils.isNotEmpty(activityId)) {
+                Map<String, String> data = new HashMap<>();
+
+                putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_ID, executionEntity.getProcessDefinitionId());
+                putIfNotNull(data, HistoryJsonConstants.PROCESS_INSTANCE_ID, executionEntity.getProcessInstanceId());
+                putIfNotNull(data, HistoryJsonConstants.EXECUTION_ID, executionEntity.getId());
+                putIfNotNull(data, HistoryJsonConstants.ACTIVITY_ID, activityId);
+
+                if (executionEntity.getCurrentFlowElement() != null) {
+                    putIfNotNull(data, HistoryJsonConstants.ACTIVITY_NAME, executionEntity.getCurrentFlowElement().getName());
+                    putIfNotNull(data, HistoryJsonConstants.ACTIVITY_TYPE, parseActivityType(executionEntity.getCurrentFlowElement()));
+                }
+
+                if (executionEntity.getTenantId() != null) {
+                    putIfNotNull(data, HistoryJsonConstants.TENANT_ID, executionEntity.getTenantId());
+                }
+
+                putIfNotNull(data, HistoryJsonConstants.DELETE_REASON, deleteReason);
+                putIfNotNull(data, HistoryJsonConstants.END_TIME, getClock().getCurrentTime());
+
+                Map<String, String> correspondingActivityStartData = getActivityStart(executionEntity.getId(), activityId, true);
+                if (correspondingActivityStartData == null) {
+                    getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_ACTIVITY_END, data);
+                } else {
+                    data.put(HistoryJsonConstants.START_TIME, correspondingActivityStartData.get(HistoryJsonConstants.START_TIME));
+                    getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_ACTIVITY_FULL, data);
+                }
             }
         }
     }
@@ -631,7 +667,10 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_UPDATE_PROCESS_DEFINITION_CASCADE, data);
         }
     }
-    
+
+    @Override
+    public void updateHistoricActivityInstance(ActivityInstanceEntity activityInstance) {
+    }
 
     /* Helper methods */
 
