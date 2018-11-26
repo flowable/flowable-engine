@@ -29,6 +29,7 @@ import org.flowable.engine.runtime.ActivityInstanceQuery;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -443,7 +444,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml")
-    public void upgradeFromHistoryToRuntimeActivities() {
+    public void upgradeFromHistoryToRuntimeActivities_completeTask() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertNotNull(processInstance);
 
@@ -459,5 +460,50 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml")
+    public void upgradeFromHistoryToRuntimeActivities_changeAssignee() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        assertNotNull(processInstance);
+
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        managementService.executeCommand(commandContext -> {
+            CommandContextUtil.getActivityInstanceEntityManager(commandContext).deleteActivityInstancesByProcessInstanceId(processInstance.getId());
+            return null;
+        });
+
+        taskService.claim(task.getId(), "newAssignee");
+
+        assertThatActivityInstancesAreSame("theTask");
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml")
+    public void upgradeFromHistoryToRuntimeActivities_changeOwner() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        assertNotNull(processInstance);
+
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        managementService.executeCommand(commandContext -> {
+            CommandContextUtil.getActivityInstanceEntityManager(commandContext).deleteActivityInstancesByProcessInstanceId(processInstance.getId());
+            return null;
+        });
+
+        taskService.setOwner(task.getId(), "newOwner");
+        assertEquals(1, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("theTask").count());
+        taskService.complete(task.getId());
+
+
+        assertProcessEnded(processInstance.getId());
+    }
 
 }

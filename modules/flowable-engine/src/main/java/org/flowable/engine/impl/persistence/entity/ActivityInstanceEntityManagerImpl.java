@@ -167,12 +167,23 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
         ExecutionEntity executionEntity = getExecutionEntityManager().findById(taskEntity.getExecutionId());
         if (executionEntity != null) {
             activityInstance = findActivityInstance(executionEntity, true);
-            if (activityInstance != null && !Objects.equals(activityInstance.getAssignee(), taskEntity.getAssignee())) {
-                activityInstance.setAssignee(taskEntity.getAssignee());
-                CommandContextUtil.getHistoricTaskService().recordTaskInfoChange(taskEntity);
-                getHistoryManager().updateHistoricActivityInstance(activityInstance);
+            if (!Objects.equals(getOriginalAssignee(taskEntity), taskEntity.getAssignee())) {
+                if (activityInstance == null) {
+                    HistoricActivityInstanceEntity historicActivityInstance = getHistoryManager().findHistoricActivityInstance(executionEntity, true);
+                    if (historicActivityInstance != null) {
+                        activityInstance = createActivityInstance(historicActivityInstance);
+                    }
+                }
+                if (activityInstance != null) {
+                    activityInstance.setAssignee(taskEntity.getAssignee());
+                    getHistoryManager().updateHistoricActivityInstance(activityInstance);
+                }
             }
         }
+    }
+
+    protected Object getOriginalAssignee(TaskEntity taskEntity) {
+        return ((Map<String, Object>) taskEntity.getOriginalPersistentState()).get("assignee");
     }
 
     protected ActivityInstance recordRuntimeActivityStart(ExecutionEntity executionEntity) {
