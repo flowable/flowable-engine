@@ -183,15 +183,13 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         entityLinks = cmmnRuntimeService.getEntityLinkChildrenForCaseInstance(caseInstance.getId());
         assertEquals(1, entityLinks.size());
         EntityLink entityLink = entityLinks.get(0);
-        assertEquals(EntityLinkType.CHILD, entityLink.getLinkType());
-        assertNotNull(entityLink.getCreateTime());
-        assertEquals(caseInstance.getId(), entityLink.getScopeId());
-        assertEquals(ScopeTypes.CMMN, entityLink.getScopeType());
-        assertNull(entityLink.getScopeDefinitionId());
-        assertEquals(planItemInstances.get(1).getCaseInstanceId(), entityLink.getReferenceScopeId());
-        assertEquals(ScopeTypes.CMMN, entityLink.getReferenceScopeType());
-        assertNull(entityLink.getReferenceScopeDefinitionId());
-        assertEquals(HierarchyType.ROOT, entityLink.getHierarchyType());
+
+        checkEntityLink(entityLink, caseInstance, planItemInstances.get(1).getCaseInstanceId());
+
+        List<EntityLink> entityLinkParentsForCaseInstance = cmmnRuntimeService.getEntityLinkParentsForCaseInstance(entityLink.getReferenceScopeId());
+        assertEquals(1, entityLinkParentsForCaseInstance.size());
+
+        checkEntityLink(entityLinkParentsForCaseInstance.get(0), caseInstance, planItemInstances.get(1).getCaseInstanceId());
 
         // Triggering the task from the child case instance should complete the child case instance
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(1).getId());
@@ -212,13 +210,35 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         
         List<HistoricEntityLink> historicEntityLinks = cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(caseInstance.getId());
         assertEquals(1, historicEntityLinks.size());
-        HistoricEntityLink historicEntityLink = historicEntityLinks.get(0);
+
+        checkHistoricEntityLink(historicEntityLinks.get(0), caseInstance, planItemInstances.get(1).getCaseInstanceId());
+
+        List<HistoricEntityLink> historicEntityLinkParentForCaseInstance = cmmnHistoryService
+            .getHistoricEntityLinkParentsForCaseInstance(entityLink.getReferenceScopeId());
+        assertEquals(1, historicEntityLinkParentForCaseInstance.size());
+
+        checkHistoricEntityLink(historicEntityLinkParentForCaseInstance.get(0), caseInstance, planItemInstances.get(1).getCaseInstanceId());
+    }
+
+    private void checkEntityLink(EntityLink entityLink, CaseInstance caseInstance, String referenceScopeId) {
+        assertEquals(EntityLinkType.CHILD, entityLink.getLinkType());
+        assertNotNull(entityLink.getCreateTime());
+        assertEquals(caseInstance.getId(), entityLink.getScopeId());
+        assertEquals(ScopeTypes.CMMN, entityLink.getScopeType());
+        assertNull(entityLink.getScopeDefinitionId());
+        assertEquals(referenceScopeId, entityLink.getReferenceScopeId());
+        assertEquals(ScopeTypes.CMMN, entityLink.getReferenceScopeType());
+        assertNull(entityLink.getReferenceScopeDefinitionId());
+        assertEquals(HierarchyType.ROOT, entityLink.getHierarchyType());
+    }
+
+    private void checkHistoricEntityLink(HistoricEntityLink historicEntityLink, CaseInstance caseInstance, String referenceScopeId) {
         assertEquals(EntityLinkType.CHILD, historicEntityLink.getLinkType());
         assertNotNull(historicEntityLink.getCreateTime());
         assertEquals(caseInstance.getId(), historicEntityLink.getScopeId());
         assertEquals(ScopeTypes.CMMN, historicEntityLink.getScopeType());
         assertNull(historicEntityLink.getScopeDefinitionId());
-        assertEquals(planItemInstances.get(1).getCaseInstanceId(), historicEntityLink.getReferenceScopeId());
+        assertEquals(referenceScopeId, historicEntityLink.getReferenceScopeId());
         assertEquals(ScopeTypes.CMMN, historicEntityLink.getReferenceScopeType());
         assertNull(historicEntityLink.getReferenceScopeDefinitionId());
         assertEquals(HierarchyType.ROOT, historicEntityLink.getHierarchyType());

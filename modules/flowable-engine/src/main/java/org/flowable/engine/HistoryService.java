@@ -131,12 +131,12 @@ public interface HistoryService {
     /**
      * Retrieves the {@link HistoricEntityLink}s where the given process instance is referenced.
      */
-    List<HistoricEntityLink> getHistoricEntityLinkParentForProcessInstance(String processInstanceId);
+    List<HistoricEntityLink> getHistoricEntityLinkParentsForProcessInstance(String processInstanceId);
 
     /**
      * Retrieves the {@link HistoricEntityLink}s where the given task is referenced.
      */
-    List<HistoricEntityLink> getHistoricEntityLinkParentForTask(String taskId);
+    List<HistoricEntityLink> getHistoricEntityLinkParentsForTask(String taskId);
 
     /**
      * Allows to retrieve the {@link ProcessInstanceHistoryLog} for one process instance.
