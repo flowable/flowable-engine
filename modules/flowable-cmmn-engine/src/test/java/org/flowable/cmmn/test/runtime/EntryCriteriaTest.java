@@ -17,6 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
@@ -215,6 +216,24 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
 
         tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
         assertThat(tasks).extracting(Task::getName).containsExactly("B", "C", "D", "E");
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testCrossBorderSentryWithVariableFunction() {
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCrossBorderSentry").start();
+        cmmnTaskService.complete(cmmnTaskService.createTaskQuery().taskName("A").singleResult().getId(), Collections.singletonMap("taskvar", 123));
+
+        assertNotNull(cmmnTaskService.createTaskQuery().taskName("B").singleResult());
+
+        PlanItemInstance stage2PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 2").singleResult();
+        assertEquals(PlanItemInstanceState.ACTIVE, stage2PlanItemInstance.getState());
+
+        PlanItemInstance stage3PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 3").singleResult();
+        assertEquals(PlanItemInstanceState.ACTIVE, stage3PlanItemInstance.getState());
+
+        assertNotNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult());
+        assertNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult());
     }
 
 }
