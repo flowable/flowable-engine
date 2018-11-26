@@ -14,16 +14,13 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItem;
-import org.flowable.cmmn.model.PlanItemControl;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.FlowableException;
@@ -74,7 +71,7 @@ public abstract class CmmnOperation implements Runnable {
             // In some cases (e.g. cross-border triggering of a sentry, the child plan item instance has been activated already
             // As such, it doesn't need to be created again (this is the if check here, which goes against the cache)
 
-            if (stagePlanItemInstanceEntity == null || !childPlanItemInstanceDoesnExist(stagePlanItemInstanceEntity, planItem)) {
+            if (stagePlanItemInstanceEntity == null || !childPlanItemInstanceForPlanItemExists(stagePlanItemInstanceEntity, planItem)) {
                 PlanItemInstanceEntity childPlanItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
                     .createChildPlanItemInstance(planItem,
                         caseDefinitionId,
@@ -89,7 +86,7 @@ public abstract class CmmnOperation implements Runnable {
         return planItemInstances;
     }
 
-    protected boolean childPlanItemInstanceDoesnExist(PlanItemInstanceEntity stagePlanItemInstanceEntity, PlanItem planItem) {
+    protected boolean childPlanItemInstanceForPlanItemExists(PlanItemInstanceEntity stagePlanItemInstanceEntity, PlanItem planItem) {
         List<PlanItemInstanceEntity> childPlanItemInstances = stagePlanItemInstanceEntity.getChildPlanItemInstances();
         if (childPlanItemInstances != null && !childPlanItemInstances.isEmpty()) {
             for (PlanItemInstanceEntity childPlanItemInstanceEntity : childPlanItemInstances) {
