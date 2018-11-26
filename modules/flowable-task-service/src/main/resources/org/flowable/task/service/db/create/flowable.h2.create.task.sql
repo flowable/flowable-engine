@@ -37,10 +37,7 @@ create table FLW_TSK_LOG (
     TASK_ID_ varchar(64),
     TIME_STAMP_ timestamp not null,
     USER_ID_ varchar(255),
-    DATA_ longvarbinary,
-    LOCK_OWNER_ varchar(255),
-    LOCK_TIME_ timestamp,
-    IS_PROCESSED_ bit default 0
+    DATA_ varchar(4000)
 );
 
 create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
