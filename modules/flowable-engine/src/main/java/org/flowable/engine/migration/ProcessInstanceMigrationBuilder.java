@@ -16,6 +16,7 @@ package org.flowable.engine.migration;
 import java.util.Map;
 
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
+import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntity;
 
 /**
  * @author Dennis Federico
@@ -119,6 +120,16 @@ public interface ProcessInstanceMigrationBuilder {
      */
     ProcessInstanceMigrationValidationResult validateMigration(String processInstanceId);
 
+    //TODO WIP - remove - batch validation of a single process instance seems nonsensical
+    //    /**
+    //     * Asynchronously validate this process instance migration instructions for a given process instance identified by its processInstanceId
+    //     *
+    //     * @param processInstanceId
+    //     * @return a ProcessMigrationBatchEntity
+    //     * @see ProcessMigrationBatchEntity
+    //     */
+    //    ProcessMigrationBatchEntity batchValidateMigration(String processInstanceId);
+
     /**
      * Starts the process instance migration for all process instances of a given process definition identified by the process definition id.
      *
@@ -134,6 +145,15 @@ public interface ProcessInstanceMigrationBuilder {
      * @see ProcessInstanceMigrationValidationResult
      */
     ProcessInstanceMigrationValidationResult validateMigrationOfProcessInstances(String processDefinitionId);
+
+    /**
+     * Asynchronously validates this process instance migration instruction for each process instance of a given process definition identified by the process definition id.
+     *
+     * @param processDefinitionId
+     * @return a ProcessMigrationBatchEntity
+     * @see ProcessMigrationBatchEntity
+     */
+    ProcessMigrationBatchEntity batchValidateMigrationOfProcessInstances(String processDefinitionId);
 
     /**
      * Starts the process instance migration for all process instances of a given process definition identified by the process definition key and version (optional tenantId).
@@ -154,5 +174,16 @@ public interface ProcessInstanceMigrationBuilder {
      * @see ProcessInstanceMigrationValidationResult
      */
     ProcessInstanceMigrationValidationResult validateMigrationOfProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId);
+
+    /**
+     * Asynchronously validates this process instance migration instruction for each process instance of a given process definition identified by the process definition key and version (optional tenantId).
+     *
+     * @param processDefinitionKey
+     * @param processDefinitionVersion
+     * @param processDefinitionTenantId
+     * @return a ProcessMigrationBatchEntity
+     * @see ProcessMigrationBatchEntity
+     */
+    ProcessMigrationBatchEntity batchValidateMigrationOfProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId);
 
 }

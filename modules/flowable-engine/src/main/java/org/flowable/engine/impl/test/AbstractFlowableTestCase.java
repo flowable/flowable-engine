@@ -37,6 +37,7 @@ import org.flowable.engine.IdentityService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.ProcessInstanceMigrationService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
@@ -46,6 +47,7 @@ import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.DefaultHistoryManager;
 import org.flowable.engine.impl.history.HistoryManager;
+import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntityManager;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -81,6 +83,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
     protected IdentityService identityService;
     protected ManagementService managementService;
     protected DynamicBpmnService dynamicBpmnService;
+    protected ProcessInstanceMigrationService processInstanceMigrationService;
 
     @BeforeEach
     public final void initializeServices(ProcessEngine processEngine) {
@@ -94,6 +97,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
         identityService = processEngine.getIdentityService();
         managementService = processEngine.getManagementService();
         dynamicBpmnService = processEngine.getDynamicBpmnService();
+        processInstanceMigrationService = processEngine.getProcessInstanceMigrationService();
     }
 
     protected static void cleanDeployments(ProcessEngine processEngine) {
@@ -366,6 +370,11 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
             processEngineConfiguration.setAsyncHistoryEnabled(true);
             processEngineConfiguration.setHistoryManager(asyncHistoryManager);
         }
+    }
+
+    protected void deleteProcessInstanceMigrationBatches() {
+        ProcessMigrationBatchEntityManager processMigrationBatchEntityManager = processEngineConfiguration.getProcessMigrationBatchEntityManager();
+
     }
 
     protected void assertHistoricTasksDeleteReason(ProcessInstance processInstance, String expectedDeleteReason, String... taskNames) {

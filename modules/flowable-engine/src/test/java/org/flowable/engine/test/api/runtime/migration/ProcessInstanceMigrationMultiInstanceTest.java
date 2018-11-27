@@ -66,7 +66,7 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSimpleOneTask.getId());
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procSequentialMultiInst.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "seqTasks"))
             .withProcessInstanceVariable("nrOfLoops", 3);
@@ -160,7 +160,7 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSimpleOneTask.getId());
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procParallelMultiInst.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "parallelTasks"))
             .withProcessInstanceVariable("nrOfLoops", 3);
@@ -286,7 +286,7 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         assertThat(miTaskVars).extracting("loopCounter").containsOnly(1);
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procSimpleOneTask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("seqTasks", "userTask1Id"));
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
@@ -382,7 +382,7 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         assertThat(tasks).allSatisfy(hasLoopCounter);
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procSimpleOneTask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTasks", "userTask1Id"));
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
@@ -467,7 +467,7 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         assertThat(miTaskVars).extracting("loopCounter").containsOnly(1);
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procParallelMultiInst.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("seqTasks", "parallelTasks"));
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
@@ -602,7 +602,7 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         assertThat(tasks).allSatisfy(hasLoopCounter);
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procSequentialMultiInst.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTasks", "seqTasks"));
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
@@ -695,7 +695,7 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSimpleOneTask.getId());
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procSequentialMultiInst.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "sequentialMISubProcess"))
             .withProcessInstanceVariable("nrOfLoops", 3);
@@ -779,7 +779,7 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSimpleOneTask.getId());
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procParallelMultiInst.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "parallelMISubProcess"))
             .withProcessInstanceVariable("nrOfLoops", 3);
@@ -890,7 +890,7 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isEqualTo(1);
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procSimpleOneTask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("sequentialMISubProcess", "userTask1Id"));
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
@@ -987,7 +987,7 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("subTask1", "subTask2");
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procSimpleOneTask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelMISubProcess", "userTask1Id"));
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
@@ -1083,7 +1083,7 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isEqualTo(1);
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procSequentialMultiInst.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("nestedSequentialMISubProcess", "sequentialMISubProcess"));
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
@@ -1185,7 +1185,7 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procNestedParallelMultiInst.getId());
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procParallelMultiInst.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("nestedParallelMISubProcess", "parallelMISubProcess"));
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntityImpl">
+
+    <resultMap id="processMigrationBatchResultMap" type="org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntityImpl">
+        <id property="id" column="ID_" jdbcType="VARCHAR"/>
+        <result property="revision" column="REV_" jdbcType="INTEGER"/>
+        <result property="parentBatchId" column="PARENT_BATCH_ID_" jdbcType="VARCHAR"/>
+        <result property="batchType" column="TYPE_" jdbcType="VARCHAR"/>
+        <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP"/>
+        <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR"/>
+        <result property="paramDataRefId" column="PARAM_DATA_BYTEARRAY_ID_" typeHandler="ByteArrayRefTypeHandler"/>
+        <result property="resultDataRefId" column="RESULT_DATA_BYTEARRAY_ID_" typeHandler="ByteArrayRefTypeHandler"/>
+        <result property="completeTime" column="COMPLETE_TIME_" jdbcType="TIMESTAMP"/>
+        <collection property="batchChildren" ofType="org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntityImpl" column="ID_" select="selectProcessMigrationBatchChildren"/>
+    </resultMap>
+
+    <resultMap id="processMigrationBatchResultMapChild" type="org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntityImpl">
+        <id property="id" column="ID_" jdbcType="VARCHAR"/>
+        <result property="revision" column="REV_" jdbcType="INTEGER"/>
+        <result property="parentBatchId" column="PARENT_BATCH_ID_" jdbcType="VARCHAR"/>
+        <result property="batchType" column="TYPE_" jdbcType="VARCHAR"/>
+        <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP"/>
+        <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR"/>
+        <result property="paramDataRefId" column="PARAM_DATA_BYTEARRAY_ID_" typeHandler="ByteArrayRefTypeHandler"/>
+        <result property="resultDataRefId" column="RESULT_DATA_BYTEARRAY_ID_" typeHandler="ByteArrayRefTypeHandler"/>
+        <result property="completeTime" column="COMPLETE_TIME_" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- ProcessMigrationBatch INSERTS -->
+    <insert id="insertProcessMigrationBatch" parameterType="org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntityImpl">
+    insert into ${prefix}ACT_RU_PROCESS_MIGRATION_BATCH(ID_, REV_, PARENT_BATCH_ID_, TYPE_, CREATE_TIME_, PROC_INST_ID_, PARAM_DATA_BYTEARRAY_ID_, RESULT_DATA_BYTEARRAY_ID_, COMPLETE_TIME_)
+    values (#{id, jdbcType=VARCHAR},
+            #{revision, jdbcType=INTEGER},
+            #{parentBatchId, jdbcType=VARCHAR},
+            #{batchType, jdbcType=VARCHAR},
+            #{createTime, jdbcType=TIMESTAMP},
+            #{processInstanceId, jdbcType=VARCHAR},
+            #{paramDataRefId, typeHandler=ByteArrayRefTypeHandler},
+            #{resultDataRefId, typeHandler=ByteArrayRefTypeHandler},
+            #{completeTime, jdbcType=TIMESTAMP})
+    </insert>
+
+    <insert id="bulkInsertProcessMigrationBatch" parameterType="java.util.List">
+        INSERT INTO ${prefix}ACT_RU_PROCESS_MIGRATION_BATCH(ID_, REV_, PARENT_BATCH_ID_, TYPE_, CREATE_TIME_, PROC_INST_ID_, PARAM_DATA_BYTEARRAY_ID_, RESULT_DATA_BYTEARRAY_ID_, COMPLETE_TIME_)
+        VALUES
+        <foreach collection="list" item="processMigrationBatch" index="index" separator=",">
+            (#{processMigrationBatch.id, jdbcType=VARCHAR},
+            #{processMigrationBatch.revision, jdbcType=INTEGER},
+            #{processMigrationBatch.parentBatchId, jdbcType=VARCHAR},
+            #{processMigrationBatch.batchType, jdbcType=VARCHAR},
+            #{processMigrationBatch.createTime, jdbcType=TIMESTAMP},
+            #{processMigrationBatch.processInstanceId, jdbcType=VARCHAR},
+            #{processMigrationBatch.paramDataRefId, typeHandler=ByteArrayRefTypeHandler},
+            #{processMigrationBatch.resultDataRefId, typeHandler=ByteArrayRefTypeHandler},
+            #{processMigrationBatch.completeTime, jdbcType=TIMESTAMP})
+        </foreach>
+    </insert>
+
+    <insert id="bulkInsertProcessMigrationBatch" databaseId="oracle" parameterType="java.util.List">
+        INSERT ALL
+        <foreach collection="list" item="processMigrationBatch" index="index">
+            INTO ${prefix}ACT_RU_PROCESS_MIGRATION_BATCH(ID_, REV_, PARENT_BATCH_ID_, TYPE_, CREATE_TIME_, PROC_INST_ID_, PARAM_DATA_BYTEARRAY_ID_, RESULT_DATA_BYTEARRAY_ID_, COMPLETE_TIME_) VALUES
+            (#{processMigrationBatch.id, jdbcType=VARCHAR},
+            #{processMigrationBatch.revision, jdbcType=INTEGER},
+            #{processMigrationBatch.parentBatchId, jdbcType=VARCHAR},
+            #{processMigrationBatch.batchType, jdbcType=VARCHAR},
+            #{processMigrationBatch.createTime, jdbcType=TIMESTAMP},
+            #{processMigrationBatch.processInstanceId, jdbcType=VARCHAR},
+            #{processMigrationBatch.paramDataRefId, typeHandler=ByteArrayRefTypeHandler},
+            #{processMigrationBatch.resultDataRefId, typeHandler=ByteArrayRefTypeHandler},
+            #{processMigrationBatch.completeTime, jdbcType=TIMESTAMP})
+        </foreach>
+        SELECT * FROM dual
+    </insert>
+
+    <!-- ProcessMigrationBatch UPDATE -->
+    <update id="updateProcessMigrationBatch" parameterType="org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntityImpl">
+        update ${prefix}ACT_RU_PROCESS_MIGRATION_BATCH
+        <set>
+            REV_ = #{revisionNext, jdbcType=INTEGER},
+            <if test="originalPersistentState.resultDataRefId != null">
+                RESULT_DATA_BYTEARRAY_ID_ = #{resultDataRefId, typeHandler=ByteArrayRefTypeHandler},
+            </if>
+            <if test="originalPersistentState.completeTime != completeTime">
+                COMPLETE_TIME_ = #{completeTime, jdbcType=TIMESTAMP}
+            </if>
+        </set>
+        where ID_ = #{id, jdbcType=VARCHAR}
+        and REV_ = #{revision, jdbcType=INTEGER}
+    </update>
+
+    <!-- ProcessMigrationBatch DELETE -->
+    <delete id="deleteProcessMigrationBatch" parameterType="string">
+      delete from ${prefix}ACT_RU_PROCESS_MIGRATION_BATCH where ID_ = #{id, jdbcType=VARCHAR}
+    </delete>
+    <!--<delete id="deleteParentBatchAndChildrenByParentId" parameterType="string">-->
+    <!--delete from ${prefix}ACT_RU_PROCESS_MIGRATION_BATCH where ID_ = #{parentBatchId} or PARENT_BATCH_ID_ = #{parentBatchId}-->
+    <!--</delete>-->
+
+    <!--<delete id="deleteResourcesByParentBatchId" parameterType="java.util.Collection">-->
+        <!--delete from ${prefix}ACT_GE_BYTEARRAY where-->
+        <!--<foreach item="resId" collection="list" index="index" separator=" or ">-->
+            <!--ID_ = #{resId, jdbcType=VARCHAR}-->
+        <!--</foreach>-->
+    <!--</delete>-->
+
+
+    <!-- ProcessMigrationBatch SELECT -->
+    <select id="selectProcessMigrationBatch" parameterType="string" resultMap="processMigrationBatchResultMap">
+      select * from ${prefix}ACT_RU_PROCESS_MIGRATION_BATCH where ID_ = #{id, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectProcessMigrationBatchChildren" parameterType="string" resultMap="processMigrationBatchResultMapChild">
+      select * from ${prefix}ACT_RU_PROCESS_MIGRATION_BATCH where PARENT_BATCH_ID_ = #{id, jdbcType=VARCHAR}
+    </select>
+
+    <!--<select id="selectMigrationValidationBatchesByParentBatchId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="processMigrationBatchResultMap">-->
+    <!--select * from ${prefix}ACT_RU_PROCESS_MIGRATION_BATCH where (TYPE_ = 'processMigration') and (ID_ = #{parentBatchId} or PARENT_BATCH_ID_ = #{parentBatchId})-->
+    <!--</select>-->
+
+    <!--<select id="selectMigrationBatchesByParentBatchId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="processMigrationBatchResultMap">-->
+    <!--select * from ${prefix}ACT_RU_PROCESS_MIGRATION_BATCH where (TYPE_ = 'processMigrationValidation') and (ID_ = #{parentBatchId} or PARENT_BATCH_ID_ = #{parentBatchId})-->
+    <!--</select>-->
+
+
+</mapper>

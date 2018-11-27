@@ -126,12 +126,26 @@ create table ACT_PROCDEF_INFO (
     primary key (ID_)
 );
 
+create table ACT_RU_PROCESS_MIGRATION_BATCH (
+	ID_ varchar(64) not null,
+	  PARENT_BATCH_ID_ varchar(64),
+	  REV_ integer,
+    TYPE_ varchar(64) not null,
+    CREATE_TIME_ timestamp not null,
+    PROC_INST_ID_ varchar(64),
+    PARAM_DATA_BYTEARRAY_ID_ varchar(64),
+    RESULT_DATA_BYTEARRAY_ID_ varchar(64),
+    COMPLETE_TIME_ timestamp,
+    primary key (ID_)
+);
+
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDC_EXEC_ROOT on ACT_RU_EXECUTION(ROOT_PROC_INST_ID_);
 create index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR(CONFIGURATION_);
 create index ACT_IDX_VARIABLE_TASK_ID on ACT_RU_VARIABLE(TASK_ID_);
 create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
 create index ACT_IDX_INFO_PROCDEF on ACT_PROCDEF_INFO(PROC_DEF_ID_);
+create index ACT_IDX_PROCESS_MIGRATION_BATCH on ACT_RU_PROCESS_MIGRATION_BATCH(PARENT_BATCH_ID_);
 
 alter table ACT_GE_BYTEARRAY
     add constraint ACT_FK_BYTEARR_DEPL
@@ -295,6 +309,21 @@ alter table ACT_PROCDEF_INFO
 alter table ACT_PROCDEF_INFO
     add constraint ACT_UNIQ_INFO_PROCDEF
     unique (PROC_DEF_ID_);
+
+alter table ACT_RU_PROCESS_MIGRATION_BATCH
+    add constraint ACT_FK_PROCESS_MIGRATION_BATCH
+    foreign key (PARENT_BATCH_ID_)
+    references ACT_RU_PROCESS_MIGRATION_BATCH (ID_);
+
+-- alter table ACT_RU_PROCESS_MIGRATION_BATCH
+--     add constraint ACT_FK_BATCH_PARAM_DATA
+--     foreign key (PARAM_DATA_BYTEARRAY_ID_)
+--     references ACT_GE_BYTEARRAY (ID_);
+
+-- alter table ACT_RU_PROCESS_MIGRATION_BATCH
+--     add constraint ACT_FK_BATCH_RESULT_DATA
+--     foreign key (RESULT_DATA_BYTEARRAY_ID_)
+--     references ACT_GE_BYTEARRAY (ID_);
     
 insert into ACT_GE_PROPERTY
 values ('schema.version', '6.4.1.1', 1);

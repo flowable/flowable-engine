@@ -106,7 +106,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertEquals(version1ProcessDef.getId(), tasks.get(0).getProcessDefinitionId());
         assertEquals("userTask1Id", tasks.get(0).getTaskDefinitionKey());
 
-        ProcessInstanceMigrationValidationResult validationResult = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationValidationResult validationResult = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId())
             .validateMigration(processInstance.getId());
 
@@ -115,7 +115,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertEquals(0, validationResult.getValidationMessages().size());
 
         //Migrate process
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId());
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
@@ -157,7 +157,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/three-tasks-simple-process.bpmn20.xml");
 
         //Migrate process
-        runtimeService.createProcessInstanceMigrationBuilder()
+        processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask2Id", "intermediateTask"))
             .migrate(processInstanceToMigrate.getId());
@@ -224,7 +224,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
         //Migrate process
         ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentConverter.convertFromJson(migrationNode.toString());
-        runtimeService.migrateProcessInstance(processInstanceToMigrate.getId(), migrationDocument);
+        processInstanceMigrationService.migrateProcessInstance(processInstanceToMigrate.getId(), migrationDocument);
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
         assertEquals(version2ProcessDef.getId(), task.getProcessDefinitionId());
@@ -277,7 +277,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         fromActivityIds.add("parallelTask1");
         fromActivityIds.add("parallelTask2");
         //Migrate process
-        runtimeService.createProcessInstanceMigrationBuilder()
+        processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor(fromActivityIds, "beforeTask"))
             .migrate(processInstanceToMigrate.getId());
@@ -344,7 +344,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/three-tasks-with-sub-process.bpmn20.xml");
 
         //Migrate process
-        runtimeService.createProcessInstanceMigrationBuilder()
+        processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId())
             .addActivityMigrationMapping(
                 ActivityMigrationMapping.createMappingFor("userTask2Id", "subScriptTask")
@@ -434,7 +434,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertEquals(version1ProcessDef.getId(), tasks.get(0).getProcessDefinitionId());
         assertEquals("userTask1Id", tasks.get(0).getTaskDefinitionKey());
 
-        ProcessInstanceMigrationValidationResult validationResult = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationValidationResult validationResult = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask1Id"))
             .validateMigration(processInstance.getId());
@@ -444,7 +444,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertEquals(0, validationResult.getValidationMessages().size());
 
         //Migrate process - moving the current execution explicitly
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask1Id"));
 
@@ -513,7 +513,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertEquals(version1ProcessDef.getId(), tasks.get(0).getProcessDefinitionId());
         assertEquals("userTask1Id", tasks.get(0).getTaskDefinitionKey());
 
-        ProcessInstanceMigrationValidationResult validationResult = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationValidationResult validationResult = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask3Id"))
             .validateMigration(processInstance.getId());
@@ -522,7 +522,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertEquals(false, validationResult.isMigrationValid());
         assertEquals(1, validationResult.getValidationMessages().size());
 
-        validationResult = runtimeService.createProcessInstanceMigrationBuilder()
+        validationResult = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask2Id"))
             .validateMigration(processInstance.getId());
@@ -532,7 +532,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertEquals(0, validationResult.getValidationMessages().size());
 
         //Migrate process - moving the current execution explicitly
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask2Id"));
 
@@ -605,7 +605,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertEquals("userTask2Id", tasks.get(0).getTaskDefinitionKey());
 
         //Migrate process - moving the current execution explicitly
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask2Id", "userTask1Id"));
 
@@ -674,7 +674,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         }
 
         //Migrate process
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId());
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
@@ -764,7 +764,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         }
 
         //Migrate process
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask1Id").withNewAssignee("kermit"));
 
@@ -836,7 +836,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("InsideSimpleSubProcess1");
 
         //Migrate to the other processDefinition
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefTwoTasks.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("InsideSimpleSubProcess1", "InsideSimpleSubProcess2"));
 
@@ -903,7 +903,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertThat(executionsBeforeMigration).extracting("activityId").containsExactlyInAnyOrder("SimpleSubProcess", "InsideSimpleSubProcess2");
 
         //Migrate to the other processDefinition
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefOneTask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("InsideSimpleSubProcess2", "InsideSimpleSubProcess1"));
 
@@ -963,7 +963,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("BeforeSubProcess");
 
         //Migrate to the other processDefinition
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefTwoTasks.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("BeforeSubProcess", "InsideSimpleSubProcess2"));
 
@@ -1024,7 +1024,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("InsideSimpleSubProcess2");
 
         //Migrate to the other processDefinition
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefOneTask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("InsideSimpleSubProcess2", "BeforeSubProcess"));
 
@@ -1098,7 +1098,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("BeforeSubProcess");
 
         //Migrate to the other processDefinition
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefNested.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("BeforeSubProcess", "InsideNestedSubProcess"));
 
@@ -1154,7 +1154,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("BeforeSubProcess");
 
         //Migrate to the other processDefinition
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefNested.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("BeforeSubProcess", "InsideNestedSubProcess"));
 
@@ -1221,7 +1221,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("InsideSimpleSubProcess1");
 
         //Migrate to the other processDefinition
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefNested.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("InsideSimpleSubProcess1", "InsideNestedSubProcess"));
 
@@ -1287,7 +1287,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertEquals("subProcess", nameDataObject.getValue());
 
         //Migrate to the other processDefinition
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefNested.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("InsideSimpleSubProcess1", "InsideNestedSubProcess"));
 
@@ -1357,7 +1357,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefOWithTimer.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "firstTask"));
 
@@ -1439,7 +1439,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefOneTask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("firstTask", "userTask1Id"));
 
@@ -1509,7 +1509,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefTwoTimers.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("firstTask", "secondTask"));
 
@@ -1598,7 +1598,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefOneTask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("subTask", "userTask1Id"));
 
@@ -1671,7 +1671,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefSubProcWithTimer.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subTask"));
 
@@ -1749,7 +1749,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefSubProcWithTimer.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subTask"));
 
@@ -1835,7 +1835,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procVersion2.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("subTask", "subTask2"));
 
@@ -1916,7 +1916,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefTimerTaskInSubProcess.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subTask"));
 
@@ -1998,7 +1998,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefTimerTaskInSubProcess.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subTask"));
 
@@ -2085,7 +2085,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "intermediateCatchEvent"));
 
@@ -2189,7 +2189,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefOneTask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("intermediateCatchEvent", "userTask1Id"));
 
@@ -2275,7 +2275,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignalVer2.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("intermediateCatchEvent", "newIntermediateCatchEvent"));
 
@@ -2371,7 +2371,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "intermediateCatchEvent"));
 
@@ -2476,7 +2476,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefOneTask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("intermediateCatchEvent", "userTask1Id"));
 
@@ -2567,7 +2567,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignalVer2.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("intermediateCatchEvent", "intermediateNewCatchEvent"));
 

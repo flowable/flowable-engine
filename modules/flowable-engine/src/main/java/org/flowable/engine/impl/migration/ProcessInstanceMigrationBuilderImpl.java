@@ -16,7 +16,8 @@ package org.flowable.engine.impl.migration;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.engine.RuntimeService;
+import org.flowable.engine.ProcessInstanceMigrationService;
+import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntity;
 import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
@@ -26,11 +27,11 @@ import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
  */
 public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigrationBuilder {
 
-    protected RuntimeService runtimeService;
+    protected ProcessInstanceMigrationService processInstanceMigrationService;
     protected ProcessInstanceMigrationDocumentBuilderImpl migrationDocumentBuilder = new ProcessInstanceMigrationDocumentBuilderImpl();
 
-    public ProcessInstanceMigrationBuilderImpl(RuntimeService runtimeService) {
-        this.runtimeService = runtimeService;
+    public ProcessInstanceMigrationBuilderImpl(ProcessInstanceMigrationService processInstanceMigrationService) {
+        this.processInstanceMigrationService = processInstanceMigrationService;
     }
 
     @Override
@@ -93,43 +94,55 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
     @Override
     public void migrate(String processInstanceId) {
         ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
-        getRuntimeService().migrateProcessInstance(processInstanceId, document);
+        getProcessInstanceMigrationService().migrateProcessInstance(processInstanceId, document);
     }
 
     @Override
     public ProcessInstanceMigrationValidationResult validateMigration(String processInstanceId) {
         ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
-        return getRuntimeService().validateMigrationForProcessInstance(processInstanceId, document);
+        return getProcessInstanceMigrationService().validateMigrationForProcessInstance(processInstanceId, document);
     }
 
     @Override
     public void migrateProcessInstances(String processDefinitionId) {
         ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
-        getRuntimeService().migrateProcessInstancesOfProcessDefinition(processDefinitionId, document);
+        getProcessInstanceMigrationService().migrateProcessInstancesOfProcessDefinition(processDefinitionId, document);
     }
 
     @Override
     public ProcessInstanceMigrationValidationResult validateMigrationOfProcessInstances(String processDefinitionId) {
         ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
-        return getRuntimeService().validateMigrationForProcessInstancesOfProcessDefinition(processDefinitionId, document);
+        return getProcessInstanceMigrationService().validateMigrationForProcessInstancesOfProcessDefinition(processDefinitionId, document);
     }
 
     @Override
     public void migrateProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId) {
         ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
-        getRuntimeService().migrateProcessInstancesOfProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, document);
+        getProcessInstanceMigrationService().migrateProcessInstancesOfProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, document);
     }
 
     @Override
     public ProcessInstanceMigrationValidationResult validateMigrationOfProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId) {
         ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
-        return getRuntimeService().validateMigrationForProcessInstancesOfProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, document);
+        return getProcessInstanceMigrationService().validateMigrationForProcessInstancesOfProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, document);
     }
 
-    protected RuntimeService getRuntimeService() {
-        if (runtimeService == null) {
-            throw new FlowableException("RuntimeService cannot be null, Obtain your builder instance from the RuntimeService to access this feature");
+    @Override
+    public ProcessMigrationBatchEntity batchValidateMigrationOfProcessInstances(String processDefinitionId) {
+        ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
+        return getProcessInstanceMigrationService().batchValidateMigrationForProcessInstancesOfProcessDefinition(processDefinitionId, document);
+    }
+
+    @Override
+    public ProcessMigrationBatchEntity batchValidateMigrationOfProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId) {
+        ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
+        return getProcessInstanceMigrationService().batchValidateMigrationForProcessInstancesOfProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, document);
+    }
+
+    protected ProcessInstanceMigrationService getProcessInstanceMigrationService() {
+        if (processInstanceMigrationService == null) {
+            throw new FlowableException("ProcessInstanceMigrationService cannot be null, Obtain your builder instance from the ProcessInstanceMigrationService to access this feature");
         }
-        return runtimeService;
+        return processInstanceMigrationService;
     }
 }

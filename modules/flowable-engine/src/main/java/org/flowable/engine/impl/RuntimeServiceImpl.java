@@ -60,6 +60,7 @@ import org.flowable.engine.impl.cmd.GetStartFormCmd;
 import org.flowable.engine.impl.cmd.GetStartFormModelCmd;
 import org.flowable.engine.impl.cmd.HasExecutionVariableCmd;
 import org.flowable.engine.impl.cmd.MessageEventReceivedCmd;
+import org.flowable.engine.impl.cmd.ProcessInstanceMigrationBatchValidationCmd;
 import org.flowable.engine.impl.cmd.ProcessInstanceMigrationCmd;
 import org.flowable.engine.impl.cmd.ProcessInstanceMigrationValidationCmd;
 import org.flowable.engine.impl.cmd.RemoveEventListenerCommand;
@@ -76,6 +77,7 @@ import org.flowable.engine.impl.cmd.SuspendProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.TriggerCmd;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationBuilderImpl;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
+import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntity;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
@@ -479,7 +481,7 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     public List<IdentityLink> getIdentityLinksForProcessInstance(String processInstanceId) {
         return commandExecutor.execute(new GetIdentityLinksForProcessInstanceCmd(processInstanceId));
     }
-    
+
     @Override
     public List<EntityLink> getEntityLinkChildrenForProcessInstance(String processInstanceId) {
         return commandExecutor.execute(new GetEntityLinkChildrenForProcessInstanceCmd(processInstanceId));
@@ -716,44 +718,5 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
         commandExecutor.execute(new ChangeActivityStateCmd(changeActivityStateBuilder));
     }
 
-    @Override
-    public ProcessInstanceMigrationBuilder createProcessInstanceMigrationBuilder() {
-        return new ProcessInstanceMigrationBuilderImpl(this);
-    }
-
-    @Override
-    public ProcessInstanceMigrationBuilder createProcessInstanceMigrationBuilderFromProcessInstanceMigrationDocument(ProcessInstanceMigrationDocument document) {
-        return createProcessInstanceMigrationBuilder().fromProcessInstanceMigrationDocument(document);
-    }
-
-    @Override
-    public ProcessInstanceMigrationValidationResult validateMigrationForProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
-        return commandExecutor.execute(ProcessInstanceMigrationValidationCmd.forProcessInstance(processInstanceId, processInstanceMigrationDocument));
-    }
-
-    @Override
-    public ProcessInstanceMigrationValidationResult validateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
-        return commandExecutor.execute(ProcessInstanceMigrationValidationCmd.forProcessDefinition(processDefinitionId, processInstanceMigrationDocument));
-    }
-
-    @Override
-    public ProcessInstanceMigrationValidationResult validateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
-        return commandExecutor.execute(ProcessInstanceMigrationValidationCmd.forProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, processInstanceMigrationDocument));
-    }
-
-    @Override
-    public void migrateProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
-        commandExecutor.execute(ProcessInstanceMigrationCmd.forProcessInstance(processInstanceId, processInstanceMigrationDocument));
-    }
-
-    @Override
-    public void migrateProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
-        commandExecutor.execute(ProcessInstanceMigrationCmd.forProcessDefinition(processDefinitionId, processInstanceMigrationDocument));
-    }
-
-    @Override
-    public void migrateProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
-        commandExecutor.execute(ProcessInstanceMigrationCmd.forProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, processInstanceMigrationDocument));
-    }
 
 }

@@ -15,6 +15,7 @@ package org.flowable.engine.migration;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
+import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntity;
 
 /**
  * @author Dennis Federico
@@ -26,6 +27,13 @@ public interface ProcessInstanceMigrationManager {
     ProcessInstanceMigrationValidationResult validateMigrateProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument, CommandContext commandContext);
 
     ProcessInstanceMigrationValidationResult validateMigrateProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument, CommandContext commandContext);
+
+    ProcessMigrationBatchEntity batchValidateMigrateProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenant, ProcessInstanceMigrationDocument processInstanceMigrationDocument, CommandContext commandContext);
+
+    ProcessMigrationBatchEntity batchValidateMigrateProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument, CommandContext commandContext);
+
+    //TODO WIP - remove comment - batch validation of a single process instance seems nonsensical
+//    ProcessMigrationBatchEntity batchValidateMigrateProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument, CommandContext commandContext);
 
     void migrateProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument document, CommandContext commandContext);
 

@@ -53,6 +53,7 @@
         <mapper resource="org/flowable/variable/service/db/mapping/entity/VariableInstance.xml" />
         <mapper resource="org/flowable/db/mapping/entity/EventSubscription.xml" />
         <mapper resource="org/flowable/db/mapping/entity/EventLogEntry.xml" />
+        <mapper resource="org/flowable/db/mapping/entity/ProcessMigrationBatch.xml" />
     </mappers>
 
 </configuration>

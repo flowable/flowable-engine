@@ -25,6 +25,7 @@ import org.flowable.engine.IdentityService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngines;
+import org.flowable.engine.ProcessInstanceMigrationService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
@@ -50,6 +51,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     protected FormService formService;
     protected ManagementService managementService;
     protected DynamicBpmnService dynamicBpmnService;
+    protected ProcessInstanceMigrationService processInstanceMigrationService;
     protected AsyncExecutor asyncExecutor;
     protected AsyncExecutor asyncHistoryExecutor;
     protected CommandExecutor commandExecutor;
@@ -68,6 +70,7 @@ public class ProcessEngineImpl implements ProcessEngine {
         this.formService = processEngineConfiguration.getFormService();
         this.managementService = processEngineConfiguration.getManagementService();
         this.dynamicBpmnService = processEngineConfiguration.getDynamicBpmnService();
+        this.processInstanceMigrationService = processEngineConfiguration.getProcessInstanceMigrationService();
         this.asyncExecutor = processEngineConfiguration.getAsyncExecutor();
         this.asyncHistoryExecutor = processEngineConfiguration.getAsyncHistoryExecutor();
         this.commandExecutor = processEngineConfiguration.getCommandExecutor();
@@ -168,6 +171,11 @@ public class ProcessEngineImpl implements ProcessEngine {
     @Override
     public DynamicBpmnService getDynamicBpmnService() {
         return dynamicBpmnService;
+    }
+
+    @Override
+    public ProcessInstanceMigrationService getProcessInstanceMigrationService() {
+        return processInstanceMigrationService;
     }
 
     @Override
