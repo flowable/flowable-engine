@@ -24,7 +24,7 @@
 
     <property name="engineName" value="customName"/>
 
-    <property name="history" value="full" />
+    <property name="history" value="none" />
     <property name="asyncHistoryEnabled" value="false" />
     <property name="enableProcessDefinitionHistoryLevel" value="true" />
     

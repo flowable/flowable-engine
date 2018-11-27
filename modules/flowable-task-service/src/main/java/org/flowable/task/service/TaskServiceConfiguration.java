@@ -24,7 +24,6 @@ import org.flowable.task.api.history.HistoricTaskQueryInterceptor;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
 import org.flowable.task.service.impl.HistoricTaskServiceImpl;
 import org.flowable.task.service.impl.TaskServiceImpl;
-import org.flowable.task.service.event.impl.UserTaskDbEventLogger;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityManager;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityManagerImpl;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityManager;
@@ -91,7 +90,6 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         initDataManagers();
         initEntityManagers();
         initTaskPostProcessor();
-        initDatabaseEventLogging();
     }
 
     // Data managers
@@ -124,12 +122,6 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
     public void initTaskPostProcessor() {
         if (taskPostProcessor == null) {
             taskPostProcessor = taskBuilder -> taskBuilder;
-        }
-    }
-
-    public void initDatabaseEventLogging() {
-        if (enableDatabaseEventLogging) {
-            getEventDispatcher().addEventListener(new UserTaskDbEventLogger(this.clock, this.objectMapper));
         }
     }
 

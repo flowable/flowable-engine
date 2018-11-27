@@ -39,6 +39,7 @@ import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntity;
 import org.flowable.variable.service.event.impl.FlowableVariableEventBuilder;
 import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayRef;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -89,6 +90,8 @@ public class TaskHelper {
                     Authentication.getAuthenticatedUserId(), null, IdentityLinkType.PARTICIPANT);
         }
 
+        logTaskCompleted(taskEntity, commandContext);
+
         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
         if (eventDispatcher.isEnabled()) {
             if (variables != null) {
@@ -106,6 +109,17 @@ public class TaskHelper {
         if (taskEntity.getExecutionId() != null) {
             ExecutionEntity executionEntity = CommandContextUtil.getExecutionEntityManager(commandContext).findById(taskEntity.getExecutionId());
             CommandContextUtil.getAgenda(commandContext).planTriggerExecutionOperation(executionEntity);
+        }
+    }
+
+    protected static void logTaskCompleted(TaskEntity taskEntity, CommandContext commandContext) {
+        if (CommandContextUtil.getTaskServiceConfiguration(commandContext).isEnableDatabaseEventLogging()) {
+            TaskLogEntryEntity taskLogEntry = org.flowable.task.service.impl.util.CommandContextUtil.getTaskLogEntryEntityManager().create();
+            taskLogEntry.setTaskId(taskEntity.getId());
+            taskLogEntry.setTimeStamp(CommandContextUtil.getTaskServiceConfiguration(commandContext).getClock().getCurrentTime());
+            taskLogEntry.setType(FlowableEngineEventType.TASK_COMPLETED.name());
+            taskLogEntry.setUserId(Authentication.getAuthenticatedUserId());
+            CommandContextUtil.getTaskService().addTaskLogEntry(taskLogEntry);
         }
     }
 

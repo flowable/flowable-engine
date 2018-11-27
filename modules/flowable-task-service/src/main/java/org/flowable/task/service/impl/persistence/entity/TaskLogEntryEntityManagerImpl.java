@@ -15,6 +15,7 @@ package org.flowable.task.service.impl.persistence.entity;
 import java.util.List;
 
 import org.flowable.task.api.TaskLogEntry;
+import org.flowable.task.api.TaskLogEntryBuilder;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.entity.data.TaskLogEntryDataManager;
 
@@ -34,12 +35,26 @@ public class TaskLogEntryEntityManagerImpl extends AbstractEntityManager<TaskLog
     protected TaskLogEntryDataManager getDataManager() {
         return taskLogDataManager;
     }
+
     @Override
     public List<TaskLogEntry> findTaskLogEntriesByTaskInstanceId(String taskInstanceId) {
         return getDataManager().findTaskLogEntriesByTaskInstanceId(taskInstanceId);
     }
+
     @Override
     public void deleteTaskLogEntry(long logNr) {
         getDataManager().deleteTaskLogEntry(logNr);
     }
+
+    @Override
+    public void createTaskLogEntry(TaskLogEntryBuilder taskLogEntryBuilder) {
+        TaskLogEntryEntity taskLogEntryEntity = getDataManager().create();
+        taskLogEntryEntity.setUserId(taskLogEntryBuilder.getUserId());
+        taskLogEntryEntity.setTimeStamp(taskLogEntryBuilder.getTimeStamp());
+        taskLogEntryEntity.setTaskId(taskLogEntryBuilder.getTaskId());
+        taskLogEntryEntity.setType(taskLogEntryBuilder.getType());
+        taskLogEntryEntity.setData(taskLogEntryBuilder.getData());
+        getDataManager().insert(taskLogEntryEntity);
+    }
+
 }

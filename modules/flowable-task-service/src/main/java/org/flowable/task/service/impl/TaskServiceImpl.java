@@ -18,11 +18,13 @@ import org.flowable.common.engine.impl.service.CommonServiceImpl;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.api.TaskLogEntry;
+import org.flowable.task.api.TaskLogEntryBuilder;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityManager;
+import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntityManager;
 
 /**
@@ -127,6 +129,20 @@ public class TaskServiceImpl extends CommonServiceImpl<TaskServiceConfiguration>
     @Override
     public void deleteTaskLogEntry(long logNumber) {
         getTaskLogEntryEntityManager().deleteTaskLogEntry(logNumber);
+    }
+
+    @Override
+    public void addTaskLogEntry(TaskLogEntry taskLogEntry) {
+        if (this.configuration.isEnableDatabaseEventLogging()) {
+            getTaskLogEntryEntityManager().insert((TaskLogEntryEntity) taskLogEntry);
+        }
+    }
+
+    @Override
+    public void createTaskLogEntry(TaskLogEntryBuilder taskLogEntryBuilder) {
+        if (this.configuration.isEnableDatabaseEventLogging()) {
+            getTaskLogEntryEntityManager().createTaskLogEntry(taskLogEntryBuilder);
+        }
     }
 
     protected TaskLogEntryEntityManager getTaskLogEntryEntityManager() {

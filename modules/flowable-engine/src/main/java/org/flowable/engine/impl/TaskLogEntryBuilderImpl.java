@@ -10,26 +10,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.task.service.event.impl;
+package org.flowable.engine.impl;
 
-import org.flowable.common.engine.api.delegate.event.FlowableEvent;
-import org.flowable.common.engine.api.delegate.event.FlowableEventType;
-import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.engine.impl.cmd.AddTaskLogEntryCmd;
+import org.flowable.task.service.impl.BaseTaskLogEntryBuilderImpl;
 
 /**
  * @author martin.grofcik
  */
-public class FlowableUserTaskCreatedEvent extends FlowableUserTaskEvent {
+public class TaskLogEntryBuilderImpl extends BaseTaskLogEntryBuilderImpl {
 
-    public static final String USER_TASK_CREATED_TYPE = "USER_TASK_CREATED";
-
-    public FlowableUserTaskCreatedEvent(TaskEntity task) {
-        super(task);
+    public TaskLogEntryBuilderImpl(CommandExecutor commandExecutor) {
+        super(commandExecutor);
     }
-
     @Override
-    public FlowableEventType getType() {
-        return () -> USER_TASK_CREATED_TYPE;
+    public void add() {
+        this.commandExecutor.execute(new AddTaskLogEntryCmd(this));
     }
-
 }

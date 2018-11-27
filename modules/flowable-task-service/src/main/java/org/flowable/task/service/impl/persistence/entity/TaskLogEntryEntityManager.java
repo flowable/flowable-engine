@@ -16,13 +16,16 @@ import java.util.List;
 
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.task.api.TaskLogEntry;
+import org.flowable.task.api.TaskLogEntryBuilder;
 
 /**
  * @author martin.grofcik
  */
 public interface TaskLogEntryEntityManager extends EntityManager<TaskLogEntryEntity> {
 
-        List<TaskLogEntry> findTaskLogEntriesByTaskInstanceId(String taskInstanceId);
+    List<TaskLogEntry> findTaskLogEntriesByTaskInstanceId(String taskInstanceId);
 
-        void deleteTaskLogEntry(long logNr);
+    void deleteTaskLogEntry(long logNr);
+
+    void createTaskLogEntry(TaskLogEntryBuilder taskLogEntryBuilder);
 }

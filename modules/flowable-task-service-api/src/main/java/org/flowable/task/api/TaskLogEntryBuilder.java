@@ -10,23 +10,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.task.service.event.impl;
+package org.flowable.task.api;
 
-import org.flowable.common.engine.api.delegate.event.FlowableEvent;
-import org.flowable.task.api.Task;
+import java.util.Date;
 
 /**
+ * Interface to create and add task log entry
+ *
  * @author martin.grofcik
  */
-public abstract class FlowableUserTaskEvent implements FlowableEvent {
+public interface TaskLogEntryBuilder {
 
-    protected Task task;
+    TaskLogEntryBuilder type(String type);
 
-    public FlowableUserTaskEvent(Task task) {
-        this.task = task;
-    }
+    TaskLogEntryBuilder taskId(String taskId);
 
-    public Task getTask() {
-        return task;
-    }
+    TaskLogEntryBuilder timeStamp(Date timeStamp);
+
+    TaskLogEntryBuilder userId(String userId);
+
+    TaskLogEntryBuilder data(byte[] data);
+
+    String getType();
+
+    String getTaskId();
+
+    Date getTimeStamp();
+
+    String getUserId();
+
+    byte[] getData();
+
+    void add();
 }

@@ -13,15 +13,23 @@
 package org.flowable.engine.test.api.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hamcrest.CoreMatchers.is;
 
+import java.util.Date;
 import java.util.List;
+import java.util.function.Consumer;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.engine.HistoryService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.test.ConfigurationResource;
 import org.flowable.engine.test.FlowableTest;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskLogEntry;
+import org.flowable.task.api.TaskLogEntryBuilder;
+import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,14 +43,18 @@ public class TaskServiceEventTest {
     protected Task task;
 
     @AfterEach
-    public void deleteTasks(TaskService taskService) {
+    public void deleteTasks(TaskService taskService, HistoryService historyService) {
         if (task != null) {
-            taskService.getTaskLogEntriesByTaskInstanceId(task.getId()).
-                forEach(
-                    logEntry -> taskService.deleteTaskLogEntry(logEntry.getLogNumber())
-                );
-            taskService.deleteTask(task.getId());
+            deleteTaskWithLogEntries(taskService, task.getId());
         }
+    }
+
+    protected void deleteTaskWithLogEntries(TaskService taskService, String taskId) {
+        taskService.getTaskLogEntriesByTaskInstanceId(taskId).
+            forEach(
+                logEntry -> taskService.deleteTaskLogEntry(logEntry.getLogNumber())
+            );
+        taskService.deleteTask(taskId);
     }
 
     @Test
@@ -101,18 +113,24 @@ public class TaskServiceEventTest {
 
     @Test
     public void queryForNullTaskLogEntries_returnsAll(TaskService taskService) {
-        taskService.createTaskBuilder().
+        Task taskA = taskService.createTaskBuilder().
             create();
-        taskService.createTaskBuilder().
+        Task taskB = taskService.createTaskBuilder().
             create();
-        taskService.createTaskBuilder().
+        Task taskC = taskService.createTaskBuilder().
             create();
 
-        List<TaskLogEntry> taskLogsByTaskInstanceId = taskService.getTaskLogEntriesByTaskInstanceId(null);
+        try {
+            List<TaskLogEntry> taskLogsByTaskInstanceId = taskService.getTaskLogEntriesByTaskInstanceId(null);
 
-        assertThat(
-            taskLogsByTaskInstanceId
-        ).size().isEqualTo(3L);
+            assertThat(
+                taskLogsByTaskInstanceId
+            ).size().isEqualTo(3L);
+        } finally {
+            deleteTaskWithLogEntries(taskService, taskC.getId());
+            deleteTaskWithLogEntries(taskService, taskB.getId());
+            deleteTaskWithLogEntries(taskService, taskA.getId());
+        }
     }
 
     @Test
@@ -155,7 +173,7 @@ public class TaskServiceEventTest {
         assertThat(taskLogEntries).size().isEqualTo(2);
         assertThat(taskLogEntries.get(1)).
             extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
-            isEqualTo("{\"newAssigneeId\":\"newAssignee\"}");
+            isEqualTo("{\"newAssigneeId\":\"newAssignee\",\"previousAssigneeId\":\"initialAssignee\"}");
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTimeStamp).isNotNull();
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTaskId).isEqualTo(task.getId());
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getUserId).isNull();
@@ -164,24 +182,9 @@ public class TaskServiceEventTest {
 
     @Test
     public void changeAssigneeTaskEventAsAuthenticatedUser(TaskService taskService) {
-        String previousUserId = Authentication.getAuthenticatedUserId();
-        task = taskService.createTaskBuilder().
-            assignee("testAssignee").
-            create();
-        Authentication.setAuthenticatedUserId("testUser");
-        try {
-            taskService.setAssignee(task.getId(), "newAssignee");
-
-            List<TaskLogEntry> taskLogsByTaskInstanceId = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
-            assertThat(
-                taskLogsByTaskInstanceId
-            ).size().isEqualTo(2);
-
-            assertThat(taskLogsByTaskInstanceId.get(1)).
-                extracting(TaskLogEntry::getUserId).isEqualTo("testUser");
-        } finally {
-            Authentication.setAuthenticatedUserId(previousUserId);
-        }
+        assertThatAuthenticatedUserIsSet(taskService,
+            taskId -> taskService.setAssignee(taskId, "newAssignee")
+        );
     }
 
     @Test
@@ -196,7 +199,7 @@ public class TaskServiceEventTest {
         assertThat(taskLogEntries).size().isEqualTo(2);
         assertThat(taskLogEntries.get(1)).
             extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
-            isEqualTo("{\"newOwnerId\":\"newOwner\"}");
+            isEqualTo("{\"previousOwnerId\":null,\"newOwnerId\":\"newOwner\"}");
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTimeStamp).isNotNull();
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTaskId).isEqualTo(task.getId());
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getUserId).isNull();
@@ -205,24 +208,9 @@ public class TaskServiceEventTest {
 
     @Test
     public void changeOwnerTaskEventAsAuthenticatedUser(TaskService taskService) {
-        String previousUserId = Authentication.getAuthenticatedUserId();
-        task = taskService.createTaskBuilder().
-            assignee("testAssignee").
-            create();
-        Authentication.setAuthenticatedUserId("testUser");
-        try {
-            taskService.setOwner(task.getId(), "newOwner");
-
-            List<TaskLogEntry> taskLogsByTaskInstanceId = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
-            assertThat(
-                taskLogsByTaskInstanceId
-            ).size().isEqualTo(2);
-
-            assertThat(taskLogsByTaskInstanceId.get(1)).
-                extracting(TaskLogEntry::getUserId).isEqualTo("testUser");
-        } finally {
-            Authentication.setAuthenticatedUserId(previousUserId);
-        }
+        assertThatAuthenticatedUserIsSet(taskService,
+            taskId -> taskService.setOwner(taskId, "newOwner")
+        );
     }
 
     @Test
@@ -236,7 +224,7 @@ public class TaskServiceEventTest {
         assertThat(taskLogEntries).size().isEqualTo(2);
         assertThat(taskLogEntries.get(1)).
             extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
-            isEqualTo("{\"newAssigneeId\":\"testUser\"}");
+            isEqualTo("{\"newAssigneeId\":\"testUser\",\"previousAssigneeId\":null}");
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTimeStamp).isNotNull();
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTaskId).isEqualTo(task.getId());
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getUserId).isNull();
@@ -255,11 +243,156 @@ public class TaskServiceEventTest {
         assertThat(taskLogEntries).size().isEqualTo(2);
         assertThat(taskLogEntries.get(1)).
             extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
-            isEqualTo("{\"newAssigneeId\":null}");
+            isEqualTo("{\"newAssigneeId\":null,\"previousAssigneeId\":\"initialAssignee\"}");
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTimeStamp).isNotNull();
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTaskId).isEqualTo(task.getId());
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getUserId).isNull();
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_ASSIGNEE_CHANGED");
+    }
+
+    @Test
+    public void changePriority(TaskService taskService) {
+        task = taskService.createTaskBuilder().
+            create();
+
+        taskService.setPriority(task.getId(), Integer.MAX_VALUE);
+        List<TaskLogEntry> taskLogEntries = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
+
+        assertThat(taskLogEntries).size().isEqualTo(2);
+        assertThat(taskLogEntries.get(1)).
+            extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
+            isEqualTo("{\"newPriority\":2147483647,\"previousPriority\":50}");
+        assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTimeStamp).isNotNull();
+        assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTaskId).isEqualTo(task.getId());
+        assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getUserId).isNull();
+        assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_PRIORITY_CHANGED");
+    }
+
+    @Test
+    public void changePriorityEventAsAuthenticatedUser(TaskService taskService) {
+        assertThatAuthenticatedUserIsSet(taskService,
+            taskId ->  taskService.setPriority(taskId, Integer.MAX_VALUE)
+        );
+    }
+
+    protected void assertThatAuthenticatedUserIsSet(TaskService taskService, Consumer<String> functionToAssert) {
+        String previousUserId = Authentication.getAuthenticatedUserId();
+        task = taskService.createTaskBuilder().
+            assignee("testAssignee").
+            create();
+        Authentication.setAuthenticatedUserId("testUser");
+        try {
+            functionToAssert.accept(task.getId());
+
+            List<TaskLogEntry> taskLogsByTaskInstanceId = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
+            assertThat(
+                taskLogsByTaskInstanceId
+            ).size().isEqualTo(2);
+
+            assertThat(taskLogsByTaskInstanceId.get(1)).
+                extracting(TaskLogEntry::getUserId).isEqualTo("testUser");
+        } finally {
+            Authentication.setAuthenticatedUserId(previousUserId);
+        }
+    }
+
+    @Test
+    public void changeDueDate(TaskService taskService) {
+        task = taskService.createTaskBuilder().
+            create();
+
+        taskService.setDueDate(task.getId(), new Date(0));
+        List<TaskLogEntry> taskLogEntries = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
+
+        assertThat(taskLogEntries).size().isEqualTo(2);
+        assertThat(taskLogEntries.get(1)).
+            extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
+            isEqualTo("{\"newDueDate\":0,\"previousDueDate\":null}");
+        assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTimeStamp).isNotNull();
+        assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTaskId).isEqualTo(task.getId());
+        assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getUserId).isNull();
+        assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_DUEDATE_CHANGED");
+    }
+
+    @Test
+    public void saveTask(TaskService taskService) {
+        task = taskService.createTaskBuilder().
+            create();
+
+        task.setAssignee("newAssignee");
+        task.setOwner("newOwner");
+        task.setPriority(Integer.MAX_VALUE);
+        task.setDueDate(new Date(0));
+        taskService.saveTask(task);
+
+        List<TaskLogEntry> taskLogEntries = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
+        assertThat(taskLogEntries).size().isEqualTo(5);
+    }
+
+    @Test
+    public void changeDueDateEventAsAuthenticatedUser(TaskService taskService) {
+        assertThatAuthenticatedUserIsSet(taskService,
+            taskId ->  taskService.setDueDate(taskId, new Date(0))
+        );
+    }
+
+    @Test
+    public void createCustomTaskEventLog(TaskService taskService) {
+        TaskLogEntryBuilder taskLogEntryBuilder = taskService.createTaskLogEntryBuilder();
+        taskLogEntryBuilder.
+            taskId("testTaskId").
+            timeStamp(new Date(0)).
+            userId("testUser").
+            type("customType").
+            data("testData".getBytes()).
+            add();
+
+        List<TaskLogEntry> logEntries = taskService.getTaskLogEntriesByTaskInstanceId("testTaskId");
+
+        MatcherAssert.assertThat(logEntries.size(), is(1));
+        TaskLogEntry taskLogEntry = logEntries.get(0);
+        assertThat(taskLogEntry.getLogNumber()).isNotNull();
+        assertThat(taskLogEntry.getUserId()).isEqualTo("testUser");
+        assertThat(taskLogEntry.getTaskId()).isEqualTo("testTaskId");
+        assertThat(taskLogEntry.getType()).isEqualTo("customType");
+        assertThat(taskLogEntry.getTimeStamp()).isEqualTo(new Date(0));
+        assertThat(taskLogEntry.getData()).isEqualTo("testData".getBytes());
+        taskService.deleteTaskLogEntry(logEntries.get(0).getLogNumber());
+    }
+
+    @Test
+    public void createCustomTaskEventLog_taskIdIsEnoughToCreateTaskLogEntry(TaskService taskService) {
+        TaskLogEntryBuilder taskLogEntryBuilder = taskService.createTaskLogEntryBuilder();
+        taskLogEntryBuilder.
+            taskId("testTaskId").
+            add();
+            List<TaskLogEntry> logEntries = taskService.getTaskLogEntriesByTaskInstanceId("testTaskId");
+
+            MatcherAssert.assertThat(logEntries.size(), is(1));
+            TaskLogEntry taskLogEntry = logEntries.get(0);
+            assertThat(taskLogEntry.getLogNumber()).isNotNull();
+            assertThat(taskLogEntry.getUserId()).isNull();
+            assertThat(taskLogEntry.getTaskId()).isEqualTo("testTaskId");
+            assertThat(taskLogEntry.getType()).isNull();
+            assertThat(taskLogEntry.getTimeStamp()).isNotNull();
+            assertThat(taskLogEntry.getData()).isNull();
+            taskService.deleteTaskLogEntry(logEntries.get(0).getLogNumber());
+    }
+
+    @Test
+    public void createCustomTaskEventLog_withoutTaskId_throwsException(TaskService taskService) {
+        TaskLogEntryBuilder taskLogEntryBuilder = taskService.createTaskLogEntryBuilder();
+
+        assertThatThrownBy(
+            () -> taskLogEntryBuilder.
+            timeStamp(new Date(0)).
+            userId("testUser").
+            type("customType").
+            data("testData".getBytes()).
+            add()
+        ).
+            hasMessage("Empty taskId is not allowed for TaskLogEntry").
+            isInstanceOf(FlowableException.class);
     }
 
 }

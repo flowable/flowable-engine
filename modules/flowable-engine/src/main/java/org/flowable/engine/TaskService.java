@@ -34,6 +34,7 @@ import org.flowable.task.api.NativeTaskQuery;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.api.TaskLogEntry;
+import org.flowable.task.api.TaskLogEntryBuilder;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
@@ -854,4 +855,9 @@ public interface TaskService {
      * @param logNumber user task log entry identifier
      */
     void deleteTaskLogEntry(long logNumber);
+
+    /**
+     * Create new task log entry builder to the log task event
+     */
+    TaskLogEntryBuilder createTaskLogEntryBuilder();
 }

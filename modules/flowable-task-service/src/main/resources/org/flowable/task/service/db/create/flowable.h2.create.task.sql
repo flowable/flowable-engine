@@ -34,7 +34,7 @@ create table ACT_RU_TASK (
 create table FLW_TSK_LOG (
     LOG_NR_ identity,
     TYPE_ varchar(64),
-    TASK_ID_ varchar(64),
+    TASK_ID_ varchar(64) not null,
     TIME_STAMP_ timestamp not null,
     USER_ID_ varchar(255),
     DATA_ varchar(4000)

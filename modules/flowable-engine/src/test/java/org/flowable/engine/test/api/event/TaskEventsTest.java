@@ -72,22 +72,25 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
 
         // Update duedate, owner and priority should trigger update-event
         taskService.setDueDate(task.getId(), new Date());
-        assertEquals(1, listener.getEventsReceived().size());
-        event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
+        assertEquals(2, listener.getEventsReceived().size());
+        assertEquals(FlowableEngineEventType.TASK_DUEDATE_CHANGED, listener.getEventsReceived().get(0).getType());
+        event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
         assertExecutionDetails(event, processInstance);
         assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
         listener.clearEventsReceived();
 
         taskService.setPriority(task.getId(), 12);
-        assertEquals(1, listener.getEventsReceived().size());
-        event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
+        assertEquals(2, listener.getEventsReceived().size());
+        assertEquals(FlowableEngineEventType.TASK_PRIORITY_CHANGED, listener.getEventsReceived().get(0).getType());
+        event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
         assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
         assertExecutionDetails(event, processInstance);
         listener.clearEventsReceived();
 
         taskService.setOwner(task.getId(), "kermit");
-        assertEquals(1, listener.getEventsReceived().size());
-        event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
+        assertEquals(2, listener.getEventsReceived().size());
+        assertEquals(FlowableEngineEventType.TASK_OWNER_CHANGED, listener.getEventsReceived().get(0).getType());
+        event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
         assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
         assertExecutionDetails(event, processInstance);
         listener.clearEventsReceived();
@@ -99,8 +102,10 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
         task.setOwner("john");
         taskService.saveTask(task);
 
-        assertEquals(1, listener.getEventsReceived().size());
-        event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
+        assertEquals(3, listener.getEventsReceived().size());
+        assertEquals(FlowableEngineEventType.TASK_OWNER_CHANGED, listener.getEventsReceived().get(0).getType());
+        assertEquals(FlowableEngineEventType.TASK_DUEDATE_CHANGED, listener.getEventsReceived().get(1).getType());
+        event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(2);
         assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
         assertExecutionDetails(event, processInstance);
         listener.clearEventsReceived();
@@ -327,8 +332,9 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
 
             // Update task
             taskService.setOwner(task.getId(), "owner");
-            assertEquals(1, listener.getEventsReceived().size());
-            event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
+            assertEquals(2, listener.getEventsReceived().size());
+            assertEquals(FlowableEngineEventType.TASK_OWNER_CHANGED, listener.getEventsReceived().get(0).getType());
+            event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
             assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
             assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
             taskFromEvent = (org.flowable.task.api.Task) event.getEntity();

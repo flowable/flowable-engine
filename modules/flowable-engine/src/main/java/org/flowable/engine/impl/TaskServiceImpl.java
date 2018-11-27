@@ -81,6 +81,7 @@ import org.flowable.task.api.NativeTaskQuery;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.api.TaskLogEntry;
+import org.flowable.task.api.TaskLogEntryBuilder;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.impl.NativeTaskQueryImpl;
 import org.flowable.task.service.impl.TaskQueryImpl;
@@ -589,5 +590,10 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
     @Override
     public void deleteTaskLogEntry(long logNumber) {
         commandExecutor.execute(new DeleteTaskLogEntryByLogNumberCmd(logNumber));
+    }
+
+    @Override
+    public TaskLogEntryBuilder createTaskLogEntryBuilder() {
+        return new TaskLogEntryBuilderImpl(commandExecutor);
     }
 }
