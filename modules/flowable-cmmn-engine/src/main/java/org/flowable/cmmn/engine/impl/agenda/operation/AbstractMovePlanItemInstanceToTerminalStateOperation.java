@@ -17,6 +17,7 @@ import org.flowable.cmmn.engine.impl.listener.PlanItemLifeCycleListenerUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.StateTransition;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -41,15 +42,21 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
             // Create new repeating instance
             PlanItemInstanceEntity newPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, true);
 
-            String oldState = newPlanItemInstanceEntity.getState();
-            String newState = PlanItemInstanceState.WAITING_FOR_REPETITION;
-            newPlanItemInstanceEntity.setState(newState);
-            PlanItemLifeCycleListenerUtil.callLifecycleListeners(commandContext, newPlanItemInstanceEntity, oldState, newState);
+            if (planItemInstanceEntity.getPlanItem() != null && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof EventListener) {
+                CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(newPlanItemInstanceEntity);
 
-            // Plan item creation "for Repetition"
-            CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceForRepetitionOperation(newPlanItemInstanceEntity);
-            // Plan item doesn't have entry criteria (checked in the if condition) and immediately goes to ACTIVE
-            CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(newPlanItemInstanceEntity, null);
+            } else {
+
+                String oldState = newPlanItemInstanceEntity.getState();
+                String newState = PlanItemInstanceState.WAITING_FOR_REPETITION;
+                newPlanItemInstanceEntity.setState(newState);
+                PlanItemLifeCycleListenerUtil.callLifecycleListeners(commandContext, newPlanItemInstanceEntity, oldState, newState);
+
+                // Plan item creation "for Repetition"
+                CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceForRepetitionOperation(newPlanItemInstanceEntity);
+                // Plan item doesn't have entry criteria (checked in the if condition) and immediately goes to ACTIVE
+                CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(newPlanItemInstanceEntity, null);
+            }
         }
         
         removeSentryRelatedData();
