@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.persistence.entity;
 
+import java.util.Collections;
+
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.impl.context.Context;
@@ -19,6 +21,10 @@ import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * Helper class for suspension state
@@ -26,6 +32,8 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
  * @author Tijs Rademakers
  */
 public class SuspensionStateUtil {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SuspensionStateUtil.class);
 
     public static void setSuspensionState(ProcessDefinitionEntity processDefinitionEntity, SuspensionState state) {
         if (processDefinitionEntity.getSuspensionState() == state.getStateCode()) {
@@ -48,7 +56,30 @@ public class SuspensionStateUtil {
             throw new FlowableException("Cannot set suspension state '" + state + "' for " + taskEntity + "': already in state '" + state + "'.");
         }
         taskEntity.setSuspensionState(state.getStateCode());
+
+        addTaskSustenstionStateEntryLog(taskEntity, state);
+
         dispatchStateChangeEvent(taskEntity, state);
+    }
+
+    protected static void addTaskSustenstionStateEntryLog(TaskEntity taskEntity, SuspensionState state) {
+        if (CommandContextUtil.getTaskServiceConfiguration().isEnableDatabaseEventLogging()) {
+            byte[] data = null;
+            try {
+                data = CommandContextUtil.getProcessEngineConfiguration().getObjectMapper().writeValueAsBytes(
+                    Collections.singletonMap("newSuspensionState", state.getStateCode())
+                );
+            } catch (JsonProcessingException e) {
+                LOGGER.warn("It was not possible to serialize suspension state. TaskEventLogEntry data is empty.", e);
+            }
+            CommandContextUtil.getProcessEngineConfiguration().getTaskService().createTaskLogEntryBuilder().
+                taskId(taskEntity.getId()).
+                type("USER_TASK_SUSPENSIONSTATE_CHANGED").
+                data(
+                    data
+                ).
+                add();
+        }
     }
 
     protected static void dispatchStateChangeEvent(Object entity, SuspensionState state) {

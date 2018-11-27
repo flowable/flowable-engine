@@ -14,6 +14,7 @@ package org.flowable.engine.impl.cmd;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -34,6 +35,9 @@ public class AddTaskLogEntryCmd implements Command<Void> {
     public Void execute(CommandContext commandContext) {
         if (StringUtils.isEmpty(taskLogEntryBuilder.getTaskId())) {
             throw new FlowableIllegalArgumentException("Empty taskId is not allowed for TaskLogEntry");
+        }
+        if (StringUtils.isEmpty(taskLogEntryBuilder.getUserId())) {
+            taskLogEntryBuilder.userId(Authentication.getAuthenticatedUserId());
         }
         if (taskLogEntryBuilder.getTimeStamp() == null) {
             taskLogEntryBuilder.timeStamp(CommandContextUtil.getTaskServiceConfiguration().getClock().getCurrentTime());

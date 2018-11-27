@@ -15,6 +15,7 @@ package org.flowable.engine.test.api.task;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Date;
 import java.util.List;
@@ -23,8 +24,11 @@ import java.util.function.Consumer;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.HistoryService;
+import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.ConfigurationResource;
+import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.FlowableTest;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskLogEntry;
@@ -395,4 +399,70 @@ public class TaskServiceEventTest {
             isInstanceOf(FlowableException.class);
     }
 
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void logSuspensionStateEvents(RuntimeService runtimeService, TaskService taskService) {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        assertNotNull(processInstance);
+
+        try {
+            runtimeService.suspendProcessInstanceById(processInstance.getId());
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertNotNull(task);
+
+            List<TaskLogEntry> logEntries = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
+            assertThat(logEntries).size().isEqualTo(2);
+            assertThat(logEntries.get(1)).
+                extracting(taskLogEntry -> taskLogEntry.getType()).isEqualTo("USER_TASK_SUSPENSIONSTATE_CHANGED")
+            ;
+
+            runtimeService.activateProcessInstanceById(processInstance.getId());
+
+            logEntries = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
+            assertThat(logEntries).size().isEqualTo(3);
+            assertThat(logEntries.get(2)).
+                extracting(taskLogEntry -> taskLogEntry.getType()).isEqualTo("USER_TASK_SUSPENSIONSTATE_CHANGED")
+            ;
+        } finally {
+            taskService.getTaskLogEntriesByTaskInstanceId(
+                taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId()
+            ).
+                forEach(
+                    logEntry -> taskService.deleteTaskLogEntry(logEntry.getLogNumber())
+                );
+            runtimeService.deleteProcessInstance(processInstance.getId(), "clean up");
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void logProcessTaskEvents(RuntimeService runtimeService, TaskService taskService) {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        assertNotNull(processInstance);
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(task);
+        try {
+            taskService.setAssignee(task.getId(), "newAssignee");
+            taskService.setOwner(task.getId(), "newOwner");
+            taskService.complete(task.getId());
+
+            List<TaskLogEntry> logEntries = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
+            assertThat(logEntries).size().isEqualTo(4);
+            assertThat(logEntries.get(0)).
+                extracting(taskLogEntry -> taskLogEntry.getType()).isEqualTo("USER_TASK_CREATED")
+            ;
+            assertThat(logEntries.get(1)).
+                extracting(taskLogEntry -> taskLogEntry.getType()).isEqualTo("USER_TASK_ASSIGNEE_CHANGED")
+            ;
+            assertThat(logEntries.get(2)).
+                extracting(taskLogEntry -> taskLogEntry.getType()).isEqualTo("USER_TASK_OWNER_CHANGED")
+            ;
+            assertThat(logEntries.get(3)).
+                extracting(taskLogEntry -> taskLogEntry.getType()).isEqualTo("TASK_COMPLETED")
+            ;
+        } finally {
+            deleteTaskWithLogEntries(taskService, task.getId());
+        }
+    }
 }

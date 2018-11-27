@@ -116,9 +116,15 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
             taskServiceConfiguration.getHistoricTaskService().recordTaskCreated(taskEntity);
         }
 
-        logTaskCreatedEvent(taskEntity);
-
         return enrichedTaskEntity;
+    }
+
+    @Override
+    public void insert(TaskEntity taskEntity, boolean fireCreatedEvent) {
+        super.insert(taskEntity, fireCreatedEvent);
+        if (fireCreatedEvent) {
+            logTaskCreatedEvent(taskEntity);
+        }
     }
 
     @Override
