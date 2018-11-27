@@ -20,9 +20,11 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.GenericEventListenerInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
@@ -314,4 +316,43 @@ public class RepetitionRuleTest extends FlowableCmmnTestCase {
         cmmnTaskService.complete(taskB.getId());
         assertCaseInstanceEnded(caseInstance);
     }
+
+    @Test
+    @CmmnDeployment
+    public void testRepeatingEventListener() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testRepeatingUserEventListener").start();
+        assertEquals(0L, cmmnTaskService.createTaskQuery().count());
+
+        for (int i = 0; i < 17; i++) {
+            GenericEventListenerInstance genericEventListenerInstance = cmmnRuntimeService.createGenericEventListenerInstanceQuery()
+                .caseInstanceId(caseInstance.getId()).singleResult();
+            assertEquals(PlanItemInstanceState.AVAILABLE, genericEventListenerInstance.getState());
+            cmmnRuntimeService.completeGenericEventListenerInstance(genericEventListenerInstance.getId());
+        }
+        assertEquals(17L, cmmnTaskService.createTaskQuery().count());
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testRepeatingRuleUserEventListener() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testRepeatingUserEventListener")
+            .variable("keepGoing", true)
+            .start();
+        assertEquals(0L, cmmnTaskService.createTaskQuery().count());
+
+        for (int i = 0; i < 3; i++) {
+            UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery()
+                .caseInstanceId(caseInstance.getId()).singleResult();
+            assertEquals(PlanItemInstanceState.AVAILABLE, userEventListenerInstance.getState());
+
+            if (i == 2) {
+                cmmnRuntimeService.setVariable(caseInstance.getId(), "keepGoing", false);
+            }
+            cmmnRuntimeService.completeGenericEventListenerInstance(userEventListenerInstance.getId());
+        }
+
+        assertEquals(3, cmmnTaskService.createTaskQuery().count());
+    }
+
 }
