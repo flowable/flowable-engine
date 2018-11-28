@@ -73,102 +73,24 @@ public class ProcessMigrationBatchEntityManagerImpl extends AbstractEntityManage
         ProcessMigrationBatchEntity parentBatch = processMigrationBatchDataManager.findById(parentBatchId);
         if (parentBatch.getBatchChildren() != null) {
             for (ProcessMigrationBatch child : parentBatch.getBatchChildren()) {
-                ProcessMigrationBatchEntityImpl childImpl = (ProcessMigrationBatchEntityImpl) child;
-                if (childImpl.getResultDataRefId() != null && childImpl.getResultDataRefId().getId() != null) {
-                    ByteArrayEntity entity = childImpl.getResultDataRefId().getEntity();
-                    childImpl.getResultDataRefId().delete();
-                }
-                delete((ProcessMigrationBatchEntity) child);
+                deleteBatchEntityAndResources((ProcessMigrationBatchEntityImpl) child);
             }
         }
 
-        ProcessMigrationBatchEntityImpl parentBatchImpl = (ProcessMigrationBatchEntityImpl) parentBatch;
-        if (parentBatchImpl.getResultDataRefId() != null && parentBatchImpl.getResultDataRefId().getId() != null) {
-            ByteArrayEntity entity = parentBatchImpl.getResultDataRefId().getEntity();
-            parentBatchImpl.getResultDataRefId().delete();
-        }
-        if (parentBatchImpl.getParamDataRefId() != null && parentBatchImpl.getParamDataRefId().getId() != null) {
-            ByteArrayEntity entity = parentBatchImpl.getParamDataRefId().getEntity();
-            parentBatchImpl.getParamDataRefId().delete();
-        }
-
-        delete(parentBatch);
+        deleteBatchEntityAndResources((ProcessMigrationBatchEntityImpl) parentBatch);
     }
 
-    //
-    //    void deleteBatchAndResultResource(ProcessMigrationBatchEntity batchEntity);
-    //
-    //    void deleteBatchAndAllResources(ProcessMigrationBatchEntity batchEntity);
-    //
-    //
-    //    @Override
-    //    public void deleteBatchAndResultResource(ProcessMigrationBatchEntity batchEntity) {
-    //        ProcessMigrationBatchEntityImpl batchEntityImpl = (ProcessMigrationBatchEntityImpl) batchEntity;
-    //        getDbSqlSession().delete(batchEntityImpl);
-    //        if (batchEntityImpl.getResultDataRefId() != null && batchEntityImpl.getResultDataRefId().getId() != null) {
-    //            batchEntityImpl.getResultDataRefId().delete();
-    //            //            getDbSqlSession().delete(batchEntityImpl.getResultDataRefId().getEntity());
-    //        }
-    //    }
-    //
-    //    @Override
-    //    public void deleteBatchAndAllResources(ProcessMigrationBatchEntity batchEntity) {
-    //        ProcessMigrationBatchEntityImpl batchEntityImpl = (ProcessMigrationBatchEntityImpl) batchEntity;
-    //        getDbSqlSession().delete(batchEntityImpl);
-    //        if (batchEntityImpl.getResultDataRefId() != null && batchEntityImpl.getResultDataRefId().getId() != null) {
-    //            batchEntityImpl.getResultDataRefId().delete();
-    //        }
-    //        if (batchEntityImpl.getParamDataRefId() != null && batchEntityImpl.getParamDataRefId().getId() != null) {
-    //            batchEntityImpl.getParamDataRefId().delete();
-    //        }
-    //    }
+    protected void deleteBatchEntityAndResources(ProcessMigrationBatchEntityImpl batchEntity) {
 
-    //TODO WIP - Update??
+        if (batchEntity.getResultDataRefId() != null && batchEntity.getResultDataRefId().getId() != null) {
+            ByteArrayEntity entity = batchEntity.getResultDataRefId().getEntity();
+            batchEntity.getResultDataRefId().delete();
+        }
+        if (batchEntity.getParamDataRefId() != null && batchEntity.getParamDataRefId().getId() != null) {
+            ByteArrayEntity entity = batchEntity.getParamDataRefId().getEntity();
+            batchEntity.getParamDataRefId().delete();
+        }
 
-    //TODO WIP - Delete by parent id??
-
-    //TODO WIP - Select all parents??
-
-    //TODO WIP - Select by parent id??
-
-    //
-    //    @Override
-    //    public void deleteProcessDefinitionInfo(String processDefinitionId) {
-    //        ProcessDefinitionInfoEntity processDefinitionInfo = findProcessDefinitionInfoByProcessDefinitionId(processDefinitionId);
-    //        if (processDefinitionInfo != null) {
-    //            delete(processDefinitionInfo);
-    //            deleteInfoJson(processDefinitionInfo);
-    //        }
-    //    }
-    //
-    //    @Override
-    //    public void updateInfoJson(String id, byte[] json) {
-    //        ProcessDefinitionInfoEntity processDefinitionInfo = findById(id);
-    //        if (processDefinitionInfo != null) {
-    //            ByteArrayRef ref = new ByteArrayRef(processDefinitionInfo.getInfoJsonId());
-    //            ref.setValue("json", json);
-    //
-    //            if (processDefinitionInfo.getInfoJsonId() == null) {
-    //                processDefinitionInfo.setInfoJsonId(ref.getId());
-    //                updateProcessDefinitionInfo(processDefinitionInfo);
-    //            }
-    //        }
-    //    }
-    //
-    //    @Override
-    //    public void deleteInfoJson(ProcessDefinitionInfoEntity processDefinitionInfo) {
-    //        if (processDefinitionInfo.getInfoJsonId() != null) {
-    //            ByteArrayRef ref = new ByteArrayRef(processDefinitionInfo.getInfoJsonId());
-    //            ref.delete();
-    //        }
-    //    }
-    //
-
-    //
-    //    @Override
-    //    public byte[] findInfoJsonById(String infoJsonId) {
-    //        ByteArrayRef ref = new ByteArrayRef(infoJsonId);
-    //        return ref.getBytes();
-    //    }
-    //
+        delete(batchEntity);
+    }
 }

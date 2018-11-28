@@ -14,7 +14,6 @@
 package org.flowable.engine.impl.migration;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -48,7 +47,4 @@ public class ProcessInstanceMigrationValidationResult {
         return validationMessages;
     }
 
-    public String getValidationMessagesToString() {
-        return Arrays.toString(validationMessages.toArray(new String[0]));
-    }
 }

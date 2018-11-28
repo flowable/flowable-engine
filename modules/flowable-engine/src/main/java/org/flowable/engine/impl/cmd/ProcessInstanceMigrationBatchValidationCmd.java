@@ -24,39 +24,19 @@ import org.flowable.engine.migration.ProcessInstanceMigrationManager;
 /**
  * @author Dennis Federico
  */
-public class ProcessInstanceMigrationBatchValidationCmd implements Command<ProcessMigrationBatchEntity> {
+public class ProcessInstanceMigrationBatchValidationCmd extends AbstractProcessInstanceMigrationCmd implements Command<String> {
 
     protected ProcessInstanceMigrationDocument processInstanceMigrationDocument;
-    //TODO WIP - remove - batch validation of a single processInstance seems nonsensical
-    //    protected String processInstanceId;
     protected String processDefinitionId;
     protected String processDefinitionKey;
     protected int processDefinitionVersion;
     protected String processDefinitionTenantId;
 
-    //TODO WIP - remove - batch validation of a single processInstance seems nonsensical
-    //    public static ProcessInstanceMigrationBatchValidationCmd forProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
-    //
-    //        if (processInstanceId == null) {
-    //            throw new FlowableException("Must specify a process instance id to migrate");
-    //        }
-    //        if (processInstanceMigrationDocument == null) {
-    //            throw new FlowableException("Must specify a process instance migration document");
-    //        }
-    //        ProcessInstanceMigrationBatchValidationCmd cmd = new ProcessInstanceMigrationBatchValidationCmd();
-    //        cmd.processInstanceId = processInstanceId;
-    //        cmd.processInstanceMigrationDocument = processInstanceMigrationDocument;
-    //        return cmd;
-    //    }
-
     public static ProcessInstanceMigrationBatchValidationCmd forProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
 
-        if (processDefinitionId == null) {
-            throw new FlowableException("Must specify a process definition id to migrate");
-        }
-        if (processInstanceMigrationDocument == null) {
-            throw new FlowableException("Must specify a process instance migration document");
-        }
+        requireNonNullProcessDefinitionId(processDefinitionId);
+        requireNonNullProcessInstanceMigrationDocument(processInstanceMigrationDocument);
+
         ProcessInstanceMigrationBatchValidationCmd cmd = new ProcessInstanceMigrationBatchValidationCmd();
         cmd.processDefinitionId = processDefinitionId;
         cmd.processInstanceMigrationDocument = processInstanceMigrationDocument;
@@ -66,15 +46,10 @@ public class ProcessInstanceMigrationBatchValidationCmd implements Command<Proce
     public static ProcessInstanceMigrationBatchValidationCmd forProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId,
         ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
 
-        if (processDefinitionKey == null) {
-            throw new FlowableException("Must specify the process definition key to migrate");
-        }
-        if (processDefinitionVersion < 0) {
-            throw new FlowableException("Must specify a valid version number to migrate");
-        }
-        if (processInstanceMigrationDocument == null) {
-            throw new FlowableException("Must specify a process instance migration document");
-        }
+        requireNonNullProcessDefinitionKey(processDefinitionKey);
+        requirePositiveProcessDefinitionVersion(processDefinitionVersion);
+        requireNonNullProcessInstanceMigrationDocument(processInstanceMigrationDocument);
+
         ProcessInstanceMigrationBatchValidationCmd cmd = new ProcessInstanceMigrationBatchValidationCmd();
         cmd.processDefinitionKey = processDefinitionKey;
         cmd.processDefinitionVersion = processDefinitionVersion;
@@ -84,21 +59,17 @@ public class ProcessInstanceMigrationBatchValidationCmd implements Command<Proce
     }
 
     @Override
-    public ProcessMigrationBatchEntity execute(CommandContext commandContext) {
+    public String execute(CommandContext commandContext) {
 
         ProcessInstanceMigrationManager migrationManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceMigrationManager();
-        
-        //TODO WIP - remove - batch validation of a single processInstance seems nonsensical
-        //        if (processInstanceId != null) {
-        //            return migrationManager.batchValidateMigrateProcessInstance(processInstanceId, processInstanceMigrationDocument, commandContext);
-        //        }
-
         if (processDefinitionId != null) {
-            return migrationManager.batchValidateMigrateProcessInstancesOfProcessDefinition(processDefinitionId, processInstanceMigrationDocument, commandContext);
+            ProcessMigrationBatchEntity batchEntity = migrationManager.batchValidateMigrateProcessInstancesOfProcessDefinition(processDefinitionId, processInstanceMigrationDocument, commandContext);
+            return batchEntity.getId();
         }
 
         if (processDefinitionKey != null && processDefinitionVersion >= 0) {
-            return migrationManager.batchValidateMigrateProcessInstancesOfProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, processInstanceMigrationDocument, commandContext);
+            ProcessMigrationBatchEntity batchEntity = migrationManager.batchValidateMigrateProcessInstancesOfProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, processInstanceMigrationDocument, commandContext);
+            return batchEntity.getId();
         }
 
         throw new FlowableException("Cannot validate process migration, not enough information");

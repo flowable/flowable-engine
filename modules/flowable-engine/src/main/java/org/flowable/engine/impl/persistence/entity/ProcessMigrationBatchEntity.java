@@ -26,5 +26,7 @@ public interface ProcessMigrationBatchEntity extends ProcessMigrationBatch, Enti
     void setMigrationDocumentJson(String migrationDocumentJson);
 
     void completeWithResult(Date completeTime, String result);
+
+    void complete(Date completeTime);
 }
 

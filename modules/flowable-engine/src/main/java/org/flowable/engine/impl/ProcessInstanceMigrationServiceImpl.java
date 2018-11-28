@@ -15,14 +15,17 @@ package org.flowable.engine.impl;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.engine.ProcessInstanceMigrationService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.cmd.DeleteProcessMigrationBatchAndResourcesCmd;
+import org.flowable.engine.impl.cmd.GetProcessInstanceMigrationBatchValidationResultCmd;
+import org.flowable.engine.impl.cmd.GetProcessInstanceMigrationValidationBatchCmd;
 import org.flowable.engine.impl.cmd.ProcessInstanceMigrationBatchValidationCmd;
 import org.flowable.engine.impl.cmd.ProcessInstanceMigrationCmd;
 import org.flowable.engine.impl.cmd.ProcessInstanceMigrationValidationCmd;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationBuilderImpl;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
-import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntity;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
+import org.flowable.engine.runtime.ProcessMigrationBatch;
 
 /**
  * @author Dennis
@@ -58,20 +61,34 @@ public class ProcessInstanceMigrationServiceImpl extends CommonEngineServiceImpl
         return commandExecutor.execute(ProcessInstanceMigrationValidationCmd.forProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, processInstanceMigrationDocument));
     }
 
-    //TODO WIP - remove - batch validation of a single processInstance seems nonsensical
-    //    @Override
-    //    public ProcessMigrationBatchEntity batchValidateMigrationForProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
-    //        return commandExecutor.execute(ProcessInstanceMigrationBatchValidationCmd.forProcessInstance(processInstanceId, processInstanceMigrationDocument));
-    //    }
-
     @Override
-    public ProcessMigrationBatchEntity batchValidateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
+    public String batchValidateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
         return commandExecutor.execute(ProcessInstanceMigrationBatchValidationCmd.forProcessDefinition(processDefinitionId, processInstanceMigrationDocument));
     }
 
     @Override
-    public ProcessMigrationBatchEntity batchValidateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
+    public String batchValidateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
         return commandExecutor.execute(ProcessInstanceMigrationBatchValidationCmd.forProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, processInstanceMigrationDocument));
+    }
+
+    @Override
+    public ProcessInstanceMigrationValidationResult getAggregatedResultOfBatchProcessInstanceMigrationValidation(String migrationBatchId) {
+        return commandExecutor.execute(new GetProcessInstanceMigrationBatchValidationResultCmd(migrationBatchId));
+    }
+
+    @Override
+    public ProcessMigrationBatch getProcessMigrationBatchById(String migrationBatchId) {
+        return commandExecutor.execute(new GetProcessInstanceMigrationValidationBatchCmd(migrationBatchId, false));
+    }
+
+    @Override
+    public ProcessMigrationBatch getProcessMigrationBatchAndResourcesById(String migrationBatchId) {
+        return commandExecutor.execute(new GetProcessInstanceMigrationValidationBatchCmd(migrationBatchId, true));
+    }
+
+    @Override
+    public void deleteBatchAndResourcesById(String migrationBatchId) {
+        commandExecutor.execute(new DeleteProcessMigrationBatchAndResourcesCmd(migrationBatchId));
     }
 
     @Override
@@ -89,5 +106,16 @@ public class ProcessInstanceMigrationServiceImpl extends CommonEngineServiceImpl
         commandExecutor.execute(ProcessInstanceMigrationCmd.forProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, processInstanceMigrationDocument));
     }
 
+    @Override
+    public void batchMigrateProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
+        throw new UnsupportedOperationException("Not implemented yet!!!");
+        //        commandExecutor.execute(ProcessInstanceMigrationCmd.forProcessDefinition(processDefinitionId, processInstanceMigrationDocument));
+    }
+
+    @Override
+    public void batchMigrateProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
+        throw new UnsupportedOperationException("Not implemented yet!!!");
+        //        commandExecutor.execute(ProcessInstanceMigrationCmd.forProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, processInstanceMigrationDocument));
+    }
 }
 

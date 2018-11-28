@@ -28,21 +28,4 @@ public interface ProcessMigrationBatchEntityManager extends EntityManager<Proces
 
     void deleteParentBatchAndChildrenAndResources(String parentBatchId);
 
-    //    void insertProcessDefinitionInfo(ProcessDefinitionInfoEntity processDefinitionInfo);
-    //
-    //    void updateProcessDefinitionInfo(ProcessDefinitionInfoEntity updatedProcessDefinitionInfo);
-    //
-    //    void deleteProcessDefinitionInfo(String processDefinitionId);
-    //
-    //    void updateInfoJson(String id, byte[] json);
-    //
-    //    void deleteInfoJson(ProcessDefinitionInfoEntity processDefinitionInfo);
-    //
-    //    @Override
-    //    ProcessDefinitionInfoEntity findById(String id);
-    //
-    //    ProcessDefinitionInfoEntity findProcessDefinitionInfoByProcessDefinitionId(String processDefinitionId);
-    //
-    //    byte[] findInfoJsonById(String infoJsonId);
-
 }

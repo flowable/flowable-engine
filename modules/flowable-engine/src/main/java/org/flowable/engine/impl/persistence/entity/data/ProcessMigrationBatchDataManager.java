@@ -12,8 +12,6 @@
  */
 package org.flowable.engine.impl.persistence.entity.data;
 
-import java.util.List;
-
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntity;
 
@@ -21,7 +19,5 @@ import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntity;
  * @author Dennis Federico
  */
 public interface ProcessMigrationBatchDataManager extends DataManager<ProcessMigrationBatchEntity> {
-
-    List<ProcessMigrationBatchEntity> findBatchesByParentBatchId(String parentBatchId);
 
 }

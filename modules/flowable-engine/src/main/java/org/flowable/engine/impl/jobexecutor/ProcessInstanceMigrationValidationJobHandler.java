@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.jobexecutor;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -51,10 +52,15 @@ public class ProcessInstanceMigrationValidationJobHandler implements JobHandler 
         ProcessInstanceMigrationValidationResult validationResult = processInstanceMigrationManager.validateMigrateProcessInstance(batchEntity.getProcessInstanceId(), migrationDocument, commandContext);
 
         Date currentTime = CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime();
-        batchEntity.completeWithResult(currentTime, validationResult.getValidationMessagesToString());
+        if (validationResult.hasErrors()) {
+            String collatedValidationResult = Arrays.toString(validationResult.getValidationMessages().toArray(new String[0]));
+            batchEntity.completeWithResult(currentTime, collatedValidationResult);
+        } else {
+            batchEntity.complete(currentTime);
+        }
     }
 
-    //TODO WIP - Review how to encode the processMigration batch id in the handlerCfg
+    //TODO WIP - Review how to encode the processMigration batch id in the handlerCfg - JSON?
     public static String getBatchIdFromHandlerCfg(String handlerCfg) {
         if (handlerCfg != null) {
             String[] split = handlerCfg.split(":");

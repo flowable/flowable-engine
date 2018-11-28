@@ -32,9 +32,6 @@ public interface ProcessInstanceMigrationManager {
 
     ProcessMigrationBatchEntity batchValidateMigrateProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument, CommandContext commandContext);
 
-    //TODO WIP - remove comment - batch validation of a single process instance seems nonsensical
-//    ProcessMigrationBatchEntity batchValidateMigrateProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument, CommandContext commandContext);
-
     void migrateProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument document, CommandContext commandContext);
 
     void migrateProcessInstancesOfProcessDefinition(String procDefKey, int procDefVer, String procDefTenantId, ProcessInstanceMigrationDocument document, CommandContext commandContext);

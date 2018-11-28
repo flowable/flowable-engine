@@ -18,14 +18,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Comparator;
 import java.util.List;
 
-import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
-import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntity;
-import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntityManager;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -34,7 +30,6 @@ import org.flowable.engine.test.api.runtime.changestate.ChangeStateEventListener
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -54,6 +49,42 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         processEngine.getRuntimeService().removeEventListener(changeStateEventListener);
         deleteProcessInstanceMigrationBatches();
         deleteDeployments();
+    }
+
+    @Test
+    public void testSimpleBatchMigrationValidationInvalidTargetProcessDefinitionId() {
+        //Deploy first version of the process
+        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
+
+        //Prepare the process Instance migration builder as usual
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition("UnknownKey", 1);
+
+        //Submit the batch
+        try {
+            String batchId = processInstanceMigrationBuilder.batchValidateMigrationOfProcessInstances(version1ProcessDef.getId());
+            fail("Should not create the batches");
+        } catch (FlowableException e) {
+            assertTextPresent("no processes deployed with key 'UnknownKey'", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testSimpleBatchMigrationValidationInvalidSourceProcessDefinitionId() {
+        //Deploy first version of the process
+        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
+
+        //Prepare the process Instance migration builder as usual
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(version1ProcessDef.getId());
+
+        //Submit the batch
+        try {
+            String batchId = processInstanceMigrationBuilder.batchValidateMigrationOfProcessInstances("UnknownKey", 2, null);
+            fail("Should not create the batches");
+        } catch (FlowableException e) {
+            assertTextPresent("no processes deployed with key 'UnknownKey'", e.getMessage());
+        }
     }
 
     @Test
@@ -89,54 +120,37 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         assertEquals(processDefinitions.get(0).getId(), version1ProcessDef.getId());
         assertEquals(processDefinitions.get(1).getId(), version2ProcessDef.getId());
 
+        //Prepare the process Instance migration builder as usual
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId());
 
-        ProcessMigrationBatchEntity processMigrationBatchEntity = processInstanceMigrationBuilder.batchValidateMigrationOfProcessInstances(version1ProcessDef.getId());
-
+        //Submit the batch
+        String batchId = processInstanceMigrationBuilder.batchValidateMigrationOfProcessInstances(version1ProcessDef.getId());
         assertTrue(JobTestHelper.areJobsAvailable(managementService));
-        executeJobExecutorForTime(1000L, 500L);
 
+        //Confirm the batch is not finished
+        ProcessMigrationBatch processMigrationBatch = processInstanceMigrationService.getProcessMigrationBatchById(batchId);
+        assertThat(processMigrationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(false);
+        ProcessInstanceMigrationValidationResult validationResult = processInstanceMigrationService.getAggregatedResultOfBatchProcessInstanceMigrationValidation(batchId);
+        assertThat(validationResult).isNull();
+
+        //Start async executor to process the batches
+        executeJobExecutorForTime(1000L, 500L);
         assertFalse(JobTestHelper.areJobsAvailable(managementService));
 
-        //TODO WIP - Hack until we have a service to query the batch with its results (eager fetch results) or aggregate by the service
-        CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
-        ProcessMigrationBatchEntity newParent = commandExecutor.execute(commandContext -> {
-            ProcessMigrationBatchEntityManager manager = CommandContextUtil.getProcessMigrationBatchEntityManager(commandContext);
-            ProcessMigrationBatchEntity batchParent = manager.findById(processMigrationBatchEntity.getId());
-
-            if (batchParent.getBatchChildren() != null) {
-                batchParent.getBatchChildren().forEach(child -> child.getResult());
-            }
-            batchParent.getMigrationDocumentJson();
-
-            return batchParent;
-        });
-
-        assertThat(newParent.getBatchChildren()).isNotNull();
-        assertThat(newParent.getBatchChildren()).size().isEqualTo(2);
-        List<ProcessMigrationBatch> batchChildren = newParent.getBatchChildren();
-        assertThat(newParent.getBatchChildren()).extracting(ProcessMigrationBatch::getResult)
+        //Confirm the batches have ended
+        //        processMigrationBatch = processInstanceMigrationService.getProcessMigrationBatchById(batchId);
+        processMigrationBatch = processInstanceMigrationService.getProcessMigrationBatchAndResourcesById(batchId);
+        assertThat(processMigrationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(true);
+        validationResult = processInstanceMigrationService.getAggregatedResultOfBatchProcessInstanceMigrationValidation(batchId);
+        assertThat(validationResult).isNotNull();
+        assertThat(validationResult.getValidationMessages())
             .containsExactlyInAnyOrder("[Process instance (id:'" + processInstance1.getId() + "') has a running Activity (id:'userTask2Id') that is not mapped for migration (Or its Multi-Instance parent)]",
                 "[Process instance (id:'" + processInstance2.getId() + "') has a running Activity (id:'userTask2Id') that is not mapped for migration (Or its Multi-Instance parent)]");
 
-        commandExecutor.<Void>execute(commandContext -> {
-            ProcessMigrationBatchEntityManager manager = CommandContextUtil.getProcessMigrationBatchEntityManager(commandContext);
-            manager.deleteParentBatchAndChildrenAndResources(processMigrationBatchEntity.getId());
-            return null;
-        });
+        processInstanceMigrationService.deleteBatchAndResourcesById(batchId);
 
-        //
-        //        //Migrate process
-        //        processInstanceMigrationBuilder.migrateProcessInstances(version1ProcessDef.getId());
-        //
-        //
-        //        task = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
-        //        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
-        //        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(version2ProcessDef.getId());
-        //        task = taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult();
-        //        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
-        //        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(version2ProcessDef.getId());
+        //TODO WIP - Batch migrate with error
 
         completeProcessInstanceTasks(processInstance1.getId());
         completeProcessInstanceTasks(processInstance2.getId());
@@ -145,8 +159,7 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
     }
 
     @Test
-    @Disabled("WIP")
-    public void testSimpleBatchMigrationWithActivityAutoMapping() {
+    public void testSimpleBatchMigrationValidationMissingMappingPartialAutoMap() {
         //Deploy first version of the process
         ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
 
@@ -154,14 +167,14 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("MP");
         ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("MP");
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult();
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
         completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
-        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask2Id");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(version1ProcessDef.getId());
         task = taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult();
-        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask2Id");
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(version1ProcessDef.getId());
 
         //Deploy second version of the process
@@ -176,27 +189,39 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         assertEquals(processDefinitions.get(0).getId(), version1ProcessDef.getId());
         assertEquals(processDefinitions.get(1).getId(), version2ProcessDef.getId());
 
+        //Prepare the process Instance migration builder as usual
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(version2ProcessDef.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask2Id", "userTask1Id"));
-        ProcessInstanceMigrationValidationResult validationResult = processInstanceMigrationBuilder.validateMigrationOfProcessInstances(version1ProcessDef.getId());
-        assertThat(validationResult.getValidationMessages()).isEmpty();
+            .migrateToProcessDefinition(version2ProcessDef.getId());
 
-        //Migrate process
-        processInstanceMigrationBuilder.migrateProcessInstances(version1ProcessDef.getId());
+        //Submit the batch
+        String batchId = processInstanceMigrationBuilder.batchValidateMigrationOfProcessInstances(version1ProcessDef.getId());
+        assertTrue(JobTestHelper.areJobsAvailable(managementService));
 
-        task = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
-        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
-        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(version2ProcessDef.getId());
-        task = taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult();
-        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
-        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(version2ProcessDef.getId());
+        //Confirm the batch is not finished
+        ProcessMigrationBatch processMigrationBatch = processInstanceMigrationService.getProcessMigrationBatchById(batchId);
+        assertThat(processMigrationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(false);
+        ProcessInstanceMigrationValidationResult validationResult = processInstanceMigrationService.getAggregatedResultOfBatchProcessInstanceMigrationValidation(batchId);
+        assertThat(validationResult).isNull();
+
+        //Start async executor to process the batches
+        executeJobExecutorForTime(1000L, 500L);
+        assertFalse(JobTestHelper.areJobsAvailable(managementService));
+
+        //Confirm the batches have ended
+        processMigrationBatch = processInstanceMigrationService.getProcessMigrationBatchById(batchId);
+        assertThat(processMigrationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(true);
+        validationResult = processInstanceMigrationService.getAggregatedResultOfBatchProcessInstanceMigrationValidation(batchId);
+        assertThat(validationResult).isNotNull();
+        assertThat(validationResult.getValidationMessages())
+            .containsExactlyInAnyOrder("[Process instance (id:'" + processInstance1.getId() + "') has a running Activity (id:'userTask2Id') that is not mapped for migration (Or its Multi-Instance parent)]");
+
+        processInstanceMigrationService.deleteBatchAndResourcesById(batchId);
+
+        //TODO WIP - Batch migrate with error
 
         completeProcessInstanceTasks(processInstance1.getId());
         completeProcessInstanceTasks(processInstance2.getId());
-
         assertProcessEnded(processInstance1.getId());
         assertProcessEnded(processInstance2.getId());
     }
-
 }

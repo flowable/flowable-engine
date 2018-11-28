@@ -40,6 +40,7 @@ public class ProcessMigrationBatchEntityImpl extends AbstractEntity implements P
     protected String processInstanceId;
     protected Date createTime;
     protected Date completeTime;
+    //TODO WIP - Use the Id (String) instead?
     protected ByteArrayRef paramDataRefId;
     protected ByteArrayRef resultDataRefId;
     protected List<ProcessMigrationBatch> batchChildren;
@@ -86,12 +87,33 @@ public class ProcessMigrationBatchEntityImpl extends AbstractEntity implements P
 
     @Override
     public Date getCompleteTime() {
-        return completeTime;
+        if (completeTime != null) {
+            return completeTime;
+        }
+
+        if (batchChildren != null && !batchChildren.isEmpty()) {
+            long maxDate = Long.MIN_VALUE;
+            for (ProcessMigrationBatch child : batchChildren) {
+                if (!child.isCompleted()) {
+                    return null;
+                }
+                maxDate = Long.max(maxDate, child.getCompleteTime().getTime());
+            }
+            return new Date(maxDate);
+        }
+        return null;
     }
 
     @Override
     public boolean isCompleted() {
-        return completeTime != null;
+        if (completeTime != null) {
+            return true;
+        }
+
+        if (batchChildren != null && !batchChildren.isEmpty()) {
+            return batchChildren.stream().allMatch(ProcessMigrationBatch::isCompleted);
+        }
+        return false;
     }
 
     @Override
@@ -117,18 +139,22 @@ public class ProcessMigrationBatchEntityImpl extends AbstractEntity implements P
 
     @Override
     public String getMigrationDocumentJson() {
-        byte[] bytes = paramDataRefId.getBytes();
-        if (bytes != null) {
-            return new String(bytes, StandardCharsets.UTF_8);
+        if (paramDataRefId != null) {
+            byte[] bytes = paramDataRefId.getBytes();
+            if (bytes != null) {
+                return new String(bytes, StandardCharsets.UTF_8);
+            }
         }
         return null;
     }
 
     @Override
     public String getResult() {
-        byte[] bytes = getResultDataRefId().getEntity().getBytes();
-        if (bytes != null) {
-            return new String(bytes, StandardCharsets.UTF_8);
+        if (resultDataRefId != null && resultDataRefId.getEntity() != null) {
+            byte[] bytes = resultDataRefId.getEntity().getBytes();
+            if (bytes != null) {
+                return new String(bytes, StandardCharsets.UTF_8);
+            }
         }
         return null;
     }
@@ -142,6 +168,11 @@ public class ProcessMigrationBatchEntityImpl extends AbstractEntity implements P
     public void completeWithResult(Date completeTime, String result) {
         this.completeTime = completeTime;
         this.resultDataRefId = setByteArrayRef(this.resultDataRefId, BATCH_RESULT_LABEL, result);
+    }
+
+    @Override
+    public void complete(Date completeTime) {
+        this.completeTime = completeTime;
     }
 
     @Override

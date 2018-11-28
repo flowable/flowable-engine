@@ -13,9 +13,9 @@
 package org.flowable.engine;
 
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
-import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntity;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
+import org.flowable.engine.runtime.ProcessMigrationBatch;
 
 /**
  * Service for preparing and execution ProcessInstanceMigration operations.
@@ -34,17 +34,26 @@ public interface ProcessInstanceMigrationService {
 
     ProcessInstanceMigrationValidationResult validateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
 
-    //TODO WIP - Remove - batch validate of a single processInstance seems nonsensical
-    //    ProcessMigrationBatchEntity batchValidateMigrationForProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
+    String batchValidateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
 
-    ProcessMigrationBatchEntity batchValidateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
+    String batchValidateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
 
-    ProcessMigrationBatchEntity batchValidateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
+    ProcessInstanceMigrationValidationResult getAggregatedResultOfBatchProcessInstanceMigrationValidation(String migrationBatchId);
+
+    ProcessMigrationBatch getProcessMigrationBatchById(String migrationBatchId);
+
+    ProcessMigrationBatch getProcessMigrationBatchAndResourcesById(String migrationBatchId);
+
+    void deleteBatchAndResourcesById(String migrationBatchId);
 
     void migrateProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
 
     void migrateProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
 
     void migrateProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
+
+    void batchMigrateProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
+
+    void batchMigrateProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
 }
 

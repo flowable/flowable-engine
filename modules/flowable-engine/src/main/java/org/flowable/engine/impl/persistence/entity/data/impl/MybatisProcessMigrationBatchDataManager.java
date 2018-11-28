@@ -12,8 +12,6 @@
  */
 package org.flowable.engine.impl.persistence.entity.data.impl;
 
-import java.util.List;
-
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntityImpl;
@@ -38,15 +36,5 @@ public class MybatisProcessMigrationBatchDataManager extends AbstractProcessData
     public ProcessMigrationBatchEntity create() {
         return new ProcessMigrationBatchEntityImpl();
     }
-
-    @Override
-    public List<ProcessMigrationBatchEntity> findBatchesByParentBatchId(String parentBatchId) {
-        return (List<ProcessMigrationBatchEntity>) getDbSqlSession().selectList("selectProcessMigrationBatchChildren", parentBatchId);
-    }
-
-    //    @Override
-    //    public void deleteParentBatchAndChildrenByParentId(String parentBatchId) {
-    //        getDbSqlSession().delete("deleteParentBatchAndChildrenByParentId", parentBatchId, ProcessMigrationBatchEntityImpl.class);
-    //    }
 
 }

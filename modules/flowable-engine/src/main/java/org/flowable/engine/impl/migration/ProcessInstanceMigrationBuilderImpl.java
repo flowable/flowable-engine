@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.ProcessInstanceMigrationService;
-import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntity;
 import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
@@ -128,13 +127,13 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
     }
 
     @Override
-    public ProcessMigrationBatchEntity batchValidateMigrationOfProcessInstances(String processDefinitionId) {
+    public String batchValidateMigrationOfProcessInstances(String processDefinitionId) {
         ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
         return getProcessInstanceMigrationService().batchValidateMigrationForProcessInstancesOfProcessDefinition(processDefinitionId, document);
     }
 
     @Override
-    public ProcessMigrationBatchEntity batchValidateMigrationOfProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId) {
+    public String batchValidateMigrationOfProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId) {
         ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
         return getProcessInstanceMigrationService().batchValidateMigrationForProcessInstancesOfProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, document);
     }

@@ -120,16 +120,6 @@ public interface ProcessInstanceMigrationBuilder {
      */
     ProcessInstanceMigrationValidationResult validateMigration(String processInstanceId);
 
-    //TODO WIP - remove - batch validation of a single process instance seems nonsensical
-    //    /**
-    //     * Asynchronously validate this process instance migration instructions for a given process instance identified by its processInstanceId
-    //     *
-    //     * @param processInstanceId
-    //     * @return a ProcessMigrationBatchEntity
-    //     * @see ProcessMigrationBatchEntity
-    //     */
-    //    ProcessMigrationBatchEntity batchValidateMigration(String processInstanceId);
-
     /**
      * Starts the process instance migration for all process instances of a given process definition identified by the process definition id.
      *
@@ -153,7 +143,7 @@ public interface ProcessInstanceMigrationBuilder {
      * @return a ProcessMigrationBatchEntity
      * @see ProcessMigrationBatchEntity
      */
-    ProcessMigrationBatchEntity batchValidateMigrationOfProcessInstances(String processDefinitionId);
+    String batchValidateMigrationOfProcessInstances(String processDefinitionId);
 
     /**
      * Starts the process instance migration for all process instances of a given process definition identified by the process definition key and version (optional tenantId).
@@ -184,6 +174,6 @@ public interface ProcessInstanceMigrationBuilder {
      * @return a ProcessMigrationBatchEntity
      * @see ProcessMigrationBatchEntity
      */
-    ProcessMigrationBatchEntity batchValidateMigrationOfProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId);
+    String batchValidateMigrationOfProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId);
 
 }
