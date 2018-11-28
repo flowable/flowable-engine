@@ -28,6 +28,12 @@ public class TaskLogEntryEntityImpl extends AbstractEntityNoRevision implements 
     protected Date timeStamp;
     protected String userId;
     protected byte[] data;
+    protected String executionId;
+    protected String processInstanceId;
+    protected String scopeId;
+    protected String subScopeId;
+    protected String scopeType;
+    protected String tenantId;
 
     public TaskLogEntryEntityImpl() {
     }
@@ -60,6 +66,36 @@ public class TaskLogEntryEntityImpl extends AbstractEntityNoRevision implements 
     @Override
     public void setData(byte[] data) {
         this.data = data;
+    }
+
+    @Override
+    public void setExecutionId(String executionId) {
+        this.executionId = executionId;
+    }
+
+    @Override
+    public void setProcessInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
+
+    @Override
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    @Override
+    public void setSubScopeId(String subScopeId) {
+        this.subScopeId = subScopeId;
+    }
+
+    @Override
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
+    @Override
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
     }
 
     @Override
@@ -103,7 +139,35 @@ public class TaskLogEntryEntityImpl extends AbstractEntityNoRevision implements 
     }
 
     @Override
+    public String getExecutionId() {
+        return executionId;
+    }
+
+    @Override
+    public String getProcessInstanceId() {
+        return processInstanceId;
+    }
+
+    @Override
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    @Override
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+    @Override
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    @Override
+    public String getTenantId() {
+        return tenantId;
+    }
+    @Override
     public String toString() {
-        return this.getClass().getName() + "(" + logNumber + ", " + getTaskId() + ", " + timeStamp + ")";
+        return this.getClass().getName() + "(" + logNumber + ", " + getTaskId() + ", " + type +")";
     }
 }

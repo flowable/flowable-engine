@@ -52,6 +52,13 @@ public class TaskLogEntryEntityManagerImpl extends AbstractEntityManager<TaskLog
         taskLogEntryEntity.setUserId(taskLogEntryBuilder.getUserId());
         taskLogEntryEntity.setTimeStamp(taskLogEntryBuilder.getTimeStamp());
         taskLogEntryEntity.setTaskId(taskLogEntryBuilder.getTaskId());
+        taskLogEntryEntity.setTenantId(taskLogEntryBuilder.getTenantId());
+        taskLogEntryEntity.setProcessInstanceId(taskLogEntryBuilder.getProcessInstanceId());
+        taskLogEntryEntity.setExecutionId(taskLogEntryBuilder.getExecutionId());
+        taskLogEntryEntity.setScopeId(taskLogEntryBuilder.getScopeId());
+        taskLogEntryEntity.setSubScopeId(taskLogEntryBuilder.getSubScopeId());
+        taskLogEntryEntity.setScopeType(taskLogEntryBuilder.getScopeType());
+
         taskLogEntryEntity.setType(taskLogEntryBuilder.getType());
         taskLogEntryEntity.setData(taskLogEntryBuilder.getData());
         getDataManager().insert(taskLogEntryEntity);

@@ -80,6 +80,7 @@ import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.NativeTaskQuery;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
+import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.TaskLogEntry;
 import org.flowable.task.api.TaskLogEntryBuilder;
 import org.flowable.task.api.TaskQuery;
@@ -593,7 +594,7 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
     }
 
     @Override
-    public TaskLogEntryBuilder createTaskLogEntryBuilder() {
-        return new TaskLogEntryBuilderImpl(commandExecutor);
+    public TaskLogEntryBuilder createTaskLogEntryBuilder(TaskInfo task) {
+        return new TaskLogEntryBuilderImpl(commandExecutor, task);
     }
 }

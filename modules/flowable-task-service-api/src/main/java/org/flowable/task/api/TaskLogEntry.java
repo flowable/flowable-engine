@@ -31,4 +31,15 @@ public interface TaskLogEntry {
 
     byte[] getData();
 
+    String getExecutionId();
+
+    String getProcessInstanceId();
+
+    String getScopeId();
+
+    String getSubScopeId();
+
+    String getScopeType();
+
+    String getTenantId();
 }

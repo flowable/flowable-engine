@@ -342,22 +342,23 @@ public class TaskServiceEventTest {
 
     @Test
     public void createCustomTaskEventLog(TaskService taskService) {
-        TaskLogEntryBuilder taskLogEntryBuilder = taskService.createTaskLogEntryBuilder();
+        task = taskService.createTaskBuilder().
+            create();
+        TaskLogEntryBuilder taskLogEntryBuilder = taskService.createTaskLogEntryBuilder(task);
         taskLogEntryBuilder.
-            taskId("testTaskId").
             timeStamp(new Date(0)).
             userId("testUser").
             type("customType").
             data("testData".getBytes()).
             add();
 
-        List<TaskLogEntry> logEntries = taskService.getTaskLogEntriesByTaskInstanceId("testTaskId");
+        List<TaskLogEntry> logEntries = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
 
-        MatcherAssert.assertThat(logEntries.size(), is(1));
-        TaskLogEntry taskLogEntry = logEntries.get(0);
+        MatcherAssert.assertThat(logEntries.size(), is(2));
+        TaskLogEntry taskLogEntry = logEntries.get(1);
         assertThat(taskLogEntry.getLogNumber()).isNotNull();
         assertThat(taskLogEntry.getUserId()).isEqualTo("testUser");
-        assertThat(taskLogEntry.getTaskId()).isEqualTo("testTaskId");
+        assertThat(taskLogEntry.getTaskId()).isEqualTo(task.getId());
         assertThat(taskLogEntry.getType()).isEqualTo("customType");
         assertThat(taskLogEntry.getTimeStamp()).isEqualTo(new Date(0));
         assertThat(taskLogEntry.getData()).isEqualTo("testData".getBytes());
@@ -366,37 +367,43 @@ public class TaskServiceEventTest {
 
     @Test
     public void createCustomTaskEventLog_taskIdIsEnoughToCreateTaskLogEntry(TaskService taskService) {
-        TaskLogEntryBuilder taskLogEntryBuilder = taskService.createTaskLogEntryBuilder();
-        taskLogEntryBuilder.
-            taskId("testTaskId").
-            add();
-            List<TaskLogEntry> logEntries = taskService.getTaskLogEntriesByTaskInstanceId("testTaskId");
+        task = taskService.createTaskBuilder().
+            create();
 
-            MatcherAssert.assertThat(logEntries.size(), is(1));
-            TaskLogEntry taskLogEntry = logEntries.get(0);
-            assertThat(taskLogEntry.getLogNumber()).isNotNull();
-            assertThat(taskLogEntry.getUserId()).isNull();
-            assertThat(taskLogEntry.getTaskId()).isEqualTo("testTaskId");
-            assertThat(taskLogEntry.getType()).isNull();
-            assertThat(taskLogEntry.getTimeStamp()).isNotNull();
-            assertThat(taskLogEntry.getData()).isNull();
-            taskService.deleteTaskLogEntry(logEntries.get(0).getLogNumber());
+        TaskLogEntryBuilder taskLogEntryBuilder = taskService.createTaskLogEntryBuilder(task);
+        taskLogEntryBuilder.
+            add();
+        List<TaskLogEntry> logEntries = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
+
+        MatcherAssert.assertThat(logEntries.size(), is(2));
+        TaskLogEntry taskLogEntry = logEntries.get(1);
+        assertThat(taskLogEntry.getLogNumber()).isNotNull();
+        assertThat(taskLogEntry.getUserId()).isNull();
+        assertThat(taskLogEntry.getTaskId()).isEqualTo(task.getId());
+        assertThat(taskLogEntry.getType()).isNull();
+        assertThat(taskLogEntry.getTimeStamp()).isNotNull();
+        assertThat(taskLogEntry.getData()).isNull();
     }
 
     @Test
-    public void createCustomTaskEventLog_withoutTaskId_throwsException(TaskService taskService) {
-        TaskLogEntryBuilder taskLogEntryBuilder = taskService.createTaskLogEntryBuilder();
+    public void createCustomTaskEventLog_withoutTimeStamp_addsDefault(TaskService taskService) {
+        task = taskService.createTaskBuilder().
+            create();
 
-        assertThatThrownBy(
-            () -> taskLogEntryBuilder.
-            timeStamp(new Date(0)).
+        TaskLogEntryBuilder taskLogEntryBuilder = taskService.createTaskLogEntryBuilder(task);
+
+        taskLogEntryBuilder.
             userId("testUser").
             type("customType").
             data("testData".getBytes()).
-            add()
-        ).
-            hasMessage("Empty taskId is not allowed for TaskLogEntry").
-            isInstanceOf(FlowableException.class);
+            add();
+
+        List<TaskLogEntry> logEntries = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
+
+        MatcherAssert.assertThat(logEntries.size(), is(2));
+        TaskLogEntry taskLogEntry = logEntries.get(1);
+        assertThat(taskLogEntry.getLogNumber()).isNotNull();
+        assertThat(taskLogEntry.getTimeStamp()).isNotNull();
     }
 
     @Test

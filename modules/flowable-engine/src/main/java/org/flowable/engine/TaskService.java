@@ -33,6 +33,7 @@ import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.NativeTaskQuery;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
+import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.TaskLogEntry;
 import org.flowable.task.api.TaskLogEntryBuilder;
 import org.flowable.task.api.TaskQuery;
@@ -858,6 +859,8 @@ public interface TaskService {
 
     /**
      * Create new task log entry builder to the log task event
+     *
+     * @param task to which is log related to
      */
-    TaskLogEntryBuilder createTaskLogEntryBuilder();
+    TaskLogEntryBuilder createTaskLogEntryBuilder(TaskInfo task);
 }

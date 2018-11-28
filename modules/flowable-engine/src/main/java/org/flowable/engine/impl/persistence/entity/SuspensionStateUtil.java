@@ -57,12 +57,12 @@ public class SuspensionStateUtil {
         }
         taskEntity.setSuspensionState(state.getStateCode());
 
-        addTaskSustenstionStateEntryLog(taskEntity, state);
+        addTaskSuspensionStateEntryLog(taskEntity, state);
 
         dispatchStateChangeEvent(taskEntity, state);
     }
 
-    protected static void addTaskSustenstionStateEntryLog(TaskEntity taskEntity, SuspensionState state) {
+    protected static void addTaskSuspensionStateEntryLog(TaskEntity taskEntity, SuspensionState state) {
         if (CommandContextUtil.getTaskServiceConfiguration().isEnableDatabaseEventLogging()) {
             byte[] data = null;
             try {
@@ -72,8 +72,7 @@ public class SuspensionStateUtil {
             } catch (JsonProcessingException e) {
                 LOGGER.warn("It was not possible to serialize suspension state. TaskEventLogEntry data is empty.", e);
             }
-            CommandContextUtil.getProcessEngineConfiguration().getTaskService().createTaskLogEntryBuilder().
-                taskId(taskEntity.getId()).
+            CommandContextUtil.getProcessEngineConfiguration().getTaskService().createTaskLogEntryBuilder(taskEntity).
                 type("USER_TASK_SUSPENSIONSTATE_CHANGED").
                 data(
                     data

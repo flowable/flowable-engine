@@ -14,6 +14,7 @@ package org.flowable.engine.impl;
 
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.cmd.AddTaskLogEntryCmd;
+import org.flowable.task.api.TaskInfo;
 import org.flowable.task.service.impl.BaseTaskLogEntryBuilderImpl;
 
 /**
@@ -21,8 +22,8 @@ import org.flowable.task.service.impl.BaseTaskLogEntryBuilderImpl;
  */
 public class TaskLogEntryBuilderImpl extends BaseTaskLogEntryBuilderImpl {
 
-    public TaskLogEntryBuilderImpl(CommandExecutor commandExecutor) {
-        super(commandExecutor);
+    public TaskLogEntryBuilderImpl(CommandExecutor commandExecutor, TaskInfo task) {
+        super(commandExecutor, task);
     }
     @Override
     public void add() {

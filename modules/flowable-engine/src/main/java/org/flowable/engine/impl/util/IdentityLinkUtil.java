@@ -111,6 +111,9 @@ public class IdentityLinkUtil {
         TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
         TaskLogEntryEntity taskLogEntry = taskServiceConfiguration.getTaskLogEntryEntityManager().create();
         taskLogEntry.setTaskId(taskEntity.getId());
+        taskLogEntry.setProcessInstanceId(taskEntity.getProcessInstanceId());
+        taskLogEntry.setExecutionId(taskEntity.getExecutionId());
+        taskLogEntry.setTenantId(taskEntity.getTenantId());
         taskLogEntry.setType(eventType);
         taskLogEntry.setTimeStamp(taskServiceConfiguration.getClock().getCurrentTime());
         Map<String, Object> dataMap = new HashMap<>();

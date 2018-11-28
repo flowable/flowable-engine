@@ -23,8 +23,6 @@ public interface TaskLogEntryBuilder {
 
     TaskLogEntryBuilder type(String type);
 
-    TaskLogEntryBuilder taskId(String taskId);
-
     TaskLogEntryBuilder timeStamp(Date timeStamp);
 
     TaskLogEntryBuilder userId(String userId);
@@ -40,6 +38,18 @@ public interface TaskLogEntryBuilder {
     String getUserId();
 
     byte[] getData();
+
+    String getExecutionId();
+
+    String getProcessInstanceId();
+
+    String getScopeId();
+
+    String getSubScopeId();
+
+    String getScopeType();
+
+    String getTenantId();
 
     void add();
 }

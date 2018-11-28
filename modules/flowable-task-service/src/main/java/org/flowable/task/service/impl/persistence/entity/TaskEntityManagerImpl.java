@@ -323,6 +323,13 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
         taskLogEntryEntity.setUserId(Authentication.getAuthenticatedUserId());
         taskLogEntryEntity.setTimeStamp(this.taskServiceConfiguration.getClock().getCurrentTime());
         taskLogEntryEntity.setTaskId(task.getId());
+        taskLogEntryEntity.setTenantId(task.getTenantId());
+        taskLogEntryEntity.setProcessInstanceId(task.getProcessInstanceId());
+        taskLogEntryEntity.setExecutionId(task.getExecutionId());
+        taskLogEntryEntity.setScopeId(task.getScopeId());
+        taskLogEntryEntity.setSubScopeId(task.getSubScopeId());
+        taskLogEntryEntity.setScopeType(task.getScopeType());
+
         return taskLogEntryEntity;
     }
 
