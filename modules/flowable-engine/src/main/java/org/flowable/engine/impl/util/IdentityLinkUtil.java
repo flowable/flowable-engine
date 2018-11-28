@@ -12,19 +12,30 @@
  */
 package org.flowable.engine.impl.util;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
 public class IdentityLinkUtil {
-    
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(IdentityLinkUtil.class);
+
     public static IdentityLinkEntity createProcessInstanceIdentityLink(ExecutionEntity processInstanceExecution, String userId, String groupId, String type) {
         IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createProcessInstanceIdentityLink(
                         processInstanceExecution.getId(), userId, groupId, type);
@@ -67,6 +78,8 @@ public class IdentityLinkUtil {
             }
         }
 
+        logTaskIdentityLinkEvent("USER_TASK_IDENTITY_LINK_ADDED", taskEntity, identityLinkEntity);
+
         taskEntity.getIdentityLinks().add(identityLinkEntity);
         CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLinkToParent(taskEntity, identityLinkEntity.getUserId());
     }
@@ -79,6 +92,7 @@ public class IdentityLinkUtil {
             if (updateTaskCounts) {
                 handleTaskCountsForIdentityLinkDeletion(taskEntity, identityLinkEntity);
             }
+            logTaskIdentityLinkEvent("USER_TASK_IDENTITY_LINK_REMOVED", taskEntity, identityLinkEntity);
         }
         
         taskEntity.getIdentityLinks().removeAll(identityLinks);
@@ -92,5 +106,31 @@ public class IdentityLinkUtil {
             }   
         }
     }
-    
+
+    protected static void logTaskIdentityLinkEvent(String eventType, TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity) {
+        TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
+        TaskLogEntryEntity taskLogEntry = taskServiceConfiguration.getTaskLogEntryEntityManager().create();
+        taskLogEntry.setTaskId(taskEntity.getId());
+        taskLogEntry.setType(eventType);
+        taskLogEntry.setTimeStamp(taskServiceConfiguration.getClock().getCurrentTime());
+        Map<String, Object> dataMap = new HashMap<>();
+        if (identityLinkEntity.isUser()) {
+            dataMap.put("userId", identityLinkEntity.getUserId());
+        } else if (identityLinkEntity.isGroup()) {
+            dataMap.put("groupId", identityLinkEntity.getGroupId());
+        }
+        dataMap.put("type", identityLinkEntity.getType());
+        byte[] dataBytes = null;
+        try {
+            dataBytes = taskServiceConfiguration.getObjectMapper().writeValueAsBytes(
+                dataMap
+            );
+        } catch (JsonProcessingException e) {
+            LOGGER.warn("It was not possible to serialize user task identity link data. TaskEventLogEntry data is empty.", e);
+        }
+        taskLogEntry.setData(dataBytes);
+        taskLogEntry.setUserId(Authentication.getAuthenticatedUserId());
+        CommandContextUtil.getTaskService().addTaskLogEntry(taskLogEntry);
+    }
+
 }

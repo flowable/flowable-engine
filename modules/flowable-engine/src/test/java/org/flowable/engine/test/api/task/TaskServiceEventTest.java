@@ -465,4 +465,138 @@ public class TaskServiceEventTest {
             deleteTaskWithLogEntries(taskService, task.getId());
         }
     }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void logAddCandidateUser(RuntimeService runtimeService, TaskService taskService) {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        try {
+            assertNotNull(processInstance);
+            assertNotNull(task);
+
+            taskService.addCandidateUser(task.getId(), "newCandidateUser");
+
+            List<TaskLogEntry> logEntries = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
+            assertThat(logEntries).size().isEqualTo(2);
+            assertThat(logEntries.get(1)).
+                extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_ADDED");
+            assertThat(new String(logEntries.get(1).getData())).contains(
+                "\"type\":\"candidate\"",
+                "\"userId\":\"newCandidateUser\""
+            );
+        } finally {
+            taskService.complete(task.getId());
+            deleteTaskWithLogEntries(taskService, task.getId());
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void logAddCandidateGroup(RuntimeService runtimeService, TaskService taskService) {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        assertNotNull(processInstance);
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(task);
+        try {
+
+            taskService.addCandidateGroup(task.getId(), "newCandidateGroup");
+
+            List<TaskLogEntry> logEntries = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
+            assertThat(logEntries).size().isEqualTo(2);
+            assertThat(logEntries.get(1)).
+                extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_ADDED");
+            assertThat(new String(logEntries.get(1).getData())).contains(
+                "\"type\":\"candidate\"",
+                "\"groupId\":\"newCandidateGroup\""
+            );
+        } finally {
+            taskService.complete(task.getId());
+            deleteTaskWithLogEntries(taskService, task.getId());
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void logDeleteCandidateGroup(RuntimeService runtimeService, TaskService taskService) {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        assertNotNull(processInstance);
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(task);
+        taskService.addCandidateGroup(task.getId(), "newCandidateGroup");
+        try {
+
+            taskService.deleteCandidateGroup(task.getId(), "newCandidateGroup");
+
+            List<TaskLogEntry> logEntries = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
+            assertThat(logEntries).size().isEqualTo(3);
+            assertThat(logEntries.get(2)).
+                extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_REMOVED");
+            assertThat(new String(logEntries.get(2).getData())).contains(
+                "\"type\":\"candidate\"",
+                "\"groupId\":\"newCandidateGroup\""
+            );
+        } finally {
+            taskService.complete(task.getId());
+            deleteTaskWithLogEntries(taskService, task.getId());
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void logDeleteCandidateUser(RuntimeService runtimeService, TaskService taskService) {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(processInstance);
+        assertNotNull(task);
+        taskService.addCandidateUser(task.getId(), "newCandidateUser");
+
+        try {
+            taskService.deleteCandidateUser(task.getId(), "newCandidateUser");
+            List<TaskLogEntry> logEntries = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
+            assertThat(logEntries).size().isEqualTo(3);
+            assertThat(logEntries.get(2)).
+                extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_REMOVED");
+            assertThat(new String(logEntries.get(2).getData())).contains(
+                "\"type\":\"candidate\"",
+                "\"userId\":\"newCandidateUser\""
+            );
+        } finally {
+            taskService.complete(task.getId());
+            deleteTaskWithLogEntries(taskService, task.getId());
+        }
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/task/TaskIdentityLinksTest.testCustomIdentityLink.bpmn20.xml")
+    public void logIdentityLinkEventsForProcessIdentityLinks(RuntimeService runtimeService, TaskService taskService) {
+        runtimeService.startProcessInstanceByKey("customIdentityLink");
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskInvolvedUser("kermit").list();
+        assertThat(tasks).size().isEqualTo(1);
+        task = tasks.get(0);
+        List<TaskLogEntry> logEntries = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
+        // create, identityLinkAdded, identityLinkAdded
+        assertThat(logEntries).size().isEqualTo(3);
+
+        assertThat(logEntries.get(1)).
+            extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_ADDED");
+        assertThat(new String(logEntries.get(1).getData())).contains(
+            "\"type\":\"businessAdministrator\"",
+            "\"userId\":\"kermit\""
+        );
+        assertThat(logEntries.get(2)).
+            extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_ADDED");
+        assertThat(new String(logEntries.get(2).getData())).contains(
+            "\"type\":\"businessAdministrator\"",
+            "\"groupId\":\"management\""
+        );
+
+        taskService.complete(tasks.get(0).getId());
+        logEntries = taskService.getTaskLogEntriesByTaskInstanceId(task.getId());
+        // + completed event. Do not expect identity link removed events
+        assertThat(logEntries).size().isEqualTo(4);
+        assertThat(logEntries.get(3)).
+            extracting(TaskLogEntry::getType).isEqualTo("TASK_COMPLETED");
+    }
+
 }
