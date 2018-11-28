@@ -64,7 +64,7 @@ public class CaseDefinitionIdentityLinkCollectionResource extends BaseCaseDefini
     @PostMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/identitylinks", produces = "application/json")
     public RestIdentityLink createIdentityLink(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId, @RequestBody RestIdentityLink identityLink, HttpServletRequest request, HttpServletResponse response) {
 
-        CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);;
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);
 
         if (identityLink.getGroup() == null && identityLink.getUser() == null) {
             throw new FlowableIllegalArgumentException("A group or a user is required to create an identity link.");
