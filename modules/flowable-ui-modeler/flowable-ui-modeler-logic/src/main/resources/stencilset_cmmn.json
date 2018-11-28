@@ -1176,6 +1176,7 @@
         "namepackage",
         "documentationpackage",
         "completionneutralrulepackage",
+        "requiredrulepackage",
         "repetitionrulepackage",
         "planitemlifecyclelistenerspackage"],
       "hiddenPropertyPackages" : [ ],
@@ -1195,6 +1196,7 @@
         "timerexpressionpackage",
         "timerstarttriggerpackage",
         "completionneutralrulepackage",
+        "requiredrulepackage",
         "planitemlifecyclelistenerspackage"],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
@@ -1211,6 +1213,7 @@
         "namepackage",
         "documentationpackage",
         "completionneutralrulepackage",
+        "requiredrulepackage",
         "repetitionrulepackage",
         "planitemlifecyclelistenerspackage"],
       "hiddenPropertyPackages" : [ ],

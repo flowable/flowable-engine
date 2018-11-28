@@ -631,5 +631,40 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
         assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).list()).isEmpty();
     }
 
+    @Test
+    @CmmnDeployment
+    public void testUserEventListenerInNonAutoCompletableStage() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("tesUserEventListenerInNonAutoCompletableStage").start();
+
+        UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId());
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+        for (Task task : tasks) {
+            cmmnTaskService.complete(task.getId());
+        }
+        assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testUserEventListenerInAutoCompletableStage() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testUserEventListenerInAutoCompletableStage").start();
+
+        // B is the only required now. So completing it, should delete the event listener
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testRequiredUserEventListenerInAutoCompletableStage() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testRequiredUserEventListenerInAutoCompletableStage").start();
+        UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId());
+        assertCaseInstanceEnded(caseInstance);
+    }
+
 }
 
