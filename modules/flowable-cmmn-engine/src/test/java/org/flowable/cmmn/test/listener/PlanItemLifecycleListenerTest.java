@@ -20,9 +20,11 @@ import java.util.Map;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.junit.Test;
 
 /**
@@ -54,6 +56,33 @@ public class PlanItemLifecycleListenerTest extends CustomCmmnConfigurationFlowab
 
         assertVariable(caseInstance, "stageActive",true);
         assertVariable(caseInstance, "milestoneReached", true);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testEventListenerPlanItemLifecycleListener() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testEventListenerPlanItemLifecycleListener").start();
+
+        assertThat((Boolean) cmmnRuntimeService.getVariable(caseInstance.getId(), "available")).isTrue();
+        assertThat((Boolean) cmmnRuntimeService.getVariable(caseInstance.getId(), "completed")).isNull();
+        assertThat((Boolean) cmmnRuntimeService.getVariable(caseInstance.getId(), "terminated")).isNull();
+
+        UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId());
+
+        assertThat((Boolean) cmmnRuntimeService.getVariable(caseInstance.getId(), "available")).isTrue();
+        assertThat((Boolean) cmmnRuntimeService.getVariable(caseInstance.getId(), "completed")).isTrue();
+        assertThat((Boolean) cmmnRuntimeService.getVariable(caseInstance.getId(), "terminated")).isNull();
+
+        // Same, but terminate the case
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testEventListenerPlanItemLifecycleListener").start();
+        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+            assertThat((Boolean) cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).variableName("available").singleResult().getValue()).isTrue();
+            assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).variableName("completed").singleResult()).isNull();
+            assertThat((Boolean) cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).variableName("terminate").singleResult().getValue()).isTrue();
+        }
     }
 
     private void assertVariable(CaseInstance caseInstance, String varName, boolean value) {
