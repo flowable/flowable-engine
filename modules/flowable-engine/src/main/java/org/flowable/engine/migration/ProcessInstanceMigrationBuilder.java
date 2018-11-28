@@ -121,11 +121,18 @@ public interface ProcessInstanceMigrationBuilder {
     ProcessInstanceMigrationValidationResult validateMigration(String processInstanceId);
 
     /**
-     * Starts the process instance migration for all process instances of a given process definition identified by the process definition id.
+     * Asynchronously starts the process instance migration for each process instances of a given process definition identified by the process definition id.
      *
      * @param processDefinitionId
      */
     void migrateProcessInstances(String processDefinitionId);
+
+    /**
+     * Starts the process instance migration for all process instances of a given process definition identified by the process definition id.
+     *
+     * @param processDefinitionId
+     */
+    String batchMigrateProcessInstances(String processDefinitionId);
 
     /**
      * Validates this process instance migration instruction for each process instance of a given process definition identified by the process definition id.
@@ -153,6 +160,15 @@ public interface ProcessInstanceMigrationBuilder {
      * @param processDefinitionTenantId
      */
     void migrateProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId);
+
+    /**
+     * Asynchronously starts the process instance migration for each process instances of a given process definition identified by the process definition key and version (optional tenantId).
+     *
+     * @param processDefinitionKey
+     * @param processDefinitionVersion
+     * @param processDefinitionTenantId
+     */
+    String batchMigrateProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId);
 
     /**
      * Validates this process instance migration instruction for each process instance of a given process definition identified by the process definition key and version (optional tenantId).

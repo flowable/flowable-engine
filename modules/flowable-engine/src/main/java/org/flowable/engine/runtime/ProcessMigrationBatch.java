@@ -22,7 +22,6 @@ public interface ProcessMigrationBatch {
 
     String getId();
 
-    //TODO WIP - Could use a enum instead?
     String getBatchType();
 
     String getParentBatchId();

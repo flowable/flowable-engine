@@ -12,12 +12,16 @@
  */
 package org.flowable.engine.impl;
 
+import java.util.List;
+
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.engine.ProcessInstanceMigrationService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.DeleteProcessMigrationBatchAndResourcesCmd;
+import org.flowable.engine.impl.cmd.GetProcessInstanceMigrationBatchResultCmd;
 import org.flowable.engine.impl.cmd.GetProcessInstanceMigrationBatchValidationResultCmd;
 import org.flowable.engine.impl.cmd.GetProcessInstanceMigrationValidationBatchCmd;
+import org.flowable.engine.impl.cmd.ProcessInstanceMigrationBatchCmd;
 import org.flowable.engine.impl.cmd.ProcessInstanceMigrationBatchValidationCmd;
 import org.flowable.engine.impl.cmd.ProcessInstanceMigrationCmd;
 import org.flowable.engine.impl.cmd.ProcessInstanceMigrationValidationCmd;
@@ -72,7 +76,7 @@ public class ProcessInstanceMigrationServiceImpl extends CommonEngineServiceImpl
     }
 
     @Override
-    public ProcessInstanceMigrationValidationResult getAggregatedResultOfBatchProcessInstanceMigrationValidation(String migrationBatchId) {
+    public ProcessInstanceMigrationValidationResult getResultsOfBatchProcessInstanceMigrationValidation(String migrationBatchId) {
         return commandExecutor.execute(new GetProcessInstanceMigrationBatchValidationResultCmd(migrationBatchId));
     }
 
@@ -107,15 +111,18 @@ public class ProcessInstanceMigrationServiceImpl extends CommonEngineServiceImpl
     }
 
     @Override
-    public void batchMigrateProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
-        throw new UnsupportedOperationException("Not implemented yet!!!");
-        //        commandExecutor.execute(ProcessInstanceMigrationCmd.forProcessDefinition(processDefinitionId, processInstanceMigrationDocument));
+    public String batchMigrateProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
+        return commandExecutor.execute(ProcessInstanceMigrationBatchCmd.forProcessDefinition(processDefinitionId, processInstanceMigrationDocument));
     }
 
     @Override
-    public void batchMigrateProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
-        throw new UnsupportedOperationException("Not implemented yet!!!");
-        //        commandExecutor.execute(ProcessInstanceMigrationCmd.forProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, processInstanceMigrationDocument));
+    public String batchMigrateProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
+        return commandExecutor.execute(ProcessInstanceMigrationBatchCmd.forProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, processInstanceMigrationDocument));
+    }
+
+    @Override
+    public List<String> getResultsOfBatchProcessInstanceMigration(String migrationBatchId) {
+        return commandExecutor.execute(new GetProcessInstanceMigrationBatchResultCmd(migrationBatchId));
     }
 }
 

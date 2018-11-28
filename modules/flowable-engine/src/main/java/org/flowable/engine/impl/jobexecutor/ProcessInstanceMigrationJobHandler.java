@@ -12,12 +12,11 @@
  */
 package org.flowable.engine.impl.jobexecutor;
 
-import java.util.Arrays;
 import java.util.Date;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationDocumentImpl;
-import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -26,12 +25,20 @@ import org.flowable.engine.migration.ProcessInstanceMigrationManager;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * @author Dennis Federico
  */
-public class ProcessInstanceMigrationValidationJobHandler extends AbstractProcessInstanceMigrationJobHandler {
+public class ProcessInstanceMigrationJobHandler extends AbstractProcessInstanceMigrationJobHandler {
 
-    public static final String TYPE = "process-migration-validation";
+    public static final String TYPE = "process-migration";
+    public static final String RESULT_LABEL_PROCESS_INSTANCE_ID = "processInstanceId";
+    public static final String RESULT_LABEL_MIGRATION_PROCESS = "migrationProcess";
+    public static final String RESULT_LABEL_CAUSE = "cause";
+    public static final String RESULT_VALUE_SUCCESSFUL = "successful";
+    public static final String RESULT_VALUE_FAILED = "failed";
 
     @Override
     public String getType() {
@@ -43,20 +50,36 @@ public class ProcessInstanceMigrationValidationJobHandler extends AbstractProces
 
         ProcessMigrationBatchEntityManager processMigrationBatchEntityManager = CommandContextUtil.getProcessMigrationBatchEntityManager(commandContext);
         ProcessInstanceMigrationManager processInstanceMigrationManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceMigrationManager();
+        ObjectMapper objectMapper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getObjectMapper();
 
         String batchId = getBatchIdFromHandlerCfg(configuration);
         ProcessMigrationBatchEntity batchEntity = processMigrationBatchEntityManager.findById(batchId);
 
         ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentImpl.fromProcessInstanceMigrationDocumentJson(batchEntity.getMigrationDocumentJson());
-        ProcessInstanceMigrationValidationResult validationResult = processInstanceMigrationManager.validateMigrateProcessInstance(batchEntity.getProcessInstanceId(), migrationDocument, commandContext);
 
-        Date currentTime = CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime();
-        if (validationResult.hasErrors()) {
-            String collatedValidationResult = Arrays.toString(validationResult.getValidationMessages().toArray(new String[0]));
-            batchEntity.completeWithResult(currentTime, collatedValidationResult);
-        } else {
-            batchEntity.complete(currentTime);
+        String exceptionMessage = null;
+        try {
+            processInstanceMigrationManager.migrateProcessInstance(batchEntity.getProcessInstanceId(), migrationDocument, commandContext);
+        } catch (FlowableException e) {
+            exceptionMessage = e.getMessage();
         }
+
+        String resultAsJsonString = getResultAsJsonString(batchEntity.getProcessInstanceId(), exceptionMessage, objectMapper);
+        Date currentTime = CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime();
+        batchEntity.completeWithResult(currentTime, resultAsJsonString);
     }
+
+    protected static String getResultAsJsonString(String processInstanceId, String exceptionMessage, ObjectMapper objectMapper) {
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put(RESULT_LABEL_PROCESS_INSTANCE_ID, processInstanceId);
+        if (exceptionMessage == null) {
+            objectNode.put(RESULT_LABEL_MIGRATION_PROCESS, RESULT_VALUE_SUCCESSFUL);
+        } else {
+            objectNode.put(RESULT_LABEL_MIGRATION_PROCESS, RESULT_VALUE_FAILED);
+            objectNode.put(RESULT_LABEL_CAUSE, exceptionMessage);
+        }
+        return objectNode.toString();
+    }
+
 }
 

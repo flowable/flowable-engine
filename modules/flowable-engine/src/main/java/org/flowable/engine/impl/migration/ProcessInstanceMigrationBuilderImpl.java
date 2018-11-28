@@ -121,6 +121,18 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
     }
 
     @Override
+    public String batchMigrateProcessInstances(String processDefinitionId) {
+        ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
+        return getProcessInstanceMigrationService().batchMigrateProcessInstancesOfProcessDefinition(processDefinitionId, document);
+    }
+
+    @Override
+    public String batchMigrateProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId) {
+        ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
+        return getProcessInstanceMigrationService().batchMigrateProcessInstancesOfProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, document);
+    }
+
+    @Override
     public ProcessInstanceMigrationValidationResult validateMigrationOfProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId) {
         ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
         return getProcessInstanceMigrationService().validateMigrationForProcessInstancesOfProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, document);

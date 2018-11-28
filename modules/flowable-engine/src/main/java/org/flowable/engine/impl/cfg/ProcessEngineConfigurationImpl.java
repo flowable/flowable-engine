@@ -246,6 +246,7 @@ import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.flowable.engine.impl.jobexecutor.AsyncTriggerJobHandler;
 import org.flowable.engine.impl.jobexecutor.DefaultFailedJobCommandFactory;
 import org.flowable.engine.impl.jobexecutor.ProcessEventJobHandler;
+import org.flowable.engine.impl.jobexecutor.ProcessInstanceMigrationJobHandler;
 import org.flowable.engine.impl.jobexecutor.ProcessInstanceMigrationValidationJobHandler;
 import org.flowable.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
 import org.flowable.engine.impl.jobexecutor.TimerStartEventJobHandler;
@@ -1888,6 +1889,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         AsyncCompleteCallActivityJobHandler asyncCompleteCallActivityJobHandler = new AsyncCompleteCallActivityJobHandler();
         jobHandlers.put(asyncCompleteCallActivityJobHandler.getType(), asyncCompleteCallActivityJobHandler);
+
+        ProcessInstanceMigrationJobHandler processInstanceMigrationJobHandler = new ProcessInstanceMigrationJobHandler();
+        jobHandlers.put(processInstanceMigrationJobHandler.getType(), processInstanceMigrationJobHandler);
 
         ProcessInstanceMigrationValidationJobHandler processInstanceMigrationValidationJobHandler = new ProcessInstanceMigrationValidationJobHandler();
         jobHandlers.put(processInstanceMigrationValidationJobHandler.getType(), processInstanceMigrationValidationJobHandler);

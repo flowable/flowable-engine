@@ -43,6 +43,7 @@ import org.flowable.engine.impl.dynamic.AbstractDynamicStateManager;
 import org.flowable.engine.impl.dynamic.MoveExecutionEntityContainer;
 import org.flowable.engine.impl.dynamic.ProcessInstanceChangeState;
 import org.flowable.engine.impl.history.HistoryManager;
+import org.flowable.engine.impl.jobexecutor.ProcessInstanceMigrationJobHandler;
 import org.flowable.engine.impl.jobexecutor.ProcessInstanceMigrationValidationJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
@@ -84,9 +85,8 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
             Date currentTime = CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime();
             parentBatch.completeWithResult(currentTime, "Cannot find the process definition to migrate from");
             return parentBatch;
-        } else {
-            return batchValidateMigrateProcessInstancesOfProcessDefinition(processDefinition.getId(), document, commandContext);
         }
+        return batchValidateMigrateProcessInstancesOfProcessDefinition(processDefinition.getId(), document, commandContext);
     }
 
     @Override
@@ -110,9 +110,8 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
             Date currentTime = CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime();
             parentBatch.completeWithResult(currentTime, parentValidationMessage);
         } else {
-            ProcessInstanceQueryImpl processInstanceQueryByProcessDefinitionId = new ProcessInstanceQueryImpl().processDefinitionId(processDefinitionId);
             ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-            List<ProcessInstance> processInstances = executionEntityManager.findProcessInstanceByQueryCriteria(processInstanceQueryByProcessDefinitionId);
+            List<ProcessInstance> processInstances = executionEntityManager.findProcessInstanceByQueryCriteria(new ProcessInstanceQueryImpl().processDefinitionId(processDefinitionId));
 
             JobService jobService = CommandContextUtil.getJobService(commandContext);
             for (ProcessInstance processInstance : processInstances) {
@@ -155,9 +154,8 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
             if (bpmnModel == null) {
                 validationResult.addValidationMessage("Cannot find the Bpmn model of the process definition to migrate to, with " + printProcessDefinitionIdentifierMessage(document));
             } else {
-                ProcessInstanceQueryImpl processInstanceQueryByProcessDefinitionId = new ProcessInstanceQueryImpl().processDefinitionId(processDefinitionId);
                 ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-                List<ProcessInstance> processInstances = executionEntityManager.findProcessInstanceByQueryCriteria(processInstanceQueryByProcessDefinitionId);
+                List<ProcessInstance> processInstances = executionEntityManager.findProcessInstanceByQueryCriteria(new ProcessInstanceQueryImpl().processDefinitionId(processDefinitionId));
 
                 for (ProcessInstance processInstance : processInstances) {
                     doValidateProcessInstanceMigration(processInstance.getId(), processDefinition.getTenantId(), bpmnModel, document, validationResult, commandContext);
@@ -216,15 +214,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         HashMap<String, HashMap<String, ActivityMigrationMapping>> subProcessActivityMappingsByCallActivityIdAndFromActivityId = new HashMap<>();
 
         for (ActivityMigrationMapping activityMigrationMapping : activityMappings) {
-            HashMap<String, ActivityMigrationMapping> mapToFill;
-            if (activityMigrationMapping.isToParentProcess()) {
-                mapToFill = subProcessActivityMappingsByCallActivityIdAndFromActivityId.computeIfAbsent(activityMigrationMapping.getFromCallActivityId(), k -> new HashMap<>());
-            } else {
-                mapToFill = mainProcessActivityMappingByFromActivityId;
-            }
-            for (String fromActivityId : activityMigrationMapping.getFromActivityIds()) {
-                mapToFill.put(fromActivityId, activityMigrationMapping);
-            }
+            splitMigrationMappingByCallActivitySubProcessScope(activityMigrationMapping, mainProcessActivityMappingByFromActivityId, subProcessActivityMappingsByCallActivityIdAndFromActivityId);
         }
 
         List<ExecutionEntity> activeMainProcessExecutions = executionEntityManager.findChildExecutionsByProcessInstanceId(processInstanceId);
@@ -359,6 +349,59 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
     }
 
     @Override
+    public ProcessMigrationBatchEntity batchMigrateProcessInstancesOfProcessDefinition(String procDefKey, int procDefVer, String procDefTenantId, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
+        ProcessDefinition processDefinition = resolveProcessDefinition(procDefKey, procDefVer, procDefTenantId, commandContext);
+        if (processDefinition == null) {
+            ProcessMigrationBatchEntityManager processMigrationBatchEntityManager = CommandContextUtil.getProcessMigrationBatchEntityManager(commandContext);
+            ProcessMigrationBatchEntityImpl parentBatch = (ProcessMigrationBatchEntityImpl) processMigrationBatchEntityManager.insertBatchForProcessMigration(document);
+            Date currentTime = CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime();
+            parentBatch.completeWithResult(currentTime, "Cannot find the process definition to migrate from, with " + printProcessDefinitionIdentifierMessage(null, procDefKey, procDefVer, procDefTenantId));
+            return parentBatch;
+        }
+        return batchMigrateProcessInstancesOfProcessDefinition(processDefinition.getId(), document, commandContext);
+    }
+
+    @Override
+    public ProcessMigrationBatchEntity batchMigrateProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
+        ProcessMigrationBatchEntityManager processMigrationBatchEntityManager = CommandContextUtil.getProcessMigrationBatchEntityManager(commandContext);
+        ProcessMigrationBatchEntityImpl parentBatch = (ProcessMigrationBatchEntityImpl) processMigrationBatchEntityManager.insertBatchForProcessMigration(document);
+
+        String parentValidationMessage = null;
+        ProcessDefinition processDefinition = resolveProcessDefinition(document, commandContext);
+        if (processDefinition == null) {
+            parentValidationMessage = "Cannot find the process definition to migrate to, with " + printProcessDefinitionIdentifierMessage(document);
+        }
+
+        BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinition.getId());
+        if (bpmnModel == null) {
+            parentValidationMessage = "Cannot find the Bpmn model of the process definition to migrate to, with " + printProcessDefinitionIdentifierMessage(document);
+        }
+
+        if (parentValidationMessage != null) {
+            Date currentTime = CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime();
+            parentBatch.completeWithResult(currentTime, parentValidationMessage);
+        } else {
+            ProcessInstanceQueryImpl processInstanceQueryByProcessDefinitionId = new ProcessInstanceQueryImpl().processDefinitionId(processDefinitionId);
+            ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+            List<ProcessInstance> processInstances = executionEntityManager.findProcessInstanceByQueryCriteria(processInstanceQueryByProcessDefinitionId);
+
+            JobService jobService = CommandContextUtil.getJobService(commandContext);
+            for (ProcessInstance processInstance : processInstances) {
+                ProcessMigrationBatchEntity childBatch = processMigrationBatchEntityManager.insertBatchChild(parentBatch, processInstance.getId());
+                parentBatch.addBatchChild(childBatch);
+                JobEntity job = jobService.createJob();
+                job.setJobHandlerType(ProcessInstanceMigrationJobHandler.TYPE);
+                job.setProcessInstanceId(processInstance.getId());
+                job.setJobHandlerConfiguration(ProcessInstanceMigrationJobHandler.getHandlerCfgForBatchId(childBatch.getId()));
+                jobService.createAsyncJob(job, false);
+                jobService.scheduleAsyncJob(job);
+            }
+        }
+
+        return parentBatch;
+    }
+
+    @Override
     public void migrateProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         ExecutionEntity processExecution = executionEntityManager.findById(processInstanceId);
@@ -370,21 +413,16 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         if (processDefinition == null) {
             throw new FlowableException("Cannot find the process definition to migrate to, with " + printProcessDefinitionIdentifierMessage(document));
         }
-
-        BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinition.getId());
-        if (bpmnModel == null) {
-            throw new FlowableException("Cannot find the Bpmn model of the process definition to migrate to, with " + printProcessDefinitionIdentifierMessage(document));
-        }
-
         doMigrateProcessInstance(processExecution, processDefinition, document, commandContext);
     }
 
     @Override
     public void migrateProcessInstancesOfProcessDefinition(String procDefKey, int procDefVer, String procDefTenantId, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
         ProcessDefinition processDefinition = resolveProcessDefinition(procDefKey, procDefVer, procDefTenantId, commandContext);
-        if (processDefinition != null) {
-            migrateProcessInstancesOfProcessDefinition(processDefinition.getId(), document, commandContext);
+        if (processDefinition == null) {
+            throw new FlowableException("Cannot find the process definition to migrate from, with " + printProcessDefinitionIdentifierMessage(null, procDefKey, procDefVer, procDefTenantId));
         }
+        migrateProcessInstancesOfProcessDefinition(processDefinition.getId(), document, commandContext);
     }
 
     @Override
@@ -394,11 +432,6 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
             throw new FlowableException("Cannot find the process definition to migrate to, with " + printProcessDefinitionIdentifierMessage(document));
         }
 
-        BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinition.getId());
-        if (bpmnModel == null) {
-            throw new FlowableException("Cannot find the Bpmn model of the process definition to migrate to, with " + printProcessDefinitionIdentifierMessage(document));
-        }
-
         ProcessInstanceQueryImpl processInstanceQueryByProcessDefinitionId = new ProcessInstanceQueryImpl().processDefinitionId(processDefinitionId);
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         List<ProcessInstance> processInstances = executionEntityManager.findProcessInstanceByQueryCriteria(processInstanceQueryByProcessDefinitionId);
@@ -406,7 +439,6 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         for (ProcessInstance processInstance : processInstances) {
             doMigrateProcessInstance(processInstance, processDefinition, document, commandContext);
         }
-
     }
 
     protected void doMigrateProcessInstance(ProcessInstance processInstance, ProcessDefinition procDefToMigrateTo, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
@@ -486,15 +518,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         HashMap<String, ActivityMigrationMapping> mainProcessActivityMappingByFromActivityId = new HashMap<>();
         HashMap<String, HashMap<String, ActivityMigrationMapping>> subProcessActivityMappingsByCallActivityIdAndFromActivityId = new HashMap<>();
         for (ActivityMigrationMapping activityMigrationMapping : document.getActivityMigrationMappings()) {
-            HashMap<String, ActivityMigrationMapping> mapToFill;
-            if (activityMigrationMapping.isToParentProcess()) {
-                mapToFill = subProcessActivityMappingsByCallActivityIdAndFromActivityId.computeIfAbsent(activityMigrationMapping.getFromCallActivityId(), k -> new HashMap<>());
-            } else {
-                mapToFill = mainProcessActivityMappingByFromActivityId;
-            }
-            for (String fromActivityId : activityMigrationMapping.getFromActivityIds()) {
-                mapToFill.put(fromActivityId, activityMigrationMapping);
-            }
+            splitMigrationMappingByCallActivitySubProcessScope(activityMigrationMapping, mainProcessActivityMappingByFromActivityId, subProcessActivityMappingsByCallActivityIdAndFromActivityId);
         }
 
         Set<String> mappedFromActivities = mainProcessActivityMappingByFromActivityId.keySet();
@@ -714,8 +738,11 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         String key = document.getMigrateToProcessDefinitionKey();
         Integer version = document.getMigrateToProcessDefinitionVersion();
         String tenantId = document.getMigrateToProcessDefinitionTenantId();
+        return printProcessDefinitionIdentifierMessage(id, key, version, tenantId);
+    }
 
-        return "process definition identified by [id:'" + id + "'] or [key:'" + key + "', version:'" + version + "', tenantId:'" + tenantId + "']";
+    protected String printProcessDefinitionIdentifierMessage(String procId, String procKey, Integer version, String tenantId) {
+        return "process definition identified by [id:'" + procId + "'] or [key:'" + procKey + "', version:'" + version + "', tenantId:'" + tenantId + "']";
     }
 
     @Override
@@ -735,6 +762,18 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         String calledElement2 = callActivity2.getCalledElement();
 
         return calledElement1.equals(calledElement2) && !isExpression(calledElement1);
+    }
+
+    protected static void splitMigrationMappingByCallActivitySubProcessScope(ActivityMigrationMapping activityMigrationMapping, HashMap<String, ActivityMigrationMapping> mainProcessActivityMappingByFromActivityId, HashMap<String, HashMap<String, ActivityMigrationMapping>> subProcessActivityMappingsByCallActivityIdAndFromActivityId) {
+        HashMap<String, ActivityMigrationMapping> mapToFill;
+        if (activityMigrationMapping.isToParentProcess()) {
+            mapToFill = subProcessActivityMappingsByCallActivityIdAndFromActivityId.computeIfAbsent(activityMigrationMapping.getFromCallActivityId(), k -> new HashMap<>());
+        } else {
+            mapToFill = mainProcessActivityMappingByFromActivityId;
+        }
+        for (String fromActivityId : activityMigrationMapping.getFromActivityIds()) {
+            mapToFill.put(fromActivityId, activityMigrationMapping);
+        }
     }
 
 }

@@ -38,21 +38,23 @@ public class ProcessMigrationBatchEntityManagerImpl extends AbstractEntityManage
 
     @Override
     public ProcessMigrationBatchEntity insertBatchForProcessMigration(ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
-        ProcessMigrationBatchEntityImpl processMigrationBatchEntity = (ProcessMigrationBatchEntityImpl) processMigrationBatchDataManager.create();
-        processMigrationBatchEntity.setBatchType(ProcessMigrationBatchEntityImpl.MIGRATION_TYPE);
-        processMigrationBatchEntity.setCreateTime(getClock().getCurrentTime());
-        processMigrationBatchEntity.setMigrationDocumentJson(processInstanceMigrationDocument.asJsonString());
+        ProcessMigrationBatchEntity processMigrationBatchEntity = prepareProcessMigrationBatch(processInstanceMigrationDocument, ProcessMigrationBatchEntityImpl.MIGRATION_TYPE);
         insert(processMigrationBatchEntity);
         return processMigrationBatchEntity;
     }
 
     @Override
     public ProcessMigrationBatchEntity insertBatchForProcessMigrationValidation(ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
+        ProcessMigrationBatchEntity processMigrationBatchEntity = prepareProcessMigrationBatch(processInstanceMigrationDocument, ProcessMigrationBatchEntityImpl.VALIDATION_TYPE);
+        insert(processMigrationBatchEntity);
+        return processMigrationBatchEntity;
+    }
+
+    protected ProcessMigrationBatchEntity prepareProcessMigrationBatch(ProcessInstanceMigrationDocument processInstanceMigrationDocument, String processMigrationBatchType) {
         ProcessMigrationBatchEntityImpl processMigrationBatchEntity = (ProcessMigrationBatchEntityImpl) processMigrationBatchDataManager.create();
-        processMigrationBatchEntity.setBatchType(ProcessMigrationBatchEntityImpl.VALIDATION_TYPE);
+        processMigrationBatchEntity.setBatchType(processMigrationBatchType);
         processMigrationBatchEntity.setCreateTime(getClock().getCurrentTime());
         processMigrationBatchEntity.setMigrationDocumentJson(processInstanceMigrationDocument.asJsonString());
-        insert(processMigrationBatchEntity);
         return processMigrationBatchEntity;
     }
 

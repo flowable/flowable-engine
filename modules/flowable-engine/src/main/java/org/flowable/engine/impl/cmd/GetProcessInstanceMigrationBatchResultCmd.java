@@ -13,9 +13,11 @@
 
 package org.flowable.engine.impl.cmd;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -24,25 +26,25 @@ import org.flowable.engine.runtime.ProcessMigrationBatch;
 /**
  * @author Dennis Federico
  */
-public class GetProcessInstanceMigrationBatchValidationResultCmd implements Command<ProcessInstanceMigrationValidationResult> {
+public class GetProcessInstanceMigrationBatchResultCmd implements Command<List<String>> {
 
     protected String batchId;
 
-    public GetProcessInstanceMigrationBatchValidationResultCmd(String batchId) {
+    public GetProcessInstanceMigrationBatchResultCmd(String batchId) {
         this.batchId = batchId;
     }
 
     @Override
-    public ProcessInstanceMigrationValidationResult execute(CommandContext commandContext) {
+    public List<String> execute(CommandContext commandContext) {
 
         ProcessMigrationBatchEntityManager batchManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessMigrationBatchEntityManager();
         ProcessMigrationBatchEntity batch = batchManager.findById(batchId);
 
-        ProcessInstanceMigrationValidationResult result = new ProcessInstanceMigrationValidationResult();
+        List<String> jsonResults = new ArrayList<>();
 
         if (batch.isCompleted()) {
             if (batch.getResult() != null) {
-                result.addValidationMessage(batch.getResult());
+                jsonResults.add(batch.getResult());
             }
 
             if (batch.getBatchChildren() != null) {
@@ -50,9 +52,9 @@ public class GetProcessInstanceMigrationBatchValidationResultCmd implements Comm
                     .stream()
                     .filter(child -> child.getResult() != null)
                     .map(ProcessMigrationBatch::getResult)
-                    .forEach(result::addValidationMessage);
+                    .forEach(jsonResults::add);
             }
-            return result;
+            return jsonResults;
         }
         return null;
     }

@@ -30,7 +30,6 @@ public class ProcessMigrationBatchEntityImpl extends AbstractEntity implements P
 
     private static final long serialVersionUID = 1L;
 
-    //TODO WIP - Use an ENUM instead?
     public static final String VALIDATION_TYPE = "processMigrationValidation";
     public static final String MIGRATION_TYPE = "processMigration";
     protected static final String MIGRATION_DOCUMENT_JSON_LABEL = "migrationDocumentJson";

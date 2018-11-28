@@ -12,6 +12,8 @@
  */
 package org.flowable.engine;
 
+import java.util.List;
+
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
@@ -38,7 +40,8 @@ public interface ProcessInstanceMigrationService {
 
     String batchValidateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
 
-    ProcessInstanceMigrationValidationResult getAggregatedResultOfBatchProcessInstanceMigrationValidation(String migrationBatchId);
+    //TODO WIP - Should it be a list of ProcessInstanceMigrationValidationResult instead
+    ProcessInstanceMigrationValidationResult getResultsOfBatchProcessInstanceMigrationValidation(String migrationBatchId);
 
     ProcessMigrationBatch getProcessMigrationBatchById(String migrationBatchId);
 
@@ -52,8 +55,10 @@ public interface ProcessInstanceMigrationService {
 
     void migrateProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
 
-    void batchMigrateProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
+    String batchMigrateProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
 
-    void batchMigrateProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
+    String batchMigrateProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
+
+    List<String> getResultsOfBatchProcessInstanceMigration(String migrationBatchId);
 }
 
