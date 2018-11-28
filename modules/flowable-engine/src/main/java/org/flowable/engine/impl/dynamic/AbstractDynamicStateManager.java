@@ -410,7 +410,7 @@ public abstract class AbstractDynamicStateManager {
                                         parentExecution.setVariablesLocal(localVariables.get(execution.getActivityId()));
                                         break;
                                     }
-                                    
+
                                     scopedExecutionCandidate = scopedExecutionCandidate.getParent();
                                 }
                             }
@@ -855,7 +855,6 @@ public abstract class AbstractDynamicStateManager {
             task.setTaskDefinitionKey(newFlowElement.getId());
             task.setName(newFlowElement.getName());
             task.setProcessInstanceId(childExecution.getProcessInstanceId());
-            task.forceUpdate();
 
             //Sync history
             syncTaskExecutionHistory(childExecution, newFlowElement, oldActivityId, task, commandContext);
@@ -871,7 +870,6 @@ public abstract class AbstractDynamicStateManager {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Child execution {} updated with parent {}", childExecution, parentExecutionEntity.getId());
         }
-        childExecution.forceUpdate();
         return childExecution;
     }
 

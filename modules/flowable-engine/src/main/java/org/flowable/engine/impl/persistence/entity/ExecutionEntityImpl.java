@@ -265,7 +265,6 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         persistentState.put("identityLinkCount", identityLinkCount);
         persistentState.put("callbackId", callbackId);
         persistentState.put("callbackType", callbackType);
-        persistentState.put("processInstanceId", this.processInstanceId);
         return persistentState;
     }
 
