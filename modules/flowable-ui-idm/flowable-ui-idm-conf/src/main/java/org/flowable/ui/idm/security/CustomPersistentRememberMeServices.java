@@ -41,6 +41,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
+import com.google.common.net.HttpHeaders;
+
 /**
  * Custom implementation of Spring Security's RememberMeServices.
  * <p/>
@@ -226,7 +228,12 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
             cookie.setDomain(tokenDomain);
         }
 
-        cookie.setSecure(request.isSecure());
+        String xForwardedProtoHeader = request.getHeader(HttpHeaders.X_FORWARDED_PROTO);
+        if (xForwardedProtoHeader != null) {
+            cookie.setSecure(xForwardedProtoHeader.equals("https") || request.isSecure());
+        } else {
+            cookie.setSecure(request.isSecure());
+        }
 
         Method setHttpOnlyMethod = ReflectionUtils.findMethod(Cookie.class, "setHttpOnly", boolean.class);
         if (setHttpOnlyMethod != null) {
