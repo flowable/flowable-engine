@@ -39,7 +39,7 @@ public abstract class AbstractTestLifecycleListener implements PlanItemInstanceL
     }
 
     public void clear() {
-        this.events.clear();;
+        this.events.clear();
     }
 
 }
