@@ -22982,7 +22982,7 @@ var NgModelController = ['$scope', '$exceptionHandler', '$attrs', '$element', '$
     // the model although neither viewValue nor the model on the scope changed
     var modelValue = ctrl.$$rawModelValue;
 
-    // Check if the there's a parse error, so we don't unset it accidentially
+    // Check if there's a parse error, so we don't unset it accidentially
     var parserName = ctrl.$$parserName || 'parse';
     var parserValid = ctrl.$error[parserName] ? false : undefined;
 

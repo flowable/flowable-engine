@@ -9543,7 +9543,7 @@ ORYX.Core.Bounds = {
 		
 		var pointX, pointY, offset;
 
-		// Get the the two Points	
+		// Get the two Points
 		switch(arguments.length) {
 			case 1:
 				pointX = arguments[0].x;
@@ -13923,7 +13923,7 @@ ORYX.Core.Shape = {
 			
 		var pointAX, pointAY, pointBX, pointBY;
 		
-		// Get the the two Points	
+		// Get the two Points
 		switch(arguments.length) {
 			case 2:
 				pointAX = arguments[0].x;
@@ -15089,7 +15089,7 @@ ORYX.Core.Node = {
     _dockerChanged: function(){
 		var docker = this.dockers[0];
         
-        //set the bounds of the the association
+        //set the bounds of the association
         this.bounds.centerMoveTo(docker.bounds.center());
         
 		this._dockerUpdated = true;
@@ -15782,7 +15782,7 @@ ORYX.Core.Edge = {
 	                b.y = Math.max(b.y, center.y);
 	            }).bind(this));
 	            
-	            //set the bounds of the the association
+	            //set the bounds of the association
 	            this.bounds.set(Object.clone(a), Object.clone(b));
 	        }
 			
@@ -17873,7 +17873,7 @@ ORYX.Plugins.AbstractPlugin = Clazz.extend({
 					.findAll(function(r){ return r.dockers.length > 2 }.bind(this))
 					// For every edge, check second and one before last docker
 					// if there are horizontal/vertical on the same level
-					// and if so, align the the bounds 
+					// and if so, align the bounds
 					.each(function(edge){
 						if (edge.dockers.first().getDockedShape() === this.node){
 							var second = edge.dockers[1];

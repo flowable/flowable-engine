@@ -425,7 +425,7 @@ ORYX.Plugins.AbstractPlugin = Clazz.extend({
 					.findAll(function(r){ return r.dockers.length > 2 }.bind(this))
 					// For every edge, check second and one before last docker
 					// if there are horizontal/vertical on the same level
-					// and if so, align the the bounds 
+					// and if so, align the bounds
 					.each(function(edge){
 						if (edge.dockers.first().getDockedShape() === this.node){
 							var second = edge.dockers[1];

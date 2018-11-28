@@ -351,7 +351,7 @@ ORYX.Core.Node = {
     _dockerChanged: function(){
 		var docker = this.dockers[0];
         
-        //set the bounds of the the association
+        //set the bounds of the association
         this.bounds.centerMoveTo(docker.bounds.center());
         
 		this._dockerUpdated = true;

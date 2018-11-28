@@ -666,7 +666,7 @@ ORYX.Core.Shape = {
 			
 		var pointAX, pointAY, pointBX, pointBY;
 		
-		// Get the the two Points	
+		// Get the two Points
 		switch(arguments.length) {
 			case 2:
 				pointAX = arguments[0].x;

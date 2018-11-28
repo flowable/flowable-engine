@@ -20883,7 +20883,7 @@ module.filter('px', function() {
          * @methodOf ui.grid.importer.service:uiGridImporterService
          * @description Provides an internationalised user alert for the failure,
          * and logs a console message including diagnostic content.
-         * Optionally, if the the `gridOptions.importerErrorCallback` routine
+         * Optionally, if `gridOptions.importerErrorCallback` routine
          * is defined, then calls that instead, allowing user specified error routines
          * @param {Grid} grid the grid we're importing into
          * @param {array} headerRow the header row that we wish to match against

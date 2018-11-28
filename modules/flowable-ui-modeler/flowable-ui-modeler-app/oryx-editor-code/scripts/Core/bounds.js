@@ -376,7 +376,7 @@ ORYX.Core.Bounds = {
 		
 		var pointX, pointY, offset;
 
-		// Get the the two Points	
+		// Get the two Points
 		switch(arguments.length) {
 			case 1:
 				pointX = arguments[0].x;

@@ -315,7 +315,7 @@ angular.module('ui.jq',[]).
           }, 0, false);
         }
 
-        // If ui-refresh is used, re-fire the the method upon every change
+        // If ui-refresh is used, re-fire the method upon every change
         if (attrs.uiRefresh) {
           scope.$watch(attrs.uiRefresh, function() {
             callPlugin();
