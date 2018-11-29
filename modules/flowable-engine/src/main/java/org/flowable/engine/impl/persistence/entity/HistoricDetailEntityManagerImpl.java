@@ -16,6 +16,7 @@ package org.flowable.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.history.HistoricDetail;
@@ -54,13 +55,12 @@ public class HistoricDetailEntityManagerImpl extends AbstractEntityManager<Histo
         historicFormPropertyEntity.setPropertyValue(propertyValue);
         historicFormPropertyEntity.setTime(getClock().getCurrentTime());
 
-        List<ActivityInstanceEntity> activityInstances = getActivityInstanceEntityManager().findUnfinishedActivityInstancesByExecutionAndActivityId(execution.getId(), execution.getActivityId());
+        ActivityInstanceEntity activityInstance = getActivityInstanceEntityManager().findUnfinishedActivityInstance(execution);
         String activityInstanceId;
-        if (!activityInstances.isEmpty()) {
-            activityInstanceId = activityInstances.get(0).getId();
+        if (activityInstance != null) {
+            activityInstanceId = activityInstance.getId();
         } else {
-            getActivityInstanceEntityManager().recordActivityStart(execution);
-            activityInstanceId = getActivityInstanceEntityManager().findUnfinishedActivityInstancesByExecutionAndActivityId(execution.getId(), execution.getActivityId()).get(0).getId();
+            throw new FlowableException("ActivityInstance not found for execution "+execution.getId());
         }
         historicFormPropertyEntity.setActivityInstanceId(activityInstanceId);
 

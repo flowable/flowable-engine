@@ -215,6 +215,8 @@ public class ProcessInstanceHelper {
         ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager(commandContext).createChildExecution(processInstance);
         execution.setCurrentFlowElement(initialFlowElement);
 
+        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(execution);
+
         if (startProcessInstance) {
             startProcessInstance(processInstance, commandContext, variables);
         }

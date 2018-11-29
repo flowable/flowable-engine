@@ -26,11 +26,9 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
  */
 public interface ActivityInstanceEntityManager extends EntityManager<ActivityInstanceEntity> {
 
-    List<ActivityInstanceEntity> findUnfinishedActivityInstancesByExecutionAndActivityId(String executionId, String activityId);
+    ActivityInstanceEntity findUnfinishedActivityInstance(ExecutionEntity execution);
 
     List<ActivityInstanceEntity> findActivityInstancesByExecutionAndActivityId(String executionId, String activityId);
-
-    List<ActivityInstanceEntity> findUnfinishedActivityInstancesByProcessInstanceId(String processInstanceId);
 
     long findActivityInstanceCountByQueryCriteria(ActivityInstanceQueryImpl activityInstanceQuery);
 

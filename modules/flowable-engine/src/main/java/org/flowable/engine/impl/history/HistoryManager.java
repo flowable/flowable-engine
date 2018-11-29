@@ -122,7 +122,7 @@ public interface HistoryManager {
     /**
      * Record task name change, if audit history is enabled.
      */
-    void recordTaskInfoChange(TaskEntity taskEntity);
+    void recordTaskInfoChange(TaskEntity taskEntity, String activityInstanceId);
 
     /**
      * Record a variable has been created, if audit history is enabled.

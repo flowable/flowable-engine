@@ -466,7 +466,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertNotNull(processInstance);
 
-        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
+//        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 

@@ -53,19 +53,13 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
         return activityInstanceDataManager;
     }
 
-    @Override
-    public List<ActivityInstanceEntity> findUnfinishedActivityInstancesByExecutionAndActivityId(String executionId, String activityId) {
+    protected List<ActivityInstanceEntity> findUnfinishedActivityInstancesByExecutionAndActivityId(String executionId, String activityId) {
         return activityInstanceDataManager.findUnfinishedActivityInstancesByExecutionAndActivityId(executionId, activityId);
     }
     
     @Override
     public List<ActivityInstanceEntity> findActivityInstancesByExecutionAndActivityId(String executionId, String activityId) {
         return activityInstanceDataManager.findActivityInstancesByExecutionIdAndActivityId(executionId, activityId);
-    }
-
-    @Override
-    public List<ActivityInstanceEntity> findUnfinishedActivityInstancesByProcessInstanceId(String processInstanceId) {
-        return activityInstanceDataManager.findUnfinishedActivityInstancesByProcessInstanceId(processInstanceId);
     }
 
     @Override
@@ -113,7 +107,7 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
 
     @Override
     public void recordSubProcessInstanceStart(ExecutionEntity parentExecution, ExecutionEntity subProcessInstance) {
-        ActivityInstanceEntity activityInstance = findActivityInstance(parentExecution, true);
+        ActivityInstanceEntity activityInstance = findUnfinishedActivityInstance(parentExecution);
         if (activityInstance != null) {
             activityInstance.setCalledProcessInstanceId(subProcessInstance.getProcessInstanceId());
             HistoricActivityInstanceEntity historicActivityInstanceEntity = getHistoricActivityInstanceEntityManager().findById(activityInstance.getId());
@@ -131,7 +125,7 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
 
     protected void recordActivityTaskCreated(TaskEntity task, ExecutionEntity execution) {
         if (execution != null) {
-            ActivityInstanceEntity activityInstance = findActivityInstance(execution, true);
+            ActivityInstanceEntity activityInstance = findUnfinishedActivityInstance(execution);
             if (activityInstance != null) {
                 activityInstance.setTaskId(task.getId());
                 getHistoryManager().updateHistoricActivityInstance(activityInstance);
@@ -141,8 +135,8 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
 
     @Override
     public void recordTaskInfoChange(TaskEntity taskEntity) {
-        recordActivityTaskInfoChange(taskEntity);
-        getHistoryManager().recordTaskInfoChange(taskEntity);
+        ActivityInstanceEntity activityInstanceEntity = recordActivityTaskInfoChange(taskEntity);
+        getHistoryManager().recordTaskInfoChange(taskEntity, activityInstanceEntity != null ? activityInstanceEntity.getId() : null);
     }
 
     @Override
@@ -162,12 +156,12 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
         }
     }
 
-    protected void recordActivityTaskInfoChange(TaskEntity taskEntity) {
-        ActivityInstanceEntity activityInstance;
+    protected ActivityInstanceEntity recordActivityTaskInfoChange(TaskEntity taskEntity) {
+        ActivityInstanceEntity activityInstance = null;
         ExecutionEntity executionEntity = getExecutionEntityManager().findById(taskEntity.getExecutionId());
         if (executionEntity != null) {
-            activityInstance = findActivityInstance(executionEntity, true);
             if (!Objects.equals(getOriginalAssignee(taskEntity), taskEntity.getAssignee())) {
+                activityInstance = findUnfinishedActivityInstance(executionEntity);
                 if (activityInstance == null) {
                     HistoricActivityInstanceEntity historicActivityInstance = getHistoryManager().findHistoricActivityInstance(executionEntity, true);
                     if (historicActivityInstance != null) {
@@ -180,6 +174,8 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
                 }
             }
         }
+
+        return activityInstance;
     }
 
     protected Object getOriginalAssignee(TaskEntity taskEntity) {
@@ -189,7 +185,7 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
     protected ActivityInstance recordRuntimeActivityStart(ExecutionEntity executionEntity) {
         ActivityInstance activityInstance = null;
         if (executionEntity.getActivityId() != null && executionEntity.getCurrentFlowElement() != null) {
-            activityInstance = findActivityInstance(executionEntity,  true);
+            activityInstance = findUnfinishedActivityInstance(executionEntity);
             if (activityInstance == null) {
                 return createActivityInstance(executionEntity);
             }
@@ -216,7 +212,7 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
     }
 
     protected ActivityInstance recordActivityInstanceEnd(ExecutionEntity executionEntity, String deleteReason) {
-        ActivityInstanceEntity activityInstance = findActivityInstance(executionEntity, true);
+        ActivityInstanceEntity activityInstance = findUnfinishedActivityInstance(executionEntity);
         if (activityInstance != null) {
             activityInstance.markEnded(deleteReason);
         } else {
@@ -239,7 +235,8 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
         this.activityInstanceDataManager = activityInstanceDataManager;
     }
 
-    public ActivityInstanceEntity findActivityInstance(ExecutionEntity execution, boolean endTimeMustBeNull) {
+    @Override
+    public ActivityInstanceEntity findUnfinishedActivityInstance(ExecutionEntity execution) {
         String activityId = getActivityIdForExecution(execution);
         if (activityId != null) {
             // No use looking for the ActivityInstance when no activityId is provided.
@@ -250,7 +247,7 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
             String executionId = execution.getId();
 
             // Check the cache
-            ActivityInstanceEntity activityInstanceFromCache = getActivityInstanceFromCache(executionId, activityId, endTimeMustBeNull);
+            ActivityInstanceEntity activityInstanceFromCache = getActivityInstanceFromCache(executionId, activityId, true);
             if (activityInstanceFromCache != null) {
                 return activityInstanceFromCache;
             }
@@ -260,14 +257,11 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
             if (!execution.isInserted() && !execution.isProcessInstanceType()) {
 
                 // Check the database
-                List<ActivityInstanceEntity> activityInstances = getActivityInstanceEntityManager()
-                    .findUnfinishedActivityInstancesByExecutionAndActivityId(executionId, activityId);
-                if (endTimeMustBeNull) {
-                    // cache can be updated before DB
-                    ActivityInstanceEntity activityFromCache = getActivityInstanceFromCache(executionId, activityId, false);
-                    if (activityFromCache != null && activityFromCache.getEndTime() != null) {
-                        activityInstances.remove(activityFromCache);
-                    }
+                List<ActivityInstanceEntity> activityInstances = findUnfinishedActivityInstancesByExecutionAndActivityId(executionId, activityId);
+                // cache can be updated before DB
+                ActivityInstanceEntity activityFromCache = getActivityInstanceFromCache(executionId, activityId, false);
+                if (activityFromCache != null && activityFromCache.getEndTime() != null) {
+                    activityInstances.remove(activityFromCache);
                 }
                 if (activityInstances.size() > 0) {
                     return activityInstances.get(0);
@@ -349,12 +343,17 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
 
         activityInstanceEntity.setProcessDefinitionId(historicActivityInstance.getProcessDefinitionId());
         activityInstanceEntity.setProcessInstanceId(historicActivityInstance.getProcessInstanceId());
+        activityInstanceEntity.setCalledProcessInstanceId(historicActivityInstance.getCalledProcessInstanceId());
         activityInstanceEntity.setExecutionId(historicActivityInstance.getExecutionId());
+        activityInstanceEntity.setTaskId(historicActivityInstance.getTaskId());
         activityInstanceEntity.setActivityId(historicActivityInstance.getActivityId());
         activityInstanceEntity.setActivityName(historicActivityInstance.getActivityName());
         activityInstanceEntity.setActivityType(historicActivityInstance.getActivityType());
         activityInstanceEntity.setAssignee(historicActivityInstance.getAssignee());
         activityInstanceEntity.setStartTime(historicActivityInstance.getStartTime());
+        activityInstanceEntity.setEndTime(historicActivityInstance.getEndTime());
+        activityInstanceEntity.setDeleteReason(historicActivityInstance.getDeleteReason());
+        activityInstanceEntity.setDurationInMillis(historicActivityInstance.getDurationInMillis());
         activityInstanceEntity.setTenantId(historicActivityInstance.getTenantId());
 
         insert(activityInstanceEntity);
