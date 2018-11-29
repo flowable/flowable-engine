@@ -130,80 +130,84 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
     }
 
     @Override
-    public ProcessInstanceMigrationValidationResult validateMigrateProcessInstancesOfProcessDefinition(String procDefKey, int procDefVer, String procDefTenantId, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
+    public List<ProcessInstanceMigrationValidationResult> validateMigrateProcessInstancesOfProcessDefinition(String procDefKey, int procDefVer, String procDefTenantId, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
         // Must first resolve the Id of the processDefinition
         ProcessDefinition processDefinition = resolveProcessDefinition(procDefKey, procDefVer, procDefTenantId, commandContext);
         if (processDefinition == null) {
             ProcessInstanceMigrationValidationResult validationResult = new ProcessInstanceMigrationValidationResult();
             validationResult.addValidationMessage("Cannot find the process definition to migrate from");
-            return validationResult;
+            return Collections.singletonList(validationResult);
         } else {
             return validateMigrateProcessInstancesOfProcessDefinition(processDefinition.getId(), document, commandContext);
         }
     }
 
     @Override
-    public ProcessInstanceMigrationValidationResult validateMigrateProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
-        ProcessInstanceMigrationValidationResult validationResult = new ProcessInstanceMigrationValidationResult();
+    public List<ProcessInstanceMigrationValidationResult> validateMigrateProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
+        List<ProcessInstanceMigrationValidationResult> validationResults;
         //Check that the processDefinition exists and get its associated BpmnModel
         ProcessDefinition processDefinition = resolveProcessDefinition(document, commandContext);
         if (processDefinition == null) {
-            validationResult.addValidationMessage("Cannot find the process definition to migrate to " + printProcessDefinitionIdentifierMessage(document));
+            validationResults = Collections.singletonList(new ProcessInstanceMigrationValidationResult()
+                .addValidationMessage("Cannot find the process definition to migrate to " + printProcessDefinitionIdentifierMessage(document)));
         } else {
             BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinition.getId());
             if (bpmnModel == null) {
-                validationResult.addValidationMessage("Cannot find the Bpmn model of the process definition to migrate to, with " + printProcessDefinitionIdentifierMessage(document));
+                validationResults = Collections.singletonList(new ProcessInstanceMigrationValidationResult()
+                    .addValidationMessage("Cannot find the Bpmn model of the process definition to migrate to, with " + printProcessDefinitionIdentifierMessage(document)));
             } else {
                 ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
                 List<ProcessInstance> processInstances = executionEntityManager.findProcessInstanceByQueryCriteria(new ProcessInstanceQueryImpl().processDefinitionId(processDefinitionId));
 
+                validationResults = new ArrayList<>();
                 for (ProcessInstance processInstance : processInstances) {
-                    doValidateProcessInstanceMigration(processInstance.getId(), processDefinition.getTenantId(), bpmnModel, document, validationResult, commandContext);
+                    validationResults.add(doValidateProcessInstanceMigration(processInstance.getId(), processDefinition.getTenantId(), bpmnModel, document, commandContext));
                 }
             }
         }
-        return validationResult;
+        return validationResults;
     }
 
     @Override
     public ProcessInstanceMigrationValidationResult validateMigrateProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
-        ProcessInstanceMigrationValidationResult validationResult = new ProcessInstanceMigrationValidationResult();
+        ProcessInstanceMigrationValidationResult validationResult;
         //Check that the processDefinition exists and get its associated BpmnModel
         ProcessDefinition processDefinition = resolveProcessDefinition(document, commandContext);
         if (processDefinition == null) {
-            validationResult.addValidationMessage(("Cannot find the process definition to migrate to, with " + printProcessDefinitionIdentifierMessage(document)));
+            validationResult = new ProcessInstanceMigrationValidationResult()
+                .addValidationMessage(("Cannot find the process definition to migrate to, with " + printProcessDefinitionIdentifierMessage(document)));
         } else {
             BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinition.getId());
             if (bpmnModel == null) {
-                validationResult.addValidationMessage("Cannot find the Bpmn model of the process definition to migrate to, with " + printProcessDefinitionIdentifierMessage(document));
+                validationResult = new ProcessInstanceMigrationValidationResult()
+                    .addValidationMessage("Cannot find the Bpmn model of the process definition to migrate to, with " + printProcessDefinitionIdentifierMessage(document));
             } else {
-                doValidateProcessInstanceMigration(processInstanceId, processDefinition.getTenantId(), bpmnModel, document, validationResult, commandContext);
+                validationResult = doValidateProcessInstanceMigration(processInstanceId, processDefinition.getTenantId(), bpmnModel, document, commandContext);
             }
         }
         return validationResult;
     }
 
-    protected void doValidateProcessInstanceMigration(String processInstanceId, String tenantId, BpmnModel newModel, ProcessInstanceMigrationDocument document, ProcessInstanceMigrationValidationResult validationResult, CommandContext commandContext) {
-
+    protected ProcessInstanceMigrationValidationResult doValidateProcessInstanceMigration(String processInstanceId, String tenantId, BpmnModel newModel, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+        ProcessInstanceMigrationValidationResult validationResult = new ProcessInstanceMigrationValidationResult().setProcessInstanceId(processInstanceId);
 
         //Check that the processInstance exists
         ExecutionEntity processInstanceExecution = executionEntityManager.findById(processInstanceId);
         if (processInstanceExecution == null) {
-            validationResult.addValidationMessage("Cannot find process instance with id:'" + processInstanceId + "'");
-            return;
+            return validationResult.addValidationMessage("Cannot find process instance with id:'" + processInstanceId + "'");
         }
 
         //Check processExecution and processDefinition tenant
         if (!isSameTenant(processInstanceExecution.getTenantId(), tenantId)) {
-            validationResult.addValidationMessage("Tenant mismatch between Process Instance ('" + processInstanceExecution.getTenantId() + "') and Process Definition ('" + tenantId + "') to migrate to");
-            return;
+            return validationResult.addValidationMessage("Tenant mismatch between Process Instance ('" + processInstanceExecution.getTenantId() + "') and Process Definition ('" + tenantId + "') to migrate to");
         }
 
-        doValidateActivityMappings(processInstanceId, document.getActivityMigrationMappings(), newModel, document, validationResult, commandContext);
+        List<String> validationMessages = doValidateActivityMappings(processInstanceId, document.getActivityMigrationMappings(), newModel, document, commandContext);
+        return validationResult.addValidationMessages(validationMessages);
     }
 
-    protected void doValidateActivityMappings(String processInstanceId, List<ActivityMigrationMapping> activityMappings, BpmnModel newModel, ProcessInstanceMigrationDocument document, ProcessInstanceMigrationValidationResult validationResult, CommandContext commandContext) {
+    protected List<String> doValidateActivityMappings(String processInstanceId, List<ActivityMigrationMapping> activityMappings, BpmnModel newModel, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
 
         ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager();
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
@@ -227,6 +231,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
             .filter(isBoundaryEventExecution.negate())
             .collect(Collectors.toList());
 
+        List<String> validationMessages = new ArrayList<>();
         for (ExecutionEntity execution : mappableMainProcessExecutions) {
             String executionActivityId = execution.getCurrentActivityId();
             FlowElement executionFlowElement = execution.getCurrentFlowElement();
@@ -248,35 +253,35 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                         if (!childrenFullyMapped) {
                             FlowElement newModelFlowElement = newModel.getFlowElement(executionActivityId);
                             if (newModelFlowElement == null) {
-                                validationResult.addValidationMessage(String.format("Incomplete migration mapping for call activity. The call activity '%s' does not exist in the new model. "
+                                validationMessages.add(String.format("Incomplete migration mapping for call activity. The call activity '%s' does not exist in the new model. "
                                     + "Running subProcess activities '%s' should also be mapped for migration (or the call activity itself)", executionActivityId, childSubProcessExecutionActivityIds));
                             } else if (newModelFlowElement instanceof CallActivity) {
                                 if (!referToSameCalledElement((CallActivity) executionFlowElement, (CallActivity) newModelFlowElement)) {
-                                    validationResult.addValidationMessage(String.format("Incomplete migration mapping for call activity. The call activity '%s' called element is different in the new model. "
+                                    validationMessages.add(String.format("Incomplete migration mapping for call activity. The call activity '%s' called element is different in the new model. "
                                         + "Running subProcess activities '%s' should also be mapped for migration (or the call activity itself)", executionActivityId, childSubProcessExecutionActivityIds));
                                 }
                                 if (((CallActivity) executionFlowElement).hasMultiInstanceLoopCharacteristics() ^ ((CallActivity) newModelFlowElement).hasMultiInstanceLoopCharacteristics()) {
-                                    validationResult.addValidationMessage(String.format("Incomplete migration mapping for call activity. The Call activity '%s' loop characteristics is different in new model. "
+                                    validationMessages.add(String.format("Incomplete migration mapping for call activity. The Call activity '%s' loop characteristics is different in new model. "
                                         + "Running subProcess activities '%s' should also be mapped for migration (or the call activity itself)", executionActivityId, childSubProcessExecutionActivityIds));
                                 }
                             } else {
-                                validationResult.addValidationMessage(String.format("Incomplete migration mapping for call activity. Activity '%s' is not a Call Activity in the new model."
+                                validationMessages.add(String.format("Incomplete migration mapping for call activity. Activity '%s' is not a Call Activity in the new model."
                                     + "Running subProcess activities '%s' should also be mapped for migration (or the call activity itself)", executionActivityId, childSubProcessExecutionActivityIds));
                             }
                         }
                     } else {
                         FlowElement newModelFlowElement = newModel.getFlowElement(executionActivityId);
                         if (newModelFlowElement == null) {
-                            validationResult.addValidationMessage("Call activity '" + executionActivityId + "' does not exist in the new model. It must be mapped explicitly for migration (or all its child activities)");
+                            validationMessages.add("Call activity '" + executionActivityId + "' does not exist in the new model. It must be mapped explicitly for migration (or all its child activities)");
                         } else if (newModelFlowElement instanceof CallActivity) {
                             if (!referToSameCalledElement((CallActivity) executionFlowElement, (CallActivity) newModelFlowElement)) {
-                                validationResult.addValidationMessage("Call activity '" + executionActivityId + "' has a different called element in the new model. It must be mapped explicitly for migration (or all its child activities)");
+                                validationMessages.add("Call activity '" + executionActivityId + "' has a different called element in the new model. It must be mapped explicitly for migration (or all its child activities)");
                             }
                             if (((CallActivity) executionFlowElement).hasMultiInstanceLoopCharacteristics() ^ ((CallActivity) newModelFlowElement).hasMultiInstanceLoopCharacteristics()) {
-                                validationResult.addValidationMessage("Call activity '" + executionActivityId + "' has a different loop characteristics is different in new model. It must be mapped explicitly for migration (or all its child activities)");
+                                validationMessages.add("Call activity '" + executionActivityId + "' has a different loop characteristics is different in new model. It must be mapped explicitly for migration (or all its child activities)");
                             }
                         } else {
-                            validationResult.addValidationMessage("Call activity '" + executionActivityId + "' is not a Call Activity in the new model. It must be mapped explicitly for migration (or all its child activities)");
+                            validationMessages.add("Call activity '" + executionActivityId + "' is not a Call Activity in the new model. It must be mapped explicitly for migration (or all its child activities)");
                         }
                     }
                     continue;
@@ -288,7 +293,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                     FlowElement currentModelFlowElement = currentModel.getFlowElement(executionActivityId);
                     Optional<String> flowElementMultiInstanceParentId = getFlowElementMultiInstanceParentId(currentModelFlowElement);
                     if (!flowElementMultiInstanceParentId.isPresent() || !mainProcessActivityMappingByFromActivityId.containsKey(flowElementMultiInstanceParentId.get())) {
-                        validationResult.addValidationMessage("Process instance (id:'" + processInstanceId + "') has a running Activity (id:'" + executionActivityId + "') that is not mapped for migration (Or its Multi-Instance parent)");
+                        validationMessages.add("Process instance (id:'" + processInstanceId + "') has a running Activity (id:'" + executionActivityId + "') that is not mapped for migration (Or its Multi-Instance parent)");
                         continue;
                     }
                 }
@@ -315,11 +320,11 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                             ProcessDefinition mappingProcDef = resolveProcessDefinition(procDefKey, mapping.getCallActivityProcessDefinitionVersion(), document.getMigrateToProcessDefinitionTenantId(), commandContext);
                             mappingModel = ProcessDefinitionUtil.getBpmnModel(mappingProcDef.getId());
                         } catch (FlowableException e) {
-                            validationResult.addValidationMessage(e.getMessage() + " for call activity element with id '" + mapping.getToCallActivityId() + "' in the process definition with id '" + mappingModel.getMainProcess().getId() + "'");
+                            validationMessages.add(e.getMessage() + " for call activity element with id '" + mapping.getToCallActivityId() + "' in the process definition with id '" + mappingModel.getMainProcess().getId() + "'");
                             continue;
                         }
                     } else {
-                        validationResult.addValidationMessage("There's no call activity element with id '" + mapping.getToCallActivityId() + "' in the process definition with id '" + mappingModel.getMainProcess().getId() + "'");
+                        validationMessages.add("There's no call activity element with id '" + mapping.getToCallActivityId() + "' in the process definition with id '" + mappingModel.getMainProcess().getId() + "'");
                         continue;
                     }
                 }
@@ -333,19 +338,20 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                 List<String> toActivityIds = mapping.getToActivityIds();
                 for (String targetActivityId : toActivityIds) {
                     if (!isActivityIdInProcessDefinitionModel(targetActivityId, mappingModel)) {
-                        validationResult.addValidationMessage("Invalid mapping for '" + execution.getCurrentActivityId() + "' to '" + targetActivityId + "', cannot be found in the process definition with id '" + mappingModel.getMainProcess().getId() + "'");
+                        validationMessages.add("Invalid mapping for '" + execution.getCurrentActivityId() + "' to '" + targetActivityId + "', cannot be found in the process definition with id '" + mappingModel.getMainProcess().getId() + "'");
                         continue;
                     }
                     //We cannot move an activity inside a MultiInstance container
                     FlowElement targetFlowElement = mappingModel.getFlowElement(targetActivityId);
                     Optional<String> targetFlowElementMultiInstanceParentId = getFlowElementMultiInstanceParentId(targetFlowElement);
                     if (targetFlowElementMultiInstanceParentId.isPresent()) {
-                        validationResult.addValidationMessage("Invalid mapping for '" + execution.getCurrentActivityId() + "' to '" + targetActivityId + "', cannot migrate arbitrarily inside a Multi Instance container '" + targetFlowElementMultiInstanceParentId.get() + "' inside process definition with id '" + mappingModel.getMainProcess().getId() + "'");
+                        validationMessages.add("Invalid mapping for '" + execution.getCurrentActivityId() + "' to '" + targetActivityId + "', cannot migrate arbitrarily inside a Multi Instance container '" + targetFlowElementMultiInstanceParentId.get() + "' inside process definition with id '" + mappingModel.getMainProcess().getId() + "'");
                         continue;
                     }
                 }
             }
         }
+        return validationMessages;
     }
 
     @Override

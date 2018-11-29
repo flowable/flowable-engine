@@ -13,6 +13,8 @@
 
 package org.flowable.engine.migration;
 
+import java.util.List;
+
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntity;
@@ -22,9 +24,9 @@ import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntity;
  */
 public interface ProcessInstanceMigrationManager {
 
-    ProcessInstanceMigrationValidationResult validateMigrateProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenant, ProcessInstanceMigrationDocument processInstanceMigrationDocument, CommandContext commandContext);
+    List<ProcessInstanceMigrationValidationResult> validateMigrateProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenant, ProcessInstanceMigrationDocument processInstanceMigrationDocument, CommandContext commandContext);
 
-    ProcessInstanceMigrationValidationResult validateMigrateProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument, CommandContext commandContext);
+    List<ProcessInstanceMigrationValidationResult> validateMigrateProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument, CommandContext commandContext);
 
     ProcessInstanceMigrationValidationResult validateMigrateProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument, CommandContext commandContext);
 

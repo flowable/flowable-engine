@@ -52,16 +52,17 @@ public class ProcessInstanceMigrationServiceImpl extends CommonEngineServiceImpl
 
     @Override
     public ProcessInstanceMigrationValidationResult validateMigrationForProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
-        return commandExecutor.execute(ProcessInstanceMigrationValidationCmd.forProcessInstance(processInstanceId, processInstanceMigrationDocument));
+        List<ProcessInstanceMigrationValidationResult> results = commandExecutor.execute(ProcessInstanceMigrationValidationCmd.forProcessInstance(processInstanceId, processInstanceMigrationDocument));
+        return results.stream().findFirst().orElse(null);
     }
 
     @Override
-    public ProcessInstanceMigrationValidationResult validateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
+    public List<ProcessInstanceMigrationValidationResult> validateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
         return commandExecutor.execute(ProcessInstanceMigrationValidationCmd.forProcessDefinition(processDefinitionId, processInstanceMigrationDocument));
     }
 
     @Override
-    public ProcessInstanceMigrationValidationResult validateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
+    public List<ProcessInstanceMigrationValidationResult> validateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
         return commandExecutor.execute(ProcessInstanceMigrationValidationCmd.forProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, processInstanceMigrationDocument));
     }
 
@@ -76,7 +77,7 @@ public class ProcessInstanceMigrationServiceImpl extends CommonEngineServiceImpl
     }
 
     @Override
-    public ProcessInstanceMigrationValidationResult getResultsOfBatchProcessInstanceMigrationValidation(String migrationBatchId) {
+    public List<ProcessInstanceMigrationValidationResult> getResultsOfBatchProcessInstanceMigrationValidation(String migrationBatchId) {
         return commandExecutor.execute(new GetProcessInstanceMigrationBatchValidationResultCmd(migrationBatchId));
     }
 

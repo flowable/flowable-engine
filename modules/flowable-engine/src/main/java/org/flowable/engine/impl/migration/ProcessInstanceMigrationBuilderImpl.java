@@ -13,6 +13,7 @@
 
 package org.flowable.engine.impl.migration;
 
+import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -109,7 +110,7 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
     }
 
     @Override
-    public ProcessInstanceMigrationValidationResult validateMigrationOfProcessInstances(String processDefinitionId) {
+    public List<ProcessInstanceMigrationValidationResult> validateMigrationOfProcessInstances(String processDefinitionId) {
         ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
         return getProcessInstanceMigrationService().validateMigrationForProcessInstancesOfProcessDefinition(processDefinitionId, document);
     }
@@ -133,7 +134,7 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
     }
 
     @Override
-    public ProcessInstanceMigrationValidationResult validateMigrationOfProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId) {
+    public List<ProcessInstanceMigrationValidationResult> validateMigrationOfProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId) {
         ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
         return getProcessInstanceMigrationService().validateMigrationForProcessInstancesOfProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, document);
     }

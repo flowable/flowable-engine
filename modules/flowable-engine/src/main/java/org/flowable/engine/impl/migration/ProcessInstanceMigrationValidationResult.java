@@ -21,6 +21,7 @@ import java.util.List;
  */
 public class ProcessInstanceMigrationValidationResult {
 
+    protected String processInstanceId;
     protected List<String> validationMessages = new ArrayList<>();
 
     public ProcessInstanceMigrationValidationResult addValidationMessage(String message) {
@@ -28,11 +29,20 @@ public class ProcessInstanceMigrationValidationResult {
         return this;
     }
 
-    public ProcessInstanceMigrationValidationResult addValidationResult(ProcessInstanceMigrationValidationResult result) {
-        if (result != null) {
-            validationMessages.addAll(result.validationMessages);
+    public ProcessInstanceMigrationValidationResult addValidationMessages(List<String> messages) {
+        if (messages != null) {
+            validationMessages.addAll(messages);
         }
         return this;
+    }
+
+    public ProcessInstanceMigrationValidationResult setProcessInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
+        return this;
+    }
+
+    public String getProcessInstanceId() {
+        return processInstanceId;
     }
 
     public boolean hasErrors() {

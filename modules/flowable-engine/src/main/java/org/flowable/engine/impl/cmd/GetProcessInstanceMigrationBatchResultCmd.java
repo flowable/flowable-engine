@@ -42,6 +42,9 @@ public class GetProcessInstanceMigrationBatchResultCmd implements Command<List<S
 
         List<String> jsonResults = new ArrayList<>();
 
+
+
+        //TODO WIP - Allow partial results?
         if (batch.isCompleted()) {
             if (batch.getResult() != null) {
                 jsonResults.add(batch.getResult());

@@ -16,6 +16,7 @@ package org.flowable.engine.test.api.runtime.migration;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -141,8 +142,8 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         //Confirm the batch is not finished
         ProcessMigrationBatch validationBatch = processInstanceMigrationService.getProcessMigrationBatchById(validationBatchId);
         assertThat(validationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(false);
-        ProcessInstanceMigrationValidationResult validationResult = processInstanceMigrationService.getResultsOfBatchProcessInstanceMigrationValidation(validationBatchId);
-        assertThat(validationResult).isNull();
+        List<ProcessInstanceMigrationValidationResult> validationResults = processInstanceMigrationService.getResultsOfBatchProcessInstanceMigrationValidation(validationBatchId);
+        assertThat(validationResults).isNull();
 
         //Start async executor to process the batches
         executeJobExecutorForTime(1000L, 500L);
@@ -151,11 +152,14 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         //Confirm the batches have ended
         validationBatch = processInstanceMigrationService.getProcessMigrationBatchById(validationBatchId);
         assertThat(validationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(true);
-        validationResult = processInstanceMigrationService.getResultsOfBatchProcessInstanceMigrationValidation(validationBatchId);
-        assertThat(validationResult).isNotNull();
-        assertThat(validationResult.getValidationMessages())
-            .containsExactlyInAnyOrder("[Process instance (id:'" + processInstance1.getId() + "') has a running Activity (id:'userTask2Id') that is not mapped for migration (Or its Multi-Instance parent)]",
-                "[Process instance (id:'" + processInstance2.getId() + "') has a running Activity (id:'userTask2Id') that is not mapped for migration (Or its Multi-Instance parent)]");
+        validationResults = processInstanceMigrationService.getResultsOfBatchProcessInstanceMigrationValidation(validationBatchId);
+        assertThat(validationResults).isNotNull();
+        assertThat(validationResults).size().isEqualTo(2);
+        assertThat(validationResults).extracting(ProcessInstanceMigrationValidationResult::getProcessInstanceId)
+            .containsExactlyInAnyOrder(processInstance1.getId(), processInstance2.getId());
+        assertThat(validationResults).<List<String>>extracting(ProcessInstanceMigrationValidationResult::getValidationMessages)
+            .containsExactlyInAnyOrder(Collections.singletonList("Process instance (id:'" + processInstance1.getId() + "') has a running Activity (id:'userTask2Id') that is not mapped for migration (Or its Multi-Instance parent)"),
+                Collections.singletonList("Process instance (id:'" + processInstance2.getId() + "') has a running Activity (id:'userTask2Id') that is not mapped for migration (Or its Multi-Instance parent)"));
 
         //Try batch migrate the process instances
         String migrationBatchId = processInstanceMigrationBuilder.batchMigrateProcessInstances(version1ProcessDef.getId());
@@ -252,8 +256,8 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         //Confirm the batch is not finished
         ProcessMigrationBatch validationBatch = processInstanceMigrationService.getProcessMigrationBatchById(validationBatchId);
         assertThat(validationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(false);
-        ProcessInstanceMigrationValidationResult validationResult = processInstanceMigrationService.getResultsOfBatchProcessInstanceMigrationValidation(validationBatchId);
-        assertThat(validationResult).isNull();
+        List<ProcessInstanceMigrationValidationResult> validationResults = processInstanceMigrationService.getResultsOfBatchProcessInstanceMigrationValidation(validationBatchId);
+        assertThat(validationResults).isNull();
 
         //Start async executor to process the batches
         executeJobExecutorForTime(1000L, 500L);
@@ -262,10 +266,13 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         //Confirm the batches have ended
         validationBatch = processInstanceMigrationService.getProcessMigrationBatchById(validationBatchId);
         assertThat(validationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(true);
-        validationResult = processInstanceMigrationService.getResultsOfBatchProcessInstanceMigrationValidation(validationBatchId);
-        assertThat(validationResult).isNotNull();
-        assertThat(validationResult.getValidationMessages())
-            .containsExactlyInAnyOrder("[Process instance (id:'" + processInstance1.getId() + "') has a running Activity (id:'userTask2Id') that is not mapped for migration (Or its Multi-Instance parent)]");
+        validationResults = processInstanceMigrationService.getResultsOfBatchProcessInstanceMigrationValidation(validationBatchId);
+        assertThat(validationResults).isNotNull();
+        assertThat(validationResults).size().isEqualTo(1);
+        assertThat(validationResults).extracting(ProcessInstanceMigrationValidationResult::getProcessInstanceId)
+            .containsExactlyInAnyOrder(processInstance1.getId());
+        assertThat(validationResults).extracting(ProcessInstanceMigrationValidationResult::getValidationMessages)
+            .containsExactlyInAnyOrder(Collections.singletonList("Process instance (id:'" + processInstance1.getId() + "') has a running Activity (id:'userTask2Id') that is not mapped for migration (Or its Multi-Instance parent)"));
 
         //Migrate the process
         //Try batch migrate the process instances
@@ -322,11 +329,11 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
     }
 
     private Extractor<JsonNode, String> jsonValueExtractor(String property) {
-        return jsonNode -> jsonNode.get(property) == null ? null : jsonNode.get(property).asText();
+        return jsonValueExtractor(property, null);
     }
 
     private Extractor<JsonNode, String> jsonValueExtractor(String property, String defaultValue) {
-        return jsonNode -> jsonNode.get(property) == null ? defaultValue : jsonNode.get(property).asText(defaultValue);
+        return jsonNode -> jsonNode.has(property) ? jsonNode.get(property).asText() : defaultValue;
     }
 
     private JsonNode readTreeNoException(String json) {

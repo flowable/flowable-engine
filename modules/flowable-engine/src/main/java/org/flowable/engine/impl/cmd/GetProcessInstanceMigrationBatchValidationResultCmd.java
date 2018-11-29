@@ -13,18 +13,27 @@
 
 package org.flowable.engine.impl.cmd;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.jobexecutor.ProcessInstanceMigrationValidationJobHandler;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessMigrationBatch;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author Dennis Federico
  */
-public class GetProcessInstanceMigrationBatchValidationResultCmd implements Command<ProcessInstanceMigrationValidationResult> {
+public class GetProcessInstanceMigrationBatchValidationResultCmd implements Command<List<ProcessInstanceMigrationValidationResult>> {
 
     protected String batchId;
 
@@ -33,16 +42,18 @@ public class GetProcessInstanceMigrationBatchValidationResultCmd implements Comm
     }
 
     @Override
-    public ProcessInstanceMigrationValidationResult execute(CommandContext commandContext) {
+    public List<ProcessInstanceMigrationValidationResult> execute(CommandContext commandContext) {
 
         ProcessMigrationBatchEntityManager batchManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessMigrationBatchEntityManager();
         ProcessMigrationBatchEntity batch = batchManager.findById(batchId);
 
-        ProcessInstanceMigrationValidationResult result = new ProcessInstanceMigrationValidationResult();
+        List<ProcessInstanceMigrationValidationResult> result = new ArrayList<>();
 
+        //TODO WIP - Allow partial results?
         if (batch.isCompleted()) {
+            //If batch parent has a result, it doesn't not have children
             if (batch.getResult() != null) {
-                result.addValidationMessage(batch.getResult());
+                result.add(getResultFromJsonString(batch.getResult(), commandContext));
             }
 
             if (batch.getBatchChildren() != null) {
@@ -50,11 +61,40 @@ public class GetProcessInstanceMigrationBatchValidationResultCmd implements Comm
                     .stream()
                     .filter(child -> child.getResult() != null)
                     .map(ProcessMigrationBatch::getResult)
-                    .forEach(result::addValidationMessage);
+                    .map(jsonString -> getResultFromJsonString(jsonString, commandContext))
+                    .forEach(result::add);
             }
             return result;
         }
         return null;
+    }
+
+    protected ProcessInstanceMigrationValidationResult getResultFromJsonString(String result, CommandContext commandContext) {
+        ObjectMapper objectMapper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getObjectMapper();
+        try {
+            JsonNode jsonNode = objectMapper.readTree(result);
+            String processInstanceId = null;
+            List<String> messages = null;
+            if (jsonNode != null) {
+                if (jsonNode.has(ProcessInstanceMigrationValidationJobHandler.RESULT_LABEL_PROCESS_INSTANCE_ID)) {
+                    processInstanceId = jsonNode.get(ProcessInstanceMigrationValidationJobHandler.RESULT_LABEL_PROCESS_INSTANCE_ID).asText();
+                }
+                if (jsonNode.has(ProcessInstanceMigrationValidationJobHandler.RESULT_LABEL_VALIDATION_MESSAGES)) {
+                    JsonNode arrayNode = jsonNode.get(ProcessInstanceMigrationValidationJobHandler.RESULT_LABEL_VALIDATION_MESSAGES);
+                    messages = objectMapper.convertValue(arrayNode, new TypeReference<List<String>>() {
+
+                    });
+                }
+            }
+            if (processInstanceId != null || messages != null) {
+                return new ProcessInstanceMigrationValidationResult()
+                    .setProcessInstanceId(processInstanceId)
+                    .addValidationMessages(messages);
+            }
+            return null;
+        } catch (IOException e) {
+            return null;
+        }
     }
 
 }

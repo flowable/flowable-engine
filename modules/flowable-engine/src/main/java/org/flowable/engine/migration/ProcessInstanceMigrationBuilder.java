@@ -13,6 +13,7 @@
 
 package org.flowable.engine.migration;
 
+import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
@@ -141,7 +142,7 @@ public interface ProcessInstanceMigrationBuilder {
      * @return a ProcessInstanceMigrationValidationResult that contains validation error messages - if any
      * @see ProcessInstanceMigrationValidationResult
      */
-    ProcessInstanceMigrationValidationResult validateMigrationOfProcessInstances(String processDefinitionId);
+    List<ProcessInstanceMigrationValidationResult> validateMigrationOfProcessInstances(String processDefinitionId);
 
     /**
      * Asynchronously validates this process instance migration instruction for each process instance of a given process definition identified by the process definition id.
@@ -179,7 +180,7 @@ public interface ProcessInstanceMigrationBuilder {
      * @return a ProcessInstanceMigrationValidationResult that contains validation error messages - if any
      * @see ProcessInstanceMigrationValidationResult
      */
-    ProcessInstanceMigrationValidationResult validateMigrationOfProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId);
+    List<ProcessInstanceMigrationValidationResult> validateMigrationOfProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId);
 
     /**
      * Asynchronously validates this process instance migration instruction for each process instance of a given process definition identified by the process definition key and version (optional tenantId).

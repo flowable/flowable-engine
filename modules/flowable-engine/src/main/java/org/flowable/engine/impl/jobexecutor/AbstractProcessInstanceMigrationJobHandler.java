@@ -12,26 +12,46 @@
  */
 package org.flowable.engine.impl.jobexecutor;
 
+import java.io.IOException;
+
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.JobHandler;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Dennis Federico
  */
 public abstract class AbstractProcessInstanceMigrationJobHandler implements JobHandler {
 
-    //TODO WIP - Review how to encode the processMigration batch id in the handlerCfg - JSON?
+    protected static final String CFG_LABEL_BATCH_ID = "batchId";
+
     protected static String getBatchIdFromHandlerCfg(String handlerCfg) {
-        if (handlerCfg != null) {
-            String[] split = handlerCfg.split(":");
-            if (split.length >= 2) {
-                return split[1];
+        try {
+            JsonNode cfgAsJson = getObjectMapper().readTree(handlerCfg);
+            if (cfgAsJson.has(CFG_LABEL_BATCH_ID)) {
+                return cfgAsJson.get(CFG_LABEL_BATCH_ID).asText();
             }
+            return null;
+        } catch (IOException e) {
+            return null;
         }
-        return null;
     }
 
     public static String getHandlerCfgForBatchId(String batchId) {
-        return "BatchId:" + batchId;
+        ObjectNode handlerCfg = getObjectMapper().createObjectNode();
+        handlerCfg.put(CFG_LABEL_BATCH_ID, batchId);
+        return handlerCfg.toString();
+    }
+
+    protected static ObjectMapper getObjectMapper() {
+        if (CommandContextUtil.getCommandContext() != null) {
+            return CommandContextUtil.getProcessEngineConfiguration().getObjectMapper();
+        } else {
+            return new ObjectMapper();
+        }
     }
 }
 

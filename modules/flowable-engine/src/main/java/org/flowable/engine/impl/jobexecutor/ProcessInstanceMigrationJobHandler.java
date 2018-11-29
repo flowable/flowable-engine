@@ -64,13 +64,13 @@ public class ProcessInstanceMigrationJobHandler extends AbstractProcessInstanceM
             exceptionMessage = e.getMessage();
         }
 
-        String resultAsJsonString = getResultAsJsonString(batchEntity.getProcessInstanceId(), exceptionMessage, objectMapper);
+        String resultAsJsonString = prepareResultAsJsonString(batchEntity.getProcessInstanceId(), exceptionMessage);
         Date currentTime = CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime();
         batchEntity.completeWithResult(currentTime, resultAsJsonString);
     }
 
-    protected static String getResultAsJsonString(String processInstanceId, String exceptionMessage, ObjectMapper objectMapper) {
-        ObjectNode objectNode = objectMapper.createObjectNode();
+    protected static String prepareResultAsJsonString(String processInstanceId, String exceptionMessage) {
+        ObjectNode objectNode = getObjectMapper().createObjectNode();
         objectNode.put(RESULT_LABEL_PROCESS_INSTANCE_ID, processInstanceId);
         if (exceptionMessage == null) {
             objectNode.put(RESULT_LABEL_MIGRATION_PROCESS, RESULT_VALUE_SUCCESSFUL);

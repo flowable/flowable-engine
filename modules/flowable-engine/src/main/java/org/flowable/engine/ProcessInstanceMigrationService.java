@@ -32,16 +32,16 @@ public interface ProcessInstanceMigrationService {
 
     ProcessInstanceMigrationValidationResult validateMigrationForProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
 
-    ProcessInstanceMigrationValidationResult validateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
+    List<ProcessInstanceMigrationValidationResult> validateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
 
-    ProcessInstanceMigrationValidationResult validateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
+    List<ProcessInstanceMigrationValidationResult> validateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
 
     String batchValidateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
 
     String batchValidateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
 
     //TODO WIP - Should it be a list of ProcessInstanceMigrationValidationResult instead
-    ProcessInstanceMigrationValidationResult getResultsOfBatchProcessInstanceMigrationValidation(String migrationBatchId);
+    List<ProcessInstanceMigrationValidationResult> getResultsOfBatchProcessInstanceMigrationValidation(String migrationBatchId);
 
     ProcessMigrationBatch getProcessMigrationBatchById(String migrationBatchId);
 
