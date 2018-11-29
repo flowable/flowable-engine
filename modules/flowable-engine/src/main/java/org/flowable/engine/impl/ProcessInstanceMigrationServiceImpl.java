@@ -122,7 +122,7 @@ public class ProcessInstanceMigrationServiceImpl extends CommonEngineServiceImpl
     }
 
     @Override
-    public List<String> getResultsOfBatchProcessInstanceMigration(String migrationBatchId) {
+    public String getBatchProcessInstanceMigrationResult(String migrationBatchId) {
         return commandExecutor.execute(new GetProcessInstanceMigrationBatchResultCmd(migrationBatchId));
     }
 }

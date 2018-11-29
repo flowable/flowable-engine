@@ -34,7 +34,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class ProcessInstanceMigrationJobHandler extends AbstractProcessInstanceMigrationJobHandler {
 
     public static final String TYPE = "process-migration";
-    public static final String RESULT_LABEL_PROCESS_INSTANCE_ID = "processInstanceId";
     public static final String RESULT_LABEL_MIGRATION_PROCESS = "migrationProcess";
     public static final String RESULT_LABEL_CAUSE = "cause";
     public static final String RESULT_VALUE_SUCCESSFUL = "successful";
@@ -71,7 +70,6 @@ public class ProcessInstanceMigrationJobHandler extends AbstractProcessInstanceM
 
     protected static String prepareResultAsJsonString(String processInstanceId, String exceptionMessage) {
         ObjectNode objectNode = getObjectMapper().createObjectNode();
-        objectNode.put(RESULT_LABEL_PROCESS_INSTANCE_ID, processInstanceId);
         if (exceptionMessage == null) {
             objectNode.put(RESULT_LABEL_MIGRATION_PROCESS, RESULT_VALUE_SUCCESSFUL);
         } else {

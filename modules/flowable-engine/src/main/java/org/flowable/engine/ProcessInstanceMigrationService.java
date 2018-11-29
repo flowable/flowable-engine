@@ -40,7 +40,6 @@ public interface ProcessInstanceMigrationService {
 
     String batchValidateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
 
-    //TODO WIP - Should it be a list of ProcessInstanceMigrationValidationResult instead
     List<ProcessInstanceMigrationValidationResult> getResultsOfBatchProcessInstanceMigrationValidation(String migrationBatchId);
 
     ProcessMigrationBatch getProcessMigrationBatchById(String migrationBatchId);
@@ -59,6 +58,6 @@ public interface ProcessInstanceMigrationService {
 
     String batchMigrateProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
 
-    List<String> getResultsOfBatchProcessInstanceMigration(String migrationBatchId);
+    String getBatchProcessInstanceMigrationResult(String migrationBatchId);
 }
 

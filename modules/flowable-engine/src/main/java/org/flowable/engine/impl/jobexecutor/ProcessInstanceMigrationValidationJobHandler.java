@@ -35,7 +35,7 @@ public class ProcessInstanceMigrationValidationJobHandler extends AbstractProces
 
     public static final String TYPE = "process-migration-validation";
     public static final String RESULT_LABEL_PROCESS_INSTANCE_ID = "processInstanceId";
-    public static final String RESULT_LABEL_VALIDATION_MESSAGES = "migrationProcess";
+    public static final String RESULT_LABEL_VALIDATION_MESSAGES = "validationMessages";
 
     @Override
     public String getType() {

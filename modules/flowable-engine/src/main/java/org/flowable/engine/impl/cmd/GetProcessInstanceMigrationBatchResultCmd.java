@@ -13,8 +13,9 @@
 
 package org.flowable.engine.impl.cmd;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -23,43 +24,76 @@ import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntityMa
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessMigrationBatch;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * @author Dennis Federico
  */
-public class GetProcessInstanceMigrationBatchResultCmd implements Command<List<String>> {
+public class GetProcessInstanceMigrationBatchResultCmd implements Command<String> {
 
-    protected String batchId;
+    public static String BATCH_ID_JSON_LABEL = "batchId";
+    public static String BATCH_STATUS_JSON_LABEL = "status";
+    public static String BATCH_RESULT_JSON_LABEL = "result";
+    public static String BATCH_NUM_PARTS_JSON_LABEL = "numParts";
+    public static String BATCH_PARTS_JSON_LABEL = "parts";
+    public static String BATCH_PROCESS_INSTANCE_ID_JSON_LABEL = "processInstanceId";
+    public static String BATCH_STATUS_COMPLETED_VALUE = "completed";
+    public static String BATCH_STATUS_IN_PROGRESS_VALUE = "inProgress";
+    public String batchId;
 
     public GetProcessInstanceMigrationBatchResultCmd(String batchId) {
         this.batchId = batchId;
     }
 
     @Override
-    public List<String> execute(CommandContext commandContext) {
+    public String execute(CommandContext commandContext) {
 
         ProcessMigrationBatchEntityManager batchManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessMigrationBatchEntityManager();
+        ObjectMapper objectMapper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getObjectMapper();
         ProcessMigrationBatchEntity batch = batchManager.findById(batchId);
 
-        List<String> jsonResults = new ArrayList<>();
+        ObjectNode rootNode = createJsonNodeFromBatch(batch, objectMapper);
 
+        if (batch.getBatchChildren() != null && !batch.getBatchChildren().isEmpty()) {
+            rootNode.put(BATCH_NUM_PARTS_JSON_LABEL, batch.getBatchChildren().size());
 
+            List<ObjectNode> childNodes = batch.getBatchChildren().stream()
+                .map(childNode -> createJsonNodeFromBatch(childNode, objectMapper))
+                .collect(Collectors.toList());
 
-        //TODO WIP - Allow partial results?
-        if (batch.isCompleted()) {
-            if (batch.getResult() != null) {
-                jsonResults.add(batch.getResult());
-            }
-
-            if (batch.getBatchChildren() != null) {
-                batch.getBatchChildren()
-                    .stream()
-                    .filter(child -> child.getResult() != null)
-                    .map(ProcessMigrationBatch::getResult)
-                    .forEach(jsonResults::add);
-            }
-            return jsonResults;
+            ArrayNode childrenNode = objectMapper.createArrayNode().addAll(childNodes);
+            rootNode.set(BATCH_PARTS_JSON_LABEL, childrenNode);
         }
-        return null;
+        return rootNode.toString();
+    }
+
+    protected ObjectNode createJsonNodeFromBatch(ProcessMigrationBatch childBatch, ObjectMapper objectMapper) {
+        ObjectNode childNode = objectMapper.createObjectNode();
+        childNode.put(BATCH_ID_JSON_LABEL, childBatch.getId());
+        if (childBatch.getProcessInstanceId() != null) {
+            childNode.put(BATCH_PROCESS_INSTANCE_ID_JSON_LABEL, childBatch.getProcessInstanceId());
+        }
+        if (childBatch.getCompleteTime() != null) {
+            childNode.put(BATCH_STATUS_JSON_LABEL, BATCH_STATUS_COMPLETED_VALUE);
+            if (childBatch.getResult() != null) {
+                JsonNode resultNode;
+                try {
+                    resultNode = objectMapper.readTree(childBatch.getResult());
+                } catch (IOException e) {
+                    resultNode = null;
+                }
+
+                if (resultNode != null) {
+                    childNode.set(BATCH_RESULT_JSON_LABEL, resultNode);
+                }
+            }
+        } else {
+            childNode.put(BATCH_STATUS_JSON_LABEL, BATCH_STATUS_IN_PROGRESS_VALUE);
+        }
+        return childNode;
     }
 
 }
