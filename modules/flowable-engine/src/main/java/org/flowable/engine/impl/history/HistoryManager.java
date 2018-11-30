@@ -66,11 +66,6 @@ public interface HistoryManager {
     void recordProcessInstanceNameChange(ExecutionEntity processInstanceExecution, String newName);
 
     /**
-     * Record a sub-process-instance started and alters the calledProcessinstanceId on the current active activity's historic counterpart. Only effective when activity history is enabled.
-     */
-    void recordSubProcessInstanceStart(ExecutionEntity parentExecution, ExecutionEntity subProcessInstance);
-
-    /**
      * Deletes a historic process instance and all historic data included
      */
     void recordProcessInstanceDeleted(String processInstanceId, String processDefinitionId);

@@ -110,8 +110,7 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
         ActivityInstanceEntity activityInstance = findUnfinishedActivityInstance(parentExecution);
         if (activityInstance != null) {
             activityInstance.setCalledProcessInstanceId(subProcessInstance.getProcessInstanceId());
-            HistoricActivityInstanceEntity historicActivityInstanceEntity = getHistoricActivityInstanceEntityManager().findById(activityInstance.getId());
-            historicActivityInstanceEntity.setCalledProcessInstanceId(activityInstance.getCalledProcessInstanceId());
+            getHistoryManager().updateHistoricActivityInstance(activityInstance);
         }
 
         getHistoryManager().recordProcessInstanceStart(subProcessInstance);

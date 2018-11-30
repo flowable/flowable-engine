@@ -123,21 +123,6 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
     }
 
     @Override
-    public void recordSubProcessInstanceStart(ExecutionEntity parentExecution, ExecutionEntity subProcessInstance) {
-        
-        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, subProcessInstance.getProcessDefinitionId())) {
-            Map<String, String> data = new HashMap<>();
-            addCommonProcessInstanceFields(subProcessInstance, data);
-            
-            String activityId = getActivityIdForExecution(parentExecution);
-            putIfNotNull(data, HistoryJsonConstants.ACTIVITY_ID, activityId);
-            putIfNotNull(data, HistoryJsonConstants.EXECUTION_ID, parentExecution.getId());
-
-            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_SUBPROCESS_INSTANCE_START, data, subProcessInstance.getTenantId());
-        }
-    }
-    
-    @Override
     public void recordProcessInstanceDeleted(String processInstanceId, String processDefinitionId) {
         if (isHistoryEnabled(processDefinitionId)) {
             Map<String, String> data = new HashMap<>();
@@ -681,6 +666,7 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
                 putIfNotNull(data, HistoryJsonConstants.RUNTIME_ACTIVITY_INSTANCE_ID, activityInstance.getId());
                 putIfNotNull(data, HistoryJsonConstants.TASK_ID, activityInstance.getTaskId());
                 putIfNotNull(data, HistoryJsonConstants.ASSIGNEE, activityInstance.getAssignee());
+                putIfNotNull(data, HistoryJsonConstants.CALLED_PROCESS_INSTANCE_ID, activityInstance.getCalledProcessInstanceId());
                 getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_UPDATE_HISTORIC_ACTIVITY_INSTANCE, data);
             }
         }

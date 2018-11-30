@@ -20,8 +20,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
+import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.impl.history.async.transformer.HistoryJsonTransformer;
 
@@ -135,6 +137,23 @@ public abstract class AbstractHistoryJsonTransformer implements HistoryJsonTrans
             }
         }
         return null;
+    }
+
+    protected HistoricActivityInstanceEntity createHistoricActivityInstanceEntity(ObjectNode historicalData, CommandContext commandContext,
+        HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager) {
+        String runtimeActivityId = getStringFromJson(historicalData, HistoryJsonConstants.RUNTIME_ACTIVITY_INSTANCE_ID);
+        HistoricActivityInstanceEntity historicActivityInstanceEntity = historicActivityInstanceEntityManager.create();
+        if (StringUtils.isEmpty(runtimeActivityId)) {
+            ProcessEngineConfiguration processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+            if (processEngineConfiguration.isUsePrefixId()) {
+                historicActivityInstanceEntity.setId(historicActivityInstanceEntity.getIdPrefix() + processEngineConfiguration.getIdGenerator().getNextId());
+            } else {
+                historicActivityInstanceEntity.setId(processEngineConfiguration.getIdGenerator().getNextId());
+            }
+        } else {
+            historicActivityInstanceEntity.setId(runtimeActivityId);
+        }
+        return historicActivityInstanceEntity;
     }
 
 }

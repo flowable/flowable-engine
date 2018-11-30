@@ -13,6 +13,9 @@
 
 package org.flowable.engine.test.history;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -412,6 +415,23 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
             assertNotNull(historicActivityInstance.getStartTime());
             assertNotNull(historicActivityInstance.getEndTime());
         }
+    }
+
+    @Test
+    @Deployment(
+        resources = {
+            "org/flowable/engine/test/api/runtime/callActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/runtime/calledActivity.bpmn20.xml"
+        }
+    )
+    public void callSubProcess() {
+        ProcessInstance pi = this.runtimeService.startProcessInstanceByKey("callActivity");
+
+        HistoricActivityInstance callSubProcessActivityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(pi.getId())
+            .activityId("callSubProcess").singleResult();
+        assertThat(callSubProcessActivityInstance.getCalledProcessInstanceId(), is(
+            runtimeService.createProcessInstanceQuery().superProcessInstanceId(pi.getId()).singleResult().getId()
+        ));
     }
 
 }

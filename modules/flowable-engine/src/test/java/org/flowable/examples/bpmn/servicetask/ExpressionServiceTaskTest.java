@@ -12,8 +12,7 @@
  */
 package org.flowable.examples.bpmn.servicetask;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -100,8 +99,8 @@ public class ExpressionServiceTaskTest extends PluggableFlowableTestCase {
             .processInstanceId(pi.getProcessInstanceId())
             .list();
 
-        assertThat(tasks.size(), is(1));
-        assertThat(tasks.get(0).getTaskDefinitionKey(), is("processWaitState"));
+        assertThat(tasks.size()).isEqualTo(1);
+        assertThat(tasks.get(0).getTaskDefinitionKey()).isEqualTo("processWaitState");
     }
 
     @Test
@@ -119,7 +118,7 @@ public class ExpressionServiceTaskTest extends PluggableFlowableTestCase {
             .processInstanceId(pi.getProcessInstanceId())
             .list();
 
-        assertThat(tasks.size(), is(1));
-        assertThat(tasks.get(0).getTaskDefinitionKey(), is("subProcessWaitState"));
+        assertThat(tasks.size()).isEqualTo(1);
+        assertThat(tasks.get(0).getTaskDefinitionKey()).isEqualTo("subProcessWaitState");
     }
 }

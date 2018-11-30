@@ -117,11 +117,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     }
 
     @Override
-    public void recordSubProcessInstanceStart(ExecutionEntity parentExecution, ExecutionEntity subProcessInstance) {
-        recordProcessInstanceStart(subProcessInstance);
-    }
-
-    @Override
     public void recordProcessInstanceDeleted(String processInstanceId, String processDefinitionId) {
         if (getHistoryManager().isHistoryEnabled(processDefinitionId)) {
             HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceEntityManager().findById(processInstanceId);
@@ -558,6 +553,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
                 if (historicActivityInstance != null) {
                     historicActivityInstance.setTaskId(activityInstance.getTaskId());
                     historicActivityInstance.setAssignee(activityInstance.getAssignee());
+                    historicActivityInstance.setCalledProcessInstanceId(activityInstance.getCalledProcessInstanceId());
                 }
             }
         }
@@ -565,16 +561,24 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
 
     protected HistoricActivityInstanceEntity createHistoricActivityInstance(ActivityInstance activityInstance) {
         HistoricActivityInstanceEntity historicActivityInstanceEntity = getHistoricActivityInstanceEntityManager().create();
+
         historicActivityInstanceEntity.setId(activityInstance.getId());
 
         historicActivityInstanceEntity.setProcessDefinitionId(activityInstance.getProcessDefinitionId());
         historicActivityInstanceEntity.setProcessInstanceId(activityInstance.getProcessInstanceId());
+        historicActivityInstanceEntity.setCalledProcessInstanceId(activityInstance.getCalledProcessInstanceId());
         historicActivityInstanceEntity.setExecutionId(activityInstance.getExecutionId());
+        historicActivityInstanceEntity.setTaskId(activityInstance.getTaskId());
         historicActivityInstanceEntity.setActivityId(activityInstance.getActivityId());
         historicActivityInstanceEntity.setActivityName(activityInstance.getActivityName());
         historicActivityInstanceEntity.setActivityType(activityInstance.getActivityType());
+        historicActivityInstanceEntity.setAssignee(activityInstance.getAssignee());
         historicActivityInstanceEntity.setStartTime(activityInstance.getStartTime());
+        historicActivityInstanceEntity.setEndTime(activityInstance.getEndTime());
+        historicActivityInstanceEntity.setDeleteReason(activityInstance.getDeleteReason());
+        historicActivityInstanceEntity.setDurationInMillis(activityInstance.getDurationInMillis());
         historicActivityInstanceEntity.setTenantId(activityInstance.getTenantId());
+
 
         getHistoricActivityInstanceEntityManager().insert(historicActivityInstanceEntity);
         return historicActivityInstanceEntity;

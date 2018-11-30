@@ -92,6 +92,7 @@ public class AsyncHistoryUpgradeTest extends CustomConfigurationFlowableTestCase
         assertTrue(jobs.size() > 0);
 
         removeRuntimeActivityInstances(processInstanceId);
+        downgradeHistoryJobConfigurations();
 
         waitForHistoryJobExecutorToProcessAllJobs(70000L, 100L);
         assertNull(managementService.createHistoryJobQuery().singleResult());
