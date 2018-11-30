@@ -14,34 +14,25 @@
 package org.flowable.engine.impl.cmd;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.jobexecutor.ProcessInstanceMigrationJobHandler;
+import org.flowable.engine.impl.migration.ProcessInstanceMigrationResultImpl;
 import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.migration.ProcessInstanceMigrationResult;
 import org.flowable.engine.runtime.ProcessMigrationBatch;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Dennis Federico
  */
-public class GetProcessInstanceMigrationBatchResultCmd implements Command<String> {
+public class GetProcessInstanceMigrationBatchResultCmd implements Command<ProcessInstanceMigrationResult> {
 
-    public static String BATCH_ID_JSON_LABEL = "batchId";
-    public static String BATCH_STATUS_JSON_LABEL = "status";
-    public static String BATCH_RESULT_JSON_LABEL = "result";
-    public static String BATCH_NUM_PARTS_JSON_LABEL = "numParts";
-    public static String BATCH_PARTS_JSON_LABEL = "parts";
-    public static String BATCH_PROCESS_INSTANCE_ID_JSON_LABEL = "processInstanceId";
-    public static String BATCH_STATUS_COMPLETED_VALUE = "completed";
-    public static String BATCH_STATUS_IN_PROGRESS_VALUE = "inProgress";
     public String batchId;
 
     public GetProcessInstanceMigrationBatchResultCmd(String batchId) {
@@ -49,51 +40,53 @@ public class GetProcessInstanceMigrationBatchResultCmd implements Command<String
     }
 
     @Override
-    public String execute(CommandContext commandContext) {
+    public ProcessInstanceMigrationResult execute(CommandContext commandContext) {
 
         ProcessMigrationBatchEntityManager batchManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessMigrationBatchEntityManager();
-        ObjectMapper objectMapper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getObjectMapper();
         ProcessMigrationBatchEntity batch = batchManager.findById(batchId);
 
-        ObjectNode rootNode = createJsonNodeFromBatch(batch, objectMapper);
-
-        if (batch.getBatchChildren() != null && !batch.getBatchChildren().isEmpty()) {
-            rootNode.put(BATCH_NUM_PARTS_JSON_LABEL, batch.getBatchChildren().size());
-
-            List<ObjectNode> childNodes = batch.getBatchChildren().stream()
-                .map(childNode -> createJsonNodeFromBatch(childNode, objectMapper))
-                .collect(Collectors.toList());
-
-            ArrayNode childrenNode = objectMapper.createArrayNode().addAll(childNodes);
-            rootNode.set(BATCH_PARTS_JSON_LABEL, childrenNode);
+        if (batch != null) {
+            ObjectMapper objectMapper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getObjectMapper();
+            ProcessInstanceMigrationResultImpl result = convertFromBatch(batch, objectMapper);
+            if (batch.getBatchChildren() != null) {
+                batch.getBatchChildren().stream()
+                    .forEach(child -> result.addResultPart(convertFromBatch(child, objectMapper)));
+            }
+            return result;
         }
-        return rootNode.toString();
+        return null;
     }
 
-    protected ObjectNode createJsonNodeFromBatch(ProcessMigrationBatch childBatch, ObjectMapper objectMapper) {
-        ObjectNode childNode = objectMapper.createObjectNode();
-        childNode.put(BATCH_ID_JSON_LABEL, childBatch.getId());
-        if (childBatch.getProcessInstanceId() != null) {
-            childNode.put(BATCH_PROCESS_INSTANCE_ID_JSON_LABEL, childBatch.getProcessInstanceId());
-        }
-        if (childBatch.getCompleteTime() != null) {
-            childNode.put(BATCH_STATUS_JSON_LABEL, BATCH_STATUS_COMPLETED_VALUE);
-            if (childBatch.getResult() != null) {
-                JsonNode resultNode;
-                try {
-                    resultNode = objectMapper.readTree(childBatch.getResult());
-                } catch (IOException e) {
-                    resultNode = null;
-                }
+    protected ProcessInstanceMigrationResultImpl convertFromBatch(ProcessMigrationBatch batch, ObjectMapper objectMapper) {
+        ProcessInstanceMigrationResultImpl result = new ProcessInstanceMigrationResultImpl();
 
-                if (resultNode != null) {
-                    childNode.set(BATCH_RESULT_JSON_LABEL, resultNode);
+        result.setBatchId(batch.getId());
+        result.setProcessInstanceId(batch.getProcessInstanceId());
+
+        if (batch.getCompleteTime() != null) {
+            result.setStatus(ProcessInstanceMigrationResult.STATUS_COMPLETED);
+
+            if (batch.getResult() != null) {
+                try {
+                    JsonNode resultNode = objectMapper.readTree(batch.getResult());
+                    String resultStatus = null;
+                    if (resultNode.has(ProcessInstanceMigrationJobHandler.RESULT_LABEL_MIGRATION_PROCESS)) {
+                        resultStatus = resultNode.get(ProcessInstanceMigrationJobHandler.RESULT_LABEL_MIGRATION_PROCESS).asText();
+                    }
+
+                    String resultMessage = null;
+                    if (resultNode.has(ProcessInstanceMigrationJobHandler.RESULT_LABEL_CAUSE)) {
+                        resultMessage = resultNode.get(ProcessInstanceMigrationJobHandler.RESULT_LABEL_CAUSE).asText();
+                    }
+
+                    result.setResult(resultStatus, resultMessage);
+                } catch (IOException e) {
+
                 }
             }
-        } else {
-            childNode.put(BATCH_STATUS_JSON_LABEL, BATCH_STATUS_IN_PROGRESS_VALUE);
+        } else if (batch.getBatchChildren() == null) {
+            result.setStatus(ProcessInstanceMigrationResult.STATUS_IN_PROGRESS);
         }
-        return childNode;
+        return result;
     }
-
 }

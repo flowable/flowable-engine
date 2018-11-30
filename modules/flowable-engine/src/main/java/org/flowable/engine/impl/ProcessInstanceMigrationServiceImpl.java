@@ -29,6 +29,7 @@ import org.flowable.engine.impl.migration.ProcessInstanceMigrationBuilderImpl;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
+import org.flowable.engine.migration.ProcessInstanceMigrationResult;
 import org.flowable.engine.runtime.ProcessMigrationBatch;
 
 /**
@@ -122,7 +123,7 @@ public class ProcessInstanceMigrationServiceImpl extends CommonEngineServiceImpl
     }
 
     @Override
-    public String getBatchProcessInstanceMigrationResult(String migrationBatchId) {
+    public ProcessInstanceMigrationResult getBatchProcessInstanceMigrationResult(String migrationBatchId) {
         return commandExecutor.execute(new GetProcessInstanceMigrationBatchResultCmd(migrationBatchId));
     }
 }

@@ -22,6 +22,7 @@ import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntityMa
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationManager;
+import org.flowable.engine.migration.ProcessInstanceMigrationResult;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
 
@@ -36,8 +37,8 @@ public class ProcessInstanceMigrationJobHandler extends AbstractProcessInstanceM
     public static final String TYPE = "process-migration";
     public static final String RESULT_LABEL_MIGRATION_PROCESS = "migrationProcess";
     public static final String RESULT_LABEL_CAUSE = "cause";
-    public static final String RESULT_VALUE_SUCCESSFUL = "successful";
-    public static final String RESULT_VALUE_FAILED = "failed";
+    public static final String RESULT_VALUE_SUCCESSFUL = ProcessInstanceMigrationResult.Result.RESULT_SUCCESSFUL;
+    public static final String RESULT_VALUE_FAILED = ProcessInstanceMigrationResult.Result.RESULT_FAILED;
 
     @Override
     public String getType() {

@@ -17,6 +17,7 @@ import java.util.List;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
+import org.flowable.engine.migration.ProcessInstanceMigrationResult;
 import org.flowable.engine.runtime.ProcessMigrationBatch;
 
 /**
@@ -58,6 +59,6 @@ public interface ProcessInstanceMigrationService {
 
     String batchMigrateProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
 
-    String getBatchProcessInstanceMigrationResult(String migrationBatchId);
+    ProcessInstanceMigrationResult getBatchProcessInstanceMigrationResult(String migrationBatchId);
 }
 

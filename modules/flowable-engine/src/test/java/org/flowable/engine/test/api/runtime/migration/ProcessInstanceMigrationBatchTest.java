@@ -22,12 +22,11 @@ import java.util.List;
 
 import org.assertj.core.api.iterable.Extractor;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.engine.impl.cmd.GetProcessInstanceMigrationBatchResultCmd;
-import org.flowable.engine.impl.jobexecutor.ProcessInstanceMigrationJobHandler;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
+import org.flowable.engine.migration.ProcessInstanceMigrationResult;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessMigrationBatch;
@@ -167,29 +166,20 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         //Confirm the batch is not finished
         ProcessMigrationBatch migrationBatch = processInstanceMigrationService.getProcessMigrationBatchById(migrationBatchId);
         assertThat(migrationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(false);
-        String migrationResult = processInstanceMigrationService.getBatchProcessInstanceMigrationResult(migrationBatchId);
+        ProcessInstanceMigrationResult migrationResult = processInstanceMigrationService.getBatchProcessInstanceMigrationResult(migrationBatchId);
+
         //Partial Results
         assertThat(migrationResult).isNotNull();
+        assertThat(migrationResult.getBatchId()).get().isEqualTo(migrationBatchId);
+        assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getStatus).isEqualTo(ProcessInstanceMigrationResult.STATUS_IN_PROGRESS);
+        assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getPartsCount).isEqualTo(2L);
+        assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getInProgressPartsCount).isEqualTo(2L);
+        assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getCompletedPartsCount).isEqualTo(0L);
 
-        JsonNode rootNode = null;
-        try {
-            rootNode = objectMapper.readTree(migrationResult);
-        } catch (IOException e) {
-            fail("Cannot parse result");
-        }
-
-        assertTrue(rootNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_ID_JSON_LABEL));
-        assertEquals(rootNode.get(GetProcessInstanceMigrationBatchResultCmd.BATCH_ID_JSON_LABEL).asText(), migrationBatchId);
-        assertTrue(rootNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_NUM_PARTS_JSON_LABEL));
-        assertEquals(rootNode.get(GetProcessInstanceMigrationBatchResultCmd.BATCH_NUM_PARTS_JSON_LABEL).intValue(), 2);
-        assertTrue(rootNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_PARTS_JSON_LABEL));
-        JsonNode childrenNode = rootNode.get(GetProcessInstanceMigrationBatchResultCmd.BATCH_PARTS_JSON_LABEL);
-        for (JsonNode childNode : childrenNode) {
-            assertTrue(childNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_ID_JSON_LABEL));
-            assertTrue(childNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_PROCESS_INSTANCE_ID_JSON_LABEL));
-            assertThat(childNode.get(GetProcessInstanceMigrationBatchResultCmd.BATCH_PROCESS_INSTANCE_ID_JSON_LABEL).asText()).isIn(processInstance1.getId(), processInstance2.getId());
-            assertTrue(childNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_STATUS_JSON_LABEL));
-            assertEquals(childNode.get(GetProcessInstanceMigrationBatchResultCmd.BATCH_STATUS_JSON_LABEL).asText(), GetProcessInstanceMigrationBatchResultCmd.BATCH_STATUS_IN_PROGRESS_VALUE);
+        for (ProcessInstanceMigrationResult part : migrationResult.getParts()) {
+            assertThat(part).extracting(ProcessInstanceMigrationResult::getStatus).isEqualTo(ProcessInstanceMigrationResult.STATUS_IN_PROGRESS);
+            assertThat(part.getResult()).isEmpty();
+            assertThat(part).extracting(ProcessInstanceMigrationResult::getPartsCount).isEqualTo(0L);
         }
 
         //Start async executor to process the batches
@@ -202,33 +192,20 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         migrationResult = processInstanceMigrationService.getBatchProcessInstanceMigrationResult(migrationBatchId);
         assertThat(migrationResult).isNotNull();
 
-        try {
-            rootNode = objectMapper.readTree(migrationResult);
-        } catch (IOException e) {
-            fail("Cannot parse result");
-        }
+        assertThat(migrationResult).isNotNull();
+        assertThat(migrationResult.getBatchId()).get().isEqualTo(migrationBatchId);
+        assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getStatus).isEqualTo(ProcessInstanceMigrationResult.STATUS_COMPLETED);
+        assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getPartsCount).isEqualTo(2L);
+        assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getInProgressPartsCount).isEqualTo(0L);
+        assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getCompletedPartsCount).isEqualTo(2L);
+        assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getSuccessfulPartsCount).isEqualTo(0L);
+        assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getFailedPartsCount).isEqualTo(2L);
 
-        assertTrue(rootNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_ID_JSON_LABEL));
-        assertEquals(rootNode.get(GetProcessInstanceMigrationBatchResultCmd.BATCH_ID_JSON_LABEL).asText(), migrationBatchId);
-        assertTrue(rootNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_NUM_PARTS_JSON_LABEL));
-        assertEquals(rootNode.get(GetProcessInstanceMigrationBatchResultCmd.BATCH_NUM_PARTS_JSON_LABEL).intValue(), 2);
-        assertTrue(rootNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_PARTS_JSON_LABEL));
-        childrenNode = rootNode.get(GetProcessInstanceMigrationBatchResultCmd.BATCH_PARTS_JSON_LABEL);
-        for (JsonNode childNode : childrenNode) {
-            assertTrue(childNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_ID_JSON_LABEL));
-            assertTrue(childNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_PROCESS_INSTANCE_ID_JSON_LABEL));
-            assertThat(childNode.get(GetProcessInstanceMigrationBatchResultCmd.BATCH_PROCESS_INSTANCE_ID_JSON_LABEL).asText()).isIn(processInstance1.getId(), processInstance2.getId());
-            assertTrue(childNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_STATUS_JSON_LABEL));
-            assertEquals(childNode.get(GetProcessInstanceMigrationBatchResultCmd.BATCH_STATUS_JSON_LABEL).asText(), GetProcessInstanceMigrationBatchResultCmd.BATCH_STATUS_COMPLETED_VALUE);
-            assertTrue(childNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_RESULT_JSON_LABEL));
-
-            JsonNode resultNode = childNode.get(GetProcessInstanceMigrationBatchResultCmd.BATCH_RESULT_JSON_LABEL);
-            assertTrue(resultNode.has(ProcessInstanceMigrationJobHandler.RESULT_LABEL_MIGRATION_PROCESS));
-            assertThat(resultNode.get(ProcessInstanceMigrationJobHandler.RESULT_LABEL_MIGRATION_PROCESS).asText())
-                .isEqualTo(ProcessInstanceMigrationJobHandler.RESULT_VALUE_FAILED);
-            assertTrue(resultNode.has(ProcessInstanceMigrationJobHandler.RESULT_LABEL_CAUSE));
-            assertThat(resultNode.get(ProcessInstanceMigrationJobHandler.RESULT_LABEL_CAUSE).asText())
-                .isEqualTo("Migration Activity mapping missing for activity definition Id:'userTask2Id' or its MI Parent");
+        for (ProcessInstanceMigrationResult part : migrationResult.getParts()) {
+            assertThat(part).extracting(ProcessInstanceMigrationResult::getStatus).isEqualTo(ProcessInstanceMigrationResult.STATUS_COMPLETED);
+            assertThat(part).extracting(ProcessInstanceMigrationResult::getPartsCount).isEqualTo(0L);
+            assertThat(part.getResult()).get().extracting(ProcessInstanceMigrationResult.Result::getStatus).isEqualTo(ProcessInstanceMigrationResult.Result.RESULT_FAILED);
+            assertThat(part.getResult().get().getMessage()).get().isEqualTo("Migration Activity mapping missing for activity definition Id:'userTask2Id' or its MI Parent");
         }
 
         //Confirm no migration happened
@@ -316,29 +293,20 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         //Confirm the batch is not finished
         ProcessMigrationBatch migrationBatch = processInstanceMigrationService.getProcessMigrationBatchById(migrationBatchId);
         assertThat(migrationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(false);
-        String migrationResult = processInstanceMigrationService.getBatchProcessInstanceMigrationResult(migrationBatchId);
+        ProcessInstanceMigrationResult migrationResult = processInstanceMigrationService.getBatchProcessInstanceMigrationResult(migrationBatchId);
+
         //Partial Results
         assertThat(migrationResult).isNotNull();
+        assertThat(migrationResult.getBatchId()).contains(migrationBatchId);
+        assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getStatus).isEqualTo(ProcessInstanceMigrationResult.STATUS_IN_PROGRESS);
+        assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getPartsCount).isEqualTo(2L);
+        assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getInProgressPartsCount).isEqualTo(2L);
+        assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getCompletedPartsCount).isEqualTo(0L);
 
-        JsonNode rootNode = null;
-        try {
-            rootNode = objectMapper.readTree(migrationResult);
-        } catch (IOException e) {
-            fail("Cannot parse result");
-        }
-
-        assertTrue(rootNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_ID_JSON_LABEL));
-        assertEquals(rootNode.get(GetProcessInstanceMigrationBatchResultCmd.BATCH_ID_JSON_LABEL).asText(), migrationBatchId);
-        assertTrue(rootNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_NUM_PARTS_JSON_LABEL));
-        assertEquals(rootNode.get(GetProcessInstanceMigrationBatchResultCmd.BATCH_NUM_PARTS_JSON_LABEL).intValue(), 2);
-        assertTrue(rootNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_PARTS_JSON_LABEL));
-        JsonNode childrenNode = rootNode.get(GetProcessInstanceMigrationBatchResultCmd.BATCH_PARTS_JSON_LABEL);
-        for (JsonNode childNode : childrenNode) {
-            assertTrue(childNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_ID_JSON_LABEL));
-            assertTrue(childNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_PROCESS_INSTANCE_ID_JSON_LABEL));
-            assertThat(childNode.get(GetProcessInstanceMigrationBatchResultCmd.BATCH_PROCESS_INSTANCE_ID_JSON_LABEL).asText()).isIn(processInstance1.getId(), processInstance2.getId());
-            assertTrue(childNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_STATUS_JSON_LABEL));
-            assertEquals(childNode.get(GetProcessInstanceMigrationBatchResultCmd.BATCH_STATUS_JSON_LABEL).asText(), GetProcessInstanceMigrationBatchResultCmd.BATCH_STATUS_IN_PROGRESS_VALUE);
+        for (ProcessInstanceMigrationResult part : migrationResult.getParts()) {
+            assertThat(part).extracting(ProcessInstanceMigrationResult::getStatus).isEqualTo(ProcessInstanceMigrationResult.STATUS_IN_PROGRESS);
+            assertThat(part.getResult()).isEmpty();
+            assertThat(part).extracting(ProcessInstanceMigrationResult::getPartsCount).isEqualTo(0L);
         }
 
         //Start async executor to process the batches
@@ -351,43 +319,27 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         migrationResult = processInstanceMigrationService.getBatchProcessInstanceMigrationResult(migrationBatchId);
         assertThat(migrationResult).isNotNull();
 
-        try {
-            rootNode = objectMapper.readTree(migrationResult);
-        } catch (IOException e) {
-            fail("Cannot parse result");
+        assertThat(migrationResult).isNotNull();
+        assertThat(migrationResult.getBatchId()).get().isEqualTo(migrationBatchId);
+        assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getStatus).isEqualTo(ProcessInstanceMigrationResult.STATUS_COMPLETED);
+        assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getPartsCount).isEqualTo(2L);
+        assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getInProgressPartsCount).isEqualTo(0L);
+        assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getCompletedPartsCount).isEqualTo(2L);
+        assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getSuccessfulPartsCount).isEqualTo(1L);
+        assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getFailedPartsCount).isEqualTo(1L);
+
+        for (ProcessInstanceMigrationResult part : migrationResult.getSuccessfulParts()) {
+            assertThat(part).extracting(ProcessInstanceMigrationResult::getStatus).isEqualTo(ProcessInstanceMigrationResult.STATUS_COMPLETED);
+            assertThat(part).extracting(ProcessInstanceMigrationResult::getPartsCount).isEqualTo(0L);
+            assertThat(part.getResult()).get().extracting(ProcessInstanceMigrationResult.Result::getStatus).isEqualTo(ProcessInstanceMigrationResult.Result.RESULT_SUCCESSFUL);
+            assertThat(part.getResult().get().getMessage()).isEmpty();
         }
 
-        assertTrue(rootNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_ID_JSON_LABEL));
-        assertEquals(rootNode.get(GetProcessInstanceMigrationBatchResultCmd.BATCH_ID_JSON_LABEL).asText(), migrationBatchId);
-        assertTrue(rootNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_NUM_PARTS_JSON_LABEL));
-        assertEquals(rootNode.get(GetProcessInstanceMigrationBatchResultCmd.BATCH_NUM_PARTS_JSON_LABEL).intValue(), 2);
-        assertTrue(rootNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_PARTS_JSON_LABEL));
-        childrenNode = rootNode.get(GetProcessInstanceMigrationBatchResultCmd.BATCH_PARTS_JSON_LABEL);
-        for (JsonNode childNode : childrenNode) {
-            assertTrue(childNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_ID_JSON_LABEL));
-            assertTrue(childNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_PROCESS_INSTANCE_ID_JSON_LABEL));
-            assertThat(childNode.get(GetProcessInstanceMigrationBatchResultCmd.BATCH_PROCESS_INSTANCE_ID_JSON_LABEL).asText()).isIn(processInstance1.getId(), processInstance2.getId());
-            assertTrue(childNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_STATUS_JSON_LABEL));
-            assertEquals(childNode.get(GetProcessInstanceMigrationBatchResultCmd.BATCH_STATUS_JSON_LABEL).asText(), GetProcessInstanceMigrationBatchResultCmd.BATCH_STATUS_COMPLETED_VALUE);
-            assertTrue(childNode.has(GetProcessInstanceMigrationBatchResultCmd.BATCH_RESULT_JSON_LABEL));
-
-            JsonNode resultNode = childNode.get(GetProcessInstanceMigrationBatchResultCmd.BATCH_RESULT_JSON_LABEL);
-            String processInstanceId = childNode.get(GetProcessInstanceMigrationBatchResultCmd.BATCH_PROCESS_INSTANCE_ID_JSON_LABEL).asText();
-            if (processInstanceId.equals(processInstance1.getId())) {
-                assertTrue(resultNode.has(ProcessInstanceMigrationJobHandler.RESULT_LABEL_MIGRATION_PROCESS));
-                assertThat(resultNode.get(ProcessInstanceMigrationJobHandler.RESULT_LABEL_MIGRATION_PROCESS).asText())
-                    .isEqualTo(ProcessInstanceMigrationJobHandler.RESULT_VALUE_FAILED);
-                assertTrue(resultNode.has(ProcessInstanceMigrationJobHandler.RESULT_LABEL_CAUSE));
-                assertThat(resultNode.get(ProcessInstanceMigrationJobHandler.RESULT_LABEL_CAUSE).asText())
-                    .isEqualTo("Migration Activity mapping missing for activity definition Id:'userTask2Id' or its MI Parent");
-            } else if (processInstanceId.equals(processInstance2.getId())) {
-                assertTrue(resultNode.has(ProcessInstanceMigrationJobHandler.RESULT_LABEL_MIGRATION_PROCESS));
-                assertThat(resultNode.get(ProcessInstanceMigrationJobHandler.RESULT_LABEL_MIGRATION_PROCESS).asText())
-                    .isEqualTo(ProcessInstanceMigrationJobHandler.RESULT_VALUE_SUCCESSFUL);
-                assertFalse(resultNode.has(ProcessInstanceMigrationJobHandler.RESULT_LABEL_CAUSE));
-            } else {
-                fail("UnExpected processInstanceId");
-            }
+        for (ProcessInstanceMigrationResult part : migrationResult.getFailedParts()) {
+            assertThat(part).extracting(ProcessInstanceMigrationResult::getStatus).isEqualTo(ProcessInstanceMigrationResult.STATUS_COMPLETED);
+            assertThat(part).extracting(ProcessInstanceMigrationResult::getPartsCount).isEqualTo(0L);
+            assertThat(part.getResult()).get().extracting(ProcessInstanceMigrationResult.Result::getStatus).isEqualTo(ProcessInstanceMigrationResult.Result.RESULT_FAILED);
+            assertThat(part.getResult().get().getMessage()).get().isEqualTo("Migration Activity mapping missing for activity definition Id:'userTask2Id' or its MI Parent");
         }
 
         //Confirm the migration
