@@ -22,6 +22,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
+import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -107,7 +108,23 @@ public abstract class AbstractHistoryJsonTransformer implements HistoryJsonTrans
         }
         return null;
     }
-    
+
+    protected ActivityInstanceEntity findActivityInstance(CommandContext commandContext, String executionId, String activityId) {
+        if (executionId == null || activityId == null) {
+            return null;
+        }
+
+        ActivityInstanceEntity activityInstanceEntity = getActivityInstanceFromCache(commandContext, executionId, activityId);
+        if (activityInstanceEntity == null) {
+            List<ActivityInstanceEntity> historicActivityInstances = CommandContextUtil.getActivityInstanceEntityManager(commandContext)
+                .findActivityInstancesByExecutionAndActivityId(executionId, activityId);
+            if (!historicActivityInstances.isEmpty()) {
+                activityInstanceEntity = historicActivityInstances.get(0);
+            }
+        }
+        return activityInstanceEntity;
+    }
+
     protected HistoricActivityInstanceEntity findHistoricActivityInstance(CommandContext commandContext, String executionId, String activityId) {
         if (executionId == null || activityId == null) {
             return null;
@@ -134,6 +151,21 @@ public abstract class AbstractHistoryJsonTransformer implements HistoryJsonTrans
                             && executionId.equals(cachedHistoricActivityInstance.getExecutionId())) {
                 
                 return cachedHistoricActivityInstance;
+            }
+        }
+        return null;
+    }
+
+    protected ActivityInstanceEntity getActivityInstanceFromCache(CommandContext commandContext,
+                    String executionId, String activityId) {
+
+        List<ActivityInstanceEntity> cachedActivityInstances = CommandContextUtil.getEntityCache(commandContext).findInCache(ActivityInstanceEntity.class);
+        for (ActivityInstanceEntity cachedActivityInstance : cachedActivityInstances) {
+            if (activityId != null
+                            && activityId.equals(cachedActivityInstance.getActivityId())
+                            && executionId.equals(cachedActivityInstance.getExecutionId())) {
+
+                return cachedActivityInstance;
             }
         }
         return null;
