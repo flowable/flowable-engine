@@ -163,8 +163,8 @@
 			</dependency>
 			<dependency>
 				<groupId>com.sun.mail</groupId>
-				<artifactId>javax.mail</artifactId>
-				<version>1.6.2</version>
+				<artifactId>jakarta.mail</artifactId>
+				<version>1.6.3</version>
 			</dependency>
 			<dependency>
 				<!-- no official JPA 2.1 Jar was ever published, so we have to use a vendor implementation :( -->
