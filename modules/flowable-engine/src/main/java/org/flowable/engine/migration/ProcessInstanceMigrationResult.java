@@ -15,14 +15,23 @@ package org.flowable.engine.migration;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * @author Dennis Federico
  */
-public interface ProcessInstanceMigrationResult {
+public interface ProcessInstanceMigrationResult<T> {
+
+    Predicate<ProcessInstanceMigrationResult<?>> isParentResult = result -> result.getParts() != null && !result.getParts().isEmpty();
+    Predicate<ProcessInstanceMigrationResult<?>> isSuccessfulResultPredicate = result -> result.getResultStatus().filter(ProcessInstanceMigrationResult.RESULT_SUCCESSFUL::equals).isPresent();
+    Predicate<ProcessInstanceMigrationResult<?>> isFailedResultPredicate = result -> result.getResultStatus().filter(ProcessInstanceMigrationResult.RESULT_FAILED::equals).isPresent();
+    Predicate<ProcessInstanceMigrationResult<?>> isCompletedResultPredicate = result -> ProcessInstanceMigrationResult.STATUS_COMPLETED.equals(result.getStatus());
+    Predicate<ProcessInstanceMigrationResult<?>> isInProgressResultPredicate = result -> ProcessInstanceMigrationResult.STATUS_IN_PROGRESS.equals(result.getStatus());
 
     String STATUS_COMPLETED = "Completed";
     String STATUS_IN_PROGRESS = "InProgress";
+    String RESULT_SUCCESSFUL = "Successful";
+    String RESULT_FAILED = "Failed";
 
     Optional<String> getBatchId();
 
@@ -38,17 +47,19 @@ public interface ProcessInstanceMigrationResult {
 
     Optional<String> getProcessInstanceId();
 
-    Optional<Result> getResult();
+    Optional<String> getResultStatus();
 
-    List<ProcessInstanceMigrationResult> getParts();
+    Optional<T> getResultValue();
 
-    List<ProcessInstanceMigrationResult> getSuccessfulParts();
+    List<ProcessInstanceMigrationResult<T>> getParts();
 
-    List<ProcessInstanceMigrationResult> getFailedParts();
+    List<ProcessInstanceMigrationResult<T>> getSuccessfulParts();
 
-    List<ProcessInstanceMigrationResult> getInProgressParts();
+    List<ProcessInstanceMigrationResult<T>> getFailedParts();
 
-    List<ProcessInstanceMigrationResult> getCompletedParts();
+    List<ProcessInstanceMigrationResult<T>> getInProgressParts();
+
+    List<ProcessInstanceMigrationResult<T>> getCompletedParts();
 
     long getPartsCount();
 
@@ -60,15 +71,11 @@ public interface ProcessInstanceMigrationResult {
 
     long getCompletedPartsCount();
 
-    //getAsJson
+    boolean isSuccessful();
 
-    interface Result {
+    boolean isFailed();
 
-        String RESULT_SUCCESSFUL = "Successful";
-        String RESULT_FAILED = "Failed";
+    boolean isInProgress();
 
-        String getStatus();
-
-        Optional<String> getMessage();
-    }
+    boolean isCompleted();
 }

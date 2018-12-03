@@ -25,13 +25,6 @@ import org.flowable.engine.migration.ProcessInstanceMigrationManager;
  */
 public class ProcessInstanceMigrationCmd extends AbstractProcessInstanceMigrationCmd implements Command<Void> {
 
-    protected ProcessInstanceMigrationDocument processInstanceMigrationDocument;
-    protected String processInstanceId;
-    protected String processDefinitionId;
-    protected String processDefinitionKey;
-    protected int processDefinitionVersion;
-    protected String processDefinitionTenantId;
-
     public static ProcessInstanceMigrationCmd forProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
         requireNonNullProcessInstanceId(processInstanceId);
         requireNonNullProcessInstanceMigrationDocument(processInstanceMigrationDocument);

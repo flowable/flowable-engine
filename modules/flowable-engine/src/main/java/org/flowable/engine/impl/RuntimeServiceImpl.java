@@ -60,9 +60,6 @@ import org.flowable.engine.impl.cmd.GetStartFormCmd;
 import org.flowable.engine.impl.cmd.GetStartFormModelCmd;
 import org.flowable.engine.impl.cmd.HasExecutionVariableCmd;
 import org.flowable.engine.impl.cmd.MessageEventReceivedCmd;
-import org.flowable.engine.impl.cmd.ProcessInstanceMigrationBatchValidationCmd;
-import org.flowable.engine.impl.cmd.ProcessInstanceMigrationCmd;
-import org.flowable.engine.impl.cmd.ProcessInstanceMigrationValidationCmd;
 import org.flowable.engine.impl.cmd.RemoveEventListenerCommand;
 import org.flowable.engine.impl.cmd.RemoveExecutionVariablesCmd;
 import org.flowable.engine.impl.cmd.SetExecutionVariablesCmd;
@@ -75,13 +72,8 @@ import org.flowable.engine.impl.cmd.StartProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.StartProcessInstanceWithFormCmd;
 import org.flowable.engine.impl.cmd.SuspendProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.TriggerCmd;
-import org.flowable.engine.impl.migration.ProcessInstanceMigrationBuilderImpl;
-import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
-import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntity;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
-import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
-import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.runtime.EventSubscriptionQuery;
@@ -717,6 +709,5 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     public void changeActivityState(ChangeActivityStateBuilderImpl changeActivityStateBuilder) {
         commandExecutor.execute(new ChangeActivityStateCmd(changeActivityStateBuilder));
     }
-
 
 }

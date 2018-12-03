@@ -13,15 +13,16 @@
 package org.flowable.engine.impl.jobexecutor;
 
 import java.util.Date;
+import java.util.List;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationDocumentImpl;
-import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationManager;
+import org.flowable.engine.migration.ProcessInstanceMigrationResult;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
 
@@ -34,8 +35,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class ProcessInstanceMigrationValidationJobHandler extends AbstractProcessInstanceMigrationJobHandler {
 
     public static final String TYPE = "process-migration-validation";
-    public static final String RESULT_LABEL_PROCESS_INSTANCE_ID = "processInstanceId";
-    public static final String RESULT_LABEL_VALIDATION_MESSAGES = "validationMessages";
 
     @Override
     public String getType() {
@@ -52,26 +51,22 @@ public class ProcessInstanceMigrationValidationJobHandler extends AbstractProces
         ProcessMigrationBatchEntity batchEntity = processMigrationBatchEntityManager.findById(batchId);
 
         ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentImpl.fromProcessInstanceMigrationDocumentJson(batchEntity.getMigrationDocumentJson());
-        ProcessInstanceMigrationValidationResult validationResult = processInstanceMigrationManager.validateMigrateProcessInstance(batchEntity.getProcessInstanceId(), migrationDocument, commandContext);
+        ProcessInstanceMigrationResult<List<String>> validationResult = processInstanceMigrationManager.validateMigrateProcessInstance(batchEntity.getProcessInstanceId(), migrationDocument, commandContext);
 
         Date currentTime = CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime();
-        if (validationResult.hasErrors()) {
-            String collatedValidationResult = prepareResultAsJsonString(validationResult);
-            batchEntity.completeWithResult(currentTime, collatedValidationResult);
-        } else {
-            batchEntity.complete(currentTime);
-        }
+        String validationResultValueAsJson = prepareResultAsJsonString (validationResult.getResultValue().orElse(null));
+        batchEntity.completeWithResult(currentTime, validationResultValueAsJson);
     }
 
-    protected static String prepareResultAsJsonString(ProcessInstanceMigrationValidationResult validationResult) {
+    protected static String prepareResultAsJsonString(List<String> validationMessages) {
         ObjectNode objectNode = getObjectMapper().createObjectNode();
-        if (validationResult.getProcessInstanceId() != null) {
-            objectNode.put(RESULT_LABEL_PROCESS_INSTANCE_ID, validationResult.getProcessInstanceId());
-        }
-        if (!validationResult.getValidationMessages().isEmpty()) {
+        if (validationMessages == null || validationMessages.isEmpty()) {
+            objectNode.put(BATCH_RESULT_STATUS_LABEL, RESULT_STATUS_SUCCESSFUL);
+        } else {
+            objectNode.put(BATCH_RESULT_STATUS_LABEL, RESULT_STATUS_FAILED);
             ArrayNode messagesNode = getObjectMapper().createArrayNode();
-            validationResult.getValidationMessages().forEach(messagesNode::add);
-            objectNode.set(RESULT_LABEL_VALIDATION_MESSAGES, messagesNode);
+            validationMessages.forEach(messagesNode::add);
+            objectNode.set(BATCH_RESULT_VALUE_LABEL, messagesNode);
         }
         return objectNode.toString();
     }

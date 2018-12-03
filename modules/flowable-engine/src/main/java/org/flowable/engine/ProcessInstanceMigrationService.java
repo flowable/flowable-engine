@@ -14,11 +14,9 @@ package org.flowable.engine;
 
 import java.util.List;
 
-import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationResult;
-import org.flowable.engine.runtime.ProcessMigrationBatch;
 
 /**
  * Service for preparing and execution ProcessInstanceMigration operations.
@@ -31,21 +29,21 @@ public interface ProcessInstanceMigrationService {
 
     ProcessInstanceMigrationBuilder createProcessInstanceMigrationBuilderFromProcessInstanceMigrationDocument(ProcessInstanceMigrationDocument document);
 
-    ProcessInstanceMigrationValidationResult validateMigrationForProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
+    ProcessInstanceMigrationResult<List<String>> validateMigrationForProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
 
-    List<ProcessInstanceMigrationValidationResult> validateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
+    ProcessInstanceMigrationResult<List<String>> validateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
 
-    List<ProcessInstanceMigrationValidationResult> validateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
+    ProcessInstanceMigrationResult<List<String>> validateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
 
     String batchValidateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
 
     String batchValidateMigrationForProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
 
-    List<ProcessInstanceMigrationValidationResult> getResultsOfBatchProcessInstanceMigrationValidation(String migrationBatchId);
+    ProcessInstanceMigrationResult<List<String>> getResultsOfBatchProcessInstanceMigrationValidation(String migrationBatchId);
 
-    ProcessMigrationBatch getProcessMigrationBatchById(String migrationBatchId);
-
-    ProcessMigrationBatch getProcessMigrationBatchAndResourcesById(String migrationBatchId);
+    //TODO WIP - Having the ProcessInstanceMigrationResult this Batch entities seem nonsensical - but batch timeStamps should be included in the Result Object
+    //    ProcessMigrationBatch getProcessMigrationBatchById(String migrationBatchId);
+    //    ProcessMigrationBatch getProcessMigrationBatchAndResourcesById(String migrationBatchId);
 
     void deleteBatchAndResourcesById(String migrationBatchId);
 
@@ -59,6 +57,6 @@ public interface ProcessInstanceMigrationService {
 
     String batchMigrateProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);
 
-    ProcessInstanceMigrationResult getBatchProcessInstanceMigrationResult(String migrationBatchId);
+    ProcessInstanceMigrationResult<String> getResultsOfBatchProcessInstanceMigration(String migrationBatchId);
 }
 

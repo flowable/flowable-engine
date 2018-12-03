@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotEquals;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -31,7 +32,6 @@ import org.flowable.engine.delegate.event.FlowableMessageEvent;
 import org.flowable.engine.delegate.event.FlowableSignalEvent;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -39,6 +39,7 @@ import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocumentConverter;
+import org.flowable.engine.migration.ProcessInstanceMigrationResult;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.DataObject;
@@ -106,19 +107,18 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertEquals(version1ProcessDef.getId(), tasks.get(0).getProcessDefinitionId());
         assertEquals("userTask1Id", tasks.get(0).getTaskDefinitionKey());
 
-        ProcessInstanceMigrationValidationResult validationResult = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationResult<List<String>> validationResult = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId())
             .validateMigration(processInstance.getId());
 
-        assertEquals(false, validationResult.hasErrors());
-        assertEquals(true, validationResult.isMigrationValid());
-        assertEquals(0, validationResult.getValidationMessages().size());
+        assertEquals(true, validationResult.isSuccessful());
+        assertEquals(0, validationResult.getPartsCount());
 
         //Migrate process
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId());
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -434,22 +434,20 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertEquals(version1ProcessDef.getId(), tasks.get(0).getProcessDefinitionId());
         assertEquals("userTask1Id", tasks.get(0).getTaskDefinitionKey());
 
-        ProcessInstanceMigrationValidationResult validationResult = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationResult<List<String>> validationResult = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask1Id"))
             .validateMigration(processInstance.getId());
 
-        assertEquals(false, validationResult.hasErrors());
-        assertEquals(true, validationResult.isMigrationValid());
-        assertEquals(0, validationResult.getValidationMessages().size());
+        assertTrue(validationResult.isSuccessful());
 
         //Migrate process - moving the current execution explicitly
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask1Id"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -513,31 +511,29 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertEquals(version1ProcessDef.getId(), tasks.get(0).getProcessDefinitionId());
         assertEquals("userTask1Id", tasks.get(0).getTaskDefinitionKey());
 
-        ProcessInstanceMigrationValidationResult validationResult = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationValidationResult = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask3Id"))
             .validateMigration(processInstance.getId());
 
-        assertEquals(true, validationResult.hasErrors());
-        assertEquals(false, validationResult.isMigrationValid());
-        assertEquals(1, validationResult.getValidationMessages().size());
+        assertThat(processInstanceMigrationValidationResult.isFailed()).isTrue();
+        assertThat(processInstanceMigrationValidationResult.getResultValue()).get()
+            .isEqualTo(Collections.singletonList("Invalid mapping for 'userTask1Id' to 'userTask3Id', cannot be found in the process definition with id 'MP'"));
 
-        validationResult = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
+        processInstanceMigrationValidationResult = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask2Id"))
             .validateMigration(processInstance.getId());
 
-        assertEquals(false, validationResult.hasErrors());
-        assertEquals(true, validationResult.isMigrationValid());
-        assertEquals(0, validationResult.getValidationMessages().size());
+        assertThat(processInstanceMigrationValidationResult.isSuccessful()).isTrue();
 
         //Migrate process - moving the current execution explicitly
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask2Id"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -609,8 +605,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(version2ProcessDef.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask2Id", "userTask1Id"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -677,8 +673,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processInstanceMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId());
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -768,8 +764,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(version2ProcessDef.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask1Id").withNewAssignee("kermit"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -840,8 +836,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(procDefTwoTasks.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("InsideSimpleSubProcess1", "InsideSimpleSubProcess2"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -907,8 +903,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(procDefOneTask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("InsideSimpleSubProcess2", "InsideSimpleSubProcess1"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -967,8 +963,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(procDefTwoTasks.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("BeforeSubProcess", "InsideSimpleSubProcess2"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -1028,8 +1024,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(procDefOneTask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("InsideSimpleSubProcess2", "BeforeSubProcess"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -1102,8 +1098,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(procDefNested.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("BeforeSubProcess", "InsideNestedSubProcess"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -1158,8 +1154,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(procDefNested.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("BeforeSubProcess", "InsideNestedSubProcess"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -1225,8 +1221,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(procDefNested.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("InsideSimpleSubProcess1", "InsideNestedSubProcess"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -1291,8 +1287,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(procDefNested.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("InsideSimpleSubProcess1", "InsideNestedSubProcess"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -1361,8 +1357,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(procDefOWithTimer.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "firstTask"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -1443,8 +1439,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(procDefOneTask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("firstTask", "userTask1Id"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -1513,8 +1509,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(procDefTwoTimers.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("firstTask", "secondTask"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -1602,8 +1598,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(procDefOneTask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("subTask", "userTask1Id"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -1675,8 +1671,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(procDefSubProcWithTimer.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subTask"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -1753,8 +1749,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(procDefSubProcWithTimer.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subTask"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -1839,8 +1835,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(procVersion2.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("subTask", "subTask2"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -1920,8 +1916,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(procDefTimerTaskInSubProcess.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subTask"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -2002,8 +1998,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(procDefTimerTaskInSubProcess.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subTask"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -2089,8 +2085,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(procWithSignal.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "intermediateCatchEvent"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -2193,8 +2189,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(procDefOneTask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("intermediateCatchEvent", "userTask1Id"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -2279,8 +2275,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(procWithSignalVer2.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("intermediateCatchEvent", "newIntermediateCatchEvent"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -2375,8 +2371,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(procWithSignal.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "intermediateCatchEvent"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -2480,8 +2476,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(procDefOneTask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("intermediateCatchEvent", "userTask1Id"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -2571,8 +2567,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .migrateToProcessDefinition(procWithSignalVer2.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("intermediateCatchEvent", "intermediateNewCatchEvent"));
 
-        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        ProcessInstanceMigrationResult<List<String>> processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isSuccessful()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 

@@ -22,7 +22,6 @@ import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntityMa
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationManager;
-import org.flowable.engine.migration.ProcessInstanceMigrationResult;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
 
@@ -35,10 +34,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class ProcessInstanceMigrationJobHandler extends AbstractProcessInstanceMigrationJobHandler {
 
     public static final String TYPE = "process-migration";
-    public static final String RESULT_LABEL_MIGRATION_PROCESS = "migrationProcess";
-    public static final String RESULT_LABEL_CAUSE = "cause";
-    public static final String RESULT_VALUE_SUCCESSFUL = ProcessInstanceMigrationResult.Result.RESULT_SUCCESSFUL;
-    public static final String RESULT_VALUE_FAILED = ProcessInstanceMigrationResult.Result.RESULT_FAILED;
 
     @Override
     public String getType() {
@@ -64,18 +59,18 @@ public class ProcessInstanceMigrationJobHandler extends AbstractProcessInstanceM
             exceptionMessage = e.getMessage();
         }
 
-        String resultAsJsonString = prepareResultAsJsonString(batchEntity.getProcessInstanceId(), exceptionMessage);
+        String resultAsJsonString = prepareResultAsJsonString(exceptionMessage);
         Date currentTime = CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime();
         batchEntity.completeWithResult(currentTime, resultAsJsonString);
     }
 
-    protected static String prepareResultAsJsonString(String processInstanceId, String exceptionMessage) {
+    protected static String prepareResultAsJsonString(String exceptionMessage) {
         ObjectNode objectNode = getObjectMapper().createObjectNode();
         if (exceptionMessage == null) {
-            objectNode.put(RESULT_LABEL_MIGRATION_PROCESS, RESULT_VALUE_SUCCESSFUL);
+            objectNode.put(BATCH_RESULT_STATUS_LABEL, RESULT_STATUS_SUCCESSFUL);
         } else {
-            objectNode.put(RESULT_LABEL_MIGRATION_PROCESS, RESULT_VALUE_FAILED);
-            objectNode.put(RESULT_LABEL_CAUSE, exceptionMessage);
+            objectNode.put(BATCH_RESULT_STATUS_LABEL, RESULT_STATUS_FAILED);
+            objectNode.put(BATCH_RESULT_VALUE_LABEL, exceptionMessage);
         }
         return objectNode.toString();
     }

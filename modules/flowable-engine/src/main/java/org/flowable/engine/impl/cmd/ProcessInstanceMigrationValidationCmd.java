@@ -13,21 +13,20 @@
 
 package org.flowable.engine.impl.cmd;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationManager;
+import org.flowable.engine.migration.ProcessInstanceMigrationResult;
 
 /**
  * @author Dennis Federico
  */
-public class ProcessInstanceMigrationValidationCmd extends AbstractProcessInstanceMigrationCmd implements Command<List<ProcessInstanceMigrationValidationResult>> {
+public class ProcessInstanceMigrationValidationCmd extends AbstractProcessInstanceMigrationCmd implements Command<ProcessInstanceMigrationResult<List<String>>> {
 
     public static ProcessInstanceMigrationValidationCmd forProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
         requireNonNullProcessInstanceId(processInstanceId);
@@ -63,12 +62,12 @@ public class ProcessInstanceMigrationValidationCmd extends AbstractProcessInstan
     }
 
     @Override
-    public List<ProcessInstanceMigrationValidationResult> execute(CommandContext commandContext) {
+    public ProcessInstanceMigrationResult<List<String>> execute(CommandContext commandContext) {
 
         ProcessInstanceMigrationManager migrationManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceMigrationManager();
 
         if (processInstanceId != null) {
-            return Collections.singletonList(migrationManager.validateMigrateProcessInstance(processInstanceId, processInstanceMigrationDocument, commandContext));
+            return migrationManager.validateMigrateProcessInstance(processInstanceId, processInstanceMigrationDocument, commandContext);
         }
 
         if (processDefinitionId != null) {

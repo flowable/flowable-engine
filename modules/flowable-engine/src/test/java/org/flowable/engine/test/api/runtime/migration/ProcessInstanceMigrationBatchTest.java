@@ -15,28 +15,24 @@ package org.flowable.engine.test.api.runtime.migration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-import org.assertj.core.api.iterable.Extractor;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationResult;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.runtime.ProcessMigrationBatch;
 import org.flowable.engine.test.api.runtime.changestate.ChangeStateEventListener;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -138,35 +134,49 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         assertTrue(JobTestHelper.areJobsAvailable(managementService));
 
         //Confirm the batch is not finished
-        ProcessMigrationBatch validationBatch = processInstanceMigrationService.getProcessMigrationBatchById(validationBatchId);
-        assertThat(validationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(false);
-        List<ProcessInstanceMigrationValidationResult> validationResults = processInstanceMigrationService.getResultsOfBatchProcessInstanceMigrationValidation(validationBatchId);
-        assertThat(validationResults).isNull();
+        //        ProcessMigrationBatch validationBatch = processInstanceMigrationService.getProcessMigrationBatchById(validationBatchId);
+        //        assertThat(validationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(false);
+        ProcessInstanceMigrationResult<List<String>> validationResults = processInstanceMigrationService.getResultsOfBatchProcessInstanceMigrationValidation(validationBatchId);
+        assertThat(validationResults.isCompleted()).isFalse();
 
         //Start async executor to process the batches
         executeJobExecutorForTime(1000L, 500L);
         assertFalse(JobTestHelper.areJobsAvailable(managementService));
 
         //Confirm the batches have ended
-        validationBatch = processInstanceMigrationService.getProcessMigrationBatchById(validationBatchId);
-        assertThat(validationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(true);
+        //        validationBatch = processInstanceMigrationService.getProcessMigrationBatchById(validationBatchId);
+        //        assertThat(validationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(true);
         validationResults = processInstanceMigrationService.getResultsOfBatchProcessInstanceMigrationValidation(validationBatchId);
         assertThat(validationResults).isNotNull();
-        assertThat(validationResults).size().isEqualTo(2);
-        assertThat(validationResults).extracting(ProcessInstanceMigrationValidationResult::getProcessInstanceId)
-            .containsExactlyInAnyOrder(processInstance1.getId(), processInstance2.getId());
-        assertThat(validationResults).<List<String>>extracting(ProcessInstanceMigrationValidationResult::getValidationMessages)
-            .containsExactlyInAnyOrder(Collections.singletonList("Process instance (id:'" + processInstance1.getId() + "') has a running Activity (id:'userTask2Id') that is not mapped for migration (Or its Multi-Instance parent)"),
-                Collections.singletonList("Process instance (id:'" + processInstance2.getId() + "') has a running Activity (id:'userTask2Id') that is not mapped for migration (Or its Multi-Instance parent)"));
+        assertThat(validationResults.getPartsCount()).isEqualTo(2L);
+        assertThat(validationResults.getFailedPartsCount()).isEqualTo(2L);
+
+        List<String> procInstanceIds = validationResults.getFailedParts().stream()
+            .map(ProcessInstanceMigrationResult::getProcessInstanceId)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .collect(Collectors.toList());
+        assertThat(procInstanceIds).containsExactlyInAnyOrder(processInstance1.getId(), processInstance2.getId());
+
+        List<String> validationMessages = validationResults.getFailedParts().stream()
+            .map(ProcessInstanceMigrationResult::getResultValue)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .flatMap(List::stream)
+            .collect(Collectors.toList());
+
+        assertThat(validationMessages)
+            .containsExactlyInAnyOrder("Process instance (id:'" + processInstance1.getId() + "') has a running Activity (id:'userTask2Id') that is not mapped for migration (Or its Multi-Instance parent)",
+                "Process instance (id:'" + processInstance2.getId() + "') has a running Activity (id:'userTask2Id') that is not mapped for migration (Or its Multi-Instance parent)");
 
         //Try batch migrate the process instances
         String migrationBatchId = processInstanceMigrationBuilder.batchMigrateProcessInstances(version1ProcessDef.getId());
         assertTrue(JobTestHelper.areJobsAvailable(managementService));
 
         //Confirm the batch is not finished
-        ProcessMigrationBatch migrationBatch = processInstanceMigrationService.getProcessMigrationBatchById(migrationBatchId);
-        assertThat(migrationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(false);
-        ProcessInstanceMigrationResult migrationResult = processInstanceMigrationService.getBatchProcessInstanceMigrationResult(migrationBatchId);
+        //        ProcessMigrationBatch migrationBatch = processInstanceMigrationService.getProcessMigrationBatchById(migrationBatchId);
+        //        assertThat(migrationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(false);
+        ProcessInstanceMigrationResult<String> migrationResult = processInstanceMigrationService.getResultsOfBatchProcessInstanceMigration(migrationBatchId);
 
         //Partial Results
         assertThat(migrationResult).isNotNull();
@@ -176,9 +186,9 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getInProgressPartsCount).isEqualTo(2L);
         assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getCompletedPartsCount).isEqualTo(0L);
 
-        for (ProcessInstanceMigrationResult part : migrationResult.getParts()) {
+        for (ProcessInstanceMigrationResult<String> part : migrationResult.getParts()) {
             assertThat(part).extracting(ProcessInstanceMigrationResult::getStatus).isEqualTo(ProcessInstanceMigrationResult.STATUS_IN_PROGRESS);
-            assertThat(part.getResult()).isEmpty();
+            assertThat(part.getResultValue()).isEmpty();
             assertThat(part).extracting(ProcessInstanceMigrationResult::getPartsCount).isEqualTo(0L);
         }
 
@@ -187,9 +197,9 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         assertFalse(JobTestHelper.areJobsAvailable(managementService));
 
         //Confirm the batches have ended
-        migrationBatch = processInstanceMigrationService.getProcessMigrationBatchById(migrationBatchId);
-        assertThat(migrationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(true);
-        migrationResult = processInstanceMigrationService.getBatchProcessInstanceMigrationResult(migrationBatchId);
+        //        migrationBatch = processInstanceMigrationService.getProcessMigrationBatchById(migrationBatchId);
+        //        assertThat(migrationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(true);
+        migrationResult = processInstanceMigrationService.getResultsOfBatchProcessInstanceMigration(migrationBatchId);
         assertThat(migrationResult).isNotNull();
 
         assertThat(migrationResult).isNotNull();
@@ -201,11 +211,11 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getSuccessfulPartsCount).isEqualTo(0L);
         assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getFailedPartsCount).isEqualTo(2L);
 
-        for (ProcessInstanceMigrationResult part : migrationResult.getParts()) {
+        for (ProcessInstanceMigrationResult<String> part : migrationResult.getParts()) {
             assertThat(part).extracting(ProcessInstanceMigrationResult::getStatus).isEqualTo(ProcessInstanceMigrationResult.STATUS_COMPLETED);
             assertThat(part).extracting(ProcessInstanceMigrationResult::getPartsCount).isEqualTo(0L);
-            assertThat(part.getResult()).get().extracting(ProcessInstanceMigrationResult.Result::getStatus).isEqualTo(ProcessInstanceMigrationResult.Result.RESULT_FAILED);
-            assertThat(part.getResult().get().getMessage()).get().isEqualTo("Migration Activity mapping missing for activity definition Id:'userTask2Id' or its MI Parent");
+            assertThat(part.getResultStatus()).get().isEqualTo(ProcessInstanceMigrationResult.RESULT_FAILED);
+            assertThat(part.getResultValue()).get().isEqualTo("Migration Activity mapping missing for activity definition Id:'userTask2Id' or its MI Parent");
         }
 
         //Confirm no migration happened
@@ -265,25 +275,49 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         assertTrue(JobTestHelper.areJobsAvailable(managementService));
 
         //Confirm the batch is not finished
-        ProcessMigrationBatch validationBatch = processInstanceMigrationService.getProcessMigrationBatchById(validationBatchId);
-        assertThat(validationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(false);
-        List<ProcessInstanceMigrationValidationResult> validationResults = processInstanceMigrationService.getResultsOfBatchProcessInstanceMigrationValidation(validationBatchId);
-        assertThat(validationResults).isNull();
+        //        ProcessMigrationBatch validationBatch = processInstanceMigrationService.getProcessMigrationBatchById(validationBatchId);
+        //        assertThat(validationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(false);
+        ProcessInstanceMigrationResult<List<String>> validationResults = processInstanceMigrationService.getResultsOfBatchProcessInstanceMigrationValidation(validationBatchId);
+        assertThat(validationResults.isCompleted()).isFalse();
+        assertThat(validationResults.getPartsCount()).isEqualTo(2L);
 
         //Start async executor to process the batches
         executeJobExecutorForTime(1000L, 500L);
         assertFalse(JobTestHelper.areJobsAvailable(managementService));
 
         //Confirm the batches have ended
-        validationBatch = processInstanceMigrationService.getProcessMigrationBatchById(validationBatchId);
-        assertThat(validationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(true);
+        //        validationBatch = processInstanceMigrationService.getProcessMigrationBatchById(validationBatchId);
+        //        assertThat(validationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(true);
         validationResults = processInstanceMigrationService.getResultsOfBatchProcessInstanceMigrationValidation(validationBatchId);
         assertThat(validationResults).isNotNull();
-        assertThat(validationResults).size().isEqualTo(1);
-        assertThat(validationResults).extracting(ProcessInstanceMigrationValidationResult::getProcessInstanceId)
-            .containsExactlyInAnyOrder(processInstance1.getId());
-        assertThat(validationResults).extracting(ProcessInstanceMigrationValidationResult::getValidationMessages)
-            .containsExactlyInAnyOrder(Collections.singletonList("Process instance (id:'" + processInstance1.getId() + "') has a running Activity (id:'userTask2Id') that is not mapped for migration (Or its Multi-Instance parent)"));
+        assertThat(validationResults.getPartsCount()).isEqualTo(2L);
+
+        assertThat(validationResults.getFailedPartsCount()).isEqualTo(1L);
+
+        List<String> procInstanceIds = validationResults.getFailedParts().stream()
+            .map(ProcessInstanceMigrationResult::getProcessInstanceId)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .collect(Collectors.toList());
+        assertThat(procInstanceIds).containsExactlyInAnyOrder(processInstance1.getId());
+
+        List<String> validationMessages = validationResults.getFailedParts().stream()
+            .map(ProcessInstanceMigrationResult::getResultValue)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .flatMap(List::stream)
+            .collect(Collectors.toList());
+
+        assertThat(validationMessages)
+            .containsExactlyInAnyOrder("Process instance (id:'" + processInstance1.getId() + "') has a running Activity (id:'userTask2Id') that is not mapped for migration (Or its Multi-Instance parent)");
+
+        assertThat(validationResults.getSuccessfulPartsCount()).isEqualTo(1L);
+        procInstanceIds = validationResults.getSuccessfulParts().stream()
+            .map(ProcessInstanceMigrationResult::getProcessInstanceId)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .collect(Collectors.toList());
+        assertThat(procInstanceIds).containsExactlyInAnyOrder(processInstance2.getId());
 
         //Migrate the process
         //Try batch migrate the process instances
@@ -291,9 +325,9 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         assertTrue(JobTestHelper.areJobsAvailable(managementService));
 
         //Confirm the batch is not finished
-        ProcessMigrationBatch migrationBatch = processInstanceMigrationService.getProcessMigrationBatchById(migrationBatchId);
-        assertThat(migrationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(false);
-        ProcessInstanceMigrationResult migrationResult = processInstanceMigrationService.getBatchProcessInstanceMigrationResult(migrationBatchId);
+        //        ProcessMigrationBatch migrationBatch = processInstanceMigrationService.getProcessMigrationBatchById(migrationBatchId);
+        //        assertThat(migrationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(false);
+        ProcessInstanceMigrationResult<String> migrationResult = processInstanceMigrationService.getResultsOfBatchProcessInstanceMigration(migrationBatchId);
 
         //Partial Results
         assertThat(migrationResult).isNotNull();
@@ -303,9 +337,9 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getInProgressPartsCount).isEqualTo(2L);
         assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getCompletedPartsCount).isEqualTo(0L);
 
-        for (ProcessInstanceMigrationResult part : migrationResult.getParts()) {
+        for (ProcessInstanceMigrationResult<String> part : migrationResult.getParts()) {
             assertThat(part).extracting(ProcessInstanceMigrationResult::getStatus).isEqualTo(ProcessInstanceMigrationResult.STATUS_IN_PROGRESS);
-            assertThat(part.getResult()).isEmpty();
+            assertThat(part.getResultValue()).isEmpty();
             assertThat(part).extracting(ProcessInstanceMigrationResult::getPartsCount).isEqualTo(0L);
         }
 
@@ -314,9 +348,9 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         assertFalse(JobTestHelper.areJobsAvailable(managementService));
 
         //Confirm the batches have ended
-        migrationBatch = processInstanceMigrationService.getProcessMigrationBatchById(migrationBatchId);
-        assertThat(migrationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(true);
-        migrationResult = processInstanceMigrationService.getBatchProcessInstanceMigrationResult(migrationBatchId);
+        //        migrationBatch = processInstanceMigrationService.getProcessMigrationBatchById(migrationBatchId);
+        //        assertThat(migrationBatch).extracting(ProcessMigrationBatch::isCompleted).isEqualTo(true);
+        migrationResult = processInstanceMigrationService.getResultsOfBatchProcessInstanceMigration(migrationBatchId);
         assertThat(migrationResult).isNotNull();
 
         assertThat(migrationResult).isNotNull();
@@ -328,18 +362,18 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getSuccessfulPartsCount).isEqualTo(1L);
         assertThat(migrationResult).extracting(ProcessInstanceMigrationResult::getFailedPartsCount).isEqualTo(1L);
 
-        for (ProcessInstanceMigrationResult part : migrationResult.getSuccessfulParts()) {
+        for (ProcessInstanceMigrationResult<String> part : migrationResult.getSuccessfulParts()) {
             assertThat(part).extracting(ProcessInstanceMigrationResult::getStatus).isEqualTo(ProcessInstanceMigrationResult.STATUS_COMPLETED);
             assertThat(part).extracting(ProcessInstanceMigrationResult::getPartsCount).isEqualTo(0L);
-            assertThat(part.getResult()).get().extracting(ProcessInstanceMigrationResult.Result::getStatus).isEqualTo(ProcessInstanceMigrationResult.Result.RESULT_SUCCESSFUL);
-            assertThat(part.getResult().get().getMessage()).isEmpty();
+            assertThat(part.getResultStatus()).get().isEqualTo(ProcessInstanceMigrationResult.RESULT_SUCCESSFUL);
+            assertThat(part.getResultValue()).isEmpty();
         }
 
-        for (ProcessInstanceMigrationResult part : migrationResult.getFailedParts()) {
+        for (ProcessInstanceMigrationResult<String> part : migrationResult.getFailedParts()) {
             assertThat(part).extracting(ProcessInstanceMigrationResult::getStatus).isEqualTo(ProcessInstanceMigrationResult.STATUS_COMPLETED);
             assertThat(part).extracting(ProcessInstanceMigrationResult::getPartsCount).isEqualTo(0L);
-            assertThat(part.getResult()).get().extracting(ProcessInstanceMigrationResult.Result::getStatus).isEqualTo(ProcessInstanceMigrationResult.Result.RESULT_FAILED);
-            assertThat(part.getResult().get().getMessage()).get().isEqualTo("Migration Activity mapping missing for activity definition Id:'userTask2Id' or its MI Parent");
+            assertThat(part.getResultStatus()).get().isEqualTo(ProcessInstanceMigrationResult.RESULT_FAILED);
+            assertThat(part.getResultValue()).get().isEqualTo("Migration Activity mapping missing for activity definition Id:'userTask2Id' or its MI Parent");
         }
 
         //Confirm the migration
@@ -359,21 +393,4 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         processInstanceMigrationService.deleteBatchAndResourcesById(validationBatchId);
         processInstanceMigrationService.deleteBatchAndResourcesById(migrationBatchId);
     }
-
-    private Extractor<JsonNode, String> jsonValueExtractor(String property) {
-        return jsonValueExtractor(property, null);
-    }
-
-    private Extractor<JsonNode, String> jsonValueExtractor(String property, String defaultValue) {
-        return jsonNode -> jsonNode.has(property) ? jsonNode.get(property).asText() : defaultValue;
-    }
-
-    private JsonNode readTreeNoException(String json) {
-        try {
-            return objectMapper.readTree(json);
-        } catch (IOException e) {
-            return null;
-        }
-    }
-
 }

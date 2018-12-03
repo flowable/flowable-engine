@@ -25,10 +25,6 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
-import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntity;
-import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
-import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.runtime.EventSubscriptionQuery;
@@ -48,7 +44,6 @@ import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
- *
  * @author Tom Baeyens
  * @author Joram Barrez
  * @author Daniel Meyer
@@ -64,25 +59,25 @@ public interface RuntimeService {
      * Starts a new process instance in the latest version of the process definition with the given key.
      *
      * @param processDefinitionKey
-     *            key of process definition, cannot be null.
+     *     key of process definition, cannot be null.
      * @throws FlowableObjectNotFoundException
-     *             when no process definition is deployed with the given key.
+     *     when no process definition is deployed with the given key.
      */
     ProcessInstance startProcessInstanceByKey(String processDefinitionKey);
 
     /**
      * Starts a new process instance in the latest version of the process definition with the given key.
-     *
+     * <p>
      * A business key can be provided to associate the process instance with a certain identifier that has a clear business meaning. For example in an order process, the business key could be an order
      * id. This business key can then be used to easily look up that process instance , see {@link ProcessInstanceQuery#processInstanceBusinessKey(String)}. Providing such a business key is definitely
      * a best practice.
      *
      * @param processDefinitionKey
-     *            key of process definition, cannot be null.
+     *     key of process definition, cannot be null.
      * @param businessKey
-     *            a key that identifies the process instance and can be used to retrieve the process instance later via the query API.
+     *     a key that identifies the process instance and can be used to retrieve the process instance later via the query API.
      * @throws FlowableObjectNotFoundException
-     *             when no process definition is deployed with the given key.
+     *     when no process definition is deployed with the given key.
      */
     ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey);
 
@@ -90,29 +85,29 @@ public interface RuntimeService {
      * Starts a new process instance in the latest version of the process definition with the given key
      *
      * @param processDefinitionKey
-     *            key of process definition, cannot be null.
+     *     key of process definition, cannot be null.
      * @param variables
-     *            the variables to pass, can be null.
+     *     the variables to pass, can be null.
      * @throws FlowableObjectNotFoundException
-     *             when no process definition is deployed with the given key.
+     *     when no process definition is deployed with the given key.
      */
     ProcessInstance startProcessInstanceByKey(String processDefinitionKey, Map<String, Object> variables);
 
     /**
      * Starts a new process instance in the latest version of the process definition with the given key.
-     *
+     * <p>
      * A business key can be provided to associate the process instance with a certain identifier that has a clear business meaning. For example in an order process, the business key could be an order
      * id. This business key can then be used to easily look up that process instance , see {@link ProcessInstanceQuery#processInstanceBusinessKey(String)}. Providing such a business key is definitely
      * a best practice.
      *
      * @param processDefinitionKey
-     *            key of process definition, cannot be null.
+     *     key of process definition, cannot be null.
      * @param variables
-     *            the variables to pass, can be null.
+     *     the variables to pass, can be null.
      * @param businessKey
-     *            a key that identifies the process instance and can be used to retrieve the process instance later via the query API.
+     *     a key that identifies the process instance and can be used to retrieve the process instance later via the query API.
      * @throws FlowableObjectNotFoundException
-     *             when no process definition is deployed with the given key.
+     *     when no process definition is deployed with the given key.
      */
     ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey, Map<String, Object> variables);
 
@@ -140,25 +135,25 @@ public interface RuntimeService {
      * Starts a new process instance in the exactly specified version of the process definition with the given id.
      *
      * @param processDefinitionId
-     *            the id of the process definition, cannot be null.
+     *     the id of the process definition, cannot be null.
      * @throws FlowableObjectNotFoundException
-     *             when no process definition is deployed with the given key.
+     *     when no process definition is deployed with the given key.
      */
     ProcessInstance startProcessInstanceById(String processDefinitionId);
 
     /**
      * Starts a new process instance in the exactly specified version of the process definition with the given id.
-     *
+     * <p>
      * A business key can be provided to associate the process instance with a certain identifier that has a clear business meaning. For example in an order process, the business key could be an order
      * id. This business key can then be used to easily look up that process instance , see {@link ProcessInstanceQuery#processInstanceBusinessKey(String)}. Providing such a business key is definitely
      * a best practice.
      *
      * @param processDefinitionId
-     *            the id of the process definition, cannot be null.
+     *     the id of the process definition, cannot be null.
      * @param businessKey
-     *            a key that identifies the process instance and can be used to retrieve the process instance later via the query API.
+     *     a key that identifies the process instance and can be used to retrieve the process instance later via the query API.
      * @throws FlowableObjectNotFoundException
-     *             when no process definition is deployed with the given key.
+     *     when no process definition is deployed with the given key.
      */
     ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey);
 
@@ -166,50 +161,50 @@ public interface RuntimeService {
      * Starts a new process instance in the exactly specified version of the process definition with the given id.
      *
      * @param processDefinitionId
-     *            the id of the process definition, cannot be null.
+     *     the id of the process definition, cannot be null.
      * @param variables
-     *            variables to be passed, can be null
+     *     variables to be passed, can be null
      * @throws FlowableObjectNotFoundException
-     *             when no process definition is deployed with the given key.
+     *     when no process definition is deployed with the given key.
      */
     ProcessInstance startProcessInstanceById(String processDefinitionId, Map<String, Object> variables);
 
     /**
      * Starts a new process instance in the exactly specified version of the process definition with the given id.
-     *
+     * <p>
      * A business key can be provided to associate the process instance with a certain identifier that has a clear business meaning. For example in an order process, the business key could be an order
      * id. This business key can then be used to easily look up that process instance , see {@link ProcessInstanceQuery#processInstanceBusinessKey(String)}. Providing such a business key is definitely
      * a best practice.
      *
      * @param processDefinitionId
-     *            the id of the process definition, cannot be null.
+     *     the id of the process definition, cannot be null.
      * @param variables
-     *            variables to be passed, can be null
+     *     variables to be passed, can be null
      * @throws FlowableObjectNotFoundException
-     *             when no process definition is deployed with the given key.
+     *     when no process definition is deployed with the given key.
      */
     ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, Map<String, Object> variables);
 
     /**
      * Starts a new process instance in the exactly specified version of the process definition with the given id.
-     *
+     * <p>
      * A business key can be provided to associate the process instance with a certain identifier that has a clear business meaning. For example in an order process, the business key could be an order
      * id. This business key can then be used to easily look up that process instance , see {@link ProcessInstanceQuery#processInstanceBusinessKey(String)}. Providing such a business key is definitely
      * a best practice.
-     *
+     * <p>
      * Only use this method when a form definition is attached to the start event of the provided process definition. This will expect the Flowable Form Engine to be enabled. A new form instance will
      * be created after successfully starting a new process instance.
      *
      * @param processDefinitionId
-     *            the id of the process definition, cannot be null.
+     *     the id of the process definition, cannot be null.
      * @param outcome
-     *            the form outcome of the start form, can be null.
+     *     the form outcome of the start form, can be null.
      * @param variables
-     *            variables to be passed, can be null
+     *     variables to be passed, can be null
      * @param processInstanceName
-     *            the name of the process instance to be started, can be null.
+     *     the name of the process instance to be started, can be null.
      * @throws FlowableObjectNotFoundException
-     *             when no process definition is deployed with the given id.
+     *     when no process definition is deployed with the given id.
      */
     ProcessInstance startProcessInstanceWithForm(String processDefinitionId, String outcome, Map<String, Object> variables, String processInstanceName);
 
@@ -227,13 +222,10 @@ public interface RuntimeService {
      * </p>
      *
      * @param messageName
-     *            the 'name' of the message as specified as an attribute on the bpmn20 {@code <message name="messageName" />} element.
-     *
+     *     the 'name' of the message as specified as an attribute on the bpmn20 {@code <message name="messageName" />} element.
      * @return the {@link ProcessInstance} object representing the started process instance
-     *
      * @throws FlowableException
-     *             if no subscription to a message with the given name exists
-     *
+     *     if no subscription to a message with the given name exists
      * @since 5.9
      */
     ProcessInstance startProcessInstanceByMessage(String messageName);
@@ -247,17 +239,15 @@ public interface RuntimeService {
      * <p>
      * Signals the process engine that a message is received and starts a new {@link ProcessInstance}.
      * </p>
-     *
+     * <p>
      * See {@link #startProcessInstanceByMessage(String, Map)}. This method allows specifying a business key.
      *
      * @param messageName
-     *            the 'name' of the message as specified as an attribute on the bpmn20 {@code <message name="messageName" />} element.
+     *     the 'name' of the message as specified as an attribute on the bpmn20 {@code <message name="messageName" />} element.
      * @param businessKey
-     *            the business key which is added to the started process instance
-     *
+     *     the business key which is added to the started process instance
      * @throws FlowableException
-     *             if no subscription to a message with the given name exists
-     *
+     *     if no subscription to a message with the given name exists
      * @since 5.10
      */
     ProcessInstance startProcessInstanceByMessage(String messageName, String businessKey);
@@ -271,18 +261,16 @@ public interface RuntimeService {
      * <p>
      * Signals the process engine that a message is received and starts a new {@link ProcessInstance}.
      * </p>
-     *
+     * <p>
      * See {@link #startProcessInstanceByMessage(String)}. In addition, this method allows specifying a the payload of the message as a map of process variables.
      *
      * @param messageName
-     *            the 'name' of the message as specified as an attribute on the bpmn20 {@code <message name="messageName" />} element.
+     *     the 'name' of the message as specified as an attribute on the bpmn20 {@code <message name="messageName" />} element.
      * @param processVariables
-     *            the 'payload' of the message. The variables are added as processes variables to the started process instance.
+     *     the 'payload' of the message. The variables are added as processes variables to the started process instance.
      * @return the {@link ProcessInstance} object representing the started process instance
-     *
      * @throws FlowableException
-     *             if no subscription to a message with the given name exists
-     *
+     *     if no subscription to a message with the given name exists
      * @since 5.9
      */
     ProcessInstance startProcessInstanceByMessage(String messageName, Map<String, Object> processVariables);
@@ -296,20 +284,18 @@ public interface RuntimeService {
      * <p>
      * Signals the process engine that a message is received and starts a new {@link ProcessInstance}.
      * </p>
-     *
+     * <p>
      * See {@link #startProcessInstanceByMessage(String, Map)}. In addition, this method allows specifying a business key.
      *
      * @param messageName
-     *            the 'name' of the message as specified as an attribute on the bpmn20 {@code <message name="messageName" />} element.
+     *     the 'name' of the message as specified as an attribute on the bpmn20 {@code <message name="messageName" />} element.
      * @param businessKey
-     *            the business key which is added to the started process instance
+     *     the business key which is added to the started process instance
      * @param processVariables
-     *            the 'payload' of the message. The variables are added as processes variables to the started process instance.
+     *     the 'payload' of the message. The variables are added as processes variables to the started process instance.
      * @return the {@link ProcessInstance} object representing the started process instance
-     *
      * @throws FlowableException
-     *             if no subscription to a message with the given name exists
-     *
+     *     if no subscription to a message with the given name exists
      * @since 5.9
      */
     ProcessInstance startProcessInstanceByMessage(String messageName, String businessKey, Map<String, Object> processVariables);
@@ -323,9 +309,9 @@ public interface RuntimeService {
      * Gets a Form model instance of the start form of a specific process definition or process instance
      *
      * @param processDefinitionId
-     *            id of process definition for which the start form should be retrieved.
+     *     id of process definition for which the start form should be retrieved.
      * @param processInstanceId
-     *            id of process instance for which the start form should be retrieved.
+     *     id of process instance for which the start form should be retrieved.
      */
     FormInfo getStartFormModel(String processDefinitionId, String processInstanceId);
 
@@ -333,11 +319,11 @@ public interface RuntimeService {
      * Delete an existing runtime process instance.
      *
      * @param processInstanceId
-     *            id of process instance to delete, cannot be null.
+     *     id of process instance to delete, cannot be null.
      * @param deleteReason
-     *            reason for deleting, can be null.
+     *     reason for deleting, can be null.
      * @throws FlowableObjectNotFoundException
-     *             when no process instance is found with the given id.
+     *     when no process instance is found with the given id.
      */
     void deleteProcessInstance(String processInstanceId, String deleteReason);
 
@@ -345,9 +331,9 @@ public interface RuntimeService {
      * Finds the activity ids for all executions that are waiting in activities. This is a list because a single activity can be active multiple times.
      *
      * @param executionId
-     *            id of the execution, cannot be null.
+     *     id of the execution, cannot be null.
      * @throws FlowableObjectNotFoundException
-     *             when no execution exists with the given executionId.
+     *     when no execution exists with the given executionId.
      */
     List<String> getActiveActivityIds(String executionId);
 
@@ -355,9 +341,9 @@ public interface RuntimeService {
      * Sends an external trigger to an activity instance that is waiting inside the given execution.
      *
      * @param executionId
-     *            id of execution to signal, cannot be null.
+     *     id of execution to signal, cannot be null.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     void trigger(String executionId);
 
@@ -366,9 +352,9 @@ public interface RuntimeService {
      * The waiting execution is notified <strong>asynchronously</strong>.
      *
      * @param executionId
-     *            id of execution to signal, cannot be null.
+     *     id of execution to signal, cannot be null.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     void triggerAsync(String executionId);
 
@@ -376,11 +362,11 @@ public interface RuntimeService {
      * Sends an external trigger to an activity instance that is waiting inside the given execution.
      *
      * @param executionId
-     *            id of execution to signal, cannot be null.
+     *     id of execution to signal, cannot be null.
      * @param processVariables
-     *            a map of process variables
+     *     a map of process variables
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     void trigger(String executionId, Map<String, Object> processVariables);
 
@@ -389,11 +375,11 @@ public interface RuntimeService {
      * The waiting execution is notified <strong>asynchronously</strong>.
      *
      * @param executionId
-     *            id of execution to signal, cannot be null.
+     *     id of execution to signal, cannot be null.
      * @param processVariables
-     *            a map of process variables
+     *     a map of process variables
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     void triggerAsync(String executionId, Map<String, Object> processVariables);
 
@@ -406,9 +392,9 @@ public interface RuntimeService {
      * Updates the business key for the provided process instance
      *
      * @param processInstanceId
-     *            id of the process instance to set the business key, cannot be null
+     *     id of the process instance to set the business key, cannot be null
      * @param businessKey
-     *            new businessKey value
+     *     new businessKey value
      */
     void updateBusinessKey(String processInstanceId, String businessKey);
 
@@ -419,13 +405,13 @@ public interface RuntimeService {
      * Involves a user with a process instance. The type of identity link is defined by the given identityLinkType.
      *
      * @param processInstanceId
-     *            id of the process instance, cannot be null.
+     *     id of the process instance, cannot be null.
      * @param userId
-     *            id of the user involve, cannot be null.
+     *     id of the user involve, cannot be null.
      * @param identityLinkType
-     *            type of identityLink, cannot be null (@see {@link IdentityLinkType}).
+     *     type of identityLink, cannot be null (@see {@link IdentityLinkType}).
      * @throws FlowableObjectNotFoundException
-     *             when the process instance doesn't exist.
+     *     when the process instance doesn't exist.
      */
     void addUserIdentityLink(String processInstanceId, String userId, String identityLinkType);
 
@@ -433,13 +419,13 @@ public interface RuntimeService {
      * Involves a group with a process instance. The type of identityLink is defined by the given identityLink.
      *
      * @param processInstanceId
-     *            id of the process instance, cannot be null.
+     *     id of the process instance, cannot be null.
      * @param groupId
-     *            id of the group to involve, cannot be null.
+     *     id of the group to involve, cannot be null.
      * @param identityLinkType
-     *            type of identity, cannot be null (@see {@link IdentityLinkType}).
+     *     type of identity, cannot be null (@see {@link IdentityLinkType}).
      * @throws FlowableObjectNotFoundException
-     *             when the process instance or group doesn't exist.
+     *     when the process instance or group doesn't exist.
      */
     void addGroupIdentityLink(String processInstanceId, String groupId, String identityLinkType);
 
@@ -447,11 +433,11 @@ public interface RuntimeService {
      * Convenience shorthand for {@link #addUserIdentityLink(String, String, String)}; with type {@link IdentityLinkType#PARTICIPANT}
      *
      * @param processInstanceId
-     *            id of the process instance, cannot be null.
+     *     id of the process instance, cannot be null.
      * @param userId
-     *            id of the user to use as candidate, cannot be null.
+     *     id of the user to use as candidate, cannot be null.
      * @throws FlowableObjectNotFoundException
-     *             when the task or user doesn't exist.
+     *     when the task or user doesn't exist.
      */
     void addParticipantUser(String processInstanceId, String userId);
 
@@ -459,11 +445,11 @@ public interface RuntimeService {
      * Convenience shorthand for {@link #addGroupIdentityLink(String, String, String)}; with type {@link IdentityLinkType#PARTICIPANT}
      *
      * @param processInstanceId
-     *            id of the process instance, cannot be null.
+     *     id of the process instance, cannot be null.
      * @param groupId
-     *            id of the group to use as candidate, cannot be null.
+     *     id of the group to use as candidate, cannot be null.
      * @throws FlowableObjectNotFoundException
-     *             when the task or group doesn't exist.
+     *     when the task or group doesn't exist.
      */
     void addParticipantGroup(String processInstanceId, String groupId);
 
@@ -471,11 +457,11 @@ public interface RuntimeService {
      * Convenience shorthand for {@link #deleteUserIdentityLink(String, String, String)}; with type {@link IdentityLinkType#PARTICIPANT}
      *
      * @param processInstanceId
-     *            id of the process instance, cannot be null.
+     *     id of the process instance, cannot be null.
      * @param userId
-     *            id of the user to use as candidate, cannot be null.
+     *     id of the user to use as candidate, cannot be null.
      * @throws FlowableObjectNotFoundException
-     *             when the task or user doesn't exist.
+     *     when the task or user doesn't exist.
      */
     void deleteParticipantUser(String processInstanceId, String userId);
 
@@ -483,11 +469,11 @@ public interface RuntimeService {
      * Convenience shorthand for {@link #deleteGroupIdentityLink(String, String, String)}; with type {@link IdentityLinkType#PARTICIPANT}
      *
      * @param processInstanceId
-     *            id of the process instance, cannot be null.
+     *     id of the process instance, cannot be null.
      * @param groupId
-     *            id of the group to use as candidate, cannot be null.
+     *     id of the group to use as candidate, cannot be null.
      * @throws FlowableObjectNotFoundException
-     *             when the task or group doesn't exist.
+     *     when the task or group doesn't exist.
      */
     void deleteParticipantGroup(String processInstanceId, String groupId);
 
@@ -495,13 +481,13 @@ public interface RuntimeService {
      * Removes the association between a user and a process instance for the given identityLinkType.
      *
      * @param processInstanceId
-     *            id of the process instance, cannot be null.
+     *     id of the process instance, cannot be null.
      * @param userId
-     *            id of the user involve, cannot be null.
+     *     id of the user involve, cannot be null.
      * @param identityLinkType
-     *            type of identityLink, cannot be null (@see {@link IdentityLinkType}).
+     *     type of identityLink, cannot be null (@see {@link IdentityLinkType}).
      * @throws FlowableObjectNotFoundException
-     *             when the task or user doesn't exist.
+     *     when the task or user doesn't exist.
      */
     void deleteUserIdentityLink(String processInstanceId, String userId, String identityLinkType);
 
@@ -509,13 +495,13 @@ public interface RuntimeService {
      * Removes the association between a group and a process instance for the given identityLinkType.
      *
      * @param processInstanceId
-     *            id of the process instance, cannot be null.
+     *     id of the process instance, cannot be null.
      * @param groupId
-     *            id of the group to involve, cannot be null.
+     *     id of the group to involve, cannot be null.
      * @param identityLinkType
-     *            type of identity, cannot be null (@see {@link IdentityLinkType}).
+     *     type of identity, cannot be null (@see {@link IdentityLinkType}).
      * @throws FlowableObjectNotFoundException
-     *             when the task or group doesn't exist.
+     *     when the task or group doesn't exist.
      */
     void deleteGroupIdentityLink(String processInstanceId, String groupId, String identityLinkType);
 
@@ -551,10 +537,10 @@ public interface RuntimeService {
      * All variables visible from the given execution scope (including parent scopes).
      *
      * @param executionId
-     *            id of execution, cannot be null.
+     *     id of execution, cannot be null.
      * @return the variables or an empty map if no such variables are found.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     Map<String, Object> getVariables(String executionId);
 
@@ -562,10 +548,10 @@ public interface RuntimeService {
      * All variables visible from the given execution scope (including parent scopes).
      *
      * @param executionId
-     *            id of execution, cannot be null.
+     *     id of execution, cannot be null.
      * @return the variable instances or an empty map if no such variables are found.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     Map<String, VariableInstance> getVariableInstances(String executionId);
 
@@ -573,7 +559,7 @@ public interface RuntimeService {
      * All variables visible from the given execution scope (including parent scopes).
      *
      * @param executionIds
-     *            ids of execution, cannot be null.
+     *     ids of execution, cannot be null.
      * @return the variables.
      */
     List<VariableInstance> getVariableInstancesByExecutionIds(Set<String> executionIds);
@@ -583,10 +569,10 @@ public interface RuntimeService {
      * {@link #getVariablesLocal(String, Collection)} for better performance.
      *
      * @param executionId
-     *            id of execution, cannot be null.
+     *     id of execution, cannot be null.
      * @return the variables or an empty map if no such variables are found.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     Map<String, Object> getVariablesLocal(String executionId);
 
@@ -595,10 +581,10 @@ public interface RuntimeService {
      * {@link #getVariableInstancesLocal(String, Collection)} for better performance.
      *
      * @param executionId
-     *            id of execution, cannot be null.
+     *     id of execution, cannot be null.
      * @return the variables or an empty map if no such variables are found.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     Map<String, VariableInstance> getVariableInstancesLocal(String executionId);
 
@@ -606,12 +592,12 @@ public interface RuntimeService {
      * The variable values for all given variableNames, takes all variables into account which are visible from the given execution scope (including parent scopes).
      *
      * @param executionId
-     *            id of execution, cannot be null.
+     *     id of execution, cannot be null.
      * @param variableNames
-     *            the collection of variable names that should be retrieved.
+     *     the collection of variable names that should be retrieved.
      * @return the variables or an empty map if no such variables are found.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     Map<String, Object> getVariables(String executionId, Collection<String> variableNames);
 
@@ -619,12 +605,12 @@ public interface RuntimeService {
      * The variable values for all given variableNames, takes all variables into account which are visible from the given execution scope (including parent scopes).
      *
      * @param executionId
-     *            id of execution, cannot be null.
+     *     id of execution, cannot be null.
      * @param variableNames
-     *            the collection of variable names that should be retrieved.
+     *     the collection of variable names that should be retrieved.
      * @return the variables or an empty map if no such variables are found.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     Map<String, VariableInstance> getVariableInstances(String executionId, Collection<String> variableNames);
 
@@ -632,12 +618,12 @@ public interface RuntimeService {
      * The variable values for the given variableNames only taking the given execution scope into account, not looking in outer scopes.
      *
      * @param executionId
-     *            id of execution, cannot be null.
+     *     id of execution, cannot be null.
      * @param variableNames
-     *            the collection of variable names that should be retrieved.
+     *     the collection of variable names that should be retrieved.
      * @return the variables or an empty map if no such variables are found.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     Map<String, Object> getVariablesLocal(String executionId, Collection<String> variableNames);
 
@@ -645,12 +631,12 @@ public interface RuntimeService {
      * The variable values for the given variableNames only taking the given execution scope into account, not looking in outer scopes.
      *
      * @param executionId
-     *            id of execution, cannot be null.
+     *     id of execution, cannot be null.
      * @param variableNames
-     *            the collection of variable names that should be retrieved.
+     *     the collection of variable names that should be retrieved.
      * @return the variables or an empty map if no such variables are found.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     Map<String, VariableInstance> getVariableInstancesLocal(String executionId, Collection<String> variableNames);
 
@@ -659,12 +645,12 @@ public interface RuntimeService {
      * given name or when the value is set to null.
      *
      * @param executionId
-     *            id of execution, cannot be null.
+     *     id of execution, cannot be null.
      * @param variableName
-     *            name of variable, cannot be null.
+     *     name of variable, cannot be null.
      * @return the variable value or null if the variable is undefined or the value of the variable is null.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     Object getVariable(String executionId, String variableName);
 
@@ -673,12 +659,12 @@ public interface RuntimeService {
      * name or when the value is set to null.
      *
      * @param executionId
-     *            id of execution, cannot be null.
+     *     id of execution, cannot be null.
      * @param variableName
-     *            name of variable, cannot be null.
+     *     name of variable, cannot be null.
      * @return the variable or null if the variable is undefined.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     VariableInstance getVariableInstance(String executionId, String variableName);
 
@@ -687,14 +673,14 @@ public interface RuntimeService {
      * given name or when the value is set to null. Throws ClassCastException when cannot cast variable to given class
      *
      * @param executionId
-     *            id of execution, cannot be null.
+     *     id of execution, cannot be null.
      * @param variableName
-     *            name of variable, cannot be null.
+     *     name of variable, cannot be null.
      * @param variableClass
-     *            name of variable, cannot be null.
+     *     name of variable, cannot be null.
      * @return the variable value or null if the variable is undefined or the value of the variable is null.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     <T> T getVariable(String executionId, String variableName, Class<T> variableClass);
 
@@ -714,12 +700,12 @@ public interface RuntimeService {
      * value is set to null.
      *
      * @param executionId
-     *            id of execution, cannot be null.
+     *     id of execution, cannot be null.
      * @param variableName
-     *            name of variable, cannot be null.
+     *     name of variable, cannot be null.
      * @return the variable or null if the variable is undefined.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     VariableInstance getVariableInstanceLocal(String executionId, String variableName);
 
@@ -740,16 +726,15 @@ public interface RuntimeService {
      * <p>
      * The variable is set according to the algorithm as documented for {@link VariableScope#setVariable(String, Object)}.
      *
-     * @see VariableScope#setVariable(String, Object) {@link VariableScope#setVariable(String, Object)}
-     *
      * @param executionId
-     *            id of execution to set variable in, cannot be null.
+     *     id of execution to set variable in, cannot be null.
      * @param variableName
-     *            name of variable to set, cannot be null.
+     *     name of variable to set, cannot be null.
      * @param value
-     *            value to set. When null is passed, the variable is not removed, only it's value will be set to null.
+     *     value to set. When null is passed, the variable is not removed, only it's value will be set to null.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
+     * @see VariableScope#setVariable(String, Object) {@link VariableScope#setVariable(String, Object)}
      */
     void setVariable(String executionId, String variableName, Object value);
 
@@ -757,13 +742,13 @@ public interface RuntimeService {
      * Update or create a variable for an execution (not considering parent scopes). If the variable is not already existing, it will be created in the given execution.
      *
      * @param executionId
-     *            id of execution to set variable in, cannot be null.
+     *     id of execution to set variable in, cannot be null.
      * @param variableName
-     *            name of variable to set, cannot be null.
+     *     name of variable to set, cannot be null.
      * @param value
-     *            value to set. When null is passed, the variable is not removed, only it's value will be set to null.
+     *     value to set. When null is passed, the variable is not removed, only it's value will be set to null.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     void setVariableLocal(String executionId, String variableName, Object value);
 
@@ -772,14 +757,13 @@ public interface RuntimeService {
      * <p>
      * Variables are set according to the algorithm as documented for {@link VariableScope#setVariables(Map)}, applied separately to each variable.
      *
-     * @see VariableScope#setVariables(Map) {@link VariableScope#setVariables(Map)}
-     *
      * @param executionId
-     *            id of the execution, cannot be null.
+     *     id of the execution, cannot be null.
      * @param variables
-     *            map containing name (key) and value of variables, can be null.
+     *     map containing name (key) and value of variables, can be null.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
+     * @see VariableScope#setVariables(Map) {@link VariableScope#setVariables(Map)}
      */
     void setVariables(String executionId, Map<String, ? extends Object> variables);
 
@@ -787,11 +771,11 @@ public interface RuntimeService {
      * Update or create given variables for an execution (not considering parent scopes). If the variables are not already existing, it will be created in the given execution.
      *
      * @param executionId
-     *            id of the execution, cannot be null.
+     *     id of the execution, cannot be null.
      * @param variables
-     *            map containing name (key) and value of variables, can be null.
+     *     map containing name (key) and value of variables, can be null.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     void setVariablesLocal(String executionId, Map<String, ? extends Object> variables);
 
@@ -799,9 +783,9 @@ public interface RuntimeService {
      * Removes a variable for an execution.
      *
      * @param executionId
-     *            id of execution to remove variable in.
+     *     id of execution to remove variable in.
      * @param variableName
-     *            name of variable to remove.
+     *     name of variable to remove.
      */
     void removeVariable(String executionId, String variableName);
 
@@ -809,9 +793,9 @@ public interface RuntimeService {
      * Removes a variable for an execution (not considering parent scopes).
      *
      * @param executionId
-     *            id of execution to remove variable in.
+     *     id of execution to remove variable in.
      * @param variableName
-     *            name of variable to remove.
+     *     name of variable to remove.
      */
     void removeVariableLocal(String executionId, String variableName);
 
@@ -819,9 +803,9 @@ public interface RuntimeService {
      * Removes variables for an execution.
      *
      * @param executionId
-     *            id of execution to remove variable in.
+     *     id of execution to remove variable in.
      * @param variableNames
-     *            collection containing name of variables to remove.
+     *     collection containing name of variables to remove.
      */
     void removeVariables(String executionId, Collection<String> variableNames);
 
@@ -829,9 +813,9 @@ public interface RuntimeService {
      * Remove variables for an execution (not considering parent scopes).
      *
      * @param executionId
-     *            id of execution to remove variable in.
+     *     id of execution to remove variable in.
      * @param variableNames
-     *            collection containing name of variables to remove.
+     *     collection containing name of variables to remove.
      */
     void removeVariablesLocal(String executionId, Collection<String> variableNames);
 
@@ -839,10 +823,10 @@ public interface RuntimeService {
      * All DataObjects visible from the given execution scope (including parent scopes).
      *
      * @param executionId
-     *            id of execution, cannot be null.
+     *     id of execution, cannot be null.
      * @return the DataObjects or an empty map if no such variables are found.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     Map<String, DataObject> getDataObjects(String executionId);
 
@@ -850,14 +834,14 @@ public interface RuntimeService {
      * All DataObjects visible from the given execution scope (including parent scopes).
      *
      * @param executionId
-     *            id of execution, cannot be null.
+     *     id of execution, cannot be null.
      * @param locale
-     *            locale the DataObject name and description should be returned in (if available).
+     *     locale the DataObject name and description should be returned in (if available).
      * @param withLocalizationFallback
-     *            When true localization will fallback to more general locales if the specified locale is not found.
+     *     When true localization will fallback to more general locales if the specified locale is not found.
      * @return the DataObjects or an empty map if no DataObjects are found.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     Map<String, DataObject> getDataObjects(String executionId, String locale, boolean withLocalizationFallback);
 
@@ -866,10 +850,10 @@ public interface RuntimeService {
      * {@link #getDataObjectsLocal(String, Collection)} for better performance.
      *
      * @param executionId
-     *            id of execution, cannot be null.
+     *     id of execution, cannot be null.
      * @return the DataObjects or an empty map if no DataObjects are found.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     Map<String, DataObject> getDataObjectsLocal(String executionId);
 
@@ -878,14 +862,14 @@ public interface RuntimeService {
      * {@link #getDataObjectsLocal(String, Collection)} for better performance.
      *
      * @param executionId
-     *            id of execution, cannot be null.
+     *     id of execution, cannot be null.
      * @param locale
-     *            locale the DataObject name and description should be returned in (if available).
+     *     locale the DataObject name and description should be returned in (if available).
      * @param withLocalizationFallback
-     *            When true localization will fallback to more general locales if the specified locale is not found.
+     *     When true localization will fallback to more general locales if the specified locale is not found.
      * @return the DataObjects or an empty map if no such variables are found.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     Map<String, DataObject> getDataObjectsLocal(String executionId, String locale, boolean withLocalizationFallback);
 
@@ -893,12 +877,12 @@ public interface RuntimeService {
      * The DataObjects for all given dataObjectNames, takes all dataObjects into account which are visible from the given execution scope (including parent scopes).
      *
      * @param executionId
-     *            id of execution, cannot be null.
+     *     id of execution, cannot be null.
      * @param dataObjectNames
-     *            the collection of DataObject names that should be retrieved.
+     *     the collection of DataObject names that should be retrieved.
      * @return the DataObject or an empty map if no DataObjects are found.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     Map<String, DataObject> getDataObjects(String executionId, Collection<String> dataObjectNames);
 
@@ -906,16 +890,16 @@ public interface RuntimeService {
      * The DataObjects for all given dataObjectNames, takes all dataObjects into account which are visible from the given execution scope (including parent scopes).
      *
      * @param executionId
-     *            id of execution, cannot be null.
+     *     id of execution, cannot be null.
      * @param dataObjectNames
-     *            the collection of DataObject names that should be retrieved.
+     *     the collection of DataObject names that should be retrieved.
      * @param locale
-     *            locale the DataObject name and description should be returned in (if available).
+     *     locale the DataObject name and description should be returned in (if available).
      * @param withLocalizationFallback
-     *            When true localization will fallback to more general locales if the specified locale is not found.
+     *     When true localization will fallback to more general locales if the specified locale is not found.
      * @return the DataObjects or an empty map if no such dataObjects are found.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     Map<String, DataObject> getDataObjects(String executionId, Collection<String> dataObjectNames, String locale, boolean withLocalizationFallback);
 
@@ -923,12 +907,12 @@ public interface RuntimeService {
      * The DataObjects for the given dataObjectNames only taking the given execution scope into account, not looking in outer scopes.
      *
      * @param executionId
-     *            id of execution, cannot be null.
+     *     id of execution, cannot be null.
      * @param dataObjects
-     *            the collection of DataObject names that should be retrieved.
+     *     the collection of DataObject names that should be retrieved.
      * @return the DataObjects or an empty map if no DataObjects are found.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     Map<String, DataObject> getDataObjectsLocal(String executionId, Collection<String> dataObjects);
 
@@ -936,16 +920,16 @@ public interface RuntimeService {
      * The DataObjects for the given dataObjectNames only taking the given execution scope into account, not looking in outer scopes.
      *
      * @param executionId
-     *            id of execution, cannot be null.
+     *     id of execution, cannot be null.
      * @param dataObjectNames
-     *            the collection of DataObject names that should be retrieved.
+     *     the collection of DataObject names that should be retrieved.
      * @param locale
-     *            locale the DataObject name and description should be returned in (if available).
+     *     locale the DataObject name and description should be returned in (if available).
      * @param withLocalizationFallback
-     *            When true localization will fallback to more general locales if the specified locale is not found.
+     *     When true localization will fallback to more general locales if the specified locale is not found.
      * @return the DataObjects or an empty map if no DataObjects are found.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     Map<String, DataObject> getDataObjectsLocal(String executionId, Collection<String> dataObjectNames, String locale, boolean withLocalizationFallback);
 
@@ -954,12 +938,12 @@ public interface RuntimeService {
      * given name or when the value is set to null.
      *
      * @param executionId
-     *            id of execution, cannot be null.
+     *     id of execution, cannot be null.
      * @param dataObject
-     *            name of DataObject, cannot be null.
+     *     name of DataObject, cannot be null.
      * @return the DataObject or null if the variable is undefined.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     DataObject getDataObject(String executionId, String dataObject);
 
@@ -968,16 +952,16 @@ public interface RuntimeService {
      * given name or when the value is set to null.
      *
      * @param executionId
-     *            id of execution, cannot be null.
+     *     id of execution, cannot be null.
      * @param dataObjectName
-     *            name of DataObject, cannot be null.
+     *     name of DataObject, cannot be null.
      * @param locale
-     *            locale the DataObject name and description should be returned in (if available).
+     *     locale the DataObject name and description should be returned in (if available).
      * @param withLocalizationFallback
-     *            When true localization will fallback to more general locales including the default locale of the JVM if the specified locale is not found.
+     *     When true localization will fallback to more general locales including the default locale of the JVM if the specified locale is not found.
      * @return the DataObject or null if the DataObject is undefined.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     DataObject getDataObject(String executionId, String dataObjectName, String locale, boolean withLocalizationFallback);
 
@@ -985,12 +969,12 @@ public interface RuntimeService {
      * The DataObject for an execution. Returns the DataObject when it is set for the execution (and not searching parent scopes). Returns null when no DataObject is found with the given name.
      *
      * @param executionId
-     *            id of execution, cannot be null.
+     *     id of execution, cannot be null.
      * @param dataObjectName
-     *            name of DataObject, cannot be null.
+     *     name of DataObject, cannot be null.
      * @return the DataObject or null if the DataObject is undefined.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     DataObject getDataObjectLocal(String executionId, String dataObjectName);
 
@@ -998,16 +982,16 @@ public interface RuntimeService {
      * The DataObject for an execution. Returns the DataObject when it is set for the execution (and not searching parent scopes). Returns null when no DataObject is found with the given name.
      *
      * @param executionId
-     *            id of execution, cannot be null.
+     *     id of execution, cannot be null.
      * @param dataObjectName
-     *            name of DataObject, cannot be null.
+     *     name of DataObject, cannot be null.
      * @param locale
-     *            locale the DataObject name and description should be returned in (if available).
+     *     locale the DataObject name and description should be returned in (if available).
      * @param withLocalizationFallback
-     *            When true localization will fallback to more general locales if the specified locale is not found.
+     *     When true localization will fallback to more general locales if the specified locale is not found.
      * @return the DataObject or null if the DataObject is undefined.
      * @throws FlowableObjectNotFoundException
-     *             when no execution is found for the given executionId.
+     *     when no execution is found for the given executionId.
      */
     DataObject getDataObjectLocal(String executionId, String dataObjectName, String locale, boolean withLocalizationFallback);
 
@@ -1042,27 +1026,27 @@ public interface RuntimeService {
 
     /**
      * Suspends the process instance with the given id.
-     *
+     * <p>
      * If a process instance is in state suspended, flowable will not execute jobs (timers, messages) associated with this instance.
-     *
+     * <p>
      * If you have a process instance hierarchy, suspending one process instance form the hierarchy will not suspend other process instances form that hierarchy.
      *
      * @throws FlowableObjectNotFoundException
-     *             if no such processInstance can be found.
+     *     if no such processInstance can be found.
      * @throws FlowableException
-     *             the process instance is already in state suspended.
+     *     the process instance is already in state suspended.
      */
     void suspendProcessInstanceById(String processInstanceId);
 
     /**
      * Activates the process instance with the given id.
-     *
+     * <p>
      * If you have a process instance hierarchy, suspending one process instance form the hierarchy will not suspend other process instances form that hierarchy.
      *
      * @throws FlowableObjectNotFoundException
-     *             if no such processInstance can be found.
+     *     if no such processInstance can be found.
      * @throws FlowableException
-     *             if the process instance is already in state active.
+     *     if the process instance is already in state active.
      */
     void activateProcessInstanceById(String processInstanceId);
 
@@ -1076,7 +1060,7 @@ public interface RuntimeService {
      * <strong>NOTE:</strong> The waiting executions are notified synchronously.
      *
      * @param signalName
-     *            the name of the signal event
+     *     the name of the signal event
      */
     void signalEventReceived(String signalName);
 
@@ -1090,7 +1074,7 @@ public interface RuntimeService {
      * <p/>
      *
      * @param signalName
-     *            the name of the signal event
+     *     the name of the signal event
      */
     void signalEventReceivedAsync(String signalName);
 
@@ -1106,9 +1090,9 @@ public interface RuntimeService {
      * <strong>NOTE:</strong> The waiting executions are notified synchronously.
      *
      * @param signalName
-     *            the name of the signal event
+     *     the name of the signal event
      * @param processVariables
-     *            a map of variables added to the execution(s)
+     *     a map of variables added to the execution(s)
      */
     void signalEventReceived(String signalName, Map<String, Object> processVariables);
 
@@ -1122,13 +1106,13 @@ public interface RuntimeService {
      * The waiting execution is notified synchronously.
      *
      * @param signalName
-     *            the name of the signal event
+     *     the name of the signal event
      * @param executionId
-     *            the id of the execution to deliver the signal to
+     *     the id of the execution to deliver the signal to
      * @throws FlowableObjectNotFoundException
-     *             if no such execution exists.
+     *     if no such execution exists.
      * @throws FlowableException
-     *             if the execution has not subscribed to the signal.
+     *     if the execution has not subscribed to the signal.
      */
     void signalEventReceived(String signalName, String executionId);
 
@@ -1137,15 +1121,15 @@ public interface RuntimeService {
      * The waiting execution is notified synchronously.
      *
      * @param signalName
-     *            the name of the signal event
+     *     the name of the signal event
      * @param executionId
-     *            the id of the execution to deliver the signal to
+     *     the id of the execution to deliver the signal to
      * @param processVariables
-     *            a map of variables added to the execution(s)
+     *     a map of variables added to the execution(s)
      * @throws FlowableObjectNotFoundException
-     *             if no such execution exists.
+     *     if no such execution exists.
      * @throws FlowableException
-     *             if the execution has not subscribed to the signal
+     *     if the execution has not subscribed to the signal
      */
     void signalEventReceived(String signalName, String executionId, Map<String, Object> processVariables);
 
@@ -1154,35 +1138,35 @@ public interface RuntimeService {
      * The waiting execution is notified <strong>asynchronously</strong>.
      *
      * @param signalName
-     *            the name of the signal event
+     *     the name of the signal event
      * @param executionId
-     *            the id of the execution to deliver the signal to
+     *     the id of the execution to deliver the signal to
      * @throws FlowableObjectNotFoundException
-     *             if no such execution exists.
+     *     if no such execution exists.
      * @throws FlowableException
-     *             if the execution has not subscribed to the signal.
+     *     if the execution has not subscribed to the signal.
      */
     void signalEventReceivedAsync(String signalName, String executionId);
 
     /**
      * Notifies the process engine that a message event with name 'messageName' has been received and has been correlated to an execution with id 'executionId'.
-     *
+     * <p>
      * The waiting execution is notified synchronously.
      *
      * @param messageName
-     *            the name of the message event
+     *     the name of the message event
      * @param executionId
-     *            the id of the execution to deliver the message to
+     *     the id of the execution to deliver the message to
      * @throws FlowableObjectNotFoundException
-     *             if no such execution exists.
+     *     if no such execution exists.
      * @throws FlowableException
-     *             if the execution has not subscribed to the signal
+     *     if the execution has not subscribed to the signal
      */
     void messageEventReceived(String messageName, String executionId);
 
     /**
      * Notifies the process engine that a message event with the name 'messageName' has been received and has been correlated to an execution with id 'executionId'.
-     *
+     * <p>
      * The waiting execution is notified synchronously.
      *
      * <p>
@@ -1194,34 +1178,33 @@ public interface RuntimeService {
      * <p>
      * Variables are set according to the algorithm as documented for {@link VariableScope#setVariables(Map)}, applied separately to each variable.
      *
-     * @see VariableScope#setVariables(Map) {@link VariableScope#setVariables(Map)}
-     *
      * @param messageName
-     *            the name of the message event
+     *     the name of the message event
      * @param executionId
-     *            the id of the execution to deliver the message to
+     *     the id of the execution to deliver the message to
      * @param processVariables
-     *            a map of variables added to the execution
+     *     a map of variables added to the execution
      * @throws FlowableObjectNotFoundException
-     *             if no such execution exists.
+     *     if no such execution exists.
      * @throws FlowableException
-     *             if the execution has not subscribed to the signal
+     *     if the execution has not subscribed to the signal
+     * @see VariableScope#setVariables(Map) {@link VariableScope#setVariables(Map)}
      */
     void messageEventReceived(String messageName, String executionId, Map<String, Object> processVariables);
 
     /**
      * Notifies the process engine that a message event with the name 'messageName' has been received and has been correlated to an execution with id 'executionId'.
-     *
+     * <p>
      * The waiting execution is notified <strong>asynchronously</strong>.
      *
      * @param messageName
-     *            the name of the message event
+     *     the name of the message event
      * @param executionId
-     *            the id of the execution to deliver the message to
+     *     the id of the execution to deliver the message to
      * @throws FlowableObjectNotFoundException
-     *             if no such execution exists.
+     *     if no such execution exists.
      * @throws FlowableException
-     *             if the execution has not subscribed to the signal
+     *     if the execution has not subscribed to the signal
      */
     void messageEventReceivedAsync(String messageName, String executionId);
 
@@ -1229,7 +1212,7 @@ public interface RuntimeService {
      * Adds an event-listener which will be notified of ALL events by the dispatcher.
      *
      * @param listenerToAdd
-     *            the listener to add
+     *     the listener to add
      */
     void addEventListener(FlowableEventListener listenerToAdd);
 
@@ -1237,9 +1220,9 @@ public interface RuntimeService {
      * Adds an event-listener which will only be notified when an event occurs, which type is in the given types.
      *
      * @param listenerToAdd
-     *            the listener to add
+     *     the listener to add
      * @param types
-     *            types of events the listener should be notified for
+     *     types of events the listener should be notified for
      */
     void addEventListener(FlowableEventListener listenerToAdd, FlowableEngineEventType... types);
 
@@ -1247,7 +1230,7 @@ public interface RuntimeService {
      * Removes the given listener from this dispatcher. The listener will no longer be notified, regardless of the type(s) it was registered for in the first place.
      *
      * @param listenerToRemove
-     *            listener to remove
+     *     listener to remove
      */
     void removeEventListener(FlowableEventListener listenerToRemove);
 
@@ -1255,12 +1238,11 @@ public interface RuntimeService {
      * Dispatches the given event to any listeners that are registered.
      *
      * @param event
-     *            event to dispatch.
-     *
+     *     event to dispatch.
      * @throws FlowableException
-     *             if an exception occurs when dispatching the event or when the {@link FlowableEventDispatcher} is disabled.
+     *     if an exception occurs when dispatching the event or when the {@link FlowableEventDispatcher} is disabled.
      * @throws FlowableIllegalArgumentException
-     *             when the given event is not suitable for dispatching.
+     *     when the given event is not suitable for dispatching.
      */
     void dispatchEvent(FlowableEvent event);
 
@@ -1268,11 +1250,11 @@ public interface RuntimeService {
      * Sets the name for the process instance with the given id.
      *
      * @param processInstanceId
-     *            id of the process instance to update
+     *     id of the process instance to update
      * @param name
-     *            new name for the process instance
+     *     new name for the process instance
      * @throws FlowableObjectNotFoundException
-     *             when the given process instance does not exist.
+     *     when the given process instance does not exist.
      */
     void setProcessInstanceName(String processInstanceId, String name);
 
@@ -1280,7 +1262,7 @@ public interface RuntimeService {
      * Gets executions with an adhoc sub process as current flow element
      *
      * @param processInstanceId
-     *            id of the process instance that is used to search for child executions
+     *     id of the process instance that is used to search for child executions
      * @return a list of executions
      */
     List<Execution> getAdhocSubProcessExecutions(String processInstanceId);
@@ -1289,7 +1271,7 @@ public interface RuntimeService {
      * Gets enabled activities from ad-hoc sub process
      *
      * @param executionId
-     *            id of the execution that has an ad-hoc sub process as current flow element
+     *     id of the execution that has an ad-hoc sub process as current flow element
      * @return a list of enabled activities
      */
     List<FlowNode> getEnabledActivitiesFromAdhocSubProcess(String executionId);
@@ -1298,9 +1280,9 @@ public interface RuntimeService {
      * Executes an activity in a ad-hoc sub process
      *
      * @param executionId
-     *            id of the execution that has an ad-hoc sub process as current flow element
+     *     id of the execution that has an ad-hoc sub process as current flow element
      * @param activityId
-     *            id of the activity id to enable
+     *     id of the activity id to enable
      * @return the newly created execution of the enabled activity
      */
     Execution executeActivityInAdhocSubProcess(String executionId, String activityId);
@@ -1309,7 +1291,7 @@ public interface RuntimeService {
      * Completes the ad-hoc sub process
      *
      * @param executionId
-     *            id of the execution that has an ad-hoc sub process as current flow element
+     *     id of the execution that has an ad-hoc sub process as current flow element
      */
     void completeAdhocSubProcess(String executionId);
 
@@ -1322,12 +1304,12 @@ public interface RuntimeService {
      * Adds a new execution to a running multi-instance parent execution
      *
      * @param activityId
-     *            id of the multi-instance activity (id attribute in the BPMN XML)
+     *     id of the multi-instance activity (id attribute in the BPMN XML)
      * @param parentExecutionId
-     *            can be the process instance id, in case there's one multi-instance execution for the provided activity id.
-     *            In case of multiple multi-instance executions with the same activity id this can be a specific parent execution id.
+     *     can be the process instance id, in case there's one multi-instance execution for the provided activity id.
+     *     In case of multiple multi-instance executions with the same activity id this can be a specific parent execution id.
      * @param executionVariables
-     *            variables to be set on as local variable on the newly created multi-instance execution
+     *     variables to be set on as local variable on the newly created multi-instance execution
      * @return the newly created multi-instance execution
      */
     Execution addMultiInstanceExecution(String activityId, String parentExecutionId, Map<String, Object> executionVariables);
@@ -1336,13 +1318,15 @@ public interface RuntimeService {
      * Deletes a multi-instance execution
      *
      * @param executionId
-     *            id of the multi-instance execution to be deleted
+     *     id of the multi-instance execution to be deleted
      * @param executionIsCompleted
-     *            defines if the deleted execution should be marked as completed on the parent multi-instance execution
+     *     defines if the deleted execution should be marked as completed on the parent multi-instance execution
      */
     void deleteMultiInstanceExecution(String executionId, boolean executionIsCompleted);
 
-    /** The all events related to the given Process Instance. */
+    /**
+     * The all events related to the given Process Instance.
+     */
     List<Event> getProcessInstanceEvents(String processInstanceId);
 
 }

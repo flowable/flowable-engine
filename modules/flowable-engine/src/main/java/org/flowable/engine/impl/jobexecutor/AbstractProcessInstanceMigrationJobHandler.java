@@ -15,6 +15,7 @@ package org.flowable.engine.impl.jobexecutor;
 import java.io.IOException;
 
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.migration.ProcessInstanceMigrationResult;
 import org.flowable.job.service.JobHandler;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -25,6 +26,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Dennis Federico
  */
 public abstract class AbstractProcessInstanceMigrationJobHandler implements JobHandler {
+
+    public static final String BATCH_RESULT_STATUS_LABEL = "resultStatus";
+    public static final String RESULT_STATUS_SUCCESSFUL = ProcessInstanceMigrationResult.RESULT_SUCCESSFUL;
+    public static final String RESULT_STATUS_FAILED = ProcessInstanceMigrationResult.RESULT_FAILED;
+    public static final String BATCH_RESULT_VALUE_LABEL = "resultValue";
 
     protected static final String CFG_LABEL_BATCH_ID = "batchId";
 

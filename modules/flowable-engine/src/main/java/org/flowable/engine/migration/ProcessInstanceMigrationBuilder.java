@@ -16,7 +16,6 @@ package org.flowable.engine.migration;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntity;
 
 /**
@@ -117,9 +116,9 @@ public interface ProcessInstanceMigrationBuilder {
      *
      * @param processInstanceId
      * @return a ProcessInstanceMigrationValidationResult that contains validation error messages - if any
-     * @see ProcessInstanceMigrationValidationResult
+     * @see ProcessInstanceMigrationResult
      */
-    ProcessInstanceMigrationValidationResult validateMigration(String processInstanceId);
+    ProcessInstanceMigrationResult<List<String>> validateMigration(String processInstanceId);
 
     /**
      * Asynchronously starts the process instance migration for each process instances of a given process definition identified by the process definition id.
@@ -140,9 +139,9 @@ public interface ProcessInstanceMigrationBuilder {
      *
      * @param processDefinitionId
      * @return a ProcessInstanceMigrationValidationResult that contains validation error messages - if any
-     * @see ProcessInstanceMigrationValidationResult
+     * @see ProcessInstanceMigrationResult
      */
-    List<ProcessInstanceMigrationValidationResult> validateMigrationOfProcessInstances(String processDefinitionId);
+    ProcessInstanceMigrationResult<List<String>> validateMigrationOfProcessInstances(String processDefinitionId);
 
     /**
      * Asynchronously validates this process instance migration instruction for each process instance of a given process definition identified by the process definition id.
@@ -178,9 +177,9 @@ public interface ProcessInstanceMigrationBuilder {
      * @param processDefinitionVersion
      * @param processDefinitionTenantId
      * @return a ProcessInstanceMigrationValidationResult that contains validation error messages - if any
-     * @see ProcessInstanceMigrationValidationResult
+     * @see ProcessInstanceMigrationResult
      */
-    List<ProcessInstanceMigrationValidationResult> validateMigrationOfProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId);
+    ProcessInstanceMigrationResult<List<String>> validateMigrationOfProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId);
 
     /**
      * Asynchronously validates this process instance migration instruction for each process instance of a given process definition identified by the process definition key and version (optional tenantId).

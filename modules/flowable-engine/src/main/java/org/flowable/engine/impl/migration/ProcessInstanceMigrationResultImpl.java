@@ -24,20 +24,17 @@ import org.flowable.engine.migration.ProcessInstanceMigrationResult;
 /**
  * @author Dennis Federico
  */
-public class ProcessInstanceMigrationResultImpl implements ProcessInstanceMigrationResult {
-
-    protected static Predicate<ProcessInstanceMigrationResult> isSuccessful = result -> result.getResult().map(Result::getStatus).filter(Result.RESULT_SUCCESSFUL::equals).isPresent();
-    protected static Predicate<ProcessInstanceMigrationResult> isFailed = result -> result.getResult().map(Result::getStatus).filter(Result.RESULT_FAILED::equals).isPresent();
-    protected static Predicate<ProcessInstanceMigrationResult> isCompleted = result -> STATUS_COMPLETED.equals(result.getStatus());
-    protected static Predicate<ProcessInstanceMigrationResult> isInProgress = result -> STATUS_IN_PROGRESS.equals(result.getStatus());
+public class ProcessInstanceMigrationResultImpl<T> implements ProcessInstanceMigrationResult<T> {
 
     //TODO Timestamps?
     protected String batchId;
-    protected String status;
+    protected String status = ProcessInstanceMigrationResult.STATUS_IN_PROGRESS;
     protected String processInstanceId;
-    protected Result result;
-    protected List<ProcessInstanceMigrationResult> resultParts = new ArrayList<>();
+    protected String resultStatus;
+    protected T resultValue;
+    protected List<ProcessInstanceMigrationResult<T>> resultParts = new ArrayList<>();
 
+    @Override
     public Optional<String> getBatchId() {
         return Optional.ofNullable(batchId);
     }
@@ -46,16 +43,12 @@ public class ProcessInstanceMigrationResultImpl implements ProcessInstanceMigrat
         this.batchId = batchId;
     }
 
-    /**
-     * Returns true if this is the parent of many individual by process instance results.
-     * In which case iterate over @see getParts() to get the individual results
-     *
-     * @return
-     */
+    @Override
     public boolean isParentResult() {
-        return resultParts != null && !resultParts.isEmpty();
+        return isParentResult.test(this);
     }
 
+    @Override
     public String getStatus() {
         if (isParentResult()) {
             Optional<String> partInProgress = resultParts.stream()
@@ -72,6 +65,7 @@ public class ProcessInstanceMigrationResultImpl implements ProcessInstanceMigrat
         this.status = status;
     }
 
+    @Override
     public Optional<String> getProcessInstanceId() {
         return Optional.ofNullable(processInstanceId);
     }
@@ -80,39 +74,53 @@ public class ProcessInstanceMigrationResultImpl implements ProcessInstanceMigrat
         this.processInstanceId = processInstanceId;
     }
 
-    public Optional<Result> getResult() {
-        return Optional.ofNullable(result);
+    public ProcessInstanceMigrationResult<T> setResult(String resultStatus, T resultValue) {
+        this.status = ProcessInstanceMigrationResult.STATUS_COMPLETED;
+        this.resultStatus = resultStatus;
+        this.resultValue = resultValue;
+        return this;
     }
 
-    public void setResult(String status, String message) {
-        this.result = new ResultImpl(status, message);
+    @Override
+    public Optional<String> getResultStatus() {
+        return Optional.ofNullable(resultStatus);
     }
 
-    public List<ProcessInstanceMigrationResult> getParts() {
+    @Override
+    public Optional<T> getResultValue() {
+        return Optional.ofNullable(resultValue);
+    }
+
+    @Override
+    public List<ProcessInstanceMigrationResult<T>> getParts() {
         return resultParts;
     }
 
-    public void addResultPart(ProcessInstanceMigrationResult resultPart) {
+    public void addResultPart(ProcessInstanceMigrationResult<T> resultPart) {
         if (resultParts == null) {
             this.resultParts = new ArrayList<>();
         }
         resultParts.add(resultPart);
     }
 
-    public List<ProcessInstanceMigrationResult> getSuccessfulParts() {
-        return getFilteredParts(isSuccessful);
+    @Override
+    public List<ProcessInstanceMigrationResult<T>> getSuccessfulParts() {
+        return getFilteredParts(isSuccessfulResultPredicate);
     }
 
-    public List<ProcessInstanceMigrationResult> getFailedParts() {
-        return getFilteredParts(isFailed);
+    @Override
+    public List<ProcessInstanceMigrationResult<T>> getFailedParts() {
+        return getFilteredParts(isFailedResultPredicate);
     }
 
-    public List<ProcessInstanceMigrationResult> getInProgressParts() {
-        return getFilteredParts(isInProgress);
+    @Override
+    public List<ProcessInstanceMigrationResult<T>> getInProgressParts() {
+        return getFilteredParts(isInProgressResultPredicate);
     }
 
-    public List<ProcessInstanceMigrationResult> getCompletedParts() {
-        return getFilteredParts(isCompleted);
+    @Override
+    public List<ProcessInstanceMigrationResult<T>> getCompletedParts() {
+        return getFilteredParts(isCompletedResultPredicate);
     }
 
     @Override
@@ -123,23 +131,55 @@ public class ProcessInstanceMigrationResultImpl implements ProcessInstanceMigrat
         return 0;
     }
 
+    @Override
     public long getSuccessfulPartsCount() {
-        return getFilteredPartsCount(isSuccessful);
+        return getFilteredPartsCount(isSuccessfulResultPredicate);
     }
 
+    @Override
     public long getFailedPartsCount() {
-        return getFilteredPartsCount(isFailed);
+        return getFilteredPartsCount(isFailedResultPredicate);
     }
 
+    @Override
     public long getInProgressPartsCount() {
-        return getFilteredPartsCount(isInProgress);
+        return getFilteredPartsCount(isInProgressResultPredicate);
     }
 
+    @Override
     public long getCompletedPartsCount() {
-        return getFilteredPartsCount(isCompleted);
+        return getFilteredPartsCount(isCompletedResultPredicate);
     }
 
-    protected List<ProcessInstanceMigrationResult> getFilteredParts(Predicate<ProcessInstanceMigrationResult> predicate) {
+    @Override
+    public boolean isSuccessful() {
+        return testResultOrChildrenPredicate(isSuccessfulResultPredicate);
+    }
+
+    @Override
+    public boolean isFailed() {
+        return testResultOrChildrenPredicate(isFailedResultPredicate);
+    }
+
+    @Override
+    public boolean isInProgress() {
+        return testResultOrChildrenPredicate(isInProgressResultPredicate);
+    }
+
+    @Override
+    public boolean isCompleted() {
+        return testResultOrChildrenPredicate(isCompletedResultPredicate);
+    }
+
+    protected boolean testResultOrChildrenPredicate(Predicate<ProcessInstanceMigrationResult<?>> predicate) {
+        if (isParentResult.test(this)) {
+            return this.getParts().stream().allMatch(predicate);
+        } else {
+            return predicate.test(this);
+        }
+    }
+
+    protected List<ProcessInstanceMigrationResult<T>> getFilteredParts(Predicate<ProcessInstanceMigrationResult<?>> predicate) {
         if (isParentResult()) {
             return resultParts.stream()
                 .filter(predicate)
@@ -148,33 +188,12 @@ public class ProcessInstanceMigrationResultImpl implements ProcessInstanceMigrat
         return null;
     }
 
-    protected long getFilteredPartsCount(Predicate<ProcessInstanceMigrationResult> predicate) {
+    protected long getFilteredPartsCount(Predicate<ProcessInstanceMigrationResult<?>> predicate) {
         if (isParentResult()) {
             return resultParts.stream()
                 .filter(predicate)
                 .count();
         }
         return 0;
-    }
-
-    //getAsJson
-
-    public static class ResultImpl implements Result {
-
-        protected String status;
-        protected String message;
-
-        public ResultImpl(String status, String message) {
-            this.status = status;
-            this.message = message;
-        }
-
-        public String getStatus() {
-            return status;
-        }
-
-        public Optional<String> getMessage() {
-            return Optional.ofNullable(message);
-        }
     }
 }

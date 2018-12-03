@@ -21,6 +21,7 @@ import org.flowable.engine.ProcessInstanceMigrationService;
 import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
+import org.flowable.engine.migration.ProcessInstanceMigrationResult;
 
 /**
  * @author Dennis Federico
@@ -98,7 +99,7 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
     }
 
     @Override
-    public ProcessInstanceMigrationValidationResult validateMigration(String processInstanceId) {
+    public ProcessInstanceMigrationResult<List<String>> validateMigration(String processInstanceId) {
         ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
         return getProcessInstanceMigrationService().validateMigrationForProcessInstance(processInstanceId, document);
     }
@@ -110,7 +111,7 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
     }
 
     @Override
-    public List<ProcessInstanceMigrationValidationResult> validateMigrationOfProcessInstances(String processDefinitionId) {
+    public ProcessInstanceMigrationResult<List<String>> validateMigrationOfProcessInstances(String processDefinitionId) {
         ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
         return getProcessInstanceMigrationService().validateMigrationForProcessInstancesOfProcessDefinition(processDefinitionId, document);
     }
@@ -134,7 +135,7 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
     }
 
     @Override
-    public List<ProcessInstanceMigrationValidationResult> validateMigrationOfProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId) {
+    public ProcessInstanceMigrationResult<List<String>> validateMigrationOfProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId) {
         ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
         return getProcessInstanceMigrationService().validateMigrationForProcessInstancesOfProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, document);
     }

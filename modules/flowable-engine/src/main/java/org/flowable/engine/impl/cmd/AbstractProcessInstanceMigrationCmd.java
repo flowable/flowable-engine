@@ -16,7 +16,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 
 /**
- * @author Dennis
+ * @author Dennis Federico
  */
 public class AbstractProcessInstanceMigrationCmd {
 

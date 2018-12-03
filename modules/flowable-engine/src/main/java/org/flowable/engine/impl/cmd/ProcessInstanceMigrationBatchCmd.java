@@ -26,12 +26,6 @@ import org.flowable.engine.migration.ProcessInstanceMigrationManager;
  */
 public class ProcessInstanceMigrationBatchCmd extends AbstractProcessInstanceMigrationCmd implements Command<String> {
 
-    protected ProcessInstanceMigrationDocument processInstanceMigrationDocument;
-    protected String processDefinitionId;
-    protected String processDefinitionKey;
-    protected int processDefinitionVersion;
-    protected String processDefinitionTenantId;
-
     public static ProcessInstanceMigrationBatchCmd forProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
 
         requireNonNullProcessDefinitionId(processDefinitionId);
