@@ -340,6 +340,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
         // Now everything has an id, the map of all case elements can be filled
         for (Case caze : cmmnModel.getCases()) {
+            processSentries(caze.getPlanModel(), caze.getPlanModel());
             for (CaseElement caseElement : conversionHelper.getCaseElements().get(caze)) {
                 caze.getAllCaseElements().put(caseElement.getId(), caseElement);
             }
@@ -407,7 +408,6 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
     protected void processPlanFragment(CmmnModel cmmnModel, PlanFragment planFragment) {
         processPlanItems(cmmnModel, planFragment);
-        processSentries(cmmnModel.getPrimaryCase().getPlanModel(), planFragment);
 
         if (planFragment instanceof Stage) {
             Stage stage = (Stage) planFragment;
@@ -543,6 +543,12 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                     throw new FlowableException("Could not resolve on part source reference "
                             + onPart.getSourceRef() + " of sentry " + sentry.getId());
                 }
+            }
+        }
+
+        for (PlanItem planItem : planFragment.getPlanItems()) {
+            if (planItem.getPlanItemDefinition() instanceof PlanFragment) {
+                processSentries(planModelStage, (PlanFragment) planItem.getPlanItemDefinition());
             }
         }
     }

@@ -32,6 +32,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.task.api.Task;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -322,6 +323,34 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
 
         PlanItemInstance planItemInstanceStageThree = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage Three").singleResult();
         assertThat(planItemInstanceStageThree.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testRepeatingCrossBoundary3() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("myCase")
+            .variable("myVar", true)
+            .start();
+
+        Task  task =  cmmnTaskService.createTaskQuery().singleResult();
+        cmmnTaskService.complete(task.getId());
+
+        task = cmmnTaskService.createTaskQuery().singleResult();
+        Assert.assertEquals("Test 2",task.getName());
+
+        for (int i = 0; i < 11; i++) {
+            cmmnTaskService.complete(task.getId());
+
+            task = cmmnTaskService.createTaskQuery().singleResult();
+            Assert.assertEquals("Test",task.getName());
+            cmmnTaskService.complete(task.getId());
+
+            task = cmmnTaskService.createTaskQuery().singleResult();
+            Assert.assertEquals("Test 2",task.getName());
+
+        }
+
     }
 
 }
