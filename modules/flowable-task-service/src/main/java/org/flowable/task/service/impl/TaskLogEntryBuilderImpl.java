@@ -10,40 +10,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.cmd;
+package org.flowable.task.service.impl;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.task.api.TaskLogEntryBuilder;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.task.api.TaskInfo;
+import org.flowable.task.service.impl.util.CommandContextUtil;
 
 /**
  * @author martin.grofcik
  */
-public class AddTaskLogEntryCmd implements Command<Void> {
+public class TaskLogEntryBuilderImpl extends BaseTaskLogEntryBuilderImpl implements Command<Void> {
 
-    protected TaskLogEntryBuilder taskLogEntryBuilder;
+    public TaskLogEntryBuilderImpl(CommandExecutor commandExecutor, TaskInfo task) {
+        super(commandExecutor, task);
+    }
 
-    public AddTaskLogEntryCmd(TaskLogEntryBuilder taskLogEntryBuilder) {
-        this.taskLogEntryBuilder = taskLogEntryBuilder;
+    public TaskLogEntryBuilderImpl(CommandExecutor commandExecutor) {
+        super(commandExecutor);
+    }
+
+    @Override
+    public void add() {
+        this.commandExecutor.execute(this);
     }
 
     @Override
     public Void execute(CommandContext commandContext) {
-        if (StringUtils.isEmpty(taskLogEntryBuilder.getTaskId())) {
+        if (StringUtils.isEmpty(getTaskId())) {
             throw new FlowableIllegalArgumentException("Empty taskId is not allowed for TaskLogEntry");
         }
-        if (StringUtils.isEmpty(taskLogEntryBuilder.getUserId())) {
-            taskLogEntryBuilder.userId(Authentication.getAuthenticatedUserId());
+        if (StringUtils.isEmpty(getUserId())) {
+            userId(Authentication.getAuthenticatedUserId());
         }
-        if (taskLogEntryBuilder.getTimeStamp() == null) {
-            taskLogEntryBuilder.timeStamp(CommandContextUtil.getTaskServiceConfiguration().getClock().getCurrentTime());
+        if (getTimeStamp() == null) {
+            timeStamp(CommandContextUtil.getTaskServiceConfiguration().getClock().getCurrentTime());
         }
 
-        CommandContextUtil.getTaskService(commandContext).createTaskLogEntry(this.taskLogEntryBuilder);
+        CommandContextUtil.getTaskServiceConfiguration(commandContext).getTaskService().createTaskLogEntry(this);
         return null;
     }
+
 }

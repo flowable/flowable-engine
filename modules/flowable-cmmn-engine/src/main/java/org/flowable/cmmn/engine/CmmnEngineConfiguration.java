@@ -682,6 +682,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected BusinessCalendarManager businessCalendarManager;
 
     /**
+     * Enable user task event logging
+     */
+    protected boolean enableUserTaskDatabaseEventLogging;
+
+    /**
      * postprocessor for a task builder
      */
     protected TaskPostProcessor taskPostProcessor;
@@ -1339,6 +1344,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.taskServiceConfiguration.setClock(this.clock);
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
         this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        this.taskServiceConfiguration.setEnableDatabaseEventLogging(this.enableUserTaskDatabaseEventLogging);
 
         if (this.taskPostProcessor != null) {
             this.taskServiceConfiguration.setTaskPostProcessor(this.taskPostProcessor);
@@ -3250,5 +3256,13 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         if (this.clock != null) {
             clock.reset();
         }
+    }
+
+    public boolean isEnableUserTaskDatabaseEventLogging() {
+        return enableUserTaskDatabaseEventLogging;
+    }
+
+    public void setEnableUserTaskDatabaseEventLogging(boolean enableUserTaskDatabaseEventLogging) {
+        this.enableUserTaskDatabaseEventLogging = enableUserTaskDatabaseEventLogging;
     }
 }

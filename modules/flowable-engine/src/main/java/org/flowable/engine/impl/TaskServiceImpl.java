@@ -86,6 +86,7 @@ import org.flowable.task.api.TaskLogEntryQuery;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.impl.NativeTaskLogEntryQueryImpl;
 import org.flowable.task.service.impl.NativeTaskQueryImpl;
+import org.flowable.task.service.impl.TaskLogEntryBuilderImpl;
 import org.flowable.task.service.impl.TaskLogEntryQueryImpl;
 import org.flowable.task.service.impl.TaskQueryImpl;
 import org.flowable.variable.api.persistence.entity.VariableInstance;

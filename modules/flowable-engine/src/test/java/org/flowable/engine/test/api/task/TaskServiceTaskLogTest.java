@@ -30,6 +30,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.ConfigurationResource;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.FlowableTest;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskLogEntry;
 import org.flowable.task.api.TaskLogEntryBuilder;
@@ -44,7 +45,7 @@ import org.junit.jupiter.api.Test;
  */
 @FlowableTest
 @ConfigurationResource("flowable.usertask-log.cfg.xml")
-public class TaskServiceEventTest {
+public class TaskServiceTaskLogTest {
 
     protected Task task;
 
@@ -502,6 +503,31 @@ public class TaskServiceEventTest {
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void logAddParticipantUser(RuntimeService runtimeService, TaskService taskService) {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        try {
+            assertNotNull(processInstance);
+            assertNotNull(task);
+
+            taskService.addUserIdentityLink(task.getId(), "newCandidateUser", IdentityLinkType.PARTICIPANT);
+
+            List<TaskLogEntry> logEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+            assertThat(logEntries).size().isEqualTo(2);
+            assertThat(logEntries.get(1)).
+                extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_ADDED");
+            assertThat(new String(logEntries.get(1).getData())).contains(
+                "\"type\":\"participant\"",
+                "\"userId\":\"newCandidateUser\""
+            );
+        } finally {
+            taskService.complete(task.getId());
+            deleteTaskWithLogEntries(taskService, task.getId());
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void logAddCandidateGroup(RuntimeService runtimeService, TaskService taskService) {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertNotNull(processInstance);
@@ -517,6 +543,31 @@ public class TaskServiceEventTest {
                 extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_ADDED");
             assertThat(new String(logEntries.get(1).getData())).contains(
                 "\"type\":\"candidate\"",
+                "\"groupId\":\"newCandidateGroup\""
+            );
+        } finally {
+            taskService.complete(task.getId());
+            deleteTaskWithLogEntries(taskService, task.getId());
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void logAddGroup(RuntimeService runtimeService, TaskService taskService) {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        assertNotNull(processInstance);
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(task);
+        try {
+
+            taskService.addGroupIdentityLink(task.getId(), "newCandidateGroup", IdentityLinkType.PARTICIPANT);
+
+            List<TaskLogEntry> logEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+            assertThat(logEntries).size().isEqualTo(2);
+            assertThat(logEntries.get(1)).
+                extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_ADDED");
+            assertThat(new String(logEntries.get(1).getData())).contains(
+                "\"type\":\"participant\"",
                 "\"groupId\":\"newCandidateGroup\""
             );
         } finally {

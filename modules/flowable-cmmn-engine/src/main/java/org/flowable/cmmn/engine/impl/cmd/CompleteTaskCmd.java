@@ -20,11 +20,13 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.task.service.delegate.TaskListener;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntity;
 
 /**
  * @author Joram Barrez
@@ -69,6 +71,8 @@ public class CompleteTaskCmd implements Command<Void> {
             taskEntity.setTransientVariables(transientVariables);
         }
 
+        logTaskCompleted(taskEntity, commandContext);
+
         CommandContextUtil.getInternalTaskAssignmentManager(commandContext).addUserIdentityLinkToParent(taskEntity, Authentication.getAuthenticatedUserId());
         CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_COMPLETE);
 
@@ -79,6 +83,17 @@ public class CompleteTaskCmd implements Command<Void> {
         }
         
         return null;
+    }
+
+    protected static void logTaskCompleted(TaskEntity taskEntity, CommandContext commandContext) {
+        if (CommandContextUtil.getTaskServiceConfiguration(commandContext).isEnableDatabaseEventLogging()) {
+            TaskLogEntryEntity taskLogEntry = org.flowable.task.service.impl.util.CommandContextUtil.getTaskLogEntryEntityManager().create();
+            taskLogEntry.setTaskId(taskEntity.getId());
+            taskLogEntry.setTimeStamp(CommandContextUtil.getTaskServiceConfiguration(commandContext).getClock().getCurrentTime());
+            taskLogEntry.setType(FlowableEngineEventType.TASK_COMPLETED.name());
+            taskLogEntry.setUserId(Authentication.getAuthenticatedUserId());
+            CommandContextUtil.getTaskService().addTaskLogEntry(taskLogEntry);
+        }
     }
 
 }
