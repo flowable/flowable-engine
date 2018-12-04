@@ -14,6 +14,7 @@ package org.flowable.engine.test.api.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.Date;
@@ -22,6 +23,7 @@ import java.util.function.Consumer;
 
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.HistoryService;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -32,6 +34,7 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskLogEntry;
 import org.flowable.task.api.TaskLogEntryBuilder;
 import org.flowable.task.api.TaskLogEntryQuery;
+import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntity;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -651,7 +654,7 @@ public class TaskServiceEventTest {
                 taskLogEntryQuery.count()
             ).isEqualTo(3l);
 
-            List<TaskLogEntry> pagedLogEntries = taskLogEntryQuery.listPage(1,1);
+            List<TaskLogEntry> pagedLogEntries = taskLogEntryQuery.listPage(1, 1);
             assertThat(pagedLogEntries.size()).isEqualTo(1);
             assertThat(pagedLogEntries.get(0)).isEqualToComparingFieldByField(logEntries.get(1));
         } finally {
@@ -702,16 +705,16 @@ public class TaskServiceEventTest {
     @Test
     public void queryForTaskLogEntriesByFromTimeStamp(TaskService taskService) {
         assertThatTaskLogIsFetched(taskService,
-            taskService.createTaskLogEntryBuilder().timeStamp(new Date(Long.MAX_VALUE/2)),
-            taskService.createTaskLogEntryQuery().from(new Date(Long.MAX_VALUE/2 - 1))
+            taskService.createTaskLogEntryBuilder().timeStamp(new Date(Long.MAX_VALUE / 2)),
+            taskService.createTaskLogEntryQuery().from(new Date(Long.MAX_VALUE / 2 - 1))
         );
     }
 
     @Test
     public void queryForTaskLogEntriesByFromIncludedTimeStamp(TaskService taskService) {
         assertThatTaskLogIsFetched(taskService,
-            taskService.createTaskLogEntryBuilder().timeStamp(new Date(Long.MAX_VALUE/2)),
-            taskService.createTaskLogEntryQuery().from(new Date(Long.MAX_VALUE/2))
+            taskService.createTaskLogEntryBuilder().timeStamp(new Date(Long.MAX_VALUE / 2)),
+            taskService.createTaskLogEntryQuery().from(new Date(Long.MAX_VALUE / 2))
         );
     }
 
@@ -765,7 +768,7 @@ public class TaskServiceEventTest {
                 fromLogNumber(allLogEntries.get(1).getLogNumber()).
                 toLogNumber(allLogEntries.get(allLogEntries.size() - 2).getLogNumber());
             List<TaskLogEntry> logEntries = taskLogEntryQuery.
-            list();
+                list();
             assertThat(logEntries.size()).isEqualTo(3);
             assertThat(logEntries).extracting(TaskLogEntry::getTaskId).containsExactly(anotherTask.getId(), task.getId(), task.getId());
 
@@ -773,7 +776,7 @@ public class TaskServiceEventTest {
                 taskLogEntryQuery.count()
             ).isEqualTo(3l);
 
-            List<TaskLogEntry> pagedLogEntries = taskLogEntryQuery.listPage(1,1);
+            List<TaskLogEntry> pagedLogEntries = taskLogEntryQuery.listPage(1, 1);
             assertThat(pagedLogEntries.size()).isEqualTo(1);
             assertThat(pagedLogEntries.get(0)).isEqualToComparingFieldByField(logEntries.get(1));
         } finally {
@@ -781,4 +784,21 @@ public class TaskServiceEventTest {
         }
     }
 
+    @Test
+    public void queryForTaskLogEntriesByNativeQuery(TaskService taskService, ManagementService managementService) {
+        assertEquals("FLW_TSK_LOG", managementService.getTableName(TaskLogEntryEntity.class));
+        assertEquals("FLW_TSK_LOG", managementService.getTableName(TaskLogEntry.class));
+        TaskLogEntryBuilder taskLogEntryBuilder = taskService.createTaskLogEntryBuilder();
+        taskLogEntryBuilder.taskId("1").add();
+        taskLogEntryBuilder.taskId("2").add();
+        taskLogEntryBuilder.taskId("3").add();
+
+        assertEquals(3, taskService.createNativeTaskLogEntryQuery().sql("SELECT * FROM " + managementService.getTableName(TaskLogEntry.class)).list().size());
+        assertEquals(3, taskService.createNativeTaskLogEntryQuery().sql("SELECT count(*) FROM " + managementService.getTableName(TaskLogEntry.class)).count());
+
+        assertEquals(1, taskService.createNativeTaskLogEntryQuery().parameter("taskId", "1").
+            sql("SELECT count(*) FROM " + managementService.getTableName(TaskLogEntry.class) + " WHERE TASK_ID_ = #{taskId}").list().size());
+        assertEquals(1, taskService.createNativeTaskLogEntryQuery().parameter("taskId", "1").
+            sql("SELECT count(*) FROM " + managementService.getTableName(TaskLogEntry.class) + " WHERE TASK_ID_ = #{taskId}").count());
+    }
 }

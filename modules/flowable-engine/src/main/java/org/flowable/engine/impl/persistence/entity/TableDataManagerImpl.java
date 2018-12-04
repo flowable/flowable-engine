@@ -50,9 +50,11 @@ import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskLogEntry;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntity;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -76,6 +78,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
     static {
         // runtime
         entityToTableNameMap.put(TaskEntity.class, "ACT_RU_TASK");
+        entityToTableNameMap.put(TaskLogEntryEntity.class, "FLW_TSK_LOG");
         entityToTableNameMap.put(ExecutionEntity.class, "ACT_RU_EXECUTION");
         entityToTableNameMap.put(IdentityLinkEntity.class, "ACT_RU_IDENTITYLINK");
         entityToTableNameMap.put(VariableInstanceEntity.class, "ACT_RU_VARIABLE");
@@ -121,6 +124,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
 
         // and now the map for the API types (does not cover all cases)
         apiTypeToTableNameMap.put(Task.class, "ACT_RU_TASK");
+        apiTypeToTableNameMap.put(TaskLogEntry.class, "FLW_TSK_LOG");
         apiTypeToTableNameMap.put(Execution.class, "ACT_RU_EXECUTION");
         apiTypeToTableNameMap.put(ProcessInstance.class, "ACT_RU_EXECUTION");
         apiTypeToTableNameMap.put(ProcessDefinition.class, "ACT_RE_PROCDEF");

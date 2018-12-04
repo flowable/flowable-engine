@@ -58,6 +58,6 @@ public class MyBatisTaskLogEntryDataManager extends AbstractDataManager<TaskLogE
     }
     @Override
     public List<TaskLogEntry> findTaskLogEntriesByNativeQueryCriteria(Map<String, Object> nativeTaskLogEntryQuery) {
-        return getDbSqlSession().selectList("selectTaskLogEntriesNativeQueryCriteria", nativeTaskLogEntryQuery);
+        return getDbSqlSession().selectListWithRawParameter("selectTaskLogEntriesByNativeQueryCriteria", nativeTaskLogEntryQuery);
     }
 }

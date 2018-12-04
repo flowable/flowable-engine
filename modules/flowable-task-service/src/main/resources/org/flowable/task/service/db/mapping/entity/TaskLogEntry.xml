@@ -118,6 +118,14 @@
     <include refid="selectTaskLogEntriesByQueryCriteriaSql"/>
   </select>
 
+  <select id="selectTaskLogEntriesByNativeQueryCriteria" parameterType="java.util.Map" resultMap="taskLogEntryResultMap">
+    <include refid="org.flowable.task.service.db.common.selectByNativeQuery"/>
+  </select>
+
+  <select id="selectTaskLogEntriesCountByNativeQueryCriteria" parameterType="java.util.Map" resultType="long">
+    ${sql}
+  </select>
+
   <sql id="selectTaskLogEntriesByQueryCriteriaSql">
     from ${prefix}FLW_TSK_LOG RES
     <include refid="commonSelectTaskLogEntriesByQueryCriteriaSql"/>
