@@ -793,12 +793,21 @@ public class TaskServiceEventTest {
         taskLogEntryBuilder.taskId("2").add();
         taskLogEntryBuilder.taskId("3").add();
 
-        assertEquals(3, taskService.createNativeTaskLogEntryQuery().sql("SELECT * FROM " + managementService.getTableName(TaskLogEntry.class)).list().size());
-        assertEquals(3, taskService.createNativeTaskLogEntryQuery().sql("SELECT count(*) FROM " + managementService.getTableName(TaskLogEntry.class)).count());
+        try {
+            assertEquals(3,
+                taskService.createNativeTaskLogEntryQuery().sql("SELECT * FROM " + managementService.getTableName(TaskLogEntry.class)).list().size());
+            assertEquals(3,
+                taskService.createNativeTaskLogEntryQuery().sql("SELECT count(*) FROM " + managementService.getTableName(TaskLogEntry.class)).count());
 
-        assertEquals(1, taskService.createNativeTaskLogEntryQuery().parameter("taskId", "1").
-            sql("SELECT count(*) FROM " + managementService.getTableName(TaskLogEntry.class) + " WHERE TASK_ID_ = #{taskId}").list().size());
-        assertEquals(1, taskService.createNativeTaskLogEntryQuery().parameter("taskId", "1").
-            sql("SELECT count(*) FROM " + managementService.getTableName(TaskLogEntry.class) + " WHERE TASK_ID_ = #{taskId}").count());
+            assertEquals(1, taskService.createNativeTaskLogEntryQuery().parameter("taskId", "1").
+                sql("SELECT count(*) FROM " + managementService.getTableName(TaskLogEntry.class) + " WHERE TASK_ID_ = #{taskId}").list().size());
+            assertEquals(1, taskService.createNativeTaskLogEntryQuery().parameter("taskId", "1").
+                sql("SELECT count(*) FROM " + managementService.getTableName(TaskLogEntry.class) + " WHERE TASK_ID_ = #{taskId}").count());
+        } finally {
+            taskService.createTaskLogEntryQuery().list().
+                forEach(
+                    logEntry -> taskService.deleteTaskLogEntry(logEntry.getLogNumber())
+                );
+        }
     }
 }
