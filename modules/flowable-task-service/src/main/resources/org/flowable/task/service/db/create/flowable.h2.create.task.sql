@@ -53,4 +53,4 @@ create index ACT_IDX_TASK_SCOPE_DEF on ACT_RU_TASK(SCOPE_DEFINITION_ID_, SCOPE_T
 
 create index FLW_IDX_TASK_LOG_NUMBER on FLW_TSK_LOG(LOG_NR_);
 
-insert into ACT_GE_PROPERTY values ('task.schema.version', '6.4.1.0', 1);
+insert into ACT_GE_PROPERTY values ('task.schema.version', '6.4.1.3', 1);

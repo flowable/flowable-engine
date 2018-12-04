@@ -47,7 +47,7 @@
     insert into ${prefix}FLW_TSK_LOG(LOG_NR_, TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, TENANT_ID_,
                                      TIME_STAMP_, USER_ID_, DATA_)
     values (
-      ${prefix}FLW_TSK_LOG_seq.nextVal,
+      ${prefix}FLW_TASK_EVT_LOG_SEQ.nextVal,
       #{type, jdbcType=VARCHAR}, 
       #{taskId, jdbcType=VARCHAR},
       #{executionId, jdbcType=VARCHAR},
@@ -70,7 +70,7 @@
       <foreach collection="list" item="taskLog" index="index">
         into ${prefix}FLW_TSK_LOG(LOG_NR_, TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, TENANT_ID_,
         TIME_STAMP_, USER_ID_, DATA_, LOCK_OWNER_, LOCK_TIME_, IS_PROCESSED_) VALUES 
-            (${prefix}FLW_TSK_LOG_seq.nextVal,
+            (${prefix}FLW_TASK_EVT_LOG_SEQ.nextVal,
              #{taskLog.type, jdbcType=VARCHAR},
              #{taskLog.taskId, jdbcType=VARCHAR},
              #{taskLog.executionId, jdbcType=VARCHAR},

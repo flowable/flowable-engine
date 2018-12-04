@@ -31,9 +31,26 @@ create table ACT_RU_TASK (
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
+create table FLW_TSK_LOG (
+    LOG_NR_       bigint auto_increment,
+    TYPE_         varchar(64),
+    TASK_ID_      varchar(64) not null,
+    TIME_STAMP_   datetime(3) not null,
+    USER_ID_      varchar(255),
+    DATA_         varchar(4000),
+    EXECUTION_ID_ varchar(64),
+    PROC_INST_ID_ varchar(64),
+    SCOPE_ID_     varchar(255),
+    SUB_SCOPE_ID_ varchar(255),
+    SCOPE_TYPE_   varchar(255),
+    TENANT_ID_    varchar(255) default ''
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+
 create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
 create index ACT_IDX_TASK_SCOPE on ACT_RU_TASK(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SUB_SCOPE on ACT_RU_TASK(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SCOPE_DEF on ACT_RU_TASK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
-insert into ACT_GE_PROPERTY values ('task.schema.version', '6.4.1.0', 1);
+create index FLW_IDX_TASK_LOG_NUMBER on FLW_TSK_LOG(LOG_NR_);
+
+insert into ACT_GE_PROPERTY values ('task.schema.version', '6.4.1.3', 1);
