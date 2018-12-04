@@ -14,11 +14,14 @@ package org.flowable.task.service.impl;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.service.CommonServiceImpl;
+import org.flowable.task.api.NativeTaskLogEntryQuery;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.api.TaskLogEntry;
 import org.flowable.task.api.TaskLogEntryBuilder;
+import org.flowable.task.api.TaskLogEntryQuery;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.TaskServiceConfiguration;
@@ -122,11 +125,6 @@ public class TaskServiceImpl extends CommonServiceImpl<TaskServiceConfiguration>
     }
 
     @Override
-    public List<TaskLogEntry> findTaskLogEntries(String taskInstanceId) {
-        return getTaskLogEntryEntityManager().findTaskLogEntriesByTaskInstanceId(taskInstanceId);
-    }
-
-    @Override
     public void deleteTaskLogEntry(long logNumber) {
         getTaskLogEntryEntityManager().deleteTaskLogEntry(logNumber);
     }
@@ -143,6 +141,16 @@ public class TaskServiceImpl extends CommonServiceImpl<TaskServiceConfiguration>
         if (this.configuration.isEnableDatabaseEventLogging()) {
             getTaskLogEntryEntityManager().createTaskLogEntry(taskLogEntryBuilder);
         }
+    }
+
+    @Override
+    public TaskLogEntryQuery createTaskLogEntryQuery(CommandExecutor commandExecutor) {
+        return new TaskLogEntryQueryImpl(commandExecutor);
+    }
+
+    @Override
+    public NativeTaskLogEntryQuery createNativeTaskLogEntryQuery(CommandExecutor commandExecutor) {
+        return new NativeTaskLogEntryQueryImpl(commandExecutor);
     }
 
     protected TaskLogEntryEntityManager getTaskLogEntryEntityManager() {

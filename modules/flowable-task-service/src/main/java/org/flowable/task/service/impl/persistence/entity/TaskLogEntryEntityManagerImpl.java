@@ -13,10 +13,12 @@
 package org.flowable.task.service.impl.persistence.entity;
 
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.task.api.TaskLogEntry;
 import org.flowable.task.api.TaskLogEntryBuilder;
 import org.flowable.task.service.TaskServiceConfiguration;
+import org.flowable.task.service.impl.TaskLogEntryQueryImpl;
 import org.flowable.task.service.impl.persistence.entity.data.TaskLogEntryDataManager;
 
 /**
@@ -37,8 +39,22 @@ public class TaskLogEntryEntityManagerImpl extends AbstractEntityManager<TaskLog
     }
 
     @Override
-    public List<TaskLogEntry> findTaskLogEntriesByTaskInstanceId(String taskInstanceId) {
-        return getDataManager().findTaskLogEntriesByTaskInstanceId(taskInstanceId);
+    public List<TaskLogEntry> findTaskLogEntriesByQueryCriteria(TaskLogEntryQueryImpl taskLogEntryQuery) {
+        return getDataManager().findTaskLogEntriesByQueryCriteria(taskLogEntryQuery);
+    }
+
+    @Override
+    public long findTaskLogEntriesCountByQueryCriteria(TaskLogEntryQueryImpl taskLogEntryQuery) {
+        return getDataManager().findTaskLogEntriesCountByQueryCriteria(taskLogEntryQuery);
+    }
+
+    @Override
+    public List<TaskLogEntry> findTaskLogEntriesByNativeQueryCriteria(Map<String, Object> nativeTaskLogEntryQuery) {
+        return getDataManager().findTaskLogEntriesByNativeQueryCriteria(nativeTaskLogEntryQuery);
+    }
+    @Override
+    public long findTaskLogEntriesCountByNativeQueryCriteria(Map<String, Object> nativeTaskLogEntryQuery) {
+        return getDataManager().findTaskLogEntriesCountByNativeQueryCriteria(nativeTaskLogEntryQuery);
     }
 
     @Override

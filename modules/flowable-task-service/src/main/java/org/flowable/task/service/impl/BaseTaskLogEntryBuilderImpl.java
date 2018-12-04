@@ -14,15 +14,37 @@ import org.flowable.task.api.TaskLogEntryBuilder;
 public abstract class BaseTaskLogEntryBuilderImpl implements TaskLogEntryBuilder {
     protected CommandExecutor commandExecutor;
 
-    protected TaskInfo task;
     protected String type;
     protected Date timeStamp;
     protected String userId;
     protected byte[] data;
+    protected String processInstanceId;
+    protected String executionId;
+    protected String scopeId;
+    protected String subScopeId;
+    protected String scopeType;
+    protected String tenantId;
+    protected String taskId;
 
     public BaseTaskLogEntryBuilderImpl(CommandExecutor commandExecutor, TaskInfo task) {
+        this(commandExecutor);
+        this.processInstanceId = task.getProcessInstanceId();
+        this.executionId = task.getExecutionId();
+        this.tenantId = task.getTenantId();
+        this.scopeId = task.getScopeId();
+        this.subScopeId = task.getSubScopeId();
+        this.scopeType = task.getScopeType();
+        this.taskId = task.getId();
+    }
+
+    public BaseTaskLogEntryBuilderImpl(CommandExecutor commandExecutor) {
         this.commandExecutor = commandExecutor;
-        this.task = task;
+    }
+
+    @Override
+    public TaskLogEntryBuilder taskId(String taskId) {
+        this.taskId = taskId;
+        return this;
     }
 
     @Override
@@ -50,13 +72,42 @@ public abstract class BaseTaskLogEntryBuilderImpl implements TaskLogEntryBuilder
     }
 
     @Override
+    public TaskLogEntryBuilder processInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
+        return this;
+    }
+
+    @Override
+    public TaskLogEntryBuilder scopeId(String scopeId) {
+        this.scopeId = scopeId;
+        return this;
+    }
+
+    @Override
+    public TaskLogEntryBuilder subScopeId(String subScopeId) {
+        this.subScopeId = subScopeId;
+        return this;
+    }
+
+    @Override
+    public TaskLogEntryBuilder scopeType(String scopeType) {
+        this.scopeType = scopeType;
+        return this;
+    }
+
+    @Override
+    public TaskLogEntryBuilder tenantId(String tenantId) {
+        return this;
+    }
+
+    @Override
     public String getType() {
         return type;
     }
 
     @Override
     public String getTaskId() {
-        return task.getId();
+        return taskId;
     }
     @Override
     public Date getTimeStamp() {
@@ -75,31 +126,31 @@ public abstract class BaseTaskLogEntryBuilderImpl implements TaskLogEntryBuilder
 
     @Override
     public String getExecutionId() {
-        return task.getExecutionId();
+        return executionId;
     }
 
     @Override
     public String getProcessInstanceId() {
-        return task.getProcessInstanceId();
+        return processInstanceId;
     }
 
     @Override
     public String getScopeId() {
-        return task.getScopeId();
+        return scopeId;
     }
 
     @Override
     public String getSubScopeId() {
-        return task.getSubScopeId();
+        return subScopeId;
     }
 
     @Override
     public String getScopeType() {
-        return task.getScopeType();
+        return scopeType;
     }
 
     @Override
     public String getTenantId() {
-        return task.getTenantId();
+        return tenantId;
     }
 }

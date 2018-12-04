@@ -13,19 +13,27 @@
 package org.flowable.task.service.impl.persistence.entity;
 
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.task.api.TaskLogEntry;
 import org.flowable.task.api.TaskLogEntryBuilder;
+import org.flowable.task.service.impl.TaskLogEntryQueryImpl;
 
 /**
  * @author martin.grofcik
  */
 public interface TaskLogEntryEntityManager extends EntityManager<TaskLogEntryEntity> {
 
-    List<TaskLogEntry> findTaskLogEntriesByTaskInstanceId(String taskInstanceId);
-
     void deleteTaskLogEntry(long logNr);
 
     void createTaskLogEntry(TaskLogEntryBuilder taskLogEntryBuilder);
+
+    List<TaskLogEntry> findTaskLogEntriesByQueryCriteria(TaskLogEntryQueryImpl taskLogEntryQuery);
+
+    long findTaskLogEntriesCountByQueryCriteria(TaskLogEntryQueryImpl taskLogEntryQuery);
+
+    List<TaskLogEntry> findTaskLogEntriesByNativeQueryCriteria(Map<String, Object> nativeTaskLogEntryQuery);
+
+    long findTaskLogEntriesCountByNativeQueryCriteria(Map<String, Object> nativeTaskLogEntryQuery);
 }

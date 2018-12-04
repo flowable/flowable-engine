@@ -30,12 +30,14 @@ import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.DelegationState;
+import org.flowable.task.api.NativeTaskLogEntryQuery;
 import org.flowable.task.api.NativeTaskQuery;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.TaskLogEntry;
 import org.flowable.task.api.TaskLogEntryBuilder;
+import org.flowable.task.api.TaskLogEntryQuery;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
@@ -843,14 +845,6 @@ public interface TaskService {
     List<Task> getSubTasks(String parentTaskId);
 
     /**
-     * Returns a list of task log entries for a specific task instance id. Note that the user task event logging must be specifically enabled
-     * in the process engine configuration.
-     *
-     * Passing null as arguments will effectively fetch ALL event log entries. Be careful, as this list might be huge!
-     */
-    List<TaskLogEntry> getTaskLogEntriesByTaskInstanceId(String taskId);
-
-    /**
      * Deletes user task log entry by its log number
      *
      * @param logNumber user task log entry identifier
@@ -863,4 +857,21 @@ public interface TaskService {
      * @param task to which is log related to
      */
     TaskLogEntryBuilder createTaskLogEntryBuilder(TaskInfo task);
+
+    /**
+     * Create new task log entry builder to the log task event without predefined values from the task
+     *
+     */
+    TaskLogEntryBuilder createTaskLogEntryBuilder();
+
+    /**
+     * Returns a new {@link TaskLogEntryQuery} that can be used to dynamically query task log entries.
+     */
+    TaskLogEntryQuery createTaskLogEntryQuery();
+
+    /**
+     * Returns a new {@link NativeTaskLogEntryQuery} for {@link TaskLogEntry}s.
+     */
+    NativeTaskLogEntryQuery createNativeTaskLogEntryQuery();
+
 }

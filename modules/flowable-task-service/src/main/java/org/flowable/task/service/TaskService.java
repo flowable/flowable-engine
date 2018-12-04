@@ -14,10 +14,13 @@ package org.flowable.task.service;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.task.api.NativeTaskLogEntryQuery;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.api.TaskLogEntry;
 import org.flowable.task.api.TaskLogEntryBuilder;
+import org.flowable.task.api.TaskLogEntryQuery;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
@@ -38,8 +41,6 @@ public interface TaskService {
     List<Task> findTasksByParentTaskId(String parentTaskId);
     
     List<TaskEntity> findTasksBySubScopeIdScopeType(String subScopeId, String scopeType);
-
-    List<TaskLogEntry> findTaskLogEntries(String taskInstanceId);
 
     TaskQuery createTaskQuery();
     
@@ -73,4 +74,8 @@ public interface TaskService {
     void addTaskLogEntry(TaskLogEntry logEntry);
 
     void createTaskLogEntry(TaskLogEntryBuilder taskLogEntryBuilder);
+
+    TaskLogEntryQuery createTaskLogEntryQuery(CommandExecutor commandExecutor);
+
+    NativeTaskLogEntryQuery createNativeTaskLogEntryQuery(CommandExecutor commandExecutor);
 }

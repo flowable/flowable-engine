@@ -80,7 +80,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
     public void tearDown() throws Exception {
         if (task != null) {
             assertThat("user task event logging is switched off in configuration",
-                taskService.getTaskLogEntriesByTaskInstanceId(task.getId()), is(Collections.emptyList()));
+                taskService.createNativeTaskLogEntryQuery().count(), is(0l));
             taskService.deleteTask(task.getId(), true);
         }
     }
@@ -2127,6 +2127,13 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
         taskService.deleteTask(task.getId(), true);
         identityService.deleteUser(user.getId());
+    }
+
+    @Test
+    public void queryTaskLogEntriesWithoutLogging() {
+        assertThat(taskService.createTaskLogEntryQuery().list(), is(Collections.emptyList()));
+
+        assertThat(taskService.createTaskLogEntryQuery().count(), is(0l));
     }
 
     private static Set<IdentityLinkEntityImpl> getDefaultIdentityLinks() {

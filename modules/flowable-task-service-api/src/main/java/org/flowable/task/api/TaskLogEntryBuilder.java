@@ -21,11 +21,23 @@ import java.util.Date;
  */
 public interface TaskLogEntryBuilder {
 
+    TaskLogEntryBuilder taskId(String taskId);
+
     TaskLogEntryBuilder type(String type);
 
     TaskLogEntryBuilder timeStamp(Date timeStamp);
 
     TaskLogEntryBuilder userId(String userId);
+
+    TaskLogEntryBuilder processInstanceId(String processInstanceId);
+
+    TaskLogEntryBuilder scopeId(String scopeId);
+
+    TaskLogEntryBuilder subScopeId(String subScopeId);
+
+    TaskLogEntryBuilder scopeType(String scopeType);
+
+    TaskLogEntryBuilder tenantId(String tenantId);
 
     TaskLogEntryBuilder data(byte[] data);
 
@@ -52,4 +64,5 @@ public interface TaskLogEntryBuilder {
     String getTenantId();
 
     void add();
+
 }

@@ -52,7 +52,6 @@ import org.flowable.engine.impl.cmd.GetTaskDataObjectsCmd;
 import org.flowable.engine.impl.cmd.GetTaskEventCmd;
 import org.flowable.engine.impl.cmd.GetTaskEventsCmd;
 import org.flowable.engine.impl.cmd.GetTaskFormModelCmd;
-import org.flowable.engine.impl.cmd.GetTaskLogEntriesByTaskInstanceIdCmd;
 import org.flowable.engine.impl.cmd.GetTaskVariableCmd;
 import org.flowable.engine.impl.cmd.GetTaskVariableInstanceCmd;
 import org.flowable.engine.impl.cmd.GetTaskVariableInstancesCmd;
@@ -77,14 +76,17 @@ import org.flowable.engine.task.Event;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.task.api.NativeTaskLogEntryQuery;
 import org.flowable.task.api.NativeTaskQuery;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.api.TaskInfo;
-import org.flowable.task.api.TaskLogEntry;
 import org.flowable.task.api.TaskLogEntryBuilder;
+import org.flowable.task.api.TaskLogEntryQuery;
 import org.flowable.task.api.TaskQuery;
+import org.flowable.task.service.impl.NativeTaskLogEntryQueryImpl;
 import org.flowable.task.service.impl.NativeTaskQueryImpl;
+import org.flowable.task.service.impl.TaskLogEntryQueryImpl;
 import org.flowable.task.service.impl.TaskQueryImpl;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
@@ -584,11 +586,6 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
     }
 
     @Override
-    public List<TaskLogEntry> getTaskLogEntriesByTaskInstanceId(String taskId) {
-        return commandExecutor.execute(new GetTaskLogEntriesByTaskInstanceIdCmd(taskId));
-    }
-
-    @Override
     public void deleteTaskLogEntry(long logNumber) {
         commandExecutor.execute(new DeleteTaskLogEntryByLogNumberCmd(logNumber));
     }
@@ -596,5 +593,20 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
     @Override
     public TaskLogEntryBuilder createTaskLogEntryBuilder(TaskInfo task) {
         return new TaskLogEntryBuilderImpl(commandExecutor, task);
+    }
+
+    @Override
+    public TaskLogEntryBuilder createTaskLogEntryBuilder() {
+        return new TaskLogEntryBuilderImpl(commandExecutor);
+    }
+
+    @Override
+    public TaskLogEntryQuery createTaskLogEntryQuery() {
+        return new TaskLogEntryQueryImpl(commandExecutor);
+    }
+
+    @Override
+    public NativeTaskLogEntryQuery createNativeTaskLogEntryQuery() {
+        return new NativeTaskLogEntryQueryImpl(commandExecutor);
     }
 }

@@ -25,6 +25,11 @@ public class TaskLogEntryBuilderImpl extends BaseTaskLogEntryBuilderImpl {
     public TaskLogEntryBuilderImpl(CommandExecutor commandExecutor, TaskInfo task) {
         super(commandExecutor, task);
     }
+
+    public TaskLogEntryBuilderImpl(CommandExecutor commandExecutor) {
+        super(commandExecutor);
+    }
+
     @Override
     public void add() {
         this.commandExecutor.execute(new AddTaskLogEntryCmd(this));

@@ -12,11 +12,12 @@
  */
 package org.flowable.task.service.impl.persistence.entity.data.impl;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.task.api.TaskLogEntry;
+import org.flowable.task.service.impl.TaskLogEntryQueryImpl;
 import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntityImpl;
 import org.flowable.task.service.impl.persistence.entity.data.TaskLogEntryDataManager;
@@ -37,12 +38,26 @@ public class MyBatisTaskLogEntryDataManager extends AbstractDataManager<TaskLogE
     }
 
     @Override
-    public List<TaskLogEntry> findTaskLogEntriesByTaskInstanceId(String taskInstanceId) {
-        return getDbSqlSession().selectList("selectTaskLogEntriesByTaskInstanceId", Collections.singletonMap("taskInstanceId", taskInstanceId));
+    public long findTaskLogEntriesCountByQueryCriteria(TaskLogEntryQueryImpl taskLogEntryQuery) {
+        return (Long) getDbSqlSession().selectOne("selectTaskLogEntriesCountByQueryCriteria", taskLogEntryQuery);
+    }
+
+    @Override
+    public List<TaskLogEntry> findTaskLogEntriesByQueryCriteria(TaskLogEntryQueryImpl taskLogEntryQuery) {
+        return getDbSqlSession().selectList("selectTaskLogEntriesByQueryCriteria", taskLogEntryQuery);
     }
 
     @Override
     public void deleteTaskLogEntry(long logEntryNumber) {
         getDbSqlSession().delete("deleteTaskLogEntryByLogNumber", logEntryNumber, TaskLogEntryEntityImpl.class);
+    }
+
+    @Override
+    public long findTaskLogEntriesCountByNativeQueryCriteria(Map<String, Object> nativeTaskLogEntryQuery) {
+        return (Long) getDbSqlSession().selectOne("selectTaskLogEntriesCountByNativeQueryCriteria", nativeTaskLogEntryQuery);
+    }
+    @Override
+    public List<TaskLogEntry> findTaskLogEntriesByNativeQueryCriteria(Map<String, Object> nativeTaskLogEntryQuery) {
+        return getDbSqlSession().selectList("selectTaskLogEntriesNativeQueryCriteria", nativeTaskLogEntryQuery);
     }
 }
