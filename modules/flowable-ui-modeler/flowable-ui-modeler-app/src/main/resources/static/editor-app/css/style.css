@@ -1208,3 +1208,9 @@ hot-table .column-header.label {
 .current-process {
     border: 1px solid green;
 }
+
+.export-option{
+    border:1px black solid;
+    font-size: 16px;
+    padding: 4px;
+}

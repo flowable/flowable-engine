@@ -1,0 +1,18 @@
+<div class="modal" tabindex="-1" role="dialog" ng-controller="ExportModelCtrl">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2>Export options</h2>
+			</div>
+			<div class="modal-body">
+				<div class="export-option">
+					<span>Export the current process to svg images</span>
+					<button type="button" ng-disabled="status.loading" class="btn btn-default" ng-click="exportSVG()">Export svg</button>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" ng-disabled="status.loading" class="btn btn-primary" ng-click="$hide()">Close</button>
+			</div>
+		</div>
+	</div>
+</div>

@@ -28,6 +28,12 @@ FLOWABLE.TOOLBAR_CONFIG = {
 			"action": "FLOWABLE.TOOLBAR.ACTIONS.validate"
 		},
         {
+            "type" : "button",
+            "title" : "TOOLBAR.ACTION.EXPORT",
+            "cssClass" : "glyphicon glyphicon-export",
+            "action": "FLOWABLE.TOOLBAR.ACTIONS.export"
+        },
+        {
             "type" : "separator",
             "title" : "",
             "cssClass" : "toolbar-separator"

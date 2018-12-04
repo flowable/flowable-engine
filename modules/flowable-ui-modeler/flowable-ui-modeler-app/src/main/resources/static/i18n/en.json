@@ -706,6 +706,7 @@
 
     "TOOLBAR.ACTION.CLOSE" : "Close the editor and go back to the overview page",
     "TOOLBAR.ACTION.SAVE" : "Save the model",
+    "TOOLBAR.ACTION.EXPORT" : "Export the given bpmn model to jpeg/svg/...",
     "TOOLBAR.ACTION.VALIDATE" : "Validate the model",
     "TOOLBAR.ACTION.CUT" : "Cut (select one or more elements in your business process)",
     "TOOLBAR.ACTION.COPY" : "Copy (select one or more elements in your business process)",

@@ -36,6 +36,15 @@ FLOWABLE.TOOLBAR = {
             }, services.$modal, services.$scope);
 		},
 
+        export: function(services){
+          _internalCreateModal({
+              autoClose: false,
+              backdrop: true,
+              keyboard: true,
+              template: 'editor-app/popups/export-model.html?version=' + Date.now(),
+              scope: services.$scope
+          },services.$modal, services.$scope)
+        },
         undo: function (services) {
 
             // Get the last commands
@@ -551,5 +560,53 @@ angular.module('flowableModeler').controller('ValidateModelCtrl',['$scope', '$ht
         },function(response){
             console.log(response);
         });
+    }
+]);
+
+angular.module('flowableModeler').controller('ExportModelCtrl',['$scope', '$http', '$q','editorManager',
+    function ($scope, $http, $q, editorManager) {
+        $scope.status = {
+            loading:false,
+        };
+
+        //we must work with promises as text nodes are attached with a delay.
+        $scope.exportSVG = function (){
+            $scope.status.loading = true;
+            var promise = editorManager.buildSVGJson($q);
+            promise.then(function(result){
+                //use the correct syntax ...
+                //https://code.angularjs.org/1.3.13/docs/api/ng/service/$http
+               $http({
+                   url: FLOWABLE.URL.exportSVG(),
+                   method: 'POST',
+                   cache: false,
+                   headers: {
+                       "Content-Type":"application/json;charset=utf-8",
+                       "Accept":"application/octet-stream"
+                   },
+                   responseType: "arraybuffer",
+                   data: result
+               }).success(function(data, status, headers, config) {
+                    // this callback will be called asynchronously
+                    // when the response is available
+                   console.log("export status",status);
+                   console.log("export data",data);
+
+                   $scope.status.loading = false;
+
+                   var endFile = new Blob([data],{type: "application/zip"});
+                   saveAs(endFile, headers('x-export-filename'));
+                }).error(function(data, status, headers, config) {
+                    // called asynchronously if an error occurs
+                    // or server returns response with an error status.
+                   console.log("Something went wrong: status -",status);
+                   console.log("Something went wrong: data - ",status);
+                });
+
+
+
+
+            });
+        }
     }
 ]);

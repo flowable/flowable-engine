@@ -15,7 +15,7 @@
  * Created by Pardo David on 3/01/2017.
  * For this service to work the user must call bootEditor method
  */
-angular.module("flowableModeler").factory("editorManager", ["$http", function ($http) {
+angular.module("flowableModeler").factory("editorManager", ["$http","$q", function ($http,$q) {
     var editorManager = Class.create({
         initialize: function () {
             this.treeFilteredElements = ["SubProcess", "CollapsedSubProcess"];
@@ -315,6 +315,30 @@ angular.module("flowableModeler").factory("editorManager", ["$http", function ($
                 }
             }
             return false;
+        },
+        buildSVGJson: function(){
+           var _self = this;
+           var resultPromise = $q(function(resolve,reject){resolve([])});
+           var serializer = new XMLSerializer();
+           this.canvasTracker.each(function(pair){
+               resultPromise = resultPromise.then(function(result){
+                  var deffered = $q.defer();
+                  _self.edit(pair.key);
+                  setTimeout(function(){
+                      console.log("resolving some fancy logic 1 second after editor is openend",pair.key);
+                      result.push({
+                          "elementId": pair.key,
+                          "svg": serializer.serializeToString(_self.getCanvas().getSVGRepresentation())
+                      });
+                      deffered.resolve(result);
+                  },1000);
+                  return deffered.promise;
+              })
+           });
+
+           return resultPromise.then(function(result){
+               return JSON.stringify(result);
+           });
         }
     });
 

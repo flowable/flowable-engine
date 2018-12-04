@@ -32,5 +32,9 @@ FLOWABLE.URL = {
     
     validateModel: function(){
 		return FLOWABLE.CONFIG.contextRoot + '/app/rest/model/validate';
+    },
+
+    exportSVG: function() {
+        return FLOWABLE.CONFIG.contextRoot + '/app/rest/model/export?format=svg&content_source=modeler'
     }
 };
