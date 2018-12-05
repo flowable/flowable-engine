@@ -79,6 +79,7 @@ public class TaskCreatedHistoryJsonTransformer extends AbstractHistoryJsonTransf
             historicTaskService.insertHistoricTask(historicTaskInstance, true);
         }
 
+        // there can be still job in the queue which can have activityId in and we should be able to handle it
         if (StringUtils.isNotEmpty(executionId)) {
             String activityId = getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID);
             if (StringUtils.isNotEmpty(activityId)) {

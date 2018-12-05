@@ -88,4 +88,12 @@ public interface ActivityInstanceEntityManager extends EntityManager<ActivityIns
      */
     void syncUserTaskExecution(ExecutionEntity executionEntity, FlowElement newFlowElement, String oldActivityId, TaskEntity task);
 
+    /**
+     * Update process definition reference in all activity instances for a given process instance
+     *
+     * @param newProcessDefinitionId new process definition id
+     * @param processInstanceId process instance which activities are transformed
+     */
+    void updateActivityInstancesProcessDefinitionId(String newProcessDefinitionId, String processInstanceId);
+
 }

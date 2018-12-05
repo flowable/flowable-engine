@@ -647,8 +647,6 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
     
     @Override
     public void updateProcessDefinitionIdInHistory(ProcessDefinitionEntity processDefinitionEntity, ExecutionEntity processInstance) {
-        updateRuntimeActivityInstancesProcessDefinitionId(processDefinitionEntity, processInstance);
-
         if (isHistoryEnabled(processDefinitionEntity.getId())) {
             Map<String, String> data = new HashMap<>();
             putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_ID, processDefinitionEntity.getId());

@@ -372,17 +372,4 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
         this.historyLevel = historyLevel;
     }
 
-    protected void updateRuntimeActivityInstancesProcessDefinitionId(ProcessDefinitionEntity processDefinitionEntity, ExecutionEntity processInstance) {
-        ActivityInstanceQueryImpl activityQuery = new ActivityInstanceQueryImpl();
-        activityQuery.processInstanceId(processInstance.getId());
-        List<ActivityInstance> activities = getActivityInstanceEntityManager().findActivityInstancesByQueryCriteria(activityQuery);
-        if (activities != null) {
-            for (ActivityInstance activityInstance : activities) {
-                ActivityInstanceEntity activityEntity = (ActivityInstanceEntity) activityInstance;
-                activityEntity.setProcessDefinitionId(processDefinitionEntity.getId());
-                getActivityInstanceEntityManager().update(activityEntity);
-            }
-        }
-    }
-
 }

@@ -144,6 +144,20 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
         getHistoryManager().syncUserTaskExecution(executionEntity, oldActivityId, newFlowElement, task);
     }
 
+    @Override
+    public void updateActivityInstancesProcessDefinitionId(String newProcessDefinitionId, String processInstanceId) {
+        ActivityInstanceQueryImpl activityQuery = new ActivityInstanceQueryImpl();
+        activityQuery.processInstanceId(processInstanceId);
+        List<ActivityInstance> activities = getActivityInstanceEntityManager().findActivityInstancesByQueryCriteria(activityQuery);
+        if (activities != null) {
+            for (ActivityInstance activityInstance : activities) {
+                ActivityInstanceEntity activityEntity = (ActivityInstanceEntity) activityInstance;
+                activityEntity.setProcessDefinitionId(newProcessDefinitionId);
+                getActivityInstanceEntityManager().update(activityEntity);
+            }
+        }
+    }
+
     protected void syncUserTaskExecutionActivityInstance(ExecutionEntity childExecution, String oldActivityId,
         FlowElement newFlowElement) {
         ActivityInstanceEntityManager activityInstanceEntityManager = CommandContextUtil.getActivityInstanceEntityManager();

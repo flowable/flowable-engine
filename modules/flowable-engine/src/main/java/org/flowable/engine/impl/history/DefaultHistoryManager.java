@@ -511,9 +511,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     
     @Override
     public void updateProcessDefinitionIdInHistory(ProcessDefinitionEntity processDefinitionEntity, ExecutionEntity processInstance) {
-        // when process instance is migrated to the new process definition we have to update runtimeActivityInstances
-        updateRuntimeActivityInstancesProcessDefinitionId(processDefinitionEntity, processInstance);
-
         if (isHistoryEnabled(processDefinitionEntity.getId())) {
             HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceEntityManager().findById(processInstance.getId());
             historicProcessInstance.setProcessDefinitionId(processDefinitionEntity.getId());
