@@ -43,8 +43,8 @@ public class PlanItemControlExport implements CmmnXmlConstants {
 
     protected static void writeItemControlContent(PlanItemControl planItemControl, XMLStreamWriter xtw) throws Exception {
         writeCompletionNeutralRule(planItemControl.getCompletionNeutralRule(), xtw);
-        writeRequiredRule(planItemControl.getRequiredRule(), xtw);
         writeRepetitionRule(planItemControl.getRepetitionRule(), xtw);
+        writeRequiredRule(planItemControl.getRequiredRule(), xtw);
         writeManualActivationRule(planItemControl.getManualActivationRule(), xtw);
     }
 

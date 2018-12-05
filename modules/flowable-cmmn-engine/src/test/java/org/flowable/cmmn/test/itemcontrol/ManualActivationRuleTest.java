@@ -308,5 +308,25 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
         cmmnTaskService.complete(taskC.getId());
         assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
     }
+
+    @Test
+    @CmmnDeployment
+    public void testManuallyActivatedRequiredAndRepeatingTask() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("test").start();
+        cmmnTaskService.complete(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("A").singleResult().getId());
+        assertCaseInstanceNotEnded(caseInstance);
+
+        assertEquals(0, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("B").count());
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceState(PlanItemInstanceState.ENABLED).singleResult();
+        cmmnRuntimeService.startPlanItemInstance(planItemInstance.getId());
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("B").count());
+
+        // 1 instance is required, the others aren't
+        cmmnTaskService.complete(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("B").singleResult().getId());
+
+        assertCaseInstanceEnded(caseInstance);
+
+    }
     
 }
