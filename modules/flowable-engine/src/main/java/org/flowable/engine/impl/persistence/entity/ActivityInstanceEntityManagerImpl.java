@@ -253,9 +253,6 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
         String activityId = getActivityIdForExecution(execution);
         if (activityId != null) {
             // No use looking for the ActivityInstance when no activityId is provided.
-            if (activityId == null) {
-                return null;
-            }
 
             String executionId = execution.getId();
 

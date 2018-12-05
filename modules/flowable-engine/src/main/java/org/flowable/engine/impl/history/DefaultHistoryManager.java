@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -319,7 +320,8 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     }
 
     @Override
-    public void recordHistoricDetailVariableCreate(VariableInstanceEntity variable, ExecutionEntity sourceActivityExecution, boolean useActivityId) {
+    public void recordHistoricDetailVariableCreate(VariableInstanceEntity variable, ExecutionEntity sourceActivityExecution, boolean useActivityId,
+        String activityInstanceId) {
         String processDefinitionId = null;
         if (sourceActivityExecution != null) {
             processDefinitionId = sourceActivityExecution.getProcessDefinitionId();
@@ -339,10 +341,14 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
 
             HistoricDetailVariableInstanceUpdateEntity historicVariableUpdate = getHistoricDetailEntityManager().copyAndInsertHistoricDetailVariableInstanceUpdateEntity(variable);
 
-            if (useActivityId && sourceActivityExecution != null) {
-                HistoricActivityInstanceEntity historicActivityInstance = findHistoricActivityInstance(sourceActivityExecution, false);
-                if (historicActivityInstance != null) {
-                    historicVariableUpdate.setActivityInstanceId(historicActivityInstance.getId());
+            if (StringUtils.isNotEmpty(activityInstanceId)) {
+                historicVariableUpdate.setActivityInstanceId(activityInstanceId);
+            } else {
+                if (useActivityId && sourceActivityExecution != null) {
+                    HistoricActivityInstanceEntity historicActivityInstance = findHistoricActivityInstance(sourceActivityExecution, false);
+                    if (historicActivityInstance != null) {
+                        historicVariableUpdate.setActivityInstanceId(historicActivityInstance.getId());
+                    }
                 }
             }
         }

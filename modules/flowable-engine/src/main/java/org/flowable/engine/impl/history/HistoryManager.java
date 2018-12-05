@@ -127,7 +127,8 @@ public interface HistoryManager {
     /**
      * Record a variable has been created, if audit history is enabled.
      */
-    void recordHistoricDetailVariableCreate(VariableInstanceEntity variable, ExecutionEntity sourceActivityExecution, boolean useActivityId);
+    void recordHistoricDetailVariableCreate(VariableInstanceEntity variable, ExecutionEntity sourceActivityExecution, boolean useActivityId,
+        String activityInstanceId);
 
     /**
      * Record a variable has been updated, if audit history is enabled.
