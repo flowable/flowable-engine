@@ -31,7 +31,7 @@ create table ACT_RU_TASK (
     primary key (ID_)
 );
 
-create table FLW_TSK_LOG (
+create table FLW_HI_TSK_LOG (
     LOG_NR_       NUMBER(19),
     TYPE_         NVARCHAR2(64),
     TASK_ID_      NVARCHAR2(64) not null,
@@ -53,6 +53,6 @@ create index ACT_IDX_TASK_SCOPE on ACT_RU_TASK(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SUB_SCOPE on ACT_RU_TASK(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SCOPE_DEF on ACT_RU_TASK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
-create index FLW_IDX_TASK_LOG_NUMBER on FLW_TSK_LOG(LOG_NR_);
+create index FLW_IDX_HI_TASK_LOG_NUMBER on FLW_HI_TSK_LOG(LOG_NR_);
 
 insert into ACT_GE_PROPERTY values ('task.schema.version', '6.4.1.3', 1);

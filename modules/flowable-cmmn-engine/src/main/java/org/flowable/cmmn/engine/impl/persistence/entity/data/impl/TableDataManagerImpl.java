@@ -58,7 +58,7 @@ public class TableDataManagerImpl implements TableDataManager {
         entityToTableNameMap.put(VariableInstanceEntity.class, "ACT_RU_VARIABLE");
         entityToTableNameMap.put(HistoricVariableInstanceEntity.class, "ACT_HI_VARINST");
         entityToTableNameMap.put(TaskEntity.class, "ACT_RU_TASK");
-        entityToTableNameMap.put(TaskLogEntryEntity.class, "FLW_TSK_LOG");
+        entityToTableNameMap.put(TaskLogEntryEntity.class, "FLW_HI_TSK_LOG");
         entityToTableNameMap.put(HistoricTaskInstanceEntity.class, "ACT_HI_TASKINST");
         entityToTableNameMap.put(IdentityLinkEntity.class, "ACT_RU_IDENTITYLINK");
         entityToTableNameMap.put(HistoricIdentityLinkEntity.class, "ACT_HI_IDENTITYLINK");

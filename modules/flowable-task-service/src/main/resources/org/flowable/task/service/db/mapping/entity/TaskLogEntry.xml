@@ -7,7 +7,7 @@
   <!-- INSERT -->
 
   <insert id="insertTaskLogEntry" parameterType="org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntityImpl">
-    insert into ${prefix}FLW_TSK_LOG(TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, TENANT_ID_,
+    insert into ${prefix}FLW_HI_TSK_LOG(TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, TENANT_ID_,
                                      TIME_STAMP_, USER_ID_, DATA_)
     values (
       #{type, jdbcType=VARCHAR}, 
@@ -25,7 +25,7 @@
   </insert>
   
   <insert id="bulkInsertTaskLogEntry" parameterType="java.util.List">
-    insert into ${prefix}FLW_TSK_LOG(TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, TENANT_ID_,
+    insert into ${prefix}FLW_HI_TSK_LOG(TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, TENANT_ID_,
                                      TIME_STAMP_, USER_ID_, DATA_)
     values 
       <foreach collection="list" item="taskLog" index="index" separator=",">
@@ -44,7 +44,7 @@
   </insert>
 
   <insert id="insertTaskLogEntry" databaseId="oracle" parameterType="org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntityImpl">
-    insert into ${prefix}FLW_TSK_LOG(LOG_NR_, TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, TENANT_ID_,
+    insert into ${prefix}FLW_HI_TSK_LOG(LOG_NR_, TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, TENANT_ID_,
                                      TIME_STAMP_, USER_ID_, DATA_)
     values (
       ${prefix}FLW_TASK_EVT_LOG_SEQ.nextVal,
@@ -68,7 +68,7 @@
   <insert id="bulkInsertTaskLogEntry" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL 
       <foreach collection="list" item="taskLog" index="index">
-        into ${prefix}FLW_TSK_LOG(LOG_NR_, TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, TENANT_ID_,
+        into ${prefix}FLW_HI_TSK_LOG(LOG_NR_, TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, TENANT_ID_,
         TIME_STAMP_, USER_ID_, DATA_, LOCK_OWNER_, LOCK_TIME_, IS_PROCESSED_) VALUES 
             (${prefix}FLW_TASK_EVT_LOG_SEQ.nextVal,
              #{taskLog.type, jdbcType=VARCHAR},
@@ -127,7 +127,7 @@
   </select>
 
   <sql id="selectTaskLogEntriesByQueryCriteriaSql">
-    from ${prefix}FLW_TSK_LOG RES
+    from ${prefix}FLW_HI_TSK_LOG RES
     <include refid="commonSelectTaskLogEntriesByQueryCriteriaSql"/>
   </sql>
 
@@ -174,7 +174,7 @@
 
   <!-- DELETE -->
   <delete id="deleteTaskLogEntryByLogNumber" parameterType="long">
-    delete from ${prefix}FLW_TSK_LOG where LOG_NR_ = #{logNr}
+    delete from ${prefix}FLW_HI_TSK_LOG where LOG_NR_ = #{logNr}
   </delete>
 
 </mapper>

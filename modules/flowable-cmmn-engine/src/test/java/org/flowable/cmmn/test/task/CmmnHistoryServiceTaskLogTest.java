@@ -37,7 +37,7 @@ import org.junit.Test;
 /**
  * @author martin.grofcik
  */
-public class CmmnTaskServiceTaskLogTest extends CustomCmmnConfigurationFlowableTestCase {
+public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowableTestCase {
 
     protected Task task;
 
@@ -733,14 +733,14 @@ public class CmmnTaskServiceTaskLogTest extends CustomCmmnConfigurationFlowableT
 
         try {
             assertEquals(3,
-                cmmnTaskService.createNativeTaskLogEntryQuery().sql("SELECT * FROM FLW_TSK_LOG").list().size());
+                cmmnTaskService.createNativeTaskLogEntryQuery().sql("SELECT * FROM FLW_HI_TSK_LOG").list().size());
             assertEquals(3,
-                cmmnTaskService.createNativeTaskLogEntryQuery().sql("SELECT count(*) FROM FLW_TSK_LOG").count());
+                cmmnTaskService.createNativeTaskLogEntryQuery().sql("SELECT count(*) FROM FLW_HI_TSK_LOG").count());
 
             assertEquals(1, cmmnTaskService.createNativeTaskLogEntryQuery().parameter("taskId", "1").
-                sql("SELECT * FROM FLW_TSK_LOG WHERE TASK_ID_ = #{taskId}").list().size());
+                sql("SELECT * FROM FLW_HI_TSK_LOG WHERE TASK_ID_ = #{taskId}").list().size());
             assertEquals(1, cmmnTaskService.createNativeTaskLogEntryQuery().parameter("taskId", "1").
-                sql("SELECT count(*) FROM FLW_TSK_LOG WHERE TASK_ID_ = #{taskId}").count());
+                sql("SELECT count(*) FROM FLW_HI_TSK_LOG WHERE TASK_ID_ = #{taskId}").count());
         } finally {
             cmmnTaskService.createTaskLogEntryQuery().list().
                 forEach(

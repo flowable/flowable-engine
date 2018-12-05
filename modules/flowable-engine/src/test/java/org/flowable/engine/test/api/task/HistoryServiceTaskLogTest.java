@@ -45,7 +45,7 @@ import org.junit.jupiter.api.Test;
  */
 @FlowableTest
 @ConfigurationResource("flowable.usertask-log.cfg.xml")
-public class TaskServiceTaskLogTest {
+public class HistoryServiceTaskLogTest {
 
     protected Task task;
 
@@ -837,8 +837,8 @@ public class TaskServiceTaskLogTest {
 
     @Test
     public void queryForTaskLogEntriesByNativeQuery(TaskService taskService, ManagementService managementService) {
-        assertEquals("FLW_TSK_LOG", managementService.getTableName(TaskLogEntryEntity.class));
-        assertEquals("FLW_TSK_LOG", managementService.getTableName(TaskLogEntry.class));
+        assertEquals("FLW_HI_TSK_LOG", managementService.getTableName(TaskLogEntryEntity.class));
+        assertEquals("FLW_HI_TSK_LOG", managementService.getTableName(TaskLogEntry.class));
         TaskLogEntryBuilder taskLogEntryBuilder = taskService.createTaskLogEntryBuilder();
         taskLogEntryBuilder.taskId("1").add();
         taskLogEntryBuilder.taskId("2").add();
