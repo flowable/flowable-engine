@@ -3,20 +3,15 @@
 		<div class="pull-right">
             <a class="action" ng-click="cancel()">&times; {{'GENERAL.ACTION.CANCEL-AND-CLOSE' | translate}}</a>
         </div>
-		<h2 translate="APP-DEPLOYMENTS.ACTION.UPLOAD"></h2>
+		<h2 translate="DECISION-TABLE-DEPLOYMENTS.ACTION.UPLOAD"></h2>
 	</div>
 </div>
 <div class="modal-body">
 
     <p>
         <i class="glyphicon glyphicon-info-sign"></i>
-        {{'APP-DEPLOYMENTS.POPUP.UPLOAD.DESCRIPTION' | translate}}
+        {{'DECISION-TABLE-DEPLOYMENTS.POPUP.UPLOAD.DESCRIPTION' | translate}}
     </p>
-
-    <!--<p class="text-warning">-->
-        <!--<i class="glyphicon glyphicon-info-sign"></i>-->
-        <!--{{'APP-DEPLOYMENTS.POPUP.UPLOAD.WARNING' | translate}}-->
-    <!--</p>-->
 
     <div class="upload-deployment-form">
 
@@ -25,10 +20,10 @@
              ngf-drop="onFileSelect($files)"
              ngf-drag-over-class="dragover"
              ng-show="dropSupported">
-            {{'APP-DEPLOYMENTS.POPUP.UPLOAD.DROPZONE' | translate}}
+            {{'DECISION-TABLE-DEPLOYMENTS.POPUP.UPLOAD.DROPZONE' | translate}}
         </div>
         <div ngf-drop-available="dropSupported=true"
-             ng-show="!dropSupported">{{'DEPLOYMENTS.POPUP.UPLOAD.NO-DROP' | translate}}</div>
+             ng-show="!dropSupported">{{'DECISION-TABLE-DEPLOYMENTS.POPUP.UPLOAD.NO-DROP' | translate}}</div>
         <div class="graph-wrapper" ng-show="status.loading" style="margin: 10px 0 10px 0">
             <div class="graph-bar" style="width:{{model.uploadProgress}}%"></div>
         </div>
@@ -36,7 +31,8 @@
                 ng-click="upload.abort()"
                 ng-disabled="!status.loading"
                 style="margin-bottom: 20px">
-            APP-DEPLOYMENTS        </button>
+            {{'DECISION-TABLE-DEPLOYMENTS.POPUP.UPLOAD.CANCEL-UPLOAD' | translate}}
+        </button>
 
     </div>
 
@@ -46,7 +42,7 @@
     <div class="modal-footer">
         <loading-indicator></loading-indicator>
         <div class="pull-right modeler-processes-error" ng-if="model.error">
-            <span>{{'APP-DEPLOYMENTS.POPUP.UPLOAD.ERROR' | translate}} <span ng-if="model.errorMessage"> : </span>{{model.errorMessage}}</span>
+            <span>{{'DECISION-TABLE-DEPLOYMENTS.POPUP.UPLOAD.ERROR' | translate}} <span ng-if="model.errorMessage"> : </span>{{model.errorMessage}}</span>
         </div>
     </div>
 </div>
