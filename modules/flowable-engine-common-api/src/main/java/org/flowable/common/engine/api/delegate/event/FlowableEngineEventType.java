@@ -248,6 +248,11 @@ public enum FlowableEngineEventType implements FlowableEventType {
     TASK_DUEDATE_CHANGED,
 
     /**
+     * A task name has been changed. This is thrown alongside with an {@link #ENTITY_UPDATED} event.
+     */
+    TASK_NAME_CHANGED,
+
+    /**
      * A process instance has been created. All basic properties have been set, but variables not yet.
      */
     PROCESS_CREATED,

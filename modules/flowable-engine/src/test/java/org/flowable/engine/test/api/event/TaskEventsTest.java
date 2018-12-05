@@ -79,6 +79,18 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
         listener.clearEventsReceived();
 
+        // Update name, owner and priority should trigger update-event
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        listener.clearEventsReceived();
+        task.setName("newName");
+        taskService.saveTask(task);
+        assertEquals(2, listener.getEventsReceived().size());
+        assertEquals(FlowableEngineEventType.TASK_NAME_CHANGED, listener.getEventsReceived().get(0).getType());
+        event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
+        assertExecutionDetails(event, processInstance);
+        assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
+        listener.clearEventsReceived();
+
         taskService.setPriority(task.getId(), 12);
         assertEquals(2, listener.getEventsReceived().size());
         assertEquals(FlowableEngineEventType.TASK_PRIORITY_CHANGED, listener.getEventsReceived().get(0).getType());

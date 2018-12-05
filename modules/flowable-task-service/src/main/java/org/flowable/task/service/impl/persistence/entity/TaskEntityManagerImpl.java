@@ -51,6 +51,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     public static final String EVENT_USER_TASK_OWNER_CHANGED = "USER_TASK_OWNER_CHANGED";
     public static final String EVENT_USER_TASK_PRIORITY_CHANGED = "USER_TASK_PRIORITY_CHANGED";
     public static final String EVENT_USER_TASK_DUEDATE_CHANGED = "USER_TASK_DUEDATE_CHANGED";
+    public static final String EVENT_USER_TASK_NAME_CHANGED = "USER_TASK_NAME_CHANGED";
 
     protected TaskDataManager taskDataManager;
 
@@ -309,6 +310,20 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
         }
     }
 
+    protected void logNameChanged(TaskEntity taskEntity, String previousName, String newName) {
+        if (this.getTaskServiceConfiguration().isEnableDatabaseEventLogging()) {
+            TaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
+            taskLogEntry.setType(EVENT_USER_TASK_NAME_CHANGED);
+            taskLogEntry.setData(
+                serializeLogEntryData(
+                    "newName", newName,
+                    "previousName", previousName
+                )
+            );
+            CommandContextUtil.getTaskLogEntryEntityManager().insert(taskLogEntry);
+        }
+    }
+
     protected void logTaskCreatedEvent(TaskInfo task) {
         if (this.getTaskServiceConfiguration().isEnableDatabaseEventLogging()) {
             TaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(task);
@@ -355,6 +370,12 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
                 getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_DUEDATE_CHANGED, task));
             }
             logDueDateChanged(task, (Date) getOriginalState(task, "dueDate"), task.getDueDate());
+        }
+        if (!Objects.equals(task.getName(), getOriginalState(task, "name"))) {
+            if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
+                getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_NAME_CHANGED, task));
+            }
+            logNameChanged(task, (String) getOriginalState(task, "name"), task.getName());
         }
     }
 

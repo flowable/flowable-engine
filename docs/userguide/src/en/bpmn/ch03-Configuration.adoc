@@ -782,6 +782,7 @@ Listed below are all event types that can occur in the engine. Each type corresp
 |TASK_OWNER_CHANGED|A task owner has been changed. This is dispatched before the +$$ENTITY_UPDATE$$+ event. |+org.flowable...FlowableEntityEvent+
 |TASK_PRIORITY_CHANGED|A task priority has been changed. This is dispatched before the +$$ENTITY_UPDATE$$+ event. |+org.flowable...FlowableEntityEvent+
 |TASK_DUEDATE_CHANGED|A task due date has been changed. This is dispatched before the +$$ENTITY_UPDATE$$+ event. |+org.flowable...FlowableEntityEvent+
+|TASK_NAME_CHANGED|A task name has been changed. This is dispatched before the +$$ENTITY_UPDATE$$+ event. |+org.flowable...FlowableEntityEvent+
 |PROCESS_CREATED|A process instance has been created. All basic properties have been set, but variables not yet.|+org.flowable...FlowableEntityEvent+
 |PROCESS_STARTED|A process instance has been started. Dispatched when starting a process instance previously created. The event PROCESS_STARTED is dispatched after the associated event ENTITY_INITIALIZED and after the variables have been set.|+org.flowable...FlowableEntityEvent+
 |PROCESS_COMPLETED| A process has been completed, meaning all executions have stopped for the process instance. Dispatched after the last activity +$$ACTIVITY_COMPLETED $$+ event. Process is completed when it reaches state in which process instance does not have any transition to take. |+org.flowable...FlowableEntityEvent+

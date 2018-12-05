@@ -326,6 +326,7 @@ public class HistoryServiceTaskLogTest {
         task = taskService.createTaskBuilder().
             create();
 
+        task.setName("newTaskName");
         task.setAssignee("newAssignee");
         task.setOwner("newOwner");
         task.setPriority(Integer.MAX_VALUE);
@@ -333,7 +334,7 @@ public class HistoryServiceTaskLogTest {
         taskService.saveTask(task);
 
         List<TaskLogEntry> taskLogEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
-        assertThat(taskLogEntries).size().isEqualTo(5);
+        assertThat(taskLogEntries).size().isEqualTo(6);
     }
 
     @Test
