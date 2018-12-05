@@ -138,7 +138,7 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
                         && evaluateCriteriaOperation.getPlanItemLifeCycleEvent().getTransition().equals(planItemLifeCycleEvent.getTransition())
                         && evaluateCriteriaOperation.getPlanItemLifeCycleEvent().getPlanItem().getId().equals(planItemLifeCycleEvent.getPlanItem().getId())
                         && evaluateCriteriaOperation.isEvaluateCaseInstanceCompleted() == evaluateCaseInstanceCompleted) {
-                    LOGGER.info("Deferred criteria evaluation for case instance with id '{}' to later in the execution. Plan item = {}, Plan item definition = {}, transition = {}",
+                    LOGGER.debug("Deferred criteria evaluation for case instance with id '{}' to later in the execution. Plan item = {}, Plan item definition = {}, transition = {}",
                         caseInstanceEntityId,
                         planItemLifeCycleEvent.getPlanItem().getId(),
                         planItemLifeCycleEvent.getPlanItem().getPlanItemDefinition(),
