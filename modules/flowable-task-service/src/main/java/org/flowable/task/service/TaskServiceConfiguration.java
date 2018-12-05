@@ -55,7 +55,6 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
     protected HistoricTaskInstanceDataManager historicTaskInstanceDataManager;
     protected TaskLogEntryDataManager taskLogDataManager;
 
-
     // ENTITY MANAGERS /////////////////////////////////////////////////
     protected TaskEntityManager taskEntityManager;
     protected HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager;

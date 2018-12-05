@@ -64,6 +64,7 @@ public class SuspensionStateUtil {
 
     protected static void addTaskSuspensionStateEntryLog(TaskEntity taskEntity, SuspensionState state) {
         if (CommandContextUtil.getTaskServiceConfiguration().isEnableDatabaseEventLogging()) {
+            LOGGER.debug("Adding UserTaskLog entry for changing suspension state {} task {}", state, taskEntity.getId());
             byte[] data = null;
             try {
                 data = CommandContextUtil.getProcessEngineConfiguration().getObjectMapper().writeValueAsBytes(

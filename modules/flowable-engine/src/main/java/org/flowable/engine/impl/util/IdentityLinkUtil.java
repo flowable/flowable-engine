@@ -109,31 +109,34 @@ public class IdentityLinkUtil {
 
     protected static void logTaskIdentityLinkEvent(String eventType, TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity) {
         TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
-        TaskLogEntryEntity taskLogEntry = taskServiceConfiguration.getTaskLogEntryEntityManager().create();
-        taskLogEntry.setTaskId(taskEntity.getId());
-        taskLogEntry.setProcessInstanceId(taskEntity.getProcessInstanceId());
-        taskLogEntry.setExecutionId(taskEntity.getExecutionId());
-        taskLogEntry.setTenantId(taskEntity.getTenantId());
-        taskLogEntry.setType(eventType);
-        taskLogEntry.setTimeStamp(taskServiceConfiguration.getClock().getCurrentTime());
-        Map<String, Object> dataMap = new HashMap<>();
-        if (identityLinkEntity.isUser()) {
-            dataMap.put("userId", identityLinkEntity.getUserId());
-        } else if (identityLinkEntity.isGroup()) {
-            dataMap.put("groupId", identityLinkEntity.getGroupId());
+        if (taskServiceConfiguration.isEnableDatabaseEventLogging()) {
+            LOGGER.debug("Adding UserTaskLog entry for identity link event {} task {} and identityLink {}", eventType, taskEntity.getId(), identityLinkEntity.getId());
+            TaskLogEntryEntity taskLogEntry = taskServiceConfiguration.getTaskLogEntryEntityManager().create();
+            taskLogEntry.setTaskId(taskEntity.getId());
+            taskLogEntry.setProcessInstanceId(taskEntity.getProcessInstanceId());
+            taskLogEntry.setExecutionId(taskEntity.getExecutionId());
+            taskLogEntry.setTenantId(taskEntity.getTenantId());
+            taskLogEntry.setType(eventType);
+            taskLogEntry.setTimeStamp(taskServiceConfiguration.getClock().getCurrentTime());
+            Map<String, Object> dataMap = new HashMap<>();
+            if (identityLinkEntity.isUser()) {
+                dataMap.put("userId", identityLinkEntity.getUserId());
+            } else if (identityLinkEntity.isGroup()) {
+                dataMap.put("groupId", identityLinkEntity.getGroupId());
+            }
+            dataMap.put("type", identityLinkEntity.getType());
+            byte[] dataBytes = null;
+            try {
+                dataBytes = taskServiceConfiguration.getObjectMapper().writeValueAsBytes(
+                    dataMap
+                );
+            } catch (JsonProcessingException e) {
+                LOGGER.warn("It was not possible to serialize user task identity link data. TaskEventLogEntry data is empty.", e);
+            }
+            taskLogEntry.setData(dataBytes);
+            taskLogEntry.setUserId(Authentication.getAuthenticatedUserId());
+            CommandContextUtil.getTaskService().addTaskLogEntry(taskLogEntry);
         }
-        dataMap.put("type", identityLinkEntity.getType());
-        byte[] dataBytes = null;
-        try {
-            dataBytes = taskServiceConfiguration.getObjectMapper().writeValueAsBytes(
-                dataMap
-            );
-        } catch (JsonProcessingException e) {
-            LOGGER.warn("It was not possible to serialize user task identity link data. TaskEventLogEntry data is empty.", e);
-        }
-        taskLogEntry.setData(dataBytes);
-        taskLogEntry.setUserId(Authentication.getAuthenticatedUserId());
-        CommandContextUtil.getTaskService().addTaskLogEntry(taskLogEntry);
     }
 
 }

@@ -15,7 +15,6 @@ package org.flowable.task.service.impl.persistence.entity;
 import java.util.Date;
 
 import org.flowable.common.engine.impl.persistence.entity.AbstractEntityNoRevision;
-import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntity;
 
 /**
  * @author martin.grofcik

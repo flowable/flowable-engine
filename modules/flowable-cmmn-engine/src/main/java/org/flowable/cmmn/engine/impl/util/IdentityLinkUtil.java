@@ -96,6 +96,7 @@ public class IdentityLinkUtil {
     }
 
     protected static void logTaskIdentityLinkEvent(String eventType, TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity) {
+        LOGGER.debug("Adding UserTaskLog entry for identity link event {} task {} and identityLink {}", eventType, taskEntity.getId(), identityLinkEntity.getId());
         TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
         TaskLogEntryEntity taskLogEntry = taskServiceConfiguration.getTaskLogEntryEntityManager().create();
         taskLogEntry.setTaskId(taskEntity.getId());
