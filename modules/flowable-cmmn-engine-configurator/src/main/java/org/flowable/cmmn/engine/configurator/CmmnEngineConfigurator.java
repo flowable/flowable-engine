@@ -21,6 +21,7 @@ import java.util.Map;
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.configurator.impl.cmmn.DefaultCaseInstanceService;
 import org.flowable.cmmn.engine.configurator.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.configurator.impl.process.DefaultProcessInstanceService;
 import org.flowable.cmmn.engine.impl.callback.ChildProcessInstanceStateChangeCallback;
@@ -97,6 +98,7 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
     protected void copyProcessEngineProperties(ProcessEngineConfigurationImpl processEngineConfiguration) {
         initProcessInstanceService(processEngineConfiguration);
         initProcessInstanceStateChangedCallbacks(processEngineConfiguration);
+        initCaseInstanceService(processEngineConfiguration);
         
         cmmnEngineConfiguration.setEnableTaskRelationshipCounts(processEngineConfiguration.getPerformanceSettings().isEnableTaskRelationshipCounts());
         cmmnEngineConfiguration.setTaskQueryLimit(processEngineConfiguration.getTaskQueryLimit());
@@ -131,6 +133,10 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
 
     protected void initProcessInstanceService(ProcessEngineConfigurationImpl processEngineConfiguration) {
         cmmnEngineConfiguration.setProcessInstanceService(new DefaultProcessInstanceService(processEngineConfiguration));
+    }
+    
+    protected void initCaseInstanceService(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        processEngineConfiguration.setCaseInstanceService(new DefaultCaseInstanceService(cmmnEngineConfiguration));
     }
 
     protected void initProcessInstanceStateChangedCallbacks(ProcessEngineConfigurationImpl processEngineConfiguration) {

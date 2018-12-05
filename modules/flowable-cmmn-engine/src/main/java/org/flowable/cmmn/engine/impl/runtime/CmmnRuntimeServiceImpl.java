@@ -93,7 +93,8 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
         return commandExecutor.execute(new GetStartFormModelCmd(caseDefinitionId, caseInstanceId));
     }
 
-    @Override public void triggerPlanItemInstance(String planItemInstanceId) {
+    @Override 
+    public void triggerPlanItemInstance(String planItemInstanceId) {
         commandExecutor.execute(new TriggerPlanItemInstanceCmd(planItemInstanceId));
     }
     

@@ -1,0 +1,24 @@
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:flowable="http://flowable.org/bpmn" 
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+    xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" 
+    xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
+    typeLanguage="http://www.w3.org/2001/XMLSchema" 
+    expressionLanguage="http://www.w3.org/1999/XPath" 
+    targetNamespace="http://www.flowable.org/test">
+    
+  <process id="process" name="process1" isExecutable="true">
+    <serviceTask id="caseServiceTask" flowable:type="case" name="Case task" flowable:caseDefinitionKey="caseId" flowable:fallbackToDefaultTenant="true">
+      <extensionElements>
+        <flowable:in source="test" target="test"></flowable:in>
+        <flowable:in sourceExpression="${test}" target="test"></flowable:in>
+        <flowable:out source="test" target="test"></flowable:out>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow id="sid-7D914C2B-2A0F-4CC8-A23D-DFC6317BF72E" sourceRef="sid-4D8B3541-C9E5-45BB-8BB1-F6C94B9A4C11" targetRef="caseServiceTask"></sequenceFlow>
+    <endEvent id="sid-DC3F9E0D-7CE0-4A8E-847E-823110F71807"></endEvent>
+    <startEvent id="sid-4D8B3541-C9E5-45BB-8BB1-F6C94B9A4C11"></startEvent>
+    <sequenceFlow id="sid-3E39A302-9778-49BA-AEBE-5609C72C7C65" sourceRef="caseServiceTask" targetRef="sid-DC3F9E0D-7CE0-4A8E-847E-823110F71807"></sequenceFlow>
+  </process>
+</definitions>
