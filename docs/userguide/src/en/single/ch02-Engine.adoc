@@ -29,7 +29,7 @@ include::../bpmn/ch10-History.adoc[leveloffset=+2]
 
 *TBD*
 
-include::../bpmn/ch07a-BPMN-Introduction.adoc[leveloffset=+2,tags=bpmn20.10minutetutorial]
+include::../bpmn/ch07a-BPMN-Introduction.adoc[leveloffset=+2,tags=bpmn20.bpm10minutetutorial]
 
 include::../bpmn/ch03-Configuration.adoc[leveloffset=+2]
 

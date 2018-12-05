@@ -12,11 +12,6 @@
  */
 package org.flowable.ui.admin.service.engine;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,6 +31,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * Service for invoking Flowable REST services.
  */
@@ -54,6 +54,7 @@ public class ProcessInstanceService {
     public static final String RUNTIME_PROCESS_INSTANCE_VARIABLES = "runtime/process-instances/{0}/variables";
     public static final String RUNTIME_PROCESS_INSTANCE_VARIABLE_URL = "runtime/process-instances/{0}/variables/{1}";
     public static final String RUNTIME_PROCESS_INSTANCE_CHANGE_STATE_URL = "runtime/process-instances/{0}/change-state";
+    public static final String RUNTIME_PROCESS_INSTANCE_MIGRATE_URL = "runtime/process-instances/{0}/migrate";
 
     private static final String DEFAULT_SUBTASK_RESULT_SIZE = "1024";
     private static final String DEFAULT_ACTIVITY_SIZE = "1024";
@@ -204,6 +205,19 @@ public class ProcessInstanceService {
             HttpPost post = clientUtil.createPost(builder.build().toString(), serverConfig);
 
             post.setEntity(clientUtil.createStringEntity(changeActivityBody.toString()));
+            clientUtil.executeRequestNoResponseBody(post, serverConfig, HttpStatus.SC_OK);
+
+        } catch (Exception e) {
+            throw new FlowableServiceException(e.getMessage(), e);
+        }
+    }
+    
+    public void migrateProcessInstance(ServerConfig serverConfig, String processInstanceId, String migrationDocument) throws FlowableServiceException {
+        try {
+            URIBuilder builder = clientUtil.createUriBuilder(MessageFormat.format(RUNTIME_PROCESS_INSTANCE_MIGRATE_URL, processInstanceId));
+            HttpPost post = clientUtil.createPost(builder.build().toString(), serverConfig);
+
+            post.setEntity(clientUtil.createStringEntity(migrationDocument));
             clientUtil.executeRequestNoResponseBody(post, serverConfig, HttpStatus.SC_OK);
 
         } catch (Exception e) {

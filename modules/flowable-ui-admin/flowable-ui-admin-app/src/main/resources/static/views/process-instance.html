@@ -74,6 +74,11 @@
                             <i class="glyphicon glyphicon-zoom-in"></i>{{'PROCESS-INSTANCE.ACTION.SHOW-DIAGRAM' | translate}}
                         </button>
                     </li>
+                    <li>
+                        <button type="button" class="btn btn-sm btn-default" ng-click="showMigrateProcessDialog()">
+                            <i class="glyphicon glyphicon-zoom-in"></i>{{'PROCESS-INSTANCE.ACTION.MIGRATE-PROCESSINSTANCE' | translate}}
+                        </button>
+                    </li>
                     <li ng-if="processCompleted">
 					    <button type="button" class="btn btn-sm btn-default btn-danger" ng-click="deleteProcessInstance()">
 							<i class="glyphicon glyphicon-remove"></i>{{'PROCESS-INSTANCE.ACTION.DELETE' | translate}}

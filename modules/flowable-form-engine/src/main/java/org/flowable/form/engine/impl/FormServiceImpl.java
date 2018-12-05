@@ -82,8 +82,8 @@ public class FormServiceImpl extends CommonEngineServiceImpl<FormEngineConfigura
     }
 
     @Override
-    public FormInfo getFormModelWithVariablesById(String formId, String taskId,Map<String, Object> variables, String tenantId) {
-        return commandExecutor.execute(new GetFormModelWithVariablesCmd(null, formId, null, taskId, tenantId, variables));
+    public FormInfo getFormModelWithVariablesById(String formDefinitionId, String taskId,Map<String, Object> variables, String tenantId) {
+        return commandExecutor.execute(new GetFormModelWithVariablesCmd(null, null, formDefinitionId, taskId, tenantId, variables));
     }
 
     @Override

@@ -96,6 +96,8 @@ public interface BpmnRestApiInterceptor {
     
     void changeActivityState(ExecutionChangeActivityStateRequest changeActivityStateRequest);
     
+    void migrateProcessInstance(String processInstanceId, String migrationDocument);
+    
     void injectActivity(InjectActivityRequest injectActivityRequest);
     
     void accessEventSubscriptionById(EventSubscription eventSubscription);

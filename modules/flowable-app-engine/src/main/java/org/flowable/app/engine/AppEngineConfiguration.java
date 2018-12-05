@@ -96,15 +96,12 @@ import org.flowable.variable.service.impl.types.SerializableType;
 import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class AppEngineConfiguration extends AbstractEngineConfiguration implements
         AppEngineConfigurationApi, HasExpressionManagerEngineConfiguration {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(AppEngineConfiguration.class);
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/app/db/mapping/mappings.xml";
     public static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_APP_";
 

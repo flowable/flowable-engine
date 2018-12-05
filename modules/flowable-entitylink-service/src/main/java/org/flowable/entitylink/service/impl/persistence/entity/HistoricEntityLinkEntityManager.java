@@ -23,7 +23,9 @@ import org.flowable.entitylink.api.history.HistoricEntityLink;
 public interface HistoricEntityLinkEntityManager extends EntityManager<HistoricEntityLinkEntity> {
 
     List<HistoricEntityLink> findHistoricEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType, String linkType);
-    
+
+    List<HistoricEntityLink> findHistoricEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String scopeType, String linkType);
+
     List<HistoricEntityLink> findHistoricEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType, String linkType);
 
     void deleteHistoricEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType);

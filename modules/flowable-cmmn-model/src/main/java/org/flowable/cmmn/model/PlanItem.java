@@ -14,7 +14,6 @@ package org.flowable.cmmn.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -33,18 +32,27 @@ public class PlanItem extends CaseElement implements HasEntryCriteria, HasExitCr
 
     /**
      * A list of {@link PlanItem}s to which this plan item is dependent on through its entry criteria.
+     * Said differently: this list of plan items will influence entry criteria on this plan item.
      */
     protected List<PlanItem> entryDependencies = new ArrayList<>();
 
     /**
      * A list of {@link PlanItem}s to which this plan item is dependent on through its exit criteria.
+     * Said differently: this list of plan items will influence exit criteria on this plan item.
      */
     protected List<PlanItem> exitDependencies = new ArrayList<>();
     
     /**
-     * A list of {@link PlanItem}s that are dependent on this plan item (through either an entry or exit criterion).
+     * A list of all {@link PlanItem}s that are dependent on this plan item through their entry criteria.
+     * Said differently: this list of plan items have an entry criteria that references this plan item.
      */
-    protected List<PlanItem> dependentPlanItems = new ArrayList<>();
+    protected List<PlanItem> entryDependentPlanItems = new ArrayList<>();
+
+    /**
+     * A list of all {@link PlanItem}s that are dependent on this plan item through their exit criteria.
+     * Said differently: this list of plan items have an exit criteria that references this plan item.
+     */
+    protected List<PlanItem> exitDependentPlanItems = new ArrayList<>();
     
     protected Object behavior;
 
@@ -168,14 +176,43 @@ public class PlanItem extends CaseElement implements HasEntryCriteria, HasExitCr
         this.exitDependencies = exitDependencies;
     }
 
-    public List<PlanItem> getDependentPlanItems() {
-        return dependentPlanItems;
+    public List<PlanItem> getEntryDependentPlanItems() {
+        return entryDependentPlanItems;
     }
 
-    public void setDependentPlanItems(List<PlanItem> dependentPlanItems) {
-        this.dependentPlanItems = dependentPlanItems;
+    public void setEntryDependentPlanItems(List<PlanItem> entryDependentPlanItems) {
+        this.entryDependentPlanItems = entryDependentPlanItems;
     }
-    
+
+    public void addEntryDependentPlanItem(PlanItem planItem) {
+        Optional<PlanItem> planItemWithSameId = entryDependentPlanItems.stream().filter(p -> p.getId().equals(planItem.getId())).findFirst();
+        if (!planItemWithSameId.isPresent()) {
+            entryDependentPlanItems.add(planItem);
+        }
+    }
+
+    public List<PlanItem> getExitDependentPlanItems() {
+        return exitDependentPlanItems;
+    }
+
+    public void setExitDependentPlanItems(List<PlanItem> exitDependentPlanItems) {
+        this.exitDependentPlanItems = exitDependentPlanItems;
+    }
+
+    public void addExitDependentPlanItem(PlanItem planItem) {
+        Optional<PlanItem> planItemWithSameId = exitDependentPlanItems.stream().filter(p -> p.getId().equals(planItem.getId())).findFirst();
+        if (!planItemWithSameId.isPresent()) {
+            exitDependentPlanItems.add(planItem);
+        }
+    }
+
+    public List<PlanItem> getAllDependentPlanItems() {
+        List<PlanItem> allDependentPlanItems = new ArrayList<>(entryDependentPlanItems.size() + exitDependentPlanItems.size());
+        allDependentPlanItems.addAll(entryDependentPlanItems);
+        allDependentPlanItems.addAll(exitDependentPlanItems);
+        return allDependentPlanItems;
+    }
+
     @Override
     public String toString() {
         return "PlanItem " + id + (name != null ? (" " + name) : "");

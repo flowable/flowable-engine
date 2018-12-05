@@ -36,12 +36,8 @@ import org.flowable.task.service.impl.persistence.entity.data.TaskLogEntryDataMa
 import org.flowable.task.service.impl.persistence.entity.data.impl.MyBatisTaskLogEntryDataManager;
 import org.flowable.task.service.impl.persistence.entity.data.impl.MybatisHistoricTaskInstanceDataManager;
 import org.flowable.task.service.impl.persistence.entity.data.impl.MybatisTaskDataManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class TaskServiceConfiguration extends AbstractServiceConfiguration {
-
-    protected static final Logger LOGGER = LoggerFactory.getLogger(TaskServiceConfiguration.class);
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/task/service/db/mapping/mappings.xml";
 
