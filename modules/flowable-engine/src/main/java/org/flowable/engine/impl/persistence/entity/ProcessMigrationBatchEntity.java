@@ -12,8 +12,6 @@
  */
 package org.flowable.engine.impl.persistence.entity;
 
-import java.util.Date;
-
 import org.flowable.common.engine.impl.db.HasRevision;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.engine.runtime.ProcessMigrationBatch;
@@ -23,10 +21,10 @@ import org.flowable.engine.runtime.ProcessMigrationBatch;
  */
 public interface ProcessMigrationBatchEntity extends ProcessMigrationBatch, Entity, HasRevision {
 
+    String VALIDATION_TYPE = "processMigrationValidation";
+    String MIGRATION_TYPE = "processMigration";
+
     void setMigrationDocumentJson(String migrationDocumentJson);
 
-    void completeWithResult(Date completeTime, String result);
-
-    void complete(Date completeTime);
 }
 

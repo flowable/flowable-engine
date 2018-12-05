@@ -10,33 +10,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.runtime;
+package org.flowable.engine.impl.persistence.entity.data;
 
-import java.util.Date;
-import java.util.List;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchPartEntity;
 
 /**
  * @author Dennis Federico
  */
-public interface ProcessMigrationBatch {
-
-    String getId();
-
-    String getBatchType();
-
-    Date getCreateTime();
-
-    Date getCompleteTime();
-
-    boolean isCompleted();
-
-    String getSourceProcessDefinitionId();
-
-    String getTargetProcessDefinitionId();
-
-    String getMigrationDocumentJson();
-
-    List<ProcessMigrationBatchPart> getBatchParts();
+public interface ProcessMigrationBatchPartDataManager extends DataManager<ProcessMigrationBatchPartEntity> {
 
 }
-

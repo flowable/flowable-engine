@@ -78,16 +78,6 @@ public class ProcessInstanceMigrationServiceImpl extends CommonEngineServiceImpl
         return commandExecutor.execute(new GetProcessInstanceMigrationBatchValidationResultCmd(migrationBatchId));
     }
 
-    //TODO WIP - Having the ProcessInstanceMigrationResult object, the ProcessMigrationBatch seems nonsensical
-    //    @Override
-    //    public ProcessMigrationBatch getProcessMigrationBatchById(String migrationBatchId) {
-    //        return commandExecutor.execute(new GetProcessInstanceMigrationValidationBatchCmd(migrationBatchId, false));
-    //    }
-    //    @Override
-    //    public ProcessMigrationBatch getProcessMigrationBatchAndResourcesById(String migrationBatchId) {
-    //        return commandExecutor.execute(new GetProcessInstanceMigrationValidationBatchCmd(migrationBatchId, true));
-    //    }
-
     @Override
     public void deleteBatchAndResourcesById(String migrationBatchId) {
         commandExecutor.execute(new DeleteProcessMigrationBatchAndResourcesCmd(migrationBatchId));

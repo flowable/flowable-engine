@@ -52,6 +52,8 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManage
 import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntityManager;
+import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchPartEntity;
+import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchPartEntityManager;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
@@ -83,23 +85,24 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
     }
 
     @Override
-    public ProcessMigrationBatchEntity batchValidateMigrateProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
+    public ProcessMigrationBatchEntity batchValidateMigrateProcessInstancesOfProcessDefinition(String sourceProcDefId, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
         //Check of the target definition exists before submitting the batch
-        resolveProcessDefinition(document, commandContext);
+        ProcessDefinition targetProcessDefinition = resolveProcessDefinition(document, commandContext);
 
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-        List<ProcessInstance> processInstances = executionEntityManager.findProcessInstanceByQueryCriteria(new ProcessInstanceQueryImpl().processDefinitionId(processDefinitionId));
+        List<ProcessInstance> processInstances = executionEntityManager.findProcessInstanceByQueryCriteria(new ProcessInstanceQueryImpl().processDefinitionId(sourceProcDefId));
 
         ProcessMigrationBatchEntityManager processMigrationBatchEntityManager = CommandContextUtil.getProcessMigrationBatchEntityManager(commandContext);
-        ProcessMigrationBatchEntityImpl parentBatch = (ProcessMigrationBatchEntityImpl) processMigrationBatchEntityManager.insertBatchForProcessMigrationValidation(document);
+        ProcessMigrationBatchPartEntityManager processMigrationBatchPartEntityManager = CommandContextUtil.getProcessMigrationBatchPartEntityManager(commandContext);
+        ProcessMigrationBatchEntityImpl parentBatch = (ProcessMigrationBatchEntityImpl) processMigrationBatchEntityManager.insertBatchForProcessMigrationValidation(document, sourceProcDefId, targetProcessDefinition.getId());
         JobService jobService = CommandContextUtil.getJobService(commandContext);
         for (ProcessInstance processInstance : processInstances) {
-            ProcessMigrationBatchEntity childBatch = processMigrationBatchEntityManager.insertBatchChild(parentBatch, processInstance.getId());
-            parentBatch.addBatchChild(childBatch);
+            ProcessMigrationBatchPartEntity batchPart = processMigrationBatchPartEntityManager.insertBatchPart(parentBatch, processInstance.getId());
+            parentBatch.addBatchPart(batchPart);
             JobEntity job = jobService.createJob();
             job.setJobHandlerType(ProcessInstanceMigrationValidationJobHandler.TYPE);
             job.setProcessInstanceId(processInstance.getId());
-            job.setJobHandlerConfiguration(ProcessInstanceMigrationValidationJobHandler.getHandlerCfgForBatchId(childBatch.getId()));
+            job.setJobHandlerConfiguration(ProcessInstanceMigrationValidationJobHandler.getHandlerCfgForBatchId(batchPart.getId()));
             jobService.createAsyncJob(job, false);
             jobService.scheduleAsyncJob(job);
         }
@@ -314,23 +317,24 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
     }
 
     @Override
-    public ProcessMigrationBatchEntity batchMigrateProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
+    public ProcessMigrationBatchEntity batchMigrateProcessInstancesOfProcessDefinition(String sourceProcDefId, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
         //Check of the target definition exists before submitting the batch
-        resolveProcessDefinition(document, commandContext);
+        ProcessDefinition targetProcessDefinition = resolveProcessDefinition(document, commandContext);
 
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-        List<ProcessInstance> processInstances = executionEntityManager.findProcessInstanceByQueryCriteria( new ProcessInstanceQueryImpl().processDefinitionId(processDefinitionId));
+        List<ProcessInstance> processInstances = executionEntityManager.findProcessInstanceByQueryCriteria( new ProcessInstanceQueryImpl().processDefinitionId(sourceProcDefId));
 
         ProcessMigrationBatchEntityManager processMigrationBatchEntityManager = CommandContextUtil.getProcessMigrationBatchEntityManager(commandContext);
-        ProcessMigrationBatchEntityImpl parentBatch = (ProcessMigrationBatchEntityImpl) processMigrationBatchEntityManager.insertBatchForProcessMigration(document);
+        ProcessMigrationBatchPartEntityManager processMigrationBatchPartEntityManager = CommandContextUtil.getProcessMigrationBatchPartEntityManager(commandContext);
+        ProcessMigrationBatchEntityImpl parentBatch = (ProcessMigrationBatchEntityImpl) processMigrationBatchEntityManager.insertBatchForProcessMigration(document, sourceProcDefId, targetProcessDefinition.getId());
         JobService jobService = CommandContextUtil.getJobService(commandContext);
         for (ProcessInstance processInstance : processInstances) {
-            ProcessMigrationBatchEntity childBatch = processMigrationBatchEntityManager.insertBatchChild(parentBatch, processInstance.getId());
-            parentBatch.addBatchChild(childBatch);
+            ProcessMigrationBatchPartEntity batchPart = processMigrationBatchPartEntityManager.insertBatchPart(parentBatch, processInstance.getId());
+            parentBatch.addBatchPart(batchPart);
             JobEntity job = jobService.createJob();
             job.setJobHandlerType(ProcessInstanceMigrationJobHandler.TYPE);
             job.setProcessInstanceId(processInstance.getId());
-            job.setJobHandlerConfiguration(ProcessInstanceMigrationJobHandler.getHandlerCfgForBatchId(childBatch.getId()));
+            job.setJobHandlerConfiguration(ProcessInstanceMigrationJobHandler.getHandlerCfgForBatchId(batchPart.getId()));
             jobService.createAsyncJob(job, false);
             jobService.scheduleAsyncJob(job);
         }

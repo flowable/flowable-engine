@@ -20,12 +20,10 @@ import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
  */
 public interface ProcessMigrationBatchEntityManager extends EntityManager<ProcessMigrationBatchEntity> {
 
-    ProcessMigrationBatchEntity insertBatchForProcessMigration(ProcessInstanceMigrationDocument processInstanceMigrationDocument);
+    ProcessMigrationBatchEntity insertBatchForProcessMigration(ProcessInstanceMigrationDocument processInstanceMigrationDocument, String sourceProcDefId, String targetProcDefId);
 
-    ProcessMigrationBatchEntity insertBatchForProcessMigrationValidation(ProcessInstanceMigrationDocument processInstanceMigrationDocument);
+    ProcessMigrationBatchEntity insertBatchForProcessMigrationValidation(ProcessInstanceMigrationDocument processInstanceMigrationDocument, String sourceProcDefId, String targetProcDefId);
 
-    ProcessMigrationBatchEntity insertBatchChild(ProcessMigrationBatchEntity parentBatch, String processInstanceId);
-
-    void deleteParentBatchAndChildrenAndResources(String parentBatchId);
+    void deleteParentBatchAndPartsAndResources(String parentBatchId);
 
 }

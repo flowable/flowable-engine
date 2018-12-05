@@ -285,6 +285,8 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityMa
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntityManagerImpl;
+import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchPartEntityManager;
+import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchPartEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.PropertyEntityManager;
 import org.flowable.engine.impl.persistence.entity.PropertyEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityManager;
@@ -305,6 +307,7 @@ import org.flowable.engine.impl.persistence.entity.data.ModelDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ProcessDefinitionDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ProcessDefinitionInfoDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ProcessMigrationBatchDataManager;
+import org.flowable.engine.impl.persistence.entity.data.ProcessMigrationBatchPartDataManager;
 import org.flowable.engine.impl.persistence.entity.data.PropertyDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ResourceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisAttachmentDataManager;
@@ -321,6 +324,7 @@ import org.flowable.engine.impl.persistence.entity.data.impl.MybatisModelDataMan
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisProcessDefinitionDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisProcessDefinitionInfoDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisProcessMigrationBatchDataManager;
+import org.flowable.engine.impl.persistence.entity.data.impl.MybatisProcessMigrationBatchPartDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisPropertyDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
@@ -448,6 +452,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected PropertyDataManager propertyDataManager;
     protected ResourceDataManager resourceDataManager;
     protected ProcessMigrationBatchDataManager processMigrationBatchDataManager;
+    protected ProcessMigrationBatchPartDataManager processMigrationBatchPartDataManager;
 
     // ENTITY MANAGERS ///////////////////////////////////////////////////////////
 
@@ -468,6 +473,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected ResourceEntityManager resourceEntityManager;
     protected TableDataManager tableDataManager;
     protected ProcessMigrationBatchEntityManager processMigrationBatchEntityManager;
+    protected ProcessMigrationBatchPartEntityManager processMigrationBatchPartEntityManager;
 
     // Candidate Manager
 
@@ -1195,6 +1201,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (processMigrationBatchDataManager == null) {
             processMigrationBatchDataManager = new MybatisProcessMigrationBatchDataManager(this);
         }
+        if (processMigrationBatchPartDataManager == null) {
+            processMigrationBatchPartDataManager = new MybatisProcessMigrationBatchPartDataManager(this);
+        }
     }
 
     // Entity managers //////////////////////////////////////////////////////////
@@ -1250,6 +1259,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
         if (processMigrationBatchEntityManager == null) {
             processMigrationBatchEntityManager = new ProcessMigrationBatchEntityManagerImpl(this, processMigrationBatchDataManager);
+        }
+        if (processMigrationBatchPartEntityManager == null) {
+            processMigrationBatchPartEntityManager = new ProcessMigrationBatchPartEntityManagerImpl(this, processMigrationBatchPartDataManager);
         }
     }
 
@@ -3934,6 +3946,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessMigrationBatchEntityManager getProcessMigrationBatchEntityManager() {
         return processMigrationBatchEntityManager;
+    }
+
+    public ProcessMigrationBatchPartEntityManager getProcessMigrationBatchPartEntityManager() {
+        return processMigrationBatchPartEntityManager;
     }
 
     @Override

@@ -33,7 +33,7 @@ public class DeleteProcessMigrationBatchAndResourcesCmd implements Command<Void>
     public Void execute(CommandContext commandContext) {
 
         ProcessMigrationBatchEntityManager batchManager = CommandContextUtil.getProcessMigrationBatchEntityManager(commandContext);
-        batchManager.deleteParentBatchAndChildrenAndResources(batchId);
+        batchManager.deleteParentBatchAndPartsAndResources(batchId);
         return null;
     }
 

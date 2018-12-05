@@ -45,6 +45,7 @@ import org.flowable.engine.impl.persistence.entity.ModelEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntityManager;
+import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchPartEntityManager;
 import org.flowable.engine.impl.persistence.entity.PropertyEntityManager;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityManager;
 import org.flowable.engine.impl.persistence.entity.TableDataManager;
@@ -625,5 +626,13 @@ public class CommandContextUtil {
 
     public static ProcessMigrationBatchEntityManager getProcessMigrationBatchEntityManager() {
         return getProcessEngineConfiguration().getProcessMigrationBatchEntityManager();
+    }
+
+    public static ProcessMigrationBatchPartEntityManager getProcessMigrationBatchPartEntityManager(CommandContext commandContext) {
+        return getProcessEngineConfiguration(commandContext).getProcessMigrationBatchPartEntityManager();
+    }
+
+    public static ProcessMigrationBatchPartEntityManager getProcessMigrationBatchPartEntityManager() {
+        return getProcessEngineConfiguration().getProcessMigrationBatchPartEntityManager();
     }
 }

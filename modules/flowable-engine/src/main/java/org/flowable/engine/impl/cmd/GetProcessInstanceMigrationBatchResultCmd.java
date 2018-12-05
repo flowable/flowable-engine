@@ -13,7 +13,7 @@
 
 package org.flowable.engine.impl.cmd;
 
-import org.flowable.engine.runtime.ProcessMigrationBatch;
+import org.flowable.engine.runtime.ProcessMigrationBatchPart;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,7 +28,7 @@ public class GetProcessInstanceMigrationBatchResultCmd extends AbstractGetProces
     }
 
     @Override
-    protected String getResultFromBatch(ProcessMigrationBatch batch, JsonNode jsonNode, ObjectMapper objectMapper) {
+    protected String getResultFromBatch(ProcessMigrationBatchPart batchPart, JsonNode jsonNode, ObjectMapper objectMapper) {
         return jsonNode.asText();
     }
 }

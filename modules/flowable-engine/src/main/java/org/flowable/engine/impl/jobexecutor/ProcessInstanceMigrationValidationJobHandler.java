@@ -19,6 +19,8 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationDocumentImpl;
 import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntityManager;
+import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchPartEntity;
+import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchPartEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationManager;
@@ -45,17 +47,19 @@ public class ProcessInstanceMigrationValidationJobHandler extends AbstractProces
     public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
 
         ProcessMigrationBatchEntityManager processMigrationBatchEntityManager = CommandContextUtil.getProcessMigrationBatchEntityManager(commandContext);
+        ProcessMigrationBatchPartEntityManager processMigrationBatchPartEntityManager = CommandContextUtil.getProcessMigrationBatchPartEntityManager(commandContext);
         ProcessInstanceMigrationManager processInstanceMigrationManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceMigrationManager();
 
         String batchId = getBatchIdFromHandlerCfg(configuration);
-        ProcessMigrationBatchEntity batchEntity = processMigrationBatchEntityManager.findById(batchId);
+        ProcessMigrationBatchPartEntity batchPart = processMigrationBatchPartEntityManager.findById(batchId);
+        ProcessMigrationBatchEntity parentBatch = processMigrationBatchEntityManager.findById(batchPart.getParentBatchId());
+        ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentImpl.fromProcessInstanceMigrationDocumentJson(parentBatch.getMigrationDocumentJson());
 
-        ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentImpl.fromProcessInstanceMigrationDocumentJson(batchEntity.getMigrationDocumentJson());
-        ProcessInstanceMigrationResult<List<String>> validationResult = processInstanceMigrationManager.validateMigrateProcessInstance(batchEntity.getProcessInstanceId(), migrationDocument, commandContext);
+        ProcessInstanceMigrationResult<List<String>> validationResult = processInstanceMigrationManager.validateMigrateProcessInstance(batchPart.getProcessInstanceId(), migrationDocument, commandContext);
 
         Date currentTime = CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime();
-        String validationResultValueAsJson = prepareResultAsJsonString (validationResult.getResultValue().orElse(null));
-        batchEntity.completeWithResult(currentTime, validationResultValueAsJson);
+        String validationResultValueAsJson = prepareResultAsJsonString(validationResult.getResultValue().orElse(null));
+        batchPart.complete(currentTime, validationResultValueAsJson);
     }
 
     protected static String prepareResultAsJsonString(List<String> validationMessages) {

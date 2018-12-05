@@ -31,6 +31,8 @@ public class ProcessInstanceMigrationResultImpl<T> implements ProcessInstanceMig
     protected String status = ProcessInstanceMigrationResult.STATUS_IN_PROGRESS;
     protected String processInstanceId;
     protected String resultStatus;
+    protected String sourceProcessDefinitionId;
+    protected String targetProcessDefinitionId;
     protected T resultValue;
     protected List<ProcessInstanceMigrationResult<T>> resultParts = new ArrayList<>();
 
@@ -63,6 +65,24 @@ public class ProcessInstanceMigrationResultImpl<T> implements ProcessInstanceMig
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    @Override
+    public Optional<String> getSourceProcessDefinitionId() {
+        return Optional.ofNullable(sourceProcessDefinitionId);
+    }
+
+    public void setSourceProcessDefinitionId(String sourceProcessDefinitionId) {
+        this.sourceProcessDefinitionId = sourceProcessDefinitionId;
+    }
+
+    @Override
+    public Optional<String> getTargetProcessDefinitionId() {
+        return Optional.ofNullable(targetProcessDefinitionId);
+    }
+
+    public void setTargetProcessDefinitionId(String targetProcessDefinitionId) {
+        this.targetProcessDefinitionId = targetProcessDefinitionId;
     }
 
     @Override

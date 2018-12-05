@@ -13,16 +13,17 @@
 package org.flowable.engine.runtime;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author Dennis Federico
  */
-public interface ProcessMigrationBatch {
+public interface ProcessMigrationBatchPart {
 
     String getId();
 
     String getBatchType();
+
+    String getParentBatchId();
 
     Date getCreateTime();
 
@@ -34,9 +35,9 @@ public interface ProcessMigrationBatch {
 
     String getTargetProcessDefinitionId();
 
-    String getMigrationDocumentJson();
+    String getProcessInstanceId();
 
-    List<ProcessMigrationBatchPart> getBatchParts();
+    String getResult();
 
 }
 

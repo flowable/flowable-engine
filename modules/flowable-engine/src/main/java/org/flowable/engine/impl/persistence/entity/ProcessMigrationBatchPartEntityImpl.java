@@ -14,30 +14,29 @@ package org.flowable.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
-import org.flowable.engine.runtime.ProcessMigrationBatchPart;
 
 /**
  * @author Dennis Federico
  */
-public class ProcessMigrationBatchEntityImpl extends AbstractEntity implements ProcessMigrationBatchEntity, Serializable {
+public class ProcessMigrationBatchPartEntityImpl extends AbstractEntity implements ProcessMigrationBatchPartEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    protected static final String MIGRATION_DOCUMENT_JSON_LABEL = "migrationDocumentJson";
+    protected static final String BATCH_RESULT_LABEL = "batchPartResult";
 
     protected String batchType;
-    protected Date createTime;
+    protected String parentBatchId;
+    protected String processInstanceId;
     protected String sourceProcessDefinitionId;
     protected String targetProcessDefinitionId;
-    protected ByteArrayRef migrationDocRefId;
-    protected List<ProcessMigrationBatchPart> batchChildren;
+    protected Date createTime;
+    protected Date completeTime;
+    protected ByteArrayRef resultDataRefId;
 
     @Override
     public String getIdPrefix() {
@@ -47,6 +46,8 @@ public class ProcessMigrationBatchEntityImpl extends AbstractEntity implements P
     @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
+        persistentState.put("completeTime", completeTime);
+        persistentState.put("resultDataRefId", resultDataRefId);
         return persistentState;
     }
 
@@ -60,6 +61,15 @@ public class ProcessMigrationBatchEntityImpl extends AbstractEntity implements P
     }
 
     @Override
+    public String getParentBatchId() {
+        return parentBatchId;
+    }
+
+    public void setParentBatchId(String parentBatchId) {
+        this.parentBatchId = parentBatchId;
+    }
+
+    @Override
     public Date getCreateTime() {
         return createTime;
     }
@@ -70,27 +80,16 @@ public class ProcessMigrationBatchEntityImpl extends AbstractEntity implements P
 
     @Override
     public Date getCompleteTime() {
+        return completeTime;
+    }
 
-        if (batchChildren != null && !batchChildren.isEmpty()) {
-            long maxDate = Long.MIN_VALUE;
-            for (ProcessMigrationBatchPart child : batchChildren) {
-                if (!child.isCompleted()) {
-                    return null;
-                }
-                maxDate = Long.max(maxDate, child.getCompleteTime().getTime());
-            }
-            return new Date(maxDate);
-        }
-        return null;
+    public void setCompleteTime(Date time) {
+        this.completeTime = time;
     }
 
     @Override
     public boolean isCompleted() {
-
-        if (batchChildren != null && !batchChildren.isEmpty()) {
-            return batchChildren.stream().allMatch(ProcessMigrationBatchPart::isCompleted);
-        }
-        return false;
+        return completeTime != null;
     }
 
     @Override
@@ -111,18 +110,27 @@ public class ProcessMigrationBatchEntityImpl extends AbstractEntity implements P
         this.targetProcessDefinitionId = targetProcessDefinitionId;
     }
 
-    public ByteArrayRef getMigrationDocRefId() {
-        return migrationDocRefId;
+    @Override
+    public String getProcessInstanceId() {
+        return processInstanceId;
     }
 
-    public void setMigrationDocRefId(ByteArrayRef migrationDocRefId) {
-        this.migrationDocRefId = migrationDocRefId;
+    public void setProcessInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
+
+    public ByteArrayRef getResultDataRefId() {
+        return resultDataRefId;
+    }
+
+    public void setResultDataRefId(ByteArrayRef resultDataRefId) {
+        this.resultDataRefId = resultDataRefId;
     }
 
     @Override
-    public String getMigrationDocumentJson() {
-        if (migrationDocRefId != null) {
-            byte[] bytes = migrationDocRefId.getBytes();
+    public String getResult() {
+        if (resultDataRefId != null && resultDataRefId.getEntity() != null) {
+            byte[] bytes = resultDataRefId.getEntity().getBytes();
             if (bytes != null) {
                 return new String(bytes, StandardCharsets.UTF_8);
             }
@@ -131,20 +139,9 @@ public class ProcessMigrationBatchEntityImpl extends AbstractEntity implements P
     }
 
     @Override
-    public void setMigrationDocumentJson(String migrationDocumentJson) {
-        this.migrationDocRefId = setByteArrayRef(this.migrationDocRefId, MIGRATION_DOCUMENT_JSON_LABEL, migrationDocumentJson);
-    }
-
-    @Override
-    public List<ProcessMigrationBatchPart> getBatchParts() {
-        return batchChildren;
-    }
-
-    public void addBatchPart(ProcessMigrationBatchPartEntity child) {
-        if (batchChildren == null) {
-            batchChildren = new ArrayList<>();
-        }
-        batchChildren.add(child);
+    public void complete(Date completeTime, String result) {
+        this.completeTime = completeTime;
+        this.resultDataRefId = setByteArrayRef(this.resultDataRefId, BATCH_RESULT_LABEL, result);
     }
 
     private static ByteArrayRef setByteArrayRef(ByteArrayRef byteArrayRef, String name, String value) {
@@ -160,4 +157,3 @@ public class ProcessMigrationBatchEntityImpl extends AbstractEntity implements P
     }
 
 }
-

@@ -47,6 +47,10 @@ public interface ProcessInstanceMigrationResult<T> {
 
     Optional<String> getProcessInstanceId();
 
+    Optional<String> getSourceProcessDefinitionId();
+
+    Optional<String> getTargetProcessDefinitionId();
+
     Optional<String> getResultStatus();
 
     Optional<T> getResultValue();

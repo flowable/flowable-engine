@@ -15,7 +15,7 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.List;
 
-import org.flowable.engine.runtime.ProcessMigrationBatch;
+import org.flowable.engine.runtime.ProcessMigrationBatchPart;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -33,7 +33,7 @@ public class GetProcessInstanceMigrationBatchValidationResultCmd extends Abstrac
     }
 
     @Override
-    protected List<String> getResultFromBatch(ProcessMigrationBatch batch, JsonNode jsonNode, ObjectMapper objectMapper) {
+    protected List<String> getResultFromBatch(ProcessMigrationBatchPart batchPart, JsonNode jsonNode, ObjectMapper objectMapper) {
         List<String> resultMessages = objectMapper.convertValue(jsonNode, new TypeReference<List<String>>() {
 
         });

@@ -41,10 +41,6 @@ public interface ProcessInstanceMigrationService {
 
     ProcessInstanceMigrationResult<List<String>> getResultsOfBatchProcessInstanceMigrationValidation(String migrationBatchId);
 
-    //TODO WIP - Having the ProcessInstanceMigrationResult this Batch entities seem nonsensical - but batch timeStamps should be included in the Result Object
-    //    ProcessMigrationBatch getProcessMigrationBatchById(String migrationBatchId);
-    //    ProcessMigrationBatch getProcessMigrationBatchAndResourcesById(String migrationBatchId);
-
     void deleteBatchAndResourcesById(String migrationBatchId);
 
     void migrateProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument);

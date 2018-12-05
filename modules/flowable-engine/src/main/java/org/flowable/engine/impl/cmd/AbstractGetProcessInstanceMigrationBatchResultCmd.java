@@ -24,6 +24,7 @@ import org.flowable.engine.impl.persistence.entity.ProcessMigrationBatchEntityMa
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.migration.ProcessInstanceMigrationResult;
 import org.flowable.engine.runtime.ProcessMigrationBatch;
+import org.flowable.engine.runtime.ProcessMigrationBatchPart;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,8 +49,8 @@ public abstract class AbstractGetProcessInstanceMigrationBatchResultCmd<T> imple
         if (batch != null) {
             ObjectMapper objectMapper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getObjectMapper();
             ProcessInstanceMigrationResultImpl<T> result = convertFromBatch(batch, objectMapper);
-            if (batch.getBatchChildren() != null) {
-                batch.getBatchChildren().forEach(child -> result.addResultPart(convertFromBatch(child, objectMapper)));
+            if (batch.getBatchParts() != null) {
+                batch.getBatchParts().forEach(batchPart -> result.addResultPart(convertFromBatchPart(batchPart, objectMapper)));
             }
             return result;
         }
@@ -60,15 +61,31 @@ public abstract class AbstractGetProcessInstanceMigrationBatchResultCmd<T> imple
         ProcessInstanceMigrationResultImpl<T> result = new ProcessInstanceMigrationResultImpl<>();
 
         result.setBatchId(batch.getId());
-        result.setProcessInstanceId(batch.getProcessInstanceId());
+        result.setSourceProcessDefinitionId(batch.getSourceProcessDefinitionId());
+        result.setTargetProcessDefinitionId(batch.getTargetProcessDefinitionId());
 
         //getCompleteTime traverses the children (if any)
         if (batch.getCompleteTime() != null) {
             result.setStatus(ProcessInstanceMigrationResult.STATUS_COMPLETED);
         }
-        if (batch.getResult() != null) {
+        return result;
+    }
+
+    protected ProcessInstanceMigrationResultImpl<T> convertFromBatchPart(ProcessMigrationBatchPart batchPart, ObjectMapper objectMapper) {
+        ProcessInstanceMigrationResultImpl<T> result = new ProcessInstanceMigrationResultImpl<>();
+
+        result.setBatchId(batchPart.getId());
+        result.setProcessInstanceId(batchPart.getProcessInstanceId());
+        result.setSourceProcessDefinitionId(batchPart.getSourceProcessDefinitionId());
+        result.setTargetProcessDefinitionId(batchPart.getTargetProcessDefinitionId());
+
+        //getCompleteTime traverses the children (if any)
+        if (batchPart.getCompleteTime() != null) {
+            result.setStatus(ProcessInstanceMigrationResult.STATUS_COMPLETED);
+        }
+        if (batchPart.getResult() != null) {
             try {
-                JsonNode resultNode = objectMapper.readTree(batch.getResult());
+                JsonNode resultNode = objectMapper.readTree(batchPart.getResult());
                 String resultStatus = null;
                 if (resultNode.has(AbstractProcessInstanceMigrationJobHandler.BATCH_RESULT_STATUS_LABEL)) {
                     resultStatus = resultNode.get(AbstractProcessInstanceMigrationJobHandler.BATCH_RESULT_STATUS_LABEL).asText();
@@ -76,7 +93,7 @@ public abstract class AbstractGetProcessInstanceMigrationBatchResultCmd<T> imple
 
                 T resultValue = null;
                 if (resultNode.has(AbstractProcessInstanceMigrationJobHandler.BATCH_RESULT_VALUE_LABEL)) {
-                    resultValue = getResultFromBatch(batch, resultNode.get(AbstractProcessInstanceMigrationJobHandler.BATCH_RESULT_VALUE_LABEL), objectMapper);
+                    resultValue = getResultFromBatch(batchPart, resultNode.get(AbstractProcessInstanceMigrationJobHandler.BATCH_RESULT_VALUE_LABEL), objectMapper);
                 }
                 result.setResult(resultStatus, resultValue);
             } catch (IOException e) {
@@ -86,5 +103,5 @@ public abstract class AbstractGetProcessInstanceMigrationBatchResultCmd<T> imple
         return result;
     }
 
-    protected abstract T getResultFromBatch(ProcessMigrationBatch batch, JsonNode jsonNode, ObjectMapper objectMapper);
+    protected abstract T getResultFromBatch(ProcessMigrationBatchPart batchPart, JsonNode jsonNode, ObjectMapper objectMapper);
 }
