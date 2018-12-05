@@ -56,6 +56,9 @@
     <property name="clock">
         <bean class="org.flowable.common.engine.impl.util.TestClockImpl" />
     </property>
+
+    <property name="enableUserTaskDatabaseEventLogging" value="true"/>
+
   </bean>
   
   <bean id="asyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">

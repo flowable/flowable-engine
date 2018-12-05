@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.test.api.task;
+package org.flowable.engine.test.api.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
@@ -27,7 +27,6 @@ import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.test.ConfigurationResource;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.FlowableTest;
 import org.flowable.identitylink.api.IdentityLinkType;
@@ -44,7 +43,6 @@ import org.junit.jupiter.api.Test;
  * @author martin.grofcik
  */
 @FlowableTest
-@ConfigurationResource("flowable.usertask-log.cfg.xml")
 public class HistoryServiceTaskLogTest {
 
     protected Task task;
@@ -83,6 +81,9 @@ public class HistoryServiceTaskLogTest {
             extracting(TaskLogEntry::getTimeStamp).isEqualTo(task.getCreateTime());
         assertThat(taskLogsByTaskInstanceId.get(0)).
             extracting(TaskLogEntry::getUserId).isNull();
+
+        taskService.deleteTask(task.getId());
+        assertThat(taskService.createTaskLogEntryQuery().taskId(task.getId()).count()).isGreaterThan(0l);
     }
 
     @Test

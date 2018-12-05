@@ -6,7 +6,7 @@
 
   <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
 
-    <property name="enableUserTaskDatabaseEventLogging" value="true"/>
+    <property name="enableUserTaskDatabaseEventLogging" value="false"/>
 
     <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE" />
     <property name="jdbcDriver" value="org.h2.Driver" />
