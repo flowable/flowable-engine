@@ -451,9 +451,7 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
             Date time = getClock().getCurrentTime();
             putIfNotNull(data, HistoryJsonConstants.CREATE_TIME, time);
 
-            if (StringUtils.isNotEmpty(activityInstanceId)) {
-                putIfNotNull(data, HistoryJsonConstants.RUNTIME_ACTIVITY_INSTANCE_ID, activityInstanceId);
-            }
+            putIfNotNull(data, HistoryJsonConstants.RUNTIME_ACTIVITY_INSTANCE_ID, activityInstanceId);
             if (useActivityId && sourceActivityExecution != null) {
                 String activityId = getActivityIdForExecution(sourceActivityExecution);
                 if (activityId != null) {
