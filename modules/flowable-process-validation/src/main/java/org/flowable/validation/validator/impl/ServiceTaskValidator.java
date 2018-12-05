@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Interface;
 import org.flowable.bpmn.model.Operation;
@@ -45,7 +46,10 @@ public class ServiceTaskValidator extends ExternalInvocationTaskValidator {
         if (!ImplementationType.IMPLEMENTATION_TYPE_CLASS.equalsIgnoreCase(serviceTask.getImplementationType())
                 && !ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equalsIgnoreCase(serviceTask.getImplementationType())
                 && !ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equalsIgnoreCase(serviceTask.getImplementationType())
-                && !ImplementationType.IMPLEMENTATION_TYPE_WEBSERVICE.equalsIgnoreCase(serviceTask.getImplementationType()) && StringUtils.isEmpty(serviceTask.getType())) {
+                && !ImplementationType.IMPLEMENTATION_TYPE_WEBSERVICE.equalsIgnoreCase(serviceTask.getImplementationType()) 
+                && !ServiceTask.CASE_TASK.equalsIgnoreCase(serviceTask.getType()) 
+                && StringUtils.isEmpty(serviceTask.getType())) {
+            
             addError(errors, Problems.SERVICE_TASK_MISSING_IMPLEMENTATION, process, serviceTask,
                     "One of the attributes 'class', 'delegateExpression', 'type', 'operation', or 'expression' is mandatory on serviceTask.");
         }
@@ -55,7 +59,8 @@ public class ServiceTaskValidator extends ExternalInvocationTaskValidator {
         if (StringUtils.isNotEmpty(serviceTask.getType())) {
 
             if (!serviceTask.getType().equalsIgnoreCase("mail") && !serviceTask.getType().equalsIgnoreCase("mule") && !serviceTask.getType().equalsIgnoreCase("camel")
-                    && !serviceTask.getType().equalsIgnoreCase("shell") && !serviceTask.getType().equalsIgnoreCase("dmn") && !serviceTask.getType().equalsIgnoreCase("http")) {
+                    && !serviceTask.getType().equalsIgnoreCase("shell") && !serviceTask.getType().equalsIgnoreCase("dmn") 
+                    && !serviceTask.getType().equalsIgnoreCase("http") && !serviceTask.getType().equalsIgnoreCase("case")) {
 
                 addError(errors, Problems.SERVICE_TASK_INVALID_TYPE, process, serviceTask, "Invalid or unsupported service task type");
             }
@@ -68,6 +73,8 @@ public class ServiceTaskValidator extends ExternalInvocationTaskValidator {
                 validateFieldDeclarationsForDmn(process, serviceTask, serviceTask.getFieldExtensions(), errors);
             } else if (serviceTask.getType().equalsIgnoreCase("http")) {
                 validateFieldDeclarationsForHttp(process, serviceTask, serviceTask.getFieldExtensions(), errors);
+            } else if (serviceTask.getType().equalsIgnoreCase("case")) {
+                validateFieldDeclarationsForCase(process, (CaseServiceTask) serviceTask, errors);
             }
 
         }
@@ -75,8 +82,9 @@ public class ServiceTaskValidator extends ExternalInvocationTaskValidator {
 
     protected void verifyResultVariableName(Process process, ServiceTask serviceTask, List<ValidationError> errors) {
         if (StringUtils.isNotEmpty(serviceTask.getResultVariableName())
-                && (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(serviceTask.getImplementationType()) || ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(serviceTask
-                        .getImplementationType()))) {
+                && (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(serviceTask.getImplementationType()) || 
+                                ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(serviceTask.getImplementationType()))) {
+            
             addError(errors, Problems.SERVICE_TASK_RESULT_VAR_NAME_WITH_DELEGATE, process, serviceTask, "'resultVariableName' not supported for service tasks using 'class' or 'delegateExpression");
         }
 

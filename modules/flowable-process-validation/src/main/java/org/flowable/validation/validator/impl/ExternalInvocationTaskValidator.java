@@ -14,6 +14,8 @@ package org.flowable.validation.validator.impl;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.TaskWithFieldExtensions;
 import org.flowable.validation.ValidationError;
@@ -118,6 +120,12 @@ public abstract class ExternalInvocationTaskValidator extends ProcessLevelValida
             addError(errors, Problems.HTTP_TASK_NO_REQUEST_URL, process, task, "No request url is defined on the http activity");
         }
 
+    }
+    
+    protected void validateFieldDeclarationsForCase(org.flowable.bpmn.model.Process process, CaseServiceTask caseServiceTask, List<ValidationError> errors) {
+        if (StringUtils.isEmpty(caseServiceTask.getCaseDefinitionKey())) {
+            addError(errors, Problems.CASE_TASK_NO_CASE_DEFINITION_KEY, process, caseServiceTask, "No case definition key is defined on the case task");
+        }
     }
 
 }

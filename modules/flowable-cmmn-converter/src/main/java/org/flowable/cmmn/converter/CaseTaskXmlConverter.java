@@ -14,7 +14,6 @@ package org.flowable.cmmn.converter;
 
 import javax.xml.stream.XMLStreamReader;
 
-import org.flowable.cmmn.converter.util.CmmnXmlUtil;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnElement;
 
