@@ -34,4 +34,10 @@ public interface TaskLogEntryDataManager extends DataManager<TaskLogEntryEntity>
     long findTaskLogEntriesCountByNativeQueryCriteria(Map<String, Object> nativeTaskLogEntryQuery);
 
     List<TaskLogEntry> findTaskLogEntriesByNativeQueryCriteria(Map<String, Object> nativeTaskLogEntryQuery);
+
+    void deleteTaskLogEntriesByProcessDefinitionId(String processDefinitionId);
+
+    void deleteTaskLogEntriesByScopeDefinitionId(String scopeType, String scopeDefinitionId);
+
+    void deleteTaskLogEntriesByTaskId(String taskId);
 }

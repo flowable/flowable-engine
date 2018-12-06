@@ -32,13 +32,17 @@ public interface TaskLogEntryEntity extends TaskLogEntry, Entity {
 
     void setUserId(String userId);
 
-    void setData(byte[] data);
+    void setData(String data);
 
     void setExecutionId(String executionId);
 
     void setProcessInstanceId(String processInstanceId);
 
+    void setProcessDefinitionId(String processDefinitionId);
+
     void setScopeId(String scopeId);
+
+    void setScopeDefinitionId(String scopeDefinitionId);
 
     void setSubScopeId(String subScopeId);
 

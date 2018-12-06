@@ -78,7 +78,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
     static {
         // runtime
         entityToTableNameMap.put(TaskEntity.class, "ACT_RU_TASK");
-        entityToTableNameMap.put(TaskLogEntryEntity.class, "FLW_HI_TSK_LOG");
+        entityToTableNameMap.put(TaskLogEntryEntity.class, "ACT_HI_TSK_LOG");
         entityToTableNameMap.put(ExecutionEntity.class, "ACT_RU_EXECUTION");
         entityToTableNameMap.put(IdentityLinkEntity.class, "ACT_RU_IDENTITYLINK");
         entityToTableNameMap.put(VariableInstanceEntity.class, "ACT_RU_VARIABLE");
@@ -124,7 +124,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
 
         // and now the map for the API types (does not cover all cases)
         apiTypeToTableNameMap.put(Task.class, "ACT_RU_TASK");
-        apiTypeToTableNameMap.put(TaskLogEntry.class, "FLW_HI_TSK_LOG");
+        apiTypeToTableNameMap.put(TaskLogEntry.class, "ACT_HI_TSK_LOG");
         apiTypeToTableNameMap.put(Execution.class, "ACT_RU_EXECUTION");
         apiTypeToTableNameMap.put(ProcessInstance.class, "ACT_RU_EXECUTION");
         apiTypeToTableNameMap.put(ProcessDefinition.class, "ACT_RE_PROCDEF");

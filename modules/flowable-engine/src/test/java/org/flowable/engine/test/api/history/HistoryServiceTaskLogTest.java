@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
@@ -55,11 +56,7 @@ public class HistoryServiceTaskLogTest {
     }
 
     protected void deleteTaskWithLogEntries(TaskService taskService, String taskId) {
-        taskService.createTaskLogEntryQuery().taskId(taskId).list().
-            forEach(
-                logEntry -> taskService.deleteTaskLogEntry(logEntry.getLogNumber())
-            );
-        taskService.deleteTask(taskId);
+        taskService.deleteTask(taskId, true);
     }
 
     @Test
@@ -354,7 +351,7 @@ public class HistoryServiceTaskLogTest {
             timeStamp(new Date(0)).
             userId("testUser").
             type("customType").
-            data("testData".getBytes()).
+            data("testData").
             add();
 
         List<TaskLogEntry> logEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
@@ -366,7 +363,7 @@ public class HistoryServiceTaskLogTest {
         assertThat(taskLogEntry.getTaskId()).isEqualTo(task.getId());
         assertThat(taskLogEntry.getType()).isEqualTo("customType");
         assertThat(taskLogEntry.getTimeStamp()).isEqualTo(new Date(0));
-        assertThat(taskLogEntry.getData()).isEqualTo("testData".getBytes());
+        assertThat(taskLogEntry.getData()).isEqualTo("testData");
         taskService.deleteTaskLogEntry(logEntries.get(0).getLogNumber());
     }
 
@@ -400,7 +397,7 @@ public class HistoryServiceTaskLogTest {
         taskLogEntryBuilder.
             userId("testUser").
             type("customType").
-            data("testData".getBytes()).
+            data("testData").
             add();
 
         List<TaskLogEntry> logEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
@@ -463,6 +460,15 @@ public class HistoryServiceTaskLogTest {
             assertThat(logEntries).size().isEqualTo(4);
             assertThat(logEntries.get(0)).
                 extracting(taskLogEntry -> taskLogEntry.getType()).isEqualTo("USER_TASK_CREATED")
+            ;
+            assertThat(logEntries.get(0)).
+                extracting(taskLogEntry -> taskLogEntry.getProcessDefinitionId()).isEqualTo(processInstance.getProcessDefinitionId())
+            ;
+            assertThat(logEntries.get(0)).
+                extracting(taskLogEntry -> taskLogEntry.getExecutionId()).isEqualTo(task.getExecutionId())
+            ;
+            assertThat(logEntries.get(0)).
+                extracting(taskLogEntry -> taskLogEntry.getProcessInstanceId()).isEqualTo(processInstance.getId())
             ;
             assertThat(logEntries.get(1)).
                 extracting(taskLogEntry -> taskLogEntry.getType()).isEqualTo("USER_TASK_ASSIGNEE_CHANGED")
@@ -839,8 +845,8 @@ public class HistoryServiceTaskLogTest {
 
     @Test
     public void queryForTaskLogEntriesByNativeQuery(TaskService taskService, ManagementService managementService) {
-        assertEquals("FLW_HI_TSK_LOG", managementService.getTableName(TaskLogEntryEntity.class));
-        assertEquals("FLW_HI_TSK_LOG", managementService.getTableName(TaskLogEntry.class));
+        assertEquals("ACT_HI_TSK_LOG", managementService.getTableName(TaskLogEntryEntity.class));
+        assertEquals("ACT_HI_TSK_LOG", managementService.getTableName(TaskLogEntry.class));
         TaskLogEntryBuilder taskLogEntryBuilder = taskService.createTaskLogEntryBuilder();
         taskLogEntryBuilder.taskId("1").add();
         taskLogEntryBuilder.taskId("2").add();

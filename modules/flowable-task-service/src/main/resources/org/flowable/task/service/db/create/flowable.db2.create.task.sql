@@ -31,19 +31,21 @@ create table ACT_RU_TASK (
     primary key (ID_)
 );
 
-create table FLW_HI_TSK_LOG (
-    LOG_NR_       bigint not null GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
-    TYPE_         varchar(64),
-    TASK_ID_      varchar(64) not null,
-    TIME_STAMP_   timestamp   not null,
-    USER_ID_      varchar(255),
-    DATA_         varchar(4000),
-    EXECUTION_ID_ varchar(64),
-    PROC_INST_ID_ varchar(64),
-    SCOPE_ID_     varchar(255),
-    SUB_SCOPE_ID_ varchar(255),
-    SCOPE_TYPE_   varchar(255),
-    TENANT_ID_    varchar(255) default ''
+create table ACT_HI_TSK_LOG (
+    LOG_NR_              bigint      not null GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+    TYPE_                varchar(64),
+    TASK_ID_             varchar(64) not null,
+    TIME_STAMP_          timestamp   not null,
+    USER_ID_             varchar(255),
+    DATA_                varchar(4000),
+    EXECUTION_ID_        varchar(64),
+    PROC_INST_ID_        varchar(64),
+    PROC_DEF_ID_         varchar(64),
+    SCOPE_ID_            varchar(255),
+    SCOPE_DEFINITION_ID_ varchar(255),
+    SUB_SCOPE_ID_        varchar(255),
+    SCOPE_TYPE_          varchar(255),
+    TENANT_ID_           varchar(255) default ''
 );
 
 create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
@@ -51,6 +53,6 @@ create index ACT_IDX_TASK_SCOPE on ACT_RU_TASK(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SUB_SCOPE on ACT_RU_TASK(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SCOPE_DEF on ACT_RU_TASK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
-create index FLW_IDX_HI_TASK_LOG_NUMBER on FLW_HI_TSK_LOG(LOG_NR_);
+create index ACT_IDX_HI_TASK_LOG_NUMBER on ACT_HI_TSK_LOG(LOG_NR_);
 
 insert into ACT_GE_PROPERTY values ('task.schema.version', '6.4.1.3', 1);

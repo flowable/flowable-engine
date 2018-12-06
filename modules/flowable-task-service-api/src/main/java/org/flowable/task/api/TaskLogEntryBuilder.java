@@ -31,7 +31,11 @@ public interface TaskLogEntryBuilder {
 
     TaskLogEntryBuilder processInstanceId(String processInstanceId);
 
+    TaskLogEntryBuilder processDefinitionId(String processDefinitionId);
+
     TaskLogEntryBuilder scopeId(String scopeId);
+
+    TaskLogEntryBuilder scopeDefinitionId(String scopeDefinitionId);
 
     TaskLogEntryBuilder subScopeId(String subScopeId);
 
@@ -39,7 +43,7 @@ public interface TaskLogEntryBuilder {
 
     TaskLogEntryBuilder tenantId(String tenantId);
 
-    TaskLogEntryBuilder data(byte[] data);
+    TaskLogEntryBuilder data(String data);
 
     String getType();
 
@@ -49,13 +53,17 @@ public interface TaskLogEntryBuilder {
 
     String getUserId();
 
-    byte[] getData();
+    String getData();
 
     String getExecutionId();
 
     String getProcessInstanceId();
 
+    String getProcessDefinitionId();
+
     String getScopeId();
+
+    String getScopeDefinitionId();
 
     String getSubScopeId();
 

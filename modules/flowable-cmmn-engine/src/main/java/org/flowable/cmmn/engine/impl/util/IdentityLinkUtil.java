@@ -101,6 +101,7 @@ public class IdentityLinkUtil {
         TaskLogEntryEntity taskLogEntry = taskServiceConfiguration.getTaskLogEntryEntityManager().create();
         taskLogEntry.setTaskId(taskEntity.getId());
         taskLogEntry.setScopeId(taskEntity.getScopeId());
+        taskLogEntry.setScopeDefinitionId(taskEntity.getScopeDefinitionId());
         taskLogEntry.setSubScopeId(taskEntity.getSubScopeId());
         taskLogEntry.setScopeType(taskEntity.getScopeType());
         taskLogEntry.setTenantId(taskEntity.getTenantId());
@@ -113,9 +114,9 @@ public class IdentityLinkUtil {
             dataMap.put("groupId", identityLinkEntity.getGroupId());
         }
         dataMap.put("type", identityLinkEntity.getType());
-        byte[] dataBytes = null;
+        String dataBytes = null;
         try {
-            dataBytes = taskServiceConfiguration.getObjectMapper().writeValueAsBytes(
+            dataBytes = taskServiceConfiguration.getObjectMapper().writeValueAsString(
                 dataMap
             );
         } catch (JsonProcessingException e) {

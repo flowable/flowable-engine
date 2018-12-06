@@ -17,10 +17,12 @@ public abstract class BaseTaskLogEntryBuilderImpl implements TaskLogEntryBuilder
     protected String type;
     protected Date timeStamp;
     protected String userId;
-    protected byte[] data;
+    protected String data;
     protected String processInstanceId;
+    protected String processDefinitionId;
     protected String executionId;
     protected String scopeId;
+    protected String scopeDefinitionId;
     protected String subScopeId;
     protected String scopeType;
     protected String tenantId;
@@ -29,9 +31,11 @@ public abstract class BaseTaskLogEntryBuilderImpl implements TaskLogEntryBuilder
     public BaseTaskLogEntryBuilderImpl(CommandExecutor commandExecutor, TaskInfo task) {
         this(commandExecutor);
         this.processInstanceId = task.getProcessInstanceId();
+        this.processDefinitionId = task.getProcessDefinitionId();
         this.executionId = task.getExecutionId();
         this.tenantId = task.getTenantId();
         this.scopeId = task.getScopeId();
+        this.scopeDefinitionId = task.getScopeDefinitionId();
         this.subScopeId = task.getSubScopeId();
         this.scopeType = task.getScopeType();
         this.taskId = task.getId();
@@ -66,7 +70,7 @@ public abstract class BaseTaskLogEntryBuilderImpl implements TaskLogEntryBuilder
     }
 
     @Override
-    public TaskLogEntryBuilder data(byte[] data) {
+    public TaskLogEntryBuilder data(String data) {
         this.data = data;
         return this;
     }
@@ -78,8 +82,20 @@ public abstract class BaseTaskLogEntryBuilderImpl implements TaskLogEntryBuilder
     }
 
     @Override
+    public TaskLogEntryBuilder processDefinitionId(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+        return this;
+    }
+
+    @Override
     public TaskLogEntryBuilder scopeId(String scopeId) {
         this.scopeId = scopeId;
+        return this;
+    }
+
+    @Override
+    public TaskLogEntryBuilder scopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
         return this;
     }
 
@@ -120,7 +136,7 @@ public abstract class BaseTaskLogEntryBuilderImpl implements TaskLogEntryBuilder
     }
 
     @Override
-    public byte[] getData() {
+    public String getData() {
         return data;
     }
 
@@ -135,8 +151,18 @@ public abstract class BaseTaskLogEntryBuilderImpl implements TaskLogEntryBuilder
     }
 
     @Override
+    public String getProcessDefinitionId() {
+        return processDefinitionId;
+    }
+
+    @Override
     public String getScopeId() {
         return scopeId;
+    }
+
+    @Override
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
     }
 
     @Override

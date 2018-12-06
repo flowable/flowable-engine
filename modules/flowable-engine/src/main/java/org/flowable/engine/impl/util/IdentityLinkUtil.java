@@ -114,6 +114,7 @@ public class IdentityLinkUtil {
             TaskLogEntryEntity taskLogEntry = taskServiceConfiguration.getTaskLogEntryEntityManager().create();
             taskLogEntry.setTaskId(taskEntity.getId());
             taskLogEntry.setProcessInstanceId(taskEntity.getProcessInstanceId());
+            taskLogEntry.setProcessDefinitionId(taskEntity.getProcessDefinitionId());
             taskLogEntry.setExecutionId(taskEntity.getExecutionId());
             taskLogEntry.setTenantId(taskEntity.getTenantId());
             taskLogEntry.setType(eventType);
@@ -125,15 +126,15 @@ public class IdentityLinkUtil {
                 dataMap.put("groupId", identityLinkEntity.getGroupId());
             }
             dataMap.put("type", identityLinkEntity.getType());
-            byte[] dataBytes = null;
+            String data = null;
             try {
-                dataBytes = taskServiceConfiguration.getObjectMapper().writeValueAsBytes(
+                data = taskServiceConfiguration.getObjectMapper().writeValueAsString(
                     dataMap
                 );
             } catch (JsonProcessingException e) {
                 LOGGER.warn("It was not possible to serialize user task identity link data. TaskEventLogEntry data is empty.", e);
             }
-            taskLogEntry.setData(dataBytes);
+            taskLogEntry.setData(data);
             taskLogEntry.setUserId(Authentication.getAuthenticatedUserId());
             CommandContextUtil.getTaskService().addTaskLogEntry(taskLogEntry);
         }

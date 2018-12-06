@@ -1,2 +1,2 @@
 drop table if exists ACT_HI_TASKINST cascade constraints;
-drop table if exists FLW_HI_TSK_LOG cascade constraints;
+drop table if exists ACT_HI_TSK_LOG cascade constraints;

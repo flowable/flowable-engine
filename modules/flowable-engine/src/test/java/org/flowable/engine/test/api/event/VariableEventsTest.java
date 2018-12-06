@@ -425,10 +425,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
 
             // Cleanup task and history to ensure a clean DB after test success/failure
             if (newTask.getId() != null) {
-                taskService.deleteTask(newTask.getId());
-                if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-                    historyService.deleteHistoricTaskInstance(newTask.getId());
-                }
+                taskService.deleteTask(newTask.getId(), true);
             }
         }
 

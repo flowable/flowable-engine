@@ -26,6 +26,7 @@ import org.flowable.cmmn.engine.impl.history.HistoricMilestoneInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseDefinitionDataManager;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionQueryImpl;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManager;
@@ -94,7 +95,8 @@ public class CaseDefinitionEntityManagerImpl extends AbstractCmmnEntityManager<C
         }
         
         if (cascadeHistory) {
-            
+            CommandContextUtil.getTaskService().deleteTaskLogEntriesForScopeDefinition(caseDefinitionId, ScopeTypes.CMMN);
+
             HistoricIdentityLinkEntityManager historicIdentityLinkEntityManager = getHistoricIdentityLinkEntityManager();
             historicIdentityLinkEntityManager.deleteHistoricIdentityLinksByScopeDefinitionIdAndScopeType(caseDefinitionId, ScopeTypes.CMMN);
             

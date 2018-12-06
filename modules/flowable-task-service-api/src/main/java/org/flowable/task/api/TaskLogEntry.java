@@ -35,7 +35,11 @@ public interface TaskLogEntry {
 
     String getProcessInstanceId();
 
+    String getProcessDefinitionId();
+
     String getScopeId();
+
+    String getScopeDefinitionId();
 
     String getSubScopeId();
 

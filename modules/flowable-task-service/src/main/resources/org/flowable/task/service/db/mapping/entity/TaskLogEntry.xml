@@ -7,58 +7,67 @@
   <!-- INSERT -->
 
   <insert id="insertTaskLogEntry" parameterType="org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntityImpl">
-    insert into ${prefix}FLW_HI_TSK_LOG(TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, TENANT_ID_,
-                                     TIME_STAMP_, USER_ID_, DATA_)
+    insert into ${prefix}ACT_HI_TSK_LOG(TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_,
+                                        SCOPE_ID_, SCOPE_DEFINITION_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_,
+                                        TENANT_ID_, TIME_STAMP_, USER_ID_, DATA_)
     values (
       #{type, jdbcType=VARCHAR}, 
       #{taskId, jdbcType=VARCHAR},
       #{executionId, jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
+      #{processDefinitionId, jdbcType=VARCHAR},
       #{scopeId, jdbcType=VARCHAR},
+      #{scopeDefinitionId, jdbcType=VARCHAR},
       #{subScopeId, jdbcType=VARCHAR},
       #{scopeType, jdbcType=VARCHAR},
       #{tenantId, jdbcType=VARCHAR},
       #{timeStamp, jdbcType=TIMESTAMP}, 
       #{userId, jdbcType=VARCHAR},
-      #{data, jdbcType=${blobType}},
+      #{data, jdbcType=VARCHAR},
     )
   </insert>
   
   <insert id="bulkInsertTaskLogEntry" parameterType="java.util.List">
-    insert into ${prefix}FLW_HI_TSK_LOG(TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, TENANT_ID_,
-                                     TIME_STAMP_, USER_ID_, DATA_)
+    insert into ${prefix}ACT_HI_TSK_LOG(TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_,
+                                        SCOPE_ID_, SCOPE_DEFINITION_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, TENANT_ID_,
+                                        TIME_STAMP_, USER_ID_, DATA_)
     values 
       <foreach collection="list" item="taskLog" index="index" separator=",">
         (#{taskLog.type, jdbcType=VARCHAR},
         #{taskLog.taskId, jdbcType=VARCHAR},
         #{taskLog.executionId, jdbcType=VARCHAR},
         #{taskLog.processInstanceId, jdbcType=VARCHAR},
+        #{taskLog.processDefintionId, jdbcType=VARCHAR},
         #{taskLog.scopeId, jdbcType=VARCHAR},
+        #{taskLog.scopeDefinitionId, jdbcType=VARCHAR},
         #{taskLog.subScopeId, jdbcType=VARCHAR},
         #{taskLog.scopeType, jdbcType=VARCHAR},
         #{taskLog.tenantId, jdbcType=VARCHAR},
         #{taskLog.timeStamp, jdbcType=TIMESTAMP},
         #{taskLog.userId, jdbcType=VARCHAR},
-        #{taskLog.data, jdbcType=${blobType}},
+        #{taskLog.data, jdbcType=VARCHAR},
       </foreach>
   </insert>
 
   <insert id="insertTaskLogEntry" databaseId="oracle" parameterType="org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntityImpl">
-    insert into ${prefix}FLW_HI_TSK_LOG(LOG_NR_, TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, TENANT_ID_,
-                                     TIME_STAMP_, USER_ID_, DATA_)
+    insert into ${prefix}ACT_HI_TSK_LOG(LOG_NR_, TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_,
+                                        SCOPE_ID_, SCOPE_DEFINITION_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_,
+                                        TENANT_ID_, TIME_STAMP_, USER_ID_, DATA_)
     values (
-      ${prefix}FLW_TASK_EVT_LOG_SEQ.nextVal,
+      ${prefix}ACT_TASK_EVT_LOG_SEQ.nextVal,
       #{type, jdbcType=VARCHAR}, 
       #{taskId, jdbcType=VARCHAR},
       #{executionId, jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
+      #{processDefinitionId, jdbcType=VARCHAR},
       #{scopeId, jdbcType=VARCHAR},
+      #{scopeDefinitionId, jdbcType=VARCHAR},
       #{subScopeId, jdbcType=VARCHAR},
       #{scopeType, jdbcType=VARCHAR},
       #{tenantId, jdbcType=VARCHAR},
       #{timeStamp, jdbcType=TIMESTAMP},
       #{userId, jdbcType=VARCHAR},
-      #{data, jdbcType=${blobType}},
+      #{data, jdbcType=VARCHAR},
       #{lockOwner, jdbcType=VARCHAR},
       #{lockTime, jdbcType=TIMESTAMP},
       #{isProcessed, jdbcType=INTEGER} 
@@ -68,20 +77,23 @@
   <insert id="bulkInsertTaskLogEntry" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL 
       <foreach collection="list" item="taskLog" index="index">
-        into ${prefix}FLW_HI_TSK_LOG(LOG_NR_, TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, TENANT_ID_,
-        TIME_STAMP_, USER_ID_, DATA_, LOCK_OWNER_, LOCK_TIME_, IS_PROCESSED_) VALUES 
-            (${prefix}FLW_TASK_EVT_LOG_SEQ.nextVal,
+        into ${prefix}ACT_HI_TSK_LOG(LOG_NR_, TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_,
+                                     SCOPE_ID_, SCOPE_DEFINITION_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_,
+                                     TENANT_ID_, TIME_STAMP_, USER_ID_, DATA_, LOCK_OWNER_, LOCK_TIME_, IS_PROCESSED_) VALUES
+            (${prefix}ACT_TASK_EVT_LOG_SEQ.nextVal,
              #{taskLog.type, jdbcType=VARCHAR},
              #{taskLog.taskId, jdbcType=VARCHAR},
              #{taskLog.executionId, jdbcType=VARCHAR},
              #{taskLog.processInstanceId, jdbcType=VARCHAR},
+             #{taskLog.processDefinitionId, jdbcType=VARCHAR},
              #{taskLog.scopeId, jdbcType=VARCHAR},
+             #{taskLog.scopeDefinitionId, jdbcType=VARCHAR},
              #{taskLog.subScopeId, jdbcType=VARCHAR},
              #{taskLog.scopeType, jdbcType=VARCHAR},
              #{taskLog.tenantId, jdbcType=VARCHAR},
              #{taskLog.timeStamp, jdbcType=TIMESTAMP},
              #{taskLog.userId, jdbcType=VARCHAR},
-             #{taskLog.data, jdbcType=${blobType}},
+             #{taskLog.data, jdbcType=VARCHAR},
       </foreach>
     SELECT * FROM dual
   </insert>
@@ -95,13 +107,15 @@
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR"/>
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR"/>
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR"/>
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR"/>
     <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
+    <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
     <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
-    <result property="subScopeType" column="SUB_SCOPE_TYPE_" jdbcType="VARCHAR"/>
+    <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
     <result property="timeStamp" column="TIME_STAMP_" jdbcType="TIMESTAMP"/>
     <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
-    <result property="data" column="DATA_" jdbcType="${blobType}"/>
+    <result property="data" column="DATA_" jdbcType="VARCHAR"/>
   </resultMap>
   
   <!-- SELECTS -->
@@ -127,7 +141,7 @@
   </select>
 
   <sql id="selectTaskLogEntriesByQueryCriteriaSql">
-    from ${prefix}FLW_HI_TSK_LOG RES
+    from ${prefix}ACT_HI_TSK_LOG RES
     <include refid="commonSelectTaskLogEntriesByQueryCriteriaSql"/>
   </sql>
 
@@ -145,8 +159,14 @@
       <if test="processInstanceId != null">
         and RES.PROC_INST_ID_ = #{processInstanceId}
       </if>
+      <if test="processDefinitionId != null">
+        and RES.PROC_DEF_ID_ = #{processDefinitionId}
+      </if>
       <if test="scopeId != null">
         and RES.SCOPE_ID_ = #{scopeId}
+      </if>
+      <if test="scopeDefinitionId != null">
+        and RES.SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
       </if>
       <if test="subScopeId != null">
         and RES.SUB_SCOPE_ID_ = #{subScopeId}
@@ -174,7 +194,19 @@
 
   <!-- DELETE -->
   <delete id="deleteTaskLogEntryByLogNumber" parameterType="long">
-    delete from ${prefix}FLW_HI_TSK_LOG where LOG_NR_ = #{logNr}
+    delete from ${prefix}ACT_HI_TSK_LOG where LOG_NR_ = #{logNr}
+  </delete>
+
+  <delete id="deleteTaskLogEntriesByProcessDefinitionId" parameterType="string">
+    delete from ${prefix}ACT_HI_TSK_LOG where PROC_DEF_ID_ = #{processDefinitionId}
+  </delete>
+
+  <delete id="deleteTaskLogEntriesByScopeDefinitionId" parameterType="map">
+    delete from ${prefix}ACT_HI_TSK_LOG where SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR} AND SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR}
+  </delete>
+
+  <delete id="deleteTaskLogEntriesByTaskId" parameterType="string">
+    delete from ${prefix}ACT_HI_TSK_LOG where TASK_ID_ = #{taskId}
   </delete>
 
 </mapper>

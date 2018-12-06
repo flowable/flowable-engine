@@ -12,6 +12,7 @@
  */
 package org.flowable.task.service.impl.persistence.entity.data.impl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,6 +51,24 @@ public class MyBatisTaskLogEntryDataManager extends AbstractDataManager<TaskLogE
     @Override
     public void deleteTaskLogEntry(long logEntryNumber) {
         getDbSqlSession().delete("deleteTaskLogEntryByLogNumber", logEntryNumber, TaskLogEntryEntityImpl.class);
+    }
+
+    @Override
+    public void deleteTaskLogEntriesByProcessDefinitionId(String processDefinitionId) {
+        getDbSqlSession().delete("deleteTaskLogEntriesByProcessDefinitionId", processDefinitionId, TaskLogEntryEntityImpl.class);
+    }
+
+    @Override
+    public void deleteTaskLogEntriesByScopeDefinitionId(String scopeType, String scopeDefinitionId) {
+        Map<String, String> params = new HashMap<>(2);
+        params.put("scopeDefinitionId", scopeDefinitionId);
+        params.put("scopeType", scopeType);
+        getDbSqlSession().delete("deleteTaskLogEntryByScopeDefinitionId", params, TaskLogEntryEntityImpl.class);
+    }
+
+    @Override
+    public void deleteTaskLogEntriesByTaskId(String taskId) {
+        getDbSqlSession().delete("deleteTaskLogEntriesByTaskId", taskId, TaskLogEntryEntityImpl.class);
     }
 
     @Override

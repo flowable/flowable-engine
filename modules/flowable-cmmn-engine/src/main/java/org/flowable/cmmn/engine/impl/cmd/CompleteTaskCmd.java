@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
+import static org.flowable.cmmn.engine.impl.util.CommandContextUtil.getTaskService;
+
 import java.util.Map;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -50,7 +52,7 @@ public class CompleteTaskCmd implements Command<Void> {
             throw new FlowableIllegalArgumentException("Null task id");
         }
         
-        TaskEntity taskEntity = CommandContextUtil.getTaskService(commandContext).getTask(taskId);
+        TaskEntity taskEntity = getTaskService(commandContext).getTask(taskId);
         if (taskEntity == null) {
             throw new FlowableObjectNotFoundException("Could not find task entity for id " + taskId, TaskEntity.class);
         }
@@ -89,6 +91,10 @@ public class CompleteTaskCmd implements Command<Void> {
         if (CommandContextUtil.getTaskServiceConfiguration(commandContext).isEnableDatabaseEventLogging()) {
             TaskLogEntryEntity taskLogEntry = org.flowable.task.service.impl.util.CommandContextUtil.getTaskLogEntryEntityManager().create();
             taskLogEntry.setTaskId(taskEntity.getId());
+            taskLogEntry.setSubScopeId(taskEntity.getSubScopeId());
+            taskLogEntry.setScopeType(taskEntity.getScopeType());
+            taskLogEntry.setScopeId(taskEntity.getScopeId());
+            taskLogEntry.setScopeDefinitionId(taskEntity.getScopeDefinitionId());
             taskLogEntry.setTimeStamp(CommandContextUtil.getTaskServiceConfiguration(commandContext).getClock().getCurrentTime());
             taskLogEntry.setType(FlowableEngineEventType.TASK_COMPLETED.name());
             taskLogEntry.setUserId(Authentication.getAuthenticatedUserId());

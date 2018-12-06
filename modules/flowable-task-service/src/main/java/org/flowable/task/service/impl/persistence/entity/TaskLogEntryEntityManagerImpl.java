@@ -63,6 +63,21 @@ public class TaskLogEntryEntityManagerImpl extends AbstractEntityManager<TaskLog
     }
 
     @Override
+    public void deleteTaskLogEntriesForProcessDefinition(String processDefinitionId) {
+        getDataManager().deleteTaskLogEntriesByProcessDefinitionId(processDefinitionId);
+    }
+
+    @Override
+    public void deleteTaskLogEntriesForScopeDefinition(String scopeType, String scopeDefinitionId) {
+        getDataManager().deleteTaskLogEntriesByScopeDefinitionId(scopeType, scopeDefinitionId);
+    }
+
+    @Override
+    public void deleteTaskLogEntriesForTaskId(String taskId) {
+        getDataManager().deleteTaskLogEntriesByTaskId(taskId);
+    }
+
+    @Override
     public void createTaskLogEntry(TaskLogEntryBuilder taskLogEntryBuilder) {
         TaskLogEntryEntity taskLogEntryEntity = getDataManager().create();
         taskLogEntryEntity.setUserId(taskLogEntryBuilder.getUserId());
@@ -70,8 +85,10 @@ public class TaskLogEntryEntityManagerImpl extends AbstractEntityManager<TaskLog
         taskLogEntryEntity.setTaskId(taskLogEntryBuilder.getTaskId());
         taskLogEntryEntity.setTenantId(taskLogEntryBuilder.getTenantId());
         taskLogEntryEntity.setProcessInstanceId(taskLogEntryBuilder.getProcessInstanceId());
+        taskLogEntryEntity.setProcessDefinitionId(taskLogEntryBuilder.getProcessDefinitionId());
         taskLogEntryEntity.setExecutionId(taskLogEntryBuilder.getExecutionId());
         taskLogEntryEntity.setScopeId(taskLogEntryBuilder.getScopeId());
+        taskLogEntryEntity.setScopeDefinitionId(taskLogEntryBuilder.getScopeDefinitionId());
         taskLogEntryEntity.setSubScopeId(taskLogEntryBuilder.getSubScopeId());
         taskLogEntryEntity.setScopeType(taskLogEntryBuilder.getScopeType());
 

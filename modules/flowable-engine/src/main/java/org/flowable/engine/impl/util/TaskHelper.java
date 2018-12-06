@@ -112,10 +112,13 @@ public class TaskHelper {
         }
     }
 
-    protected static void logTaskCompleted(TaskEntity taskEntity, CommandContext commandContext) {
+    public static void logTaskCompleted(TaskEntity taskEntity, CommandContext commandContext) {
         if (CommandContextUtil.getTaskServiceConfiguration(commandContext).isEnableDatabaseEventLogging()) {
             TaskLogEntryEntity taskLogEntry = org.flowable.task.service.impl.util.CommandContextUtil.getTaskLogEntryEntityManager().create();
             taskLogEntry.setTaskId(taskEntity.getId());
+            taskLogEntry.setExecutionId(taskEntity.getExecutionId());
+            taskLogEntry.setProcessInstanceId(taskEntity.getProcessInstanceId());
+            taskLogEntry.setProcessDefinitionId(taskEntity.getProcessDefinitionId());
             taskLogEntry.setTimeStamp(CommandContextUtil.getTaskServiceConfiguration(commandContext).getClock().getCurrentTime());
             taskLogEntry.setType(FlowableEngineEventType.TASK_COMPLETED.name());
             taskLogEntry.setUserId(Authentication.getAuthenticatedUserId());
@@ -327,6 +330,7 @@ public class TaskHelper {
     protected static void handleTaskHistory(CommandContext commandContext, TaskEntity task, String deleteReason, boolean cascade) {
         if (cascade) {
             deleteHistoricTask(task.getId());
+            deleteHistoricTaskEventLogEntries(task.getId());
         } else {
             ExecutionEntity execution = null;
             if (task.getExecutionId() != null) {
@@ -375,6 +379,7 @@ public class TaskHelper {
             deleteTask(task, deleteReason, cascade, true, true);
         } else if (cascade) {
             deleteHistoricTask(taskId);
+            deleteHistoricTaskEventLogEntries(taskId);
         }
     }
 
@@ -435,6 +440,10 @@ public class TaskHelper {
                 historicTaskService.deleteHistoricTask(historicTaskInstance);
             }
         }
+    }
+
+    public static void deleteHistoricTaskEventLogEntries(String taskId) {
+        CommandContextUtil.getTaskService().deleteTaskLogEntriesForTaskId(taskId);
     }
 
     protected static void fireAssignmentEvents(TaskEntity taskEntity) {

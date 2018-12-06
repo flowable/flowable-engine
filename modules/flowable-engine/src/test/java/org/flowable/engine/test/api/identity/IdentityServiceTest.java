@@ -417,9 +417,8 @@ public class IdentityServiceTest extends PluggableFlowableTestCase {
             identityService.updateUserPassword(user);
             assertTrue(identityService.checkPassword("johndoe", "yyy"));
 
-            identityService.deleteUser("johndoe");
-
         } finally {
+            identityService.deleteUser("johndoe");
             idmEngineConfiguration.setPasswordEncoder(ClearTextPasswordEncoder.getInstance());
         }
     }

@@ -36,7 +36,7 @@ public class HistoryServiceDisableTaskLogTest {
     public void deleteTasks(TaskService taskService, HistoryService historyService) {
         if (task != null) {
             assertThat(taskService.createTaskLogEntryQuery().count()).isEqualTo(0l);
-            taskService.deleteTask(task.getId());
+            taskService.deleteTask(task.getId(), true);
         }
     }
 

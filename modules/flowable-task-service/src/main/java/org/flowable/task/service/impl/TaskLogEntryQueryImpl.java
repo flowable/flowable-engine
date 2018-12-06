@@ -30,7 +30,9 @@ public class TaskLogEntryQueryImpl extends AbstractQuery<TaskLogEntryQuery, Task
     protected String type;
     protected String userId;
     protected String processInstanceId;
+    protected String processDefinitionId;
     protected String scopeId;
+    protected String scopeDefinitionId;
     protected String subScopeId;
     protected String scopeType;
     protected Date fromDate;
@@ -38,6 +40,9 @@ public class TaskLogEntryQueryImpl extends AbstractQuery<TaskLogEntryQuery, Task
     protected String tenantId;
     protected long fromLogNumber = -1;
     protected long toLogNumber = -1;
+
+    public TaskLogEntryQueryImpl() {
+    }
 
     public TaskLogEntryQueryImpl(CommandExecutor commandExecutor) {
         super(commandExecutor);
@@ -66,13 +71,25 @@ public class TaskLogEntryQueryImpl extends AbstractQuery<TaskLogEntryQuery, Task
         this.processInstanceId = processInstanceId;
         return this;
     }
-    
+
+    @Override
+    public TaskLogEntryQuery processDefinitionId(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+        return this;
+    }
+
     @Override
     public TaskLogEntryQuery scopeId(String scopeId) {
         this.scopeId = scopeId;
         return this;
     }
     
+    @Override
+    public TaskLogEntryQuery scopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
+        return this;
+    }
+
     @Override
     public TaskLogEntryQuery subScopeId(String subScopeId) {
         this.subScopeId = subScopeId;
@@ -131,8 +148,16 @@ public class TaskLogEntryQueryImpl extends AbstractQuery<TaskLogEntryQuery, Task
         return processInstanceId;
     }
 
+    public String getProcessDefinitionId() {
+        return processDefinitionId;
+    }
+
     public String getScopeId() {
         return scopeId;
+    }
+
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
     }
 
     public String getSubScopeId() {

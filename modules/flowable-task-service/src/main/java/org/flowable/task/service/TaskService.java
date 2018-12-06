@@ -78,4 +78,10 @@ public interface TaskService {
     TaskLogEntryQuery createTaskLogEntryQuery(CommandExecutor commandExecutor);
 
     NativeTaskLogEntryQuery createNativeTaskLogEntryQuery(CommandExecutor commandExecutor);
+
+    void deleteTaskLogEntriesForProcessDefinition(String processDefinitionId);
+
+    void deleteTaskLogEntriesForScopeDefinition(String scopeType, String scopeDefinitionId);
+
+    void deleteTaskLogEntriesForTaskId(String taskId);
 }

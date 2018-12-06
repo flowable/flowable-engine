@@ -149,6 +149,21 @@ public class TaskServiceImpl extends CommonServiceImpl<TaskServiceConfiguration>
     }
 
     @Override
+    public void deleteTaskLogEntriesForProcessDefinition(String processDefinitionId) {
+        getTaskLogEntryEntityManager().deleteTaskLogEntriesForProcessDefinition(processDefinitionId);
+    }
+
+    @Override
+    public void deleteTaskLogEntriesForScopeDefinition(String scopeType, String scopeDefinitionId) {
+        getTaskLogEntryEntityManager().deleteTaskLogEntriesForScopeDefinition(scopeType, scopeDefinitionId);
+    }
+
+    @Override
+    public void deleteTaskLogEntriesForTaskId(String taskId) {
+        getTaskLogEntryEntityManager().deleteTaskLogEntriesForTaskId(taskId);
+    }
+
+    @Override
     public NativeTaskLogEntryQuery createNativeTaskLogEntryQuery(CommandExecutor commandExecutor) {
         return new NativeTaskLogEntryQueryImpl(commandExecutor);
     }

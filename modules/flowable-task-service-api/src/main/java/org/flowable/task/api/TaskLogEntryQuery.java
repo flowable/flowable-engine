@@ -31,7 +31,11 @@ public interface TaskLogEntryQuery extends Query<TaskLogEntryQuery, TaskLogEntry
 
     TaskLogEntryQuery processInstanceId(String processInstanceId);
 
+    TaskLogEntryQuery processDefinitionId(String processDefinitionId);
+
     TaskLogEntryQuery scopeId(String scopeId);
+
+    TaskLogEntryQuery scopeDefinitionId(String scopeDefinitionId);
 
     TaskLogEntryQuery subScopeId(String subScopeId);
 

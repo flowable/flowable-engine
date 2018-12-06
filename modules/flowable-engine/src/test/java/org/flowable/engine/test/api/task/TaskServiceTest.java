@@ -16,6 +16,7 @@ package org.flowable.engine.test.api.task;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNull.notNullValue;
 
@@ -47,6 +48,7 @@ import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Attachment;
@@ -698,10 +700,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         } finally {
             // Adhoc task not part of deployment, cleanup
             if (task != null && task.getId() != null) {
-                taskService.deleteTask(task.getId());
-                if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                    historyService.deleteHistoricTaskInstance(task.getId());
-                }
+                taskService.deleteTask(task.getId(), true);
             }
         }
     }
@@ -854,6 +853,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         // Fetch the task again
         task = taskService.createTaskQuery().taskId(taskId).singleResult();
         assertNull(task);
+
+        taskService.createTaskLogEntryQuery().list().forEach(taskLogEntry -> taskService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
     }
 
     @SuppressWarnings("unchecked")
@@ -872,6 +873,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         // Fetch the task again
         task = taskService.createTaskQuery().taskId(taskId).singleResult();
         assertNull(task);
+
+        taskService.createTaskLogEntryQuery().list().forEach(taskLogEntry -> taskService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
     }
 
     @Test
@@ -2125,13 +2128,6 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
         taskService.deleteTask(task.getId(), true);
         identityService.deleteUser(user.getId());
-    }
-
-    @Test
-    public void queryTaskLogEntriesWithoutLogging() {
-        assertThat(taskService.createTaskLogEntryQuery().list(), is(Collections.emptyList()));
-
-        assertThat(taskService.createTaskLogEntryQuery().count(), is(0l));
     }
 
     private static Set<IdentityLinkEntityImpl> getDefaultIdentityLinks() {

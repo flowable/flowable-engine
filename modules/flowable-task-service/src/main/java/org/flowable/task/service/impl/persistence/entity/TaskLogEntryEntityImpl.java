@@ -29,7 +29,9 @@ public class TaskLogEntryEntityImpl extends AbstractEntityNoRevision implements 
     protected byte[] data;
     protected String executionId;
     protected String processInstanceId;
+    protected String processDefinitionId;
     protected String scopeId;
+    protected String scopeDefinitionId;
     protected String subScopeId;
     protected String scopeType;
     protected String tenantId;
@@ -78,8 +80,18 @@ public class TaskLogEntryEntityImpl extends AbstractEntityNoRevision implements 
     }
 
     @Override
+    public void setProcessDefinitionId(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+    }
+
+    @Override
     public void setScopeId(String scopeId) {
         this.scopeId = scopeId;
+    }
+
+    @Override
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
     }
 
     @Override
@@ -148,8 +160,18 @@ public class TaskLogEntryEntityImpl extends AbstractEntityNoRevision implements 
     }
 
     @Override
+    public String getProcessDefinitionId() {
+        return processDefinitionId;
+    }
+
+    @Override
     public String getScopeId() {
         return scopeId;
+    }
+
+    @Override
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
     }
 
     @Override

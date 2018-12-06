@@ -241,13 +241,13 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
         this.taskDataManager = taskDataManager;
     }
 
-    protected byte[] serializeLogEntryData(Object... data) {
+    protected String serializeLogEntryData(Object... data) {
         try {
             Map<String, Object> dataToSerialize = new HashMap<>();
             for (int i = 0; i < data.length; i+=2) {
                 dataToSerialize.put((String) data[i], data[i+1]);
             }
-            return this.getTaskServiceConfiguration().getObjectMapper().writeValueAsBytes(dataToSerialize);
+            return this.getTaskServiceConfiguration().getObjectMapper().writeValueAsString(dataToSerialize);
         } catch (JsonProcessingException e) {
             LOGGER.warn("Could not serialize user task event data. Data will not be written to the database", e);
         }
@@ -302,7 +302,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
             taskLogEntry.setType(EVENT_USER_TASK_DUEDATE_CHANGED);
             taskLogEntry.setData(
                 serializeLogEntryData(
-                    "newDueDate", newDueDate.getTime(),
+                    "newDueDate", newDueDate != null ? newDueDate.getTime() : null,
                     "previousDueDate", previousDueDate != null ? previousDueDate.getTime() : null
                 )
             );
@@ -340,8 +340,10 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
         taskLogEntryEntity.setTaskId(task.getId());
         taskLogEntryEntity.setTenantId(task.getTenantId());
         taskLogEntryEntity.setProcessInstanceId(task.getProcessInstanceId());
+        taskLogEntryEntity.setProcessDefinitionId(task.getProcessDefinitionId());
         taskLogEntryEntity.setExecutionId(task.getExecutionId());
         taskLogEntryEntity.setScopeId(task.getScopeId());
+        taskLogEntryEntity.setScopeDefinitionId(task.getScopeDefinitionId());
         taskLogEntryEntity.setSubScopeId(task.getSubScopeId());
         taskLogEntryEntity.setScopeType(task.getScopeType());
 
