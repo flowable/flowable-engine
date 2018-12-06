@@ -29,7 +29,7 @@ public interface TaskLogEntry {
 
     String getUserId();
 
-    byte[] getData();
+    String getData();
 
     String getExecutionId();
 

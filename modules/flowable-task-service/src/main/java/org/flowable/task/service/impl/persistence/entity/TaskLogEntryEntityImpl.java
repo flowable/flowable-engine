@@ -26,7 +26,7 @@ public class TaskLogEntryEntityImpl extends AbstractEntityNoRevision implements 
     protected String taskId;
     protected Date timeStamp;
     protected String userId;
-    protected byte[] data;
+    protected String data;
     protected String executionId;
     protected String processInstanceId;
     protected String processDefinitionId;
@@ -65,7 +65,7 @@ public class TaskLogEntryEntityImpl extends AbstractEntityNoRevision implements 
     }
 
     @Override
-    public void setData(byte[] data) {
+    public void setData(String data) {
         this.data = data;
     }
 
@@ -145,7 +145,7 @@ public class TaskLogEntryEntityImpl extends AbstractEntityNoRevision implements 
     }
 
     @Override
-    public byte[] getData() {
+    public String getData() {
         return data;
     }
 
