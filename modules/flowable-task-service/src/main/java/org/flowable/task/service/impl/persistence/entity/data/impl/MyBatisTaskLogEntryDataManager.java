@@ -63,7 +63,7 @@ public class MyBatisTaskLogEntryDataManager extends AbstractDataManager<TaskLogE
         Map<String, String> params = new HashMap<>(2);
         params.put("scopeDefinitionId", scopeDefinitionId);
         params.put("scopeType", scopeType);
-        getDbSqlSession().delete("deleteTaskLogEntryByScopeDefinitionId", params, TaskLogEntryEntityImpl.class);
+        getDbSqlSession().delete("deleteTaskLogEntriesByScopeDefinitionId", params, TaskLogEntryEntityImpl.class);
     }
 
     @Override
