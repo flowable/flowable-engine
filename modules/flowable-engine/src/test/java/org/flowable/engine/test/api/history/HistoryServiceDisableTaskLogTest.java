@@ -17,8 +17,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.test.ConfigurationResource;
 import org.flowable.engine.test.FlowableTest;
+import org.flowable.engine.test.impl.CustomConfigurationFlowableTestCase;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -27,10 +29,18 @@ import org.junit.jupiter.api.Test;
  * @author martin.grofcik
  */
 @FlowableTest
-@ConfigurationResource("flowable.disable-usertask-log.cfg.xml")
-public class HistoryServiceDisableTaskLogTest {
+public class HistoryServiceDisableTaskLogTest extends CustomConfigurationFlowableTestCase {
 
     protected Task task;
+
+    public HistoryServiceDisableTaskLogTest() {
+        super(HistoryServiceDisableTaskLogTest.class.getName());
+    }
+
+    @Override
+    protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        processEngineConfiguration.setEnableUserTaskDatabaseEventLogging(false);
+    }
 
     @AfterEach
     public void deleteTasks(TaskService taskService, HistoryService historyService) {

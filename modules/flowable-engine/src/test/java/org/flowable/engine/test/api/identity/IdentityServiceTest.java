@@ -19,12 +19,15 @@ import java.util.List;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.test.impl.CustomConfigurationFlowableTestCase;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.Picture;
 import org.flowable.idm.api.User;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.IdmEngines;
+import org.flowable.idm.engine.configurator.IdmEngineConfigurator;
 import org.flowable.idm.engine.impl.authentication.ApacheDigester;
 import org.flowable.idm.engine.impl.authentication.ClearTextPasswordEncoder;
 import org.junit.jupiter.api.Test;
@@ -32,7 +35,18 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Frederik Heremans
  */
-public class IdentityServiceTest extends PluggableFlowableTestCase {
+public class IdentityServiceTest extends CustomConfigurationFlowableTestCase {
+
+    public IdentityServiceTest() {
+        super(IdentityServiceTest.class.getName());
+    }
+
+    @Override
+    protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        processEngineConfiguration.setIdmEngineConfigurator(
+            new PasswordEncoderIdmEngineConfigurator()
+        );
+    }
 
     @Test
     public void testUserInfo() {
@@ -390,10 +404,6 @@ public class IdentityServiceTest extends PluggableFlowableTestCase {
 
     @Test
     public void testChangePassword() {
-
-        IdmEngineConfiguration idmEngineConfiguration = IdmEngines.getDefaultIdmEngine().getIdmEngineConfiguration();
-        idmEngineConfiguration.setPasswordEncoder(new ApacheDigester(ApacheDigester.Digester.MD5));
-
         try {
             User user = identityService.newUser("johndoe");
             user.setPassword("xxx");
@@ -419,7 +429,6 @@ public class IdentityServiceTest extends PluggableFlowableTestCase {
 
         } finally {
             identityService.deleteUser("johndoe");
-            idmEngineConfiguration.setPasswordEncoder(ClearTextPasswordEncoder.getInstance());
         }
     }
 
