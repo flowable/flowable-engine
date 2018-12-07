@@ -141,7 +141,7 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
     @Override
     public void syncUserTaskExecution(ExecutionEntity executionEntity, FlowElement newFlowElement, String oldActivityId, TaskEntity task) {
         syncUserTaskExecutionActivityInstance(executionEntity, oldActivityId, newFlowElement);
-        getHistoryManager().syncUserTaskExecution(executionEntity, oldActivityId, newFlowElement, task);
+        getHistoryManager().updateActivity(executionEntity, oldActivityId, newFlowElement, task);
     }
 
     @Override

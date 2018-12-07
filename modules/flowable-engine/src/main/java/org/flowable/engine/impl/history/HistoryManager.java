@@ -220,7 +220,7 @@ public interface HistoryManager {
      * @param newFlowElement new flowElement
      * @param task new user task
      */
-    void syncUserTaskExecution(ExecutionEntity executionEntity, String oldActivityId, FlowElement newFlowElement, TaskEntity task);
+    void updateActivity(ExecutionEntity executionEntity, String oldActivityId, FlowElement newFlowElement, TaskEntity task);
 
     void updateHistoricActivityInstance(ActivityInstanceEntity activityInstance);
 }

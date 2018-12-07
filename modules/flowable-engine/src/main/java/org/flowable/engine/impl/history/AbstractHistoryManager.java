@@ -244,7 +244,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
     }
 
     @Override
-    public void syncUserTaskExecution(ExecutionEntity childExecution, String oldActivityId, FlowElement newFlowElement, TaskEntity task) {
+    public void updateActivity(ExecutionEntity childExecution, String oldActivityId, FlowElement newFlowElement, TaskEntity task) {
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager = CommandContextUtil.getHistoricActivityInstanceEntityManager();
             List<HistoricActivityInstanceEntity> historicActivityInstances = historicActivityInstanceEntityManager.findHistoricActivityInstancesByExecutionAndActivityId(childExecution.getId(), oldActivityId);
