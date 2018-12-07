@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Test;
 /**
  * @author martin.grofcik
  */
-@FlowableTest
 public class HistoryServiceDisableTaskLogTest extends CustomConfigurationFlowableTestCase {
 
     protected Task task;
@@ -43,7 +42,7 @@ public class HistoryServiceDisableTaskLogTest extends CustomConfigurationFlowabl
     }
 
     @AfterEach
-    public void deleteTasks(TaskService taskService, HistoryService historyService) {
+    public void deleteTasks() {
         if (task != null) {
             assertThat(taskService.createTaskLogEntryQuery().count()).isEqualTo(0l);
             taskService.deleteTask(task.getId(), true);
@@ -51,14 +50,14 @@ public class HistoryServiceDisableTaskLogTest extends CustomConfigurationFlowabl
     }
 
     @Test
-    public void createTaskEvent(TaskService taskService) {
+    public void createTaskEvent() {
         task = taskService.createTaskBuilder().
             assignee("testAssignee").
             create();
     }
 
     @Test
-    public void createTaskEventAsAuthenticatedUser(TaskService taskService) {
+    public void createTaskEventAsAuthenticatedUser() {
         String previousUserId = Authentication.getAuthenticatedUserId();
         Authentication.setAuthenticatedUserId("testUser");
         try {
