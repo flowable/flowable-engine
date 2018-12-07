@@ -1,5 +1,5 @@
 create table ACT_HI_TSK_LOG (
-  LOG_NR_             bigint      not null GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+  ID_                 bigint      not null GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
   TYPE_               varchar(64),
   TASK_ID_            varchar(64) not null,
   TIME_STAMP_         timestamp   not null,
@@ -15,6 +15,6 @@ create table ACT_HI_TSK_LOG (
   TENANT_ID_          varchar(255) default ''
 );
 
-create index ACT_IDX_HI_TASK_LOG_NUMBER on ACT_HI_TSK_LOG(LOG_NR_);
+create index ACT_IDX_HI_TASK_LOG_NUMBER on ACT_HI_TSK_LOG(ID_);
 
 update ACT_GE_PROPERTY set VALUE_ = '6.4.1.3' where NAME_ = 'task.schema.version';

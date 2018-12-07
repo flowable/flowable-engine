@@ -50,7 +50,7 @@
   </insert>
 
   <insert id="insertTaskLogEntry" databaseId="oracle" parameterType="org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntityImpl">
-    insert into ${prefix}ACT_HI_TSK_LOG(LOG_NR_, TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_,
+    insert into ${prefix}ACT_HI_TSK_LOG(ID_, TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_,
                                         SCOPE_ID_, SCOPE_DEFINITION_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_,
                                         TENANT_ID_, TIME_STAMP_, USER_ID_, DATA_)
     values (
@@ -77,7 +77,7 @@
   <insert id="bulkInsertTaskLogEntry" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL 
       <foreach collection="list" item="taskLog" index="index">
-        into ${prefix}ACT_HI_TSK_LOG(LOG_NR_, TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_,
+        into ${prefix}ACT_HI_TSK_LOG(ID_, TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_,
                                      SCOPE_ID_, SCOPE_DEFINITION_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_,
                                      TENANT_ID_, TIME_STAMP_, USER_ID_, DATA_, LOCK_OWNER_, LOCK_TIME_, IS_PROCESSED_) VALUES
             (${prefix}ACT_TASK_EVT_LOG_SEQ.nextVal,
@@ -101,8 +101,8 @@
   <!-- RESULTMAP -->
   
   <resultMap id="taskLogEntryResultMap" type="org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntityImpl">
-    <id property="logNumber" column="LOG_NR_" jdbcType="BIGINT" />
-    <result property="id" column="LOG_NR_" jdbcType="BIGINT" />
+    <id property="logNumber" column="ID_" jdbcType="BIGINT" />
+    <result property="id" column="ID_" jdbcType="BIGINT" />
     <result property="type" column="TYPE_" jdbcType="VARCHAR"/>
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR"/>
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR"/>
@@ -123,12 +123,12 @@
     <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
     select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectTaskLogEntriesByQueryCriteriaSql"/>
-    ORDER BY LOG_NR_ ASC
+    ${orderBy}
     <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
 
   <select id="selectTaskLogEntriesCountByQueryCriteria" parameterType="org.flowable.task.service.impl.TaskLogEntryQueryImpl" resultType="long">
-    select count(RES.LOG_NR_)
+    select count(RES.ID_)
     <include refid="selectTaskLogEntriesByQueryCriteriaSql"/>
   </select>
 
@@ -184,17 +184,17 @@
         and RES.TENANT_ID_ = #{tenantId}
       </if>
       <if test="fromLogNumber != -1">
-        and RES.LOG_NR_ &gt;= #{fromLogNumber}
+        and RES.ID_ &gt;= #{fromLogNumber}
       </if>
       <if test="toLogNumber != -1">
-        and RES.LOG_NR_ &lt;= #{toLogNumber}
+        and RES.ID_ &lt;= #{toLogNumber}
       </if>
     </where>
   </sql>
 
   <!-- DELETE -->
   <delete id="deleteTaskLogEntryByLogNumber" parameterType="long">
-    delete from ${prefix}ACT_HI_TSK_LOG where LOG_NR_ = #{logNr}
+    delete from ${prefix}ACT_HI_TSK_LOG where ID_ = #{logNr}
   </delete>
 
   <delete id="deleteTaskLogEntriesByProcessDefinitionId" parameterType="string">

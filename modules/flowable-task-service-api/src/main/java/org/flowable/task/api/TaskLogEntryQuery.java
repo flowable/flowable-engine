@@ -51,4 +51,7 @@ public interface TaskLogEntryQuery extends Query<TaskLogEntryQuery, TaskLogEntry
 
     TaskLogEntryQuery toLogNumber(long toLogNumber);
 
+    TaskLogEntryQuery orderByLogNumber();
+
+    TaskLogEntryQuery orderByTimeStamp();
 }

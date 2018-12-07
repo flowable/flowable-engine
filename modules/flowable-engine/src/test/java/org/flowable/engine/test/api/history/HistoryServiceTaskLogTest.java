@@ -869,4 +869,31 @@ public class HistoryServiceTaskLogTest {
                 );
         }
     }
+
+    @Test
+    public void queryForTaskLogOrderBy(TaskService taskService, ManagementService managementService) {
+        TaskLogEntryBuilder taskLogEntryBuilder = taskService.createTaskLogEntryBuilder();
+        taskLogEntryBuilder.taskId("1").timeStamp(new Date(0)).add();
+        taskLogEntryBuilder.taskId("2").timeStamp(new Date(2)).add();
+        taskLogEntryBuilder.taskId("3").timeStamp(new Date(1)).add();
+
+        try {
+
+            List<TaskLogEntry> taskLogEntries = taskService.createTaskLogEntryQuery().list();
+            assertThat(taskLogEntries).extracting(taskLogEntry -> taskLogEntry.getTaskId()).containsExactly("1", "2", "3");
+
+            taskLogEntries = taskService.createTaskLogEntryQuery().orderByLogNumber().desc().list();
+            assertThat(taskLogEntries).extracting(taskLogEntry -> taskLogEntry.getTaskId()).containsExactly("3", "2", "1");
+
+            taskLogEntries = taskService.createTaskLogEntryQuery().orderByTimeStamp().desc().list();
+            assertThat(taskLogEntries).extracting(taskLogEntry -> taskLogEntry.getTaskId()).containsExactly("2", "3", "1");
+
+        } finally {
+            taskService.createTaskLogEntryQuery().list().
+                forEach(
+                    logEntry -> taskService.deleteTaskLogEntry(logEntry.getLogNumber())
+                );
+        }
+    }
+
 }

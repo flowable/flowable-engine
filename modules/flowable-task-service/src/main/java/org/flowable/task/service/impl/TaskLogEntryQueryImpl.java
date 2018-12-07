@@ -41,9 +41,6 @@ public class TaskLogEntryQueryImpl extends AbstractQuery<TaskLogEntryQuery, Task
     protected long fromLogNumber = -1;
     protected long toLogNumber = -1;
 
-    public TaskLogEntryQueryImpl() {
-    }
-
     public TaskLogEntryQueryImpl(CommandExecutor commandExecutor) {
         super(commandExecutor);
     }
@@ -198,5 +195,16 @@ public class TaskLogEntryQueryImpl extends AbstractQuery<TaskLogEntryQuery, Task
     public List<TaskLogEntry> executeList(CommandContext commandContext) {
         checkQueryOk();
         return CommandContextUtil.getTaskLogEntryEntityManager(commandContext).findTaskLogEntriesByQueryCriteria(this);
+    }
+
+    @Override
+    public TaskLogEntryQuery orderByLogNumber() {
+        orderBy(TaskLogEntryQueryProperty.LOG_NUMBER);
+        return this;
+    }
+    @Override
+    public TaskLogEntryQuery orderByTimeStamp() {
+        orderBy(TaskLogEntryQueryProperty.TIME_STAMP);
+        return this;
     }
 }
