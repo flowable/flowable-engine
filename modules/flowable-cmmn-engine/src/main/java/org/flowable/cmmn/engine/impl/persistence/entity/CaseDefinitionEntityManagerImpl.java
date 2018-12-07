@@ -95,7 +95,7 @@ public class CaseDefinitionEntityManagerImpl extends AbstractCmmnEntityManager<C
         }
         
         if (cascadeHistory) {
-            CommandContextUtil.getTaskService().deleteTaskLogEntriesForScopeDefinition(caseDefinitionId, ScopeTypes.CMMN);
+            CommandContextUtil.getTaskService().deleteTaskLogEntriesForScopeDefinition(ScopeTypes.CMMN, caseDefinitionId);
 
             HistoricIdentityLinkEntityManager historicIdentityLinkEntityManager = getHistoricIdentityLinkEntityManager();
             historicIdentityLinkEntityManager.deleteHistoricIdentityLinksByScopeDefinitionIdAndScopeType(caseDefinitionId, ScopeTypes.CMMN);
