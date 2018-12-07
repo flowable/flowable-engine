@@ -36,7 +36,6 @@ import org.flowable.engine.impl.cmd.DeleteAttachmentCmd;
 import org.flowable.engine.impl.cmd.DeleteCommentCmd;
 import org.flowable.engine.impl.cmd.DeleteIdentityLinkCmd;
 import org.flowable.engine.impl.cmd.DeleteTaskCmd;
-import org.flowable.engine.impl.cmd.DeleteTaskLogEntryByLogNumberCmd;
 import org.flowable.engine.impl.cmd.GetAttachmentCmd;
 import org.flowable.engine.impl.cmd.GetAttachmentContentCmd;
 import org.flowable.engine.impl.cmd.GetCommentCmd;
@@ -76,18 +75,11 @@ import org.flowable.engine.task.Event;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
-import org.flowable.task.api.NativeTaskLogEntryQuery;
 import org.flowable.task.api.NativeTaskQuery;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
-import org.flowable.task.api.TaskInfo;
-import org.flowable.task.api.TaskLogEntryBuilder;
-import org.flowable.task.api.TaskLogEntryQuery;
 import org.flowable.task.api.TaskQuery;
-import org.flowable.task.service.impl.NativeTaskLogEntryQueryImpl;
 import org.flowable.task.service.impl.NativeTaskQueryImpl;
-import org.flowable.task.service.impl.TaskLogEntryBuilderImpl;
-import org.flowable.task.service.impl.TaskLogEntryQueryImpl;
 import org.flowable.task.service.impl.TaskQueryImpl;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
@@ -585,5 +577,4 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
     public TaskBuilder createTaskBuilder() {
         return new TaskBuilderImpl(commandExecutor);
     }
-
 }

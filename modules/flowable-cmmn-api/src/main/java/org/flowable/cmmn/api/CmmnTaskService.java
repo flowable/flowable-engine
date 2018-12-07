@@ -24,13 +24,8 @@ import org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.task.api.DelegationState;
-import org.flowable.task.api.NativeTaskLogEntryQuery;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
-import org.flowable.task.api.TaskInfo;
-import org.flowable.task.api.TaskLogEntry;
-import org.flowable.task.api.TaskLogEntryBuilder;
-import org.flowable.task.api.TaskLogEntryQuery;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
@@ -498,5 +493,4 @@ public interface CmmnTaskService {
      *             when the task or group doesn't exist.
      */
     void deleteGroupIdentityLink(String taskId, String groupId, String identityLinkType);
-
 }

@@ -15,11 +15,7 @@ package org.flowable.engine.test.api.history;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.common.engine.impl.identity.Authentication;
-import org.flowable.engine.HistoryService;
-import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.test.ConfigurationResource;
-import org.flowable.engine.test.FlowableTest;
 import org.flowable.engine.test.impl.CustomConfigurationFlowableTestCase;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;

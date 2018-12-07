@@ -20,16 +20,10 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.impl.CustomConfigurationFlowableTestCase;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.Picture;
 import org.flowable.idm.api.User;
-import org.flowable.idm.engine.IdmEngineConfiguration;
-import org.flowable.idm.engine.IdmEngines;
-import org.flowable.idm.engine.configurator.IdmEngineConfigurator;
-import org.flowable.idm.engine.impl.authentication.ApacheDigester;
-import org.flowable.idm.engine.impl.authentication.ClearTextPasswordEncoder;
 import org.junit.jupiter.api.Test;
 
 /**
