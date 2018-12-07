@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
@@ -60,12 +59,12 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void createTaskEvent(TaskService taskService) {
+    public void createTaskEvent(TaskService taskService, HistoryService historyService) {
         task = taskService.createTaskBuilder().
             assignee("testAssignee").
             create();
 
-        List<TaskLogEntry> taskLogsByTaskInstanceId = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+        List<TaskLogEntry> taskLogsByTaskInstanceId = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
         assertThat(
             taskLogsByTaskInstanceId
         ).size().isEqualTo(1);
@@ -80,11 +79,11 @@ public class HistoryServiceTaskLogTest {
             extracting(TaskLogEntry::getUserId).isNull();
 
         taskService.deleteTask(task.getId());
-        assertThat(taskService.createTaskLogEntryQuery().taskId(task.getId()).count()).isGreaterThan(0l);
+        assertThat(historyService.createTaskLogEntryQuery().taskId(task.getId()).count()).isGreaterThan(0l);
     }
 
     @Test
-    public void createTaskEventAsAuthenticatedUser(TaskService taskService) {
+    public void createTaskEventAsAuthenticatedUser(TaskService taskService, HistoryService historyService) {
         String previousUserId = Authentication.getAuthenticatedUserId();
         Authentication.setAuthenticatedUserId("testUser");
         try {
@@ -92,7 +91,7 @@ public class HistoryServiceTaskLogTest {
                 assignee("testAssignee").
                 create();
 
-            List<TaskLogEntry> taskLogsByTaskInstanceId = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+            List<TaskLogEntry> taskLogsByTaskInstanceId = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(
                 taskLogsByTaskInstanceId
             ).size().isEqualTo(1);
@@ -105,11 +104,11 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void queryForNonExistingTaskLogEntries(TaskService taskService) {
+    public void queryForNonExistingTaskLogEntries(TaskService taskService, HistoryService historyService) {
         task = taskService.createTaskBuilder().
             create();
 
-        List<TaskLogEntry> taskLogsByTaskInstanceId = taskService.createTaskLogEntryQuery().taskId("NON-EXISTING-TASK-ID").list();
+        List<TaskLogEntry> taskLogsByTaskInstanceId = historyService.createTaskLogEntryQuery().taskId("NON-EXISTING-TASK-ID").list();
 
         assertThat(
             taskLogsByTaskInstanceId
@@ -117,7 +116,7 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void queryForNullTaskLogEntries_returnsAll(TaskService taskService) {
+    public void queryForNullTaskLogEntries_returnsAll(TaskService taskService, HistoryService historyService) {
         Task taskA = taskService.createTaskBuilder().
             create();
         Task taskB = taskService.createTaskBuilder().
@@ -126,7 +125,7 @@ public class HistoryServiceTaskLogTest {
             create();
 
         try {
-            List<TaskLogEntry> taskLogsByTaskInstanceId = taskService.createTaskLogEntryQuery().taskId(null).list();
+            List<TaskLogEntry> taskLogsByTaskInstanceId = historyService.createTaskLogEntryQuery().taskId(null).list();
 
             assertThat(
                 taskLogsByTaskInstanceId
@@ -139,41 +138,41 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void deleteTaskEventLogEntry(TaskService taskService) {
+    public void deleteTaskEventLogEntry(TaskService taskService, HistoryService historyService) {
         task = taskService.createTaskBuilder().
             assignee("testAssignee").
             create();
-        List<TaskLogEntry> taskLogsByTaskInstanceId = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+        List<TaskLogEntry> taskLogsByTaskInstanceId = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
         assertThat(
             taskLogsByTaskInstanceId
         ).size().isEqualTo(1);
 
-        taskService.deleteTaskLogEntry(taskLogsByTaskInstanceId.get(0).getLogNumber());
+        historyService.deleteTaskLogEntry(taskLogsByTaskInstanceId.get(0).getLogNumber());
 
-        taskLogsByTaskInstanceId = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+        taskLogsByTaskInstanceId = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
         assertThat(
             taskLogsByTaskInstanceId
         ).isEmpty();
     }
 
     @Test
-    public void deleteNonExistingTaskEventLogEntry(TaskService taskService) {
+    public void deleteNonExistingTaskEventLogEntry(TaskService taskService, HistoryService historyService) {
         task = taskService.createTaskBuilder().
             create();
         // non existing log entry delete should be successful
-        taskService.deleteTaskLogEntry(Long.MIN_VALUE);
+        historyService.deleteTaskLogEntry(Long.MIN_VALUE);
 
-        assertThat(taskService.createTaskLogEntryQuery().taskId(task.getId()).list().size()).isEqualTo(1);
+        assertThat(historyService.createTaskLogEntryQuery().taskId(task.getId()).list().size()).isEqualTo(1);
     }
 
     @Test
-    public void taskAssigneeEvent(TaskService taskService) {
+    public void taskAssigneeEvent(TaskService taskService, HistoryService historyService) {
         task = taskService.createTaskBuilder().
             assignee("initialAssignee").
             create();
 
         taskService.setAssignee(task.getId(), "newAssignee");
-        List<TaskLogEntry> taskLogEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+        List<TaskLogEntry> taskLogEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
 
         assertThat(taskLogEntries).size().isEqualTo(2);
         assertThat(taskLogEntries.get(1)).
@@ -186,20 +185,20 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void changeAssigneeTaskEventAsAuthenticatedUser(TaskService taskService) {
+    public void changeAssigneeTaskEventAsAuthenticatedUser(TaskService taskService, HistoryService historyService) {
         assertThatAuthenticatedUserIsSet(taskService,
-            taskId -> taskService.setAssignee(taskId, "newAssignee")
+            historyService, taskId -> taskService.setAssignee(taskId, "newAssignee")
         );
     }
 
     @Test
-    public void taskOwnerEvent(TaskService taskService) {
+    public void taskOwnerEvent(TaskService taskService, HistoryService historyService) {
         task = taskService.createTaskBuilder().
             assignee("initialAssignee").
             create();
 
         taskService.setOwner(task.getId(), "newOwner");
-        List<TaskLogEntry> taskLogEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+        List<TaskLogEntry> taskLogEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
 
         assertThat(taskLogEntries).size().isEqualTo(2);
         assertThat(taskLogEntries.get(1)).
@@ -212,20 +211,20 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void changeOwnerTaskEventAsAuthenticatedUser(TaskService taskService) {
+    public void changeOwnerTaskEventAsAuthenticatedUser(TaskService taskService, HistoryService historyService) {
         assertThatAuthenticatedUserIsSet(taskService,
-            taskId -> taskService.setOwner(taskId, "newOwner")
+            historyService, taskId -> taskService.setOwner(taskId, "newOwner")
         );
     }
 
     @Test
-    public void claimTaskEvent(TaskService taskService) {
+    public void claimTaskEvent(TaskService taskService, HistoryService historyService) {
         task = taskService.createTaskBuilder().
             create();
 
         taskService.claim(task.getId(), "testUser");
 
-        List<TaskLogEntry> taskLogEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+        List<TaskLogEntry> taskLogEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
         assertThat(taskLogEntries).size().isEqualTo(2);
         assertThat(taskLogEntries.get(1)).
             extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
@@ -237,14 +236,14 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void unClaimTaskEvent(TaskService taskService) {
+    public void unClaimTaskEvent(TaskService taskService, HistoryService historyService) {
         task = taskService.createTaskBuilder().
             assignee("initialAssignee").
             create();
 
         taskService.unclaim(task.getId());
 
-        List<TaskLogEntry> taskLogEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+        List<TaskLogEntry> taskLogEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
         assertThat(taskLogEntries).size().isEqualTo(2);
         assertThat(taskLogEntries.get(1)).
             extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
@@ -256,12 +255,12 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void changePriority(TaskService taskService) {
+    public void changePriority(TaskService taskService, HistoryService historyService) {
         task = taskService.createTaskBuilder().
             create();
 
         taskService.setPriority(task.getId(), Integer.MAX_VALUE);
-        List<TaskLogEntry> taskLogEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+        List<TaskLogEntry> taskLogEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
 
         assertThat(taskLogEntries).size().isEqualTo(2);
         assertThat(taskLogEntries.get(1)).
@@ -274,13 +273,14 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void changePriorityEventAsAuthenticatedUser(TaskService taskService) {
+    public void changePriorityEventAsAuthenticatedUser(TaskService taskService, HistoryService historyService) {
         assertThatAuthenticatedUserIsSet(taskService,
-            taskId ->  taskService.setPriority(taskId, Integer.MAX_VALUE)
+            historyService, taskId ->  taskService.setPriority(taskId, Integer.MAX_VALUE)
         );
     }
 
-    protected void assertThatAuthenticatedUserIsSet(TaskService taskService, Consumer<String> functionToAssert) {
+    protected void assertThatAuthenticatedUserIsSet(TaskService taskService, HistoryService historyService,
+        Consumer<String> functionToAssert) {
         String previousUserId = Authentication.getAuthenticatedUserId();
         task = taskService.createTaskBuilder().
             assignee("testAssignee").
@@ -289,7 +289,7 @@ public class HistoryServiceTaskLogTest {
         try {
             functionToAssert.accept(task.getId());
 
-            List<TaskLogEntry> taskLogsByTaskInstanceId = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+            List<TaskLogEntry> taskLogsByTaskInstanceId = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(
                 taskLogsByTaskInstanceId
             ).size().isEqualTo(2);
@@ -302,12 +302,12 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void changeDueDate(TaskService taskService) {
+    public void changeDueDate(TaskService taskService, HistoryService historyService) {
         task = taskService.createTaskBuilder().
             create();
 
         taskService.setDueDate(task.getId(), new Date(0));
-        List<TaskLogEntry> taskLogEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+        List<TaskLogEntry> taskLogEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
 
         assertThat(taskLogEntries).size().isEqualTo(2);
         assertThat(taskLogEntries.get(1)).
@@ -320,7 +320,7 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void saveTask(TaskService taskService) {
+    public void saveTask(TaskService taskService, HistoryService historyService) {
         task = taskService.createTaskBuilder().
             create();
 
@@ -331,22 +331,22 @@ public class HistoryServiceTaskLogTest {
         task.setDueDate(new Date(0));
         taskService.saveTask(task);
 
-        List<TaskLogEntry> taskLogEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+        List<TaskLogEntry> taskLogEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
         assertThat(taskLogEntries).size().isEqualTo(6);
     }
 
     @Test
-    public void changeDueDateEventAsAuthenticatedUser(TaskService taskService) {
+    public void changeDueDateEventAsAuthenticatedUser(TaskService taskService, HistoryService historyService) {
         assertThatAuthenticatedUserIsSet(taskService,
-            taskId ->  taskService.setDueDate(taskId, new Date(0))
+            historyService, taskId ->  taskService.setDueDate(taskId, new Date(0))
         );
     }
 
     @Test
-    public void createCustomTaskEventLog(TaskService taskService) {
+    public void createCustomTaskEventLog(TaskService taskService, HistoryService historyService) {
         task = taskService.createTaskBuilder().
             create();
-        TaskLogEntryBuilder taskLogEntryBuilder = taskService.createTaskLogEntryBuilder(task);
+        TaskLogEntryBuilder taskLogEntryBuilder = historyService.createTaskLogEntryBuilder(task);
         taskLogEntryBuilder.
             timeStamp(new Date(0)).
             userId("testUser").
@@ -354,7 +354,7 @@ public class HistoryServiceTaskLogTest {
             data("testData").
             add();
 
-        List<TaskLogEntry> logEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+        List<TaskLogEntry> logEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
 
         MatcherAssert.assertThat(logEntries.size(), is(2));
         TaskLogEntry taskLogEntry = logEntries.get(1);
@@ -364,18 +364,18 @@ public class HistoryServiceTaskLogTest {
         assertThat(taskLogEntry.getType()).isEqualTo("customType");
         assertThat(taskLogEntry.getTimeStamp()).isEqualTo(new Date(0));
         assertThat(taskLogEntry.getData()).isEqualTo("testData");
-        taskService.deleteTaskLogEntry(logEntries.get(0).getLogNumber());
+        historyService.deleteTaskLogEntry(logEntries.get(0).getLogNumber());
     }
 
     @Test
-    public void createCustomTaskEventLog_taskIdIsEnoughToCreateTaskLogEntry(TaskService taskService) {
+    public void createCustomTaskEventLog_taskIdIsEnoughToCreateTaskLogEntry(TaskService taskService, HistoryService historyService) {
         task = taskService.createTaskBuilder().
             create();
 
-        TaskLogEntryBuilder taskLogEntryBuilder = taskService.createTaskLogEntryBuilder(task);
+        TaskLogEntryBuilder taskLogEntryBuilder = historyService.createTaskLogEntryBuilder(task);
         taskLogEntryBuilder.
             add();
-        List<TaskLogEntry> logEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+        List<TaskLogEntry> logEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
 
         MatcherAssert.assertThat(logEntries.size(), is(2));
         TaskLogEntry taskLogEntry = logEntries.get(1);
@@ -388,11 +388,11 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void createCustomTaskEventLog_withoutTimeStamp_addsDefault(TaskService taskService) {
+    public void createCustomTaskEventLog_withoutTimeStamp_addsDefault(TaskService taskService, HistoryService historyService) {
         task = taskService.createTaskBuilder().
             create();
 
-        TaskLogEntryBuilder taskLogEntryBuilder = taskService.createTaskLogEntryBuilder(task);
+        TaskLogEntryBuilder taskLogEntryBuilder = historyService.createTaskLogEntryBuilder(task);
 
         taskLogEntryBuilder.
             userId("testUser").
@@ -400,7 +400,7 @@ public class HistoryServiceTaskLogTest {
             data("testData").
             add();
 
-        List<TaskLogEntry> logEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+        List<TaskLogEntry> logEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
 
         MatcherAssert.assertThat(logEntries.size(), is(2));
         TaskLogEntry taskLogEntry = logEntries.get(1);
@@ -410,7 +410,7 @@ public class HistoryServiceTaskLogTest {
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
-    public void logSuspensionStateEvents(RuntimeService runtimeService, TaskService taskService) {
+    public void logSuspensionStateEvents(RuntimeService runtimeService, TaskService taskService, HistoryService historyService) {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertNotNull(processInstance);
 
@@ -419,7 +419,7 @@ public class HistoryServiceTaskLogTest {
             org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             assertNotNull(task);
 
-            List<TaskLogEntry> logEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+            List<TaskLogEntry> logEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(logEntries).size().isEqualTo(2);
             assertThat(logEntries.get(1)).
                 extracting(taskLogEntry -> taskLogEntry.getType()).isEqualTo("USER_TASK_SUSPENSIONSTATE_CHANGED")
@@ -427,17 +427,17 @@ public class HistoryServiceTaskLogTest {
 
             runtimeService.activateProcessInstanceById(processInstance.getId());
 
-            logEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+            logEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(logEntries).size().isEqualTo(3);
             assertThat(logEntries.get(2)).
                 extracting(taskLogEntry -> taskLogEntry.getType()).isEqualTo("USER_TASK_SUSPENSIONSTATE_CHANGED")
             ;
         } finally {
-            taskService.createTaskLogEntryQuery().taskId(
+            historyService.createTaskLogEntryQuery().taskId(
                 taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId()
             ).list().
                 forEach(
-                    logEntry -> taskService.deleteTaskLogEntry(logEntry.getLogNumber())
+                    logEntry -> historyService.deleteTaskLogEntry(logEntry.getLogNumber())
                 );
             runtimeService.deleteProcessInstance(processInstance.getId(), "clean up");
         }
@@ -445,7 +445,7 @@ public class HistoryServiceTaskLogTest {
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
-    public void logProcessTaskEvents(RuntimeService runtimeService, TaskService taskService) {
+    public void logProcessTaskEvents(RuntimeService runtimeService, TaskService taskService, HistoryService historyService) {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertNotNull(processInstance);
 
@@ -456,7 +456,7 @@ public class HistoryServiceTaskLogTest {
             taskService.setOwner(task.getId(), "newOwner");
             taskService.complete(task.getId());
 
-            List<TaskLogEntry> logEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+            List<TaskLogEntry> logEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(logEntries).size().isEqualTo(4);
             assertThat(logEntries.get(0)).
                 extracting(taskLogEntry -> taskLogEntry.getType()).isEqualTo("USER_TASK_CREATED")
@@ -486,7 +486,7 @@ public class HistoryServiceTaskLogTest {
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
-    public void logAddCandidateUser(RuntimeService runtimeService, TaskService taskService) {
+    public void logAddCandidateUser(RuntimeService runtimeService, TaskService taskService, HistoryService historyService) {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         try {
@@ -495,7 +495,7 @@ public class HistoryServiceTaskLogTest {
 
             taskService.addCandidateUser(task.getId(), "newCandidateUser");
 
-            List<TaskLogEntry> logEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+            List<TaskLogEntry> logEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(logEntries).size().isEqualTo(2);
             assertThat(logEntries.get(1)).
                 extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_ADDED");
@@ -511,7 +511,7 @@ public class HistoryServiceTaskLogTest {
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
-    public void logAddParticipantUser(RuntimeService runtimeService, TaskService taskService) {
+    public void logAddParticipantUser(RuntimeService runtimeService, TaskService taskService, HistoryService historyService) {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         try {
@@ -520,7 +520,7 @@ public class HistoryServiceTaskLogTest {
 
             taskService.addUserIdentityLink(task.getId(), "newCandidateUser", IdentityLinkType.PARTICIPANT);
 
-            List<TaskLogEntry> logEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+            List<TaskLogEntry> logEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(logEntries).size().isEqualTo(2);
             assertThat(logEntries.get(1)).
                 extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_ADDED");
@@ -536,7 +536,7 @@ public class HistoryServiceTaskLogTest {
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
-    public void logAddCandidateGroup(RuntimeService runtimeService, TaskService taskService) {
+    public void logAddCandidateGroup(RuntimeService runtimeService, TaskService taskService, HistoryService historyService) {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertNotNull(processInstance);
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -545,7 +545,7 @@ public class HistoryServiceTaskLogTest {
 
             taskService.addCandidateGroup(task.getId(), "newCandidateGroup");
 
-            List<TaskLogEntry> logEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+            List<TaskLogEntry> logEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(logEntries).size().isEqualTo(2);
             assertThat(logEntries.get(1)).
                 extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_ADDED");
@@ -561,7 +561,7 @@ public class HistoryServiceTaskLogTest {
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
-    public void logAddGroup(RuntimeService runtimeService, TaskService taskService) {
+    public void logAddGroup(RuntimeService runtimeService, TaskService taskService, HistoryService historyService) {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertNotNull(processInstance);
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -570,7 +570,7 @@ public class HistoryServiceTaskLogTest {
 
             taskService.addGroupIdentityLink(task.getId(), "newCandidateGroup", IdentityLinkType.PARTICIPANT);
 
-            List<TaskLogEntry> logEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+            List<TaskLogEntry> logEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(logEntries).size().isEqualTo(2);
             assertThat(logEntries.get(1)).
                 extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_ADDED");
@@ -586,7 +586,7 @@ public class HistoryServiceTaskLogTest {
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
-    public void logDeleteCandidateGroup(RuntimeService runtimeService, TaskService taskService) {
+    public void logDeleteCandidateGroup(RuntimeService runtimeService, TaskService taskService, HistoryService historyService) {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertNotNull(processInstance);
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -596,7 +596,7 @@ public class HistoryServiceTaskLogTest {
 
             taskService.deleteCandidateGroup(task.getId(), "newCandidateGroup");
 
-            List<TaskLogEntry> logEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+            List<TaskLogEntry> logEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(logEntries).size().isEqualTo(3);
             assertThat(logEntries.get(2)).
                 extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_REMOVED");
@@ -612,7 +612,7 @@ public class HistoryServiceTaskLogTest {
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
-    public void logDeleteCandidateUser(RuntimeService runtimeService, TaskService taskService) {
+    public void logDeleteCandidateUser(RuntimeService runtimeService, TaskService taskService, HistoryService historyService) {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(processInstance);
@@ -621,7 +621,7 @@ public class HistoryServiceTaskLogTest {
 
         try {
             taskService.deleteCandidateUser(task.getId(), "newCandidateUser");
-            List<TaskLogEntry> logEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+            List<TaskLogEntry> logEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(logEntries).size().isEqualTo(3);
             assertThat(logEntries.get(2)).
                 extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_REMOVED");
@@ -637,12 +637,12 @@ public class HistoryServiceTaskLogTest {
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/task/TaskIdentityLinksTest.testCustomIdentityLink.bpmn20.xml")
-    public void logIdentityLinkEventsForProcessIdentityLinks(RuntimeService runtimeService, TaskService taskService) {
+    public void logIdentityLinkEventsForProcessIdentityLinks(RuntimeService runtimeService, TaskService taskService, HistoryService historyService) {
         runtimeService.startProcessInstanceByKey("customIdentityLink");
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskInvolvedUser("kermit").list();
         assertThat(tasks).size().isEqualTo(1);
         task = tasks.get(0);
-        List<TaskLogEntry> logEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+        List<TaskLogEntry> logEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
         // create, identityLinkAdded, identityLinkAdded
         assertThat(logEntries).size().isEqualTo(3);
 
@@ -660,7 +660,7 @@ public class HistoryServiceTaskLogTest {
         );
 
         taskService.complete(tasks.get(0).getId());
-        logEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+        logEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
         // + completed event. Do not expect identity link removed events
         assertThat(logEntries).size().isEqualTo(4);
         assertThat(logEntries.get(3)).
@@ -668,19 +668,19 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void queryForTaskLogEntriesByTasKId(TaskService taskService) {
+    public void queryForTaskLogEntriesByTasKId(TaskService taskService, HistoryService historyService) {
         task = taskService.createTaskBuilder().
             assignee("testAssignee").
             create();
         Task anotherTask = taskService.createTaskBuilder().create();
 
         try {
-            List<TaskLogEntry> logEntries = taskService.createTaskLogEntryQuery().taskId(task.getId()).list();
+            List<TaskLogEntry> logEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(logEntries.size()).isEqualTo(1);
             assertThat(logEntries.get(0)).extracting(TaskLogEntry::getTaskId).isEqualTo(task.getId());
 
             assertThat(
-                taskService.createTaskLogEntryQuery().taskId(task.getId()).count()
+                historyService.createTaskLogEntryQuery().taskId(task.getId()).count()
             ).isEqualTo(1l);
         } finally {
             deleteTaskWithLogEntries(taskService, anotherTask.getId());
@@ -688,10 +688,10 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void queryForTaskLogEntriesByUserId(TaskService taskService) {
+    public void queryForTaskLogEntriesByUserId(TaskService taskService, HistoryService historyService) {
         assertThatTaskLogIsFetched(taskService,
-            taskService.createTaskLogEntryBuilder().userId("testUser"),
-            taskService.createTaskLogEntryQuery().userId("testUser")
+            historyService.createTaskLogEntryBuilder().userId("testUser"),
+            historyService.createTaskLogEntryQuery().userId("testUser")
         );
     }
 
@@ -722,108 +722,108 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void queryForTaskLogEntriesByType(TaskService taskService) {
+    public void queryForTaskLogEntriesByType(TaskService taskService, HistoryService historyService) {
         assertThatTaskLogIsFetched(taskService,
-            taskService.createTaskLogEntryBuilder().type("testType"),
-            taskService.createTaskLogEntryQuery().type("testType")
+            historyService.createTaskLogEntryBuilder().type("testType"),
+            historyService.createTaskLogEntryQuery().type("testType")
         );
     }
 
     @Test
-    public void queryForTaskLogEntriesByProcessInstanceId(TaskService taskService) {
+    public void queryForTaskLogEntriesByProcessInstanceId(TaskService taskService, HistoryService historyService) {
         assertThatTaskLogIsFetched(taskService,
-            taskService.createTaskLogEntryBuilder().processInstanceId("testProcess"),
-            taskService.createTaskLogEntryQuery().processInstanceId("testProcess")
+            historyService.createTaskLogEntryBuilder().processInstanceId("testProcess"),
+            historyService.createTaskLogEntryQuery().processInstanceId("testProcess")
         );
     }
 
     @Test
-    public void queryForTaskLogEntriesByScopeId(TaskService taskService) {
+    public void queryForTaskLogEntriesByScopeId(TaskService taskService, HistoryService historyService) {
         assertThatTaskLogIsFetched(taskService,
-            taskService.createTaskLogEntryBuilder().scopeId("testScopeId"),
-            taskService.createTaskLogEntryQuery().scopeId("testScopeId")
+            historyService.createTaskLogEntryBuilder().scopeId("testScopeId"),
+            historyService.createTaskLogEntryQuery().scopeId("testScopeId")
         );
     }
 
     @Test
-    public void queryForTaskLogEntriesBySubScopeId(TaskService taskService) {
+    public void queryForTaskLogEntriesBySubScopeId(TaskService taskService, HistoryService historyService) {
         assertThatTaskLogIsFetched(taskService,
-            taskService.createTaskLogEntryBuilder().subScopeId("testSubScopeId"),
-            taskService.createTaskLogEntryQuery().subScopeId("testSubScopeId")
+            historyService.createTaskLogEntryBuilder().subScopeId("testSubScopeId"),
+            historyService.createTaskLogEntryQuery().subScopeId("testSubScopeId")
         );
     }
 
     @Test
-    public void queryForTaskLogEntriesByScopeType(TaskService taskService) {
+    public void queryForTaskLogEntriesByScopeType(TaskService taskService, HistoryService historyService) {
         assertThatTaskLogIsFetched(taskService,
-            taskService.createTaskLogEntryBuilder().scopeType("testScopeType"),
-            taskService.createTaskLogEntryQuery().scopeType("testScopeType")
+            historyService.createTaskLogEntryBuilder().scopeType("testScopeType"),
+            historyService.createTaskLogEntryQuery().scopeType("testScopeType")
         );
     }
 
     @Test
-    public void queryForTaskLogEntriesByFromTimeStamp(TaskService taskService) {
+    public void queryForTaskLogEntriesByFromTimeStamp(TaskService taskService, HistoryService historyService) {
         assertThatTaskLogIsFetched(taskService,
-            taskService.createTaskLogEntryBuilder().timeStamp(new Date(Long.MAX_VALUE / 2)),
-            taskService.createTaskLogEntryQuery().from(new Date(Long.MAX_VALUE / 2 - 1))
+            historyService.createTaskLogEntryBuilder().timeStamp(new Date(Long.MAX_VALUE / 2)),
+            historyService.createTaskLogEntryQuery().from(new Date(Long.MAX_VALUE / 2 - 1))
         );
     }
 
     @Test
-    public void queryForTaskLogEntriesByFromIncludedTimeStamp(TaskService taskService) {
+    public void queryForTaskLogEntriesByFromIncludedTimeStamp(TaskService taskService, HistoryService historyService) {
         assertThatTaskLogIsFetched(taskService,
-            taskService.createTaskLogEntryBuilder().timeStamp(new Date(Long.MAX_VALUE / 2)),
-            taskService.createTaskLogEntryQuery().from(new Date(Long.MAX_VALUE / 2))
+            historyService.createTaskLogEntryBuilder().timeStamp(new Date(Long.MAX_VALUE / 2)),
+            historyService.createTaskLogEntryQuery().from(new Date(Long.MAX_VALUE / 2))
         );
     }
 
     @Test
-    public void queryForTaskLogEntriesByToTimeStamp(TaskService taskService) {
+    public void queryForTaskLogEntriesByToTimeStamp(TaskService taskService, HistoryService historyService) {
         assertThatTaskLogIsFetched(taskService,
-            taskService.createTaskLogEntryBuilder().timeStamp(new Date(0)),
-            taskService.createTaskLogEntryQuery().to(new Date(1))
+            historyService.createTaskLogEntryBuilder().timeStamp(new Date(0)),
+            historyService.createTaskLogEntryQuery().to(new Date(1))
         );
     }
 
     @Test
-    public void queryForTaskLogEntriesByToIncludedTimeStamp(TaskService taskService) {
+    public void queryForTaskLogEntriesByToIncludedTimeStamp(TaskService taskService, HistoryService historyService) {
         assertThatTaskLogIsFetched(taskService,
-            taskService.createTaskLogEntryBuilder().timeStamp(new Date(0)),
-            taskService.createTaskLogEntryQuery().to(new Date(1))
+            historyService.createTaskLogEntryBuilder().timeStamp(new Date(0)),
+            historyService.createTaskLogEntryQuery().to(new Date(1))
         );
     }
 
     @Test
-    public void queryForTaskLogEntriesByFromToTimeStamp(TaskService taskService) {
+    public void queryForTaskLogEntriesByFromToTimeStamp(TaskService taskService, HistoryService historyService) {
         assertThatTaskLogIsFetched(taskService,
-            taskService.createTaskLogEntryBuilder().timeStamp(new Date(0)),
-            taskService.createTaskLogEntryQuery().from(new Date(-1)).to(new Date(1))
+            historyService.createTaskLogEntryBuilder().timeStamp(new Date(0)),
+            historyService.createTaskLogEntryQuery().from(new Date(-1)).to(new Date(1))
         );
     }
 
     @Test
-    public void queryForTaskLogEntriesByTenantId(TaskService taskService) {
+    public void queryForTaskLogEntriesByTenantId(TaskService taskService, HistoryService historyService) {
         assertThatTaskLogIsFetched(taskService,
-            taskService.createTaskLogEntryBuilder().timeStamp(new Date(0)),
-            taskService.createTaskLogEntryQuery().from(new Date(-1)).to(new Date(1))
+            historyService.createTaskLogEntryBuilder().timeStamp(new Date(0)),
+            historyService.createTaskLogEntryQuery().from(new Date(-1)).to(new Date(1))
         );
     }
 
     @Test
-    public void queryForTaskLogEntriesByLogNumber(TaskService taskService) {
+    public void queryForTaskLogEntriesByLogNumber(TaskService taskService, HistoryService historyService) {
         task = taskService.createTaskBuilder().
             assignee("testAssignee").
             create();
         Task anotherTask = taskService.createTaskBuilder().create();
-        TaskLogEntryBuilder taskLogEntryBuilder = taskService.createTaskLogEntryBuilder();
+        TaskLogEntryBuilder taskLogEntryBuilder = historyService.createTaskLogEntryBuilder();
         taskLogEntryBuilder.taskId(task.getId()).add();
         taskLogEntryBuilder.taskId(task.getId()).add();
         taskLogEntryBuilder.taskId(task.getId()).add();
 
-        List<TaskLogEntry> allLogEntries = taskService.createTaskLogEntryQuery().list();
+        List<TaskLogEntry> allLogEntries = historyService.createTaskLogEntryQuery().list();
 
         try {
-            TaskLogEntryQuery taskLogEntryQuery = taskService.createTaskLogEntryQuery().
+            TaskLogEntryQuery taskLogEntryQuery = historyService.createTaskLogEntryQuery().
                 fromLogNumber(allLogEntries.get(1).getLogNumber()).
                 toLogNumber(allLogEntries.get(allLogEntries.size() - 2).getLogNumber());
             List<TaskLogEntry> logEntries = taskLogEntryQuery.
@@ -844,54 +844,54 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void queryForTaskLogEntriesByNativeQuery(TaskService taskService, ManagementService managementService) {
+    public void queryForTaskLogEntriesByNativeQuery(TaskService taskService, HistoryService historyService, ManagementService managementService) {
         assertEquals("ACT_HI_TSK_LOG", managementService.getTableName(TaskLogEntryEntity.class));
         assertEquals("ACT_HI_TSK_LOG", managementService.getTableName(TaskLogEntry.class));
-        TaskLogEntryBuilder taskLogEntryBuilder = taskService.createTaskLogEntryBuilder();
+        TaskLogEntryBuilder taskLogEntryBuilder = historyService.createTaskLogEntryBuilder();
         taskLogEntryBuilder.taskId("1").add();
         taskLogEntryBuilder.taskId("2").add();
         taskLogEntryBuilder.taskId("3").add();
 
         try {
             assertEquals(3,
-                taskService.createNativeTaskLogEntryQuery().sql("SELECT * FROM " + managementService.getTableName(TaskLogEntry.class)).list().size());
+                historyService.createNativeTaskLogEntryQuery().sql("SELECT * FROM " + managementService.getTableName(TaskLogEntry.class)).list().size());
             assertEquals(3,
-                taskService.createNativeTaskLogEntryQuery().sql("SELECT count(*) FROM " + managementService.getTableName(TaskLogEntry.class)).count());
+                historyService.createNativeTaskLogEntryQuery().sql("SELECT count(*) FROM " + managementService.getTableName(TaskLogEntry.class)).count());
 
-            assertEquals(1, taskService.createNativeTaskLogEntryQuery().parameter("taskId", "1").
+            assertEquals(1, historyService.createNativeTaskLogEntryQuery().parameter("taskId", "1").
                 sql("SELECT count(*) FROM " + managementService.getTableName(TaskLogEntry.class) + " WHERE TASK_ID_ = #{taskId}").list().size());
-            assertEquals(1, taskService.createNativeTaskLogEntryQuery().parameter("taskId", "1").
+            assertEquals(1, historyService.createNativeTaskLogEntryQuery().parameter("taskId", "1").
                 sql("SELECT count(*) FROM " + managementService.getTableName(TaskLogEntry.class) + " WHERE TASK_ID_ = #{taskId}").count());
         } finally {
-            taskService.createTaskLogEntryQuery().list().
+            historyService.createTaskLogEntryQuery().list().
                 forEach(
-                    logEntry -> taskService.deleteTaskLogEntry(logEntry.getLogNumber())
+                    logEntry -> historyService.deleteTaskLogEntry(logEntry.getLogNumber())
                 );
         }
     }
 
     @Test
-    public void queryForTaskLogOrderBy(TaskService taskService, ManagementService managementService) {
-        TaskLogEntryBuilder taskLogEntryBuilder = taskService.createTaskLogEntryBuilder();
+    public void queryForTaskLogOrderBy(TaskService taskService, HistoryService historyService, ManagementService managementService) {
+        TaskLogEntryBuilder taskLogEntryBuilder = historyService.createTaskLogEntryBuilder();
         taskLogEntryBuilder.taskId("1").timeStamp(new Date(0)).add();
         taskLogEntryBuilder.taskId("2").timeStamp(new Date(2)).add();
         taskLogEntryBuilder.taskId("3").timeStamp(new Date(1)).add();
 
         try {
 
-            List<TaskLogEntry> taskLogEntries = taskService.createTaskLogEntryQuery().list();
+            List<TaskLogEntry> taskLogEntries = historyService.createTaskLogEntryQuery().list();
             assertThat(taskLogEntries).extracting(taskLogEntry -> taskLogEntry.getTaskId()).containsExactly("1", "2", "3");
 
-            taskLogEntries = taskService.createTaskLogEntryQuery().orderByLogNumber().desc().list();
+            taskLogEntries = historyService.createTaskLogEntryQuery().orderByLogNumber().desc().list();
             assertThat(taskLogEntries).extracting(taskLogEntry -> taskLogEntry.getTaskId()).containsExactly("3", "2", "1");
 
-            taskLogEntries = taskService.createTaskLogEntryQuery().orderByTimeStamp().desc().list();
+            taskLogEntries = historyService.createTaskLogEntryQuery().orderByTimeStamp().desc().list();
             assertThat(taskLogEntries).extracting(taskLogEntry -> taskLogEntry.getTaskId()).containsExactly("2", "3", "1");
 
         } finally {
-            taskService.createTaskLogEntryQuery().list().
+            historyService.createTaskLogEntryQuery().list().
                 forEach(
-                    logEntry -> taskService.deleteTaskLogEntry(logEntry.getLogNumber())
+                    logEntry -> historyService.deleteTaskLogEntry(logEntry.getLogNumber())
                 );
         }
     }

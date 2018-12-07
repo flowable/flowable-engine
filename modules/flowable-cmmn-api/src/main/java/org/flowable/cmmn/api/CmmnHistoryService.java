@@ -21,6 +21,11 @@ import org.flowable.cmmn.api.history.HistoricVariableInstanceQuery;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.task.api.NativeTaskLogEntryQuery;
+import org.flowable.task.api.TaskInfo;
+import org.flowable.task.api.TaskLogEntry;
+import org.flowable.task.api.TaskLogEntryBuilder;
+import org.flowable.task.api.TaskLogEntryQuery;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 
 /**
@@ -62,4 +67,35 @@ public interface CmmnHistoryService {
      * Retrieves the {@link HistoricEntityLink}s associated with the given case instance.
      */
     List<HistoricEntityLink> getHistoricEntityLinkChildrenForCaseInstance(String caseInstanceId);
+
+    /**
+     * Deletes user task log entry by its log number
+     *
+     * @param logNumber user task log entry identifier
+     */
+    void deleteTaskLogEntry(long logNumber);
+
+    /**
+     * Create new task log entry builder to the log task event
+     *
+     * @param task to which is log related to
+     */
+    TaskLogEntryBuilder createTaskLogEntryBuilder(TaskInfo task);
+
+    /**
+     * Create new task log entry builder to the log task event without predefined values from the task
+     *
+     */
+    TaskLogEntryBuilder createTaskLogEntryBuilder();
+
+    /**
+     * Returns a new {@link TaskLogEntryQuery} that can be used to dynamically query task log entries.
+     */
+    TaskLogEntryQuery createTaskLogEntryQuery();
+
+    /**
+     * Returns a new {@link NativeTaskLogEntryQuery} for {@link TaskLogEntry}s.
+     */
+    NativeTaskLogEntryQuery createNativeTaskLogEntryQuery();
+
 }

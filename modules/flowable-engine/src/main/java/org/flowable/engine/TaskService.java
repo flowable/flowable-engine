@@ -844,34 +844,4 @@ public interface TaskService {
     /** The list of subtasks for this parent task */
     List<Task> getSubTasks(String parentTaskId);
 
-    /**
-     * Deletes user task log entry by its log number
-     *
-     * @param logNumber user task log entry identifier
-     */
-    void deleteTaskLogEntry(long logNumber);
-
-    /**
-     * Create new task log entry builder to the log task event
-     *
-     * @param task to which is log related to
-     */
-    TaskLogEntryBuilder createTaskLogEntryBuilder(TaskInfo task);
-
-    /**
-     * Create new task log entry builder to the log task event without predefined values from the task
-     *
-     */
-    TaskLogEntryBuilder createTaskLogEntryBuilder();
-
-    /**
-     * Returns a new {@link TaskLogEntryQuery} that can be used to dynamically query task log entries.
-     */
-    TaskLogEntryQuery createTaskLogEntryQuery();
-
-    /**
-     * Returns a new {@link NativeTaskLogEntryQuery} for {@link TaskLogEntry}s.
-     */
-    NativeTaskLogEntryQuery createNativeTaskLogEntryQuery();
-
 }

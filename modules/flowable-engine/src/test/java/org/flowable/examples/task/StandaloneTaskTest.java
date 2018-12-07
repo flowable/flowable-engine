@@ -183,7 +183,7 @@ public class StandaloneTaskTest extends PluggableFlowableTestCase {
 
             // Cleanup
             historyService.deleteHistoricTaskInstance(task.getId());
-            taskService.createTaskLogEntryQuery().taskId(task.getId()).list().forEach(taskLogEntry -> taskService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
+            historyService.createTaskLogEntryQuery().taskId(task.getId()).list().forEach(taskLogEntry -> historyService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
         }
     }
 

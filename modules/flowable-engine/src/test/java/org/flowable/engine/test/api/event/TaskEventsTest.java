@@ -258,7 +258,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
                     taskService.deleteTask(taskId);
                 }
                 historyService.deleteHistoricTaskInstance(taskId);
-                taskService.createTaskLogEntryQuery().list().forEach(taskLogEntry -> taskService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
+                historyService.createTaskLogEntryQuery().list().forEach(taskLogEntry -> historyService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
             }
         }
     }
@@ -411,7 +411,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
                     taskService.deleteTask(taskId);
                 }
                 historyService.deleteHistoricTaskInstance(taskId);
-                taskService.createTaskLogEntryQuery().list().forEach(taskLogEntry -> taskService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
+                historyService.createTaskLogEntryQuery().list().forEach(taskLogEntry -> historyService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
             }
         }
     }

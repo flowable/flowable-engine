@@ -64,24 +64,4 @@ public interface TaskService {
     
     void deleteTasksByExecutionId(String executionId);
 
-    void deleteTaskLogEntry(long taskLogNumber);
-
-    /**
-     * Log new entry to the task log.
-     *
-     * @param logEntry log entry to add
-     */
-    void addTaskLogEntry(TaskLogEntry logEntry);
-
-    void createTaskLogEntry(TaskLogEntryBuilder taskLogEntryBuilder);
-
-    TaskLogEntryQuery createTaskLogEntryQuery(CommandExecutor commandExecutor);
-
-    NativeTaskLogEntryQuery createNativeTaskLogEntryQuery(CommandExecutor commandExecutor);
-
-    void deleteTaskLogEntriesForProcessDefinition(String processDefinitionId);
-
-    void deleteTaskLogEntriesForScopeDefinition(String scopeType, String scopeDefinitionId);
-
-    void deleteTaskLogEntriesForTaskId(String taskId);
 }

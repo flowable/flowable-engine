@@ -28,6 +28,7 @@ import org.flowable.engine.history.ProcessInstanceHistoryLogQuery;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.DeleteHistoricProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.DeleteHistoricTaskInstanceCmd;
+import org.flowable.engine.impl.cmd.DeleteTaskLogEntryByLogNumberCmd;
 import org.flowable.engine.impl.cmd.GetHistoricEntityLinkChildrenForProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.GetHistoricEntityLinkChildrenForTaskCmd;
 import org.flowable.engine.impl.cmd.GetHistoricEntityLinkParentForProcessInstanceCmd;
@@ -35,10 +36,17 @@ import org.flowable.engine.impl.cmd.GetHistoricEntityLinkParentForTaskCmd;
 import org.flowable.engine.impl.cmd.GetHistoricIdentityLinksForTaskCmd;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.task.api.NativeTaskLogEntryQuery;
+import org.flowable.task.api.TaskInfo;
+import org.flowable.task.api.TaskLogEntryBuilder;
+import org.flowable.task.api.TaskLogEntryQuery;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.service.history.NativeHistoricTaskInstanceQuery;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
 import org.flowable.task.service.impl.NativeHistoricTaskInstanceQueryImpl;
+import org.flowable.task.service.impl.NativeTaskLogEntryQueryImpl;
+import org.flowable.task.service.impl.TaskLogEntryBuilderImpl;
+import org.flowable.task.service.impl.TaskLogEntryQueryImpl;
 import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
 import org.flowable.variable.api.history.NativeHistoricVariableInstanceQuery;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
@@ -148,6 +156,31 @@ public class HistoryServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     @Override
     public ProcessInstanceHistoryLogQuery createProcessInstanceHistoryLogQuery(String processInstanceId) {
         return new ProcessInstanceHistoryLogQueryImpl(commandExecutor, processInstanceId);
+    }
+
+    @Override
+    public void deleteTaskLogEntry(long logNumber) {
+        commandExecutor.execute(new DeleteTaskLogEntryByLogNumberCmd(logNumber));
+    }
+
+    @Override
+    public TaskLogEntryBuilder createTaskLogEntryBuilder(TaskInfo task) {
+        return new TaskLogEntryBuilderImpl(commandExecutor, task);
+    }
+
+    @Override
+    public TaskLogEntryBuilder createTaskLogEntryBuilder() {
+        return new TaskLogEntryBuilderImpl(commandExecutor);
+    }
+
+    @Override
+    public TaskLogEntryQuery createTaskLogEntryQuery() {
+        return new TaskLogEntryQueryImpl(commandExecutor);
+    }
+
+    @Override
+    public NativeTaskLogEntryQuery createNativeTaskLogEntryQuery() {
+        return new NativeTaskLogEntryQueryImpl(commandExecutor);
     }
 
 }

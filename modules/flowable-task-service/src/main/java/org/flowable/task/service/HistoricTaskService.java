@@ -14,6 +14,11 @@ package org.flowable.task.service;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.task.api.NativeTaskLogEntryQuery;
+import org.flowable.task.api.TaskLogEntry;
+import org.flowable.task.api.TaskLogEntryBuilder;
+import org.flowable.task.api.TaskLogEntryQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
@@ -50,5 +55,26 @@ public interface HistoricTaskService {
     HistoricTaskInstanceEntity recordTaskEnd(TaskEntity task, String deleteReason);
     
     HistoricTaskInstanceEntity recordTaskInfoChange(TaskEntity taskEntity);
-    
+
+    void deleteTaskLogEntry(long taskLogNumber);
+
+    /**
+     * Log new entry to the task log.
+     *
+     * @param logEntry log entry to add
+     */
+    void addTaskLogEntry(TaskLogEntry logEntry);
+
+    void createTaskLogEntry(TaskLogEntryBuilder taskLogEntryBuilder);
+
+    TaskLogEntryQuery createTaskLogEntryQuery(CommandExecutor commandExecutor);
+
+    NativeTaskLogEntryQuery createNativeTaskLogEntryQuery(CommandExecutor commandExecutor);
+
+    void deleteTaskLogEntriesForProcessDefinition(String processDefinitionId);
+
+    void deleteTaskLogEntriesForScopeDefinition(String scopeType, String scopeDefinitionId);
+
+    void deleteTaskLogEntriesForTaskId(String taskId);
+
 }

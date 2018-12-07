@@ -51,7 +51,7 @@ public class TaskLogEntryBuilderImpl extends BaseTaskLogEntryBuilderImpl impleme
             timeStamp(CommandContextUtil.getTaskServiceConfiguration().getClock().getCurrentTime());
         }
 
-        CommandContextUtil.getTaskServiceConfiguration(commandContext).getTaskService().createTaskLogEntry(this);
+        CommandContextUtil.getTaskServiceConfiguration(commandContext).getHistoricTaskService().createTaskLogEntry(this);
         return null;
     }
 

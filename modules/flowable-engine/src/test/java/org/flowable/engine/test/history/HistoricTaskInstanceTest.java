@@ -109,7 +109,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         assertNotNull(historicTaskInstance.getWorkTimeInMillis());
 
         historyService.deleteHistoricTaskInstance(taskId);
-        taskService.createTaskLogEntryQuery().taskId(taskId).list().forEach(taskLogEntry -> taskService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
+        historyService.createTaskLogEntryQuery().taskId(taskId).list().forEach(taskLogEntry -> historyService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
 
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
@@ -801,7 +801,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         } catch (FlowableObjectNotFoundException aonfe) {
             assertEquals(HistoricTaskInstance.class, aonfe.getObjectClass());
         }
-        taskService.createTaskLogEntryQuery().taskId(task.getId()).list().forEach(taskLogEntry -> taskService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
+        historyService.createTaskLogEntryQuery().taskId(task.getId()).list().forEach(taskLogEntry -> historyService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
     }
 
     @Test

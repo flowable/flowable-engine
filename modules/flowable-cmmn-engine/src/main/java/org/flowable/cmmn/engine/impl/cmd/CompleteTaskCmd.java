@@ -98,7 +98,7 @@ public class CompleteTaskCmd implements Command<Void> {
             taskLogEntry.setTimeStamp(CommandContextUtil.getTaskServiceConfiguration(commandContext).getClock().getCurrentTime());
             taskLogEntry.setType(FlowableEngineEventType.TASK_COMPLETED.name());
             taskLogEntry.setUserId(Authentication.getAuthenticatedUserId());
-            CommandContextUtil.getTaskService().addTaskLogEntry(taskLogEntry);
+            CommandContextUtil.getHistoricTaskService().addTaskLogEntry(taskLogEntry);
         }
     }
 

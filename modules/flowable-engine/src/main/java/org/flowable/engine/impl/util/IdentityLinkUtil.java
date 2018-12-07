@@ -136,7 +136,7 @@ public class IdentityLinkUtil {
             }
             taskLogEntry.setData(data);
             taskLogEntry.setUserId(Authentication.getAuthenticatedUserId());
-            CommandContextUtil.getTaskService().addTaskLogEntry(taskLogEntry);
+            CommandContextUtil.getHistoricTaskService().addTaskLogEntry(taskLogEntry);
         }
     }
 

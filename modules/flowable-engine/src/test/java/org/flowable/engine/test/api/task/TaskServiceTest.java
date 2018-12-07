@@ -854,7 +854,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().taskId(taskId).singleResult();
         assertNull(task);
 
-        taskService.createTaskLogEntryQuery().list().forEach(taskLogEntry -> taskService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
+        historyService.createTaskLogEntryQuery().list().forEach(taskLogEntry -> historyService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
     }
 
     @SuppressWarnings("unchecked")
@@ -874,7 +874,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().taskId(taskId).singleResult();
         assertNull(task);
 
-        taskService.createTaskLogEntryQuery().list().forEach(taskLogEntry -> taskService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
+        historyService.createTaskLogEntryQuery().list().forEach(taskLogEntry -> historyService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
     }
 
     @Test

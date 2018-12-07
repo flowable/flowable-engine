@@ -981,7 +981,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertThat(historicIdentityLink.getUserId()).isEqualTo("johndoe");
         assertThat(historicIdentityLink.getCreateTime()).isEqualTo(taskCompleteTime);
 
-        taskService.createTaskLogEntryQuery().processInstanceId(processInstance.getId()).list().forEach(taskLogEntry -> taskService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
+        historyService.createTaskLogEntryQuery().processInstanceId(processInstance.getId()).list().forEach(taskLogEntry -> historyService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
     }
 
 }

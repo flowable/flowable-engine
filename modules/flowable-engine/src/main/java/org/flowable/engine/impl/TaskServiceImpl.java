@@ -586,28 +586,4 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
         return new TaskBuilderImpl(commandExecutor);
     }
 
-    @Override
-    public void deleteTaskLogEntry(long logNumber) {
-        commandExecutor.execute(new DeleteTaskLogEntryByLogNumberCmd(logNumber));
-    }
-
-    @Override
-    public TaskLogEntryBuilder createTaskLogEntryBuilder(TaskInfo task) {
-        return new TaskLogEntryBuilderImpl(commandExecutor, task);
-    }
-
-    @Override
-    public TaskLogEntryBuilder createTaskLogEntryBuilder() {
-        return new TaskLogEntryBuilderImpl(commandExecutor);
-    }
-
-    @Override
-    public TaskLogEntryQuery createTaskLogEntryQuery() {
-        return new TaskLogEntryQueryImpl(commandExecutor);
-    }
-
-    @Override
-    public NativeTaskLogEntryQuery createNativeTaskLogEntryQuery() {
-        return new NativeTaskLogEntryQueryImpl(commandExecutor);
-    }
 }

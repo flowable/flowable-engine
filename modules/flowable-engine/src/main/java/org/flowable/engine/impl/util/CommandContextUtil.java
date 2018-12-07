@@ -213,15 +213,19 @@ public class CommandContextUtil {
     }
     
     public static HistoricTaskService getHistoricTaskService() {
+        return getHistoricTaskService(getCommandContext());
+    }
+
+    public static HistoricTaskService getHistoricTaskService(CommandContext commandContext) {
         HistoricTaskService historicTaskService = null;
-        TaskServiceConfiguration taskServiceConfiguration = getTaskServiceConfiguration();
+        TaskServiceConfiguration taskServiceConfiguration = getTaskServiceConfiguration(commandContext);
         if (taskServiceConfiguration != null) {
             historicTaskService = taskServiceConfiguration.getHistoricTaskService();
         }
-        
+
         return historicTaskService;
     }
-    
+
     // JOB SERVICE
     public static JobServiceConfiguration getJobServiceConfiguration() {
         return getJobServiceConfiguration(getCommandContext());

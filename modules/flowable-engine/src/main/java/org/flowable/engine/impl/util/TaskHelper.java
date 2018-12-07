@@ -122,7 +122,7 @@ public class TaskHelper {
             taskLogEntry.setTimeStamp(CommandContextUtil.getTaskServiceConfiguration(commandContext).getClock().getCurrentTime());
             taskLogEntry.setType(FlowableEngineEventType.TASK_COMPLETED.name());
             taskLogEntry.setUserId(Authentication.getAuthenticatedUserId());
-            CommandContextUtil.getTaskService().addTaskLogEntry(taskLogEntry);
+            CommandContextUtil.getHistoricTaskService().addTaskLogEntry(taskLogEntry);
         }
     }
 
@@ -443,7 +443,7 @@ public class TaskHelper {
     }
 
     public static void deleteHistoricTaskEventLogEntries(String taskId) {
-        CommandContextUtil.getTaskService().deleteTaskLogEntriesForTaskId(taskId);
+        CommandContextUtil.getHistoricTaskService().deleteTaskLogEntriesForTaskId(taskId);
     }
 
     protected static void fireAssignmentEvents(TaskEntity taskEntity) {

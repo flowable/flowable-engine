@@ -160,8 +160,8 @@ public class SubTaskTest extends PluggableFlowableTestCase {
         }
 
         repositoryService.deleteDeployment(deployment.getId(), true);
-        taskService.createTaskLogEntryQuery().taskId(subTask1.getId()).list().forEach(taskLogEntry -> taskService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
-        taskService.createTaskLogEntryQuery().taskId(subTask2.getId()).list().forEach(taskLogEntry -> taskService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
+        historyService.createTaskLogEntryQuery().taskId(subTask1.getId()).list().forEach(taskLogEntry -> historyService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
+        historyService.createTaskLogEntryQuery().taskId(subTask2.getId()).list().forEach(taskLogEntry -> historyService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
     }
 
 }

@@ -73,7 +73,7 @@ public class SuspensionStateUtil {
             } catch (JsonProcessingException e) {
                 LOGGER.warn("It was not possible to serialize suspension state. TaskEventLogEntry data is empty.", e);
             }
-            CommandContextUtil.getProcessEngineConfiguration().getTaskService().createTaskLogEntryBuilder(taskEntity).
+            CommandContextUtil.getProcessEngineConfiguration().getHistoryService().createTaskLogEntryBuilder(taskEntity).
                 type("USER_TASK_SUSPENSIONSTATE_CHANGED").
                 data(
                     data
