@@ -25,8 +25,9 @@ import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntity;
 public class ActivityByProcessInstanceIdMatcher implements CachedEntityMatcher<ActivityInstanceEntity> {
 
     @Override
-    public boolean isRetained(Collection<ActivityInstanceEntity> databaseEntities, Collection<CachedEntity> cachedEntities, ActivityInstanceEntity entity,
-        Object param) {
+    public boolean isRetained(Collection<ActivityInstanceEntity> databaseEntities, Collection<CachedEntity> cachedEntities, 
+                    ActivityInstanceEntity entity, Object param) {
+        
         String processInstanceId = (String) param;
         return Objects.equals(entity.getProcessInstanceId(), processInstanceId);
     }
