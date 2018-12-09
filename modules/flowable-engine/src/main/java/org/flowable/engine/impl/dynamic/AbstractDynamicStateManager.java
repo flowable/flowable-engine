@@ -373,18 +373,15 @@ public abstract class AbstractDynamicStateManager {
 
             List<ExecutionEntity> newChildExecutions = createEmbeddedSubProcessAndExecutions(moveToFlowElements, executionsToMove, moveExecutionContainer, processInstanceChangeState, commandContext);
 
-            ExecutionEntity defaultContinueParentExecution;
             if (moveExecutionContainer.isMoveToSubProcessInstance()) {
                 CallActivity callActivity = moveExecutionContainer.getCallActivity();
                 Process subProcess = moveExecutionContainer.getSubProcessModel().getProcessById(moveExecutionContainer.getSubProcessDefKey());
                 ExecutionEntity callActivityInstanceExecution = createCallActivityInstance(callActivity, moveExecutionContainer.getSubProcessDefinition(), newChildExecutions.get(0), subProcess.getInitialFlowElement().getId(), commandContext);
-                MoveExecutionEntityContainer subProcessMoveExecutionEntityContainer;
                 List<ExecutionEntity> moveExecutions = moveExecutionContainer.getExecutions();
-                subProcessMoveExecutionEntityContainer = new MoveExecutionEntityContainer(moveExecutions, moveExecutionContainer.getMoveToActivityIds());
+                MoveExecutionEntityContainer subProcessMoveExecutionEntityContainer = new MoveExecutionEntityContainer(moveExecutions, moveExecutionContainer.getMoveToActivityIds());
                 moveExecutionContainer.getNewAssigneeId().ifPresent(subProcessMoveExecutionEntityContainer::setNewAssigneeId);
                 moveExecutions.forEach(executionEntity -> subProcessMoveExecutionEntityContainer.addContinueParentExecution(executionEntity.getId(), callActivityInstanceExecution));
                 newChildExecutions = createEmbeddedSubProcessAndExecutions(moveExecutionContainer.getMoveToFlowElements(), moveExecutions, subProcessMoveExecutionEntityContainer, new ProcessInstanceChangeState(), commandContext);
-
             }
 
             if (!processInstanceChangeState.getLocalVariables().isEmpty()) {
@@ -820,13 +817,7 @@ public abstract class AbstractDynamicStateManager {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, subProcessInstance));
         }
 
-        // Create the first execution that will visit all the process definition elements
-        ExecutionEntity subProcessInitialExecution = executionEntityManager.createChildExecution(subProcessInstance);
-        subProcessInitialExecution.setCurrentFlowElement(initialFlowElement);
-
-        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(subProcessInitialExecution);
-
-        return subProcessInitialExecution;
+        return subProcessInstance;
     }
 
     protected ExecutionEntity migrateExecutionEntity(ExecutionEntity parentExecutionEntity, ExecutionEntity childExecution, FlowElement newFlowElement, CommandContext commandContext) {
