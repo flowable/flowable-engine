@@ -125,7 +125,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
             // for synchronous, history was created already in ContinueMultiInstanceOperation,
             // but that would lead to wrong timings for asynchronous which is why it's here
             if (activity.isAsynchronous()) {
-                CommandContextUtil.getHistoryManager().recordActivityStart((ExecutionEntity) execution);
+                CommandContextUtil.getActivityInstanceEntityManager().recordActivityStart(execution);
             }
             innerActivityBehavior.execute(execution);
         }

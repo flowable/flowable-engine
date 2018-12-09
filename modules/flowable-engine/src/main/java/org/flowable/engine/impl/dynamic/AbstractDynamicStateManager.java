@@ -52,7 +52,6 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.el.ExpressionManager;
-import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -68,8 +67,6 @@ import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManage
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
@@ -85,7 +82,6 @@ import org.flowable.engine.impl.util.TimerUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
-import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.slf4j.Logger;
@@ -639,7 +635,7 @@ public abstract class AbstractDynamicStateManager {
                     }
 
                     if (newFlowElement instanceof CallActivity) {
-                        CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(newChildExecution);
+                        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(newChildExecution);
 
                         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
                         if (eventDispatcher.isEnabled()) {
@@ -736,7 +732,7 @@ public abstract class AbstractDynamicStateManager {
 
         subProcessExecution.setVariablesLocal(processDataObjects(subProcess.getDataObjects()));
 
-        CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(subProcessExecution);
+        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(subProcessExecution);
 
         List<BoundaryEvent> boundaryEvents = subProcess.getBoundaryEvents();
         if (CollectionUtil.isNotEmpty(boundaryEvents)) {
@@ -815,7 +811,7 @@ public abstract class AbstractDynamicStateManager {
         }
 
         ExecutionEntity subProcessInstance = executionEntityManager.createSubprocessInstance(subProcessDefinition, parentExecution, businessKey, initialFlowElement.getId());
-        CommandContextUtil.getHistoryManager(commandContext).recordSubProcessInstanceStart(parentExecution, subProcessInstance);
+        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordSubProcessInstanceStart(parentExecution, subProcessInstance);
 
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher.isEnabled()) {
@@ -859,7 +855,7 @@ public abstract class AbstractDynamicStateManager {
         ExecutionEntity subProcessInitialExecution = executionEntityManager.createChildExecution(subProcessInstance);
         subProcessInitialExecution.setCurrentFlowElement(initialFlowElement);
 
-        CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(subProcessInitialExecution);
+        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(subProcessInitialExecution);
 
         return subProcessInitialExecution;
     }
@@ -888,7 +884,7 @@ public abstract class AbstractDynamicStateManager {
             task.setName(newFlowElement.getName());
 
             //Sync history
-            syncTaskExecutionHistory(childExecution, newFlowElement, oldActivityId, task, commandContext);
+            CommandContextUtil.getActivityInstanceEntityManager(commandContext).syncUserTaskExecution(childExecution, newFlowElement, oldActivityId, task);
         }
 
         // Boundary Events - only applies to Activities and up to this point we have a UserTask or ReceiveTask execution, both are Activities
@@ -912,25 +908,6 @@ public abstract class AbstractDynamicStateManager {
 
     protected boolean isEventSubProcessStart(FlowElement flowElement) {
         return flowElement instanceof StartEvent && flowElement.getSubProcess() != null && flowElement.getSubProcess() instanceof EventSubProcess;
-    }
-
-    protected void syncTaskExecutionHistory(ExecutionEntity childExecution, FlowElement newFlowElement, String oldActivityId, TaskEntityImpl task, CommandContext commandContext) {
-
-        HistoryLevel currentHistoryLevel = CommandContextUtil.getProcessEngineConfiguration(commandContext).getHistoryLevel();
-        if (currentHistoryLevel.isAtLeast(HistoryLevel.ACTIVITY)) {
-            HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager = CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext);
-            List<HistoricActivityInstanceEntity> historicActivityInstances = historicActivityInstanceEntityManager.findHistoricActivityInstancesByExecutionAndActivityId(childExecution.getId(), oldActivityId);
-            for (HistoricActivityInstanceEntity historicActivityInstance : historicActivityInstances) {
-                historicActivityInstance.setProcessDefinitionId(childExecution.getProcessDefinitionId());
-                historicActivityInstance.setActivityId(childExecution.getActivityId());
-                historicActivityInstance.setActivityName(newFlowElement.getName());
-            }
-        }
-
-        if (currentHistoryLevel.isAtLeast(HistoryLevel.AUDIT)) {
-            HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
-            historicTaskService.recordTaskInfoChange(task);
-        }
     }
 
     protected List<ExecutionEntity> createBoundaryEvents(List<BoundaryEvent> boundaryEvents, ExecutionEntity execution, CommandContext commandContext) {

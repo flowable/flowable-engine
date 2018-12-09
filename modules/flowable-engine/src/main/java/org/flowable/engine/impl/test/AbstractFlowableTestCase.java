@@ -48,6 +48,7 @@ import org.flowable.engine.impl.history.DefaultHistoryManager;
 import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
@@ -157,6 +158,11 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
                         assertNotNull("Historic activity instance " + historicActivityInstance.getId() + " / " + historicActivityInstance.getActivityId() + " has no execution id", historicActivityInstance.getExecutionId());
                         assertNotNull("Historic activity instance " + historicActivityInstance.getId() + " / " + historicActivityInstance.getActivityId() + " has no start time", historicActivityInstance.getStartTime());
                         assertNotNull("Historic activity instance " + historicActivityInstance.getId() + " / " + historicActivityInstance.getActivityId() + " has no end time", historicActivityInstance.getEndTime());
+                        if (historicProcessInstance.getEndTime() == null) {
+                            assertActivityInstancesAreSame(historicActivityInstance,
+                                processEngine.getRuntimeService().createActivityInstanceQuery().activityInstanceId(historicActivityInstance.getId()).singleResult()
+                            );
+                        }
                     }
                 }
             }
@@ -207,6 +213,28 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
                 }
             }
         }
+
+        // runtime activities
+        assertEquals(0L, runtimeService.createActivityInstanceQuery().count());
+    }
+
+    public static void assertActivityInstancesAreSame(HistoricActivityInstance historicActInst, ActivityInstance activityInstance) {
+        assertTrue(Objects.equals(historicActInst.getId(), activityInstance.getId()));
+        assertTrue(Objects.equals(historicActInst.getActivityId(), activityInstance.getActivityId()));
+        assertTrue(Objects.equals(historicActInst.getEndTime(), activityInstance.getEndTime()));
+        assertTrue(Objects.equals(historicActInst.getProcessDefinitionId(), activityInstance.getProcessDefinitionId()));
+        assertTrue(Objects.equals(historicActInst.getStartTime(), activityInstance.getStartTime()));
+        assertTrue(Objects.equals(historicActInst.getExecutionId(), activityInstance.getExecutionId()));
+        assertTrue(Objects.equals(historicActInst.getActivityType(), activityInstance.getActivityType()));
+        assertTrue(Objects.equals(historicActInst.getProcessInstanceId(), activityInstance.getProcessInstanceId()));
+        assertTrue(Objects.equals(historicActInst.getAssignee(), activityInstance.getAssignee()));
+        assertTrue(Objects.equals(historicActInst.getDurationInMillis(), activityInstance.getDurationInMillis()));
+        assertTrue(Objects.equals(historicActInst.getTenantId(), activityInstance.getTenantId()));
+        assertTrue(Objects.equals(historicActInst.getDeleteReason(), activityInstance.getDeleteReason()));
+        assertTrue(Objects.equals(historicActInst.getActivityName(), activityInstance.getActivityName()));
+        assertTrue(Objects.equals(historicActInst.getCalledProcessInstanceId(), activityInstance.getCalledProcessInstanceId()));
+        assertTrue(Objects.equals(historicActInst.getTaskId(), activityInstance.getTaskId()));
+        assertTrue(Objects.equals(historicActInst.getTime(), activityInstance.getTime()));
     }
 
     public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis) {

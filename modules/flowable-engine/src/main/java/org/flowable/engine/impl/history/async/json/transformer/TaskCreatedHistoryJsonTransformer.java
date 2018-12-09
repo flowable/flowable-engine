@@ -36,20 +36,9 @@ public class TaskCreatedHistoryJsonTransformer extends AbstractHistoryJsonTransf
     public List<String> getTypes() {
         return Collections.singletonList(HistoryJsonConstants.TYPE_TASK_CREATED);
     }
-    
+
     @Override
     public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
-        String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);
-        if (StringUtils.isNotEmpty(executionId)) {
-            String activityId = getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID);
-            if (StringUtils.isNotEmpty(activityId)) {
-                HistoricActivityInstanceEntity historicActivityInstanceEntity = findHistoricActivityInstance(commandContext, executionId, activityId);
-                if (historicActivityInstanceEntity == null) {
-                    return false;
-                }
-            }
-        }
-        
         return true;
     }
 
@@ -90,6 +79,7 @@ public class TaskCreatedHistoryJsonTransformer extends AbstractHistoryJsonTransf
             historicTaskService.insertHistoricTask(historicTaskInstance, true);
         }
 
+        // there can be still job in the queue which can have activityId in and we should be able to handle it
         if (StringUtils.isNotEmpty(executionId)) {
             String activityId = getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID);
             if (StringUtils.isNotEmpty(activityId)) {

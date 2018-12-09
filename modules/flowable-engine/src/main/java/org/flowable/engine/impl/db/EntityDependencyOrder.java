@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ByteArrayEntityImpl;
 import org.flowable.engine.impl.persistence.entity.CommentEntityImpl;
@@ -61,7 +62,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 public class EntityDependencyOrder {
 
     public static List<Class<? extends Entity>> DELETE_ORDER = new ArrayList<>();
-    public static List<Class<? extends Entity>> INSERT_ORDER = new ArrayList<>();
+    public static List<Class<? extends Entity>> INSERT_ORDER;
 
     static {
 
@@ -170,8 +171,13 @@ public class EntityDependencyOrder {
         DELETE_ORDER.add(TaskEntityImpl.class);
 
         /*
+         * FK from ExecutionEntity, ProcessDefinition
+         */
+        DELETE_ORDER.add(ActivityInstanceEntityImpl.class);
+
+        /*
          * FK from VariableInstance FK from EventSubscription FK from IdentityLink FK from Task
-         * 
+         *
          * FK to ProcessDefinition
          */
         DELETE_ORDER.add(ExecutionEntityImpl.class);

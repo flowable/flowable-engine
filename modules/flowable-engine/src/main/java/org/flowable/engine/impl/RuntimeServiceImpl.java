@@ -194,6 +194,11 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     }
 
     @Override
+    public NativeActivityInstanceQueryImpl createNativeActivityInstanceQuery() {
+        return new NativeActivityInstanceQueryImpl(commandExecutor);
+    }
+
+    @Override
     public EventSubscriptionQuery createEventSubscriptionQuery() {
         return new EventSubscriptionQueryImpl(commandExecutor);
     }
@@ -503,6 +508,11 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     @Override
     public ProcessInstanceQuery createProcessInstanceQuery() {
         return new ProcessInstanceQueryImpl(commandExecutor);
+    }
+
+    @Override
+    public ActivityInstanceQueryImpl createActivityInstanceQuery() {
+        return new ActivityInstanceQueryImpl(commandExecutor);
     }
 
     @Override

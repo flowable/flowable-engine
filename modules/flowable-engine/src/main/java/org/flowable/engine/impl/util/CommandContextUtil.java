@@ -30,6 +30,7 @@ import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.HistoryManager;
+import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityManager;
 import org.flowable.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.flowable.engine.impl.persistence.entity.CommentEntityManager;
@@ -546,14 +547,22 @@ public class CommandContextUtil {
         return getProcessEngineConfiguration(commandContext).getHistoricProcessInstanceEntityManager();
     }
     
+    public static ActivityInstanceEntityManager getActivityInstanceEntityManager() {
+        return getActivityInstanceEntityManager(getCommandContext());
+    }
+    
+    public static ActivityInstanceEntityManager getActivityInstanceEntityManager(CommandContext commandContext) {
+        return getProcessEngineConfiguration(commandContext).getActivityInstanceEntityManager();
+    }
+
     public static HistoricActivityInstanceEntityManager getHistoricActivityInstanceEntityManager() {
         return getHistoricActivityInstanceEntityManager(getCommandContext());
     }
-    
+
     public static HistoricActivityInstanceEntityManager getHistoricActivityInstanceEntityManager(CommandContext commandContext) {
         return getProcessEngineConfiguration(commandContext).getHistoricActivityInstanceEntityManager();
     }
-    
+
     public static HistoryManager getHistoryManager(CommandContext commandContext) {
         return getProcessEngineConfiguration(commandContext).getHistoryManager();
     }

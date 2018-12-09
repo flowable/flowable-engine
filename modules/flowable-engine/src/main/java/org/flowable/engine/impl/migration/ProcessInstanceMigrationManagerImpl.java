@@ -182,6 +182,9 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
 
         doMoveExecutionState(processInstanceChangeState, commandContext);
 
+        LOGGER.debug("Updating process definition reference in activity instances");
+        CommandContextUtil.getActivityInstanceEntityManager().updateActivityInstancesProcessDefinitionId(procDefToMigrateTo.getId(), processExecution.getId());
+
         LOGGER.debug("Updating Process definition reference in history");
         changeProcessDefinitionReferenceOfHistory(processExecution, procDefToMigrateTo, commandContext);
 

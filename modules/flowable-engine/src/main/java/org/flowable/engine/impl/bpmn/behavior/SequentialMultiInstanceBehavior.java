@@ -108,7 +108,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
                 executionToContinue.setScope(true);
                 executeOriginalBehavior(executionToContinue, multiInstanceRootExecution, loopCounter);
             } else {
-                CommandContextUtil.getHistoryManager().recordActivityEnd((ExecutionEntity) execution, null);
+                CommandContextUtil.getActivityInstanceEntityManager().recordActivityEnd((ExecutionEntity) execution, null);
                 executeOriginalBehavior(execution, multiInstanceRootExecution, loopCounter);
             }
 

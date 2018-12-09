@@ -43,7 +43,7 @@ public class HistoricActivityInstanceEntityManager extends AbstractManager {
         parameters.put("activityId", activityId);
         parameters.put("processInstanceId", processInstanceId);
 
-        return (HistoricActivityInstanceEntity) getDbSqlSession().selectOne("selectHistoricActivityInstance", parameters);
+        return (HistoricActivityInstanceEntity) getDbSqlSession().selectOne("selectHistoricActivityInstanceByActivityIdAndProcessInstanceId", parameters);
     }
 
     public long findHistoricActivityInstanceCountByQueryCriteria(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery) {

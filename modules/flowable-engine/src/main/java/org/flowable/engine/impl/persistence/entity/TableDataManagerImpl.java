@@ -89,6 +89,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
         entityToTableNameMap.put(CompensateEventSubscriptionEntity.class, "ACT_RU_EVENT_SUBSCR");
         entityToTableNameMap.put(MessageEventSubscriptionEntity.class, "ACT_RU_EVENT_SUBSCR");
         entityToTableNameMap.put(SignalEventSubscriptionEntity.class, "ACT_RU_EVENT_SUBSCR");
+        entityToTableNameMap.put(ActivityInstanceEntity.class, "ACT_RU_ACTINST");
 
         // repository
         entityToTableNameMap.put(DeploymentEntity.class, "ACT_RE_DEPLOYMENT");

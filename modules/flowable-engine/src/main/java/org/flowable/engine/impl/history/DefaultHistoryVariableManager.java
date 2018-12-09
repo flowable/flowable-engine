@@ -29,7 +29,7 @@ public class DefaultHistoryVariableManager implements InternalHistoryVariableMan
     public void recordVariableCreate(VariableInstanceEntity variable) {
         getHistoryManager().recordVariableCreate(variable);
         if (variable.getProcessInstanceId() != null || variable.getExecutionId() != null || variable.getTaskId() != null) {
-            getHistoryManager().recordHistoricDetailVariableCreate(variable, null, false);
+            getHistoryManager().recordHistoricDetailVariableCreate(variable, null, false, null);
         }
     }
 
@@ -37,7 +37,7 @@ public class DefaultHistoryVariableManager implements InternalHistoryVariableMan
     public void recordVariableUpdate(VariableInstanceEntity variable) {
         getHistoryManager().recordVariableUpdate(variable);
         if (variable.getProcessInstanceId() != null || variable.getExecutionId() != null || variable.getTaskId() != null) {
-            getHistoryManager().recordHistoricDetailVariableCreate(variable, null, false);
+            getHistoryManager().recordHistoricDetailVariableCreate(variable, null, false, null);
         }
     }
 
@@ -45,7 +45,7 @@ public class DefaultHistoryVariableManager implements InternalHistoryVariableMan
     public void recordVariableRemoved(VariableInstanceEntity variable) {
         getHistoryManager().recordVariableRemoved(variable);
         if (variable.getProcessInstanceId() != null || variable.getExecutionId() != null || variable.getTaskId() != null) {
-            getHistoryManager().recordHistoricDetailVariableCreate(variable, null, false);
+            getHistoryManager().recordHistoricDetailVariableCreate(variable, null, false, null);
         }
     }
     
