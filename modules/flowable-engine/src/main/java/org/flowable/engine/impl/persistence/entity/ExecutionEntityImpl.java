@@ -726,8 +726,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
         // Record historic detail
         CommandContextUtil.getHistoryManager().recordHistoricDetailVariableCreate(variableInstance, sourceExecution, true,
-            getRelatedActivityInstanceId(sourceExecution)
-        );
+            getRelatedActivityInstanceId(sourceExecution));
 
         return variableInstance;
     }
@@ -767,8 +766,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
         // Record historic detail
         CommandContextUtil.getHistoryManager().recordHistoricDetailVariableCreate(variableInstance, this, true,
-            getRelatedActivityInstanceId(this)
-        );
+            getRelatedActivityInstanceId(this));
     }
     
     @Override
