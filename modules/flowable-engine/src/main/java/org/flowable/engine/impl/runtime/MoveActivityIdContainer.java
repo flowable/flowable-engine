@@ -26,6 +26,7 @@ public class MoveActivityIdContainer {
     protected boolean moveToParentProcess;
     protected boolean moveToSubProcessInstance;
     protected String callActivityId;
+    protected Integer callActivitySubProcessVersion;
     protected String newAssigneeId;
 
     public MoveActivityIdContainer(String singleActivityId, String moveToActivityId) {
@@ -88,6 +89,14 @@ public class MoveActivityIdContainer {
 
     public void setCallActivityId(String callActivityId) {
         this.callActivityId = callActivityId;
+    }
+
+    public Integer getCallActivitySubProcessVersion() {
+        return callActivitySubProcessVersion;
+    }
+
+    public void setCallActivitySubProcessVersion(Integer callActivitySubProcessVersion) {
+        this.callActivitySubProcessVersion = callActivitySubProcessVersion;
     }
 
     public Optional<String> getNewAssigneeId() {

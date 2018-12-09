@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.dynamic;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +33,9 @@ public class MoveExecutionEntityContainer {
     protected boolean moveToSubProcessInstance;
     protected boolean directExecutionMigration;
     protected String callActivityId;
+    protected Integer callActivitySubProcessVersion;
     protected CallActivity callActivity;
+    protected String subProcessDefKey;
     protected ProcessDefinition subProcessDefinition;
     protected BpmnModel subProcessModel;
     protected BpmnModel processModel;
@@ -86,12 +89,28 @@ public class MoveExecutionEntityContainer {
         this.callActivityId = callActivityId;
     }
 
+    public Integer getCallActivitySubProcessVersion() {
+        return callActivitySubProcessVersion;
+    }
+
+    public void setCallActivitySubProcessVersion(Integer callActivitySubProcessVersion) {
+        this.callActivitySubProcessVersion = callActivitySubProcessVersion;
+    }
+
     public CallActivity getCallActivity() {
         return callActivity;
     }
 
     public void setCallActivity(CallActivity callActivity) {
         this.callActivity = callActivity;
+    }
+
+    public String getSubProcessDefKey() {
+        return subProcessDefKey;
+    }
+
+    public void setSubProcessDefKey(String subProcessDefKey) {
+        this.subProcessDefKey = subProcessDefKey;
     }
 
     public ProcessDefinition getSubProcessDefinition() {
@@ -158,8 +177,8 @@ public class MoveExecutionEntityContainer {
         return moveToFlowElementMap.get(activityId);
     }
 
-    public Collection<FlowElementMoveEntry> getMoveToFlowElements() {
-        return moveToFlowElementMap.values();
+    public List<FlowElementMoveEntry> getMoveToFlowElements() {
+        return new ArrayList<>(moveToFlowElementMap.values());
     }
 
     public static class FlowElementMoveEntry {

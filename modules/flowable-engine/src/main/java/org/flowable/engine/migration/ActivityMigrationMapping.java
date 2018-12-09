@@ -23,9 +23,33 @@ import java.util.Map;
  */
 public abstract class ActivityMigrationMapping {
 
+    protected String toCallActivityId;
+    protected Integer callActivityProcessDefinitionVersion;
+    protected String fromCallActivityId;
+
     public abstract List<String> getFromActivityIds();
 
     public abstract List<String> getToActivityIds();
+
+    public boolean isToParentProcess() {
+        return this.fromCallActivityId != null;
+    }
+
+    public boolean isToCallActivity() {
+        return this.toCallActivityId != null;
+    }
+
+    public String getToCallActivityId() {
+        return toCallActivityId;
+    }
+
+    public Integer getCallActivityProcessDefinitionVersion() {
+        return callActivityProcessDefinitionVersion;
+    }
+
+    public String getFromCallActivityId() {
+        return fromCallActivityId;
+    }
 
     public static ActivityMigrationMapping.OneToOneMapping createMappingFor(String fromActivityId, String toActivityId) {
         return new OneToOneMapping(fromActivityId, toActivityId);
@@ -71,6 +95,30 @@ public abstract class ActivityMigrationMapping {
 
         public String getToActivityId() {
             return toActivityId;
+        }
+
+        @Override
+        public OneToOneMapping inParentProcessOfCallActivityId(String fromCallActivityId) {
+            this.fromCallActivityId = fromCallActivityId;
+            this.toCallActivityId = null;
+            this.callActivityProcessDefinitionVersion = null;
+            return this;
+        }
+
+        @Override
+        public OneToOneMapping inSubProcessOfCallActivityId(String toCallActivityId) {
+            this.toCallActivityId = toCallActivityId;
+            this.callActivityProcessDefinitionVersion = null;
+            this.fromCallActivityId = null;
+            return this;
+        }
+
+        @Override
+        public OneToOneMapping inSubProcessOfCallActivityId(String toCallActivityId, int subProcessDefVersion) {
+            this.toCallActivityId = toCallActivityId;
+            this.callActivityProcessDefinitionVersion = subProcessDefVersion;
+            this.fromCallActivityId = null;
+            return this;
         }
 
         @Override
@@ -132,6 +180,30 @@ public abstract class ActivityMigrationMapping {
 
         public String getFromActivityId() {
             return fromActivityId;
+        }
+
+        @Override
+        public OneToManyMapping inParentProcessOfCallActivityId(String fromCallActivityId) {
+            this.fromCallActivityId = fromCallActivityId;
+            this.toCallActivityId = null;
+            this.callActivityProcessDefinitionVersion = null;
+            return this;
+        }
+
+        @Override
+        public OneToManyMapping inSubProcessOfCallActivityId(String toCallActivityId) {
+            this.toCallActivityId = toCallActivityId;
+            this.callActivityProcessDefinitionVersion = null;
+            this.fromCallActivityId = null;
+            return this;
+        }
+
+        @Override
+        public OneToManyMapping inSubProcessOfCallActivityId(String toCallActivityId, int subProcessDefVersion) {
+            this.toCallActivityId = toCallActivityId;
+            this.callActivityProcessDefinitionVersion = subProcessDefVersion;
+            this.fromCallActivityId = null;
+            return this;
         }
 
         @Override
@@ -203,6 +275,30 @@ public abstract class ActivityMigrationMapping {
 
         public String getToActivityId() {
             return toActivityId;
+        }
+
+        @Override
+        public ManyToOneMapping inParentProcessOfCallActivityId(String fromCallActivityId) {
+            this.fromCallActivityId = fromCallActivityId;
+            this.toCallActivityId = null;
+            this.callActivityProcessDefinitionVersion = null;
+            return this;
+        }
+
+        @Override
+        public ManyToOneMapping inSubProcessOfCallActivityId(String toCallActivityId) {
+            this.toCallActivityId = toCallActivityId;
+            this.callActivityProcessDefinitionVersion = null;
+            this.fromCallActivityId = null;
+            return this;
+        }
+
+        @Override
+        public ManyToOneMapping inSubProcessOfCallActivityId(String toCallActivityId, int subProcessDefVersion) {
+            this.toCallActivityId = toCallActivityId;
+            this.callActivityProcessDefinitionVersion = subProcessDefVersion;
+            this.fromCallActivityId = null;
+            return this;
         }
 
         @Override

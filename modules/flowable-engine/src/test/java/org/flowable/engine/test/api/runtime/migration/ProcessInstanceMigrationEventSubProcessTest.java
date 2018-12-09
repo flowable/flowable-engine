@@ -20,9 +20,11 @@ import java.util.List;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.migration.ActivityMigrationMapping;
+import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.EventSubscription;
@@ -76,10 +78,14 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -125,10 +131,14 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -186,10 +196,14 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -234,10 +248,14 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -259,7 +277,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
 
             checkTaskInstance(procWithSignal, processInstance, "eventSubProcessTask");
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -284,10 +302,14 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -309,7 +331,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
 
             checkTaskInstance(procWithSignal, processInstance, "eventSubProcessTask");
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -334,10 +356,14 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "eventSubProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -360,7 +386,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
 
             checkTaskInstance(procWithSignal, processInstance, "eventSubProcessTask");
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -390,10 +416,14 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -431,7 +461,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                 assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
             }
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -461,10 +491,14 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -485,7 +519,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
 
             checkTaskInstance(procWithSignal, processInstance, "eventSubProcessTask", "processTask");
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -515,10 +549,14 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -539,7 +577,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
 
             checkTaskInstance(procWithSignal, processInstance, "eventSubProcessTask", "processTask");
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -569,10 +607,14 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -607,7 +649,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
 
             checkTaskInstance(procWithSignal, processInstance, "processTask", "eventSubProcessTask", "eventSubProcessTask");
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -637,10 +679,14 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -676,7 +722,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
 
             checkTaskInstance(procWithSignal, processInstance, "processTask", "eventSubProcessTask", "eventSubProcessTask");
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -706,10 +752,14 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "eventSubProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -741,7 +791,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
 
             checkTaskInstance(procWithSignal, processInstance, "processTask", "eventSubProcessTask", "eventSubProcessTask");
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -766,10 +816,14 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -785,7 +839,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
 
         //Fire the signal
         runtimeService.signalEventReceived("someSignal");
-        
+
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("subProcess", "nestedSignalEventSubProcess", "nestedSignalEventSubProcessTask", "nestedSignalEventSubProcessStart");
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
@@ -807,7 +861,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                 .list();
             assertThat(eventSubProcExecution).isEmpty();
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -832,10 +886,14 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -900,10 +958,14 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -925,9 +987,8 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("nestedTimerEventSubProcessTask");
         job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(job);
-        
-        completeProcessInstanceTasks(processInstance.getId());
 
+        completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History
@@ -941,7 +1002,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                 .list();
             assertThat(eventSubProcExecution).isEmpty();
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -966,10 +1027,14 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1011,7 +1076,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
             assertThat(eventSubProcExecution).isEmpty();
 
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1036,10 +1101,14 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1080,7 +1149,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                 .list();
             assertThat(eventSubProcExecution).isEmpty();
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1105,10 +1174,14 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1149,7 +1222,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
             assertThat(eventSubProcExecution).isEmpty();
 
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1179,11 +1252,15 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "beforeSubProcessTask"))
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedSignalEventSubProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedSignalEventSubProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1213,7 +1290,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                 assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
             }
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1243,11 +1320,15 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "subProcessTask"))
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedSignalEventSubProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedSignalEventSubProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1275,7 +1356,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                 assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
             }
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1305,11 +1386,15 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "beforeSubProcessTask"))
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedMessageEventSubProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedMessageEventSubProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1343,7 +1428,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                 assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
             }
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1373,11 +1458,15 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "subProcessTask"))
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedMessageEventSubProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedMessageEventSubProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1411,7 +1500,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                 assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
             }
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1441,11 +1530,15 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "beforeSubProcessTask"))
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedTimerEventSubProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedTimerEventSubProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1479,7 +1572,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                 assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
             }
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1509,11 +1602,15 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "subProcessTask"))
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedTimerEventSubProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedTimerEventSubProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1547,7 +1644,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                 assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
             }
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1577,11 +1674,15 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "beforeSubProcessTask"))
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedSignalEventSubProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedSignalEventSubProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1615,7 +1716,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                 assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
             }
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1645,11 +1746,15 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "subProcessTask"))
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedSignalEventSubProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedSignalEventSubProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1701,7 +1806,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                 assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
             }
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1731,11 +1836,15 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "beforeSubProcessTask"))
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedMessageEventSubProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedMessageEventSubProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1749,7 +1858,6 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         assertThat(eventSubscriptions).isEmpty();
 
         completeProcessInstanceTasks(processInstance.getId());
-
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History
@@ -1770,7 +1878,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                 assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
             }
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1800,11 +1908,15 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "subProcessTask"))
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedMessageEventSubProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedMessageEventSubProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1858,7 +1970,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                 assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
             }
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1888,11 +2000,15 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "beforeSubProcessTask"))
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedTimerEventSubProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedTimerEventSubProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1905,7 +2021,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         //Behaves like interrupting since theres no execution in the parentScop
         job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(job);
-        
+
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
@@ -1927,7 +2043,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                 assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
             }
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1958,11 +2074,15 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procWithSignal.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("processTask", "subProcessTask"))
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedTimerEventSubProcessTask"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTask", "nestedTimerEventSubProcessTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -2011,7 +2131,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                 assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
             }
         }
-        
+
         assertProcessEnded(processInstance.getId());
     }
 
@@ -2036,9 +2156,13 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("eventSignal");
 
         //Migrate only with autoMapping
-        runtimeService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procWithMessage.getId())
-            .migrate(processInstance.getId());
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procWithMessage.getId());
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm migration
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -2114,9 +2238,12 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("eventSignal");
 
         //Migrate only with autoMapping
-        runtimeService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procWithMessage.getId())
-            .migrate(processInstance.getId());
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procWithMessage.getId());
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm migration
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -2209,9 +2336,13 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("eventSignal");
 
         //Migrate only with autoMapping
-        runtimeService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procWithMessage.getId())
-            .migrate(processInstance.getId());
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procWithMessage.getId());
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm migration
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -2304,9 +2435,13 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("eventSignal");
 
         //Migrate only with autoMapping
-        runtimeService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procWithMessage.getId())
-            .migrate(processInstance.getId());
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procWithMessage.getId());
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm migration
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -2385,11 +2520,15 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
         changeStateEventListener.clear();
 
         //Migrate only the user task
-        runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefOneTask.getId())
             //This is still a "valid" migration of the Event SubProcess Start execution, doing it along with the task activity execution that requires migration, but is not a "direct" migration of the task
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor(Arrays.asList("processTask", "eventSubProcessStart"), "userTask1Id"))
-            .migrate(processInstance.getId());
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor(Arrays.asList("processTask", "eventSubProcessStart"), "userTask1Id"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();

@@ -13,8 +13,11 @@
 package org.flowable.engine.migration;
 
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.ACTIVITY_MAPPINGS_JSON_SECTION;
+import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.CALL_ACTIVITY_PROCESS_DEFINITION_VERSION_JSON_PROPERTY;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.FROM_ACTIVITY_IDS_JSON_PROPERTY;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.FROM_ACTIVITY_ID_JSON_PROPERTY;
+import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.IN_PARENT_PROCESS_OF_CALL_ACTIVITY_JSON_PROPERTY;
+import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.IN_SUB_PROCESS_OF_CALL_ACTIVITY_ID_JSON_PROPERTY;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.LOCAL_VARIABLES_JSON_SECTION;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.NEW_ASSIGNEE_JSON_PROPERTY;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.PROCESS_INSTANCE_VARIABLES_JSON_SECTION;
@@ -27,7 +30,6 @@ import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentCons
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,9 +38,11 @@ import java.util.function.Predicate;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationDocumentBuilderImpl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -61,7 +65,7 @@ public class ProcessInstanceMigrationDocumentConverter {
         activityMigrationMappingConverters.put(ActivityMigrationMapping.ManyToOneMapping.class, new ManyToOneMappingConverter());
     }
 
-    protected static <T> T convertFromJsonNodeToObject(ObjectMapper objectMapper, JsonNode jsonNode) {
+    protected static <T> T convertFromJsonNodeToObject(JsonNode jsonNode, ObjectMapper objectMapper) {
         return objectMapper.convertValue(jsonNode, new TypeReference<T>() {
 
         });
@@ -92,12 +96,37 @@ public class ProcessInstanceMigrationDocumentConverter {
             documentNode.set(ACTIVITY_MAPPINGS_JSON_SECTION, mappingNodes);
         }
 
-        JsonNode processInstanceVariablesNode = convertToJsonProcessInstanceVariables(processInstanceMigrationDocument.getProcessInstanceVariables());
+        JsonNode processInstanceVariablesNode = convertToJsonProcessInstanceVariables(processInstanceMigrationDocument, objectMapper);
         if (processInstanceVariablesNode != null && !processInstanceVariablesNode.isNull()) {
             documentNode.set(PROCESS_INSTANCE_VARIABLES_JSON_SECTION, processInstanceVariablesNode);
         }
 
         return documentNode;
+    }
+
+    public static String convertToJsonString(ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
+        JsonNode jsonNode = convertToJson(processInstanceMigrationDocument);
+        ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
+        try {
+            return objectWriter.writeValueAsString(jsonNode);
+        } catch (JsonProcessingException e) {
+            return jsonNode.toString();
+        }
+    }
+
+    protected static ArrayNode convertToJsonActivityMigrationMappings(List<? extends ActivityMigrationMapping> activityMigrationMappings) {
+        ArrayNode mappingsArray = objectMapper.createArrayNode();
+
+        for (ActivityMigrationMapping mapping : activityMigrationMappings) {
+            BaseActivityMigrationMappingConverter mappingConverter = activityMigrationMappingConverters.get(mapping.getClass());
+            if (mappingConverter == null) {
+                throw new FlowableException("Cannot convert mapping of type '" + mapping.getClass() + "'");
+            }
+            ObjectNode mappingNode = mappingConverter.convertToJson(mapping, objectMapper);
+            mappingsArray.add(mappingNode);
+        }
+
+        return mappingsArray;
     }
 
     public static ProcessInstanceMigrationDocument convertFromJson(String jsonProcessInstanceMigrationDocument) {
@@ -122,11 +151,8 @@ public class ProcessInstanceMigrationDocumentConverter {
 
             JsonNode activityMigrationMappings = rootNode.get(ACTIVITY_MAPPINGS_JSON_SECTION);
             if (activityMigrationMappings != null) {
-                Iterator<JsonNode> mappingNodes = activityMigrationMappings.iterator();
 
-                while (mappingNodes.hasNext()) {
-                    JsonNode mappingNode = mappingNodes.next();
-
+                for (JsonNode mappingNode : activityMigrationMappings) {
                     Class<? extends ActivityMigrationMapping> mappingClass = null;
                     if (isSingleTextValue.test(mappingNode.get(FROM_ACTIVITY_ID_JSON_PROPERTY)) && isSingleTextValue.test(mappingNode.get(TO_ACTIVITY_ID_JSON_PROPERTY))) {
                         mappingClass = ActivityMigrationMapping.OneToOneMapping.class;
@@ -146,7 +172,7 @@ public class ProcessInstanceMigrationDocumentConverter {
 
             JsonNode processInstanceVariablesNode = rootNode.get(PROCESS_INSTANCE_VARIABLES_JSON_SECTION);
             if (processInstanceVariablesNode != null) {
-                Map<String, Object> processInstanceVariables = ProcessInstanceMigrationDocumentConverter.convertFromJsonNodeToObject(objectMapper, processInstanceVariablesNode);
+                Map<String, Object> processInstanceVariables = ProcessInstanceMigrationDocumentConverter.convertFromJsonNodeToObject(processInstanceVariablesNode, objectMapper);
                 documentBuilder.addProcessInstanceVariables(processInstanceVariables);
             }
             return documentBuilder.build();
@@ -157,23 +183,12 @@ public class ProcessInstanceMigrationDocumentConverter {
 
     }
 
-    protected static ArrayNode convertToJsonActivityMigrationMappings(List<? extends ActivityMigrationMapping> activityMigrationMappings) {
-        ArrayNode mappingsArray = objectMapper.createArrayNode();
-
-        for (ActivityMigrationMapping mapping : activityMigrationMappings) {
-            BaseActivityMigrationMappingConverter mappingConverter = activityMigrationMappingConverters.get(mapping.getClass());
-            if (mappingConverter == null) {
-                throw new FlowableException("Cannot convert mapping of type '" + mapping.getClass() + "'");
-            }
-            ObjectNode mappingNode = mappingConverter.convertToJson(mapping, objectMapper);
-            mappingsArray.add(mappingNode);
+    protected static JsonNode convertToJsonProcessInstanceVariables(ProcessInstanceMigrationDocument processInstanceMigrationDocument, ObjectMapper objectMapper) {
+        Map<String, Object> processInstanceVariables = processInstanceMigrationDocument.getProcessInstanceVariables();
+        if (processInstanceVariables != null && !processInstanceVariables.isEmpty()) {
+            return objectMapper.valueToTree(processInstanceVariables);
         }
-
-        return mappingsArray;
-    }
-
-    protected static JsonNode convertToJsonProcessInstanceVariables(Map<String, Object> variables) {
-        return objectMapper.valueToTree(variables);
+        return null;
     }
 
     public static abstract class BaseActivityMigrationMappingConverter<T extends ActivityMigrationMapping> {
@@ -196,11 +211,50 @@ public class ProcessInstanceMigrationDocumentConverter {
 
         protected abstract ObjectNode convertMappingInfoToJson(T mapping, ObjectMapper objectMapper);
 
+        protected ObjectNode convertAdditionalMappingInfoToJson(T mapping, ObjectMapper objectMapper) {
+            ObjectNode mappingNode = objectMapper.createObjectNode();
+            if (mapping.isToParentProcess()) {
+                mappingNode.put(IN_PARENT_PROCESS_OF_CALL_ACTIVITY_JSON_PROPERTY, mapping.getFromCallActivityId());
+            }
+            if (mapping.isToCallActivity()) {
+                mappingNode.put(IN_SUB_PROCESS_OF_CALL_ACTIVITY_ID_JSON_PROPERTY, mapping.getToCallActivityId());
+                mappingNode.put(CALL_ACTIVITY_PROCESS_DEFINITION_VERSION_JSON_PROPERTY, mapping.getCallActivityProcessDefinitionVersion());
+            }
+            return mappingNode;
+        }
+
         protected abstract JsonNode convertLocalVariablesToJson(T mapping, ObjectMapper objectMapper);
 
         protected abstract JsonNode convertNewAssigneeToJson(T mapping, ObjectMapper objectMapper);
 
         public abstract T convertFromJson(JsonNode jsonNode, ObjectMapper objectMapper);
+
+        protected <M extends ActivityMigrationMappingOptions<T>> void convertAdditionalMappingInfoFromJson(M mapping, JsonNode jsonNode) {
+            Optional<JsonNode> callActivityOfParentProcess = Optional.ofNullable(jsonNode.get(IN_PARENT_PROCESS_OF_CALL_ACTIVITY_JSON_PROPERTY));
+            if (callActivityOfParentProcess.isPresent()) {
+                callActivityOfParentProcess.map(JsonNode::textValue).ifPresent(mapping::inParentProcessOfCallActivityId);
+                return; //if its a move to parent, it cannot be also a move to subProcess
+            }
+
+            Optional<JsonNode> ofCallActivityId = Optional.ofNullable(jsonNode.get(IN_SUB_PROCESS_OF_CALL_ACTIVITY_ID_JSON_PROPERTY));
+            Optional<JsonNode> subProcDefVer = Optional.ofNullable(jsonNode.get(CALL_ACTIVITY_PROCESS_DEFINITION_VERSION_JSON_PROPERTY));
+            if (ofCallActivityId.isPresent()) {
+                if (subProcDefVer.isPresent()) {
+                    mapping.inSubProcessOfCallActivityId(ofCallActivityId.get().textValue(), subProcDefVer.get().intValue());
+                } else {
+                    mapping.inSubProcessOfCallActivityId(ofCallActivityId.get().textValue());
+                }
+            }
+
+        }
+
+        protected <V> V getLocalVariablesFromJson(JsonNode jsonNode, ObjectMapper objectMapper) {
+            JsonNode localVariablesNode = jsonNode.get(LOCAL_VARIABLES_JSON_SECTION);
+            if (localVariablesNode != null) {
+                return ProcessInstanceMigrationDocumentConverter.convertFromJsonNodeToObject(localVariablesNode, objectMapper);
+            }
+            return null;
+        }
 
         protected String getNewAssigneeFromJson(JsonNode jsonNode) {
             if (isSingleTextValue.test(jsonNode.get(NEW_ASSIGNEE_JSON_PROPERTY))) {
@@ -218,13 +272,17 @@ public class ProcessInstanceMigrationDocumentConverter {
             ObjectNode mappingNode = objectMapper.createObjectNode();
             mappingNode.put(FROM_ACTIVITY_ID_JSON_PROPERTY, mapping.getFromActivityId());
             mappingNode.put(TO_ACTIVITY_ID_JSON_PROPERTY, mapping.getToActivityId());
+            mappingNode.setAll(convertAdditionalMappingInfoToJson(mapping, objectMapper));
             return mappingNode;
         }
 
         @Override
         public JsonNode convertLocalVariablesToJson(ActivityMigrationMapping.OneToOneMapping mapping, ObjectMapper objectMapper) {
             Map<String, Object> activityLocalVariables = mapping.getActivityLocalVariables();
-            return objectMapper.valueToTree(activityLocalVariables);
+            if (activityLocalVariables != null && !activityLocalVariables.isEmpty()) {
+                return objectMapper.valueToTree(activityLocalVariables);
+            }
+            return null;
         }
 
         @Override
@@ -238,11 +296,13 @@ public class ProcessInstanceMigrationDocumentConverter {
             String toActivityId = jsonNode.get(TO_ACTIVITY_ID_JSON_PROPERTY).textValue();
 
             ActivityMigrationMapping.OneToOneMapping oneToOneMapping = ActivityMigrationMapping.createMappingFor(fromActivityId, toActivityId);
+            convertAdditionalMappingInfoFromJson(oneToOneMapping, jsonNode);
 
-            Optional.ofNullable(getNewAssigneeFromJson(jsonNode)).ifPresent(oneToOneMapping::withNewAssignee);
-            Optional<JsonNode> withLocalVariablesNode = Optional.ofNullable(jsonNode.get(LOCAL_VARIABLES_JSON_SECTION));
-            if (withLocalVariablesNode.isPresent()) {
-                Map<String, Object> localVariables = ProcessInstanceMigrationDocumentConverter.convertFromJsonNodeToObject(objectMapper, withLocalVariablesNode.get());
+            Optional.ofNullable(getNewAssigneeFromJson(jsonNode))
+                .ifPresent(oneToOneMapping::withNewAssignee);
+
+            Map<String, Object> localVariables = getLocalVariablesFromJson(jsonNode, objectMapper);
+            if (localVariables != null) {
                 oneToOneMapping.withLocalVariables(localVariables);
             }
 
@@ -259,13 +319,17 @@ public class ProcessInstanceMigrationDocumentConverter {
             JsonNode fromActivityIdsNode = objectMapper.valueToTree(mapping.getFromActivityIds());
             mappingNode.set(FROM_ACTIVITY_IDS_JSON_PROPERTY, fromActivityIdsNode);
             mappingNode.put(TO_ACTIVITY_ID_JSON_PROPERTY, mapping.getToActivityId());
+            mappingNode.setAll(convertAdditionalMappingInfoToJson(mapping, objectMapper));
             return mappingNode;
         }
 
         @Override
         public JsonNode convertLocalVariablesToJson(ActivityMigrationMapping.ManyToOneMapping mapping, ObjectMapper objectMapper) {
             Map<String, Object> activityLocalVariables = mapping.getActivityLocalVariables();
-            return objectMapper.valueToTree(activityLocalVariables);
+            if (activityLocalVariables != null && !activityLocalVariables.isEmpty()) {
+                return objectMapper.valueToTree(activityLocalVariables);
+            }
+            return null;
         }
 
         @Override
@@ -282,11 +346,13 @@ public class ProcessInstanceMigrationDocumentConverter {
             String toActivityId = jsonNode.get(TO_ACTIVITY_ID_JSON_PROPERTY).textValue();
 
             ActivityMigrationMapping.ManyToOneMapping manyToOneMapping = ActivityMigrationMapping.createMappingFor(fromActivityIds, toActivityId);
+            convertAdditionalMappingInfoFromJson(manyToOneMapping, jsonNode);
 
-            Optional.ofNullable(getNewAssigneeFromJson(jsonNode)).ifPresent(manyToOneMapping::withNewAssignee);
-            Optional<JsonNode> withLocalVariablesNode = Optional.ofNullable(jsonNode.get(LOCAL_VARIABLES_JSON_SECTION));
-            if (withLocalVariablesNode.isPresent()) {
-                Map<String, Object> localVariables = ProcessInstanceMigrationDocumentConverter.convertFromJsonNodeToObject(objectMapper, withLocalVariablesNode.get());
+            Optional.ofNullable(getNewAssigneeFromJson(jsonNode))
+                .ifPresent(manyToOneMapping::withNewAssignee);
+
+            Map<String, Object> localVariables = getLocalVariablesFromJson(jsonNode, objectMapper);
+            if (localVariables != null) {
                 manyToOneMapping.withLocalVariables(localVariables);
             }
 
@@ -302,13 +368,17 @@ public class ProcessInstanceMigrationDocumentConverter {
             mappingNode.put(FROM_ACTIVITY_ID_JSON_PROPERTY, mapping.getFromActivityId());
             JsonNode toActivityIdsNode = objectMapper.valueToTree(mapping.getToActivityIds());
             mappingNode.set(TO_ACTIVITY_IDS_JSON_PROPERTY, toActivityIdsNode);
+            mappingNode.setAll(convertAdditionalMappingInfoToJson(mapping, objectMapper));
             return mappingNode;
         }
 
         @Override
         public JsonNode convertLocalVariablesToJson(ActivityMigrationMapping.OneToManyMapping mapping, ObjectMapper objectMapper) {
             Map<String, Map<String, Object>> activitiesLocalVariables = mapping.getActivitiesLocalVariables();
-            return objectMapper.valueToTree(activitiesLocalVariables);
+            if (activitiesLocalVariables != null && !activitiesLocalVariables.isEmpty()) {
+                return objectMapper.valueToTree(activitiesLocalVariables);
+            }
+            return null;
         }
 
         @Override
@@ -325,10 +395,10 @@ public class ProcessInstanceMigrationDocumentConverter {
             });
 
             ActivityMigrationMapping.OneToManyMapping oneToManyMapping = ActivityMigrationMapping.createMappingFor(fromActivityId, toActivityIds);
+            convertAdditionalMappingInfoFromJson(oneToManyMapping, jsonNode);
 
-            Optional<JsonNode> withLocalVariablesNode = Optional.ofNullable(jsonNode.get(LOCAL_VARIABLES_JSON_SECTION));
-            if (withLocalVariablesNode.isPresent()) {
-                Map<String, Map<String, Object>> localVariables = ProcessInstanceMigrationDocumentConverter.convertFromJsonNodeToObject(objectMapper, withLocalVariablesNode.get());
+            Map<String, Map<String, Object>> localVariables = getLocalVariablesFromJson(jsonNode, objectMapper);
+            if (localVariables != null) {
                 oneToManyMapping.withLocalVariables(localVariables);
             }
 

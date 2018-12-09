@@ -1,0 +1,51 @@
+{
+  "toProcessDefinitionId": "someProcessId",
+  "toProcessDefinitionKey": "MyProcessKey",
+  "toProcessDefinitionVersion": 9,
+  "toProcessDefinitionTenantId": "admin",
+  "activityMappings": [
+    {
+      "fromActivityId": "originalActivity1",
+      "toActivityId": "newActivity1",
+      "inSubProcessOfCallActivityId": "callActivityId",
+      "newAssignee": "kermit",
+      "localVariables": {
+        "varForNewActivity1": "varValue"
+      }
+    },
+    {
+      "fromActivityId": "originalActivity2",
+      "toActivityIds": [
+        "newActivity2.1",
+        "newActivity2.2"
+      ],
+      "inSubProcessOfCallActivityId": "someCallActivityId",
+      "callActivityProcessDefinitionVersion": 2,
+      "localVariables": {
+        "newActivity2.1": {
+          "var2ForNewActivity2.x": 1234.567,
+          "var1ForNewActivity2.x": "varValue"
+        },
+        "newActivity2.2": {
+          "var2ForNewActivity2.x": 1234.567,
+          "var1ForNewActivity2.x": "varValue"
+        }
+      }
+    },
+    {
+      "fromActivityIds": [
+        "originalActivity3",
+        "originalActivity4"
+      ],
+      "toActivityId": "newActivity3",
+      "inParentProcessOfCallActivityId": "someCallActivityId",
+      "localVariables": {
+        "varForNewActivity3": 9876
+      }
+    }
+  ],
+  "processInstanceVariables": {
+    "processVar2": 456.789,
+    "processVar1": "varValue1"
+  }
+}
