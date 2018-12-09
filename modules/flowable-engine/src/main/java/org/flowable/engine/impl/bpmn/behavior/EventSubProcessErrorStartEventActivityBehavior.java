@@ -28,7 +28,7 @@ public class EventSubProcessErrorStartEventActivityBehavior extends FlowNodeActi
     
     @Override
     public void trigger(DelegateExecution execution, String signalName, Object signalData) {
-        CommandContextUtil.getHistoryManager().recordActivityStart((ExecutionEntity) execution);
+        CommandContextUtil.getActivityInstanceEntityManager().recordActivityStart((ExecutionEntity) execution);
         super.trigger(execution, signalName, signalData);
     }
 

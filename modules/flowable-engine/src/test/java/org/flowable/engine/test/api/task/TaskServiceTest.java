@@ -47,6 +47,7 @@ import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Attachment;
@@ -1808,6 +1809,50 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
             resultSet = historyService.createHistoricDetailQuery().variableUpdates()
                     .activityInstanceId(historicActivitiInstance.getId())
+                    .orderByTime()
+                    .asc()
+                    .list();
+
+            assertEquals(2, resultSet.size());
+            assertEquals("variable1", ((HistoricVariableUpdate) resultSet.get(0)).getVariableName());
+            assertEquals("value1", ((HistoricVariableUpdate) resultSet.get(0)).getValue());
+            assertEquals("variable1", ((HistoricVariableUpdate) resultSet.get(1)).getVariableName());
+            assertEquals("value2", ((HistoricVariableUpdate) resultSet.get(1)).getValue());
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testGetVariableByActivityInstance() throws Exception {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+            assertNotNull(processInstance);
+            org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+
+            taskService.setVariable(task.getId(), "variable1", "value1");
+            Thread.sleep(50L); // to make sure the times for ordering below are different.
+            taskService.setVariable(task.getId(), "variable1", "value2");
+
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
+
+            ActivityInstance activityInstance = runtimeService.createActivityInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .activityId("theTask").singleResult();
+            assertNotNull(activityInstance);
+
+            List<HistoricDetail> resultSet = historyService.createHistoricDetailQuery().variableUpdates()
+                    .orderByTime()
+                    .asc()
+                    .list();
+
+            assertEquals(2, resultSet.size());
+            assertEquals("variable1", ((HistoricVariableUpdate) resultSet.get(0)).getVariableName());
+            assertEquals("value1", ((HistoricVariableUpdate) resultSet.get(0)).getValue());
+            assertEquals("variable1", ((HistoricVariableUpdate) resultSet.get(1)).getVariableName());
+            assertEquals("value2", ((HistoricVariableUpdate) resultSet.get(1)).getValue());
+
+            resultSet = historyService.createHistoricDetailQuery().variableUpdates()
+                    .activityInstanceId(activityInstance.getId())
                     .orderByTime()
                     .asc()
                     .list();

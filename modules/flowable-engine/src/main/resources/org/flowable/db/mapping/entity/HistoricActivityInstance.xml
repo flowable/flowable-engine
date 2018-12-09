@@ -208,8 +208,12 @@
 
   <!-- HISTORIC ACTIVITY INSTANCE SELECT -->
   
-  <select id="selectHistoricActivityInstance" resultMap="historicActivityInstanceResultMap">
+  <select id="selectHistoricActivityInstanceByActivityIdAndProcessInstanceId" resultMap="historicActivityInstanceResultMap">
     select * from ${prefix}ACT_HI_ACTINST where ACT_ID_ = #{activityId} and PROC_INST_ID_ = #{processInstanceId}
+  </select>
+
+  <select id="selectHistoricActivityInstance" resultMap="historicActivityInstanceResultMap">
+    select * from ${prefix}ACT_HI_ACTINST where ID_ =#{id}
   </select>
 
   <select id="selectHistoricActivityInstancesByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricActivityInstanceQueryImpl" resultMap="historicActivityInstanceResultMap">

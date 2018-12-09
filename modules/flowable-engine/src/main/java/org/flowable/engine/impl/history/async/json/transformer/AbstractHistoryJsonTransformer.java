@@ -20,8 +20,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
+import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.impl.history.async.transformer.HistoryJsonTransformer;
 
@@ -37,29 +39,41 @@ public abstract class AbstractHistoryJsonTransformer implements HistoryJsonTrans
     }
 
     public boolean historicActivityInstanceExistsForData(ObjectNode historicalData, CommandContext commandContext) {
-        String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);
-        if (StringUtils.isNotEmpty(executionId)) {
-            String activityId = getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID);
-            
-            if (StringUtils.isNotEmpty(activityId)) {
-                HistoricActivityInstanceEntity historicActivityInstanceEntity = findUnfinishedHistoricActivityInstance(commandContext, executionId, activityId);
-                return historicActivityInstanceEntity != null;
+        String runtimeActivityInstanceId = getStringFromJson(historicalData, HistoryJsonConstants.RUNTIME_ACTIVITY_INSTANCE_ID);
+        if (runtimeActivityInstanceId != null) {
+            return CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext).findById(runtimeActivityInstanceId) != null;
+        } else {
+            String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);
+            if (StringUtils.isNotEmpty(executionId)) {
+                String activityId = getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID);
+
+                if (StringUtils.isNotEmpty(activityId)) {
+                    HistoricActivityInstanceEntity historicActivityInstanceEntity = findUnfinishedHistoricActivityInstance(commandContext, executionId,
+                        activityId);
+                    return historicActivityInstanceEntity != null;
+                }
             }
         }
         return false;
     }
     
     public boolean historicActivityInstanceExistsForDataIncludingFinished(ObjectNode historicalData, CommandContext commandContext) {
-        String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);
-        if (StringUtils.isNotEmpty(executionId)) {
-            String activityId = getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID);
-            
-            if (StringUtils.isNotEmpty(activityId)) {
-                HistoricActivityInstanceEntity historicActivityInstanceEntity = findHistoricActivityInstance(commandContext, executionId, activityId);
-                return historicActivityInstanceEntity != null;
+        String runtimeActivityInstanceId = getStringFromJson(historicalData, HistoryJsonConstants.RUNTIME_ACTIVITY_INSTANCE_ID);
+        if (StringUtils.isNotEmpty(runtimeActivityInstanceId)) {
+            HistoricActivityInstanceEntity historicActivityInstanceEntity = CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext).findById(runtimeActivityInstanceId);
+            return historicActivityInstanceEntity != null;
+        } else {
+            String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);
+            if (StringUtils.isNotEmpty(executionId)) {
+                String activityId = getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID);
+
+                if (StringUtils.isNotEmpty(activityId)) {
+                    HistoricActivityInstanceEntity historicActivityInstanceEntity = findHistoricActivityInstance(commandContext, executionId, activityId);
+                    return historicActivityInstanceEntity != null;
+                }
             }
+            return false;
         }
-        return false;
     }
 
     protected HistoricActivityInstanceEntity findUnfinishedHistoricActivityInstance(CommandContext commandContext, String executionId, String activityId) {
@@ -93,7 +107,7 @@ public abstract class AbstractHistoryJsonTransformer implements HistoryJsonTrans
         }
         return null;
     }
-    
+
     protected HistoricActivityInstanceEntity findHistoricActivityInstance(CommandContext commandContext, String executionId, String activityId) {
         if (executionId == null || activityId == null) {
             return null;
@@ -123,6 +137,23 @@ public abstract class AbstractHistoryJsonTransformer implements HistoryJsonTrans
             }
         }
         return null;
+    }
+
+    protected HistoricActivityInstanceEntity createHistoricActivityInstanceEntity(ObjectNode historicalData, CommandContext commandContext,
+        HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager) {
+        String runtimeActivityId = getStringFromJson(historicalData, HistoryJsonConstants.RUNTIME_ACTIVITY_INSTANCE_ID);
+        HistoricActivityInstanceEntity historicActivityInstanceEntity = historicActivityInstanceEntityManager.create();
+        if (StringUtils.isEmpty(runtimeActivityId)) {
+            ProcessEngineConfiguration processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+            if (processEngineConfiguration.isUsePrefixId()) {
+                historicActivityInstanceEntity.setId(historicActivityInstanceEntity.getIdPrefix() + processEngineConfiguration.getIdGenerator().getNextId());
+            } else {
+                historicActivityInstanceEntity.setId(processEngineConfiguration.getIdGenerator().getNextId());
+            }
+        } else {
+            historicActivityInstanceEntity.setId(runtimeActivityId);
+        }
+        return historicActivityInstanceEntity;
     }
 
 }

@@ -88,6 +88,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
             assertNotNull(historicTaskInstance.getEndTime());
 
             HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("subProcessTask").singleResult();
+            assertActivityInstancesAreSame(historicActivityInstance, runtimeService.createActivityInstanceQuery().activityInstanceId(historicActivityInstance.getId()).singleResult());
             assertNotNull(historicActivityInstance.getEndTime());
         }
     }

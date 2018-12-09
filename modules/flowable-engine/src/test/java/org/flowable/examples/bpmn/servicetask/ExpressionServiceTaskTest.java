@@ -12,6 +12,8 @@
  */
 package org.flowable.examples.bpmn.servicetask;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -25,9 +27,6 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author Christian Stettler
@@ -64,7 +63,8 @@ public class ExpressionServiceTaskTest extends PluggableFlowableTestCase {
             HistoricActivityInstance skipActivityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(pi2.getId())
                     .activityId("valueExpressionServiceWithResultVariableNameSet")
                     .singleResult();
-            
+            assertActivityInstancesAreSame(skipActivityInstance, runtimeService.createActivityInstanceQuery().activityInstanceId(skipActivityInstance .getId()).singleResult());
+
             assertNotNull(skipActivityInstance);
         }
 
@@ -99,8 +99,8 @@ public class ExpressionServiceTaskTest extends PluggableFlowableTestCase {
             .processInstanceId(pi.getProcessInstanceId())
             .list();
 
-        assertThat(tasks.size(), is(1));
-        assertThat(tasks.get(0).getTaskDefinitionKey(), is("processWaitState"));
+        assertThat(tasks.size()).isEqualTo(1);
+        assertThat(tasks.get(0).getTaskDefinitionKey()).isEqualTo("processWaitState");
     }
 
     @Test
@@ -118,7 +118,7 @@ public class ExpressionServiceTaskTest extends PluggableFlowableTestCase {
             .processInstanceId(pi.getProcessInstanceId())
             .list();
 
-        assertThat(tasks.size(), is(1));
-        assertThat(tasks.get(0).getTaskDefinitionKey(), is("subProcessWaitState"));
+        assertThat(tasks.size()).isEqualTo(1);
+        assertThat(tasks.get(0).getTaskDefinitionKey()).isEqualTo("subProcessWaitState");
     }
 }

@@ -133,6 +133,8 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
+
+        assertEquals(runtimeService.createActivityInstanceQuery().count(), 0L);
     }
 
     @Test
@@ -283,6 +285,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             assertDatabaseInserts("StartProcessInstanceCmd",
                     "JobEntityImpl", 1L,
                     "ExecutionEntityImpl-bulk-with-2", 1L,
+                    "ActivityInstanceEntityImpl", 1L,
                     "HistoricActivityInstanceEntityImpl", 1L,
                     "HistoricProcessInstanceEntityImpl", 1L);
             assertNoUpdatesAndDeletes("StartProcessInstanceCmd");
@@ -293,7 +296,8 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             assertDatabaseDeletes("org.flowable.job.service.impl.cmd.ExecuteJobCmd",
                             "JobEntityImpl", 1L,
                             "ExecutionEntityImpl", 2L,
-                            "Bulk-delete-deleteTasksByExecutionId", 1L);
+                            "Bulk-delete-deleteTasksByExecutionId", 1L,
+                            "Bulk-delete-deleteActivityInstancesByProcessInstanceId", 1L);
 
             Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().count());
             Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
@@ -318,6 +322,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                     "ExecutionEntityImpl-bulk-with-2", 1L,
                     "TaskEntityImpl", 1L,
                     "EntityLinkEntityImpl", 1L,
+                    "ActivityInstanceEntityImpl-bulk-with-2", 1L,
                     "HistoricActivityInstanceEntityImpl-bulk-with-2", 1L,
                     "HistoricTaskInstanceEntityImpl", 1L,
                     "HistoricProcessInstanceEntityImpl", 1L,
@@ -337,7 +342,8 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                     "selectById org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityImpl", 1L,
                     "selectById org.flowable.task.service.impl.persistence.entity.TaskEntityImpl", 1L,
                     "selectById org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl", 1L,
-                    "selectUnfinishedHistoricActivityInstanceExecutionIdAndActivityId", 1L,
+                    "selectById org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityImpl", 1L,
+                    "selectUnfinishedActivityInstanceExecutionIdAndActivityId", 2L,
                     "selectExecutionsWithSameRootProcessInstanceId", 1L,
                     "selectTasksByExecutionId", 2L,
                     "selectVariablesByExecutionId", 1L,
@@ -360,7 +366,8 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                     "TaskEntityImpl", 1L, 
                     "ExecutionEntityImpl", 2L,
                     "Bulk-delete-deleteTasksByExecutionId", 1L,
-                    "Bulk-delete-deleteEntityLinksByScopeIdAndScopeType", 1L);
+                    "Bulk-delete-deleteEntityLinksByScopeIdAndScopeType", 1L,
+                    "Bulk-delete-deleteActivityInstancesByProcessInstanceId", 1L);
         }
     }
 
@@ -383,6 +390,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                     "TaskEntityImpl", 1L,
                     "TimerJobEntityImpl", 1L,
                     "EntityLinkEntityImpl", 1L,
+                    "ActivityInstanceEntityImpl-bulk-with-2", 1L,
                     "HistoricActivityInstanceEntityImpl-bulk-with-2", 1L,
                     "HistoricTaskInstanceEntityImpl", 1L,
                     "HistoricProcessInstanceEntityImpl", 1L,
@@ -395,6 +403,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                             "TaskEntityImpl", 1L,
                             "TimerJobEntityImpl", 1L,
                             "ExecutionEntityImpl", 3L,
+                            "Bulk-delete-deleteActivityInstancesByProcessInstanceId", 1L,
                             "Bulk-delete-deleteTasksByExecutionId", 1L,
                             "Bulk-delete-deleteEntityLinksByScopeIdAndScopeType", 1L); 
         }
@@ -551,7 +560,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         }
     }
 
-    private Map<String, Object> createVariables(long count, String prefix) {
+   private Map<String, Object> createVariables(long count, String prefix) {
         Map<String, Object> vars = new HashMap<>();
         for (int i = 0; i < count; i++) {
             vars.put(prefix + "_var0" + i, prefix + "+values0" + i);

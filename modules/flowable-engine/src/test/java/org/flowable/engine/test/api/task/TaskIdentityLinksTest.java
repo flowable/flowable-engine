@@ -432,7 +432,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
             }
         }
     }
-    
+
     private void assertTaskEvent(String taskId, int expectedCount, String expectedAction,
                     String expectedIdentityId, String expectedIdentityType) {
         
