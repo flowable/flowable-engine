@@ -166,6 +166,7 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
                     .processInstanceId(processInstance.getId()).singleResult().getDeleteReason());
 
             assertNull(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("boundaryTimer").singleResult());
+            assertEquals(runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).count(), 0L);
             assertHistoricActivitiesDeleteReason(processInstance, null, "A");
             assertHistoricActivitiesDeleteReason(processInstance, DeleteReason.PROCESS_INSTANCE_DELETED, "B", "C");
         }

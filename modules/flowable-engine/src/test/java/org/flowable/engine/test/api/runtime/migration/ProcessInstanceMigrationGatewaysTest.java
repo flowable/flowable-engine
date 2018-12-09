@@ -25,7 +25,6 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.impl.test.HistoryTestHelper;
-import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -40,7 +39,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Dennis Federico
  */
-public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestCase {
+public class ProcessInstanceMigrationGatewaysTest extends AbstractProcessInstanceMigrationTest {
 
     @AfterEach
     protected void tearDown() {
@@ -80,35 +79,22 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("defaultFlowTask");
 
-        //Complete the process
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            checkActivityInstances(procWithExcGtw, processInstance, "userTask", "userTask1Id", "defaultFlowTask");
+            checkActivityInstances(procWithExcGtw, processInstance, "exclusiveGateway", "exclusiveGw");
+            checkTaskInstance(procWithExcGtw, processInstance, "userTask1Id", "defaultFlowTask");
+        }
+
         completeProcessInstanceTasks(processInstance.getId());
+        assertProcessEnded(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "defaultFlowTask");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
-
-            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("exclusiveGateway")
-                .list();
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("exclusiveGw");
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
-
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactly("userTask1Id", "defaultFlowTask");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
-            }
+            checkActivityInstances(procWithExcGtw, processInstance, "userTask", "userTask1Id", "defaultFlowTask");
+            checkActivityInstances(procWithExcGtw, processInstance, "exclusiveGateway", "exclusiveGw");
+            checkTaskInstance(procWithExcGtw, processInstance, "userTask1Id", "defaultFlowTask");
         }
-
-        assertProcessEnded(processInstance.getId());
     }
 
     @Test
@@ -145,34 +131,15 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("theTask1");
 
-        //Complete the process
-        completeProcessInstanceTasks(processInstance.getId());
-
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "theTask1");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
+            checkActivityInstances(procWithExcGtw, processInstance, "userTask", "userTask1Id", "theTask1");
+            checkActivityInstances(procWithExcGtw, processInstance, "exclusiveGateway", "exclusiveGw");
 
-            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("exclusiveGateway")
-                .list();
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("exclusiveGw");
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
-
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactly("userTask1Id", "theTask1");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
-            }
+            checkTaskInstance(procWithExcGtw, processInstance, "userTask1Id", "theTask1");
         }
 
+        completeProcessInstanceTasks(processInstance.getId());
         assertProcessEnded(processInstance.getId());
     }
 
@@ -208,35 +175,27 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("theTask1");
 
-        //Complete the process
-        completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "theTask1");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
+            checkActivityInstances(procWithExcGtw, processInstance, "userTask", "userTask1Id", "theTask1");
+            checkActivityInstances(procWithExcGtw, processInstance, "exclusiveGateway", "exclusiveGw");
 
-            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("exclusiveGateway")
-                .list();
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("exclusiveGw");
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
-
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactly("userTask1Id", "theTask1");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
-            }
+            checkTaskInstance(procWithExcGtw, processInstance, "userTask1Id", "theTask1");
         }
 
+        //Complete the process
+        completeProcessInstanceTasks(processInstance.getId());
         assertProcessEnded(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            checkActivityInstances(procWithExcGtw, processInstance, "userTask", "userTask1Id", "theTask1");
+            checkActivityInstances(procWithExcGtw, processInstance, "exclusiveGateway", "exclusiveGw");
+
+            checkTaskInstance(procWithExcGtw, processInstance, "userTask1Id", "theTask1");
+        }
+
     }
 
     @Test
@@ -272,32 +231,23 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("theTask1");
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            checkActivityInstances(procWithExcGtw, processInstance, "userTask", "userTask1Id", "theTask1");
+            checkActivityInstances(procWithExcGtw, processInstance, "exclusiveGateway", "exclusiveGw");
+
+            checkTaskInstance(procWithExcGtw, processInstance, "userTask1Id", "theTask1");
+        }
+
         //Complete the process
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "theTask1");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
+            checkActivityInstances(procWithExcGtw, processInstance, "userTask", "userTask1Id", "theTask1");
+            checkActivityInstances(procWithExcGtw, processInstance, "exclusiveGateway", "exclusiveGw");
 
-            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("exclusiveGateway")
-                .list();
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("exclusiveGw");
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
-
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactly("userTask1Id", "theTask1");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
-            }
+            checkTaskInstance(procWithExcGtw, processInstance, "userTask1Id", "theTask1");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -335,18 +285,9 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("theTask2");
 
-        //Complete the process
-        completeProcessInstanceTasks(processInstance.getId());
-
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            //Direct migration
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("theTask2");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
+            checkActivityInstances(procWithExcGtw, processInstance, "userTask", "theTask2");
 
             List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(processInstance.getId())
@@ -354,13 +295,23 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
                 .list();
             assertThat(gtwExecution).isEmpty();
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactly("theTask2");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
-            }
+            checkTaskInstance(procWithExcGtw, processInstance, "theTask2");
+        }
+
+        //Complete the process
+        completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            checkActivityInstances(procWithExcGtw, processInstance, "userTask", "theTask2");
+
+            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("exclusiveGateway")
+                .list();
+            assertThat(gtwExecution).isEmpty();
+
+            checkTaskInstance(procWithExcGtw, processInstance, "theTask2");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -399,33 +350,23 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            checkActivityInstances(procDefOneTask, processInstance, "userTask", "userTask1Id");
+            checkActivityInstances(procDefOneTask, processInstance, "exclusiveGateway", "exclusiveGw");
+
+            checkTaskInstance(procDefOneTask, processInstance, "userTask1Id");
+        }
+
         //Complete the process
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            //Direct migration
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
+            checkActivityInstances(procDefOneTask, processInstance, "userTask", "userTask1Id");
+            checkActivityInstances(procDefOneTask, processInstance, "exclusiveGateway", "exclusiveGw");
 
-            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("exclusiveGateway")
-                .list();
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("exclusiveGw");
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
-
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactly("userTask1Id");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
-            }
+            checkTaskInstance(procDefOneTask, processInstance, "userTask1Id");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -463,39 +404,25 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("defaultFlowTask");
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            checkActivityInstances(procWithExcGtw, processInstance, "userTask", "userTask1Id", "defaultFlowTask");
+            checkActivityInstances(procWithExcGtw, processInstance, "subProcess", "theSubProcess");
+            checkActivityInstances(procWithExcGtw, processInstance, "exclusiveGateway", "exclusiveGw");
+
+            checkTaskInstance(procWithExcGtw, processInstance, "userTask1Id", "defaultFlowTask");
+        }
+
         //Complete the process
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "defaultFlowTask", "afterSubProcessTask");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
+            checkActivityInstances(procWithExcGtw, processInstance, "userTask", "userTask1Id", "defaultFlowTask", "afterSubProcessTask");
+            checkActivityInstances(procWithExcGtw, processInstance, "subProcess", "theSubProcess");
+            checkActivityInstances(procWithExcGtw, processInstance, "exclusiveGateway", "exclusiveGw");
 
-            List<HistoricActivityInstance> subProcExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("subProcess")
-                .list();
-            assertThat(subProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("theSubProcess");
-            assertThat(subProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
-
-            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("exclusiveGateway")
-                .list();
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("exclusiveGw");
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
-
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("userTask1Id", "defaultFlowTask", "afterSubProcessTask");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
-            }
+            checkTaskInstance(procWithExcGtw, processInstance, "userTask1Id", "defaultFlowTask", "afterSubProcessTask");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -533,39 +460,25 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("theTask1");
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            checkActivityInstances(procWithExcGtw, processInstance, "userTask", "userTask1Id", "theTask1");
+            checkActivityInstances(procWithExcGtw, processInstance, "subProcess", "theSubProcess");
+            checkActivityInstances(procWithExcGtw, processInstance, "exclusiveGateway", "exclusiveGw");
+
+            checkTaskInstance(procWithExcGtw, processInstance, "userTask1Id", "theTask1");
+        }
+
         //Complete the process
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "theTask1", "afterSubProcessTask");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
+            checkActivityInstances(procWithExcGtw, processInstance, "userTask", "userTask1Id", "theTask1", "afterSubProcessTask");
+            checkActivityInstances(procWithExcGtw, processInstance, "subProcess", "theSubProcess");
+            checkActivityInstances(procWithExcGtw, processInstance, "exclusiveGateway", "exclusiveGw");
 
-            List<HistoricActivityInstance> subProcExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("subProcess")
-                .list();
-            assertThat(subProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("theSubProcess");
-            assertThat(subProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
-
-            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("exclusiveGateway")
-                .list();
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("exclusiveGw");
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
-
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactly("userTask1Id", "theTask1", "afterSubProcessTask");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
-            }
+            checkTaskInstance(procWithExcGtw, processInstance, "userTask1Id", "theTask1", "afterSubProcessTask");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -603,39 +516,33 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("theTask2");
 
-        //Complete the process
-        completeProcessInstanceTasks(processInstance.getId());
-
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            //Direct migration
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("theTask2", "afterSubProcessTask");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
-
-            List<HistoricActivityInstance> subProcExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("subProcess")
-                .list();
-            assertThat(subProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("theSubProcess");
-            assertThat(subProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
-
+            checkActivityInstances(procWithExcGtw, processInstance, "userTask", "theTask2");
+            checkActivityInstances(procWithExcGtw, processInstance, "subProcess", "theSubProcess");
             List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(processInstance.getId())
                 .activityType("exclusiveGateway")
                 .list();
             assertThat(gtwExecution).isEmpty();
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactly("theTask2", "afterSubProcessTask");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithExcGtw.getId());
-            }
+            checkTaskInstance(procWithExcGtw, processInstance, "theTask2");
+        }
+
+        //Complete the process
+        completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            checkActivityInstances(procWithExcGtw, processInstance, "userTask", "theTask2", "afterSubProcessTask");
+            checkActivityInstances(procWithExcGtw, processInstance, "subProcess", "theSubProcess");
+            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("exclusiveGateway")
+                .list();
+            assertThat(gtwExecution).isEmpty();
+
+            checkTaskInstance(procWithExcGtw, processInstance, "theTask2", "afterSubProcessTask");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -676,32 +583,23 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("oddFlowTask1", "evenFlowTask2");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            checkActivityInstances(procParallelGtw, processInstance, "userTask", "userTask1Id", "oddFlowTask1", "evenFlowTask2");
+            checkActivityInstances(procParallelGtw, processInstance, "parallelGateway", "parallelFork");
+
+            checkTaskInstance(procParallelGtw, processInstance, "userTask1Id", "oddFlowTask1", "evenFlowTask2");
+        }
+
         //Complete the process
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            List<HistoricActivityInstance> subProcesses = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(subProcesses).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "oddFlowTask1", "oddFlowTask3", "evenFlowTask2", "evenFlowTask4", "taskAfter");
-            assertThat(subProcesses).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+            //Check History
+            checkActivityInstances(procParallelGtw, processInstance, "userTask", "userTask1Id", "oddFlowTask1", "oddFlowTask3", "evenFlowTask2", "evenFlowTask4", "taskAfter");
+            checkActivityInstances(procParallelGtw, processInstance, "parallelGateway", "parallelFork", "parallelJoin", "parallelJoin");
 
-            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("parallelGateway")
-                .list();
-            //Two flows to join in
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("parallelFork", "parallelJoin", "parallelJoin");
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
-
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("userTask1Id", "oddFlowTask1", "oddFlowTask3", "evenFlowTask2", "evenFlowTask4", "taskAfter");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
-            }
+            checkTaskInstance(procParallelGtw, processInstance, "userTask1Id", "oddFlowTask1", "oddFlowTask3", "evenFlowTask2", "evenFlowTask4", "taskAfter");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -919,16 +817,23 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("oddFlowTask1", "evenFlowTask2");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            checkActivityInstances(procParallelGtw, processInstance, "userTask", "userTask1Id", "oddFlowTask1", "evenFlowTask2");
+            checkActivityInstances(procParallelGtw, processInstance, "subProcess", "subProcess");
+            checkActivityInstances(procParallelGtw, processInstance, "parallelGateway", "parallelFork");
+
+            checkTaskInstance(procParallelGtw, processInstance, "userTask1Id", "oddFlowTask1", "evenFlowTask2");
+        }
+
         //Complete the process
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            List<HistoricActivityInstance> subProcesses = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(subProcesses).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "oddFlowTask1", "oddFlowTask3", "evenFlowTask2", "evenFlowTask4", "taskAfter");
-            assertThat(subProcesses).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+            //Check History
+            checkActivityInstances(procParallelGtw, processInstance, "userTask", "userTask1Id", "oddFlowTask1", "oddFlowTask3", "evenFlowTask2", "evenFlowTask4", "taskAfter");
+            checkActivityInstances(procParallelGtw, processInstance, "subProcess", "subProcess");
+            checkActivityInstances(procParallelGtw, processInstance, "parallelGateway", "parallelFork", "parallelJoin", "parallelJoin");
 
             List<HistoricActivityInstance> subProcExecution = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(processInstance.getId())
@@ -996,17 +901,22 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("oddFlowTask1", "evenFlowTask4");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(procParallelGtw, processInstance, "userTask", "oddFlowTask1", "evenFlowTask4");
+            checkActivityInstances(procParallelGtw, processInstance, "subProcess", "subProcess");
+
+            checkTaskInstance(procParallelGtw, processInstance, "oddFlowTask1", "evenFlowTask4");
+        }
+
         //Complete the process
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            List<HistoricActivityInstance> subProcesses = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            //Direct Migration
-            assertThat(subProcesses).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("oddFlowTask1", "oddFlowTask3", "evenFlowTask4", "taskAfter");
-            assertThat(subProcesses).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+            checkActivityInstances(procParallelGtw, processInstance, "userTask", "oddFlowTask1", "oddFlowTask3", "evenFlowTask4", "taskAfter");
+            checkActivityInstances(procParallelGtw, processInstance, "subProcess", "subProcess");
+            checkActivityInstances(procParallelGtw, processInstance, "parallelGateway", "parallelJoin", "parallelJoin");
+
+            checkTaskInstance(procParallelGtw, processInstance, "oddFlowTask1", "oddFlowTask3", "evenFlowTask4", "taskAfter");
 
             List<HistoricActivityInstance> subProcExecution = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(processInstance.getId())
@@ -1069,16 +979,20 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("oddFlowTask3", "evenFlowTask2");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(procParallelGtw, processInstance, "userTask", "userTask1Id", "evenFlowTask2", "oddFlowTask3");
+            checkActivityInstances(procParallelGtw, processInstance, "subProcess", "subProcess");
+
+            checkTaskInstance(procParallelGtw, processInstance, "userTask1Id", "evenFlowTask2", "oddFlowTask3");
+        }
+
         //Complete the process
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            List<HistoricActivityInstance> subProcesses = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(subProcesses).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "oddFlowTask3", "evenFlowTask2", "evenFlowTask4", "taskAfter");
-            assertThat(subProcesses).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelGtw.getId());
+            checkActivityInstances(procParallelGtw, processInstance, "userTask", "userTask1Id", "oddFlowTask3", "evenFlowTask2", "evenFlowTask4", "taskAfter");
+            checkActivityInstances(procParallelGtw, processInstance, "subProcess", "subProcess");
+            checkActivityInstances(procParallelGtw, processInstance, "parallelGateway", "parallelJoin", "parallelJoin");
 
             List<HistoricActivityInstance> subProcExecution = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(processInstance.getId())
@@ -1152,31 +1066,22 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactly("taskAfter");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            checkActivityInstances(procInclusiveGtw, processInstance, "inclusiveGateway", "gwFork", "gwJoin");
+
+            checkTaskInstance(procInclusiveGtw, processInstance, "userTask1Id", "taskEquals", "taskAfter");
+        }
+
+
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "taskEquals", "taskAfter");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
+            checkActivityInstances(procInclusiveGtw, processInstance, "userTask", "userTask1Id", "taskEquals", "taskAfter");
+            checkActivityInstances(procInclusiveGtw, processInstance, "inclusiveGateway", "gwJoin", "gwFork");
 
-            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("inclusiveGateway")
-                .list();
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("gwJoin", "gwFork");
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
-
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("userTask1Id", "taskEquals", "taskAfter");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
-            }
+            checkTaskInstance(procInclusiveGtw, processInstance, "userTask1Id", "taskEquals", "taskAfter");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -1260,31 +1165,23 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactly("taskAfter");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(procInclusiveGtw, processInstance, "userTask", "userTask1Id", "taskMore", "taskAfter");
+            checkActivityInstances(procInclusiveGtw, processInstance, "inclusiveGateway", "gwJoin", "gwFork");
+
+            checkTaskInstance(procInclusiveGtw, processInstance, "userTask1Id", "taskMore", "taskAfter");
+
+        }
+
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "taskMore", "taskAfter");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
+            checkActivityInstances(procInclusiveGtw, processInstance, "userTask", "userTask1Id", "taskMore", "taskAfter");
+            checkActivityInstances(procInclusiveGtw, processInstance, "inclusiveGateway", "gwJoin", "gwFork");
 
-            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("inclusiveGateway")
-                .list();
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("gwJoin", "gwFork");
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
+            checkTaskInstance(procInclusiveGtw, processInstance, "userTask1Id", "taskMore", "taskAfter");
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("userTask1Id", "taskMore", "taskAfter");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
-            }
         }
 
         assertProcessEnded(processInstance.getId());
@@ -1334,31 +1231,24 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactly("taskAfter");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            checkActivityInstances(procInclusiveGtw, processInstance, "userTask", "userTask1Id", "taskMore", "taskAfter");
+            checkActivityInstances(procInclusiveGtw, processInstance, "inclusiveGateway", "gwJoin", "gwFork");
+
+            checkTaskInstance(procInclusiveGtw, processInstance, "taskMore", "userTask1Id", "taskAfter");
+
+        }
+
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "taskMore", "taskAfter");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
+            checkActivityInstances(procInclusiveGtw, processInstance, "userTask", "userTask1Id", "taskMore", "taskAfter");
+            checkActivityInstances(procInclusiveGtw, processInstance, "inclusiveGateway", "gwJoin", "gwFork");
 
-            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("inclusiveGateway")
-                .list();
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("gwJoin", "gwFork");
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
+            checkTaskInstance(procInclusiveGtw, processInstance, "taskMore", "userTask1Id", "taskAfter");
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("taskMore", "userTask1Id", "taskAfter");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
-            }
         }
 
         assertProcessEnded(processInstance.getId());
@@ -1409,33 +1299,25 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactly("taskAfter");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            checkActivityInstances(procInclusiveGtw, processInstance, "userTask", "userTask1Id", "taskMore", "taskAfter");
+            checkActivityInstances(procInclusiveGtw, processInstance, "inclusiveGateway", "gwJoin", "gwFork");
+
+            checkTaskInstance(procInclusiveGtw, processInstance, "taskMore", "userTask1Id", "taskAfter");
+
+        }
+
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "taskMore", "taskAfter");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
+            checkActivityInstances(procInclusiveGtw, processInstance, "userTask", "userTask1Id", "taskMore", "taskAfter");
+            checkActivityInstances(procInclusiveGtw, processInstance, "inclusiveGateway", "gwJoin", "gwFork");
 
-            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("inclusiveGateway")
-                .list();
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("gwJoin", "gwFork");
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
+            checkTaskInstance(procInclusiveGtw, processInstance, "taskMore", "userTask1Id", "taskAfter");
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("userTask1Id", "taskAfter", "taskMore");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
-            }
         }
-
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1483,33 +1365,22 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactly("taskAfter");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            checkActivityInstances(procInclusiveGtw, processInstance, "userTask", "taskLess", "taskAfter");
+            checkActivityInstances(procInclusiveGtw, processInstance, "inclusiveGateway", "gwJoin");
+
+            checkTaskInstance(procInclusiveGtw, processInstance, "taskAfter", "taskLess");
+        }
+
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            //Direct migration
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("taskLess", "taskAfter");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
+            checkActivityInstances(procInclusiveGtw, processInstance, "userTask", "taskLess", "taskAfter");
+            checkActivityInstances(procInclusiveGtw, processInstance, "inclusiveGateway", "gwJoin");
 
-            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("inclusiveGateway")
-                .list();
-            //Join gateway only
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("gwJoin");
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
-
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("taskAfter", "taskLess");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
-            }
+            checkTaskInstance(procInclusiveGtw, processInstance, "taskAfter", "taskLess");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -1571,32 +1442,22 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactly("taskAfter");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            checkActivityInstances(procInclusiveGtw, processInstance, "userTask", "userTask1Id", "taskLess", "taskMore", "taskAfter");
+            checkActivityInstances(procInclusiveGtw, processInstance, "inclusiveGateway", "gwJoin", "gwJoin");
+
+            checkTaskInstance(procInclusiveGtw, processInstance, "userTask1Id", "taskLess", "taskMore", "taskAfter");
+        }
+
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "taskLess", "taskMore", "taskAfter");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
+            checkActivityInstances(procInclusiveGtw, processInstance, "userTask", "userTask1Id", "taskLess", "taskMore", "taskAfter");
+            checkActivityInstances(procInclusiveGtw, processInstance, "inclusiveGateway", "gwJoin", "gwJoin");
 
-            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("inclusiveGateway")
-                .list();
-            //One join per parallel task
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("gwJoin", "gwJoin");
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
-
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("userTask1Id", "taskLess", "taskMore", "taskAfter");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
-            }
+            checkTaskInstance(procInclusiveGtw, processInstance, "userTask1Id", "taskLess", "taskMore", "taskAfter");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -1665,35 +1526,22 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactly("taskAfter");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
 
-        completeProcessInstanceTasks(processInstance.getId());
-
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            //Direct Migrations
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("taskMore", "taskLess", "taskAfter");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
+            checkActivityInstances(procInclusiveGtw, processInstance, "userTask", "taskMore", "taskLess", "taskAfter");
+            checkActivityInstances(procInclusiveGtw, processInstance, "inclusiveGateway", "gwJoin", "gwJoin");
 
-            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("inclusiveGateway")
-                .list();
-            //One join per parallel task
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("gwJoin", "gwJoin");
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
-
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("taskMore", "taskLess", "taskAfter");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
-            }
+            checkTaskInstance(procInclusiveGtw, processInstance, "taskMore", "taskLess", "taskAfter");
         }
 
+        completeProcessInstanceTasks(processInstance.getId());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            checkActivityInstances(procInclusiveGtw, processInstance, "userTask", "taskMore", "taskLess", "taskAfter");
+            checkActivityInstances(procInclusiveGtw, processInstance, "inclusiveGateway", "gwJoin", "gwJoin");
+
+            checkTaskInstance(procInclusiveGtw, processInstance, "taskMore", "taskLess", "taskAfter");
+        }
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1731,33 +1579,22 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("userTask1Id");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            checkActivityInstances(procDefOneTask, processInstance, "userTask", "taskBefore", "taskMore", "taskLess", "userTask1Id");
+            checkActivityInstances(procDefOneTask, processInstance, "inclusiveGateway", "gwFork");
+
+            checkTaskInstance(procDefOneTask, processInstance, "taskBefore", "taskMore", "taskLess", "userTask1Id");
+        }
+
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            //Direct Migrations
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("taskBefore", "taskMore", "taskLess", "userTask1Id");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
+            checkActivityInstances(procDefOneTask, processInstance, "userTask", "taskBefore", "taskMore", "taskLess", "userTask1Id");
+            checkActivityInstances(procDefOneTask, processInstance, "inclusiveGateway", "gwFork");
 
-            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("inclusiveGateway")
-                .list();
-            //Only the fork was executed
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("gwFork");
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
-
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("taskBefore", "taskMore", "taskLess", "userTask1Id");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
-            }
+            checkTaskInstance(procDefOneTask, processInstance, "taskBefore", "taskMore", "taskLess", "userTask1Id");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -1807,38 +1644,24 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactly("taskAfter");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            checkActivityInstances(procInclusiveGtw, processInstance, "userTask", "userTask1Id", "taskEquals", "taskAfter");
+            checkActivityInstances(procInclusiveGtw, processInstance, "subProcess", "subProcess");
+            checkActivityInstances(procInclusiveGtw, processInstance, "inclusiveGateway", "gwJoin", "gwFork");
+
+            checkTaskInstance(procInclusiveGtw, processInstance, "userTask1Id", "taskEquals", "taskAfter");
+        }
+
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "taskEquals", "taskAfter");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
+            checkActivityInstances(procInclusiveGtw, processInstance, "userTask", "userTask1Id", "taskEquals", "taskAfter");
+            checkActivityInstances(procInclusiveGtw, processInstance, "subProcess", "subProcess");
+            checkActivityInstances(procInclusiveGtw, processInstance, "inclusiveGateway", "gwJoin", "gwFork");
 
-            List<HistoricActivityInstance> subProcExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("subProcess")
-                .list();
-            assertThat(subProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("subProcess");
-            assertThat(subProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
-
-            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("inclusiveGateway")
-                .list();
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("gwJoin", "gwFork");
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
-
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("userTask1Id", "taskEquals", "taskAfter");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
-            }
+            checkTaskInstance(procInclusiveGtw, processInstance, "userTask1Id", "taskEquals", "taskAfter");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -1888,24 +1711,13 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactly("taskAfter");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
 
-        completeProcessInstanceTasks(processInstance.getId());
-
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            //Direct migration
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("taskLess", "taskAfter");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
+            checkActivityInstances(procInclusiveGtw, processInstance, "userTask", "taskLess", "taskAfter");
+            checkActivityInstances(procInclusiveGtw, processInstance, "subProcess", "subProcess");
+            checkActivityInstances(procInclusiveGtw, processInstance, "inclusiveGateway", "gwJoin");
 
-            List<HistoricActivityInstance> subProcExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("subProcess")
-                .list();
-            assertThat(subProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("subProcess");
-            assertThat(subProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
+            checkTaskInstance(procInclusiveGtw, processInstance, "taskAfter", "taskLess");
 
             List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(processInstance.getId())
@@ -1914,14 +1726,17 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
             //Join gateway only
             assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("gwJoin");
             assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
+        }
+      
+        completeProcessInstanceTasks(processInstance.getId());
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("taskAfter", "taskLess");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
-            }
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            checkActivityInstances(procInclusiveGtw, processInstance, "userTask", "taskLess", "taskAfter");
+            checkActivityInstances(procInclusiveGtw, processInstance, "subProcess", "subProcess");
+            checkActivityInstances(procInclusiveGtw, processInstance, "inclusiveGateway", "gwJoin");
+
+            checkTaskInstance(procInclusiveGtw, processInstance, "taskAfter", "taskLess");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -1983,39 +1798,24 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactly("taskAfter");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            checkActivityInstances(procInclusiveGtw, processInstance, "userTask", "userTask1Id", "taskLess", "taskMore", "taskAfter");
+            checkActivityInstances(procInclusiveGtw, processInstance, "subProcess", "subProcess");
+            checkActivityInstances(procInclusiveGtw, processInstance, "inclusiveGateway", "gwJoin", "gwJoin");
+
+            checkTaskInstance(procInclusiveGtw, processInstance, "userTask1Id", "taskLess", "taskMore", "taskAfter");
+        }
+
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "taskLess", "taskMore", "taskAfter");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
+            checkActivityInstances(procInclusiveGtw, processInstance, "userTask", "userTask1Id", "taskLess", "taskMore", "taskAfter");
+            checkActivityInstances(procInclusiveGtw, processInstance, "subProcess", "subProcess");
+            checkActivityInstances(procInclusiveGtw, processInstance, "inclusiveGateway", "gwJoin", "gwJoin");
 
-            List<HistoricActivityInstance> subProcExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("subProcess")
-                .list();
-            assertThat(subProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("subProcess");
-            assertThat(subProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
-
-            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("inclusiveGateway")
-                .list();
-            //One join per parallel task
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("gwJoin", "gwJoin");
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
-
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("userTask1Id", "taskLess", "taskMore", "taskAfter");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procInclusiveGtw.getId());
-            }
+            checkTaskInstance(procInclusiveGtw, processInstance, "userTask1Id", "taskLess", "taskMore", "taskAfter");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -2023,8 +1823,10 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
 
     @Test
     public void testMigrateInclusiveGatewayParallelActivitiesInsideEmbeddedSubProcessToSingleActivity() {
-        ProcessDefinition procInclusiveGtw = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/inclusive-gateway-fork-multiple-outgoing-sequences-nested-in-embedded-subprocess.bpmn20.xml");
-        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition procInclusiveGtw = deployProcessDefinition("my deploy",
+            "org/flowable/engine/test/api/runtime/migration/inclusive-gateway-fork-multiple-outgoing-sequences-nested-in-embedded-subprocess.bpmn20.xml");
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",
+            "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
 
         //Start the processInstance
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procInclusiveGtw.getId(), Collections.singletonMap("myConditionVar", 10));
@@ -2055,43 +1857,24 @@ public class ProcessInstanceMigrationGatewaysTest extends PluggableFlowableTestC
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("userTask1Id");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            //Check History
+            checkActivityInstances(procDefOneTask, processInstance, "userTask", "taskBefore", "taskMore", "taskLess", "userTask1Id");
+            checkActivityInstances(procDefOneTask, processInstance, "subProcess", "subProcess");
+            checkActivityInstances(procDefOneTask, processInstance, "inclusiveGateway", "gwFork");
+
+            checkTaskInstance(procDefOneTask, processInstance, "taskBefore", "taskMore", "taskLess", "userTask1Id");
+        }
+
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            //Direct Migrations
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("taskBefore", "taskMore", "taskLess", "userTask1Id");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
+            checkActivityInstances(procDefOneTask, processInstance, "userTask", "taskBefore", "taskMore", "taskLess", "userTask1Id");
+            checkActivityInstances(procDefOneTask, processInstance, "subProcess", "subProcess");
+            checkActivityInstances(procDefOneTask, processInstance, "inclusiveGateway", "gwFork");
 
-            List<HistoricActivityInstance> gtwExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("inclusiveGateway")
-                .list();
-            //Only the fork was executed
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("gwFork");
-            assertThat(gtwExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
-
-            List<HistoricActivityInstance> subProcExecution = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("subProcess")
-                .list();
-            assertThat(subProcExecution).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("subProcess");
-            assertThat(subProcExecution).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
-
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("taskBefore", "taskMore", "taskLess", "userTask1Id");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
-            }
+            checkTaskInstance(procDefOneTask, processInstance, "taskBefore", "taskMore", "taskLess", "userTask1Id");
         }
-
-        assertProcessEnded(processInstance.getId());
     }
-
 }

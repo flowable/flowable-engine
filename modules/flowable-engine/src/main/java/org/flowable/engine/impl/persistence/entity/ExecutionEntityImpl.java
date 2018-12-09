@@ -25,6 +25,7 @@ import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.SuspensionState;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
@@ -724,7 +725,9 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         CommandContextUtil.getHistoryManager().recordVariableCreate(variableInstance);
 
         // Record historic detail
-        CommandContextUtil.getHistoryManager().recordHistoricDetailVariableCreate(variableInstance, sourceExecution, true);
+        CommandContextUtil.getHistoryManager().recordHistoricDetailVariableCreate(variableInstance, sourceExecution, true,
+            getRelatedActivityInstanceId(sourceExecution)
+        );
 
         return variableInstance;
     }
@@ -746,12 +749,13 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
     protected void updateVariableInstance(VariableInstanceEntity variableInstance, Object value, ExecutionEntity sourceExecution) {
         super.updateVariableInstance(variableInstance, value);
-        
-        CommandContextUtil.getHistoryManager().recordHistoricDetailVariableCreate(variableInstance, sourceExecution, true);
+
+        CommandContextUtil.getHistoryManager().recordHistoricDetailVariableCreate(variableInstance, sourceExecution, true,
+            getRelatedActivityInstanceId(sourceExecution));
 
         CommandContextUtil.getHistoryManager().recordVariableUpdate(variableInstance);
     }
-    
+
     @Override
     protected void deleteVariableInstanceForExplicitUserCall(VariableInstanceEntity variableInstance) {
         super.deleteVariableInstanceForExplicitUserCall(variableInstance);
@@ -762,7 +766,9 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         CommandContextUtil.getHistoryManager().recordVariableRemoved(variableInstance);
 
         // Record historic detail
-        CommandContextUtil.getHistoryManager().recordHistoricDetailVariableCreate(variableInstance, this, true);
+        CommandContextUtil.getHistoryManager().recordHistoricDetailVariableCreate(variableInstance, this, true,
+            getRelatedActivityInstanceId(this)
+        );
     }
     
     @Override
@@ -1223,6 +1229,18 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     @Override
     public void setCallbackType(String callbackType) {
         this.callbackType = callbackType;
+    }
+
+    protected String getRelatedActivityInstanceId(ExecutionEntity sourceExecution) {
+        String activityInstanceId = null;
+        if (CommandContextUtil.getHistoryManager().isHistoryLevelAtLeast(HistoryLevel.FULL)) {
+            ActivityInstanceEntity unfinishedActivityInstance = CommandContextUtil.getActivityInstanceEntityManager()
+                .findUnfinishedActivityInstance(sourceExecution);
+            if (unfinishedActivityInstance != null) {
+                activityInstanceId = unfinishedActivityInstance.getId();
+            }
+        }
+        return activityInstanceId;
     }
 
     // toString /////////////////////////////////////////////////////////////////

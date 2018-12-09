@@ -12,6 +12,8 @@
  */
 package org.flowable.standalone.history.async;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -25,6 +27,7 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.impl.CustomConfigurationFlowableTestCase;
 import org.flowable.job.api.HistoryJob;
@@ -437,6 +440,25 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         
         // The lock expiration time should be null now
         assertNull(((HistoryJobEntity) managementService.createHistoryJobQuery().singleResult()).getLockExpirationTime());
+    }
+
+    @Test
+    @Deployment(
+        resources = {
+            "org/flowable/engine/test/api/runtime/callActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/runtime/calledActivity.bpmn20.xml"
+        }
+    )
+    public void callSubProcess() {
+        ProcessInstance pi = this.runtimeService.startProcessInstanceByKey("callActivity");
+
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
+        HistoricActivityInstance callSubProcessActivityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(pi.getId())
+            .activityId("callSubProcess").singleResult();
+        assertThat(callSubProcessActivityInstance).extracting(HistoricActivityInstance::getCalledProcessInstanceId).
+            isEqualTo(
+                runtimeService.createProcessInstanceQuery().superProcessInstanceId(pi.getId()).singleResult().getId()
+            );
     }
 
     protected Task startOneTaskprocess() {

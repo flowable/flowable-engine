@@ -61,6 +61,8 @@ public interface Problems {
 
     String HTTP_TASK_NO_REQUEST_URL = "flowable-httptask-no-request-url";
     String HTTP_TASK_NO_REQUEST_METHOD = "flowable-httptask-no-request-method";
+    
+    String CASE_TASK_NO_CASE_DEFINITION_KEY = "flowable-casetask-no-case-definition-key";
 
     String EXCLUSIVE_GATEWAY_NO_OUTGOING_SEQ_FLOW = "flowable-exclusive-gateway-no-outgoing-seq-flow";
     String EXCLUSIVE_GATEWAY_CONDITION_NOT_ALLOWED_ON_SINGLE_SEQ_FLOW = "flowable-exclusive-gateway-condition-not-allowed-on-single-seq-flow";

@@ -837,6 +837,8 @@ image::images/cmmn.repeatingtimereventlistener.png[align="center"]
 
 If the timer event listener is repeating (for example, _R/PT1H_), the _occur_ event will be fired every hour. When the repetition rule expression of the human task evaluates to true, a new human task instance will be created each hour.
 
+Note that Flowable allows to have repeating user and generic event listeners. This is contrary to the CMMN specification (which disallows it), but we believe it is needed for having a more flexible way of using event listeners (for example to model a case where a user might multiple times trigger an action that leads to the creation of tasks).
+
 ==== Item control: Manual Activation Rule
 
 Plan items on the case model can have a _manual activation rule_: an expression that can be used to indicate a certain plan item needs to be _manually activated by an end-user_.

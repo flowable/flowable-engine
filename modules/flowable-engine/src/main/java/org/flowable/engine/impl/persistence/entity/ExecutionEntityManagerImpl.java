@@ -435,6 +435,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         if (deleteReason == null) {
             deleteReason = DeleteReason.PROCESS_INSTANCE_DELETED;
         }
+        getActivityInstanceEntityManager().deleteActivityInstancesByProcessInstanceId(execution.getId());
 
         for (ExecutionEntity subExecutionEntity : execution.getExecutions()) {
             if (subExecutionEntity.isMultiInstanceRoot()) {
@@ -500,7 +501,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
                 && executionEntity.getCurrentFlowElement() != null
                 && !executionEntity.isMultiInstanceRoot()
                 && !(executionEntity.getCurrentFlowElement() instanceof BoundaryEvent)) {  // Boundary events will handle the history themselves (see TriggerExecutionOperation for example)
-            getHistoryManager().recordActivityEnd(executionEntity, deleteReason);
+            CommandContextUtil.getActivityInstanceEntityManager().recordActivityEnd(executionEntity, deleteReason);
         }
         deleteRelatedDataForExecution(executionEntity, deleteReason);
         delete(executionEntity);
@@ -766,7 +767,13 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         deleteUserTasks(executionEntity, deleteReason, commandContext, enableExecutionRelationshipCounts, eventDispatcherEnabled);
         deleteJobs(executionEntity, commandContext, enableExecutionRelationshipCounts, eventDispatcherEnabled);
         deleteEventSubScriptions(executionEntity, enableExecutionRelationshipCounts, eventDispatcherEnabled);
+        deleteActivityInstances(executionEntity, commandContext);
+    }
 
+    protected void deleteActivityInstances(ExecutionEntity executionEntity, CommandContext commandContext) {
+        if (executionEntity.isProcessInstanceType()) {
+            CommandContextUtil.getActivityInstanceEntityManager(commandContext).deleteActivityInstancesByProcessInstanceId(executionEntity.getId());
+        }
     }
 
     protected void deleteIdentityLinks(ExecutionEntity executionEntity, CommandContext commandContext, boolean eventDispatcherEnabled) {

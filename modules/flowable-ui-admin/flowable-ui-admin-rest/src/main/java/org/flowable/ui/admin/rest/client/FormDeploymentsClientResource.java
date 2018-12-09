@@ -77,7 +77,7 @@ public class FormDeploymentsClientResource extends AbstractClientResource {
             try {
                 ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
                 String fileName = file.getOriginalFilename();
-                if (fileName != null && (fileName.endsWith(".form") || fileName.endsWith(".xml"))) {
+                if (fileName != null && (fileName.endsWith(".form") || fileName.endsWith(".json"))) {
 
                     return clientService.uploadDeployment(serverConfig, fileName, file.getInputStream());
 

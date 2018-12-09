@@ -1,3 +1,4 @@
+drop table if exists ACT_RU_ACTINST cascade;
 drop table if exists ACT_RE_DEPLOYMENT cascade;
 drop table if exists ACT_RE_MODEL cascade;
 drop table if exists ACT_RE_PROCDEF cascade;

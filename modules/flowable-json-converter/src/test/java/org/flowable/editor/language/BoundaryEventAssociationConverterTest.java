@@ -12,11 +12,16 @@
  */
 package org.flowable.editor.language;
 
-import org.flowable.bpmn.model.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.flowable.bpmn.model.Association;
+import org.flowable.bpmn.model.AssociationDirection;
+import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ScriptTask;
 import org.junit.Test;
-
-
-import static org.junit.Assert.*;
 
 public class BoundaryEventAssociationConverterTest extends AbstractConverterTest {
 

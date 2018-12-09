@@ -160,7 +160,7 @@ public class TaskHelper {
             }
         }
 
-        CommandContextUtil.getHistoryManager().recordTaskCreated(taskEntity, execution);
+        CommandContextUtil.getActivityInstanceEntityManager().recordTaskCreated(taskEntity, execution);
     }
 
     public static void insertTask(TaskEntity taskEntity, boolean fireCreateEvent) {

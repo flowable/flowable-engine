@@ -12,7 +12,6 @@
  */
 package org.flowable.engine.impl.history;
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -22,18 +21,24 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SequenceFlow;
-import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
+import org.flowable.engine.impl.ActivityInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.AbstractManager;
+import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
+import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
+import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.task.Event;
+import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -238,6 +243,25 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
         }
     }
 
+    @Override
+    public void updateActivity(ExecutionEntity childExecution, String oldActivityId, FlowElement newFlowElement, TaskEntity task) {
+        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager = CommandContextUtil.getHistoricActivityInstanceEntityManager();
+            List<HistoricActivityInstanceEntity> historicActivityInstances = historicActivityInstanceEntityManager.findHistoricActivityInstancesByExecutionAndActivityId(childExecution.getId(), oldActivityId);
+            for (HistoricActivityInstanceEntity historicActivityInstance : historicActivityInstances) {
+                historicActivityInstance.setProcessDefinitionId(childExecution.getProcessDefinitionId());
+                historicActivityInstance.setActivityId(childExecution.getActivityId());
+                historicActivityInstance.setActivityName(newFlowElement.getName());
+            }
+        }
+
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
+            HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
+            historicTaskService.recordTaskInfoChange(task);
+        }
+
+    }
+
     protected HistoricActivityInstanceEntity getHistoricActivityInstanceFromCache(String executionId, String activityId, boolean endTimeMustBeNull) {
         List<HistoricActivityInstanceEntity> cachedHistoricActivityInstances = getEntityCache().findInCache(HistoricActivityInstanceEntity.class);
         for (HistoricActivityInstanceEntity cachedHistoricActivityInstance : cachedHistoricActivityInstances) {
@@ -254,9 +278,9 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
     }
 
     @Override
-    public HistoricActivityInstanceEntity findActivityInstance(ExecutionEntity execution, boolean createOnNotFound, boolean endTimeMustBeNull) {
+    public HistoricActivityInstanceEntity findHistoricActivityInstance(ExecutionEntity execution, boolean endTimeMustBeNull) {
         String activityId = getActivityIdForExecution(execution);
-        return activityId != null ? findActivityInstance(execution, activityId, createOnNotFound, endTimeMustBeNull) : null;
+        return activityId != null ? findHistoricActivityInstance(execution, activityId, endTimeMustBeNull) : null;
     }
 
     protected String getActivityIdForExecution(ExecutionEntity execution) {
@@ -270,7 +294,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
         return activityId;
     }
 
-    protected HistoricActivityInstanceEntity findActivityInstance(ExecutionEntity execution, String activityId, boolean createOnNotFound, boolean endTimeMustBeNull) {
+    protected HistoricActivityInstanceEntity findHistoricActivityInstance(ExecutionEntity execution, String activityId, boolean endTimeMustBeNull) {
 
         // No use looking for the HistoricActivityInstance when no activityId is provided.
         if (activityId == null) {
@@ -293,52 +317,15 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
             List<HistoricActivityInstanceEntity> historicActivityInstances = getHistoricActivityInstanceEntityManager()
                             .findUnfinishedHistoricActivityInstancesByExecutionAndActivityId(executionId, activityId);
 
-            if (historicActivityInstances.size() > 0) {
+            if (historicActivityInstances.size() > 0 && (!endTimeMustBeNull || historicActivityInstances.get(0).getEndTime() == null)) {
                 return historicActivityInstances.get(0);
             }
 
         }
 
-        if (createOnNotFound
-                        && ((execution.getCurrentFlowElement() != null && execution.getCurrentFlowElement() instanceof FlowNode) || execution.getCurrentFlowElement() == null)) {
-            return createHistoricActivityInstanceEntity(execution);
-        }
-
         return null;
     }
 
-    protected HistoricActivityInstanceEntity createHistoricActivityInstanceEntity(ExecutionEntity execution) {
-        IdGenerator idGenerator = getProcessEngineConfiguration().getIdGenerator();
-
-        String processDefinitionId = execution.getProcessDefinitionId();
-        String processInstanceId = execution.getProcessInstanceId();
-
-        HistoricActivityInstanceEntity historicActivityInstance = getHistoricActivityInstanceEntityManager().create();
-        if (usePrefixId) {
-            historicActivityInstance.setId(historicActivityInstance.getIdPrefix() + idGenerator.getNextId());
-        } else {
-            historicActivityInstance.setId(idGenerator.getNextId());
-        }
-        
-        historicActivityInstance.setProcessDefinitionId(processDefinitionId);
-        historicActivityInstance.setProcessInstanceId(processInstanceId);
-        historicActivityInstance.setExecutionId(execution.getId());
-        historicActivityInstance.setActivityId(execution.getActivityId());
-        if (execution.getCurrentFlowElement() != null) {
-            historicActivityInstance.setActivityName(execution.getCurrentFlowElement().getName());
-            historicActivityInstance.setActivityType(parseActivityType(execution.getCurrentFlowElement()));
-        }
-        Date now = getClock().getCurrentTime();
-        historicActivityInstance.setStartTime(now);
-
-        if (execution.getTenantId() != null) {
-            historicActivityInstance.setTenantId(execution.getTenantId());
-        }
-
-        getHistoricActivityInstanceEntityManager().insert(historicActivityInstance);
-        return historicActivityInstance;
-    }
-    
     protected HistoryLevel getProcessDefinitionHistoryLevel(String processDefinitionId) {
         HistoryLevel processDefinitionHistoryLevel = null;
 

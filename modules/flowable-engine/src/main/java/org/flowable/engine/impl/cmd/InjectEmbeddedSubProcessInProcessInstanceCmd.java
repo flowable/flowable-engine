@@ -67,7 +67,7 @@ public class InjectEmbeddedSubProcessInProcessInstanceCmd extends AbstractDynami
         ExecutionEntity subProcessExecution = executionEntityManager.createChildExecution(processInstance);
         subProcessExecution.setScope(true);
         subProcessExecution.setCurrentFlowElement(subProcess);
-        CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(subProcessExecution);
+        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(subProcessExecution);
         
         ExecutionEntity childExecution = executionEntityManager.createChildExecution(subProcessExecution);
         

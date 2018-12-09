@@ -96,10 +96,8 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
             return deploymentBuilder.deploy().getId();
             
         } catch (Exception e) {
-            LOGGER.error("Error while deploying case definition", e);
+            throw new FlowableException("Error while deploying case definition", e);
         }
-        
-        return null;
     }
     
     protected String getCmmnDefinitionResource(FrameworkMethod method) {

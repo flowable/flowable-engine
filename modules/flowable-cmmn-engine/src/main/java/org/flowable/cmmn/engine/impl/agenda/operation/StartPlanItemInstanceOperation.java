@@ -55,15 +55,6 @@ public class StartPlanItemInstanceOperation extends AbstractChangePlanItemInstan
         executeActivityBehavior();
     }
 
-    @Override
-    public void beforeLifecycleListenersExecution() {
-        // Special case: when there is a cross-border plan item instance activation, it goes from nothing to active immediately.
-        // This makes sure any 'nothing -> available' life cycle listener is also called
-        if (planItemInstanceEntity.getState() == null) {
-            PlanItemLifeCycleListenerUtil.callLifecycleListeners(commandContext, planItemInstanceEntity, PlanItemInstanceState.AVAILABLE, getNewState());
-        }
-    }
-
     protected void executeActivityBehavior() {
         CmmnActivityBehavior activityBehavior = (CmmnActivityBehavior) planItemInstanceEntity.getPlanItem().getBehavior();
         if (activityBehavior instanceof CoreCmmnActivityBehavior) {

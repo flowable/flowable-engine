@@ -47,8 +47,8 @@ import org.flowable.engine.impl.cmd.GetDataObjectsCmd;
 import org.flowable.engine.impl.cmd.GetEnabledActivitiesForAdhocSubProcessCmd;
 import org.flowable.engine.impl.cmd.GetEntityLinkChildrenForProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.GetEntityLinkChildrenForTaskCmd;
-import org.flowable.engine.impl.cmd.GetEntityLinkParentForProcessInstanceCmd;
-import org.flowable.engine.impl.cmd.GetEntityLinkParentForTaskCmd;
+import org.flowable.engine.impl.cmd.GetEntityLinkParentsForProcessInstanceCmd;
+import org.flowable.engine.impl.cmd.GetEntityLinkParentsForTaskCmd;
 import org.flowable.engine.impl.cmd.GetExecutionVariableCmd;
 import org.flowable.engine.impl.cmd.GetExecutionVariableInstanceCmd;
 import org.flowable.engine.impl.cmd.GetExecutionVariableInstancesCmd;
@@ -191,6 +191,11 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     @Override
     public NativeProcessInstanceQuery createNativeProcessInstanceQuery() {
         return new NativeProcessInstanceQueryImpl(commandExecutor);
+    }
+
+    @Override
+    public NativeActivityInstanceQueryImpl createNativeActivityInstanceQuery() {
+        return new NativeActivityInstanceQueryImpl(commandExecutor);
     }
 
     @Override
@@ -491,18 +496,23 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     }
 
     @Override
-    public List<EntityLink> getEntityLinkParentForProcessInstance(String processInstanceId) {
-        return commandExecutor.execute(new GetEntityLinkParentForProcessInstanceCmd(processInstanceId));
+    public List<EntityLink> getEntityLinkParentsForProcessInstance(String processInstanceId) {
+        return commandExecutor.execute(new GetEntityLinkParentsForProcessInstanceCmd(processInstanceId));
     }
 
     @Override
-    public List<EntityLink> getEntityLinkParentForTask(String taskId) {
-        return commandExecutor.execute(new GetEntityLinkParentForTaskCmd(taskId));
+    public List<EntityLink> getEntityLinkParentsForTask(String taskId) {
+        return commandExecutor.execute(new GetEntityLinkParentsForTaskCmd(taskId));
     }
 
     @Override
     public ProcessInstanceQuery createProcessInstanceQuery() {
         return new ProcessInstanceQueryImpl(commandExecutor);
+    }
+
+    @Override
+    public ActivityInstanceQueryImpl createActivityInstanceQuery() {
+        return new ActivityInstanceQueryImpl(commandExecutor);
     }
 
     @Override

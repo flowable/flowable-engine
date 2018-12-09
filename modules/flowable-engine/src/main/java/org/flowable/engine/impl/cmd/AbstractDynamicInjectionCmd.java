@@ -157,8 +157,9 @@ public abstract class AbstractDynamicInjectionCmd {
         for (IdentityLinkEntity identityLinkEntity : identityLinks) {
             identityLinkEntity.setProcessDefId(processDefinitionEntity.getId());
         }
-        
-        CommandContextUtil.getHistoryManager().updateProcessDefinitionIdInHistory(processDefinitionEntity, processInstance);
+
+        CommandContextUtil.getActivityInstanceEntityManager(commandContext).updateActivityInstancesProcessDefinitionId(processDefinitionEntity.getId(), processInstance.getId());
+        CommandContextUtil.getHistoryManager(commandContext).updateProcessDefinitionIdInHistory(processDefinitionEntity, processInstance);
         
         List<ExecutionEntity> childExecutions = CommandContextUtil.getExecutionEntityManager(commandContext).findChildExecutionsByProcessInstanceId(processInstance.getId());
         for (ExecutionEntity childExecution : childExecutions) {
