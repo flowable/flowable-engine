@@ -26,7 +26,6 @@ import org.flowable.engine.impl.persistence.entity.HistoricDetailEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricFormPropertyEntity;
 import org.flowable.engine.impl.persistence.entity.data.HistoricDetailDataManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -68,7 +67,6 @@ public class FormPropertiesSubmittedHistoryJsonTransformer extends AbstractHisto
             historicFormPropertyEntity.setProcessInstanceId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID));
             historicFormPropertyEntity.setExecutionId(getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID));
             historicFormPropertyEntity.setTaskId(getStringFromJson(historicalData, HistoryJsonConstants.TASK_ID));
-            historicFormPropertyEntity.setPropertyId(propertyId);
             historicFormPropertyEntity.setPropertyId(propertyId);
             historicFormPropertyEntity.setPropertyValue(getStringFromJson(historicalData, HistoryJsonConstants.FORM_PROPERTY_VALUE + counter));
             historicFormPropertyEntity.setTime(getDateFromJson(historicalData, HistoryJsonConstants.CREATE_TIME));
