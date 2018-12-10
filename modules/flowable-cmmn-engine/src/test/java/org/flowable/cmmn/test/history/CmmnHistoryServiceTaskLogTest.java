@@ -208,9 +208,9 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
         List<TaskLogEntry> taskLogEntries = cmmnHistoryService.createTaskLogEntryQuery().taskId(task.getId()).list();
 
         assertThat(taskLogEntries).size().isEqualTo(2);
-        assertThat(taskLogEntries.get(1)).
-            extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
-            isEqualTo("{\"previousOwnerId\":null,\"newOwnerId\":\"newOwner\"}");
+        assertThat(taskLogEntries.get(1).getData()).
+            contains("\"previousOwnerId\":null").
+            contains("\"newOwnerId\":\"newOwner\"");
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTimeStamp).isNotNull();
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTaskId).isEqualTo(task.getId());
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getUserId).isNull();
@@ -233,9 +233,9 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
 
         List<TaskLogEntry> taskLogEntries = cmmnHistoryService.createTaskLogEntryQuery().taskId(task.getId()).list();
         assertThat(taskLogEntries).size().isEqualTo(2);
-        assertThat(taskLogEntries.get(1)).
-            extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
-            isEqualTo("{\"newAssigneeId\":\"testUser\",\"previousAssigneeId\":null}");
+        assertThat(taskLogEntries.get(1).getData()).
+            contains("\"newAssigneeId\":\"testUser\"").
+            contains("\"previousAssigneeId\":null");
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTimeStamp).isNotNull();
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTaskId).isEqualTo(task.getId());
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getUserId).isNull();
@@ -252,9 +252,9 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
 
         List<TaskLogEntry> taskLogEntries = cmmnHistoryService.createTaskLogEntryQuery().taskId(task.getId()).list();
         assertThat(taskLogEntries).size().isEqualTo(2);
-        assertThat(taskLogEntries.get(1)).
-            extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
-            isEqualTo("{\"newAssigneeId\":null,\"previousAssigneeId\":\"initialAssignee\"}");
+        assertThat(taskLogEntries.get(1).getData()).
+            contains("\"newAssigneeId\":null").
+            contains("\"previousAssigneeId\":\"initialAssignee\"");
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTimeStamp).isNotNull();
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTaskId).isEqualTo(task.getId());
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getUserId).isNull();
@@ -270,9 +270,9 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
         List<TaskLogEntry> taskLogEntries = cmmnHistoryService.createTaskLogEntryQuery().taskId(task.getId()).list();
 
         assertThat(taskLogEntries).size().isEqualTo(2);
-        assertThat(taskLogEntries.get(1)).
-            extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
-            isEqualTo("{\"newPriority\":2147483647,\"previousPriority\":50}");
+        assertThat(taskLogEntries.get(1).getData()).
+            contains("\"newPriority\":2147483647").
+            contains("\"previousPriority\":50");
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTimeStamp).isNotNull();
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTaskId).isEqualTo(task.getId());
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getUserId).isNull();
@@ -316,9 +316,9 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
         List<TaskLogEntry> taskLogEntries = cmmnHistoryService.createTaskLogEntryQuery().taskId(task.getId()).list();
 
         assertThat(taskLogEntries).size().isEqualTo(2);
-        assertThat(taskLogEntries.get(1)).
-            extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
-            isEqualTo("{\"newDueDate\":0,\"previousDueDate\":null}");
+        assertThat(taskLogEntries.get(1).getData()).
+            contains("\"newDueDate\":0").
+            contains("\"previousDueDate\":null");
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTimeStamp).isNotNull();
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTaskId).isEqualTo(task.getId());
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getUserId).isNull();
@@ -446,7 +446,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
                 extracting(taskLogEntry -> taskLogEntry.getType()).isEqualTo("USER_TASK_OWNER_CHANGED")
             ;
             assertThat(logEntries.get(3)).
-                extracting(taskLogEntry -> taskLogEntry.getType()).isEqualTo("TASK_COMPLETED")
+                extracting(taskLogEntry -> taskLogEntry.getType()).isEqualTo("USER_TASK_COMPLETED")
             ;
         } finally {
             deleteTaskWithLogEntries(task.getId());
@@ -470,7 +470,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
             assertThat(logEntries).size().isEqualTo(2);
             assertThat(logEntries.get(1)).
                 extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_ADDED");
-            assertThat(new String(logEntries.get(1).getData())).contains(
+            assertThat(logEntries.get(1).getData()).contains(
                 "\"type\":\"candidate\"",
                 "\"userId\":\"newCandidateUser\""
             );

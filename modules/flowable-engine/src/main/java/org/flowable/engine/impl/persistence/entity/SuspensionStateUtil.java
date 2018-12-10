@@ -19,6 +19,7 @@ import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.task.api.TaskLogEntryBuilder;
+import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +69,7 @@ public class SuspensionStateUtil {
             data.put("newSuspensionState", state.getStateCode());
             TaskLogEntryBuilder taskLogEntryBuilder = CommandContextUtil.getProcessEngineConfiguration().getHistoryService()
                 .createTaskLogEntryBuilder(taskEntity);
-            taskLogEntryBuilder.type("USER_TASK_SUSPENSIONSTATE_CHANGED");
+            taskLogEntryBuilder.type(HistoricTaskLogEntryType.USER_TASK_SUSPENSIONSTATE_CHANGED.name());
             taskLogEntryBuilder.data(data.toString());
             taskLogEntryBuilder.add();
         }

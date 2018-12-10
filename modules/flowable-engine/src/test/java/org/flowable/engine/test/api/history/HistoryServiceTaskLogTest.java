@@ -175,9 +175,7 @@ public class HistoryServiceTaskLogTest {
         List<TaskLogEntry> taskLogEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
 
         assertThat(taskLogEntries).size().isEqualTo(2);
-        assertThat(taskLogEntries.get(1)).
-            extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
-            isEqualTo("{\"newAssigneeId\":\"newAssignee\",\"previousAssigneeId\":\"initialAssignee\"}");
+        assertThat(taskLogEntries.get(1).getData()).contains("\"newAssigneeId\":\"newAssignee\"","\"previousAssigneeId\":\"initialAssignee\"");
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTimeStamp).isNotNull();
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTaskId).isEqualTo(task.getId());
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getUserId).isNull();
@@ -201,9 +199,8 @@ public class HistoryServiceTaskLogTest {
         List<TaskLogEntry> taskLogEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
 
         assertThat(taskLogEntries).size().isEqualTo(2);
-        assertThat(taskLogEntries.get(1)).
-            extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
-            isEqualTo("{\"previousOwnerId\":null,\"newOwnerId\":\"newOwner\"}");
+        assertThat(taskLogEntries.get(1).getData()).
+            contains("\"previousOwnerId\":null","\"newOwnerId\":\"newOwner\"");
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTimeStamp).isNotNull();
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTaskId).isEqualTo(task.getId());
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getUserId).isNull();
@@ -226,9 +223,7 @@ public class HistoryServiceTaskLogTest {
 
         List<TaskLogEntry> taskLogEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
         assertThat(taskLogEntries).size().isEqualTo(2);
-        assertThat(taskLogEntries.get(1)).
-            extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
-            isEqualTo("{\"newAssigneeId\":\"testUser\",\"previousAssigneeId\":null}");
+        assertThat(taskLogEntries.get(1).getData()).contains("\"newAssigneeId\":\"testUser\"","\"previousAssigneeId\":null");
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTimeStamp).isNotNull();
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTaskId).isEqualTo(task.getId());
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getUserId).isNull();
@@ -245,9 +240,8 @@ public class HistoryServiceTaskLogTest {
 
         List<TaskLogEntry> taskLogEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
         assertThat(taskLogEntries).size().isEqualTo(2);
-        assertThat(taskLogEntries.get(1)).
-            extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
-            isEqualTo("{\"newAssigneeId\":null,\"previousAssigneeId\":\"initialAssignee\"}");
+        assertThat(taskLogEntries.get(1).getData()).
+            contains("\"newAssigneeId\":null","\"previousAssigneeId\":\"initialAssignee\"");
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTimeStamp).isNotNull();
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTaskId).isEqualTo(task.getId());
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getUserId).isNull();
@@ -263,9 +257,8 @@ public class HistoryServiceTaskLogTest {
         List<TaskLogEntry> taskLogEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
 
         assertThat(taskLogEntries).size().isEqualTo(2);
-        assertThat(taskLogEntries.get(1)).
-            extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
-            isEqualTo("{\"newPriority\":2147483647,\"previousPriority\":50}");
+        assertThat(taskLogEntries.get(1).getData()).
+            contains("\"newPriority\":2147483647","\"previousPriority\":50}");
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTimeStamp).isNotNull();
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTaskId).isEqualTo(task.getId());
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getUserId).isNull();
@@ -310,9 +303,7 @@ public class HistoryServiceTaskLogTest {
         List<TaskLogEntry> taskLogEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
 
         assertThat(taskLogEntries).size().isEqualTo(2);
-        assertThat(taskLogEntries.get(1)).
-            extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
-            isEqualTo("{\"newDueDate\":0,\"previousDueDate\":null}");
+        assertThat(taskLogEntries.get(1).getData()).contains("\"newDueDate\":0","\"previousDueDate\":null}");
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTimeStamp).isNotNull();
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getTaskId).isEqualTo(task.getId());
         assertThat(taskLogEntries.get(1)).extracting(TaskLogEntry::getUserId).isNull();
@@ -472,7 +463,7 @@ public class HistoryServiceTaskLogTest {
                 extracting(taskLogEntry -> taskLogEntry.getType()).isEqualTo("USER_TASK_OWNER_CHANGED")
             ;
             assertThat(logEntries.get(3)).
-                extracting(taskLogEntry -> taskLogEntry.getType()).isEqualTo("TASK_COMPLETED")
+                extracting(taskLogEntry -> taskLogEntry.getType()).isEqualTo("USER_TASK_COMPLETED")
             ;
         } finally {
             deleteTaskWithLogEntries(taskService, task.getId());
@@ -659,7 +650,7 @@ public class HistoryServiceTaskLogTest {
         // + completed event. Do not expect identity link removed events
         assertThat(logEntries).size().isEqualTo(4);
         assertThat(logEntries.get(3)).
-            extracting(TaskLogEntry::getType).isEqualTo("TASK_COMPLETED");
+            extracting(TaskLogEntry::getType).isEqualTo("USER_TASK_COMPLETED");
     }
 
     @Test

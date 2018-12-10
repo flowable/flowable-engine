@@ -26,6 +26,7 @@ import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.api.TaskInfo;
+import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.event.impl.FlowableTaskEventBuilder;
 import org.flowable.task.service.impl.TaskQueryImpl;
@@ -40,13 +41,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Joram Barrez
  */
 public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> implements TaskEntityManager {
-
-    public static final String EVENT_USER_TASK_ASSIGNEE_CHANGED = "USER_TASK_ASSIGNEE_CHANGED";
-    public static final String EVENT_USER_TASK_CREATED = "USER_TASK_CREATED";
-    public static final String EVENT_USER_TASK_OWNER_CHANGED = "USER_TASK_OWNER_CHANGED";
-    public static final String EVENT_USER_TASK_PRIORITY_CHANGED = "USER_TASK_PRIORITY_CHANGED";
-    public static final String EVENT_USER_TASK_DUEDATE_CHANGED = "USER_TASK_DUEDATE_CHANGED";
-    public static final String EVENT_USER_TASK_NAME_CHANGED = "USER_TASK_NAME_CHANGED";
 
     protected TaskDataManager taskDataManager;
 
@@ -247,7 +241,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     protected void logAssigneeChanged(TaskEntity taskEntity, String previousAssignee, String newAssignee) {
         if (this.getTaskServiceConfiguration().isEnableDatabaseEventLogging()) {
             TaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
-            taskLogEntry.setType(EVENT_USER_TASK_ASSIGNEE_CHANGED);
+            taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_ASSIGNEE_CHANGED.name());
             taskLogEntry.setData(
                 serializeLogEntryData(
                     "newAssigneeId", newAssignee,
@@ -261,7 +255,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     protected void logOwnerChanged(TaskEntity taskEntity, String previousOwner, String newOwner) {
         if (this.getTaskServiceConfiguration().isEnableDatabaseEventLogging()) {
             TaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
-            taskLogEntry.setType(EVENT_USER_TASK_OWNER_CHANGED);
+            taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_OWNER_CHANGED.name());
             taskLogEntry.setData(
                 serializeLogEntryData(
                     "newOwnerId", newOwner,
@@ -275,7 +269,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     protected void logPriorityChanged(TaskEntity taskEntity, Integer previousPriority, int newPriority) {
         if (this.getTaskServiceConfiguration().isEnableDatabaseEventLogging()) {
             TaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
-            taskLogEntry.setType(EVENT_USER_TASK_PRIORITY_CHANGED);
+            taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_PRIORITY_CHANGED.name());
             ObjectNode dataNode = taskServiceConfiguration.getObjectMapper().createObjectNode();
             dataNode.put("newPriority", newPriority);
             dataNode.put("previousPriority", previousPriority);
@@ -287,7 +281,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     protected void logDueDateChanged(TaskEntity taskEntity, Date previousDueDate, Date newDueDate) {
         if (this.getTaskServiceConfiguration().isEnableDatabaseEventLogging()) {
             TaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
-            taskLogEntry.setType(EVENT_USER_TASK_DUEDATE_CHANGED);
+            taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_DUEDATE_CHANGED.name());
             ObjectNode dataNode = taskServiceConfiguration.getObjectMapper().createObjectNode();
             dataNode.put("newDueDate", newDueDate != null ? newDueDate.getTime() : null);
             dataNode.put("previousDueDate", previousDueDate != null ? previousDueDate.getTime() : null);
@@ -299,7 +293,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     protected void logNameChanged(TaskEntity taskEntity, String previousName, String newName) {
         if (this.getTaskServiceConfiguration().isEnableDatabaseEventLogging()) {
             TaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
-            taskLogEntry.setType(EVENT_USER_TASK_NAME_CHANGED);
+            taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_NAME_CHANGED.name());
             taskLogEntry.setData(
                 serializeLogEntryData(
                     "newName", newName,
@@ -314,7 +308,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
         if (this.getTaskServiceConfiguration().isEnableDatabaseEventLogging()) {
             TaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(task);
             taskLogEntry.setTimeStamp(task.getCreateTime());
-            taskLogEntry.setType(EVENT_USER_TASK_CREATED);
+            taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_CREATED.name());
             CommandContextUtil.getTaskLogEntryEntityManager().insert(taskLogEntry);
         }
     }

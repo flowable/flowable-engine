@@ -17,6 +17,7 @@ import java.util.List;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.api.TaskLogEntryBuilder;
+import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -71,7 +72,7 @@ public class IdentityLinkUtil {
             }
         }
 
-        logTaskIdentityLinkEvent("USER_TASK_IDENTITY_LINK_ADDED", taskEntity, identityLinkEntity);
+        logTaskIdentityLinkEvent(HistoricTaskLogEntryType.USER_TASK_IDENTITY_LINK_ADDED.name(), taskEntity, identityLinkEntity);
 
         taskEntity.getIdentityLinks().add(identityLinkEntity);
         CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLinkToParent(taskEntity, identityLinkEntity.getUserId());
@@ -85,7 +86,7 @@ public class IdentityLinkUtil {
             if (updateTaskCounts) {
                 handleTaskCountsForIdentityLinkDeletion(taskEntity, identityLinkEntity);
             }
-            logTaskIdentityLinkEvent("USER_TASK_IDENTITY_LINK_REMOVED", taskEntity, identityLinkEntity);
+            logTaskIdentityLinkEvent(HistoricTaskLogEntryType.USER_TASK_IDENTITY_LINK_REMOVED.name(), taskEntity, identityLinkEntity);
         }
         
         taskEntity.getIdentityLinks().removeAll(identityLinks);
@@ -103,7 +104,7 @@ public class IdentityLinkUtil {
     protected static void logTaskIdentityLinkEvent(String eventType, TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity) {
         TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
         if (taskServiceConfiguration.isEnableDatabaseEventLogging()) {
-            TaskLogEntryBuilder taskLogEntryBuilder = CommandContextUtil.getProcessEngineConfiguration().getHistoryService().createTaskLogEntryBuilder();
+            TaskLogEntryBuilder taskLogEntryBuilder = CommandContextUtil.getProcessEngineConfiguration().getHistoryService().createTaskLogEntryBuilder(taskEntity);
             taskLogEntryBuilder.type(eventType);
             ObjectNode data = CommandContextUtil.getTaskServiceConfiguration().getObjectMapper().createObjectNode();
             if (identityLinkEntity.isUser()) {

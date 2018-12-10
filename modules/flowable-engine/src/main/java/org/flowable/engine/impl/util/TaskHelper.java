@@ -34,6 +34,7 @@ import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEnt
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
@@ -120,7 +121,7 @@ public class TaskHelper {
             taskLogEntry.setProcessInstanceId(taskEntity.getProcessInstanceId());
             taskLogEntry.setProcessDefinitionId(taskEntity.getProcessDefinitionId());
             taskLogEntry.setTimeStamp(CommandContextUtil.getTaskServiceConfiguration(commandContext).getClock().getCurrentTime());
-            taskLogEntry.setType(FlowableEngineEventType.TASK_COMPLETED.name());
+            taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_COMPLETED.name());
             taskLogEntry.setUserId(Authentication.getAuthenticatedUserId());
             CommandContextUtil.getHistoricTaskService().addTaskLogEntry(taskLogEntry);
         }
