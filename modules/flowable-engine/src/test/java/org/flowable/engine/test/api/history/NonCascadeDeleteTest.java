@@ -50,7 +50,7 @@ public class NonCascadeDeleteTest extends PluggableFlowableTestCase {
 
             // clean
             historyService.deleteHistoricProcessInstance(processInstanceId);
-            historyService.createTaskLogEntryQuery().processInstanceId(processInstanceId).list().forEach(taskLogEntry -> historyService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
+            historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceId).list().forEach(taskLogEntry -> historyService.deleteHistoricTaskLogEntry(taskLogEntry.getLogNumber()));
 
             waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         }

@@ -41,12 +41,12 @@ public class NativeHistoricTaskLogEntryQueryImpl extends AbstractNativeQuery<Nat
 
     @Override
     public List<HistoricTaskLogEntry> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
-        return CommandContextUtil.getTaskLogEntryEntityManager(commandContext).findTaskLogEntriesByNativeQueryCriteria(parameterMap);
+        return CommandContextUtil.getHistoricTaskLogEntryEntityManager(commandContext).findHistoricTaskLogEntriesByNativeQueryCriteria(parameterMap);
     }
 
     @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
-        return CommandContextUtil.getTaskLogEntryEntityManager(commandContext).findTaskLogEntriesCountByNativeQueryCriteria(parameterMap);
+        return CommandContextUtil.getHistoricTaskLogEntryEntityManager(commandContext).findHistoricTaskLogEntriesCountByNativeQueryCriteria(parameterMap);
     }
 
 }

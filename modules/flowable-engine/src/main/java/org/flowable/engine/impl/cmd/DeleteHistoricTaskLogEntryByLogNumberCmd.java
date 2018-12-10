@@ -19,17 +19,17 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 /**
  * @author martin.grofcik
  */
-public class DeleteTaskLogEntryByLogNumberCmd implements Command<Void> {
+public class DeleteHistoricTaskLogEntryByLogNumberCmd implements Command<Void> {
 
     protected long logNumber;
 
-    public DeleteTaskLogEntryByLogNumberCmd(long logNumber) {
+    public DeleteHistoricTaskLogEntryByLogNumberCmd(long logNumber) {
         this.logNumber = logNumber;
     }
 
     @Override
     public Void execute(CommandContext commandContext) {
-        CommandContextUtil.getHistoricTaskService(commandContext).deleteTaskLogEntry(logNumber);
+        CommandContextUtil.getHistoricTaskService(commandContext).deleteHistoricTaskLogEntry(logNumber);
         return null;
     }
 }

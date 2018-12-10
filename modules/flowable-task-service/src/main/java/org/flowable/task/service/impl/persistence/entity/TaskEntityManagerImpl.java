@@ -248,7 +248,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
                     "previousAssigneeId", previousAssignee
                 )
             );
-            CommandContextUtil.getTaskLogEntryEntityManager().insert(taskLogEntry);
+            CommandContextUtil.getHistoricTaskLogEntryEntityManager().insert(taskLogEntry);
         }
     }
 
@@ -262,7 +262,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
                     "previousOwnerId", previousOwner
                 )
             );
-            CommandContextUtil.getTaskLogEntryEntityManager().insert(taskLogEntry);
+            CommandContextUtil.getHistoricTaskLogEntryEntityManager().insert(taskLogEntry);
         }
     }
 
@@ -274,7 +274,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
             dataNode.put("newPriority", newPriority);
             dataNode.put("previousPriority", previousPriority);
             taskLogEntry.setData( dataNode.toString());
-            CommandContextUtil.getTaskLogEntryEntityManager().insert(taskLogEntry);
+            CommandContextUtil.getHistoricTaskLogEntryEntityManager().insert(taskLogEntry);
         }
     }
 
@@ -286,7 +286,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
             dataNode.put("newDueDate", newDueDate != null ? newDueDate.getTime() : null);
             dataNode.put("previousDueDate", previousDueDate != null ? previousDueDate.getTime() : null);
             taskLogEntry.setData(dataNode.toString());
-            CommandContextUtil.getTaskLogEntryEntityManager().insert(taskLogEntry);
+            CommandContextUtil.getHistoricTaskLogEntryEntityManager().insert(taskLogEntry);
         }
     }
 
@@ -300,7 +300,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
                     "previousName", previousName
                 )
             );
-            CommandContextUtil.getTaskLogEntryEntityManager().insert(taskLogEntry);
+            CommandContextUtil.getHistoricTaskLogEntryEntityManager().insert(taskLogEntry);
         }
     }
 
@@ -309,25 +309,25 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
             HistoricTaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(task);
             taskLogEntry.setTimeStamp(task.getCreateTime());
             taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_CREATED.name());
-            CommandContextUtil.getTaskLogEntryEntityManager().insert(taskLogEntry);
+            CommandContextUtil.getHistoricTaskLogEntryEntityManager().insert(taskLogEntry);
         }
     }
 
     protected HistoricTaskLogEntryEntity createInitialTaskLogEntry(TaskInfo task) {
-        HistoricTaskLogEntryEntity taskLogEntryEntity = CommandContextUtil.getTaskLogEntryEntityManager().create();
-        taskLogEntryEntity.setUserId(Authentication.getAuthenticatedUserId());
-        taskLogEntryEntity.setTimeStamp(this.taskServiceConfiguration.getClock().getCurrentTime());
-        taskLogEntryEntity.setTaskId(task.getId());
-        taskLogEntryEntity.setTenantId(task.getTenantId());
-        taskLogEntryEntity.setProcessInstanceId(task.getProcessInstanceId());
-        taskLogEntryEntity.setProcessDefinitionId(task.getProcessDefinitionId());
-        taskLogEntryEntity.setExecutionId(task.getExecutionId());
-        taskLogEntryEntity.setScopeId(task.getScopeId());
-        taskLogEntryEntity.setScopeDefinitionId(task.getScopeDefinitionId());
-        taskLogEntryEntity.setSubScopeId(task.getSubScopeId());
-        taskLogEntryEntity.setScopeType(task.getScopeType());
+        HistoricTaskLogEntryEntity historicTaskLogEntryEntity = CommandContextUtil.getHistoricTaskLogEntryEntityManager().create();
+        historicTaskLogEntryEntity.setUserId(Authentication.getAuthenticatedUserId());
+        historicTaskLogEntryEntity.setTimeStamp(this.taskServiceConfiguration.getClock().getCurrentTime());
+        historicTaskLogEntryEntity.setTaskId(task.getId());
+        historicTaskLogEntryEntity.setTenantId(task.getTenantId());
+        historicTaskLogEntryEntity.setProcessInstanceId(task.getProcessInstanceId());
+        historicTaskLogEntryEntity.setProcessDefinitionId(task.getProcessDefinitionId());
+        historicTaskLogEntryEntity.setExecutionId(task.getExecutionId());
+        historicTaskLogEntryEntity.setScopeId(task.getScopeId());
+        historicTaskLogEntryEntity.setScopeDefinitionId(task.getScopeDefinitionId());
+        historicTaskLogEntryEntity.setSubScopeId(task.getSubScopeId());
+        historicTaskLogEntryEntity.setScopeType(task.getScopeType());
 
-        return taskLogEntryEntity;
+        return historicTaskLogEntryEntity;
     }
 
     protected void logTaskUpdateEvents(TaskEntity task) {

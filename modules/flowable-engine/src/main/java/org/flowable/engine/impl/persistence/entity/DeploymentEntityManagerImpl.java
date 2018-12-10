@@ -140,7 +140,7 @@ public class DeploymentEntityManagerImpl extends AbstractEntityManager<Deploymen
 
     protected void deleteTaskEventLogEntriesForProcessDefinitions(List<ProcessDefinition> processDefinitions) {
         for (ProcessDefinition processDefinition : processDefinitions) {
-            CommandContextUtil.getHistoricTaskService().deleteTaskLogEntriesForProcessDefinition(processDefinition.getId());
+            CommandContextUtil.getHistoricTaskService().deleteHistoricTaskLogEntriesForProcessDefinition(processDefinition.getId());
         }
     }
 

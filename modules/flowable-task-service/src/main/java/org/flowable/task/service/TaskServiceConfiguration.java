@@ -28,12 +28,12 @@ import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEnt
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityManagerImpl;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityManager;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityManagerImpl;
-import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntityManager;
-import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntityManagerImpl;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityManager;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityManagerImpl;
 import org.flowable.task.service.impl.persistence.entity.data.HistoricTaskInstanceDataManager;
 import org.flowable.task.service.impl.persistence.entity.data.TaskDataManager;
-import org.flowable.task.service.impl.persistence.entity.data.TaskLogEntryDataManager;
-import org.flowable.task.service.impl.persistence.entity.data.impl.MyBatisTaskLogEntryDataManager;
+import org.flowable.task.service.impl.persistence.entity.data.HistoricTaskLogEntryDataManager;
+import org.flowable.task.service.impl.persistence.entity.data.impl.MyBatisHistoricTaskLogEntryDataManager;
 import org.flowable.task.service.impl.persistence.entity.data.impl.MybatisHistoricTaskInstanceDataManager;
 import org.flowable.task.service.impl.persistence.entity.data.impl.MybatisTaskDataManager;
 
@@ -53,12 +53,12 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
 
     protected TaskDataManager taskDataManager;
     protected HistoricTaskInstanceDataManager historicTaskInstanceDataManager;
-    protected TaskLogEntryDataManager taskLogDataManager;
+    protected HistoricTaskLogEntryDataManager historicTaskLogDataManager;
 
     // ENTITY MANAGERS /////////////////////////////////////////////////
     protected TaskEntityManager taskEntityManager;
     protected HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager;
-    protected TaskLogEntryEntityManager taskLogEntityManager;
+    protected HistoricTaskLogEntryEntityManager taskLogEntityManager;
 
     protected InternalTaskVariableScopeResolver internalTaskVariableScopeResolver;
     protected InternalHistoryTaskManager internalHistoryTaskManager;
@@ -97,8 +97,8 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         if (historicTaskInstanceDataManager == null) {
             historicTaskInstanceDataManager = new MybatisHistoricTaskInstanceDataManager();
         }
-        if (taskLogDataManager == null) {
-            taskLogDataManager = new MyBatisTaskLogEntryDataManager();
+        if (historicTaskLogDataManager == null) {
+            historicTaskLogDataManager = new MyBatisHistoricTaskLogEntryDataManager();
         }
     }
 
@@ -110,7 +110,7 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
             historicTaskInstanceEntityManager = new HistoricTaskInstanceEntityManagerImpl(this, historicTaskInstanceDataManager);
         }
         if (taskLogEntityManager == null) {
-            taskLogEntityManager = new TaskLogEntryEntityManagerImpl(this, taskLogDataManager);
+            taskLogEntityManager = new HistoricTaskLogEntryEntityManagerImpl(this, historicTaskLogDataManager);
         }
     }
 
@@ -186,11 +186,11 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         return this;
     }
 
-    public TaskLogEntryEntityManager getTaskLogEntryEntityManager() {
+    public HistoricTaskLogEntryEntityManager getHistoricTaskLogEntryEntityManager() {
         return taskLogEntityManager;
     }
 
-    public TaskServiceConfiguration setTaskLogEntryEntityManager(TaskLogEntryEntityManager taskLogEntityManager) {
+    public TaskServiceConfiguration setTaskLogEntryEntityManager(HistoricTaskLogEntryEntityManager taskLogEntityManager) {
         this.taskLogEntityManager = taskLogEntityManager;
         return this;
     }

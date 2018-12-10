@@ -28,7 +28,7 @@ import org.flowable.engine.history.ProcessInstanceHistoryLogQuery;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.DeleteHistoricProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.DeleteHistoricTaskInstanceCmd;
-import org.flowable.engine.impl.cmd.DeleteTaskLogEntryByLogNumberCmd;
+import org.flowable.engine.impl.cmd.DeleteHistoricTaskLogEntryByLogNumberCmd;
 import org.flowable.engine.impl.cmd.GetHistoricEntityLinkChildrenForProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.GetHistoricEntityLinkChildrenForTaskCmd;
 import org.flowable.engine.impl.cmd.GetHistoricEntityLinkParentsForProcessInstanceCmd;
@@ -159,27 +159,27 @@ public class HistoryServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     }
 
     @Override
-    public void deleteTaskLogEntry(long logNumber) {
-        commandExecutor.execute(new DeleteTaskLogEntryByLogNumberCmd(logNumber));
+    public void deleteHistoricTaskLogEntry(long logNumber) {
+        commandExecutor.execute(new DeleteHistoricTaskLogEntryByLogNumberCmd(logNumber));
     }
 
     @Override
-    public HistoricTaskLogEntryBuilder createTaskLogEntryBuilder(TaskInfo task) {
+    public HistoricTaskLogEntryBuilder createHistoricTaskLogEntryBuilder(TaskInfo task) {
         return new HistoricTaskLogEntryBuilderImpl(commandExecutor, task);
     }
 
     @Override
-    public HistoricTaskLogEntryBuilder createTaskLogEntryBuilder() {
+    public HistoricTaskLogEntryBuilder createHistoricTaskLogEntryBuilder() {
         return new HistoricTaskLogEntryBuilderImpl(commandExecutor);
     }
 
     @Override
-    public HistoricTaskLogEntryQuery createTaskLogEntryQuery() {
+    public HistoricTaskLogEntryQuery createHistoricTaskLogEntryQuery() {
         return new HistoricTaskLogEntryQueryImpl(commandExecutor);
     }
 
     @Override
-    public NativeHistoricTaskLogEntryQuery createNativeTaskLogEntryQuery() {
+    public NativeHistoricTaskLogEntryQuery createNativeHistoricTaskLogEntryQuery() {
         return new NativeHistoricTaskLogEntryQueryImpl(commandExecutor);
     }
 

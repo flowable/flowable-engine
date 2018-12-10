@@ -188,23 +188,23 @@ public class HistoricTaskLogEntryQueryImpl extends AbstractQuery<HistoricTaskLog
     @Override
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
-        return CommandContextUtil.getTaskLogEntryEntityManager(commandContext).findTaskLogEntriesCountByQueryCriteria(this);
+        return CommandContextUtil.getHistoricTaskLogEntryEntityManager(commandContext).findHistoricTaskLogEntriesCountByQueryCriteria(this);
     }
 
     @Override
     public List<HistoricTaskLogEntry> executeList(CommandContext commandContext) {
         checkQueryOk();
-        return CommandContextUtil.getTaskLogEntryEntityManager(commandContext).findTaskLogEntriesByQueryCriteria(this);
+        return CommandContextUtil.getHistoricTaskLogEntryEntityManager(commandContext).findHistoricTaskLogEntriesByQueryCriteria(this);
     }
 
     @Override
     public HistoricTaskLogEntryQuery orderByLogNumber() {
-        orderBy(TaskLogEntryQueryProperty.LOG_NUMBER);
+        orderBy(HistoricTaskLogEntryQueryProperty.LOG_NUMBER);
         return this;
     }
     @Override
     public HistoricTaskLogEntryQuery orderByTimeStamp() {
-        orderBy(TaskLogEntryQueryProperty.TIME_STAMP);
+        orderBy(HistoricTaskLogEntryQueryProperty.TIME_STAMP);
         return this;
     }
 }

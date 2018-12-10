@@ -496,7 +496,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             stopProfiling();
 
             assertExecutedCommands("StartProcessInstanceCmd", "org.flowable.task.service.impl.TaskQueryImpl", "AddIdentityLinkCmd", "DeleteIdentityLinkCmd",
-                    "CompleteTaskCmd");
+                    "CompleteTaskCmd", "org.flowable.task.service.impl.HistoricTaskLogEntryBuilderImpl");
 
             // Check "AddIdentityLinkCmd" (2 invocations)
             assertNoDeletes("AddIdentityLinkCmd");
@@ -552,7 +552,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             stopProfiling();
 
             assertExecutedCommands("StartProcessInstanceCmd", "org.flowable.task.service.impl.TaskQueryImpl", "AddIdentityLinkCmd", "DeleteIdentityLinkCmd",
-                    "CompleteTaskCmd");
+                    "CompleteTaskCmd", "org.flowable.task.service.impl.HistoricTaskLogEntryBuilderImpl");
 
             // Check "AddIdentityLinkCmd"
             assertNoDeletes("AddIdentityLinkCmd");

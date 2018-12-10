@@ -115,7 +115,7 @@ public class TaskHelper {
 
     public static void logTaskCompleted(TaskEntity taskEntity, CommandContext commandContext) {
         if (CommandContextUtil.getTaskServiceConfiguration(commandContext).isEnableDatabaseEventLogging()) {
-            HistoricTaskLogEntryEntity taskLogEntry = org.flowable.task.service.impl.util.CommandContextUtil.getTaskLogEntryEntityManager().create();
+            HistoricTaskLogEntryEntity taskLogEntry = org.flowable.task.service.impl.util.CommandContextUtil.getHistoricTaskLogEntryEntityManager().create();
             taskLogEntry.setTaskId(taskEntity.getId());
             taskLogEntry.setExecutionId(taskEntity.getExecutionId());
             taskLogEntry.setProcessInstanceId(taskEntity.getProcessInstanceId());
@@ -123,7 +123,7 @@ public class TaskHelper {
             taskLogEntry.setTimeStamp(CommandContextUtil.getTaskServiceConfiguration(commandContext).getClock().getCurrentTime());
             taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_COMPLETED.name());
             taskLogEntry.setUserId(Authentication.getAuthenticatedUserId());
-            CommandContextUtil.getHistoricTaskService().addTaskLogEntry(taskLogEntry);
+            CommandContextUtil.getHistoricTaskService().addHistoricTaskLogEntry(taskLogEntry);
         }
     }
 
@@ -444,7 +444,7 @@ public class TaskHelper {
     }
 
     public static void deleteHistoricTaskEventLogEntries(String taskId) {
-        CommandContextUtil.getHistoricTaskService().deleteTaskLogEntriesForTaskId(taskId);
+        CommandContextUtil.getHistoricTaskService().deleteHistoricTaskLogEntriesForTaskId(taskId);
     }
 
     protected static void fireAssignmentEvents(TaskEntity taskEntity) {

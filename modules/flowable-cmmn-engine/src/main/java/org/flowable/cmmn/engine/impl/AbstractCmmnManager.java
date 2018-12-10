@@ -33,7 +33,7 @@ import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentit
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityManager;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityManager;
-import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntityManager;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityManager;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityManager;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityManager;
 
@@ -128,8 +128,8 @@ public abstract class AbstractCmmnManager {
         return cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskEntityManager();
     }
 
-    protected TaskLogEntryEntityManager getTaskLogEntryEntityManager() {
-        return cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskLogEntryEntityManager();
+    protected HistoricTaskLogEntryEntityManager getHistoricTaskLogEntryEntityManager() {
+        return cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskLogEntryEntityManager();
     }
 
     protected HistoricTaskInstanceEntityManager getHistoricTaskInstanceEntityManager() {

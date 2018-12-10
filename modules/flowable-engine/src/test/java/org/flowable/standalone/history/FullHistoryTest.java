@@ -808,7 +808,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         historicTaskVariableUpdates = historyService.createHistoricDetailQuery().taskId(taskId).variableUpdates().orderByVariableName().asc().list();
 
         assertEquals(0, historicTaskVariableUpdates.size());
-        historyService.createTaskLogEntryQuery().taskId(taskId).list().forEach(taskLogEntry -> historyService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
+        historyService.createHistoricTaskLogEntryQuery().taskId(taskId).list().forEach(taskLogEntry -> historyService.deleteHistoricTaskLogEntry(taskLogEntry.getLogNumber()));
     }
 
     // ACT-592

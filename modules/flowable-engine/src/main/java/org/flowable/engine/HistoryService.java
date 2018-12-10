@@ -153,29 +153,29 @@ public interface HistoryService {
      *
      * @param logNumber user task log entry identifier
      */
-    void deleteTaskLogEntry(long logNumber);
+    void deleteHistoricTaskLogEntry(long logNumber);
 
     /**
      * Create new task log entry builder to the log task event
      *
      * @param task to which is log related to
      */
-    HistoricTaskLogEntryBuilder createTaskLogEntryBuilder(TaskInfo task);
+    HistoricTaskLogEntryBuilder createHistoricTaskLogEntryBuilder(TaskInfo task);
 
     /**
      * Create new task log entry builder to the log task event without predefined values from the task
      *
      */
-    HistoricTaskLogEntryBuilder createTaskLogEntryBuilder();
+    HistoricTaskLogEntryBuilder createHistoricTaskLogEntryBuilder();
 
     /**
      * Returns a new {@link HistoricTaskLogEntryQuery} that can be used to dynamically query task log entries.
      */
-    HistoricTaskLogEntryQuery createTaskLogEntryQuery();
+    HistoricTaskLogEntryQuery createHistoricTaskLogEntryQuery();
 
     /**
      * Returns a new {@link NativeHistoricTaskLogEntryQuery} for {@link HistoricTaskLogEntry}s.
      */
-    NativeHistoricTaskLogEntryQuery createNativeTaskLogEntryQuery();
+    NativeHistoricTaskLogEntryQuery createNativeHistoricTaskLogEntryQuery();
 
 }

@@ -6,7 +6,7 @@
 
   <!-- INSERT -->
 
-  <insert id="insertTaskLogEntry" parameterType="org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityImpl">
+  <insert id="insertHistoricTaskLogEntry" parameterType="org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityImpl">
     insert into ${prefix}ACT_HI_TSK_LOG(TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_,
                                         SCOPE_ID_, SCOPE_DEFINITION_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_,
                                         TENANT_ID_, TIME_STAMP_, USER_ID_, DATA_)
@@ -27,7 +27,7 @@
     )
   </insert>
   
-  <insert id="bulkInsertTaskLogEntry" parameterType="java.util.List">
+  <insert id="bulkInsertHistoricTaskLogEntry" parameterType="java.util.List">
     insert into ${prefix}ACT_HI_TSK_LOG(TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_,
                                         SCOPE_ID_, SCOPE_DEFINITION_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, TENANT_ID_,
                                         TIME_STAMP_, USER_ID_, DATA_)
@@ -49,7 +49,7 @@
       </foreach>
   </insert>
 
-  <insert id="insertTaskLogEntry" databaseId="oracle" parameterType="org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityImpl">
+  <insert id="insertHistoricTaskLogEntry" databaseId="oracle" parameterType="org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityImpl">
     insert into ${prefix}ACT_HI_TSK_LOG(ID_, TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_,
                                         SCOPE_ID_, SCOPE_DEFINITION_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_,
                                         TENANT_ID_, TIME_STAMP_, USER_ID_, DATA_)
@@ -74,7 +74,7 @@
     )  
   </insert>
 
-  <insert id="bulkInsertTaskLogEntry" databaseId="oracle" parameterType="java.util.List">
+  <insert id="bulkInsertHistoricTaskLogEntry" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL 
       <foreach collection="list" item="taskLog" index="index">
         into ${prefix}ACT_HI_TSK_LOG(ID_, TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_,
@@ -100,7 +100,7 @@
   
   <!-- RESULTMAP -->
   
-  <resultMap id="taskLogEntryResultMap" type="org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityImpl">
+  <resultMap id="HistoricTaskLogEntryResultMap" type="org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityImpl">
     <id property="logNumber" column="ID_" jdbcType="BIGINT" />
     <result property="id" column="ID_" jdbcType="BIGINT" />
     <result property="type" column="TYPE_" jdbcType="VARCHAR"/>
@@ -119,33 +119,33 @@
   </resultMap>
   
   <!-- SELECTS -->
-  <select id="selectTaskLogEntriesByQueryCriteria" parameterType="org.flowable.task.service.impl.HistoricTaskLogEntryQueryImpl" resultMap="taskLogEntryResultMap">
+  <select id="selectHistoricTaskLogEntriesByQueryCriteria" parameterType="org.flowable.task.service.impl.HistoricTaskLogEntryQueryImpl" resultMap="HistoricTaskLogEntryResultMap">
     <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
     select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
-    <include refid="selectTaskLogEntriesByQueryCriteriaSql"/>
+    <include refid="selectHistoricTaskLogEntriesByQueryCriteriaSql"/>
     ${orderBy}
     <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
 
-  <select id="selectTaskLogEntriesCountByQueryCriteria" parameterType="org.flowable.task.service.impl.HistoricTaskLogEntryQueryImpl" resultType="long">
+  <select id="selectHistoricTaskLogEntriesCountByQueryCriteria" parameterType="org.flowable.task.service.impl.HistoricTaskLogEntryQueryImpl" resultType="long">
     select count(RES.ID_)
-    <include refid="selectTaskLogEntriesByQueryCriteriaSql"/>
+    <include refid="selectHistoricTaskLogEntriesByQueryCriteriaSql"/>
   </select>
 
-  <select id="selectTaskLogEntriesByNativeQueryCriteria" parameterType="java.util.Map" resultMap="taskLogEntryResultMap">
+  <select id="selectHistoricTaskLogEntriesByNativeQueryCriteria" parameterType="java.util.Map" resultMap="HistoricTaskLogEntryResultMap">
     <include refid="org.flowable.task.service.db.common.selectByNativeQuery"/>
   </select>
 
-  <select id="selectTaskLogEntriesCountByNativeQueryCriteria" parameterType="java.util.Map" resultType="long">
+  <select id="selectHistoricTaskLogEntriesCountByNativeQueryCriteria" parameterType="java.util.Map" resultType="long">
     ${sql}
   </select>
 
-  <sql id="selectTaskLogEntriesByQueryCriteriaSql">
+  <sql id="selectHistoricTaskLogEntriesByQueryCriteriaSql">
     from ${prefix}ACT_HI_TSK_LOG RES
-    <include refid="commonSelectTaskLogEntriesByQueryCriteriaSql"/>
+    <include refid="commonselectHistoricTaskLogEntriesByQueryCriteriaSql"/>
   </sql>
 
-  <sql id="commonSelectTaskLogEntriesByQueryCriteriaSql">
+  <sql id="commonselectHistoricTaskLogEntriesByQueryCriteriaSql">
     <where>
       <if test="taskId != null">
         RES.TASK_ID_ = #{taskId}
@@ -193,19 +193,19 @@
   </sql>
 
   <!-- DELETE -->
-  <delete id="deleteTaskLogEntryByLogNumber" parameterType="long">
+  <delete id="deleteHistoricTaskLogEntryByLogNumber" parameterType="long">
     delete from ${prefix}ACT_HI_TSK_LOG where ID_ = #{logNr}
   </delete>
 
-  <delete id="deleteTaskLogEntriesByProcessDefinitionId" parameterType="string">
+  <delete id="deleteHistoricTaskLogEntriesByProcessDefinitionId" parameterType="string">
     delete from ${prefix}ACT_HI_TSK_LOG where PROC_DEF_ID_ = #{processDefinitionId}
   </delete>
 
-  <delete id="deleteTaskLogEntriesByScopeDefinitionId" parameterType="map">
+  <delete id="deleteHistoricTaskLogEntriesByScopeDefinitionId" parameterType="map">
     delete from ${prefix}ACT_HI_TSK_LOG where SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR} AND SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR}
   </delete>
 
-  <delete id="deleteTaskLogEntriesByTaskId" parameterType="string">
+  <delete id="deleteHistoricTaskLogEntriesByTaskId" parameterType="string">
     delete from ${prefix}ACT_HI_TSK_LOG where TASK_ID_ = #{taskId}
   </delete>
 

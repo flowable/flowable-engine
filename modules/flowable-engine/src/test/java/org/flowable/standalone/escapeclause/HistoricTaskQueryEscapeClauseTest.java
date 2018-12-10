@@ -465,9 +465,9 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
 
             // clean
             historyService.deleteHistoricTaskInstance(task5.getId());
-            historyService.createTaskLogEntryQuery().taskId(task5.getId()).list().forEach(taskLogEntry -> historyService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
+            historyService.createHistoricTaskLogEntryQuery().taskId(task5.getId()).list().forEach(taskLogEntry -> historyService.deleteHistoricTaskLogEntry(taskLogEntry.getLogNumber()));
             historyService.deleteHistoricTaskInstance(task6.getId());
-            historyService.createTaskLogEntryQuery().taskId(task6.getId()).list().forEach(taskLogEntry -> historyService.deleteTaskLogEntry(taskLogEntry.getLogNumber()));
+            historyService.createHistoricTaskLogEntryQuery().taskId(task6.getId()).list().forEach(taskLogEntry -> historyService.deleteHistoricTaskLogEntry(taskLogEntry.getLogNumber()));
         }
     }
 

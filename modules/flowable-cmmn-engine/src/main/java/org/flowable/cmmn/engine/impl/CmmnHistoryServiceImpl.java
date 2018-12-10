@@ -20,7 +20,7 @@ import org.flowable.cmmn.api.history.HistoricMilestoneInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricVariableInstanceQuery;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.impl.cmd.CmmnDeleteTaskLogEntryCmd;
+import org.flowable.cmmn.engine.impl.cmd.CmmnDeleteHistoricTaskLogEntryCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricTaskInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricEntityLinkChildrenForCaseInstanceCmd;
@@ -107,27 +107,27 @@ public class CmmnHistoryServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
 
 
     @Override
-    public void deleteTaskLogEntry(long logNumber) {
-        commandExecutor.execute(new CmmnDeleteTaskLogEntryCmd(logNumber));
+    public void deleteHistoricTaskLogEntry(long logNumber) {
+        commandExecutor.execute(new CmmnDeleteHistoricTaskLogEntryCmd(logNumber));
     }
 
     @Override
-    public HistoricTaskLogEntryBuilder createTaskLogEntryBuilder(TaskInfo task) {
+    public HistoricTaskLogEntryBuilder createHistoricTaskLogEntryBuilder(TaskInfo task) {
         return new HistoricTaskLogEntryBuilderImpl(commandExecutor, task);
     }
 
     @Override
-    public HistoricTaskLogEntryBuilder createTaskLogEntryBuilder() {
+    public HistoricTaskLogEntryBuilder createHistoricTaskLogEntryBuilder() {
         return new HistoricTaskLogEntryBuilderImpl(commandExecutor);
     }
 
     @Override
-    public HistoricTaskLogEntryQuery createTaskLogEntryQuery() {
+    public HistoricTaskLogEntryQuery createHistoricTaskLogEntryQuery() {
         return new HistoricTaskLogEntryQueryImpl(commandExecutor);
     }
 
     @Override
-    public NativeHistoricTaskLogEntryQuery createNativeTaskLogEntryQuery() {
+    public NativeHistoricTaskLogEntryQuery createNativeHistoricTaskLogEntryQuery() {
         return new NativeHistoricTaskLogEntryQueryImpl(commandExecutor);
     }
 

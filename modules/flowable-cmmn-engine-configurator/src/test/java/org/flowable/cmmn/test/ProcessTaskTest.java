@@ -287,10 +287,10 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
                 processEngine.getProcessEngineConfiguration().getHistoryService().deleteHistoricTaskInstance(historicTaskInstance.getId());
             }
 
-            if (cmmnHistoryService.createTaskLogEntryQuery().count() > 0) {
-                List<HistoricTaskLogEntry> taskLogEntries = cmmnHistoryService.createTaskLogEntryQuery().list();
+            if (cmmnHistoryService.createHistoricTaskLogEntryQuery().count() > 0) {
+                List<HistoricTaskLogEntry> taskLogEntries = cmmnHistoryService.createHistoricTaskLogEntryQuery().list();
                 for (HistoricTaskLogEntry historicTaskLogEntry : taskLogEntries) {
-                    cmmnHistoryService.deleteTaskLogEntry(historicTaskLogEntry.getLogNumber());
+                    cmmnHistoryService.deleteHistoricTaskLogEntry(historicTaskLogEntry.getLogNumber());
                 }
             }
         }

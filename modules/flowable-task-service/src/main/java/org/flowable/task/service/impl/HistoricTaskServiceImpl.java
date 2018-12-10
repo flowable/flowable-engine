@@ -31,7 +31,7 @@ import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEnt
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityManager;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntityManager;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityManager;
 import org.flowable.task.service.impl.util.CommandContextUtil;
 
 /**
@@ -136,51 +136,51 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
     }
 
     @Override
-    public void deleteTaskLogEntry(long logNumber) {
-        getTaskLogEntryEntityManager().deleteTaskLogEntry(logNumber);
+    public void deleteHistoricTaskLogEntry(long logNumber) {
+        getHistoricTaskLogEntryEntityManager().deleteHistoricTaskLogEntry(logNumber);
     }
 
     @Override
-    public void addTaskLogEntry(HistoricTaskLogEntry historicTaskLogEntry) {
+    public void addHistoricTaskLogEntry(HistoricTaskLogEntry historicTaskLogEntry) {
         if (this.configuration.isEnableDatabaseEventLogging()) {
-            getTaskLogEntryEntityManager().insert((HistoricTaskLogEntryEntity) historicTaskLogEntry);
+            getHistoricTaskLogEntryEntityManager().insert((HistoricTaskLogEntryEntity) historicTaskLogEntry);
         }
     }
 
     @Override
-    public void createTaskLogEntry(HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder) {
+    public void createHistoricTaskLogEntry(HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder) {
         if (this.configuration.isEnableDatabaseEventLogging()) {
-            getTaskLogEntryEntityManager().createTaskLogEntry(historicTaskLogEntryBuilder);
+            getHistoricTaskLogEntryEntityManager().createHistoricTaskLogEntry(historicTaskLogEntryBuilder);
         }
     }
 
     @Override
-    public HistoricTaskLogEntryQuery createTaskLogEntryQuery(CommandExecutor commandExecutor) {
+    public HistoricTaskLogEntryQuery createHistoricTaskLogEntryQuery(CommandExecutor commandExecutor) {
         return new HistoricTaskLogEntryQueryImpl(commandExecutor);
     }
 
     @Override
-    public void deleteTaskLogEntriesForProcessDefinition(String processDefinitionId) {
-        getTaskLogEntryEntityManager().deleteTaskLogEntriesForProcessDefinition(processDefinitionId);
+    public void deleteHistoricTaskLogEntriesForProcessDefinition(String processDefinitionId) {
+        getHistoricTaskLogEntryEntityManager().deleteHistoricTaskLogEntriesForProcessDefinition(processDefinitionId);
     }
 
     @Override
-    public void deleteTaskLogEntriesForScopeDefinition(String scopeType, String scopeDefinitionId) {
-        getTaskLogEntryEntityManager().deleteTaskLogEntriesForScopeDefinition(scopeType, scopeDefinitionId);
+    public void deleteHistoricTaskLogEntriesForScopeDefinition(String scopeType, String scopeDefinitionId) {
+        getHistoricTaskLogEntryEntityManager().deleteHistoricTaskLogEntriesForScopeDefinition(scopeType, scopeDefinitionId);
     }
 
     @Override
-    public void deleteTaskLogEntriesForTaskId(String taskId) {
-        getTaskLogEntryEntityManager().deleteTaskLogEntriesForTaskId(taskId);
+    public void deleteHistoricTaskLogEntriesForTaskId(String taskId) {
+        getHistoricTaskLogEntryEntityManager().deleteHistoricTaskLogEntriesForTaskId(taskId);
     }
 
     @Override
-    public NativeHistoricTaskLogEntryQuery createNativeTaskLogEntryQuery(CommandExecutor commandExecutor) {
+    public NativeHistoricTaskLogEntryQuery createNativeHistoricTaskLogEntryQuery(CommandExecutor commandExecutor) {
         return new NativeHistoricTaskLogEntryQueryImpl(commandExecutor);
     }
 
-    protected TaskLogEntryEntityManager getTaskLogEntryEntityManager() {
-        return configuration.getTaskLogEntryEntityManager();
+    protected HistoricTaskLogEntryEntityManager getHistoricTaskLogEntryEntityManager() {
+        return configuration.getHistoricTaskLogEntryEntityManager();
     }
 
     protected void createHistoricIdentityLink(String taskId, String type, String userId) {

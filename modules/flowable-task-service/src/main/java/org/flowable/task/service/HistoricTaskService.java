@@ -56,25 +56,25 @@ public interface HistoricTaskService {
     
     HistoricTaskInstanceEntity recordTaskInfoChange(TaskEntity taskEntity);
 
-    void deleteTaskLogEntry(long taskLogNumber);
+    void deleteHistoricTaskLogEntry(long taskLogNumber);
 
     /**
      * Log new entry to the task log.
      *
      * @param logEntry log entry to add
      */
-    void addTaskLogEntry(HistoricTaskLogEntry logEntry);
+    void addHistoricTaskLogEntry(HistoricTaskLogEntry logEntry);
 
-    void createTaskLogEntry(HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder);
+    void createHistoricTaskLogEntry(HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder);
 
-    HistoricTaskLogEntryQuery createTaskLogEntryQuery(CommandExecutor commandExecutor);
+    HistoricTaskLogEntryQuery createHistoricTaskLogEntryQuery(CommandExecutor commandExecutor);
 
-    NativeHistoricTaskLogEntryQuery createNativeTaskLogEntryQuery(CommandExecutor commandExecutor);
+    NativeHistoricTaskLogEntryQuery createNativeHistoricTaskLogEntryQuery(CommandExecutor commandExecutor);
 
-    void deleteTaskLogEntriesForProcessDefinition(String processDefinitionId);
+    void deleteHistoricTaskLogEntriesForProcessDefinition(String processDefinitionId);
 
-    void deleteTaskLogEntriesForScopeDefinition(String scopeType, String scopeDefinitionId);
+    void deleteHistoricTaskLogEntriesForScopeDefinition(String scopeType, String scopeDefinitionId);
 
-    void deleteTaskLogEntriesForTaskId(String taskId);
+    void deleteHistoricTaskLogEntriesForTaskId(String taskId);
 
 }

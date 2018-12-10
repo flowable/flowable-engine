@@ -23,21 +23,21 @@ import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEnt
 /**
  * author martin.grofcik
  */
-public interface TaskLogEntryDataManager extends DataManager<HistoricTaskLogEntryEntity> {
+public interface HistoricTaskLogEntryDataManager extends DataManager<HistoricTaskLogEntryEntity> {
 
-    void deleteTaskLogEntry(long logEntryNumber);
+    void deleteHistoricTaskLogEntry(long logEntryNumber);
 
-    long findTaskLogEntriesCountByQueryCriteria(HistoricTaskLogEntryQueryImpl taskLogEntryQuery);
+    long findHistoricTaskLogEntriesCountByQueryCriteria(HistoricTaskLogEntryQueryImpl taskLogEntryQuery);
 
-    List<HistoricTaskLogEntry> findTaskLogEntriesByQueryCriteria(HistoricTaskLogEntryQueryImpl taskLogEntryQuery);
+    List<HistoricTaskLogEntry> findHistoricTaskLogEntriesByQueryCriteria(HistoricTaskLogEntryQueryImpl taskLogEntryQuery);
 
-    long findTaskLogEntriesCountByNativeQueryCriteria(Map<String, Object> nativeTaskLogEntryQuery);
+    long findHistoricTaskLogEntriesCountByNativeQueryCriteria(Map<String, Object> nativeHistoricTaskLogEntryQuery);
 
-    List<HistoricTaskLogEntry> findTaskLogEntriesByNativeQueryCriteria(Map<String, Object> nativeTaskLogEntryQuery);
+    List<HistoricTaskLogEntry> findHistoricTaskLogEntriesByNativeQueryCriteria(Map<String, Object> nativeHistoricTaskLogEntryQuery);
 
-    void deleteTaskLogEntriesByProcessDefinitionId(String processDefinitionId);
+    void deleteHistoricTaskLogEntriesByProcessDefinitionId(String processDefinitionId);
 
-    void deleteTaskLogEntriesByScopeDefinitionId(String scopeType, String scopeDefinitionId);
+    void deleteHistoricTaskLogEntriesByScopeDefinitionId(String scopeType, String scopeDefinitionId);
 
-    void deleteTaskLogEntriesByTaskId(String taskId);
+    void deleteHistoricTaskLogEntriesByTaskId(String taskId);
 }

@@ -104,7 +104,7 @@ public class IdentityLinkUtil {
     protected static void logTaskIdentityLinkEvent(String eventType, TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity) {
         TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
         if (taskServiceConfiguration.isEnableDatabaseEventLogging()) {
-            HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = CommandContextUtil.getProcessEngineConfiguration().getHistoryService().createTaskLogEntryBuilder(taskEntity);
+            HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = CommandContextUtil.getProcessEngineConfiguration().getHistoryService().createHistoricTaskLogEntryBuilder(taskEntity);
             historicTaskLogEntryBuilder.type(eventType);
             ObjectNode data = CommandContextUtil.getTaskServiceConfiguration().getObjectMapper().createObjectNode();
             if (identityLinkEntity.isUser()) {

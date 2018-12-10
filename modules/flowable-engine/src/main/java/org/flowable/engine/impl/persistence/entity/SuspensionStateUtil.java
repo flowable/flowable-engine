@@ -68,7 +68,7 @@ public class SuspensionStateUtil {
             data.put("previousSuspensionState", taskEntity.getSuspensionState());
             data.put("newSuspensionState", state.getStateCode());
             HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = CommandContextUtil.getProcessEngineConfiguration().getHistoryService()
-                .createTaskLogEntryBuilder(taskEntity);
+                .createHistoricTaskLogEntryBuilder(taskEntity);
             historicTaskLogEntryBuilder.type(HistoricTaskLogEntryType.USER_TASK_SUSPENSIONSTATE_CHANGED.name());
             historicTaskLogEntryBuilder.data(data.toString());
             historicTaskLogEntryBuilder.add();

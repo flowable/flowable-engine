@@ -35,6 +35,7 @@
         <mapper resource="org/flowable/db/mapping/entity/HistoricProcessInstance.xml" />
         <mapper resource="org/flowable/variable/service/db/mapping/entity/HistoricVariableInstance.xml" />
         <mapper resource="org/flowable/task/service/db/mapping/entity/HistoricTaskInstance.xml" />
+        <mapper resource="org/flowable/task/service/db/mapping/entity/HistoricTaskLogEntry.xml" />
         <mapper resource="org/flowable/identitylink/service/db/mapping/entity/HistoricIdentityLink.xml" />
         <mapper resource="org/flowable/entitylink/service/db/mapping/entity/HistoricEntityLink.xml" />
         <mapper resource="org/flowable/job/service/db/mapping/entity/HistoryJob.xml" />
@@ -50,7 +51,6 @@
         <mapper resource="org/flowable/db/mapping/entity/TableData.xml" />
         <mapper resource="org/flowable/task/service/db/mapping/common.xml" />
         <mapper resource="org/flowable/task/service/db/mapping/entity/Task.xml" />
-        <mapper resource="org/flowable/task/service/db/mapping/entity/TaskLogEntry.xml" />
         <mapper resource="org/flowable/job/service/db/mapping/entity/TimerJob.xml" />
         <mapper resource="org/flowable/variable/service/db/mapping/entity/VariableInstance.xml" />
         <mapper resource="org/flowable/db/mapping/entity/EventSubscription.xml" />
