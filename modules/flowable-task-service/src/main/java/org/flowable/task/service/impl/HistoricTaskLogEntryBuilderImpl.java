@@ -24,13 +24,13 @@ import org.flowable.task.service.impl.util.CommandContextUtil;
 /**
  * @author martin.grofcik
  */
-public class TaskLogEntryBuilderImpl extends BaseTaskLogEntryBuilderImpl implements Command<Void> {
+public class HistoricTaskLogEntryBuilderImpl extends BaseHistoricTaskLogEntryBuilderImpl implements Command<Void> {
 
-    public TaskLogEntryBuilderImpl(CommandExecutor commandExecutor, TaskInfo task) {
+    public HistoricTaskLogEntryBuilderImpl(CommandExecutor commandExecutor, TaskInfo task) {
         super(commandExecutor, task);
     }
 
-    public TaskLogEntryBuilderImpl(CommandExecutor commandExecutor) {
+    public HistoricTaskLogEntryBuilderImpl(CommandExecutor commandExecutor) {
         super(commandExecutor);
     }
 
@@ -42,7 +42,7 @@ public class TaskLogEntryBuilderImpl extends BaseTaskLogEntryBuilderImpl impleme
     @Override
     public Void execute(CommandContext commandContext) {
         if (StringUtils.isEmpty(getTaskId())) {
-            throw new FlowableIllegalArgumentException("Empty taskId is not allowed for TaskLogEntry");
+            throw new FlowableIllegalArgumentException("Empty taskId is not allowed for HistoricTaskLogEntry");
         }
         if (StringUtils.isEmpty(getUserId())) {
             userId(Authentication.getAuthenticatedUserId());

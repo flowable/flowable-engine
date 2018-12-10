@@ -44,7 +44,7 @@ import org.flowable.entitylink.api.EntityLinkType;
 import org.flowable.entitylink.api.HierarchyType;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.task.api.Task;
-import org.flowable.task.api.TaskLogEntry;
+import org.flowable.task.api.history.HistoricTaskLogEntry;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.Before;
 import org.junit.Test;
@@ -288,9 +288,9 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             }
 
             if (cmmnHistoryService.createTaskLogEntryQuery().count() > 0) {
-                List<TaskLogEntry> taskLogEntries = cmmnHistoryService.createTaskLogEntryQuery().list();
-                for (TaskLogEntry taskLogEntry : taskLogEntries) {
-                    cmmnHistoryService.deleteTaskLogEntry(taskLogEntry.getLogNumber());
+                List<HistoricTaskLogEntry> taskLogEntries = cmmnHistoryService.createTaskLogEntryQuery().list();
+                for (HistoricTaskLogEntry historicTaskLogEntry : taskLogEntries) {
+                    cmmnHistoryService.deleteTaskLogEntry(historicTaskLogEntry.getLogNumber());
                 }
             }
         }

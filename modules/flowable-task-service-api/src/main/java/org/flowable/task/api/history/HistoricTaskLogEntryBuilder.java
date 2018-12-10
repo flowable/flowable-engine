@@ -10,16 +10,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.task.api;
+package org.flowable.task.api.history;
 
 import java.util.Date;
 
 /**
+ * Interface to create and add task log entry
+ *
  * @author martin.grofcik
  */
-public interface TaskLogEntry {
+public interface HistoricTaskLogEntryBuilder {
 
-    long getLogNumber();
+    HistoricTaskLogEntryBuilder taskId(String taskId);
+
+    HistoricTaskLogEntryBuilder type(String type);
+
+    HistoricTaskLogEntryBuilder timeStamp(Date timeStamp);
+
+    HistoricTaskLogEntryBuilder userId(String userId);
+
+    HistoricTaskLogEntryBuilder processInstanceId(String processInstanceId);
+
+    HistoricTaskLogEntryBuilder processDefinitionId(String processDefinitionId);
+
+    HistoricTaskLogEntryBuilder scopeId(String scopeId);
+
+    HistoricTaskLogEntryBuilder scopeDefinitionId(String scopeDefinitionId);
+
+    HistoricTaskLogEntryBuilder subScopeId(String subScopeId);
+
+    HistoricTaskLogEntryBuilder scopeType(String scopeType);
+
+    HistoricTaskLogEntryBuilder tenantId(String tenantId);
+
+    HistoricTaskLogEntryBuilder data(String data);
 
     String getType();
 
@@ -46,4 +70,7 @@ public interface TaskLogEntry {
     String getScopeType();
 
     String getTenantId();
+
+    void add();
+
 }

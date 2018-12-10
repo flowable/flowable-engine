@@ -15,12 +15,12 @@ package org.flowable.task.service.impl.persistence.entity;
 import java.util.Date;
 
 import org.flowable.common.engine.impl.persistence.entity.Entity;
-import org.flowable.task.api.TaskLogEntry;
+import org.flowable.task.api.history.HistoricTaskLogEntry;
 
 /**
  * @author martin.grofcik
  */
-public interface TaskLogEntryEntity extends TaskLogEntry, Entity {
+public interface HistoricTaskLogEntryEntity extends HistoricTaskLogEntry, Entity {
 
     void setLogNumber(long logNumber);
 

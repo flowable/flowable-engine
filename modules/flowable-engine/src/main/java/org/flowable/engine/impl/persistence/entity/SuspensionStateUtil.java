@@ -18,7 +18,7 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.task.api.TaskLogEntryBuilder;
+import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.slf4j.Logger;
@@ -67,11 +67,11 @@ public class SuspensionStateUtil {
             ObjectNode data = CommandContextUtil.getTaskServiceConfiguration().getObjectMapper().createObjectNode();
             data.put("previousSuspensionState", taskEntity.getSuspensionState());
             data.put("newSuspensionState", state.getStateCode());
-            TaskLogEntryBuilder taskLogEntryBuilder = CommandContextUtil.getProcessEngineConfiguration().getHistoryService()
+            HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = CommandContextUtil.getProcessEngineConfiguration().getHistoryService()
                 .createTaskLogEntryBuilder(taskEntity);
-            taskLogEntryBuilder.type(HistoricTaskLogEntryType.USER_TASK_SUSPENSIONSTATE_CHANGED.name());
-            taskLogEntryBuilder.data(data.toString());
-            taskLogEntryBuilder.add();
+            historicTaskLogEntryBuilder.type(HistoricTaskLogEntryType.USER_TASK_SUSPENSIONSTATE_CHANGED.name());
+            historicTaskLogEntryBuilder.data(data.toString());
+            historicTaskLogEntryBuilder.add();
         }
     }
 

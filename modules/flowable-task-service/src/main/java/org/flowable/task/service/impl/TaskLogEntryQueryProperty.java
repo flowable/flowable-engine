@@ -16,10 +16,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.api.query.QueryProperty;
-import org.flowable.task.api.TaskLogEntryQuery;
+import org.flowable.task.api.history.HistoricTaskLogEntryQuery;
 
 /**
- * Contains the possible properties that can be used in a {@link TaskLogEntryQuery}.
+ * Contains the possible properties that can be used in a {@link HistoricTaskLogEntryQuery}.
  * 
  * @author martin.grofcik
  */

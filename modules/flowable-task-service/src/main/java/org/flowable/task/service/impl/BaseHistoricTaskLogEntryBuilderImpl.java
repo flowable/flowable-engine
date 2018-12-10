@@ -4,14 +4,14 @@ import java.util.Date;
 
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.task.api.TaskInfo;
-import org.flowable.task.api.TaskLogEntryBuilder;
+import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 
 /**
- * Base implementation of the {@link TaskLogEntryBuilder} interface
+ * Base implementation of the {@link HistoricTaskLogEntryBuilder} interface
  *
  * @author martin.grofcik
  */
-public abstract class BaseTaskLogEntryBuilderImpl implements TaskLogEntryBuilder {
+public abstract class BaseHistoricTaskLogEntryBuilderImpl implements HistoricTaskLogEntryBuilder {
     protected CommandExecutor commandExecutor;
 
     protected String type;
@@ -28,7 +28,7 @@ public abstract class BaseTaskLogEntryBuilderImpl implements TaskLogEntryBuilder
     protected String tenantId;
     protected String taskId;
 
-    public BaseTaskLogEntryBuilderImpl(CommandExecutor commandExecutor, TaskInfo task) {
+    public BaseHistoricTaskLogEntryBuilderImpl(CommandExecutor commandExecutor, TaskInfo task) {
         this(commandExecutor);
         this.processInstanceId = task.getProcessInstanceId();
         this.processDefinitionId = task.getProcessDefinitionId();
@@ -41,78 +41,78 @@ public abstract class BaseTaskLogEntryBuilderImpl implements TaskLogEntryBuilder
         this.taskId = task.getId();
     }
 
-    public BaseTaskLogEntryBuilderImpl(CommandExecutor commandExecutor) {
+    public BaseHistoricTaskLogEntryBuilderImpl(CommandExecutor commandExecutor) {
         this.commandExecutor = commandExecutor;
     }
 
     @Override
-    public TaskLogEntryBuilder taskId(String taskId) {
+    public HistoricTaskLogEntryBuilder taskId(String taskId) {
         this.taskId = taskId;
         return this;
     }
 
     @Override
-    public TaskLogEntryBuilder type(String type) {
+    public HistoricTaskLogEntryBuilder type(String type) {
         this.type = type;
         return this;
     }
 
     @Override
-    public TaskLogEntryBuilder timeStamp(Date timeStamp) {
+    public HistoricTaskLogEntryBuilder timeStamp(Date timeStamp) {
         this.timeStamp = timeStamp;
         return this;
     }
 
     @Override
-    public TaskLogEntryBuilder userId(String userId) {
+    public HistoricTaskLogEntryBuilder userId(String userId) {
         this.userId = userId;
         return this;
     }
 
     @Override
-    public TaskLogEntryBuilder data(String data) {
+    public HistoricTaskLogEntryBuilder data(String data) {
         this.data = data;
         return this;
     }
 
     @Override
-    public TaskLogEntryBuilder processInstanceId(String processInstanceId) {
+    public HistoricTaskLogEntryBuilder processInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
         return this;
     }
 
     @Override
-    public TaskLogEntryBuilder processDefinitionId(String processDefinitionId) {
+    public HistoricTaskLogEntryBuilder processDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
         return this;
     }
 
     @Override
-    public TaskLogEntryBuilder scopeId(String scopeId) {
+    public HistoricTaskLogEntryBuilder scopeId(String scopeId) {
         this.scopeId = scopeId;
         return this;
     }
 
     @Override
-    public TaskLogEntryBuilder scopeDefinitionId(String scopeDefinitionId) {
+    public HistoricTaskLogEntryBuilder scopeDefinitionId(String scopeDefinitionId) {
         this.scopeDefinitionId = scopeDefinitionId;
         return this;
     }
 
     @Override
-    public TaskLogEntryBuilder subScopeId(String subScopeId) {
+    public HistoricTaskLogEntryBuilder subScopeId(String subScopeId) {
         this.subScopeId = subScopeId;
         return this;
     }
 
     @Override
-    public TaskLogEntryBuilder scopeType(String scopeType) {
+    public HistoricTaskLogEntryBuilder scopeType(String scopeType) {
         this.scopeType = scopeType;
         return this;
     }
 
     @Override
-    public TaskLogEntryBuilder tenantId(String tenantId) {
+    public HistoricTaskLogEntryBuilder tenantId(String tenantId) {
         return this;
     }
 

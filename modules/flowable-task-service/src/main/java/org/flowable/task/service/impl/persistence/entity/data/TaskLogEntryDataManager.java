@@ -16,24 +16,24 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
-import org.flowable.task.api.TaskLogEntry;
-import org.flowable.task.service.impl.TaskLogEntryQueryImpl;
-import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntity;
+import org.flowable.task.api.history.HistoricTaskLogEntry;
+import org.flowable.task.service.impl.HistoricTaskLogEntryQueryImpl;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntity;
 
 /**
  * author martin.grofcik
  */
-public interface TaskLogEntryDataManager extends DataManager<TaskLogEntryEntity> {
+public interface TaskLogEntryDataManager extends DataManager<HistoricTaskLogEntryEntity> {
 
     void deleteTaskLogEntry(long logEntryNumber);
 
-    long findTaskLogEntriesCountByQueryCriteria(TaskLogEntryQueryImpl taskLogEntryQuery);
+    long findTaskLogEntriesCountByQueryCriteria(HistoricTaskLogEntryQueryImpl taskLogEntryQuery);
 
-    List<TaskLogEntry> findTaskLogEntriesByQueryCriteria(TaskLogEntryQueryImpl taskLogEntryQuery);
+    List<HistoricTaskLogEntry> findTaskLogEntriesByQueryCriteria(HistoricTaskLogEntryQueryImpl taskLogEntryQuery);
 
     long findTaskLogEntriesCountByNativeQueryCriteria(Map<String, Object> nativeTaskLogEntryQuery);
 
-    List<TaskLogEntry> findTaskLogEntriesByNativeQueryCriteria(Map<String, Object> nativeTaskLogEntryQuery);
+    List<HistoricTaskLogEntry> findTaskLogEntriesByNativeQueryCriteria(Map<String, Object> nativeTaskLogEntryQuery);
 
     void deleteTaskLogEntriesByProcessDefinitionId(String processDefinitionId);
 

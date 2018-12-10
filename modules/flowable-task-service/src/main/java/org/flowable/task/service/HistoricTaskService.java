@@ -15,10 +15,10 @@ package org.flowable.task.service;
 import java.util.List;
 
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
-import org.flowable.task.api.NativeTaskLogEntryQuery;
-import org.flowable.task.api.TaskLogEntry;
-import org.flowable.task.api.TaskLogEntryBuilder;
-import org.flowable.task.api.TaskLogEntryQuery;
+import org.flowable.task.api.history.NativeHistoricTaskLogEntryQuery;
+import org.flowable.task.api.history.HistoricTaskLogEntry;
+import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
+import org.flowable.task.api.history.HistoricTaskLogEntryQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
@@ -63,13 +63,13 @@ public interface HistoricTaskService {
      *
      * @param logEntry log entry to add
      */
-    void addTaskLogEntry(TaskLogEntry logEntry);
+    void addTaskLogEntry(HistoricTaskLogEntry logEntry);
 
-    void createTaskLogEntry(TaskLogEntryBuilder taskLogEntryBuilder);
+    void createTaskLogEntry(HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder);
 
-    TaskLogEntryQuery createTaskLogEntryQuery(CommandExecutor commandExecutor);
+    HistoricTaskLogEntryQuery createTaskLogEntryQuery(CommandExecutor commandExecutor);
 
-    NativeTaskLogEntryQuery createNativeTaskLogEntryQuery(CommandExecutor commandExecutor);
+    NativeHistoricTaskLogEntryQuery createNativeTaskLogEntryQuery(CommandExecutor commandExecutor);
 
     void deleteTaskLogEntriesForProcessDefinition(String processDefinitionId);
 

@@ -19,7 +19,7 @@ import org.flowable.common.engine.impl.persistence.entity.AbstractEntityNoRevisi
 /**
  * @author martin.grofcik
  */
-public class TaskLogEntryEntityImpl extends AbstractEntityNoRevision implements TaskLogEntryEntity {
+public class HistoricTaskLogEntryEntityImpl extends AbstractEntityNoRevision implements HistoricTaskLogEntryEntity {
 
     protected long logNumber;
     protected String type;
@@ -36,7 +36,7 @@ public class TaskLogEntryEntityImpl extends AbstractEntityNoRevision implements 
     protected String scopeType;
     protected String tenantId;
 
-    public TaskLogEntryEntityImpl() {
+    public HistoricTaskLogEntryEntityImpl() {
     }
 
     @Override

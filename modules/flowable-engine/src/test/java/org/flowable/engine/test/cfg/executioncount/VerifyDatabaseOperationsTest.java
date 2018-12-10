@@ -325,7 +325,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                     "ActivityInstanceEntityImpl-bulk-with-2", 1L,
                     "HistoricActivityInstanceEntityImpl-bulk-with-2", 1L,
                     "HistoricTaskInstanceEntityImpl", 1L,
-                    "TaskLogEntryEntityImpl", 1L,
+                    "HistoricTaskLogEntryEntityImpl", 1L,
                     "HistoricProcessInstanceEntityImpl", 1L,
                     "HistoricEntityLinkEntityImpl", 1L);
             assertNoUpdatesAndDeletes("StartProcessInstanceCmd");
@@ -358,7 +358,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
 
             assertDatabaseInserts("CompleteTaskCmd",
                 "HistoricActivityInstanceEntityImpl", 1L,
-                "TaskLogEntryEntityImpl", 1L
+                "HistoricTaskLogEntryEntityImpl", 1L
                 );
 
             assertDatabaseUpdates("CompleteTaskCmd", "org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityImpl", 1L,
@@ -397,7 +397,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                     "ActivityInstanceEntityImpl-bulk-with-2", 1L,
                     "HistoricActivityInstanceEntityImpl-bulk-with-2", 1L,
                     "HistoricTaskInstanceEntityImpl", 1L,
-                    "TaskLogEntryEntityImpl", 1L,
+                    "HistoricTaskLogEntryEntityImpl", 1L,
                     "HistoricProcessInstanceEntityImpl", 1L,
                     "HistoricEntityLinkEntityImpl", 1L);
             assertNoUpdatesAndDeletes("StartProcessInstanceCmd");
@@ -465,7 +465,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
 
             assertNoDeletes("ClaimTaskCmd");
             assertDatabaseInserts("ClaimTaskCmd",
-                "TaskLogEntryEntityImpl", 2L,
+                "HistoricTaskLogEntryEntityImpl", 2L,
                 "CommentEntityImpl", 2L,
                 "HistoricIdentityLinkEntityImpl-bulk-with-2", 1L,
                 "IdentityLinkEntityImpl", 1L,
@@ -501,7 +501,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             // Check "AddIdentityLinkCmd" (2 invocations)
             assertNoDeletes("AddIdentityLinkCmd");
             assertDatabaseInserts("AddIdentityLinkCmd",
-                "TaskLogEntryEntityImpl", 2L,
+                "HistoricTaskLogEntryEntityImpl", 2L,
                     "CommentEntityImpl", 2L,
                     "HistoricIdentityLinkEntityImpl-bulk-with-2", 2L, 
                     "IdentityLinkEntityImpl-bulk-with-2", 2l);
@@ -519,7 +519,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             assertDatabaseDeletes("DeleteIdentityLinkCmd", "IdentityLinkEntityImpl", 2L, "HistoricIdentityLinkEntityImpl", 2L);
             assertDatabaseInserts("DeleteIdentityLinkCmd",
                 "CommentEntityImpl", 5L,
-                "TaskLogEntryEntityImpl", 2L
+                "HistoricTaskLogEntryEntityImpl", 2L
             );
             assertDatabaseSelects("DeleteIdentityLinkCmd", "selectById org.flowable.task.service.impl.persistence.entity.TaskEntityImpl", 5L,
                     "selectIdentityLinkByTaskUserGroupAndType", 5L, 
@@ -558,7 +558,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             assertNoDeletes("AddIdentityLinkCmd");
             assertDatabaseInserts("AddIdentityLinkCmd",
                 "CommentEntityImpl", 2L,
-                "TaskLogEntryEntityImpl", 2L,
+                "HistoricTaskLogEntryEntityImpl", 2L,
                 "IdentityLinkEntityImpl", 2L,
                 "HistoricIdentityLinkEntityImpl", 2L
             );
@@ -570,7 +570,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             assertDatabaseDeletes("DeleteIdentityLinkCmd", "IdentityLinkEntityImpl", 2L, "HistoricIdentityLinkEntityImpl", 2L);
             assertDatabaseInserts("DeleteIdentityLinkCmd",
                 "CommentEntityImpl", 5L,
-                "TaskLogEntryEntityImpl", 2L
+                "HistoricTaskLogEntryEntityImpl", 2L
             );
             assertDatabaseSelects("DeleteIdentityLinkCmd", 
                     "selectById org.flowable.task.service.impl.persistence.entity.TaskEntityImpl", 5L,
@@ -737,7 +737,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         if (className.startsWith("VariableInstanceEntityImpl") || className.startsWith("HistoricVariableInstanceEntityImpl")) {
             return "org.flowable.variable.service.impl.persistence.entity." + className;
 
-        } else if (className.startsWith("TaskEntityImpl") || className.startsWith("HistoricTaskInstanceEntityImpl") || className.startsWith("TaskLogEntryEntityImpl")) {
+        } else if (className.startsWith("TaskEntityImpl") || className.startsWith("HistoricTaskInstanceEntityImpl") || className.startsWith("HistoricTaskLogEntryEntityImpl")) {
             return "org.flowable.task.service.impl.persistence.entity." + className;
 
         } else if (className.startsWith("JobEntityImpl") || className.startsWith("TimerJobEntityImpl")) {

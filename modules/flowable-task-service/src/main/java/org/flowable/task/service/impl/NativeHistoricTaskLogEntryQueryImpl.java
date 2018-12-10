@@ -17,29 +17,30 @@ import java.util.Map;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
-import org.flowable.task.api.NativeTaskLogEntryQuery;
-import org.flowable.task.api.TaskLogEntry;
+import org.flowable.task.api.history.NativeHistoricTaskLogEntryQuery;
+import org.flowable.task.api.history.HistoricTaskLogEntry;
 import org.flowable.task.service.impl.util.CommandContextUtil;
 
 /**
  * @author martin.grofcik
  */
-public class NativeTaskLogEntryQueryImpl extends AbstractNativeQuery<NativeTaskLogEntryQuery, TaskLogEntry> implements NativeTaskLogEntryQuery {
+public class NativeHistoricTaskLogEntryQueryImpl extends AbstractNativeQuery<NativeHistoricTaskLogEntryQuery, HistoricTaskLogEntry> implements
+    NativeHistoricTaskLogEntryQuery {
 
     private static final long serialVersionUID = 1L;
 
-    public NativeTaskLogEntryQueryImpl(CommandContext commandContext) {
+    public NativeHistoricTaskLogEntryQueryImpl(CommandContext commandContext) {
         super(commandContext);
     }
 
-    public NativeTaskLogEntryQueryImpl(CommandExecutor commandExecutor) {
+    public NativeHistoricTaskLogEntryQueryImpl(CommandExecutor commandExecutor) {
         super(commandExecutor);
     }
 
     // results ////////////////////////////////////////////////////////////////
 
     @Override
-    public List<TaskLogEntry> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
+    public List<HistoricTaskLogEntry> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getTaskLogEntryEntityManager(commandContext).findTaskLogEntriesByNativeQueryCriteria(parameterMap);
     }
 

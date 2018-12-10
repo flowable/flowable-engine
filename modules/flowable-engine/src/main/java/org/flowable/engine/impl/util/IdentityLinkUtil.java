@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
-import org.flowable.task.api.TaskLogEntryBuilder;
+import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
@@ -104,8 +104,8 @@ public class IdentityLinkUtil {
     protected static void logTaskIdentityLinkEvent(String eventType, TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity) {
         TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
         if (taskServiceConfiguration.isEnableDatabaseEventLogging()) {
-            TaskLogEntryBuilder taskLogEntryBuilder = CommandContextUtil.getProcessEngineConfiguration().getHistoryService().createTaskLogEntryBuilder(taskEntity);
-            taskLogEntryBuilder.type(eventType);
+            HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = CommandContextUtil.getProcessEngineConfiguration().getHistoryService().createTaskLogEntryBuilder(taskEntity);
+            historicTaskLogEntryBuilder.type(eventType);
             ObjectNode data = CommandContextUtil.getTaskServiceConfiguration().getObjectMapper().createObjectNode();
             if (identityLinkEntity.isUser()) {
                 data.put("userId", identityLinkEntity.getUserId());
@@ -113,8 +113,8 @@ public class IdentityLinkUtil {
                 data.put("groupId", identityLinkEntity.getGroupId());
             }
             data.put("type", identityLinkEntity.getType());
-            taskLogEntryBuilder.data(data.toString());
-            taskLogEntryBuilder.add();
+            historicTaskLogEntryBuilder.data(data.toString());
+            historicTaskLogEntryBuilder.add();
         }
     }
 

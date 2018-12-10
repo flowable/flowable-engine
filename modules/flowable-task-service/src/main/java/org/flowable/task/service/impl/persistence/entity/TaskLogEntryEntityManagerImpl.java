@@ -15,16 +15,16 @@ package org.flowable.task.service.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.task.api.TaskLogEntry;
-import org.flowable.task.api.TaskLogEntryBuilder;
+import org.flowable.task.api.history.HistoricTaskLogEntry;
+import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.service.TaskServiceConfiguration;
-import org.flowable.task.service.impl.TaskLogEntryQueryImpl;
+import org.flowable.task.service.impl.HistoricTaskLogEntryQueryImpl;
 import org.flowable.task.service.impl.persistence.entity.data.TaskLogEntryDataManager;
 
 /**
  * @author martin.grofcik
  */
-public class TaskLogEntryEntityManagerImpl extends AbstractEntityManager<TaskLogEntryEntity> implements TaskLogEntryEntityManager {
+public class TaskLogEntryEntityManagerImpl extends AbstractEntityManager<HistoricTaskLogEntryEntity> implements TaskLogEntryEntityManager {
 
     private final TaskLogEntryDataManager taskLogDataManager;
 
@@ -39,17 +39,17 @@ public class TaskLogEntryEntityManagerImpl extends AbstractEntityManager<TaskLog
     }
 
     @Override
-    public List<TaskLogEntry> findTaskLogEntriesByQueryCriteria(TaskLogEntryQueryImpl taskLogEntryQuery) {
+    public List<HistoricTaskLogEntry> findTaskLogEntriesByQueryCriteria(HistoricTaskLogEntryQueryImpl taskLogEntryQuery) {
         return getDataManager().findTaskLogEntriesByQueryCriteria(taskLogEntryQuery);
     }
 
     @Override
-    public long findTaskLogEntriesCountByQueryCriteria(TaskLogEntryQueryImpl taskLogEntryQuery) {
+    public long findTaskLogEntriesCountByQueryCriteria(HistoricTaskLogEntryQueryImpl taskLogEntryQuery) {
         return getDataManager().findTaskLogEntriesCountByQueryCriteria(taskLogEntryQuery);
     }
 
     @Override
-    public List<TaskLogEntry> findTaskLogEntriesByNativeQueryCriteria(Map<String, Object> nativeTaskLogEntryQuery) {
+    public List<HistoricTaskLogEntry> findTaskLogEntriesByNativeQueryCriteria(Map<String, Object> nativeTaskLogEntryQuery) {
         return getDataManager().findTaskLogEntriesByNativeQueryCriteria(nativeTaskLogEntryQuery);
     }
     @Override
@@ -78,22 +78,22 @@ public class TaskLogEntryEntityManagerImpl extends AbstractEntityManager<TaskLog
     }
 
     @Override
-    public void createTaskLogEntry(TaskLogEntryBuilder taskLogEntryBuilder) {
-        TaskLogEntryEntity taskLogEntryEntity = getDataManager().create();
-        taskLogEntryEntity.setUserId(taskLogEntryBuilder.getUserId());
-        taskLogEntryEntity.setTimeStamp(taskLogEntryBuilder.getTimeStamp());
-        taskLogEntryEntity.setTaskId(taskLogEntryBuilder.getTaskId());
-        taskLogEntryEntity.setTenantId(taskLogEntryBuilder.getTenantId());
-        taskLogEntryEntity.setProcessInstanceId(taskLogEntryBuilder.getProcessInstanceId());
-        taskLogEntryEntity.setProcessDefinitionId(taskLogEntryBuilder.getProcessDefinitionId());
-        taskLogEntryEntity.setExecutionId(taskLogEntryBuilder.getExecutionId());
-        taskLogEntryEntity.setScopeId(taskLogEntryBuilder.getScopeId());
-        taskLogEntryEntity.setScopeDefinitionId(taskLogEntryBuilder.getScopeDefinitionId());
-        taskLogEntryEntity.setSubScopeId(taskLogEntryBuilder.getSubScopeId());
-        taskLogEntryEntity.setScopeType(taskLogEntryBuilder.getScopeType());
+    public void createTaskLogEntry(HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder) {
+        HistoricTaskLogEntryEntity taskLogEntryEntity = getDataManager().create();
+        taskLogEntryEntity.setUserId(historicTaskLogEntryBuilder.getUserId());
+        taskLogEntryEntity.setTimeStamp(historicTaskLogEntryBuilder.getTimeStamp());
+        taskLogEntryEntity.setTaskId(historicTaskLogEntryBuilder.getTaskId());
+        taskLogEntryEntity.setTenantId(historicTaskLogEntryBuilder.getTenantId());
+        taskLogEntryEntity.setProcessInstanceId(historicTaskLogEntryBuilder.getProcessInstanceId());
+        taskLogEntryEntity.setProcessDefinitionId(historicTaskLogEntryBuilder.getProcessDefinitionId());
+        taskLogEntryEntity.setExecutionId(historicTaskLogEntryBuilder.getExecutionId());
+        taskLogEntryEntity.setScopeId(historicTaskLogEntryBuilder.getScopeId());
+        taskLogEntryEntity.setScopeDefinitionId(historicTaskLogEntryBuilder.getScopeDefinitionId());
+        taskLogEntryEntity.setSubScopeId(historicTaskLogEntryBuilder.getSubScopeId());
+        taskLogEntryEntity.setScopeType(historicTaskLogEntryBuilder.getScopeType());
 
-        taskLogEntryEntity.setType(taskLogEntryBuilder.getType());
-        taskLogEntryEntity.setData(taskLogEntryBuilder.getData());
+        taskLogEntryEntity.setType(historicTaskLogEntryBuilder.getType());
+        taskLogEntryEntity.setData(historicTaskLogEntryBuilder.getData());
         getDataManager().insert(taskLogEntryEntity);
     }
 

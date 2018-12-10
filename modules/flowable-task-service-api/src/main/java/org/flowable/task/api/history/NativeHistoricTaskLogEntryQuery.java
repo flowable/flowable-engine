@@ -10,15 +10,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.task.api;
+package org.flowable.task.api.history;
 
 import org.flowable.common.engine.api.query.NativeQuery;
 
 /**
- * Allows querying of {@link TaskLogEntry}s via native (SQL) queries
+ * Allows querying of {@link HistoricTaskLogEntry}s via native (SQL) queries
  * 
  * @author martin.grofcik
  */
-public interface NativeTaskLogEntryQuery extends NativeQuery<NativeTaskLogEntryQuery, TaskLogEntry> {
+public interface NativeHistoricTaskLogEntryQuery extends NativeQuery<NativeHistoricTaskLogEntryQuery, HistoricTaskLogEntry> {
 
 }

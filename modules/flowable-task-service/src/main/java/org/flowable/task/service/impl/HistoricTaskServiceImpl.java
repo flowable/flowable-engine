@@ -20,17 +20,17 @@ import org.flowable.common.engine.impl.service.CommonServiceImpl;
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
-import org.flowable.task.api.NativeTaskLogEntryQuery;
-import org.flowable.task.api.TaskLogEntry;
-import org.flowable.task.api.TaskLogEntryBuilder;
-import org.flowable.task.api.TaskLogEntryQuery;
+import org.flowable.task.api.history.NativeHistoricTaskLogEntryQuery;
+import org.flowable.task.api.history.HistoricTaskLogEntry;
+import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
+import org.flowable.task.api.history.HistoricTaskLogEntryQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityManager;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntityManager;
 import org.flowable.task.service.impl.util.CommandContextUtil;
 
@@ -141,22 +141,22 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
     }
 
     @Override
-    public void addTaskLogEntry(TaskLogEntry taskLogEntry) {
+    public void addTaskLogEntry(HistoricTaskLogEntry historicTaskLogEntry) {
         if (this.configuration.isEnableDatabaseEventLogging()) {
-            getTaskLogEntryEntityManager().insert((TaskLogEntryEntity) taskLogEntry);
+            getTaskLogEntryEntityManager().insert((HistoricTaskLogEntryEntity) historicTaskLogEntry);
         }
     }
 
     @Override
-    public void createTaskLogEntry(TaskLogEntryBuilder taskLogEntryBuilder) {
+    public void createTaskLogEntry(HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder) {
         if (this.configuration.isEnableDatabaseEventLogging()) {
-            getTaskLogEntryEntityManager().createTaskLogEntry(taskLogEntryBuilder);
+            getTaskLogEntryEntityManager().createTaskLogEntry(historicTaskLogEntryBuilder);
         }
     }
 
     @Override
-    public TaskLogEntryQuery createTaskLogEntryQuery(CommandExecutor commandExecutor) {
-        return new TaskLogEntryQueryImpl(commandExecutor);
+    public HistoricTaskLogEntryQuery createTaskLogEntryQuery(CommandExecutor commandExecutor) {
+        return new HistoricTaskLogEntryQueryImpl(commandExecutor);
     }
 
     @Override
@@ -175,8 +175,8 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
     }
 
     @Override
-    public NativeTaskLogEntryQuery createNativeTaskLogEntryQuery(CommandExecutor commandExecutor) {
-        return new NativeTaskLogEntryQueryImpl(commandExecutor);
+    public NativeHistoricTaskLogEntryQuery createNativeTaskLogEntryQuery(CommandExecutor commandExecutor) {
+        return new NativeHistoricTaskLogEntryQueryImpl(commandExecutor);
     }
 
     protected TaskLogEntryEntityManager getTaskLogEntryEntityManager() {

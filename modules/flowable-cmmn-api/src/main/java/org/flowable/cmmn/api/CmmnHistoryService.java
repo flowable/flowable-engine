@@ -21,11 +21,11 @@ import org.flowable.cmmn.api.history.HistoricVariableInstanceQuery;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
-import org.flowable.task.api.NativeTaskLogEntryQuery;
+import org.flowable.task.api.history.NativeHistoricTaskLogEntryQuery;
 import org.flowable.task.api.TaskInfo;
-import org.flowable.task.api.TaskLogEntry;
-import org.flowable.task.api.TaskLogEntryBuilder;
-import org.flowable.task.api.TaskLogEntryQuery;
+import org.flowable.task.api.history.HistoricTaskLogEntry;
+import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
+import org.flowable.task.api.history.HistoricTaskLogEntryQuery;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 
 /**
@@ -85,22 +85,22 @@ public interface CmmnHistoryService {
      *
      * @param task to which is log related to
      */
-    TaskLogEntryBuilder createTaskLogEntryBuilder(TaskInfo task);
+    HistoricTaskLogEntryBuilder createTaskLogEntryBuilder(TaskInfo task);
 
     /**
      * Create new task log entry builder to the log task event without predefined values from the task
      *
      */
-    TaskLogEntryBuilder createTaskLogEntryBuilder();
+    HistoricTaskLogEntryBuilder createTaskLogEntryBuilder();
 
     /**
-     * Returns a new {@link TaskLogEntryQuery} that can be used to dynamically query task log entries.
+     * Returns a new {@link HistoricTaskLogEntryQuery} that can be used to dynamically query task log entries.
      */
-    TaskLogEntryQuery createTaskLogEntryQuery();
+    HistoricTaskLogEntryQuery createTaskLogEntryQuery();
 
     /**
-     * Returns a new {@link NativeTaskLogEntryQuery} for {@link TaskLogEntry}s.
+     * Returns a new {@link NativeHistoricTaskLogEntryQuery} for {@link HistoricTaskLogEntry}s.
      */
-    NativeTaskLogEntryQuery createNativeTaskLogEntryQuery();
+    NativeHistoricTaskLogEntryQuery createNativeTaskLogEntryQuery();
 
 }

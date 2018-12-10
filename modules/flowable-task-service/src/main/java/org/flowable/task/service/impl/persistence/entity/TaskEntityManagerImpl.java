@@ -240,7 +240,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
 
     protected void logAssigneeChanged(TaskEntity taskEntity, String previousAssignee, String newAssignee) {
         if (this.getTaskServiceConfiguration().isEnableDatabaseEventLogging()) {
-            TaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
+            HistoricTaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
             taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_ASSIGNEE_CHANGED.name());
             taskLogEntry.setData(
                 serializeLogEntryData(
@@ -254,7 +254,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
 
     protected void logOwnerChanged(TaskEntity taskEntity, String previousOwner, String newOwner) {
         if (this.getTaskServiceConfiguration().isEnableDatabaseEventLogging()) {
-            TaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
+            HistoricTaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
             taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_OWNER_CHANGED.name());
             taskLogEntry.setData(
                 serializeLogEntryData(
@@ -268,7 +268,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
 
     protected void logPriorityChanged(TaskEntity taskEntity, Integer previousPriority, int newPriority) {
         if (this.getTaskServiceConfiguration().isEnableDatabaseEventLogging()) {
-            TaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
+            HistoricTaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
             taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_PRIORITY_CHANGED.name());
             ObjectNode dataNode = taskServiceConfiguration.getObjectMapper().createObjectNode();
             dataNode.put("newPriority", newPriority);
@@ -280,7 +280,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
 
     protected void logDueDateChanged(TaskEntity taskEntity, Date previousDueDate, Date newDueDate) {
         if (this.getTaskServiceConfiguration().isEnableDatabaseEventLogging()) {
-            TaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
+            HistoricTaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
             taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_DUEDATE_CHANGED.name());
             ObjectNode dataNode = taskServiceConfiguration.getObjectMapper().createObjectNode();
             dataNode.put("newDueDate", newDueDate != null ? newDueDate.getTime() : null);
@@ -292,7 +292,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
 
     protected void logNameChanged(TaskEntity taskEntity, String previousName, String newName) {
         if (this.getTaskServiceConfiguration().isEnableDatabaseEventLogging()) {
-            TaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
+            HistoricTaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
             taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_NAME_CHANGED.name());
             taskLogEntry.setData(
                 serializeLogEntryData(
@@ -306,15 +306,15 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
 
     protected void logTaskCreatedEvent(TaskInfo task) {
         if (this.getTaskServiceConfiguration().isEnableDatabaseEventLogging()) {
-            TaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(task);
+            HistoricTaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(task);
             taskLogEntry.setTimeStamp(task.getCreateTime());
             taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_CREATED.name());
             CommandContextUtil.getTaskLogEntryEntityManager().insert(taskLogEntry);
         }
     }
 
-    protected TaskLogEntryEntity createInitialTaskLogEntry(TaskInfo task) {
-        TaskLogEntryEntity taskLogEntryEntity = CommandContextUtil.getTaskLogEntryEntityManager().create();
+    protected HistoricTaskLogEntryEntity createInitialTaskLogEntry(TaskInfo task) {
+        HistoricTaskLogEntryEntity taskLogEntryEntity = CommandContextUtil.getTaskLogEntryEntityManager().create();
         taskLogEntryEntity.setUserId(Authentication.getAuthenticatedUserId());
         taskLogEntryEntity.setTimeStamp(this.taskServiceConfiguration.getClock().getCurrentTime());
         taskLogEntryEntity.setTaskId(task.getId());

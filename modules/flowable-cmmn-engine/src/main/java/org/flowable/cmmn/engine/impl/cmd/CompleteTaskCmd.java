@@ -28,7 +28,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.flowable.task.service.delegate.TaskListener;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntity;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntity;
 
 /**
  * @author Joram Barrez
@@ -89,7 +89,7 @@ public class CompleteTaskCmd implements Command<Void> {
 
     protected static void logTaskCompleted(TaskEntity taskEntity, CommandContext commandContext) {
         if (CommandContextUtil.getTaskServiceConfiguration(commandContext).isEnableDatabaseEventLogging()) {
-            TaskLogEntryEntity taskLogEntry = org.flowable.task.service.impl.util.CommandContextUtil.getTaskLogEntryEntityManager().create();
+            HistoricTaskLogEntryEntity taskLogEntry = org.flowable.task.service.impl.util.CommandContextUtil.getTaskLogEntryEntityManager().create();
             taskLogEntry.setTaskId(taskEntity.getId());
             taskLogEntry.setSubScopeId(taskEntity.getSubScopeId());
             taskLogEntry.setScopeType(taskEntity.getScopeType());

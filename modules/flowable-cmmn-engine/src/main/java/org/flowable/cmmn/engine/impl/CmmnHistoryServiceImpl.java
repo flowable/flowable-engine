@@ -31,15 +31,15 @@ import org.flowable.cmmn.engine.impl.history.CmmnHistoricVariableInstanceQueryIm
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
-import org.flowable.task.api.NativeTaskLogEntryQuery;
+import org.flowable.task.api.history.NativeHistoricTaskLogEntryQuery;
 import org.flowable.task.api.TaskInfo;
-import org.flowable.task.api.TaskLogEntryBuilder;
-import org.flowable.task.api.TaskLogEntryQuery;
+import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
+import org.flowable.task.api.history.HistoricTaskLogEntryQuery;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
-import org.flowable.task.service.impl.NativeTaskLogEntryQueryImpl;
-import org.flowable.task.service.impl.TaskLogEntryBuilderImpl;
-import org.flowable.task.service.impl.TaskLogEntryQueryImpl;
+import org.flowable.task.service.impl.NativeHistoricTaskLogEntryQueryImpl;
+import org.flowable.task.service.impl.HistoricTaskLogEntryBuilderImpl;
+import org.flowable.task.service.impl.HistoricTaskLogEntryQueryImpl;
 
 /**
  * @author Joram Barrez
@@ -112,23 +112,23 @@ public class CmmnHistoryServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     }
 
     @Override
-    public TaskLogEntryBuilder createTaskLogEntryBuilder(TaskInfo task) {
-        return new TaskLogEntryBuilderImpl(commandExecutor, task);
+    public HistoricTaskLogEntryBuilder createTaskLogEntryBuilder(TaskInfo task) {
+        return new HistoricTaskLogEntryBuilderImpl(commandExecutor, task);
     }
 
     @Override
-    public TaskLogEntryBuilder createTaskLogEntryBuilder() {
-        return new TaskLogEntryBuilderImpl(commandExecutor);
+    public HistoricTaskLogEntryBuilder createTaskLogEntryBuilder() {
+        return new HistoricTaskLogEntryBuilderImpl(commandExecutor);
     }
 
     @Override
-    public TaskLogEntryQuery createTaskLogEntryQuery() {
-        return new TaskLogEntryQueryImpl(commandExecutor);
+    public HistoricTaskLogEntryQuery createTaskLogEntryQuery() {
+        return new HistoricTaskLogEntryQueryImpl(commandExecutor);
     }
 
     @Override
-    public NativeTaskLogEntryQuery createNativeTaskLogEntryQuery() {
-        return new NativeTaskLogEntryQueryImpl(commandExecutor);
+    public NativeHistoricTaskLogEntryQuery createNativeTaskLogEntryQuery() {
+        return new NativeHistoricTaskLogEntryQueryImpl(commandExecutor);
     }
 
 }
