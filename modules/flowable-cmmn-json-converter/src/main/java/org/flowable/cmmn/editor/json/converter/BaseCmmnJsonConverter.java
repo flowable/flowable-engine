@@ -86,6 +86,13 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
         
         if (planItemDefinition instanceof Task) {
             Task task = (Task) planItemDefinition;
+            if (task.isBlocking()){
+                propertiesNode.put(PROPERTY_IS_BLOCKING, task.isBlocking());
+            }
+            if (StringUtils.isNotEmpty(task.getBlockingExpression())){
+                propertiesNode.put(PROPERTY_IS_BLOCKING_EXPRESSION, task.getBlockingExpression());
+            }
+
             if (task.isAsync()) {
                 propertiesNode.put(PROPERTY_IS_ASYNC, task.isAsync());
             }

@@ -1,0 +1,148 @@
+{
+  "modelId": "89879e54-ea5b-11e8-9b03-265fdd7d11ee",
+  "bounds": {
+    "lowerRight": {
+      "x": 1200,
+      "y": 1050
+    },
+    "upperLeft": {
+      "x": 0,
+      "y": 0
+    }
+  },
+  "properties": {
+    "case_id": "shareniu_test",
+    "name": "shareniu_test",
+    "documentation": "shareniu_test",
+    "case_initiatorvariablename": "",
+    "case_author": "",
+    "case_version": "",
+    "case_namespace": "http://www.flowable.org/casedef",
+    "process_id": "shareniu_test"
+  },
+  "childShapes": [
+    {
+      "resourceId": "casePlanModel",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": "",
+        "formkeydefinition": "",
+        "formreference": "",
+        "autocompleteenabled": "",
+        "autocompletecondition": ""
+      },
+      "stencil": {
+        "id": "CasePlanModel"
+      },
+      "childShapes": [
+        {
+          "resourceId": "sid-92C46068-1AAE-4E0B-B262-C63092A8082D",
+          "properties": {
+            "overrideid": "shareniu_task",
+            "name": "shareniu_task",
+            "documentation": "",
+            "isblocking": true,
+            "isblockingexpression": "${shareniu_task}",
+            "isasync": "",
+            "isexclusive": "",
+            "requiredenabled": "",
+            "requiredrulecondition": "",
+            "repetitionenabled": "",
+            "repetitionrulecondition": "",
+            "repetitioncountervariablename": "",
+            "manualactivationenabled": "",
+            "manualactivationrulecondition": "",
+            "completionneutralenabled": "",
+            "completionneutralrulecondition": "",
+            "planitemlifecyclelisteners": ""
+          },
+          "stencil": {
+            "id": "Task"
+          },
+          "childShapes": [],
+          "outgoing": [],
+          "bounds": {
+            "lowerRight": {
+              "x": 235,
+              "y": 130
+            },
+            "upperLeft": {
+              "x": 135,
+              "y": 50
+            }
+          },
+          "dockers": []
+        },
+        {
+          "resourceId": "sid-3BC8C5F6-BA9F-4C4C-A699-B09CA392E277",
+          "properties": {
+            "overrideid": "",
+            "name": "shareniu_human_task",
+            "documentation": "",
+            "isblocking": true,
+            "isblockingexpression": "${shareniu_human_task}",
+            "usertaskassignment": {
+              "assignment": {
+                "type": "static",
+                "assignee": "shareniu"
+              }
+            },
+            "formkeydefinition": "",
+            "formreference": "",
+            "duedatedefinition": "",
+            "prioritydefinition": "",
+            "tasklisteners": "",
+            "isasync": "",
+            "isexclusive": "",
+            "requiredenabled": "",
+            "requiredrulecondition": "",
+            "repetitionenabled": "",
+            "repetitionrulecondition": "",
+            "repetitioncountervariablename": "",
+            "manualactivationenabled": "",
+            "manualactivationrulecondition": "",
+            "completionneutralenabled": "",
+            "completionneutralrulecondition": "",
+            "planitemlifecyclelisteners": ""
+          },
+          "stencil": {
+            "id": "HumanTask"
+          },
+          "childShapes": [],
+          "outgoing": [],
+          "bounds": {
+            "lowerRight": {
+              "x": 460,
+              "y": 130
+            },
+            "upperLeft": {
+              "x": 360,
+              "y": 50
+            }
+          },
+          "dockers": []
+        }
+      ],
+      "outgoing": [],
+      "bounds": {
+        "lowerRight": {
+          "x": 763,
+          "y": 754
+        },
+        "upperLeft": {
+          "x": 45,
+          "y": 40
+        }
+      },
+      "dockers": []
+    }
+  ],
+  "stencil": {
+    "id": "CMMNDiagram"
+  },
+  "stencilset": {
+    "namespace": "http://b3mn.org/stencilset/cmmn1.1#",
+    "url": "../editor/stencilsets/cmmn1.1/cmmn1.1.json"
+  }
+}
