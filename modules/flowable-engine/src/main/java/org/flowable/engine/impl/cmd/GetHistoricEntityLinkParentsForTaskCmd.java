@@ -26,12 +26,12 @@ import org.flowable.entitylink.api.history.HistoricEntityLink;
 /**
  * @author Javier Casal
  */
-public class GetHistoricEntityLinkParentForTaskCmd implements Command<List<HistoricEntityLink>>, Serializable {
+public class GetHistoricEntityLinkParentsForTaskCmd implements Command<List<HistoricEntityLink>>, Serializable {
 
     private static final long serialVersionUID = 1L;
     protected String taskId;
 
-    public GetHistoricEntityLinkParentForTaskCmd(String taskId) {
+    public GetHistoricEntityLinkParentsForTaskCmd(String taskId) {
         if (taskId == null) {
             throw new FlowableIllegalArgumentException("taskId is required");
         }

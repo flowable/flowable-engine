@@ -17,21 +17,21 @@
 flowableAdminApp.controller('DecisionTableDeploymentsController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', 'gridConstants',
     function ($rootScope, $scope, $http, $timeout, $location, $translate, $q, $modal, gridConstants) {
 
-		$rootScope.navigation = {main: 'dmn-engine', sub: 'deployments'};
-        
-		$scope.filter = {};
-		$scope.deploymentsData = {};
+        $rootScope.navigation = {main: 'dmn-engine', sub: 'deployments'};
 
-		// Array to contain selected properties (yes - we only can select one, but ng-grid isn't smart enough)
-	    $scope.selectedDefinitions = [];
+        $scope.filter = {};
+        $scope.deploymentsData = {};
 
-	    var filterConfig = {
-	    	url: '/app/rest/admin/decision-table-deployments',
-	    	method: 'GET',
-	    	success: function(data, status, headers, config) {
-	    		$scope.deploymentsData = data;
+        // Array to contain selected properties (yes - we only can select one, but ng-grid isn't smart enough)
+        $scope.selectedDefinitions = [];
+
+        var filterConfig = {
+            url: '/app/rest/admin/decision-table-deployments',
+            method: 'GET',
+            success: function (data, status, headers, config) {
+                $scope.deploymentsData = data;
             },
-            error: function(data, status, headers, config) {
+            error: function (data, status, headers, config) {
                 if (data && data.message) {
                     // Extract error-message
                     $rootScope.addAlert(data.message, 'error');
@@ -50,50 +50,68 @@ flowableAdminApp.controller('DecisionTableDeploymentsController', ['$rootScope',
                 {id: 'nameLike', name: 'DECISION-TABLE-DEPLOYMENTS.FILTER.NAME', showByDefault: true},
                 {id: 'tenantIdLike', name: 'DECISION-TABLE-DEPLOYMENTS.FILTER.TENANTID', showByDefault: true}
             ]
-	    };
+        };
 
-	    if($rootScope.filters && $rootScope.filters.decisionTableDeploymentFilter) {
-	    	// Reuse the existing filter
-	    	$scope.filter = $rootScope.filters.decisionTableDeploymentFilter;
-	    	$scope.filter.config = filterConfig;
-	    } else {
-		    $scope.filter = new FlowableAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
-		    $rootScope.filters.decisionTableDeploymentFilter = $scope.filter;
-	    }
+        if ($rootScope.filters && $rootScope.filters.decisionTableDeploymentFilter) {
+            // Reuse the existing filter
+            $scope.filter = $rootScope.filters.decisionTableDeploymentFilter;
+            $scope.filter.config = filterConfig;
+        } else {
+            $scope.filter = new FlowableAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
+            $rootScope.filters.decisionTableDeploymentFilter = $scope.filter;
+        }
 
-	    $scope.deploymentSelected = function(deployment) {
-	    	if (deployment && deployment.getProperty('id')) {
-	    		$location.path('/decision-table-deployment/' + deployment.getProperty('id'));
-	    	}
-	    };
+        $scope.deploymentSelected = function (deployment) {
+            if (deployment && deployment.getProperty('id')) {
+                $location.path('/decision-table-deployment/' + deployment.getProperty('id'));
+            }
+        };
 
-	    $q.all([$translate('DECISION-TABLE-DEPLOYMENTS.HEADER.ID'),
-              $translate('DECISION-TABLE-DEPLOYMENTS.HEADER.NAME'),
-              $translate('DECISION-TABLE-DEPLOYMENTS.HEADER.DEPLOY-TIME'),
-              $translate('DECISION-TABLE-DEPLOYMENTS.HEADER.CATEGORY'),
-              $translate('DECISION-TABLE-DEPLOYMENTS.HEADER.TENANT')])
-              .then(function(headers) {
+        $q.all([$translate('DECISION-TABLE-DEPLOYMENTS.HEADER.ID'),
+            $translate('DECISION-TABLE-DEPLOYMENTS.HEADER.NAME'),
+            $translate('DECISION-TABLE-DEPLOYMENTS.HEADER.DEPLOY-TIME'),
+            $translate('DECISION-TABLE-DEPLOYMENTS.HEADER.CATEGORY'),
+            $translate('DECISION-TABLE-DEPLOYMENTS.HEADER.TENANT')])
+            .then(function (headers) {
 
-          // Config for grid
-          $scope.gridDeployments = {
-              data: 'deploymentsData.data',
-              enableRowReordering: true,
-              multiSelect: false,
-              keepLastSelected : false,
-              rowHeight: 36,
-              afterSelectionChange: $scope.deploymentSelected,
-              columnDefs: [
-                  { field: 'id', displayName: headers[0], cellTemplate: gridConstants.defaultTemplate},
-                  { field: 'name', displayName: headers[1], cellTemplate: gridConstants.defaultTemplate},
-                  { field: 'deploymentTime', displayName: headers[2], cellTemplate: gridConstants.dateTemplate},
-                  { field: 'category', displayName: headers[3], cellTemplate: gridConstants.defaultTemplate},
-                  { field: 'tenantId', displayName: headers[4], cellTemplate: gridConstants.defaultTemplate}]
-          };
-      });
+                // Config for grid
+                $scope.gridDeployments = {
+                    data: 'deploymentsData.data',
+                    enableRowReordering: true,
+                    multiSelect: false,
+                    keepLastSelected: false,
+                    rowHeight: 36,
+                    afterSelectionChange: $scope.deploymentSelected,
+                    columnDefs: [
+                        {field: 'id', displayName: headers[0], cellTemplate: gridConstants.defaultTemplate},
+                        {field: 'name', displayName: headers[1], cellTemplate: gridConstants.defaultTemplate},
+                        {field: 'deploymentTime', displayName: headers[2], cellTemplate: gridConstants.dateTemplate},
+                        {field: 'category', displayName: headers[3], cellTemplate: gridConstants.defaultTemplate},
+                        {field: 'tenantId', displayName: headers[4], cellTemplate: gridConstants.defaultTemplate}]
+                };
+            });
 
-      $scope.executeWhenReady(function() {
-          $scope.filter.refresh();
-      });
+        $scope.executeWhenReady(function () {
+            $scope.filter.refresh();
+        });
+
+        /*
+        * ACTIONS
+        */
+
+        $scope.uploadDeployment = function () {
+            var modalInstance = $modal.open({
+                templateUrl: 'views/upload-dmn-deployment.html',
+                controller: 'UploadDecisionDeploymentCtrl'
+            });
+            modalInstance.result.then(function (result) {
+                // Refresh page if closed successfully
+                if (result) {
+                    $scope.deploymentsData = {};
+                    $scope.filter.refresh();
+                }
+            });
+        };
 
     }]);
 
@@ -101,44 +119,46 @@ flowableAdminApp.controller('DecisionTableDeploymentsController', ['$rootScope',
 /**\
  * Controller for the upload a model from the process Modeler.
  */
- flowableAdminApp.controller('UploadDecisionDeploymentCtrl',
-    ['$scope', '$modalInstance', '$http', '$upload', function ($scope, $modalInstance, $http, $upload) {
+flowableAdminApp.controller('UploadDecisionDeploymentCtrl',
+    ['$scope', '$modalInstance', '$http', 'Upload', '$timeout', '$translate', function ($scope, $modalInstance, $http, Upload, $timeout, $translate) {
 
-    $scope.status = {loading: false};
+        $scope.status = {loading: false};
 
-    $scope.model = {};
+        $scope.model = {};
 
-    $scope.onFileSelect = function($files) {
+        $scope.onFileSelect = function ($files) {
 
-        for (var i = 0; i < $files.length; i++) {
-            var file = $files[i];
-            $upload.upload({
-                url: '/app/rest/admin/deployments',
-                method: 'POST',
-                file: file
-            }).progress(function(evt) {
-                    $scope.status.loading = true;
-                    $scope.model.uploadProgress =  parseInt(100.0 * evt.loaded / evt.total);
-                }).success(function(data, status, headers, config) {
-                    $scope.status.loading = false;
-                    $modalInstance.close(true);
-                })
-            .error(function(data, status, headers, config) {
+            for (var i = 0; i < $files.length; i++) {
+                var file = $files[i];
+                file.upload = Upload.upload({
+                    url: '/app/rest/admin/decision-table-deployments',
+                    method: 'POST',
+                    data: {file: file}
+                });
 
-                    if (data && data.message) {
-                        $scope.model.errorMessage = data.message;
+                file.upload.then(function (response) {
+                    $timeout(function () {
+                        $scope.addAlert($translate.instant('ALERT.DEPLOYMENT.DEPLOYMENT-SUCCESS'), 'info');
+                        $scope.status.loading = false;
+                        $modalInstance.close(true);
+                    });
+                }, function (response) {
+                    if (response.data && response.data.message) {
+                        $scope.model.errorMessage = response.data.message;
                     }
-
                     $scope.model.error = true;
                     $scope.status.loading = false;
+                }, function (evt) {
+                    file.progress = Math.min(100, parseInt(100.0 *
+                        evt.loaded / evt.total));
                 });
-        }
-    };
+            }
+        };
 
-    $scope.cancel = function () {
-        if (!$scope.status.loading) {
-            $modalInstance.dismiss('cancel');
-        }
-    };
+        $scope.cancel = function () {
+            if (!$scope.status.loading) {
+                $modalInstance.dismiss('cancel');
+            }
+        };
 
-}]);
+    }]);

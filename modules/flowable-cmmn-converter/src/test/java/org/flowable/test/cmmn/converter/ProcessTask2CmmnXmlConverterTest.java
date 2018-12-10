@@ -18,6 +18,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ProcessTask;
@@ -66,6 +67,17 @@ public class ProcessTask2CmmnXmlConverterTest extends AbstractConverterTest {
         
         assertEquals(0, task1.getInParameters().size());
         assertEquals(0, task1.getOutParameters().size());
+        
+        PlanItemDefinition taskDefinition = cmmnModel.findPlanItemDefinition("onehumantask1");
+        assertTrue(taskDefinition instanceof HumanTask);
+        HumanTask humanTask = (HumanTask) taskDefinition;
+        assertEquals("Human task", humanTask.getName());
+        assertEquals("admin", humanTask.getAssignee());
+        assertEquals("admin", humanTask.getOwner());
+        assertEquals("aHumanTaskForm", humanTask.getFormKey());
+        assertEquals("50", humanTask.getPriority());
+        assertEquals("2019-01-01", humanTask.getDueDate());
+        assertEquals("testCategory", humanTask.getCategory());
     }
 
 }

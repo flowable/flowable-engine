@@ -66,7 +66,7 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
 
         int expectedCreatedEvents = 8;
         if (processEngineConfiguration.getHistoryManager().isHistoryEnabled()) {
-            expectedCreatedEvents += 3;
+            expectedCreatedEvents += 5;
         }
         if (processEngineConfiguration.isEnableUserTaskDatabaseEventLogging()) {
             expectedCreatedEvents += 4;

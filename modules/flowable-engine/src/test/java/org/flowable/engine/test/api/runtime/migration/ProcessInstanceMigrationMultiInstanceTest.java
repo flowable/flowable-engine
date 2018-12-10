@@ -27,7 +27,6 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
-import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -42,7 +41,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Dennis Federico
  */
-public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowableTestCase {
+public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessInstanceMigrationTest {
 
     @AfterEach
     protected void tearDown() {
@@ -120,24 +119,19 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSequentialMultiInst.getId());
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isNull();
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(procSequentialMultiInst, processInstance, "userTask", "userTask1Id", "seqTasks", "seqTasks", "seqTasks",
+                "afterMultiInstance");
+
+            checkTaskInstance(procSequentialMultiInst, processInstance, "userTask1Id", "seqTasks", "seqTasks", "seqTasks", "afterMultiInstance");
+        }
+
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "seqTasks", "seqTasks", "seqTasks", "afterMultiInstance");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procSequentialMultiInst.getId());
+            checkActivityInstances(procSequentialMultiInst, processInstance, "userTask", "userTask1Id", "seqTasks", "seqTasks", "seqTasks", "afterMultiInstance");
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("userTask1Id", "seqTasks", "seqTasks", "seqTasks", "afterMultiInstance");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procSequentialMultiInst.getId());
-            }
+            checkTaskInstance(procSequentialMultiInst, processInstance, "userTask1Id", "seqTasks", "seqTasks", "seqTasks", "afterMultiInstance");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -216,24 +210,18 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procParallelMultiInst.getId());
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isNull();
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(procParallelMultiInst, processInstance, "userTask", "userTask1Id", "parallelTasks", "parallelTasks", "parallelTasks", "afterMultiInstance");
+
+            checkTaskInstance(procParallelMultiInst, processInstance, "userTask1Id", "parallelTasks", "parallelTasks", "parallelTasks", "afterMultiInstance");
+        }
+
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "parallelTasks", "parallelTasks", "parallelTasks", "afterMultiInstance");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelMultiInst.getId());
+            checkActivityInstances(procParallelMultiInst, processInstance, "userTask", "userTask1Id", "parallelTasks", "parallelTasks", "parallelTasks", "afterMultiInstance");
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("userTask1Id", "parallelTasks", "parallelTasks", "parallelTasks", "afterMultiInstance");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procParallelMultiInst.getId());
-            }
+            checkTaskInstance(procParallelMultiInst, processInstance, "userTask1Id", "parallelTasks", "parallelTasks", "parallelTasks", "afterMultiInstance");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -302,24 +290,18 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSimpleOneTask.getId());
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isNull();
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(procSimpleOneTask, processInstance, "userTask", "beforeMultiInstance", "seqTasks", "seqTasks", "userTask1Id");
+
+            checkTaskInstance(procSimpleOneTask, processInstance, "beforeMultiInstance", "seqTasks", "seqTasks", "userTask1Id");
+        }
+
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("beforeMultiInstance", "seqTasks", "seqTasks", "userTask1Id");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procSimpleOneTask.getId());
+            checkActivityInstances(procSimpleOneTask, processInstance, "userTask", "beforeMultiInstance", "seqTasks", "seqTasks", "userTask1Id");
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("beforeMultiInstance", "seqTasks", "seqTasks", "userTask1Id");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procSimpleOneTask.getId());
-            }
+            checkTaskInstance(procSimpleOneTask, processInstance, "beforeMultiInstance", "seqTasks", "seqTasks", "userTask1Id");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -397,24 +379,18 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsExactlyInAnyOrder(procSimpleOneTask.getId());
         assertThat(taskService.getVariable(tasks.get(0).getId(), "loopCounter")).isNull();
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(procSimpleOneTask, processInstance, "userTask", "beforeMultiInstance", "parallelTasks", "parallelTasks", "parallelTasks", "userTask1Id");
+
+            checkTaskInstance(procSimpleOneTask, processInstance, "beforeMultiInstance", "parallelTasks", "parallelTasks", "parallelTasks", "userTask1Id");
+        }
+
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("beforeMultiInstance", "parallelTasks", "parallelTasks", "parallelTasks", "userTask1Id");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procSimpleOneTask.getId());
+            checkActivityInstances(procSimpleOneTask, processInstance, "userTask", "beforeMultiInstance", "parallelTasks", "parallelTasks", "parallelTasks", "userTask1Id");
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("beforeMultiInstance", "parallelTasks", "parallelTasks", "parallelTasks", "userTask1Id");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procSimpleOneTask.getId());
-            }
+            checkTaskInstance(procSimpleOneTask, processInstance, "beforeMultiInstance", "parallelTasks", "parallelTasks", "parallelTasks", "userTask1Id");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -522,24 +498,18 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procParallelMultiInst.getId());
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isNull();
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(procParallelMultiInst, processInstance, "userTask", "beforeMultiInstance", "seqTasks", "seqTasks", "parallelTasks", "parallelTasks", "parallelTasks", "afterMultiInstance");
+
+            checkTaskInstance(procParallelMultiInst, processInstance, "beforeMultiInstance", "seqTasks", "seqTasks", "parallelTasks", "parallelTasks", "parallelTasks", "afterMultiInstance");
+        }
+
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("beforeMultiInstance", "seqTasks", "seqTasks", "parallelTasks", "parallelTasks", "parallelTasks", "afterMultiInstance");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelMultiInst.getId());
+            checkActivityInstances(procParallelMultiInst, processInstance, "userTask", "beforeMultiInstance", "seqTasks", "seqTasks", "parallelTasks", "parallelTasks", "parallelTasks", "afterMultiInstance");
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("beforeMultiInstance", "seqTasks", "seqTasks", "parallelTasks", "parallelTasks", "parallelTasks", "afterMultiInstance");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procParallelMultiInst.getId());
-            }
+            checkTaskInstance(procParallelMultiInst, processInstance, "beforeMultiInstance", "seqTasks", "seqTasks", "parallelTasks", "parallelTasks", "parallelTasks", "afterMultiInstance");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -655,24 +625,18 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSequentialMultiInst.getId());
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isNull();
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(procSequentialMultiInst, processInstance, "userTask", "beforeMultiInstance", "parallelTasks", "parallelTasks", "parallelTasks", "seqTasks", "seqTasks", "seqTasks", "afterMultiInstance");
+
+            checkTaskInstance(procSequentialMultiInst, processInstance, "beforeMultiInstance", "parallelTasks", "parallelTasks", "parallelTasks", "seqTasks", "seqTasks", "seqTasks", "afterMultiInstance");
+        }
+
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("beforeMultiInstance", "parallelTasks", "parallelTasks", "parallelTasks", "seqTasks", "seqTasks", "seqTasks", "afterMultiInstance");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procSequentialMultiInst.getId());
+            checkActivityInstances(procSequentialMultiInst, processInstance, "userTask", "beforeMultiInstance", "parallelTasks", "parallelTasks", "parallelTasks", "seqTasks", "seqTasks", "seqTasks", "afterMultiInstance");
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("beforeMultiInstance", "parallelTasks", "parallelTasks", "parallelTasks", "seqTasks", "seqTasks", "seqTasks", "afterMultiInstance");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procSequentialMultiInst.getId());
-            }
+            checkTaskInstance(procSequentialMultiInst, processInstance, "beforeMultiInstance", "parallelTasks", "parallelTasks", "parallelTasks", "seqTasks", "seqTasks", "seqTasks", "afterMultiInstance");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -738,25 +702,19 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSequentialMultiInst.getId());
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isEqualTo(1);
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(procSequentialMultiInst, processInstance, "userTask", "userTask1Id", "subTask1", "subTask2", "subTask1");
+
+            checkTaskInstance(procSequentialMultiInst, processInstance, "userTask1Id", "subTask1", "subTask2", "subTask1");
+        }
+
         //Complete the process
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "subTask1", "subTask2", "subTask1", "subTask2", "subTask1", "subTask2", "afterMultiInstance");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procSequentialMultiInst.getId());
+            checkActivityInstances(procSequentialMultiInst, processInstance, "userTask", "userTask1Id", "subTask1", "subTask2", "subTask1", "subTask2", "subTask1", "subTask2", "afterMultiInstance");
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("userTask1Id", "subTask1", "subTask2", "subTask1", "subTask2", "subTask1", "subTask2", "afterMultiInstance");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procSequentialMultiInst.getId());
-            }
+            checkTaskInstance(procSequentialMultiInst, processInstance, "userTask1Id", "subTask1", "subTask2", "subTask1", "subTask2", "subTask1", "subTask2", "afterMultiInstance");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -825,25 +783,19 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         loopCounters = tasks.stream().map(aTask -> taskService.getVariable(aTask.getId(), "loopCounter", Integer.class)).collect(Collectors.toList());
         assertThat(loopCounters).containsExactlyInAnyOrder(0, 2);
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(procParallelMultiInst, processInstance, "userTask", "userTask1Id", "subTask1", "subTask1", "subTask1", "subTask2");
+
+            checkTaskInstance(procParallelMultiInst, processInstance, "userTask1Id", "subTask1", "subTask1", "subTask1", "subTask2");
+        }
+
         //Complete the process
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "subTask1", "subTask1", "subTask1", "subTask2", "subTask2", "subTask2", "afterMultiInstance");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procParallelMultiInst.getId());
+            checkActivityInstances(procParallelMultiInst, processInstance, "userTask", "userTask1Id", "subTask1", "subTask1", "subTask1", "subTask2", "subTask2", "subTask2", "afterMultiInstance");
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("userTask1Id", "subTask1", "subTask1", "subTask1", "subTask2", "subTask2", "subTask2", "afterMultiInstance");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procParallelMultiInst.getId());
-            }
+            checkTaskInstance(procParallelMultiInst, processInstance, "userTask1Id", "subTask1", "subTask1", "subTask1", "subTask2", "subTask2", "subTask2", "afterMultiInstance");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -906,25 +858,19 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSimpleOneTask.getId());
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isNull();
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(procSimpleOneTask, processInstance, "userTask", "beforeMultiInstance", "subTask1", "subTask2", "subTask1", "userTask1Id");
+
+            checkTaskInstance(procSimpleOneTask, processInstance, "beforeMultiInstance", "subTask1", "subTask2", "subTask1", "userTask1Id");
+        }
+
         //Complete the process
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("beforeMultiInstance", "subTask1", "subTask2", "subTask1", "userTask1Id");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procSimpleOneTask.getId());
+            checkActivityInstances(procSimpleOneTask, processInstance, "userTask", "beforeMultiInstance", "subTask1", "subTask2", "subTask1", "userTask1Id");
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("beforeMultiInstance", "subTask1", "subTask2", "subTask1", "userTask1Id");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procSimpleOneTask.getId());
-            }
+            checkTaskInstance(procSimpleOneTask, processInstance, "beforeMultiInstance", "subTask1", "subTask2", "subTask1", "userTask1Id");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -1003,25 +949,19 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSimpleOneTask.getId());
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isNull();
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(procSimpleOneTask, processInstance, "userTask", "beforeMultiInstance", "subTask1", "subTask1", "subTask1", "subTask2", "subTask2", "userTask1Id");
+
+            checkTaskInstance(procSimpleOneTask, processInstance, "beforeMultiInstance", "subTask1", "subTask1", "subTask1", "subTask2", "subTask2", "userTask1Id");
+        }
+
         //Complete the process
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            //Check History
-            List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("beforeMultiInstance", "subTask1", "subTask1", "subTask1", "subTask2", "subTask2", "userTask1Id");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procSimpleOneTask.getId());
+            checkActivityInstances(procSimpleOneTask, processInstance, "userTask", "beforeMultiInstance", "subTask1", "subTask1", "subTask1", "subTask2", "subTask2", "userTask1Id");
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .list();
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder("beforeMultiInstance", "subTask1", "subTask1", "subTask1", "subTask2", "subTask2", "userTask1Id");
-                assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procSimpleOneTask.getId());
-            }
+            checkTaskInstance(procSimpleOneTask, processInstance, "beforeMultiInstance", "subTask1", "subTask1", "subTask1", "subTask2", "subTask2", "userTask1Id");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -1126,8 +1066,20 @@ public class ProcessInstanceMigrationMultiInstanceTest extends PluggableFlowable
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSequentialMultiInst.getId());
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isEqualTo(1);
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(procSequentialMultiInst, processInstance, "userTask", "beforeMultiInstance", "subTask1", "nestedSubTask1", "nestedSubTask2", "nestedSubTask1", "subTask1", "subTask2", "subTask1");
+
+            checkTaskInstance(procSequentialMultiInst, processInstance, "beforeMultiInstance", "subTask1", "nestedSubTask1", "nestedSubTask2", "nestedSubTask1", "subTask1", "subTask2", "subTask1");
+        }
+
         //Complete the process
         completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(procSequentialMultiInst, processInstance, "userTask", "beforeMultiInstance", "subTask1", "nestedSubTask1", "nestedSubTask2", "nestedSubTask1", "subTask1", "subTask2", "subTask1", "subTask2", "afterMultiInstance");
+
+            checkTaskInstance(procSequentialMultiInst, processInstance, "beforeMultiInstance", "subTask1", "nestedSubTask1", "nestedSubTask2", "nestedSubTask1", "subTask1", "subTask2", "subTask1", "subTask2", "afterMultiInstance");
+        }
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History

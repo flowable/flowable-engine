@@ -15,9 +15,12 @@ package org.flowable.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.List;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkType;
@@ -26,18 +29,26 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 /**
  * @author Javier Casal
  */
-public class GetEntityLinkParentForTaskCmd implements Command<List<EntityLink>>, Serializable {
+public class GetEntityLinkParentsForTaskCmd implements Command<List<EntityLink>>, Serializable {
 
     private static final long serialVersionUID = 1L;
     protected String taskId;
 
-    public GetEntityLinkParentForTaskCmd(String taskId) {
+    public GetEntityLinkParentsForTaskCmd(String taskId) {
+        if (taskId == null) {
+            throw new FlowableIllegalArgumentException("taskId is required");
+        }
         this.taskId = taskId;
     }
 
     @Override
     public List<EntityLink> execute(CommandContext commandContext) {
         TaskEntity task = CommandContextUtil.getTaskService().getTask(taskId);
+
+        if (task == null) {
+            throw new FlowableObjectNotFoundException("Cannot find task with id " + taskId, ExecutionEntity.class);
+        }
+
         return CommandContextUtil.getEntityLinkService().findEntityLinksByReferenceScopeIdAndType(task.getId(), ScopeTypes.TASK, EntityLinkType.CHILD);
     }
 

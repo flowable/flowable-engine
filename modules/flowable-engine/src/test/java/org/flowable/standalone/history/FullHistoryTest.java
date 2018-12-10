@@ -72,11 +72,14 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         // Start-task should be added to history
         HistoricActivityInstance historicStartEvent = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("theStart").singleResult();
         assertNotNull(historicStartEvent);
+        assertActivityInstancesAreSame(historicStartEvent, runtimeService.createActivityInstanceQuery().activityInstanceId(historicStartEvent.getId()).singleResult());
 
         HistoricActivityInstance waitStateActivity = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("waitState").singleResult();
+        assertActivityInstancesAreSame(waitStateActivity, runtimeService.createActivityInstanceQuery().activityInstanceId(waitStateActivity.getId()).singleResult());
         assertNotNull(waitStateActivity);
 
         HistoricActivityInstance serviceTaskActivity = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("serviceTask").singleResult();
+        assertActivityInstancesAreSame(serviceTaskActivity, runtimeService.createActivityInstanceQuery().activityInstanceId(serviceTaskActivity.getId()).singleResult());
         assertNotNull(serviceTaskActivity);
 
         List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().orderByVariableName().asc().orderByVariableRevision().asc().list();
@@ -915,8 +918,10 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertNotSame(details.get(0).getActivityInstanceId(), details.get(1).getActivityInstanceId());
 
         HistoricActivityInstance historicActInst1 = historyService.createHistoricActivityInstanceQuery().activityInstanceId(details.get(0).getActivityInstanceId()).singleResult();
+        assertActivityInstancesAreSame(historicActInst1, runtimeService.createActivityInstanceQuery().activityInstanceId(historicActInst1.getId()).singleResult());
 
         HistoricActivityInstance historicActInst2 = historyService.createHistoricActivityInstanceQuery().activityInstanceId(details.get(1).getActivityInstanceId()).singleResult();
+        assertActivityInstancesAreSame(historicActInst2, runtimeService.createActivityInstanceQuery().activityInstanceId(historicActInst2.getId()).singleResult());
 
         assertEquals(historicActInst1.getActivityId(), historicActInst2.getActivityId());
     }

@@ -14,20 +14,18 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItem;
-import org.flowable.cmmn.model.PlanItemControl;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
@@ -73,7 +71,7 @@ public abstract class CmmnOperation implements Runnable {
             // In some cases (e.g. cross-border triggering of a sentry, the child plan item instance has been activated already
             // As such, it doesn't need to be created again (this is the if check here, which goes against the cache)
 
-            if (stagePlanItemInstanceEntity == null || !childPlanItemInstanceDoesnExist(stagePlanItemInstanceEntity, planItem)) {
+            if (stagePlanItemInstanceEntity == null || !childPlanItemInstanceForPlanItemExists(stagePlanItemInstanceEntity, planItem)) {
                 PlanItemInstanceEntity childPlanItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
                     .createChildPlanItemInstance(planItem,
                         caseDefinitionId,
@@ -88,7 +86,7 @@ public abstract class CmmnOperation implements Runnable {
         return planItemInstances;
     }
 
-    protected boolean childPlanItemInstanceDoesnExist(PlanItemInstanceEntity stagePlanItemInstanceEntity, PlanItem planItem) {
+    protected boolean childPlanItemInstanceForPlanItemExists(PlanItemInstanceEntity stagePlanItemInstanceEntity, PlanItem planItem) {
         List<PlanItemInstanceEntity> childPlanItemInstances = stagePlanItemInstanceEntity.getChildPlanItemInstances();
         if (childPlanItemInstances != null && !childPlanItemInstances.isEmpty()) {
             for (PlanItemInstanceEntity childPlanItemInstanceEntity : childPlanItemInstances) {
@@ -136,29 +134,36 @@ public abstract class CmmnOperation implements Runnable {
     }
 
     protected boolean hasRepetitionRule(PlanItemInstanceEntity planItemInstanceEntity) {
-        return Optional.ofNullable(planItemInstanceEntity)
-                .map(DelegatePlanItemInstance::getPlanItem)
-                .map(PlanItem::getItemControl)
-                .map(PlanItemControl::getRepetitionRule)
-                .isPresent();
+        if (planItemInstanceEntity != null && planItemInstanceEntity.getPlanItem() != null) {
+            return hasRepetitionRule(planItemInstanceEntity.getPlanItem());
+        }
+        return false;
+    }
 
+    protected boolean hasRepetitionRule(PlanItem planItem) {
+        return planItem.getItemControl() != null
+            && planItem.getItemControl().getRepetitionRule() != null;
     }
 
     protected boolean evaluateRepetitionRule(PlanItemInstanceEntity planItemInstanceEntity) {
         if (hasRepetitionRule(planItemInstanceEntity)) {
             String repetitionCondition = planItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule().getCondition();
-            if (StringUtils.isNotEmpty(repetitionCondition)) {
-                return evaluateBooleanExpression(commandContext, planItemInstanceEntity, repetitionCondition);
-            } else {
-                return true; // no condition set, but a repetition rule defined is assumed to be defaulting to true
-            }
+            return evaluateRepetitionRule(planItemInstanceEntity, repetitionCondition);
         }
         return false;
     }
 
-    protected boolean evaluateBooleanExpression(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, String condition) {
+    protected boolean evaluateRepetitionRule(VariableContainer variableContainer, String repetitionCondition) {
+        if (StringUtils.isNotEmpty(repetitionCondition)) {
+            return evaluateBooleanExpression(commandContext, variableContainer, repetitionCondition);
+        } else {
+            return true; // no condition set, but a repetition rule defined is assumed to be defaulting to true
+        }
+    }
+
+    protected boolean evaluateBooleanExpression(CommandContext commandContext, VariableContainer variableContainer, String condition) {
         Expression expression = CommandContextUtil.getExpressionManager(commandContext).createExpression(condition);
-        Object evaluationResult = expression.getValue(planItemInstanceEntity);
+        Object evaluationResult = expression.getValue(variableContainer);
         if (evaluationResult instanceof Boolean) {
             return (boolean) evaluationResult;
         } else if (evaluationResult instanceof String) {

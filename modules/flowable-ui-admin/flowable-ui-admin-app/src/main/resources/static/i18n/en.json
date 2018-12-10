@@ -809,12 +809,12 @@
             "TENANT": "Tenant"
         },
         "ACTION": {
-            "UPLOAD": "Upload process or package",
+            "UPLOAD": "Upload case or package",
             "DELETE": "Delete deployment"
         },
         "POPUP": {
             "UPLOAD": {
-                "DESCRIPTION": "Select a .bpmn, .bpmn20.xml process file to deploy or upload a package of processes (with assets) contained in .zip or .bar file.",
+                "DESCRIPTION": "Select a .cmmn, .cmmn.xml case file to deploy or upload a package of cases (with assets) contained in .zip or .bar file.",
                 "DROPZONE": "Or drop a file here",
                 "NO-DROP": "File drop is not supported by your browser",
                 "CANCEL-UPLOAD": "Cancel upload",
@@ -1167,7 +1167,20 @@
             "TENANT": "Tenant"
         },
         "ACTION": {
+            "UPLOAD": "Upload decision",
             "DELETE": "Delete deployment"
+        },
+        "POPUP": {
+            "UPLOAD": {
+                "DESCRIPTION": "Select a .dmn, .dmn.xml decision file to deploy to the DMN engine.",
+                "DROPZONE": "Or drop a file here",
+                "NO-DROP": "File drop is not supported by your browser",
+                "CANCEL-UPLOAD": "Cancel upload",
+                "ERROR": "Could not upload this file"
+            },
+            "DELETE": {
+                "CONFIRM-MESSAGE": "Delete deployment '{{name}}'?"
+            }
         }
     },
     "DECISION-TABLE-DEPLOYMENT": {
@@ -1399,7 +1412,20 @@
             "TENANT": "Tenant"
         },
         "ACTION": {
+            "UPLOAD": "Upload form",
             "DELETE": "Delete deployment"
+        },
+        "POPUP": {
+            "UPLOAD": {
+                "DESCRIPTION": "Select a .form, .json form file to deploy to the FORM engine.",
+                "DROPZONE": "Or drop a file here",
+                "NO-DROP": "File drop is not supported by your browser",
+                "CANCEL-UPLOAD": "Cancel upload",
+                "ERROR": "Could not upload this file"
+            },
+            "DELETE": {
+                "CONFIRM-MESSAGE": "Delete deployment '{{name}}'?"
+            }
         }
     },
     "FORM-DEPLOYMENT": {

@@ -18,14 +18,14 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jdk.version>1.8</jdk.version>
-		<spring.framework.version>5.0.10.RELEASE</spring.framework.version>
-		<spring.security.version>5.0.9.RELEASE</spring.security.version>
+		<spring.framework.version>5.0.11.RELEASE</spring.framework.version>
+		<spring.security.version>5.0.10.RELEASE</spring.security.version>
 		<jackson.version>2.9.7</jackson.version>
 		<mule.version>3.8.0</mule.version>
-        <camel.version>2.22.0</camel.version>
+        <camel.version>2.23.0</camel.version>
 		<cxf.version>3.2.7</cxf.version>
 		<slf4j.version>1.7.25</slf4j.version>
-		<spring.boot.version>2.0.6.RELEASE</spring.boot.version>
+		<spring.boot.version>2.0.7.RELEASE</spring.boot.version>
 
 		<junit.version>4.12</junit.version>
 		<junit.jupiter.version>5.3.1</junit.jupiter.version>

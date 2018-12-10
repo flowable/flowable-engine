@@ -69,6 +69,11 @@ public interface CmmnHistoryService {
     List<HistoricEntityLink> getHistoricEntityLinkChildrenForCaseInstance(String caseInstanceId);
 
     /**
+     * Retrieves the {@link HistoricEntityLink}s where the given case instance is referenced.
+     */
+    List<HistoricEntityLink> getHistoricEntityLinkParentsForCaseInstance(String caseInstanceId);
+
+    /**
      * Deletes user task log entry by its log number
      *
      * @param logNumber user task log entry identifier

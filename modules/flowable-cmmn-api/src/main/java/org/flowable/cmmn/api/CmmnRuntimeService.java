@@ -172,6 +172,11 @@ public interface CmmnRuntimeService {
     List<EntityLink> getEntityLinkChildrenForCaseInstance(String instanceId);
 
     /**
+     * Retrieves the {@link EntityLink}s where the given case instance is referenced.
+     */
+    List<EntityLink> getEntityLinkParentsForCaseInstance(String instanceId);
+
+    /**
      * Gets a Form model instance of the start form of a specific case definition or case instance
      *
      * @param caseDefinitionId

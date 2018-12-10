@@ -43,6 +43,7 @@ import org.flowable.cmmn.engine.impl.CmmnTaskServiceImpl;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaFactory;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaSessionFactory;
 import org.flowable.cmmn.engine.impl.agenda.DefaultCmmnEngineAgendaFactory;
+import org.flowable.cmmn.engine.impl.callback.ChildBpmnCaseInstanceStateChangeCallback;
 import org.flowable.cmmn.engine.impl.callback.ChildCaseInstanceStateChangeCallback;
 import org.flowable.cmmn.engine.impl.callback.DefaultInternalCmmnJobManager;
 import org.flowable.cmmn.engine.impl.cfg.DefaultTaskAssignmentManager;
@@ -1241,6 +1242,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected void initDefaultCaseInstanceCallbacks() {
         this.caseInstanceStateChangeCallbacks.put(CallbackTypes.PLAN_ITEM_CHILD_CASE,
                 Collections.<RuntimeInstanceStateChangeCallback>singletonList(new ChildCaseInstanceStateChangeCallback()));
+        this.caseInstanceStateChangeCallbacks.put(CallbackTypes.EXECUTION_CHILD_CASE,
+                Collections.<RuntimeInstanceStateChangeCallback>singletonList(new ChildBpmnCaseInstanceStateChangeCallback()));
     }
 
     protected void initScriptingEngines() {

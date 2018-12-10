@@ -52,7 +52,7 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
                     // exception. Otherwise, ignore this, post-conditions of method already met.
                     throw new FlowableTaskAlreadyClaimedException(task.getId(), task.getAssignee());
                 }
-                CommandContextUtil.getHistoryManager(commandContext).recordTaskInfoChange(task);
+                CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordTaskInfoChange(task);
                 
             } else {
                 TaskHelper.changeTaskAssignee(task, userId);

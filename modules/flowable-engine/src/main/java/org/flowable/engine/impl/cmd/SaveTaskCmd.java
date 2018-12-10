@@ -82,7 +82,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
                 originalTaskEntity = CommandContextUtil.getHistoricTaskService().getHistoricTask(task.getId());
             }
 
-            CommandContextUtil.getHistoryManager(commandContext).recordTaskInfoChange(task);
+            CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordTaskInfoChange(task);
             taskService.updateTask(task, true);
 
             // Special care needed to detect the assignee task has changed

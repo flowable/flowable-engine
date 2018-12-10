@@ -100,6 +100,7 @@ public class FlowableVersions {
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.4.0.0"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.4.1.0"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.4.1.1"));
+        FLOWABLE_VERSIONS.add(new FlowableVersion("6.4.1.2"));
 
         /* Current */
         FLOWABLE_VERSIONS.add(new FlowableVersion(CURRENT_VERSION));

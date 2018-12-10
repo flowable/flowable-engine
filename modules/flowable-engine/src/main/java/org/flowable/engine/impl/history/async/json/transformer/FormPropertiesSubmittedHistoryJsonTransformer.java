@@ -41,10 +41,10 @@ public class FormPropertiesSubmittedHistoryJsonTransformer extends AbstractHisto
     public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
         String activityId = getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID);
         if (StringUtils.isNotEmpty(activityId)) {
-            HistoricActivityInstance activityInstance = findHistoricActivityInstance(commandContext, 
+            HistoricActivityInstance historicActivityInstance = findHistoricActivityInstance(commandContext,
                     getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID), activityId);
-            
-            if (activityInstance == null) {
+
+            if (historicActivityInstance == null) {
                 return false;
             }
         }

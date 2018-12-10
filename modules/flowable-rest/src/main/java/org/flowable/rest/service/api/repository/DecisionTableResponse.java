@@ -30,6 +30,9 @@ public class DecisionTableResponse {
     private String tenantId;
     private String url;
 
+    public DecisionTableResponse() {
+    }
+
     public DecisionTableResponse(DmnDecisionTable decisionTable) {
         this.id = decisionTable.getId();
         this.category = decisionTable.getCategory();

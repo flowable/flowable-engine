@@ -93,11 +93,15 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
             // Map all plan item instances to its id
             for (PlanItemInstanceEntity planItemInstanceEntity : allPlanItemInstances) {
 
+                PlanItemInstanceEntity currentPlanItemInstanceEntity = planItemInstanceEntity;
+
                 // If it's already in the cache, it has precedence on the fetched one
                 PlanItemInstanceEntity planItemInstanceFromCache = entityCache.findInCache(PlanItemInstanceEntityImpl.class, planItemInstanceEntity.getId());
                 if (planItemInstanceFromCache != null) {
                     // Mapping
                     planItemInstanceMap.put(planItemInstanceFromCache.getId(), planItemInstanceFromCache);
+
+                    currentPlanItemInstanceEntity = planItemInstanceFromCache;
 
                 } else {
                     // Mapping
@@ -109,13 +113,13 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
                 }
 
                 // plan items of case plan model
-                if (planItemInstanceEntity.getStageInstanceId() == null) {
-                    directPlanItemInstances.add(planItemInstanceEntity);
+                if (currentPlanItemInstanceEntity.getStageInstanceId() == null) {
+                    directPlanItemInstances.add(currentPlanItemInstanceEntity);
                 }
 
                 // Always add empty list, so no check is needed later and plan items
                 // without children have a non-null value, not triggering the fetch
-                planItemInstanceEntity.setChildPlanItemInstances(new ArrayList<>());
+                currentPlanItemInstanceEntity.setChildPlanItemInstances(new ArrayList<>());
             }
 
             // Add to correct parent
@@ -123,7 +127,14 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
                 for (PlanItemInstanceEntity planItemInstanceEntity : allPlanItemInstances) {
                     if (planItemInstanceEntity.getStageInstanceId() != null) {
                         PlanItemInstanceEntity parentPlanItemInstanceEntity = planItemInstanceMap.get(planItemInstanceEntity.getStageInstanceId());
-                        parentPlanItemInstanceEntity.getChildPlanItemInstances().add(planItemInstanceMap.get(planItemInstanceEntity.getId()));
+
+                        // It can happen the parent plan item instance does not exist:
+                        // For example when a nested B is nested in a stage A and both are repeating.
+                        // The wait_for_repetition of B has the old stage A plan item instance as parent,
+                        // and it won't be returned by the eager fetch query
+                        if (parentPlanItemInstanceEntity != null) {
+                            parentPlanItemInstanceEntity.getChildPlanItemInstances().add(planItemInstanceMap.get(planItemInstanceEntity.getId()));
+                        }
                     }
                 }
             }

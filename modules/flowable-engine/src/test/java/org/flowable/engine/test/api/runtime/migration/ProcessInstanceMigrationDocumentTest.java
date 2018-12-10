@@ -319,4 +319,84 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         assertThat(migrationDocument.getActivitiesLocalVariables().get("newActivity2")).isEqualTo((Collections.singletonMap("variableDouble", 12345.6789)));
         assertThat(migrationDocument.getProcessInstanceVariables()).isEqualTo(processInstanceVars);
     }
+
+    @Test
+    public void testDeSerializeWithCallActivityProcessInstanceMigrationDocument() {
+
+        String definitionId = "someProcessId";
+        String definitionKey = "MyProcessKey";
+        Integer definitionVer = 9;
+        String definitionTenantId = "admin";
+
+        //last occurrence of inSubProcessOfCallActivityId prevails
+        ActivityMigrationMapping oneToOneMapping = ActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1")
+            .inSubProcessOfCallActivityId("wrongCallActivity", -4)
+            .inSubProcessOfCallActivityId("callActivityId")
+            .withLocalVariable("varForNewActivity1", "varValue")
+            .withNewAssignee("kermit");
+
+        //inParentProcessOfCallActivityId and inSubProcess are mutually exclusive, last occurrence prevails
+        ActivityMigrationMapping oneToManyMapping = ActivityMigrationMapping.createMappingFor("originalActivity2", Arrays.asList("newActivity2.1", "newActivity2.2"))
+            .withLocalVariableForAllActivities("var1ForNewActivity2.x", "varValue")
+            .withLocalVariableForAllActivities("var2ForNewActivity2.x", 1234.567)
+            .inParentProcessOfCallActivityId("someCallActivityId")
+            .inSubProcessOfCallActivityId("someCallActivityId", 2);
+
+        //inParentProcessOfCallActivityId and inSubProcess are mutually exclusive, last occurrence prevails
+        ActivityMigrationMapping manyToOneMapping = ActivityMigrationMapping.createMappingFor(Arrays.asList("originalActivity3", "originalActivity4"), "newActivity3")
+            .withLocalVariable("varForNewActivity3", 9876)
+            .inSubProcessOfCallActivityId("subProcKey", 2)
+            .inParentProcessOfCallActivityId("someCallActivityId");
+
+        HashMap<String, Map<String, Object>> activityLocalVariables = new HashMap<String, Map<String, Object>>() {
+
+            {
+                put("newActivity1", new HashMap<String, Object>() {
+
+                    {
+                        put("varForNewActivity1", "varValue");
+                    }
+                });
+                put("newActivity3", new HashMap<String, Object>() {
+
+                    {
+                        put("varForNewActivity3", 9876);
+                    }
+                });
+                put("newActivity2.1", new HashMap<String, Object>() {
+
+                    {
+                        put("var1ForNewActivity2.x", "varValue");
+                        put("var2ForNewActivity2.x", 1234.567);
+                    }
+                });
+                put("newActivity2.2", new HashMap<String, Object>() {
+
+                    {
+                        put("var1ForNewActivity2.x", "varValue");
+                        put("var2ForNewActivity2.x", 1234.567);
+                    }
+                });
+            }
+        };
+
+        HashMap<String, Object> processInstanceVariables = new HashMap<String, Object>() {
+
+            {
+                put("processVar1", "varValue1");
+                put("processVar2", 456.789);
+            }
+        };
+
+        String jsonAsStr = IoUtil.readFileAsString("org/flowable/engine/test/api/runtime/migration/withCallActivityProcessInstanceMigrationDocument.json");
+
+        ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentImpl.fromProcessInstanceMigrationDocumentJson(jsonAsStr);
+        assertEquals(definitionId, migrationDocument.getMigrateToProcessDefinitionId());
+        assertEquals(definitionKey, migrationDocument.getMigrateToProcessDefinitionKey());
+        assertEquals(definitionVer, migrationDocument.getMigrateToProcessDefinitionVersion());
+        assertEquals(definitionTenantId, migrationDocument.getMigrateToProcessDefinitionTenantId());
+        assertThat(migrationDocument.getActivityMigrationMappings()).usingFieldByFieldElementComparator().containsExactly(oneToOneMapping, oneToManyMapping, manyToOneMapping);
+        assertThat(migrationDocument.getActivitiesLocalVariables()).isEqualTo(activityLocalVariables);
+        assertThat(migrationDocument.getProcessInstanceVariables()).isEqualTo(processInstanceVariables);
+    }
 }

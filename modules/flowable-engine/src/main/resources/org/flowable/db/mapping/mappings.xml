@@ -29,6 +29,7 @@
         <mapper resource="org/flowable/job/service/db/mapping/entity/DeadLetterJob.xml" />
         <mapper resource="org/flowable/db/mapping/entity/Deployment.xml" />
         <mapper resource="org/flowable/db/mapping/entity/Execution.xml" />
+        <mapper resource="org/flowable/db/mapping/entity/ActivityInstance.xml" />
         <mapper resource="org/flowable/db/mapping/entity/HistoricActivityInstance.xml" />
         <mapper resource="org/flowable/db/mapping/entity/HistoricDetail.xml" />
         <mapper resource="org/flowable/db/mapping/entity/HistoricProcessInstance.xml" />

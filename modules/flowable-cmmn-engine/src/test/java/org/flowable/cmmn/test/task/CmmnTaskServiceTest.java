@@ -12,6 +12,19 @@
  */
 package org.flowable.cmmn.test.task;
 
+import static java.util.stream.Collectors.toSet;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
+
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
@@ -25,6 +38,7 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkService;
 import org.flowable.entitylink.api.EntityLinkType;
+import org.flowable.entitylink.api.HierarchyType;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 import org.flowable.identitylink.api.IdentityLinkType;
@@ -34,19 +48,6 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toSet;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 /**
  * @author Joram Barrez
@@ -253,8 +254,7 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         });
 
         assertEquals(1, entityLinks.size());
-        assertEquals(caseInstance.getId(), entityLinks.get(0).getRootScopeId());
-        assertEquals(ScopeTypes.CMMN, entityLinks.get(0).getRootScopeType());
+        assertEquals(HierarchyType.ROOT, entityLinks.get(0).getHierarchyType());
 
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
@@ -266,8 +266,7 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         });
 
         assertEquals(1, entityLinksByScopeIdAndType.size());
-        assertEquals(caseInstance.getId(), entityLinksByScopeIdAndType.get(0).getRootScopeId());
-        assertEquals(ScopeTypes.CMMN, entityLinksByScopeIdAndType.get(0).getRootScopeType());
+        assertEquals(HierarchyType.ROOT, entityLinksByScopeIdAndType.get(0).getHierarchyType());
     }
 
     private static Set<IdentityLinkEntityImpl> getDefaultIdentityLinks() {

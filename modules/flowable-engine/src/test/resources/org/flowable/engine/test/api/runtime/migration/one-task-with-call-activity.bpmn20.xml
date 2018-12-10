@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" targetNamespace="Examples">
+
+    <process id="oneTasksParentProcess">
+
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="firstTask"/>
+        <userTask id="firstTask" name="First task"/>
+        <sequenceFlow id="flow2" sourceRef="firstTask" targetRef="callActivity"/>
+        <callActivity id="callActivity" calledElement="oneTaskProcess"/>
+        <sequenceFlow id="flow3" sourceRef="callActivity" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

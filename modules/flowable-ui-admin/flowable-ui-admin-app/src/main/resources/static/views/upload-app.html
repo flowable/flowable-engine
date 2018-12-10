@@ -3,31 +3,31 @@
 		<div class="pull-right">
             <a class="action" ng-click="cancel()">&times; {{'GENERAL.ACTION.CANCEL-AND-CLOSE' | translate}}</a>
         </div>
-		<h2 translate="APPS.ACTION.UPLOAD"></h2>
+		<h2 translate="APP-DEPLOYMENTS.ACTION.UPLOAD"></h2>
 	</div>
 </div>
 <div class="modal-body">
 
     <p>
         <i class="glyphicon glyphicon-info-sign"></i>
-        {{'APPS.POPUP.UPLOAD.DESCRIPTION' | translate}}
+        {{'APP-DEPLOYMENTS.POPUP.UPLOAD.DESCRIPTION' | translate}}
     </p>
 
-    <p class="text-warning">
-        <i class="glyphicon glyphicon-info-sign"></i>
-        {{'APPS.POPUP.UPLOAD.WARNING' | translate}}
-    </p>
+    <!--<p class="text-warning">-->
+        <!--<i class="glyphicon glyphicon-info-sign"></i>-->
+        <!--{{'APP-DEPLOYMENTS.POPUP.UPLOAD.WARNING' | translate}}-->
+    <!--</p>-->
 
     <div class="upload-deployment-form">
 
-        <input type="file" ng-file-select="onFileSelect($files)" style="font-size: smaller; padding-top:6px;" >
+        <input type="file" ngf-select="onFileSelect($files)" style="font-size: smaller; padding-top:6px;" >
         <div class="dropbox"
-             ng-file-drop="onFileSelect($files)"
-             ng-file-drag-over-class="dragover"
+             ngf-drop="onFileSelect($files)"
+             ngf-drag-over-class="dragover"
              ng-show="dropSupported">
-            {{'DEPLOYMENTS.POPUP.UPLOAD.DROPZONE' | translate}}
+            {{'APP-DEPLOYMENTS.POPUP.UPLOAD.DROPZONE' | translate}}
         </div>
-        <div ng-file-drop-available="dropSupported=true"
+        <div ngf-drop-available="dropSupported=true"
              ng-show="!dropSupported">{{'DEPLOYMENTS.POPUP.UPLOAD.NO-DROP' | translate}}</div>
         <div class="graph-wrapper" ng-show="status.loading" style="margin: 10px 0 10px 0">
             <div class="graph-bar" style="width:{{model.uploadProgress}}%"></div>
@@ -36,8 +36,7 @@
                 ng-click="upload.abort()"
                 ng-disabled="!status.loading"
                 style="margin-bottom: 20px">
-            {{'DEPLOYMENTS.POPUP.UPLOAD.CANCEL-UPLOAD' | translate}}
-        </button>
+            APP-DEPLOYMENTS        </button>
 
     </div>
 
@@ -47,7 +46,7 @@
     <div class="modal-footer">
         <loading-indicator></loading-indicator>
         <div class="pull-right modeler-processes-error" ng-if="model.error">
-            <span>{{'DEPLOYMENTS.POPUP.UPLOAD.ERROR' | translate}} <span ng-if="model.errorMessage"> : </span>{{model.errorMessage}}</span>
+            <span>{{'APP-DEPLOYMENTS.POPUP.UPLOAD.ERROR' | translate}} <span ng-if="model.errorMessage"> : </span>{{model.errorMessage}}</span>
         </div>
     </div>
 </div>

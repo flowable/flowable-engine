@@ -14,10 +14,13 @@ package org.flowable.engine.impl.history;
 
 import java.util.Map;
 
+import org.flowable.bpmn.model.FlowElement;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.api.IdentityLink;
@@ -31,7 +34,7 @@ public interface HistoryManager {
      * @return true, if the configured history-level is equal to OR set to a higher value than the given level.
      */
     boolean isHistoryLevelAtLeast(HistoryLevel level);
-    
+
     /**
      * @return true, if the configured process definition history-level is equal to OR set to a higher value than the given level.
      */
@@ -41,7 +44,7 @@ public interface HistoryManager {
      * @return true, if history-level is configured to level other than "none".
      */
     boolean isHistoryEnabled();
-    
+
     /**
      * @return true, if process definition history-level is configured to level other than "none".
      */
@@ -63,15 +66,10 @@ public interface HistoryManager {
     void recordProcessInstanceNameChange(ExecutionEntity processInstanceExecution, String newName);
 
     /**
-     * Record a sub-process-instance started and alters the calledProcessinstanceId on the current active activity's historic counterpart. Only effective when activity history is enabled.
-     */
-    void recordSubProcessInstanceStart(ExecutionEntity parentExecution, ExecutionEntity subProcessInstance);
-    
-    /**
      * Deletes a historic process instance and all historic data included
      */
     void recordProcessInstanceDeleted(String processInstanceId, String processDefinitionId);
-    
+
     /**
      * Deletes historic process instances for a provided process definition id
      */
@@ -79,18 +77,27 @@ public interface HistoryManager {
 
     /**
      * Record the start of an activity, if activity history is enabled.
+     *
+     * @param activityInstance activity instance template
      */
-    void recordActivityStart(ExecutionEntity executionEntity);
+    void recordActivityStart(ActivityInstance activityInstance);
 
     /**
      * Record the end of an activity, if activity history is enabled.
+     *
+     * @param activityInstance activity instance template
+     */
+    void recordActivityEnd(ActivityInstance activityInstance);
+
+    /**
+     * Record activity end in the case when runtime activity instance does not exist.
      */
     void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason);
 
     /**
      * Finds the {@link HistoricActivityInstanceEntity} that is active in the given execution.
      */
-    HistoricActivityInstanceEntity findActivityInstance(ExecutionEntity execution, boolean createOnNotFound, boolean validateEndTimeNull);
+    HistoricActivityInstanceEntity findHistoricActivityInstance(ExecutionEntity execution, boolean validateEndTimeNull);
 
     /**
      * Record a change of the process-definition id of a process instance, if activity history is enabled.
@@ -110,7 +117,7 @@ public interface HistoryManager {
     /**
      * Record task name change, if audit history is enabled.
      */
-    void recordTaskInfoChange(TaskEntity taskEntity);
+    void recordTaskInfoChange(TaskEntity taskEntity, String activityInstanceId);
 
     /**
      * Record a variable has been created, if audit history is enabled.
@@ -120,7 +127,8 @@ public interface HistoryManager {
     /**
      * Record a variable has been created, if audit history is enabled.
      */
-    void recordHistoricDetailVariableCreate(VariableInstanceEntity variable, ExecutionEntity sourceActivityExecution, boolean useActivityId);
+    void recordHistoricDetailVariableCreate(VariableInstanceEntity variable, ExecutionEntity sourceActivityExecution, boolean useActivityId,
+        String activityInstanceId);
 
     /**
      * Record a variable has been updated, if audit history is enabled.
@@ -181,27 +189,38 @@ public interface HistoryManager {
      * Record the creation of a new {@link IdentityLink}, if audit history is enabled.
      */
     void recordIdentityLinkCreated(IdentityLinkEntity identityLink);
-    
+
     /**
      * Record the deletion of a {@link IdentityLink}, if audit history is enabled
      */
     void recordIdentityLinkDeleted(IdentityLinkEntity identityLink);
-    
+
     /**
      * Record the creation of a new {@link EntityLink}, if audit history is enabled.
      */
     void recordEntityLinkCreated(EntityLinkEntity entityLink);
-    
+
     /**
      * Record the deletion of a {@link EntityLink}, if audit history is enabled
      */
     void recordEntityLinkDeleted(EntityLinkEntity entityLink);
 
     void updateProcessBusinessKeyInHistory(ExecutionEntity processInstance);
-    
+
     /**
      * Record the update of a process definition for historic process instance, task, and activity instance, if history is enabled.
      */
     void updateProcessDefinitionIdInHistory(ProcessDefinitionEntity processDefinitionEntity, ExecutionEntity processInstance);
 
+    /**
+     * Synchronize historic data with the current user task execution
+     *
+     * @param executionEntity entity which executes user task
+     * @param oldActivityId previous activityId
+     * @param newFlowElement new flowElement
+     * @param task new user task
+     */
+    void updateActivity(ExecutionEntity executionEntity, String oldActivityId, FlowElement newFlowElement, TaskEntity task);
+
+    void updateHistoricActivityInstance(ActivityInstanceEntity activityInstance);
 }

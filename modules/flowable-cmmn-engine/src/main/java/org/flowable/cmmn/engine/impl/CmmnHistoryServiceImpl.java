@@ -24,6 +24,7 @@ import org.flowable.cmmn.engine.impl.cmd.CmmnDeleteTaskLogEntryCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricTaskInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricEntityLinkChildrenForCaseInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetHistoricEntityLinkParentsForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricIdentityLinksForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricIdentityLinksForTaskCmd;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoricVariableInstanceQueryImpl;
@@ -98,6 +99,12 @@ public class CmmnHistoryServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     public List<HistoricEntityLink> getHistoricEntityLinkChildrenForCaseInstance(String caseInstanceId) {
         return commandExecutor.execute(new GetHistoricEntityLinkChildrenForCaseInstanceCmd(caseInstanceId));
     }
+
+    @Override
+    public List<HistoricEntityLink> getHistoricEntityLinkParentsForCaseInstance(String caseInstanceId) {
+        return commandExecutor.execute(new GetHistoricEntityLinkParentsForCaseInstanceCmd(caseInstanceId));
+    }
+
 
     @Override
     public void deleteTaskLogEntry(long logNumber) {

@@ -68,5 +68,5 @@ When building the html doc, following files get included automatically:
 
 NB
 -------
-We still use Ant as building tool because Asciidoctor Maven Plugin does not support the current level of quality for the generated documenation. We "still" 
+We still use Ant as building tool because Asciidoctor Maven Plugin does not support the current level of quality for the generated documentation. We "still" 
 have to use asciidoc command line.

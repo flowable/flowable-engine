@@ -20,6 +20,7 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.HistoryManager;
+import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityManager;
 import org.flowable.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.flowable.engine.impl.persistence.entity.CommentEntityManager;
@@ -113,6 +114,10 @@ public abstract class AbstractManager {
 
     protected EventSubscriptionEntityManager getEventSubscriptionEntityManager() {
         return getProcessEngineConfiguration().getEventSubscriptionEntityManager();
+    }
+
+    protected ActivityInstanceEntityManager getActivityInstanceEntityManager() {
+        return getProcessEngineConfiguration().getActivityInstanceEntityManager();
     }
 
     protected HistoricProcessInstanceEntityManager getHistoricProcessInstanceEntityManager() {

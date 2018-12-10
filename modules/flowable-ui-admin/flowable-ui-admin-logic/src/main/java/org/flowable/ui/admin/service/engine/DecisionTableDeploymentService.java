@@ -14,13 +14,20 @@ package org.flowable.ui.admin.service.engine;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.admin.service.engine.exception.FlowableServiceException;
 import org.slf4j.Logger;
@@ -64,6 +71,15 @@ public class DecisionTableDeploymentService {
     public void deleteDeployment(ServerConfig serverConfig, HttpServletResponse httpResponse, String appDeploymentId) {
         HttpDelete delete = new HttpDelete(clientUtil.getServerUrl(serverConfig, clientUtil.createUriBuilder("dmn-repository/deployments/" + appDeploymentId)));
         clientUtil.execute(delete, httpResponse, serverConfig);
+    }
+
+    public JsonNode uploadDeployment(ServerConfig serverConfig, String name, InputStream inputStream) throws IOException {
+        HttpPost post = new HttpPost(clientUtil.getServerUrl(serverConfig, "dmn-repository/deployments"));
+        HttpEntity reqEntity = MultipartEntityBuilder.create()
+                .addBinaryBody(name, IOUtils.toByteArray(inputStream), ContentType.APPLICATION_OCTET_STREAM, name)
+                .build();
+        post.setEntity(reqEntity);
+        return clientUtil.executeRequest(post, serverConfig, 201);
     }
 
 }

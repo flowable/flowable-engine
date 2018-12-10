@@ -118,7 +118,6 @@ public class SkipExpressionUserTaskTest extends PluggableFlowableTestCase {
             HistoricActivityInstance skipActivityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(skipPi.getId())
                     .activityId("userTask1")
                     .singleResult();
-            
             assertNotNull(skipActivityInstance);
             
             HistoricTaskInstance skipTaskInstance = historyService.createHistoricTaskInstanceQuery()
