@@ -31,30 +31,9 @@ create table ACT_RU_TASK (
     primary key (ID_)
 );
 
-create table ACT_HI_TSK_LOG (
-    ID_              NUMBER(19),
-    TYPE_                NVARCHAR2(64),
-    TASK_ID_             NVARCHAR2(64) not null,
-    TIME_STAMP_          TIMESTAMP(6) not null,
-    USER_ID_             NVARCHAR2(255),
-    DATA_                NVARCHAR2(4000),
-    EXECUTION_ID_        NVARCHAR2(64),
-    PROC_INST_ID_        NVARCHAR2(64),
-    PROC_DEF_ID_         NVARCHAR2(64),
-    SCOPE_ID_            NVARCHAR2(255),
-    SCOPE_DEFINITION_ID_ NVARCHAR2(255),
-    SUB_SCOPE_ID_        NVARCHAR2(255),
-    SCOPE_TYPE_          NVARCHAR2(255),
-    TENANT_ID_           NVARCHAR2(255) default ''
-);
-
-create sequence flw_task_evt_log_seq;
-
 create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
 create index ACT_IDX_TASK_SCOPE on ACT_RU_TASK(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SUB_SCOPE on ACT_RU_TASK(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SCOPE_DEF on ACT_RU_TASK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
-
-create index ACT_IDX_HI_TASK_LOG_NUMBER on ACT_HI_TSK_LOG(ID_);
 
 insert into ACT_GE_PROPERTY values ('task.schema.version', '6.4.1.3', 1);
