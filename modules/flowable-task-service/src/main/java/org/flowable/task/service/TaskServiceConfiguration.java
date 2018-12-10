@@ -58,7 +58,7 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
     // ENTITY MANAGERS /////////////////////////////////////////////////
     protected TaskEntityManager taskEntityManager;
     protected HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager;
-    protected HistoricTaskLogEntryEntityManager taskLogEntityManager;
+    protected HistoricTaskLogEntryEntityManager historicTaskLogEntryEntityManager;
 
     protected InternalTaskVariableScopeResolver internalTaskVariableScopeResolver;
     protected InternalHistoryTaskManager internalHistoryTaskManager;
@@ -109,8 +109,8 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         if (historicTaskInstanceEntityManager == null) {
             historicTaskInstanceEntityManager = new HistoricTaskInstanceEntityManagerImpl(this, historicTaskInstanceDataManager);
         }
-        if (taskLogEntityManager == null) {
-            taskLogEntityManager = new HistoricTaskLogEntryEntityManagerImpl(this, historicTaskLogDataManager);
+        if (historicTaskLogEntryEntityManager == null) {
+            historicTaskLogEntryEntityManager = new HistoricTaskLogEntryEntityManagerImpl(this, historicTaskLogDataManager);
         }
     }
 
@@ -187,11 +187,11 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
     }
 
     public HistoricTaskLogEntryEntityManager getHistoricTaskLogEntryEntityManager() {
-        return taskLogEntityManager;
+        return historicTaskLogEntryEntityManager;
     }
 
-    public TaskServiceConfiguration setTaskLogEntryEntityManager(HistoricTaskLogEntryEntityManager taskLogEntityManager) {
-        this.taskLogEntityManager = taskLogEntityManager;
+    public TaskServiceConfiguration setHistoricTaskLogEntryEntityManager(HistoricTaskLogEntryEntityManager historicTaskLogEntryEntityManager) {
+        this.historicTaskLogEntryEntityManager = historicTaskLogEntryEntityManager;
         return this;
     }
 

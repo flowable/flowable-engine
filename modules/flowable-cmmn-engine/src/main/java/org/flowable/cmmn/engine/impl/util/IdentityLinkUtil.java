@@ -19,6 +19,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
+import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -68,7 +69,7 @@ public class IdentityLinkUtil {
             countingTaskEntity.setIdentityLinkCount(countingTaskEntity.getIdentityLinkCount() + 1);
         }
 
-        logTaskIdentityLinkEvent("USER_TASK_IDENTITY_LINK_ADDED", taskEntity, identityLinkEntity);
+        logTaskIdentityLinkEvent(HistoricTaskLogEntryType.USER_TASK_IDENTITY_LINK_ADDED.name(), taskEntity, identityLinkEntity);
 
         taskEntity.getIdentityLinks().add(identityLinkEntity);
         CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLinkToParent(taskEntity, identityLinkEntity.getUserId());
@@ -83,7 +84,7 @@ public class IdentityLinkUtil {
             if (cascaseHistory) {
                 CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkDeleted(identityLinkEntity);
             }
-            logTaskIdentityLinkEvent("USER_TASK_IDENTITY_LINK_REMOVED", taskEntity, identityLinkEntity);
+            logTaskIdentityLinkEvent(HistoricTaskLogEntryType.USER_TASK_IDENTITY_LINK_REMOVED.name(), taskEntity, identityLinkEntity);
         }
 
         taskEntity.getIdentityLinks().removeAll(identityLinks);

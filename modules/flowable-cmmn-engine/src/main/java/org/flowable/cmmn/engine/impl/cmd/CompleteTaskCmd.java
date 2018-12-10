@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
+import static org.flowable.cmmn.engine.impl.util.CommandContextUtil.getCmmnHistoryService;
 import static org.flowable.cmmn.engine.impl.util.CommandContextUtil.getTaskService;
 
 import java.util.Map;
@@ -25,10 +26,10 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.flowable.task.service.delegate.TaskListener;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntity;
 
 /**
  * @author Joram Barrez
@@ -89,16 +90,9 @@ public class CompleteTaskCmd implements Command<Void> {
 
     protected static void logTaskCompleted(TaskEntity taskEntity, CommandContext commandContext) {
         if (CommandContextUtil.getTaskServiceConfiguration(commandContext).isEnableDatabaseEventLogging()) {
-            HistoricTaskLogEntryEntity taskLogEntry = org.flowable.task.service.impl.util.CommandContextUtil.getHistoricTaskLogEntryEntityManager().create();
-            taskLogEntry.setTaskId(taskEntity.getId());
-            taskLogEntry.setSubScopeId(taskEntity.getSubScopeId());
-            taskLogEntry.setScopeType(taskEntity.getScopeType());
-            taskLogEntry.setScopeId(taskEntity.getScopeId());
-            taskLogEntry.setScopeDefinitionId(taskEntity.getScopeDefinitionId());
-            taskLogEntry.setTimeStamp(CommandContextUtil.getTaskServiceConfiguration(commandContext).getClock().getCurrentTime());
-            taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_COMPLETED.name());
-            taskLogEntry.setUserId(Authentication.getAuthenticatedUserId());
-            CommandContextUtil.getHistoricTaskService().addHistoricTaskLogEntry(taskLogEntry);
+            HistoricTaskLogEntryBuilder taskLogEntryBuilder = getCmmnHistoryService().createHistoricTaskLogEntryBuilder(taskEntity);
+            taskLogEntryBuilder.type(HistoricTaskLogEntryType.USER_TASK_COMPLETED.name());
+            taskLogEntryBuilder.add();
         }
     }
 

@@ -33,8 +33,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class SuspensionStateUtil {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SuspensionStateUtil.class);
-
     public static void setSuspensionState(ProcessDefinitionEntity processDefinitionEntity, SuspensionState state) {
         if (processDefinitionEntity.getSuspensionState() == state.getStateCode()) {
             throw new FlowableException("Cannot set suspension state '" + state + "' for " + processDefinitionEntity + "': already in state '" + state + "'.");

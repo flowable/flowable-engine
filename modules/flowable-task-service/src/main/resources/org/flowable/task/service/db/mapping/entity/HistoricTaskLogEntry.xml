@@ -54,7 +54,7 @@
                                         SCOPE_ID_, SCOPE_DEFINITION_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_,
                                         TENANT_ID_, TIME_STAMP_, USER_ID_, DATA_)
     values (
-      ${prefix}ACT_TASK_EVT_LOG_SEQ.nextVal,
+      ${prefix}ACT_HI_TASK_EVT_LOG_SEQ.nextVal,
       #{type, jdbcType=VARCHAR}, 
       #{taskId, jdbcType=VARCHAR},
       #{executionId, jdbcType=VARCHAR},
@@ -80,7 +80,7 @@
         into ${prefix}ACT_HI_TSK_LOG(ID_, TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_,
                                      SCOPE_ID_, SCOPE_DEFINITION_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_,
                                      TENANT_ID_, TIME_STAMP_, USER_ID_, DATA_, LOCK_OWNER_, LOCK_TIME_, IS_PROCESSED_) VALUES
-            (${prefix}ACT_TASK_EVT_LOG_SEQ.nextVal,
+            (${prefix}ACT_HI_TASK_EVT_LOG_SEQ.nextVal,
              #{taskLog.type, jdbcType=VARCHAR},
              #{taskLog.taskId, jdbcType=VARCHAR},
              #{taskLog.executionId, jdbcType=VARCHAR},

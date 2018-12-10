@@ -30,24 +30,24 @@ create table ACT_HI_TASKINST (
 );
 
 create table ACT_HI_TSK_LOG (
-    ID_              NUMBER(19),
-    TYPE_                NVARCHAR2(64),
-    TASK_ID_             NVARCHAR2(64) not null,
-    TIME_STAMP_          TIMESTAMP(6) not null,
-    USER_ID_             NVARCHAR2(255),
-    DATA_                NVARCHAR2(4000),
-    EXECUTION_ID_        NVARCHAR2(64),
-    PROC_INST_ID_        NVARCHAR2(64),
-    PROC_DEF_ID_         NVARCHAR2(64),
-    SCOPE_ID_            NVARCHAR2(255),
+    ID_ NUMBER(19),
+    TYPE_ NVARCHAR2(64),
+    TASK_ID_ NVARCHAR2(64) not null,
+    TIME_STAMP_ TIMESTAMP(6) not null,
+    USER_ID_ NVARCHAR2(255),
+    DATA_ NVARCHAR2(4000),
+    EXECUTION_ID_ NVARCHAR2(64),
+    PROC_INST_ID_ NVARCHAR2(64),
+    PROC_DEF_ID_ NVARCHAR2(64),
+    SCOPE_ID_ NVARCHAR2(255),
     SCOPE_DEFINITION_ID_ NVARCHAR2(255),
-    SUB_SCOPE_ID_        NVARCHAR2(255),
-    SCOPE_TYPE_          NVARCHAR2(255),
-    TENANT_ID_           NVARCHAR2(255) default '',
+    SUB_SCOPE_ID_ NVARCHAR2(255),
+    SCOPE_TYPE_ NVARCHAR2(255),
+    TENANT_ID_ NVARCHAR2(255) default '',
     primary key (ID_)
 );
 
-create sequence flw_hi_task_evt_log_seq;
+create sequence act_hi_task_evt_log_seq;
 
 create index ACT_IDX_HI_TASK_SCOPE on ACT_HI_TASKINST(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_HI_TASK_SUB_SCOPE on ACT_HI_TASKINST(SUB_SCOPE_ID_, SCOPE_TYPE_);
