@@ -344,15 +344,13 @@ public class HistoryServiceTaskLogTest {
 
     @Test
     public void createCustomTaskEventLog(TaskService taskService, HistoryService historyService) {
-        task = taskService.createTaskBuilder().
-            create();
+        task = taskService.createTaskBuilder().create();
         TaskLogEntryBuilder taskLogEntryBuilder = historyService.createTaskLogEntryBuilder(task);
-        taskLogEntryBuilder.
-            timeStamp(new Date(0)).
-            userId("testUser").
-            type("customType").
-            data("testData").
-            add();
+        taskLogEntryBuilder.timeStamp(new Date(0));
+        taskLogEntryBuilder.userId("testUser");
+        taskLogEntryBuilder.type("customType");
+        taskLogEntryBuilder.data("testData");
+        taskLogEntryBuilder.add();
 
         List<TaskLogEntry> logEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
 
@@ -373,8 +371,7 @@ public class HistoryServiceTaskLogTest {
             create();
 
         TaskLogEntryBuilder taskLogEntryBuilder = historyService.createTaskLogEntryBuilder(task);
-        taskLogEntryBuilder.
-            add();
+        taskLogEntryBuilder.add();
         List<TaskLogEntry> logEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
 
         MatcherAssert.assertThat(logEntries.size(), is(2));
@@ -393,12 +390,10 @@ public class HistoryServiceTaskLogTest {
             create();
 
         TaskLogEntryBuilder taskLogEntryBuilder = historyService.createTaskLogEntryBuilder(task);
-
-        taskLogEntryBuilder.
-            userId("testUser").
-            type("customType").
-            data("testData").
-            add();
+        taskLogEntryBuilder.userId("testUser");
+        taskLogEntryBuilder.type("customType");
+        taskLogEntryBuilder.data("testData");
+        taskLogEntryBuilder.add();
 
         List<TaskLogEntry> logEntries = historyService.createTaskLogEntryQuery().taskId(task.getId()).list();
 

@@ -12,29 +12,22 @@
  */
 package org.flowable.engine.impl.util;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.api.TaskLogEntryBuilder;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
 public class IdentityLinkUtil {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(IdentityLinkUtil.class);
 
     public static IdentityLinkEntity createProcessInstanceIdentityLink(ExecutionEntity processInstanceExecution, String userId, String groupId, String type) {
         IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createProcessInstanceIdentityLink(
@@ -110,33 +103,17 @@ public class IdentityLinkUtil {
     protected static void logTaskIdentityLinkEvent(String eventType, TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity) {
         TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
         if (taskServiceConfiguration.isEnableDatabaseEventLogging()) {
-            LOGGER.debug("Adding UserTaskLog entry for identity link event {} task {} and identityLink {}", eventType, taskEntity.getId(), identityLinkEntity.getId());
-            TaskLogEntryEntity taskLogEntry = taskServiceConfiguration.getTaskLogEntryEntityManager().create();
-            taskLogEntry.setTaskId(taskEntity.getId());
-            taskLogEntry.setProcessInstanceId(taskEntity.getProcessInstanceId());
-            taskLogEntry.setProcessDefinitionId(taskEntity.getProcessDefinitionId());
-            taskLogEntry.setExecutionId(taskEntity.getExecutionId());
-            taskLogEntry.setTenantId(taskEntity.getTenantId());
-            taskLogEntry.setType(eventType);
-            taskLogEntry.setTimeStamp(taskServiceConfiguration.getClock().getCurrentTime());
-            Map<String, Object> dataMap = new HashMap<>();
+            TaskLogEntryBuilder taskLogEntryBuilder = CommandContextUtil.getProcessEngineConfiguration().getHistoryService().createTaskLogEntryBuilder();
+            taskLogEntryBuilder.type(eventType);
+            ObjectNode data = CommandContextUtil.getTaskServiceConfiguration().getObjectMapper().createObjectNode();
             if (identityLinkEntity.isUser()) {
-                dataMap.put("userId", identityLinkEntity.getUserId());
+                data.put("userId", identityLinkEntity.getUserId());
             } else if (identityLinkEntity.isGroup()) {
-                dataMap.put("groupId", identityLinkEntity.getGroupId());
+                data.put("groupId", identityLinkEntity.getGroupId());
             }
-            dataMap.put("type", identityLinkEntity.getType());
-            String data = null;
-            try {
-                data = taskServiceConfiguration.getObjectMapper().writeValueAsString(
-                    dataMap
-                );
-            } catch (JsonProcessingException e) {
-                LOGGER.warn("It was not possible to serialize user task identity link data. TaskEventLogEntry data is empty.", e);
-            }
-            taskLogEntry.setData(data);
-            taskLogEntry.setUserId(Authentication.getAuthenticatedUserId());
-            CommandContextUtil.getHistoricTaskService().addTaskLogEntry(taskLogEntry);
+            data.put("type", identityLinkEntity.getType());
+            taskLogEntryBuilder.data(data.toString());
+            taskLogEntryBuilder.add();
         }
     }
 

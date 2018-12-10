@@ -352,12 +352,11 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
         task = cmmnTaskService.createTaskBuilder().
             create();
         TaskLogEntryBuilder taskLogEntryBuilder = cmmnHistoryService.createTaskLogEntryBuilder(task);
-        taskLogEntryBuilder.
-            timeStamp(new Date(0)).
-            userId("testUser").
-            type("customType").
-            data("testData").
-            add();
+        taskLogEntryBuilder.timeStamp(new Date(0));
+        taskLogEntryBuilder.userId("testUser");
+        taskLogEntryBuilder.type("customType");
+        taskLogEntryBuilder.data("testData");
+        taskLogEntryBuilder.add();
 
         List<TaskLogEntry> logEntries = cmmnHistoryService.createTaskLogEntryQuery().taskId(task.getId()).list();
 
@@ -378,8 +377,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
             create();
 
         TaskLogEntryBuilder taskLogEntryBuilder = cmmnHistoryService.createTaskLogEntryBuilder(task);
-        taskLogEntryBuilder.
-            add();
+        taskLogEntryBuilder.add();
         List<TaskLogEntry> logEntries = cmmnHistoryService.createTaskLogEntryQuery().taskId(task.getId()).list();
 
         MatcherAssert.assertThat(logEntries.size(), is(2));
@@ -398,12 +396,10 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
             create();
 
         TaskLogEntryBuilder taskLogEntryBuilder = cmmnHistoryService.createTaskLogEntryBuilder(task);
-
-        taskLogEntryBuilder.
-            userId("testUser").
-            type("customType").
-            data("testData").
-            add();
+        taskLogEntryBuilder.userId("testUser");
+        taskLogEntryBuilder.type("customType");
+        taskLogEntryBuilder.data("testData");
+        taskLogEntryBuilder.add();
 
         List<TaskLogEntry> logEntries = cmmnHistoryService.createTaskLogEntryQuery().taskId(task.getId()).list();
 

@@ -12,29 +12,23 @@
  */
 package org.flowable.cmmn.engine.impl.util;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.api.TaskLogEntryBuilder;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-import org.flowable.task.service.impl.persistence.entity.TaskLogEntryEntity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
  */
 public class IdentityLinkUtil {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(IdentityLinkUtil.class);
 
     public static IdentityLinkEntity createCaseInstanceIdentityLink(CaseInstance caseInstance, String userId, String groupId, String type) {
         IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createScopeIdentityLink(
@@ -96,35 +90,21 @@ public class IdentityLinkUtil {
     }
 
     protected static void logTaskIdentityLinkEvent(String eventType, TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity) {
-        LOGGER.debug("Adding UserTaskLog entry for identity link event {} task {} and identityLink {}", eventType, taskEntity.getId(), identityLinkEntity.getId());
         TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
-        TaskLogEntryEntity taskLogEntry = taskServiceConfiguration.getTaskLogEntryEntityManager().create();
-        taskLogEntry.setTaskId(taskEntity.getId());
-        taskLogEntry.setScopeId(taskEntity.getScopeId());
-        taskLogEntry.setScopeDefinitionId(taskEntity.getScopeDefinitionId());
-        taskLogEntry.setSubScopeId(taskEntity.getSubScopeId());
-        taskLogEntry.setScopeType(taskEntity.getScopeType());
-        taskLogEntry.setTenantId(taskEntity.getTenantId());
-        taskLogEntry.setType(eventType);
-        taskLogEntry.setTimeStamp(taskServiceConfiguration.getClock().getCurrentTime());
-        Map<String, Object> dataMap = new HashMap<>();
-        if (identityLinkEntity.isUser()) {
-            dataMap.put("userId", identityLinkEntity.getUserId());
-        } else if (identityLinkEntity.isGroup()) {
-            dataMap.put("groupId", identityLinkEntity.getGroupId());
+        if (taskServiceConfiguration.isEnableDatabaseEventLogging()) {
+            TaskLogEntryBuilder taskLogEntryBuilder = CommandContextUtil.getCmmnHistoryService().createTaskLogEntryBuilder(taskEntity);
+            taskLogEntryBuilder.type(eventType);
+            ObjectNode data = CommandContextUtil.getCmmnEngineConfiguration().getObjectMapper().createObjectNode();
+            if (identityLinkEntity.isUser()) {
+                data.put("userId", identityLinkEntity.getUserId());
+            } else if (identityLinkEntity.isGroup()) {
+                data.put("groupId", identityLinkEntity.getGroupId());
+            }
+            data.put("type", identityLinkEntity.getType());
+            taskLogEntryBuilder.data(data.toString());
+            taskLogEntryBuilder.userId(Authentication.getAuthenticatedUserId());
+            taskLogEntryBuilder.add();
         }
-        dataMap.put("type", identityLinkEntity.getType());
-        String dataBytes = null;
-        try {
-            dataBytes = taskServiceConfiguration.getObjectMapper().writeValueAsString(
-                dataMap
-            );
-        } catch (JsonProcessingException e) {
-            LOGGER.warn("It was not possible to serialize user task identity link data. TaskEventLogEntry data is empty.", e);
-        }
-        taskLogEntry.setData(dataBytes);
-        taskLogEntry.setUserId(Authentication.getAuthenticatedUserId());
-        CommandContextUtil.getHistoricTaskService().addTaskLogEntry(taskLogEntry);
     }
 
 }

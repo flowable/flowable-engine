@@ -12,19 +12,18 @@
  */
 package org.flowable.engine.impl.persistence.entity;
 
-import java.util.Collections;
-
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.task.api.TaskLogEntryBuilder;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Helper class for suspension state
@@ -64,21 +63,14 @@ public class SuspensionStateUtil {
 
     protected static void addTaskSuspensionStateEntryLog(TaskEntity taskEntity, SuspensionState state) {
         if (CommandContextUtil.getTaskServiceConfiguration().isEnableDatabaseEventLogging()) {
-            LOGGER.debug("Adding UserTaskLog entry for changing suspension state {} task {}", state, taskEntity.getId());
-            String data = null;
-            try {
-                data = CommandContextUtil.getProcessEngineConfiguration().getObjectMapper().writeValueAsString(
-                    Collections.singletonMap("newSuspensionState", state.getStateCode())
-                );
-            } catch (JsonProcessingException e) {
-                LOGGER.warn("It was not possible to serialize suspension state. TaskEventLogEntry data is empty.", e);
-            }
-            CommandContextUtil.getProcessEngineConfiguration().getHistoryService().createTaskLogEntryBuilder(taskEntity).
-                type("USER_TASK_SUSPENSIONSTATE_CHANGED").
-                data(
-                    data
-                ).
-                add();
+            ObjectNode data = CommandContextUtil.getTaskServiceConfiguration().getObjectMapper().createObjectNode();
+            data.put("previousSuspensionState", taskEntity.getSuspensionState());
+            data.put("newSuspensionState", state.getStateCode());
+            TaskLogEntryBuilder taskLogEntryBuilder = CommandContextUtil.getProcessEngineConfiguration().getHistoryService()
+                .createTaskLogEntryBuilder(taskEntity);
+            taskLogEntryBuilder.type("USER_TASK_SUSPENSIONSTATE_CHANGED");
+            taskLogEntryBuilder.data(data.toString());
+            taskLogEntryBuilder.add();
         }
     }
 

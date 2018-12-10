@@ -14,7 +14,6 @@
 package org.flowable.task.service.impl.persistence.entity;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -33,18 +32,14 @@ import org.flowable.task.service.impl.TaskQueryImpl;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.data.TaskDataManager;
 import org.flowable.task.service.impl.util.CommandContextUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
 public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> implements TaskEntityManager {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(TaskEntityManagerImpl.class);
 
     public static final String EVENT_USER_TASK_ASSIGNEE_CHANGED = "USER_TASK_ASSIGNEE_CHANGED";
     public static final String EVENT_USER_TASK_CREATED = "USER_TASK_CREATED";
@@ -241,17 +236,12 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
         this.taskDataManager = taskDataManager;
     }
 
-    protected String serializeLogEntryData(Object... data) {
-        try {
-            Map<String, Object> dataToSerialize = new HashMap<>();
-            for (int i = 0; i < data.length; i+=2) {
-                dataToSerialize.put((String) data[i], data[i+1]);
-            }
-            return this.getTaskServiceConfiguration().getObjectMapper().writeValueAsString(dataToSerialize);
-        } catch (JsonProcessingException e) {
-            LOGGER.warn("Could not serialize user task event data. Data will not be written to the database", e);
+    protected String serializeLogEntryData(String... data) {
+        ObjectNode dataNode = taskServiceConfiguration.getObjectMapper().createObjectNode();
+        for (int i = 0; i < data.length; i += 2) {
+            dataNode.put(data[i], data[i + 1]);
         }
-        return null;
+        return dataNode.toString();
     }
 
     protected void logAssigneeChanged(TaskEntity taskEntity, String previousAssignee, String newAssignee) {
@@ -286,12 +276,10 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
         if (this.getTaskServiceConfiguration().isEnableDatabaseEventLogging()) {
             TaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
             taskLogEntry.setType(EVENT_USER_TASK_PRIORITY_CHANGED);
-            taskLogEntry.setData(
-                serializeLogEntryData(
-                    "newPriority", newPriority,
-                    "previousPriority", previousPriority
-                )
-            );
+            ObjectNode dataNode = taskServiceConfiguration.getObjectMapper().createObjectNode();
+            dataNode.put("newPriority", newPriority);
+            dataNode.put("previousPriority", previousPriority);
+            taskLogEntry.setData( dataNode.toString());
             CommandContextUtil.getTaskLogEntryEntityManager().insert(taskLogEntry);
         }
     }
@@ -300,12 +288,10 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
         if (this.getTaskServiceConfiguration().isEnableDatabaseEventLogging()) {
             TaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
             taskLogEntry.setType(EVENT_USER_TASK_DUEDATE_CHANGED);
-            taskLogEntry.setData(
-                serializeLogEntryData(
-                    "newDueDate", newDueDate != null ? newDueDate.getTime() : null,
-                    "previousDueDate", previousDueDate != null ? previousDueDate.getTime() : null
-                )
-            );
+            ObjectNode dataNode = taskServiceConfiguration.getObjectMapper().createObjectNode();
+            dataNode.put("newDueDate", newDueDate != null ? newDueDate.getTime() : null);
+            dataNode.put("previousDueDate", previousDueDate != null ? previousDueDate.getTime() : null);
+            taskLogEntry.setData(dataNode.toString());
             CommandContextUtil.getTaskLogEntryEntityManager().insert(taskLogEntry);
         }
     }
