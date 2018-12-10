@@ -78,7 +78,6 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
     static {
         // runtime
         entityToTableNameMap.put(TaskEntity.class, "ACT_RU_TASK");
-        entityToTableNameMap.put(HistoricTaskLogEntryEntity.class, "ACT_HI_TSK_LOG");
         entityToTableNameMap.put(ExecutionEntity.class, "ACT_RU_EXECUTION");
         entityToTableNameMap.put(IdentityLinkEntity.class, "ACT_RU_IDENTITYLINK");
         entityToTableNameMap.put(VariableInstanceEntity.class, "ACT_RU_VARIABLE");
@@ -108,6 +107,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
         entityToTableNameMap.put(HistoricProcessInstanceEntity.class, "ACT_HI_PROCINST");
         entityToTableNameMap.put(HistoricVariableInstanceEntity.class, "ACT_HI_VARINST");
         entityToTableNameMap.put(HistoricTaskInstanceEntity.class, "ACT_HI_TASKINST");
+        entityToTableNameMap.put(HistoricTaskLogEntryEntity.class, "ACT_HI_TSK_LOG");
         entityToTableNameMap.put(HistoricIdentityLinkEntity.class, "ACT_HI_IDENTITYLINK");
 
         // a couple of stuff goes to the same table
@@ -125,7 +125,6 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
 
         // and now the map for the API types (does not cover all cases)
         apiTypeToTableNameMap.put(Task.class, "ACT_RU_TASK");
-        apiTypeToTableNameMap.put(HistoricTaskLogEntry.class, "ACT_HI_TSK_LOG");
         apiTypeToTableNameMap.put(Execution.class, "ACT_RU_EXECUTION");
         apiTypeToTableNameMap.put(ProcessInstance.class, "ACT_RU_EXECUTION");
         apiTypeToTableNameMap.put(ProcessDefinition.class, "ACT_RE_PROCDEF");
@@ -140,6 +139,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
         apiTypeToTableNameMap.put(HistoricVariableUpdate.class, "ACT_HI_DETAIL");
         apiTypeToTableNameMap.put(HistoricFormProperty.class, "ACT_HI_DETAIL");
         apiTypeToTableNameMap.put(HistoricTaskInstance.class, "ACT_HI_TASKINST");
+        apiTypeToTableNameMap.put(HistoricTaskLogEntry.class, "ACT_HI_TSK_LOG");
         apiTypeToTableNameMap.put(HistoricVariableInstance.class, "ACT_HI_VARINST");
 
         // TODO: Identity skipped for the moment as no SQL injection is provided
