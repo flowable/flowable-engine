@@ -38,8 +38,10 @@ import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.TaskService;
+import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.event.impl.FlowableVariableEventBuilder;
 import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayRef;
@@ -91,7 +93,7 @@ public class TaskHelper {
                     Authentication.getAuthenticatedUserId(), null, IdentityLinkType.PARTICIPANT);
         }
 
-        logTaskCompleted(taskEntity, commandContext);
+        CommandContextUtil.getHistoricTaskService().addHistoricTaskLogEntry(taskEntity, HistoricTaskLogEntryType.USER_TASK_COMPLETED.name(), null);
 
         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
         if (eventDispatcher.isEnabled()) {
@@ -110,15 +112,6 @@ public class TaskHelper {
         if (taskEntity.getExecutionId() != null) {
             ExecutionEntity executionEntity = CommandContextUtil.getExecutionEntityManager(commandContext).findById(taskEntity.getExecutionId());
             CommandContextUtil.getAgenda(commandContext).planTriggerExecutionOperation(executionEntity);
-        }
-    }
-
-    public static void logTaskCompleted(TaskEntity taskEntity, CommandContext commandContext) {
-        if (CommandContextUtil.getTaskServiceConfiguration(commandContext).isEnableDatabaseEventLogging()) {
-            HistoricTaskLogEntryBuilder taskLogEntryBuilder = CommandContextUtil.getProcessEngineConfiguration(commandContext).getHistoryService().
-                createHistoricTaskLogEntryBuilder(taskEntity);
-            taskLogEntryBuilder.type(HistoricTaskLogEntryType.USER_TASK_COMPLETED.name());
-            taskLogEntryBuilder.add();
         }
     }
 

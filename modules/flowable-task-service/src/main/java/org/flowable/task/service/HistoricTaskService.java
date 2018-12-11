@@ -15,6 +15,7 @@ package org.flowable.task.service;
 import java.util.List;
 
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.history.NativeHistoricTaskLogEntryQuery;
 import org.flowable.task.api.history.HistoricTaskLogEntry;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
@@ -58,14 +59,16 @@ public interface HistoricTaskService {
 
     void deleteHistoricTaskLogEntry(long taskLogNumber);
 
+    void createHistoricTaskLogEntry(HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder);
+
     /**
      * Log new entry to the task log.
      *
-     * @param logEntry log entry to add
+     * @param taskInfo task to which add log entry
+     * @param logEntryType log entry type
+     * @param data log entry data
      */
-    void addHistoricTaskLogEntry(HistoricTaskLogEntry logEntry);
-
-    void createHistoricTaskLogEntry(HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder);
+    void addHistoricTaskLogEntry(TaskInfo taskInfo, String logEntryType, String data);
 
     HistoricTaskLogEntryQuery createHistoricTaskLogEntryQuery(CommandExecutor commandExecutor);
 

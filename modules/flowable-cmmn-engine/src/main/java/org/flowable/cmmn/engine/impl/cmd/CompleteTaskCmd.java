@@ -74,7 +74,7 @@ public class CompleteTaskCmd implements Command<Void> {
             taskEntity.setTransientVariables(transientVariables);
         }
 
-        logTaskCompleted(taskEntity, commandContext);
+        CommandContextUtil.getHistoricTaskService().addHistoricTaskLogEntry(taskEntity, HistoricTaskLogEntryType.USER_TASK_COMPLETED.name(), null);
 
         CommandContextUtil.getInternalTaskAssignmentManager(commandContext).addUserIdentityLinkToParent(taskEntity, Authentication.getAuthenticatedUserId());
         CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_COMPLETE);
@@ -86,14 +86,6 @@ public class CompleteTaskCmd implements Command<Void> {
         }
         
         return null;
-    }
-
-    protected static void logTaskCompleted(TaskEntity taskEntity, CommandContext commandContext) {
-        if (CommandContextUtil.getTaskServiceConfiguration(commandContext).isEnableDatabaseEventLogging()) {
-            HistoricTaskLogEntryBuilder taskLogEntryBuilder = getCmmnHistoryService().createHistoricTaskLogEntryBuilder(taskEntity);
-            taskLogEntryBuilder.type(HistoricTaskLogEntryType.USER_TASK_COMPLETED.name());
-            taskLogEntryBuilder.add();
-        }
     }
 
 }

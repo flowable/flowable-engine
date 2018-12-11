@@ -15,11 +15,14 @@ package org.flowable.task.service.impl;
 import java.util.List;
 import java.util.Objects;
 
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.service.CommonServiceImpl;
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
+import org.flowable.task.api.TaskInfo;
+import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.flowable.task.api.history.NativeHistoricTaskLogEntryQuery;
 import org.flowable.task.api.history.HistoricTaskLogEntry;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
@@ -141,9 +144,18 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
     }
 
     @Override
-    public void addHistoricTaskLogEntry(HistoricTaskLogEntry historicTaskLogEntry) {
+    public void addHistoricTaskLogEntry(TaskInfo task, String logEntryType, String data) {
         if (this.configuration.isEnableDatabaseEventLogging()) {
-            getHistoricTaskLogEntryEntityManager().insert((HistoricTaskLogEntryEntity) historicTaskLogEntry);
+            HistoricTaskLogEntryEntity taskLogEntry = getHistoricTaskLogEntryEntityManager().create();
+            taskLogEntry.setTaskId(task.getId());
+            taskLogEntry.setExecutionId(task.getExecutionId());
+            taskLogEntry.setProcessInstanceId(task.getProcessInstanceId());
+            taskLogEntry.setProcessDefinitionId(task.getProcessDefinitionId());
+            taskLogEntry.setTimeStamp(this.configuration.getClock().getCurrentTime());
+            taskLogEntry.setType(logEntryType);
+            taskLogEntry.setData(data);
+            taskLogEntry.setUserId(Authentication.getAuthenticatedUserId());
+            getHistoricTaskLogEntryEntityManager().insert(taskLogEntry);
         }
     }
 
