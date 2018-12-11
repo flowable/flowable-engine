@@ -14,7 +14,6 @@ package org.flowable.cmmn.test.el;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.flowable.common.engine.impl.el.function.VariableEqualsExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableGetExpressionFunction;
 import org.junit.Test;
 

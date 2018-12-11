@@ -14,7 +14,6 @@
 package org.flowable.cmmn.rest.service.api.runtime.planitem;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;

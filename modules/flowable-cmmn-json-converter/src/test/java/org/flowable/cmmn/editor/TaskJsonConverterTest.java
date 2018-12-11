@@ -12,19 +12,19 @@
  */
 package org.flowable.cmmn.editor;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter;
-import org.flowable.cmmn.model.*;
-import org.hamcrest.core.Is;
-import org.junit.Test;
-
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import org.flowable.cmmn.model.Case;
+import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.FieldExtension;
+import org.flowable.cmmn.model.HumanTask;
+import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.cmmn.model.Stage;
+import org.flowable.cmmn.model.Task;
+import org.junit.Test;
 
 /**
  * @author shareniu
