@@ -28,11 +28,15 @@ public interface UserService {
 
     void updateUserDetails(String userId, String firstName, String lastName, String email);
 
+    void updateUserDetails(String userId, String firstName, String lastName, String email, String tenantId);
+
     void bulkUpdatePassword(List<String> userIds, String newPassword);
 
     void deleteUser(String userId);
 
     User createNewUser(String id, String firstName, String lastName, String email, String password);
+
+    User createNewUser(String id, String firstName, String lastName, String email, String password, String tenantId);
 
     UserInformation getUserInformation(String userId);
 

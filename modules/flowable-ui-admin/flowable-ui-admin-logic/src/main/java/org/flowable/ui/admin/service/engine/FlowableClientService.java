@@ -51,6 +51,7 @@ import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.admin.service.AttachmentResponseInfo;
 import org.flowable.ui.admin.service.ResponseInfo;
 import org.flowable.ui.admin.service.engine.exception.FlowableServiceException;
+import org.flowable.ui.common.security.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -591,6 +592,10 @@ public class FlowableClientService {
         }
 
         URIBuilder builder = createUriBuilder(finalUrl + uri);
+
+        if (SecurityUtils.getCurrentUserObject().getTenantId() != null) {
+            builder.setParameter("tenantId", SecurityUtils.getCurrentUserObject().getTenantId());
+        }
 
         return builder.toString();
     }

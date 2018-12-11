@@ -130,6 +130,7 @@
          "ID": "ID",
          "EMAIL": "E-mail",
          "NAME": "Nom",
+         "TENANT": "Tenancier",
          "CREATED": "Créé",
          "TYPE": "Type",
          "EXTERNAL-ID": "Identifiant externe",
