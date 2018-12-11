@@ -187,6 +187,16 @@ flowableApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'auth
 
           return deferred.promise;
         },
+
+        getSsoUrl: function (param) {
+            $http.get(FLOWABLE.CONFIG.contextRoot + '/app/sso/external', {
+                ignoreAuthModule: 'ignoreAuthModule'
+            }).success(function (data, status, headers, config) {
+                if ( data != null && data.length > 0 && param.success ){
+                    param.success(data, status, headers, config);
+                }
+            });
+        },
           
         login: function (param) {
             var data ="j_username=" + encodeURIComponent(param.username) +"&j_password=" + encodeURIComponent(param.password) +"&_spring_security_remember_me=true&submit=Login";
