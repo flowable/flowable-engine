@@ -145,8 +145,7 @@ public class SecurityConfiguration {
                     .addHeaderWriter(new XXssProtectionHeaderWriter())
                     .and()
                     .authorizeRequests()
-                    .antMatchers("/*").permitAll()
-                    .antMatchers("/app/rest/authenticate").permitAll()
+                    .antMatchers("/*", "/app/rest/authenticate", "/app/sso/*").permitAll()
                     .antMatchers("/app/**").hasAuthority(DefaultPrivileges.ACCESS_IDM);
 
             // Custom login form configurer to allow for non-standard HTTP-methods (eg. LOCK)

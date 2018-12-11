@@ -39,6 +39,7 @@
         "PASSWORD": "Password",
         "PASSWORD-PLACEHOLDER": "Enter your password",
         "INVALID-CREDENTIALS": "Invalid credentials",
+        "EXTERNAL-SERVICE": "Log in with an external service",
         "ACTION": {
             "CONFIRM": "Sign in"
         }

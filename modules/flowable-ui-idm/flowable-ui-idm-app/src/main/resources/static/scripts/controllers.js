@@ -10,12 +10,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-flowableApp.controller('LoginController', ['$scope', '$location', 'AuthenticationSharedService', '$timeout',
-    function ($scope, $location, AuthenticationSharedService, $timeout) {
+flowableApp.controller('LoginController', ['$scope', '$location', '$cookies', 'AuthenticationSharedService', '$timeout',
+    function ($scope, $location, $cookies, AuthenticationSharedService, $timeout) {
 
         $scope.model = {
             loading: false
         };
+
+        // default values
+        if ( !('redirectUrl' in $location.search()) ) {
+            delete $cookies.redirectUrl;
+        }
+        $scope.hasExternalAuth = false;
+
+        AuthenticationSharedService.getSsoUrl({
+            success: function(data) {
+                $scope.ssoUrl = data;
+                $scope.hasExternalAuth = true;
+
+                if( 'redirectUrl' in $location.search() ){
+                    var redirectUrl = $location.search()['redirectUrl'];
+                    if( redirectUrl != null && redirectUrl.length > 0 ){
+                        $cookies.redirectUrl = redirectUrl;
+                    }
+                }
+            }
+        });
+
         $scope.login = function () {
 
             $scope.model.loading = true;
