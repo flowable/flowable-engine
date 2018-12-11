@@ -15,6 +15,8 @@ package org.flowable.engine.history;
 
 import org.flowable.common.engine.api.query.Query;
 
+import java.util.Set;
+
 /**
  * Programmatic querying for {@link HistoricActivityInstance}s.
  * 
@@ -53,6 +55,11 @@ public interface HistoricActivityInstanceQuery extends Query<HistoricActivityIns
      * Only select historic activity instances for activities with the given activity type
      */
     HistoricActivityInstanceQuery activityType(String activityType);
+
+    /**
+     * Only select historic activity instances whose activity type is in the given set of activity types.
+     */
+    HistoricActivityInstanceQuery activityTypes(Set<String>  activityTypes);
 
     /**
      * Only select historic activity instances for userTask activities assigned to the given user

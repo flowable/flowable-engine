@@ -253,6 +253,12 @@
       <if test="activityType != null">
         and RES.ACT_TYPE_ = #{activityType}
       </if>
+      <if test="activityTypes != null and !activityTypes.isEmpty()">
+            and RES.ACT_TYPE_ in
+            <foreach item="item" index="index" collection="activityTypes" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+      </if>
       <if test="assignee != null">
         and RES.ASSIGNEE_ = #{assignee}
       </if>

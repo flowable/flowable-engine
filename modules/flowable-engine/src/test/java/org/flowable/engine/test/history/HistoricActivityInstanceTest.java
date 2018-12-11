@@ -16,7 +16,9 @@ package org.flowable.engine.test.history;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -53,6 +55,26 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         assertNotNull(historicActivityInstance.getStartTime());
         assertNotNull(historicActivityInstance.getEndTime());
         assertTrue(historicActivityInstance.getDurationInMillis() >= 0);
+    }
+    @Test
+    @Deployment
+    public void testOneTaskProcessActivityTypes() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcessActivityTypesProcess");
+
+        Set<String> activityTypes = new HashSet<>();
+        activityTypes.add("startEvent");
+
+        List<HistoricActivityInstance> historicActivityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityTypes(activityTypes).list();
+
+        assertEquals(1, historicActivityInstance.size());
+
+        activityTypes.add("userTask");
+        List<HistoricActivityInstance> historicActivityInstance2 = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityTypes(activityTypes).list();
+
+        assertEquals(2, historicActivityInstance2.size());
+
+
+
     }
 
     @Test
@@ -433,5 +455,6 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
             runtimeService.createProcessInstanceQuery().superProcessInstanceId(pi.getId()).singleResult().getId()
         ));
     }
+
 
 }

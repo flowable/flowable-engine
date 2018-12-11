@@ -14,6 +14,7 @@
 package org.flowable.engine.impl;
 
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.AbstractQuery;
@@ -36,6 +37,7 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     protected String activityId;
     protected String activityName;
     protected String activityType;
+    protected Set<String> activityTypes;
     protected String assignee;
     protected String tenantId;
     protected String tenantIdLike;
@@ -44,6 +46,7 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     protected boolean unfinished;
     protected String deleteReason;
     protected String deleteReasonLike;
+
 
     public HistoricActivityInstanceQueryImpl() {
     }
@@ -101,6 +104,12 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     @Override
     public HistoricActivityInstanceQueryImpl activityType(String activityType) {
         this.activityType = activityType;
+        return this;
+    }
+
+    @Override
+    public HistoricActivityInstanceQuery activityTypes(Set<String> activityTypes) {
+        this.activityTypes=activityTypes;
         return this;
     }
 
@@ -272,6 +281,10 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
 
     public String getActivityType() {
         return activityType;
+    }
+
+    public Set<String> getActivityTypes() {
+        return activityTypes;
     }
 
     public String getAssignee() {
