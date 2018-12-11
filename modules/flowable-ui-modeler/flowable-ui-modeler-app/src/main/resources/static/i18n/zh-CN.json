@@ -3,7 +3,7 @@
         "MAIN-TITLE": "Flowable编辑器",
         "NAVIGATION" : {
             "PROCESSES": "流程",
-            "CASEMODELS": "Case模型",
+            "CASEMODELS": "案例模型",
             "FORMS": "表单",
             "DECISION-TABLES": "决策表",
             "APPS": "应用程序"
@@ -86,18 +86,18 @@
     },
     
     "CASE-LIST" : {
-        "TITLE" : "Case模型",
+        "TITLE" : "案例模型",
         "SEARCH-PLACEHOLDER": "搜索",
         "ACTION" : {
-            "CREATE": "创建Case",
-            "IMPORT": "导入Case"
+            "CREATE": "创建案例",
+            "IMPORT": "导入案例"
         },
 
         "FILTER" : {
-            "CASES": "Case 模型",
-            "CASES-COUNT": "一共有 {{total}}个 case 模型",
+            "CASES": "案例模型",
+            "CASES-COUNT": "一共有 {{total}}个案例模型",
             "CASES-ONE": "有一个case模型",
-            "CASES-EMPTY": "目前还没有创建case模型。您可以设计实例模型、用户表单，然后将它们捆绑到app应用程序定义中。第一步是创建一个case模型。:",
+            "CASES-EMPTY": "目前还没有创建案例模型。您可以设计实例模型、用户表单，然后将它们捆绑到app应用程序定义中。第一步是创建一个案例模型。:",
             "CASES-CMMN-HINT": "使用CMMN可视化编辑器创建CMMN模型.",
             "CASES-CMMN-IMPORT-HINT": "还可以导入现有CMMN模型。",
             "FILTER-TEXT": ", 匹配 \"{{filterText}}\"",
@@ -302,8 +302,8 @@
           "NO-DESCRIPTION": "这个模型没有描述信息，可以通过修改模型来添加一个描述"
         },
         "POPUP": {
-          "CREATE-TITLE": "创建一个新的case模型",
-          "DUPLICATE-TITLE": "复制这个case模型",
+          "CREATE-TITLE": "创建一个新的案例模型",
+          "DUPLICATE-TITLE": "复制这个案例模型",
           "CREATE-DESCRIPTION": "您需要为新模型命名，并且您可以在这个操作中添加描述信息。",
           "DUPLICATE-DESCRIPTION": "您可以更改新模型的名称，并且此时您可以更改描述信息。",
           "EDIT-DESCRIPTION": "更改下面的任何模型属性，然后按下保存去更新模型。",
@@ -313,14 +313,14 @@
           "DELETE-LOADING-RELATIONS": "检查模型使用...",
           "DELETE-RELATIONS-DESCRIPTION-SINGLE": "无法删除此模型，因为另一个模型正在使用它:",
           "DELETE-RELATIONS-DESCRIPTION": "无法删除此模型，因为另一个模型正在使用它:",
-          "DELETE-PROCESS-RELATION": "Case模型",
+          "DELETE-PROCESS-RELATION": "案例模型",
           "DELETE-FORM-RELATION": "表单模型",
-          "DELETE-APP-RELATION": "App模型",
+          "DELETE-APP-RELATION": "应用程序模型",
           "IMPORT-DESCRIPTION": "请浏览或拖拽.cmmn 或者.cmmn.xml 扩展名的CMMN XML",
-          "IMPORT-TITLE": "导入一个case模型",
+          "IMPORT-TITLE": "导入一个案例模型",
           "USE-AS-NEW-TITLE": "作为一个新版本使用",
           "USE-AS-NEW-DESCRIPTION": "您确定要使用 {{version}}版本 去创建一个关于 \"{{name}}\"的新版本?",
-          "USE-AS-NEW-UNRESOLVED-MODELS-ERROR": "无法完全恢复app模型到所选择的版本：由于一些引用的模型过去被删除而丢失。请相应地更新app模型。缺失模型:",
+          "USE-AS-NEW-UNRESOLVED-MODELS-ERROR": "无法完全恢复app模型到所选择的版本：由于一些引用的模型过去被删除而丢失。请相应地更新应用程序模型。缺失模型:",
           "USE-AS-NEW-UNRESOLVED-MODEL": "模型 '{{name}}' 内部id {{id}}, 被 {{createdBy}}创建",
           "SHARED-WITH": "分享",
           "PERMISSION": "许可",
@@ -452,8 +452,8 @@
     },
 
     "APP": {
-        "NAME": "App 定义名称",
-        "KEY": "App定义key",
+        "NAME": "应用程序定义名称",
+        "KEY": "应用程序定义key",
         "DESCRIPTION": "描述",
         "ICON": "图标",
         "THEME": "主题",
@@ -461,17 +461,17 @@
 		"USERS-ACCESS": "用户访问，用逗号分隔",
         "ACTION": {
             "DETAILS": "显示详细信息",
-            "EDIT": "修改app定义属性",
+            "EDIT": "修改应用程序定义属性",
             "DUPLICATE": "复制这个应用",
-            "SHARE": "分享app定义",
-            "DELETE": "删除app定义",
-            "CREATE-CONFIRM": "创建新的app定义",
-            "DUPLICATE-CONFIRM": "复制这个app定义",
-            "DELETE-CONFIRM": "删除app定义",
+            "SHARE": "分享应用程序定义",
+            "DELETE": "删除应用程序定义",
+            "CREATE-CONFIRM": "创建新的应用程序定义",
+            "DUPLICATE-CONFIRM": "复制这个应用程序定义",
+            "DELETE-CONFIRM": "删除应用程序定义",
             "USE-AS-NEW-VERSION": "作为新版本使用",
-            "OPEN-IN-EDITOR": "App编辑器",
+            "OPEN-IN-EDITOR": "应用程序编辑器",
             "PUBLISH": "发布",
-            "PUBLISH-CONFIRM": "发布app定义",
+            "PUBLISH-CONFIRM": "发布应用程序定义",
             "SELECT-ICON": "修改图标...",
             "SELECT-THEME": "修改主题...",
             "EDIT-MODELS": "编辑包含的模型",
@@ -485,8 +485,8 @@
           "MODELS-TITLE": "app定义中包含的模型",
           "LAST-UPDATED-BY": "最后被{{lastUpdatedBy}} - {{lastUpdated | dateformat}}更新",
           "CREATED-BY": "被{{createdBy}}创建",
-          "NO-DESCRIPTION": "这个app定义没有描述信息，可以通过修改app定义来添加一个描述",
-          "NO-MODELS-SELECTED": "没有为这个app选择模型"
+          "NO-DESCRIPTION": "这个应用程序定义没有描述信息，可以通过修改应用程序定义来添加一个描述",
+          "NO-MODELS-SELECTED": "没有为这个应用程序选择模型"
         },
         "TITLE": {
           "SELECT-ICON": "选择应用图标",
@@ -504,10 +504,10 @@
           "PUBLISH-TITLE": "发布应用程序定义",
           "PUBLISH-DESCRIPTION": "您确定要发布应用程序定义 \"{{name}}\"? 注意这个应用程序定义将版本化，如果已经存在，则将更新工作流应用程序。",
           "PUBLISH-FIELD": "发布？请注意，如果启用了发布，则将版本化此应用程序定义，如果已经存在，则将更新工作流应用程序。",
-          "PUBLISH-ERROR-PROCDEF-KEY-CONFLICT": "你的流程模型 \"{{modelInAppName}}\"具有相同的标识符\"{{processDefinitionKey}}\"作为已经存在的部署流程\"{{conflictingModelName}}\" ，关于这个app \"{{conflictingAppName}}\". 请修改这个 \"id\"流程模型的属性。",
+          "PUBLISH-ERROR-PROCDEF-KEY-CONFLICT": "你的流程模型 \"{{modelInAppName}}\"具有相同的标识符\"{{processDefinitionKey}}\"作为已经存在的部署流程\"{{conflictingModelName}}\" ，关于这个应用程序 \"{{conflictingAppName}}\". 请修改这个 \"id\"流程模型的属性。",
           "PUBLISH-ERROR-PROCESS-ALREADY-USED": "下面的流程模型已经在另一个应用程序中使用了。这样行吗？",
-          "PUBLISH-ERROR-PROCESS-ALREADY-USED-APP": "App",
-          "PUBLISH-ERROR-PROCDEF-DUPLICATE-KEYS": "无效的app: 找到重复的流程标识符 (修改这个非法的流程模型  \"id\"属性):",
+          "PUBLISH-ERROR-PROCESS-ALREADY-USED-APP": "应用程序",
+          "PUBLISH-ERROR-PROCDEF-DUPLICATE-KEYS": "无效的应用程序: 找到重复的流程标识符 (修改这个非法的流程模型  \"id\"属性):",
           "DELETE-TITLE": "删除应用程序定义",
           "DELETE-DESCRIPTION": "确实要删除应用程序定义 \"{{name}}\"?",
           "DELETE-DESCRIPTION-WITH-RUNTIME": "确实要删应用程序定义 \"{{name}}\"? 注意，这个应用程序定义已经部署到任务landing页面，并且通过确认，该应用程序将从任务应用程序landing页面中删除。",
@@ -997,8 +997,8 @@
     "PROPERTY.DECISIONTABLEREFERENCE.DECISIONTABLE.EMPTY" : "此文件夹不包含任何决策表",
     
     "PROPERTY.CASEREFERENCE.EMPTY" : "没有选择引用",
-    "PROPERTY.CASEREFERENCE.TITLE" : "Case模型引用",
-    "PROPERTY.CASEREFERENCE.ERROR.FORM" : "加载case模型时出错。稍后再试一次",
-    "PROPERTY.CASEREFERENCE.CASE.LOADING" : "加载case模型...",
-    "PROPERTY.CASEREFERENCE.CASE.EMPTY" : "此文件夹不包含任何case模型"
+    "PROPERTY.CASEREFERENCE.TITLE" : "案例型引用",
+    "PROPERTY.CASEREFERENCE.ERROR.FORM" : "加载案例模型时出错。稍后再试一次",
+    "PROPERTY.CASEREFERENCE.CASE.LOADING" : "加载案例模型...",
+    "PROPERTY.CASEREFERENCE.CASE.EMPTY" : "此文件夹不包含任何案例模型"
 }
