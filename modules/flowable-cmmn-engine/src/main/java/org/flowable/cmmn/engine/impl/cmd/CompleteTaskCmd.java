@@ -74,7 +74,7 @@ public class CompleteTaskCmd implements Command<Void> {
             taskEntity.setTransientVariables(transientVariables);
         }
 
-        CommandContextUtil.getHistoricTaskService().addHistoricTaskLogEntry(taskEntity, HistoricTaskLogEntryType.USER_TASK_COMPLETED.name(), null);
+        CommandContextUtil.getHistoricTaskService(commandContext).addHistoricTaskLogEntry(taskEntity, HistoricTaskLogEntryType.USER_TASK_COMPLETED.name(), null);
 
         CommandContextUtil.getInternalTaskAssignmentManager(commandContext).addUserIdentityLinkToParent(taskEntity, Authentication.getAuthenticatedUserId());
         CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_COMPLETE);

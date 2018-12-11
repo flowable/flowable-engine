@@ -151,6 +151,10 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
             taskLogEntry.setExecutionId(task.getExecutionId());
             taskLogEntry.setProcessInstanceId(task.getProcessInstanceId());
             taskLogEntry.setProcessDefinitionId(task.getProcessDefinitionId());
+            taskLogEntry.setScopeId(task.getScopeId());
+            taskLogEntry.setScopeDefinitionId(task.getScopeDefinitionId());
+            taskLogEntry.setScopeType(task.getScopeType());
+            taskLogEntry.setSubScopeId(task.getSubScopeId());
             taskLogEntry.setTimeStamp(this.configuration.getClock().getCurrentTime());
             taskLogEntry.setType(logEntryType);
             taskLogEntry.setData(data);

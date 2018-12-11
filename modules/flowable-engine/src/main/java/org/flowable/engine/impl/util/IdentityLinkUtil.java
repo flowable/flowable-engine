@@ -104,8 +104,6 @@ public class IdentityLinkUtil {
     protected static void logTaskIdentityLinkEvent(String eventType, TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity) {
         TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
         if (taskServiceConfiguration.isEnableDatabaseEventLogging()) {
-            HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = CommandContextUtil.getProcessEngineConfiguration().getHistoryService().createHistoricTaskLogEntryBuilder(taskEntity);
-            historicTaskLogEntryBuilder.type(eventType);
             ObjectNode data = CommandContextUtil.getTaskServiceConfiguration().getObjectMapper().createObjectNode();
             if (identityLinkEntity.isUser()) {
                 data.put("userId", identityLinkEntity.getUserId());
@@ -113,8 +111,8 @@ public class IdentityLinkUtil {
                 data.put("groupId", identityLinkEntity.getGroupId());
             }
             data.put("type", identityLinkEntity.getType());
-            historicTaskLogEntryBuilder.data(data.toString());
-            historicTaskLogEntryBuilder.add();
+            taskServiceConfiguration.getHistoricTaskService().addHistoricTaskLogEntry(
+                taskEntity, eventType, data.toString());
         }
     }
 

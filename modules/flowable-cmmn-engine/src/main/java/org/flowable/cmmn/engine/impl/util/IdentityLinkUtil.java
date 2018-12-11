@@ -16,9 +16,7 @@ import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
-import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
@@ -93,18 +91,15 @@ public class IdentityLinkUtil {
     protected static void logTaskIdentityLinkEvent(String eventType, TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity) {
         TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
         if (taskServiceConfiguration.isEnableDatabaseEventLogging()) {
-            HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = CommandContextUtil.getCmmnHistoryService().createHistoricTaskLogEntryBuilder(taskEntity);
-            historicTaskLogEntryBuilder.type(eventType);
-            ObjectNode data = CommandContextUtil.getCmmnEngineConfiguration().getObjectMapper().createObjectNode();
+            ObjectNode data = CommandContextUtil.getTaskServiceConfiguration().getObjectMapper().createObjectNode();
             if (identityLinkEntity.isUser()) {
                 data.put("userId", identityLinkEntity.getUserId());
             } else if (identityLinkEntity.isGroup()) {
                 data.put("groupId", identityLinkEntity.getGroupId());
             }
             data.put("type", identityLinkEntity.getType());
-            historicTaskLogEntryBuilder.data(data.toString());
-            historicTaskLogEntryBuilder.userId(Authentication.getAuthenticatedUserId());
-            historicTaskLogEntryBuilder.add();
+            taskServiceConfiguration.getHistoricTaskService().addHistoricTaskLogEntry(
+                taskEntity, eventType, data.toString());
         }
     }
 

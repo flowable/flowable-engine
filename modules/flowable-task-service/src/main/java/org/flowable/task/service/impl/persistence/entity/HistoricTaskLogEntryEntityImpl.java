@@ -111,7 +111,8 @@ public class HistoricTaskLogEntryEntityImpl extends AbstractEntityNoRevision imp
 
     @Override
     public String getIdPrefix() {
-        return TaskServiceEntityConstants.TASK_SERVICE_ID_PREFIX;
+        // id prefix is empty because sequence is used instead of id prefix
+        return "";
     }
 
     @Override

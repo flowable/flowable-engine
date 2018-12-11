@@ -34,14 +34,11 @@ import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEnt
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.TaskService;
-import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
-import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.event.impl.FlowableVariableEventBuilder;
 import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayRef;
@@ -93,7 +90,7 @@ public class TaskHelper {
                     Authentication.getAuthenticatedUserId(), null, IdentityLinkType.PARTICIPANT);
         }
 
-        CommandContextUtil.getHistoricTaskService().addHistoricTaskLogEntry(taskEntity, HistoricTaskLogEntryType.USER_TASK_COMPLETED.name(), null);
+        CommandContextUtil.getHistoricTaskService(commandContext).addHistoricTaskLogEntry(taskEntity, HistoricTaskLogEntryType.USER_TASK_COMPLETED.name(), null);
 
         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
         if (eventDispatcher.isEnabled()) {
