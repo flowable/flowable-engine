@@ -26,6 +26,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.flowable.task.service.impl.persistence.entity.data.TaskDataManager;
 import org.flowable.task.service.impl.persistence.entity.data.impl.cachematcher.TasksByExecutionIdMatcher;
+import org.flowable.task.service.impl.persistence.entity.data.impl.cachematcher.TasksByProcessInstanceIdMatcher;
 import org.flowable.task.service.impl.persistence.entity.data.impl.cachematcher.TasksByScopeIdAndScopeTypeMatcher;
 import org.flowable.task.service.impl.persistence.entity.data.impl.cachematcher.TasksBySubScopeIdAndScopeTypeMatcher;
 import org.flowable.task.service.impl.util.CommandContextUtil;
@@ -37,6 +38,8 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
 
     protected CachedEntityMatcher<TaskEntity> tasksByExecutionIdMatcher = new TasksByExecutionIdMatcher();
     
+    protected CachedEntityMatcher<TaskEntity> tasksByProcessInstanceIdMatcher = new TasksByProcessInstanceIdMatcher();
+
     protected CachedEntityMatcher<TaskEntity> tasksBySubScopeIdAndScopeTypeMatcher = new TasksBySubScopeIdAndScopeTypeMatcher();
     
     protected CachedEntityMatcher<TaskEntity> tasksByScopeIdAndScopeTypeMatcher = new TasksByScopeIdAndScopeTypeMatcher();
@@ -66,7 +69,14 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
     @Override
     @SuppressWarnings("unchecked")
     public List<TaskEntity> findTasksByProcessInstanceId(String processInstanceId) {
-        return getDbSqlSession().selectList("selectTasksByProcessInstanceId", processInstanceId);
+        DbSqlSession dbSqlSession = getDbSqlSession();
+
+        // If the process instance has been inserted in the same command execution as this query, there can't be any in the database
+        if (isEntityInserted(dbSqlSession, "execution", processInstanceId)) {
+            return getListFromCache(tasksByProcessInstanceIdMatcher, processInstanceId);
+        }
+
+        return getList(dbSqlSession, "selectTasksByProcessInstanceId", processInstanceId, tasksByProcessInstanceIdMatcher, true);
     }
     
     @Override
