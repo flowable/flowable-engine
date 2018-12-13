@@ -291,40 +291,6 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
         return null;
     }
 
-    public ActivityInstanceEntity findUnfinishedFlowSequenceActivityInstance(ExecutionEntity execution) {
-        String activityId = execution.getActivityId();
-        if (activityId != null) {
-            // No use looking for the ActivityInstance when no activityId is provided.
-
-            String executionId = execution.getId();
-
-            // Check the cache
-            ActivityInstanceEntity activityInstanceFromCache = getActivityInstanceFromCache(executionId, activityId, true);
-            if (activityInstanceFromCache != null) {
-                return activityInstanceFromCache;
-            }
-
-            // If the execution was freshly created, there is no need to check the database,
-            // there can never be an entry for a activity instance with this execution id.
-            if (!execution.isInserted() && !execution.isProcessInstanceType()) {
-
-                // Check the database
-                List<ActivityInstanceEntity> activityInstances = findUnfinishedActivityInstancesByExecutionAndActivityId(executionId, activityId);
-                // cache can be updated before DB
-                ActivityInstanceEntity activityFromCache = getActivityInstanceFromCache(executionId, activityId, false);
-                if (activityFromCache != null && activityFromCache.getEndTime() != null) {
-                    activityInstances.remove(activityFromCache);
-                }
-                if (activityInstances.size() > 0) {
-                    return activityInstances.get(0);
-                }
-
-            }
-        }
-
-        return null;
-    }
-
     protected ActivityInstanceEntity createActivityInstanceEntity(ExecutionEntity execution) {
         IdGenerator idGenerator = getProcessEngineConfiguration().getIdGenerator();
 
