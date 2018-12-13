@@ -271,6 +271,7 @@ public class ContinueProcessOperation extends AbstractOperation {
     }
 
     protected void continueThroughSequenceFlow(SequenceFlow sequenceFlow) {
+        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(execution);
 
         // Execution listener. Sequenceflow only 'take' makes sense ... but we've supported all three since the beginning
         if (CollectionUtil.isNotEmpty(sequenceFlow.getExecutionListeners())) {
@@ -298,6 +299,8 @@ public class ContinueProcessOperation extends AbstractOperation {
                             targetFlowElement != null ? targetFlowElement.getClass().getName() : null,
                             targetFlowElement != null ? ((FlowNode) targetFlowElement).getBehavior() : null));
         }
+
+        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordSequenceFlowEnd(execution);
 
         FlowElement targetFlowElement = sequenceFlow.getTargetFlowElement();
         execution.setCurrentFlowElement(targetFlowElement);
