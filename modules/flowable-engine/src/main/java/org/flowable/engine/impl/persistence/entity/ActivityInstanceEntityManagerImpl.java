@@ -106,12 +106,11 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
     }
 
     @Override
-    public void recordSequenceFlowEnd(ExecutionEntity executionEntity) {
-        ActivityInstanceEntity activityInstance = findUnfinishedFlowSequenceActivityInstance(executionEntity);
-        if (activityInstance != null) {
-            activityInstance.markEnded(null);
-            getHistoryManager().recordActivityEnd(activityInstance);
-        }
+    public void recordSequenceFlowTaken(ExecutionEntity executionEntity) {
+        ActivityInstanceEntity activityInstance = createActivityInstanceEntity(executionEntity);
+        activityInstance.setDurationInMillis(0l);
+        activityInstance.setEndTime(activityInstance.getStartTime());
+        getHistoryManager().createHistoricActivityInstance(activityInstance);
     }
 
     @Override
@@ -342,7 +341,16 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
         activityInstanceEntity.setProcessDefinitionId(processDefinitionId);
         activityInstanceEntity.setProcessInstanceId(processInstanceId);
         activityInstanceEntity.setExecutionId(execution.getId());
-        activityInstanceEntity.setActivityId(execution.getActivityId());
+        if (execution.getActivityId() != null ) {
+            activityInstanceEntity.setActivityId(execution.getActivityId());
+        } else {
+            // sequence flow activity id can be null
+            if (execution.getCurrentFlowElement() instanceof SequenceFlow) {
+                SequenceFlow currentFlowElement = (SequenceFlow) execution.getCurrentFlowElement();
+                activityInstanceEntity.setActivityId(currentFlowElement.getSourceRef()+ "->" +currentFlowElement.getTargetRef());
+            }
+        }
+
         if (execution.getCurrentFlowElement() != null) {
             activityInstanceEntity.setActivityName(execution.getCurrentFlowElement().getName());
             activityInstanceEntity.setActivityType(parseActivityType(execution.getCurrentFlowElement()));

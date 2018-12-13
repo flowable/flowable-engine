@@ -197,17 +197,29 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
             assertNotNull(historicProcess);
             assertEquals("theStart", historicProcess.getStartActivityId());
 
-            List<HistoricActivityInstance> historicInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(taskInSubProcess.getProcessInstanceId()).list();
+            List<HistoricActivityInstance> subProcesshistoricInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(taskInSubProcess.getProcessInstanceId()).list();
 
             // Should contain a start-event, the task and an end-event
-            assertEquals(3L, historicInstances.size());
-            Set<String> expectedActivities = new HashSet<>(Arrays.asList(new String[]{"theStart", "task", "theEnd"}));
+            assertEquals(5L, subProcesshistoricInstances.size());
+            Set<String> expectedActivities = new HashSet<>(Arrays.asList(new String[]{"theStart", "flow1", "task", "flow2", "theEnd"}));
+
+            for (HistoricActivityInstance act : subProcesshistoricInstances) {
+                expectedActivities.remove(act.getActivityId());
+            }
+            assertTrue("Not all expected activities were found in the history", expectedActivities.isEmpty());
+
+            List<HistoricActivityInstance> historicInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getProcessInstanceId()).list();
+
+            assertEquals(9L, historicInstances.size());
+            expectedActivities = new HashSet<>(Arrays.asList(new String[]{"theStart", "flow1", "taskBeforeSubProcess", "flow2", "callSubProcess", "flow3",
+                "taskAfterSubProcess", "flow4", "theEnd"
+            }));
 
             for (HistoricActivityInstance act : historicInstances) {
                 expectedActivities.remove(act.getActivityId());
             }
             assertTrue("Not all expected activities were found in the history", expectedActivities.isEmpty());
-            
+
             if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
                 List<HistoricEntityLink> historicEntityLinks = historyService.getHistoricEntityLinkChildrenForProcessInstance(processInstance.getId());
                 assertEquals(4, historicEntityLinks.size());

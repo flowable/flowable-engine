@@ -13,6 +13,9 @@
 
 package org.flowable.engine.test.bpmn.multiinstance;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1465,7 +1468,7 @@ assertProcessEnded(procId);
         assertEquals(processes.size() * assignees.size(), tasks.size());
 
         for (org.flowable.task.api.Task t : tasks) {
-            taskService.complete(t.getId());
+            taskService.complete(t.getId(), Collections.singletonMap("assignee", "1"));
         }
 
         List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().processDefinitionKey("miNestedMultiInstanceTasks").list();

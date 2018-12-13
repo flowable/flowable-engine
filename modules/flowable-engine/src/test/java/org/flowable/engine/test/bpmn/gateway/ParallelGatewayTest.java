@@ -188,10 +188,13 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
         
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().list();
-            assertEquals(21, historicActivityInstances.size());
+            assertEquals(41, historicActivityInstances.size());
             for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
                 Assert.assertNotNull(historicActivityInstance.getStartTime());
                 Assert.assertNotNull(historicActivityInstance.getEndTime());
+                if (historicActivityInstance.getActivityId().startsWith("flow")) {
+                    assertEquals(historicActivityInstance.getStartTime(), historicActivityInstance.getEndTime());
+                }
             }
         }
     }

@@ -111,10 +111,28 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         ActivityInstanceQuery activityInstanceQuery = runtimeService.createActivityInstanceQuery();
 
         long finishedActivityInstanceCount = activityInstanceQuery.finished().count();
-        assertEquals("The Start event is completed", 1, finishedActivityInstanceCount);
+        assertEquals("The Start event and sequenceFlow are completed", 2, finishedActivityInstanceCount);
 
         long unfinishedActivityInstanceCount = activityInstanceQuery.unfinished().count();
         assertEquals("One active (unfinished) User org.flowable.task.service.Task", 1, unfinishedActivityInstanceCount);
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml")
+    public void testSequenceFlowActivityInstance() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        assertNotNull(processInstance);
+
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
+
+        ActivityInstance sequenceFlow = runtimeService.createActivityInstanceQuery().activityType("sequenceFlow").singleResult();
+        assertEquals("flow1", sequenceFlow.getActivityId());
+        assertEquals(processInstance.getId(), sequenceFlow.getProcessInstanceId());
+        assertEquals(processInstance.getProcessDefinitionId(), sequenceFlow.getProcessDefinitionId());
+        assertNotNull(sequenceFlow.getExecutionId());
+        assertNotNull(sequenceFlow.getStartTime());
+        assertEquals(sequenceFlow.getStartTime(), sequenceFlow.getEndTime());
+        assertEquals(Long.valueOf(0L), sequenceFlow.getDurationInMillis());
     }
 
     @Test
@@ -138,7 +156,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createActivityInstanceQuery().executionId("nonExistingExecutionId").list().size());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertEquals(3, runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list().size());
+            assertEquals(5, runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list().size());
         } else {
             assertEquals(0, runtimeService.createActivityInstanceQuery().executionId(processInstance.getId()).list().size());
         }
@@ -146,7 +164,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createActivityInstanceQuery().processInstanceId("nonExistingProcessInstanceId").list().size());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertEquals(3, runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list().size());
+            assertEquals(5, runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list().size());
         } else {
             assertEquals(0, runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list().size());
         }
@@ -154,7 +172,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createActivityInstanceQuery().processDefinitionId("nonExistingProcessDefinitionId").list().size());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertEquals(3, runtimeService.createActivityInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).list().size());
+            assertEquals(5, runtimeService.createActivityInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).list().size());
         } else {
             assertEquals(0, runtimeService.createActivityInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).list().size());
         }
@@ -162,7 +180,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         assertEquals(1, runtimeService.createActivityInstanceQuery().unfinished().list().size());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertEquals(2, runtimeService.createActivityInstanceQuery().finished().list().size());
+            assertEquals(4, runtimeService.createActivityInstanceQuery().finished().list().size());
         } else {
             assertEquals(0, runtimeService.createActivityInstanceQuery().finished().list().size());
         }
@@ -250,7 +268,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
 
         int expectedActivityInstances;
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            expectedActivityInstances = 2;
+            expectedActivityInstances = 3;
         } else {
             expectedActivityInstances = 0;
         }
@@ -437,8 +455,8 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
     public void testNativeActivityInstanceTest() {
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
-        assertEquals(2, runtimeService.createNativeActivityInstanceQuery().sql("SELECT count(*) FROM " + managementService.getTableName(ActivityInstanceEntity.class)).count());
-        assertEquals(2, runtimeService.createNativeActivityInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(ActivityInstanceEntity.class)).list().size());
+        assertEquals(3, runtimeService.createNativeActivityInstanceQuery().sql("SELECT count(*) FROM " + managementService.getTableName(ActivityInstanceEntity.class)).count());
+        assertEquals(3, runtimeService.createNativeActivityInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(ActivityInstanceEntity.class)).list().size());
         assertEquals(1, runtimeService.createNativeActivityInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(ActivityInstanceEntity.class)).listPage(0, 1).size());
     }
 

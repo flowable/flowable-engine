@@ -64,7 +64,7 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
         deployOneTaskTestProcess();
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-        int expectedCreatedEvents = 13;
+        int expectedCreatedEvents = 15;
         if (!processEngineConfiguration.getHistoryManager().isHistoryEnabled()) {
             expectedCreatedEvents = 8;
         }
