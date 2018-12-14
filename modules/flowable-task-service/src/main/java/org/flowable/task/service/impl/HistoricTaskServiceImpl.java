@@ -22,9 +22,7 @@ import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.task.api.TaskInfo;
-import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.flowable.task.api.history.NativeHistoricTaskLogEntryQuery;
-import org.flowable.task.api.history.HistoricTaskLogEntry;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.api.history.HistoricTaskLogEntryQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -145,7 +143,7 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
 
     @Override
     public void addHistoricTaskLogEntry(TaskInfo task, String logEntryType, String data) {
-        if (this.configuration.isEnableDatabaseEventLogging()) {
+        if (this.configuration.isEnableHistoricTaskLogging()) {
             HistoricTaskLogEntryEntity taskLogEntry = getHistoricTaskLogEntryEntityManager().create();
             taskLogEntry.setTaskId(task.getId());
             taskLogEntry.setExecutionId(task.getExecutionId());
@@ -165,7 +163,7 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
 
     @Override
     public void createHistoricTaskLogEntry(HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder) {
-        if (this.configuration.isEnableDatabaseEventLogging()) {
+        if (this.configuration.isEnableHistoricTaskLogging()) {
             getHistoricTaskLogEntryEntityManager().createHistoricTaskLogEntry(historicTaskLogEntryBuilder);
         }
     }

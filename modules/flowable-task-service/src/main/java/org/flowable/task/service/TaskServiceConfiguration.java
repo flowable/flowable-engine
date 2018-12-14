@@ -76,7 +76,7 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
     protected TaskPostProcessor taskPostProcessor;
 
     // Events
-    protected boolean enableDatabaseEventLogging;
+    protected boolean enableHistoricTaskLogging;
 
     // init
     // /////////////////////////////////////////////////////////////////////
@@ -281,12 +281,12 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         return this;
     }
 
-    public boolean isEnableDatabaseEventLogging() {
-        return enableDatabaseEventLogging;
+    public boolean isEnableHistoricTaskLogging() {
+        return enableHistoricTaskLogging;
     }
 
-    public TaskServiceConfiguration setEnableDatabaseEventLogging(boolean enableDatabaseEventLogging) {
-        this.enableDatabaseEventLogging = enableDatabaseEventLogging;
+    public TaskServiceConfiguration setEnableHistoricTaskLogging(boolean enableHistoricTaskLogging) {
+        this.enableHistoricTaskLogging = enableHistoricTaskLogging;
         return this;
     }
 

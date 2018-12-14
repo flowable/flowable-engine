@@ -34,7 +34,7 @@ public class HistoryServiceDisableTaskLogTest extends CustomConfigurationFlowabl
 
     @Override
     protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        processEngineConfiguration.setEnableUserTaskDatabaseEventLogging(false);
+        processEngineConfiguration.setEnableHistoricTaskLogging(false);
     }
 
     @AfterEach

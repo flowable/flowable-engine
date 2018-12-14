@@ -843,7 +843,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     // Event logging to database
     protected boolean enableDatabaseEventLogging;
-    protected boolean enableUserTaskDatabaseEventLogging;
+    protected boolean enableHistoricTaskLogging;
 
     /**
      * Using field injection together with a delegate expression for a service task / execution listener / task listener is not thread-sade , see user guide section 'Field Injection' for more
@@ -1427,7 +1427,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.taskServiceConfiguration.setClock(this.clock);
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
         this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
-        this.taskServiceConfiguration.setEnableDatabaseEventLogging(this.enableUserTaskDatabaseEventLogging);
+        this.taskServiceConfiguration.setEnableHistoricTaskLogging(this.enableHistoricTaskLogging);
 
         if (this.taskPostProcessor != null) {
             this.taskServiceConfiguration.setTaskPostProcessor(this.taskPostProcessor);
@@ -3497,12 +3497,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public boolean isEnableUserTaskDatabaseEventLogging() {
-        return enableUserTaskDatabaseEventLogging;
+    public boolean isEnableHistoricTaskLogging() {
+        return enableHistoricTaskLogging;
     }
 
-    public ProcessEngineConfigurationImpl setEnableUserTaskDatabaseEventLogging(boolean enableUserTaskDatabaseEventLogging) {
-        this.enableUserTaskDatabaseEventLogging = enableUserTaskDatabaseEventLogging;
+    public ProcessEngineConfigurationImpl setEnableHistoricTaskLogging(boolean enableHistoricTaskLogging) {
+        this.enableHistoricTaskLogging = enableHistoricTaskLogging;
         return this;
     }
 

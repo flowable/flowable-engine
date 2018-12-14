@@ -18,11 +18,8 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -61,7 +58,7 @@ public class SuspensionStateUtil {
     }
 
     protected static void addTaskSuspensionStateEntryLog(TaskEntity taskEntity, SuspensionState state) {
-        if (CommandContextUtil.getTaskServiceConfiguration().isEnableDatabaseEventLogging()) {
+        if (CommandContextUtil.getTaskServiceConfiguration().isEnableHistoricTaskLogging()) {
             ObjectNode data = CommandContextUtil.getTaskServiceConfiguration().getObjectMapper().createObjectNode();
             data.put("previousSuspensionState", taskEntity.getSuspensionState());
             data.put("newSuspensionState", state.getStateCode());

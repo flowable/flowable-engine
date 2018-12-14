@@ -57,7 +57,7 @@
         <bean class="org.flowable.common.engine.impl.util.TestClockImpl" />
     </property>
 
-    <property name="enableUserTaskDatabaseEventLogging" value="true"/>
+    <property name="enableHistoricTaskLogging" value="true"/>
 
   </bean>
   

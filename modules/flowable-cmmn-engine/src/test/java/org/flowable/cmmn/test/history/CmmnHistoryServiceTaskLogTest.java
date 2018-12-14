@@ -49,7 +49,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
 
     @Override
     protected void configureConfiguration(CmmnEngineConfiguration cmmnEngineConfiguration) {
-        cmmnEngineConfiguration.setEnableUserTaskDatabaseEventLogging(true);
+        cmmnEngineConfiguration.setEnableHistoricTaskLogging(true);
     }
 
     @After

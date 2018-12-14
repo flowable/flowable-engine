@@ -35,7 +35,7 @@ public class CmmnHistoryServiceDisableTaskLogTest extends CustomCmmnConfiguratio
 
     @Override
     protected void configureConfiguration(CmmnEngineConfiguration cmmnEngineConfiguration) {
-        cmmnEngineConfiguration.setEnableUserTaskDatabaseEventLogging(false);
+        cmmnEngineConfiguration.setEnableHistoricTaskLogging(false);
     }
 
     @After

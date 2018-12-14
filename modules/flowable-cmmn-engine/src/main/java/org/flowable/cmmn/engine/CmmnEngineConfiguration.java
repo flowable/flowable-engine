@@ -682,7 +682,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     /**
      * Enable user task event logging
      */
-    protected boolean enableUserTaskDatabaseEventLogging;
+    protected boolean enableHistoricTaskLogging;
 
     /**
      * postprocessor for a task builder
@@ -1344,7 +1344,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.taskServiceConfiguration.setClock(this.clock);
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
         this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
-        this.taskServiceConfiguration.setEnableDatabaseEventLogging(this.enableUserTaskDatabaseEventLogging);
+        this.taskServiceConfiguration.setEnableHistoricTaskLogging(this.enableHistoricTaskLogging);
 
         if (this.taskPostProcessor != null) {
             this.taskServiceConfiguration.setTaskPostProcessor(this.taskPostProcessor);
@@ -3258,11 +3258,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
     }
 
-    public boolean isEnableUserTaskDatabaseEventLogging() {
-        return enableUserTaskDatabaseEventLogging;
+    public boolean isEnableHistoricTaskLogging() {
+        return enableHistoricTaskLogging;
     }
 
-    public void setEnableUserTaskDatabaseEventLogging(boolean enableUserTaskDatabaseEventLogging) {
-        this.enableUserTaskDatabaseEventLogging = enableUserTaskDatabaseEventLogging;
+    public void setEnableHistoricTaskLogging(boolean enableHistoricTaskLogging) {
+        this.enableHistoricTaskLogging = enableHistoricTaskLogging;
     }
 }

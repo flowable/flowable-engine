@@ -168,7 +168,7 @@ public class TaskHelper {
     }
 
     public static void deleteHistoricTaskLogEntries(String taskId) {
-        if (CommandContextUtil.getCmmnEngineConfiguration().isEnableUserTaskDatabaseEventLogging()) {
+        if (CommandContextUtil.getCmmnEngineConfiguration().isEnableHistoricTaskLogging()) {
             CommandContextUtil.getCmmnEngineConfiguration().getCmmnHistoryService().createHistoricTaskLogEntryQuery().taskId(taskId).list().
                 forEach(
                     logEntry -> CommandContextUtil.getCmmnEngineConfiguration().getCmmnHistoryService().deleteHistoricTaskLogEntry(logEntry.getLogNumber())
