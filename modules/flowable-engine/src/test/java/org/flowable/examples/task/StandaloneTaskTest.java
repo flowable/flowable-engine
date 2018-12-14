@@ -20,6 +20,7 @@ import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.jupiter.api.AfterEach;
@@ -183,7 +184,10 @@ public class StandaloneTaskTest extends PluggableFlowableTestCase {
 
             // Cleanup
             historyService.deleteHistoricTaskInstance(task.getId());
-            historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list().forEach(taskLogEntry -> historyService.deleteHistoricTaskLogEntry(taskLogEntry.getLogNumber()));
+            managementService.executeCommand(commandContext -> {
+                CommandContextUtil.getHistoricTaskService(commandContext).deleteHistoricTaskLogEntriesForTaskId(task.getId());
+                return null;
+            });
         }
     }
 

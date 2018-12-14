@@ -47,6 +47,7 @@ import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -853,7 +854,10 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().taskId(taskId).singleResult();
         assertNull(task);
 
-        historyService.createHistoricTaskLogEntryQuery().list().forEach(taskLogEntry -> historyService.deleteHistoricTaskLogEntry(taskLogEntry.getLogNumber()));
+        managementService.executeCommand(commandContext -> {
+            CommandContextUtil.getHistoricTaskService(commandContext).deleteHistoricTaskLogEntriesForTaskId(taskId);
+            return null;
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -873,7 +877,10 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().taskId(taskId).singleResult();
         assertNull(task);
 
-        historyService.createHistoricTaskLogEntryQuery().list().forEach(taskLogEntry -> historyService.deleteHistoricTaskLogEntry(taskLogEntry.getLogNumber()));
+        managementService.executeCommand(commandContext -> {
+            CommandContextUtil.getHistoricTaskService(commandContext).deleteHistoricTaskLogEntriesForTaskId(taskId);
+            return null;
+        });
     }
 
     @Test

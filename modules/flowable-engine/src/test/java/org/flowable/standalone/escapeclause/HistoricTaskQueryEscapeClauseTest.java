@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.AfterEach;
@@ -465,9 +466,15 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
 
             // clean
             historyService.deleteHistoricTaskInstance(task5.getId());
-            historyService.createHistoricTaskLogEntryQuery().taskId(task5.getId()).list().forEach(taskLogEntry -> historyService.deleteHistoricTaskLogEntry(taskLogEntry.getLogNumber()));
+            managementService.executeCommand(commandContext -> {
+                CommandContextUtil.getHistoricTaskService(commandContext).deleteHistoricTaskLogEntriesForTaskId(task5.getId());
+                return null;
+            });
             historyService.deleteHistoricTaskInstance(task6.getId());
-            historyService.createHistoricTaskLogEntryQuery().taskId(task6.getId()).list().forEach(taskLogEntry -> historyService.deleteHistoricTaskLogEntry(taskLogEntry.getLogNumber()));
+            managementService.executeCommand(commandContext -> {
+                CommandContextUtil.getHistoricTaskService(commandContext).deleteHistoricTaskLogEntriesForTaskId(task6.getId());
+                return null;
+            });
         }
     }
 

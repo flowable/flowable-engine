@@ -60,12 +60,8 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
     }
 
     protected void deleteTaskWithLogEntries(String taskId) {
-        cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(taskId).list().
-            forEach(
-                logEntry -> cmmnHistoryService.deleteHistoricTaskLogEntry(logEntry.getLogNumber())
-            );
         cmmnHistoryService.deleteHistoricTaskInstance(taskId);
-        cmmnTaskService.deleteTask(taskId);
+        cmmnTaskService.deleteTask(taskId,true);
     }
 
     @Test
@@ -767,10 +763,9 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
             assertEquals(1, cmmnHistoryService.createNativeHistoricTaskLogEntryQuery().parameter("taskId", "1").
                 sql("SELECT count(*) FROM ACT_HI_TSK_LOG WHERE TASK_ID_ = #{taskId}").count());
         } finally {
-            cmmnHistoryService.createHistoricTaskLogEntryQuery().list().
-                forEach(
-                    logEntry -> cmmnHistoryService.deleteHistoricTaskLogEntry(logEntry.getLogNumber())
-                );
+            deleteTaskWithLogEntries("1");
+            deleteTaskWithLogEntries("2");
+            deleteTaskWithLogEntries("3");
         }
     }
 }

@@ -26,6 +26,7 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.FlowableTest;
@@ -396,7 +397,7 @@ public class HistoryServiceTaskLogTest {
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
-    public void logSuspensionStateEvents(RuntimeService runtimeService, TaskService taskService, HistoryService historyService) {
+    public void logSuspensionStateEvents(RuntimeService runtimeService, TaskService taskService, HistoryService historyService, ManagementService managementService) {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertNotNull(processInstance);
 
@@ -419,12 +420,11 @@ public class HistoryServiceTaskLogTest {
                 extracting(taskLogEntry -> taskLogEntry.getType()).isEqualTo("USER_TASK_SUSPENSIONSTATE_CHANGED")
             ;
         } finally {
-            historyService.createHistoricTaskLogEntryQuery().taskId(
-                taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId()
-            ).list().
-                forEach(
-                    logEntry -> historyService.deleteHistoricTaskLogEntry(logEntry.getLogNumber())
-                );
+            String taskId = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId();
+            managementService.executeCommand(commandContext -> {
+                CommandContextUtil.getHistoricTaskService().deleteHistoricTaskLogEntriesForTaskId(taskId);
+                return null;
+            });
             runtimeService.deleteProcessInstance(processInstance.getId(), "clean up");
         }
     }
@@ -849,10 +849,9 @@ public class HistoryServiceTaskLogTest {
             assertEquals(1, historyService.createNativeHistoricTaskLogEntryQuery().parameter("taskId", "1").
                 sql("SELECT count(*) FROM " + managementService.getTableName(HistoricTaskLogEntry.class) + " WHERE TASK_ID_ = #{taskId}").count());
         } finally {
-            historyService.createHistoricTaskLogEntryQuery().list().
-                forEach(
-                    logEntry -> historyService.deleteHistoricTaskLogEntry(logEntry.getLogNumber())
-                );
+            deleteTaskWithLogEntries(taskService, "1");
+            deleteTaskWithLogEntries(taskService, "2");
+            deleteTaskWithLogEntries(taskService, "3");
         }
     }
 
@@ -875,10 +874,9 @@ public class HistoryServiceTaskLogTest {
             assertThat(taskLogEntries).extracting(taskLogEntry -> taskLogEntry.getTaskId()).containsExactly("2", "3", "1");
 
         } finally {
-            historyService.createHistoricTaskLogEntryQuery().list().
-                forEach(
-                    logEntry -> historyService.deleteHistoricTaskLogEntry(logEntry.getLogNumber())
-                );
+            deleteTaskWithLogEntries(taskService, "1");
+            deleteTaskWithLogEntries(taskService, "2");
+            deleteTaskWithLogEntries(taskService, "3");
         }
     }
 

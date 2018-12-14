@@ -168,12 +168,8 @@ public class TaskHelper {
     }
 
     public static void deleteHistoricTaskLogEntries(String taskId) {
-        if (CommandContextUtil.getCmmnEngineConfiguration().isEnableHistoricTaskLogging()) {
-            CommandContextUtil.getCmmnEngineConfiguration().getCmmnHistoryService().createHistoricTaskLogEntryQuery().taskId(taskId).list().
-                forEach(
-                    logEntry -> CommandContextUtil.getCmmnEngineConfiguration().getCmmnHistoryService().deleteHistoricTaskLogEntry(logEntry.getLogNumber())
-                );
-
+        if (CommandContextUtil.getTaskServiceConfiguration().isEnableHistoricTaskLogging()) {
+            CommandContextUtil.getHistoricTaskService().deleteHistoricTaskLogEntriesForTaskId(taskId);
         }
     }
     

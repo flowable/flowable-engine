@@ -230,24 +230,14 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
         this.taskDataManager = taskDataManager;
     }
 
-    protected String serializeLogEntryData(String... data) {
-        ObjectNode dataNode = taskServiceConfiguration.getObjectMapper().createObjectNode();
-        for (int i = 0; i < data.length; i += 2) {
-            dataNode.put(data[i], data[i + 1]);
-        }
-        return dataNode.toString();
-    }
-
     protected void logAssigneeChanged(TaskEntity taskEntity, String previousAssignee, String newAssignee) {
         if (this.getTaskServiceConfiguration().isEnableHistoricTaskLogging()) {
             HistoricTaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
             taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_ASSIGNEE_CHANGED.name());
-            taskLogEntry.setData(
-                serializeLogEntryData(
-                    "newAssigneeId", newAssignee,
-                    "previousAssigneeId", previousAssignee
-                )
-            );
+            ObjectNode dataNode = taskServiceConfiguration.getObjectMapper().createObjectNode();
+            dataNode.put("newAssigneeId", newAssignee);
+            dataNode.put("previousAssigneeId", previousAssignee);
+            taskLogEntry.setData(dataNode.toString());
             CommandContextUtil.getHistoricTaskLogEntryEntityManager().insert(taskLogEntry);
         }
     }
@@ -256,12 +246,10 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
         if (this.getTaskServiceConfiguration().isEnableHistoricTaskLogging()) {
             HistoricTaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
             taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_OWNER_CHANGED.name());
-            taskLogEntry.setData(
-                serializeLogEntryData(
-                    "newOwnerId", newOwner,
-                    "previousOwnerId", previousOwner
-                )
-            );
+            ObjectNode dataNode = taskServiceConfiguration.getObjectMapper().createObjectNode();
+            dataNode.put("newOwnerId", newOwner);
+            dataNode.put("previousOwnerId", previousOwner);
+            taskLogEntry.setData(dataNode.toString());
             CommandContextUtil.getHistoricTaskLogEntryEntityManager().insert(taskLogEntry);
         }
     }
@@ -294,12 +282,10 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
         if (this.getTaskServiceConfiguration().isEnableHistoricTaskLogging()) {
             HistoricTaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
             taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_NAME_CHANGED.name());
-            taskLogEntry.setData(
-                serializeLogEntryData(
-                    "newName", newName,
-                    "previousName", previousName
-                )
-            );
+            ObjectNode dataNode = taskServiceConfiguration.getObjectMapper().createObjectNode();
+            dataNode.put("newName", newName);
+            dataNode.put("previousName", previousName);
+            taskLogEntry.setData(dataNode.toString());
             CommandContextUtil.getHistoricTaskLogEntryEntityManager().insert(taskLogEntry);
         }
     }
