@@ -6,7 +6,6 @@ import static org.junit.Assert.assertThat;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 

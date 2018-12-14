@@ -17,7 +17,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
-import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.task.api.Task;
 import org.junit.After;

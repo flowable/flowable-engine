@@ -16,7 +16,6 @@ package org.flowable.spring.test.autodeployment;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.never;
@@ -28,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.flowable.cmmn.spring.autodeployment.DefaultAutoDeploymentStrategy;
-import org.flowable.common.engine.api.FlowableException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

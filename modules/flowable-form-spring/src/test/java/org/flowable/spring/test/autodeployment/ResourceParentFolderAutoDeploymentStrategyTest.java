@@ -13,7 +13,6 @@
 
 package org.flowable.spring.test.autodeployment;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,7 +27,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.form.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
