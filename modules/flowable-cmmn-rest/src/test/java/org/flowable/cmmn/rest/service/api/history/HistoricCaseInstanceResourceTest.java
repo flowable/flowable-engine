@@ -13,10 +13,7 @@
 
 package org.flowable.cmmn.rest.service.api.history;
 
-import java.io.IOException;
-import java.sql.Date;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -26,11 +23,7 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
-import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * Test for REST-operation related to historic case instances.

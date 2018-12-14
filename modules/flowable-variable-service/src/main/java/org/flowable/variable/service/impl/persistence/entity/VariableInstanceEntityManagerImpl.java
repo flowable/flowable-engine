@@ -15,7 +15,6 @@ package org.flowable.variable.service.impl.persistence.entity;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;

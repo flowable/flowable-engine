@@ -15,7 +15,6 @@ package org.flowable.dmn.spring.autodeployment;
 
 import java.io.IOException;
 
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.slf4j.Logger;

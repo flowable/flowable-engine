@@ -19,7 +19,6 @@ import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.spring.boot.FlowableSecurityAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
-import org.flowable.spring.security.FlowableAuthenticationProvider;
 import org.flowable.spring.security.FlowableUserDetailsService;
 import org.flowable.spring.security.SpringSecurityAuthenticationContext;
 import org.junit.Test;
