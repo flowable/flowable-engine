@@ -448,6 +448,10 @@ public class CmmnRestResponseFactory {
         result.setCallbackType(caseInstance.getCallbackType());
         result.setTenantId(caseInstance.getTenantId());
 
+        for (String name : caseInstance.getCaseVariables().keySet()) {
+            result.addVariable(createRestVariable(name, caseInstance.getCaseVariables().get(name), RestVariableScope.LOCAL, caseInstance.getId(), VARIABLE_CASE, false, urlBuilder));
+        }
+
         return result;
     }
 
