@@ -16,9 +16,12 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.SuspensionState;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.task.api.history.HistoricTaskLogEntryType;
+import org.flowable.task.service.TaskServiceConfiguration;
+import org.flowable.task.service.impl.BaseHistoricTaskLogEntryBuilderImpl;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -58,13 +61,17 @@ public class SuspensionStateUtil {
     }
 
     protected static void addTaskSuspensionStateEntryLog(TaskEntity taskEntity, SuspensionState state) {
-        if (CommandContextUtil.getTaskServiceConfiguration().isEnableHistoricTaskLogging()) {
-            ObjectNode data = CommandContextUtil.getTaskServiceConfiguration().getObjectMapper().createObjectNode();
+        TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
+        if (taskServiceConfiguration.isEnableHistoricTaskLogging()) {
+            BaseHistoricTaskLogEntryBuilderImpl taskLogEntryBuilder = new BaseHistoricTaskLogEntryBuilderImpl(null, taskEntity);
+            ObjectNode data = taskServiceConfiguration.getObjectMapper().createObjectNode();
             data.put("previousSuspensionState", taskEntity.getSuspensionState());
             data.put("newSuspensionState", state.getStateCode());
-            CommandContextUtil.getTaskServiceConfiguration().getHistoricTaskService().addHistoricTaskLogEntry(
-                taskEntity, HistoricTaskLogEntryType.USER_TASK_SUSPENSIONSTATE_CHANGED.name(), data.toString()
-            );
+            taskLogEntryBuilder.timeStamp(taskServiceConfiguration.getClock().getCurrentTime());
+            taskLogEntryBuilder.userId(Authentication.getAuthenticatedUserId());
+            taskLogEntryBuilder.data(data.toString());
+            taskLogEntryBuilder.type(HistoricTaskLogEntryType.USER_TASK_SUSPENSIONSTATE_CHANGED.name());
+            taskServiceConfiguration.getInternalHistoryTaskManager().recordHistoryUserTaskLog(taskLogEntryBuilder);
         }
     }
 

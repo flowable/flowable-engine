@@ -30,6 +30,7 @@ import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.impl.CustomConfigurationFlowableTestCase;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.asyncexecutor.AbstractAsyncExecutor;
@@ -37,6 +38,9 @@ import org.flowable.job.service.impl.asyncexecutor.ResetExpiredJobsRunnable;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskLogEntry;
+import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
+import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -102,7 +106,11 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
                 assertNotNull(((HistoryJobEntity) job).getAdvancedJobHandlerConfigurationByteArrayRef());
             }
 
+            assertEquals(0l, historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceId).count());
+
             waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
+
+            assertEquals(2l, historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceId).count());
 
             HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
             assertNotNull(historicProcessInstance);
@@ -440,6 +448,8 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         
         // The lock expiration time should be null now
         assertNull(((HistoryJobEntity) managementService.createHistoryJobQuery().singleResult()).getLockExpirationTime());
+
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
     }
 
     @Test
@@ -459,6 +469,96 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
             isEqualTo(
                 runtimeService.createProcessInstanceQuery().superProcessInstanceId(pi.getId()).singleResult().getId()
             );
+    }
+
+    @Test
+    public void createUserTaskLogEntity() {
+        HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = historyService.createHistoricTaskLogEntryBuilder();
+        historicTaskLogEntryBuilder.taskId("1");
+        historicTaskLogEntryBuilder.type("testType");
+        historicTaskLogEntryBuilder.userId("testUserId");
+        historicTaskLogEntryBuilder.data("testData");
+        historicTaskLogEntryBuilder.processInstanceId("processInstanceId");
+        historicTaskLogEntryBuilder.processDefinitionId("testDefinitionId");
+        historicTaskLogEntryBuilder.executionId("testExecutionId");
+        historicTaskLogEntryBuilder.timeStamp(new Date(0));
+        historicTaskLogEntryBuilder.tenantId("testTenant");
+
+        historicTaskLogEntryBuilder.add();
+
+        HistoricTaskLogEntry historicTaskLogEntry = null;
+        try {
+            assertEquals(0l, historyService.createHistoricTaskLogEntryQuery().taskId("1").count());
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 200);
+            assertEquals(1l, historyService.createHistoricTaskLogEntryQuery().taskId("1").count());
+
+            historicTaskLogEntry = historyService.createHistoricTaskLogEntryQuery().taskId("1").singleResult();
+            assertThat(historicTaskLogEntry.getLogNumber()).isGreaterThan(0);
+            assertThat(historicTaskLogEntry.getTaskId()).isEqualTo("1");
+            assertThat(historicTaskLogEntry.getType()).isEqualTo("testType");
+            assertThat(historicTaskLogEntry.getUserId()).isEqualTo("testUserId");
+            assertThat(historicTaskLogEntry.getProcessInstanceId()).isEqualTo("processInstanceId");
+            assertThat(historicTaskLogEntry.getProcessDefinitionId()).isEqualTo("testDefinitionId");
+            assertThat(historicTaskLogEntry.getExecutionId()).isEqualTo("testExecutionId");
+            assertThat(historicTaskLogEntry.getData()).isEqualTo("testData");
+            assertThat(historicTaskLogEntry.getLogNumber()).isGreaterThan(0L);
+            assertThat(historicTaskLogEntry.getTimeStamp()).isEqualTo(new Date(0));
+            assertThat(historicTaskLogEntry.getTenantId()).isEqualTo("testTenant");
+
+        } finally {
+            if (historicTaskLogEntry != null) {
+                historyService.deleteHistoricTaskLogEntry(historicTaskLogEntry.getLogNumber());
+            }
+        }
+
+    }
+
+    @Test
+    public void testAsynchUsertTaskLogEntries() {
+        deployOneTaskTestProcess();
+        ProcessInstance oneTaskProcess = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        Task task = taskService.createTaskQuery().processInstanceId(oneTaskProcess.getId()).singleResult();
+        task.setName("newName");
+        task.setPriority(0);
+        taskService.saveTask(task);
+        taskService.setAssignee(task.getId(), "newAssignee");
+        taskService.setOwner(task.getId(), "newOwner");
+        taskService.setDueDate(task.getId(), new Date(0));
+        taskService.addUserIdentityLink(task.getId(), "testUser", IdentityLinkType.PARTICIPANT);
+        taskService.addGroupIdentityLink(task.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        taskService.deleteUserIdentityLink(task.getId(), "testUser", IdentityLinkType.PARTICIPANT);
+        taskService.deleteGroupIdentityLink(task.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.suspendProcessInstanceById(oneTaskProcess.getId());
+        runtimeService.activateProcessInstanceById(oneTaskProcess.getId());
+        taskService.complete(task.getId());
+
+        assertEquals(0l, historyService.createHistoricTaskLogEntryQuery().count());
+        assertEquals(12l, managementService.createHistoryJobQuery().count());
+
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 200);
+
+        assertEquals(13l, historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count());
+        assertEquals(1l, historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type(HistoricTaskLogEntryType.USER_TASK_CREATED.name()).count());
+        assertEquals(1l,
+            historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type(HistoricTaskLogEntryType.USER_TASK_NAME_CHANGED.name()).count());
+        assertEquals(1l,
+            historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type(HistoricTaskLogEntryType.USER_TASK_PRIORITY_CHANGED.name()).count());
+        assertEquals(1l,
+            historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type(HistoricTaskLogEntryType.USER_TASK_ASSIGNEE_CHANGED.name()).count());
+        assertEquals(1l,
+            historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type(HistoricTaskLogEntryType.USER_TASK_OWNER_CHANGED.name()).count());
+        assertEquals(1l,
+            historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type(HistoricTaskLogEntryType.USER_TASK_DUEDATE_CHANGED.name()).count());
+        assertEquals(2l,
+            historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type(HistoricTaskLogEntryType.USER_TASK_SUSPENSIONSTATE_CHANGED.name())
+                .count());
+        assertEquals(2l,
+            historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type(HistoricTaskLogEntryType.USER_TASK_IDENTITY_LINK_ADDED.name()).count());
+        assertEquals(2l,
+            historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type(HistoricTaskLogEntryType.USER_TASK_IDENTITY_LINK_REMOVED.name()).count());
+        assertEquals(1l,
+                historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type(HistoricTaskLogEntryType.USER_TASK_COMPLETED.name()).count());
     }
 
     protected Task startOneTaskprocess() {

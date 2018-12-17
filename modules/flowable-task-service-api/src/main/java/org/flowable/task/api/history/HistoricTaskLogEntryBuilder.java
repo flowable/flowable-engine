@@ -33,6 +33,8 @@ public interface HistoricTaskLogEntryBuilder {
 
     HistoricTaskLogEntryBuilder processDefinitionId(String processDefinitionId);
 
+    HistoricTaskLogEntryBuilder executionId(String executionId);
+
     HistoricTaskLogEntryBuilder scopeId(String scopeId);
 
     HistoricTaskLogEntryBuilder scopeDefinitionId(String scopeDefinitionId);

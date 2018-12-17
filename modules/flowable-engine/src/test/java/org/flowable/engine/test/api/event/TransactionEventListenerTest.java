@@ -69,7 +69,7 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
             expectedCreatedEvents += 5;
         }
         if (processEngineConfiguration.isEnableHistoricTaskLogging()) {
-            expectedCreatedEvents += 4;
+            expectedCreatedEvents += 1;
         }
         if (processEngineConfiguration.isAsyncHistoryEnabled()) {
             waitForHistoryJobExecutorToProcessAllJobs(7000L, 200L);

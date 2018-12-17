@@ -26,9 +26,11 @@ import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.api.TaskInfo;
+import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.event.impl.FlowableTaskEventBuilder;
+import org.flowable.task.service.impl.BaseHistoricTaskLogEntryBuilderImpl;
 import org.flowable.task.service.impl.TaskQueryImpl;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.data.TaskDataManager;
@@ -232,123 +234,110 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
 
     protected void logAssigneeChanged(TaskEntity taskEntity, String previousAssignee, String newAssignee) {
         if (this.getTaskServiceConfiguration().isEnableHistoricTaskLogging()) {
-            HistoricTaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
-            taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_ASSIGNEE_CHANGED.name());
             ObjectNode dataNode = taskServiceConfiguration.getObjectMapper().createObjectNode();
             dataNode.put("newAssigneeId", newAssignee);
             dataNode.put("previousAssigneeId", previousAssignee);
-            taskLogEntry.setData(dataNode.toString());
-            CommandContextUtil.getHistoricTaskLogEntryEntityManager().insert(taskLogEntry);
+            recordHistoryUserTaskLog(HistoricTaskLogEntryType.USER_TASK_ASSIGNEE_CHANGED, taskEntity, dataNode);
         }
     }
 
     protected void logOwnerChanged(TaskEntity taskEntity, String previousOwner, String newOwner) {
         if (this.getTaskServiceConfiguration().isEnableHistoricTaskLogging()) {
-            HistoricTaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
-            taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_OWNER_CHANGED.name());
             ObjectNode dataNode = taskServiceConfiguration.getObjectMapper().createObjectNode();
             dataNode.put("newOwnerId", newOwner);
             dataNode.put("previousOwnerId", previousOwner);
-            taskLogEntry.setData(dataNode.toString());
-            CommandContextUtil.getHistoricTaskLogEntryEntityManager().insert(taskLogEntry);
+            recordHistoryUserTaskLog(HistoricTaskLogEntryType.USER_TASK_OWNER_CHANGED, taskEntity, dataNode);
         }
     }
 
     protected void logPriorityChanged(TaskEntity taskEntity, Integer previousPriority, int newPriority) {
         if (this.getTaskServiceConfiguration().isEnableHistoricTaskLogging()) {
-            HistoricTaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
-            taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_PRIORITY_CHANGED.name());
             ObjectNode dataNode = taskServiceConfiguration.getObjectMapper().createObjectNode();
             dataNode.put("newPriority", newPriority);
             dataNode.put("previousPriority", previousPriority);
-            taskLogEntry.setData( dataNode.toString());
-            CommandContextUtil.getHistoricTaskLogEntryEntityManager().insert(taskLogEntry);
+            recordHistoryUserTaskLog(HistoricTaskLogEntryType.USER_TASK_PRIORITY_CHANGED, taskEntity, dataNode);
         }
     }
 
     protected void logDueDateChanged(TaskEntity taskEntity, Date previousDueDate, Date newDueDate) {
         if (this.getTaskServiceConfiguration().isEnableHistoricTaskLogging()) {
-            HistoricTaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
-            taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_DUEDATE_CHANGED.name());
             ObjectNode dataNode = taskServiceConfiguration.getObjectMapper().createObjectNode();
             dataNode.put("newDueDate", newDueDate != null ? newDueDate.getTime() : null);
             dataNode.put("previousDueDate", previousDueDate != null ? previousDueDate.getTime() : null);
-            taskLogEntry.setData(dataNode.toString());
-            CommandContextUtil.getHistoricTaskLogEntryEntityManager().insert(taskLogEntry);
+            recordHistoryUserTaskLog(HistoricTaskLogEntryType.USER_TASK_DUEDATE_CHANGED, taskEntity, dataNode);
         }
     }
 
     protected void logNameChanged(TaskEntity taskEntity, String previousName, String newName) {
         if (this.getTaskServiceConfiguration().isEnableHistoricTaskLogging()) {
-            HistoricTaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(taskEntity);
-            taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_NAME_CHANGED.name());
             ObjectNode dataNode = taskServiceConfiguration.getObjectMapper().createObjectNode();
             dataNode.put("newName", newName);
             dataNode.put("previousName", previousName);
-            taskLogEntry.setData(dataNode.toString());
-            CommandContextUtil.getHistoricTaskLogEntryEntityManager().insert(taskLogEntry);
+            recordHistoryUserTaskLog(HistoricTaskLogEntryType.USER_TASK_NAME_CHANGED, taskEntity, dataNode);
         }
     }
 
     protected void logTaskCreatedEvent(TaskInfo task) {
         if (this.getTaskServiceConfiguration().isEnableHistoricTaskLogging()) {
-            HistoricTaskLogEntryEntity taskLogEntry = createInitialTaskLogEntry(task);
-            taskLogEntry.setTimeStamp(task.getCreateTime());
-            taskLogEntry.setType(HistoricTaskLogEntryType.USER_TASK_CREATED.name());
-            CommandContextUtil.getHistoricTaskLogEntryEntityManager().insert(taskLogEntry);
+            HistoricTaskLogEntryBuilder taskLogEntryBuilder = createHistoricTaskLogEntryBuilder(task, HistoricTaskLogEntryType.USER_TASK_CREATED);
+            taskLogEntryBuilder.timeStamp(task.getCreateTime());
+            getTaskServiceConfiguration().getInternalHistoryTaskManager().recordHistoryUserTaskLog(taskLogEntryBuilder);
         }
     }
 
-    protected HistoricTaskLogEntryEntity createInitialTaskLogEntry(TaskInfo task) {
-        HistoricTaskLogEntryEntity historicTaskLogEntryEntity = CommandContextUtil.getHistoricTaskLogEntryEntityManager().create();
-        historicTaskLogEntryEntity.setUserId(Authentication.getAuthenticatedUserId());
-        historicTaskLogEntryEntity.setTimeStamp(this.taskServiceConfiguration.getClock().getCurrentTime());
-        historicTaskLogEntryEntity.setTaskId(task.getId());
-        historicTaskLogEntryEntity.setTenantId(task.getTenantId());
-        historicTaskLogEntryEntity.setProcessInstanceId(task.getProcessInstanceId());
-        historicTaskLogEntryEntity.setProcessDefinitionId(task.getProcessDefinitionId());
-        historicTaskLogEntryEntity.setExecutionId(task.getExecutionId());
-        historicTaskLogEntryEntity.setScopeId(task.getScopeId());
-        historicTaskLogEntryEntity.setScopeDefinitionId(task.getScopeDefinitionId());
-        historicTaskLogEntryEntity.setSubScopeId(task.getSubScopeId());
-        historicTaskLogEntryEntity.setScopeType(task.getScopeType());
-
-        return historicTaskLogEntryEntity;
+    protected HistoricTaskLogEntryBuilder createHistoricTaskLogEntryBuilder(TaskInfo task, HistoricTaskLogEntryType userTaskCreated) {
+        HistoricTaskLogEntryBuilder taskLogEntryBuilder = new BaseHistoricTaskLogEntryBuilderImpl(null, task);
+        taskLogEntryBuilder.timeStamp(this.taskServiceConfiguration.getClock().getCurrentTime());
+        taskLogEntryBuilder.userId(Authentication.getAuthenticatedUserId());
+        taskLogEntryBuilder.type(userTaskCreated.name());
+        return taskLogEntryBuilder;
     }
 
     protected void logTaskUpdateEvents(TaskEntity task) {
-        if (!Objects.equals(task.getAssignee(), getOriginalState(task, "assignee"))) {
-            logAssigneeChanged(task, (String) getOriginalState(task, "assignee"), task.getAssignee());
-        }
-        if (!Objects.equals(task.getOwner(), getOriginalState(task, "owner"))) {
-            if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
-                getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_OWNER_CHANGED, task));
+        if (wasPersisted(task)) {
+            if (!Objects.equals(task.getAssignee(), getOriginalState(task, "assignee"))) {
+                logAssigneeChanged(task, (String) getOriginalState(task, "assignee"), task.getAssignee());
             }
+            if (!Objects.equals(task.getOwner(), getOriginalState(task, "owner"))) {
+                if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
+                    getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_OWNER_CHANGED, task));
+                }
 
-            logOwnerChanged(task, (String) getOriginalState(task, "owner"), task.getOwner());
-        }
-        if (!Objects.equals(task.getPriority(), getOriginalState(task, "priority"))) {
-            if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
-                getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_PRIORITY_CHANGED, task));
+                logOwnerChanged(task, (String) getOriginalState(task, "owner"), task.getOwner());
             }
-            logPriorityChanged(task, (Integer) getOriginalState(task, "priority"), task.getPriority());
-        }
-        if (!Objects.equals(task.getDueDate(), getOriginalState(task, "dueDate"))) {
-            if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
-                getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_DUEDATE_CHANGED, task));
+            if (!Objects.equals(task.getPriority(), getOriginalState(task, "priority"))) {
+                if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
+                    getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_PRIORITY_CHANGED, task));
+                }
+                logPriorityChanged(task, (Integer) getOriginalState(task, "priority"), task.getPriority());
             }
-            logDueDateChanged(task, (Date) getOriginalState(task, "dueDate"), task.getDueDate());
-        }
-        if (!Objects.equals(task.getName(), getOriginalState(task, "name"))) {
-            if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
-                getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_NAME_CHANGED, task));
+            if (!Objects.equals(task.getDueDate(), getOriginalState(task, "dueDate"))) {
+                if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
+                    getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_DUEDATE_CHANGED, task));
+                }
+                logDueDateChanged(task, (Date) getOriginalState(task, "dueDate"), task.getDueDate());
             }
-            logNameChanged(task, (String) getOriginalState(task, "name"), task.getName());
+            if (!Objects.equals(task.getName(), getOriginalState(task, "name"))) {
+                if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
+                    getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_NAME_CHANGED, task));
+                }
+                logNameChanged(task, (String) getOriginalState(task, "name"), task.getName());
+            }
         }
+    }
+
+    protected boolean wasPersisted(TaskEntity task) {
+        return ((Map<String, Object>) task.getOriginalPersistentState()).size() > 0;
     }
 
     protected Object getOriginalState(TaskEntity task, String stateKey) {
         return ((Map<String, Object>) task.getOriginalPersistentState()).get(stateKey);
+    }
+
+    protected void recordHistoryUserTaskLog(HistoricTaskLogEntryType logEntryType, TaskInfo task, ObjectNode dataNode) {
+        HistoricTaskLogEntryBuilder taskLogEntryBuilder = createHistoricTaskLogEntryBuilder(task, logEntryType);
+        taskLogEntryBuilder.data( dataNode.toString());
+        getTaskServiceConfiguration().getInternalHistoryTaskManager().recordHistoryUserTaskLog(taskLogEntryBuilder);
     }
 
 }

@@ -52,7 +52,6 @@ public class CmmnHistoryServiceDisableTaskLogTest extends CustomCmmnConfiguratio
         task = cmmnTaskService.createTaskBuilder().
             assignee("testAssignee").
             create();
-
     }
 
     @Test
@@ -66,6 +65,14 @@ public class CmmnHistoryServiceDisableTaskLogTest extends CustomCmmnConfiguratio
         } finally {
             Authentication.setAuthenticatedUserId(previousUserId);
         }
+    }
+
+    @Test
+    public void createUserTaskLogEntry() {
+        task = cmmnTaskService.createTaskBuilder().
+            assignee("testAssignee").
+            create();
+        cmmnHistoryService.createHistoricTaskLogEntryBuilder().taskId(task.getId()).add();
     }
 
 }

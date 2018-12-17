@@ -94,7 +94,7 @@ public class HistoricTaskLogEntryEntityManagerImpl extends AbstractEntityManager
 
         historicTaskLogEntryEntity.setType(historicTaskLogEntryBuilder.getType());
         historicTaskLogEntryEntity.setData(historicTaskLogEntryBuilder.getData());
-        getDataManager().insert(historicTaskLogEntryEntity);
+        insert(historicTaskLogEntryEntity);
     }
 
 }

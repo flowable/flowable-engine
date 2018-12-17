@@ -151,7 +151,7 @@
         RES.TASK_ID_ = #{taskId}
       </if>
       <if test="type != null">
-        RES.TYPE_ = #{type}
+        and RES.TYPE_ = #{type}
       </if>
       <if test="userId != null">
         and RES.USER_ID_ = #{userId}

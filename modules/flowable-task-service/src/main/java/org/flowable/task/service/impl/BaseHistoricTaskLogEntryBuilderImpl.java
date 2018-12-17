@@ -11,7 +11,7 @@ import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
  *
  * @author martin.grofcik
  */
-public abstract class BaseHistoricTaskLogEntryBuilderImpl implements HistoricTaskLogEntryBuilder {
+public class BaseHistoricTaskLogEntryBuilderImpl implements HistoricTaskLogEntryBuilder {
     protected CommandExecutor commandExecutor;
 
     protected String type;
@@ -88,6 +88,12 @@ public abstract class BaseHistoricTaskLogEntryBuilderImpl implements HistoricTas
     }
 
     @Override
+    public HistoricTaskLogEntryBuilder executionId(String executionId) {
+        this.executionId = executionId;
+        return this;
+    }
+
+    @Override
     public HistoricTaskLogEntryBuilder scopeId(String scopeId) {
         this.scopeId = scopeId;
         return this;
@@ -113,6 +119,7 @@ public abstract class BaseHistoricTaskLogEntryBuilderImpl implements HistoricTas
 
     @Override
     public HistoricTaskLogEntryBuilder tenantId(String tenantId) {
+        this.tenantId = tenantId;
         return this;
     }
 
@@ -178,5 +185,11 @@ public abstract class BaseHistoricTaskLogEntryBuilderImpl implements HistoricTas
     @Override
     public String getTenantId() {
         return tenantId;
+    }
+
+    @Override
+    public void add() {
+        // add is not supported by default
+        throw new RuntimeException("Operation is not supported");
     }
 }

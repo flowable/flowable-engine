@@ -37,6 +37,7 @@ import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.history.async.AsyncHistorySession;
+import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
@@ -457,7 +458,26 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
         updatePlanItemInstanceTimeStamp(planItemInstanceEntity, planItemInstanceEntity.getExitTime(),
             CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_EXIT, CmmnAsyncHistoryConstants.FIELD_END_TIME, CmmnAsyncHistoryConstants.FIELD_EXIT_TIME);
     }
-    
+
+    @Override
+    public void recordHistoricUserTaskLogEntry(HistoricTaskLogEntryBuilder taskLogEntryBuilder) {
+        if (cmmnEngineConfiguration.getTaskServiceConfiguration().isEnableHistoricTaskLogging()) {
+            Map<String, String> data = new HashMap<>();
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LOG_ENTRY_DATA, taskLogEntryBuilder.getData());
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SCOPE_ID, taskLogEntryBuilder.getScopeId());
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SCOPE_TYPE, taskLogEntryBuilder.getScopeType());
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SUB_SCOPE_ID, taskLogEntryBuilder.getSubScopeId());
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SCOPE_DEFINITION_ID, taskLogEntryBuilder.getScopeDefinitionId());
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_TASK_ID, taskLogEntryBuilder.getTaskId());
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_TENANT_ID, taskLogEntryBuilder.getTenantId());
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CREATE_TIME, taskLogEntryBuilder.getTimeStamp());
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LOG_ENTRY_TYPE, taskLogEntryBuilder.getType());
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_USER_ID, taskLogEntryBuilder.getUserId());
+
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_HISTORIC_TASK_LOG_RECORD, data, taskLogEntryBuilder.getTenantId());
+        }
+    }
+
     protected void addCommonPlanItemInstanceFields(PlanItemInstanceEntity planItemInstanceEntity, Map<String, String> data) {
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, planItemInstanceEntity.getId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REVISION, planItemInstanceEntity.getRevision());

@@ -39,6 +39,7 @@ import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEnt
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.history.async.AsyncHistorySession;
 import org.flowable.job.service.impl.history.async.AsyncHistorySession.AsyncHistorySessionData;
+import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
@@ -668,6 +669,25 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
                 putIfNotNull(data, HistoryJsonConstants.CALLED_PROCESS_INSTANCE_ID, activityInstance.getCalledProcessInstanceId());
                 getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_UPDATE_HISTORIC_ACTIVITY_INSTANCE, data);
             }
+        }
+    }
+
+    @Override
+    public void recordHistoricUserTaskLogEntry(HistoricTaskLogEntryBuilder taskLogEntryBuilder) {
+        if (processEngineConfiguration.isEnableHistoricTaskLogging()) {
+            Map<String, String> data = new HashMap<>();
+            putIfNotNull(data, HistoryJsonConstants.LOG_ENTRY_DATA, taskLogEntryBuilder.getData());
+            putIfNotNull(data, HistoryJsonConstants.PROCESS_INSTANCE_ID, taskLogEntryBuilder.getProcessInstanceId());
+            putIfNotNull(data, HistoryJsonConstants.EXECUTION_ID, taskLogEntryBuilder.getExecutionId());
+            putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_ID, taskLogEntryBuilder.getProcessDefinitionId());
+            putIfNotNull(data, HistoryJsonConstants.TASK_ID, taskLogEntryBuilder.getTaskId());
+            putIfNotNull(data, HistoryJsonConstants.TENANT_ID, taskLogEntryBuilder.getTenantId());
+            putIfNotNull(data, HistoryJsonConstants.CREATE_TIME, taskLogEntryBuilder.getTimeStamp());
+            putIfNotNull(data, HistoryJsonConstants.USER_ID, taskLogEntryBuilder.getUserId());
+            putIfNotNull(data, HistoryJsonConstants.LOG_ENTRY_TYPE, taskLogEntryBuilder.getType());
+
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_HISTORIC_TASK_LOG_RECORD, data,
+                taskLogEntryBuilder.getTenantId());
         }
     }
 

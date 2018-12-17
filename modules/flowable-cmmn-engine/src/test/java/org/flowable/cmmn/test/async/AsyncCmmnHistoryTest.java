@@ -19,6 +19,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
@@ -37,6 +38,9 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskLogEntry;
+import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
+import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.Test;
 
@@ -388,6 +392,90 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         planItemInstanceC = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceName("C").singleResult();
         assertEquals(planItemInstanceC.getEntryCriterionId(), "entryA2");
         assertEquals(planItemInstanceC.getExitCriterionId(), "stop");
+    }
+
+    @Test
+    public void createUserTaskLogEntity() {
+        HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = cmmnHistoryService.createHistoricTaskLogEntryBuilder();
+        historicTaskLogEntryBuilder.taskId("1");
+        historicTaskLogEntryBuilder.type("testType");
+        historicTaskLogEntryBuilder.userId("testUserId");
+        historicTaskLogEntryBuilder.data("testData");
+        historicTaskLogEntryBuilder.scopeId("testScopeId");
+        historicTaskLogEntryBuilder.scopeType("testScopeType");
+        historicTaskLogEntryBuilder.scopeDefinitionId("testDefinitionId");
+        historicTaskLogEntryBuilder.subScopeId("testSubScopeId");
+        historicTaskLogEntryBuilder.timeStamp(new Date(0));
+        historicTaskLogEntryBuilder.tenantId("testTenant");
+
+        historicTaskLogEntryBuilder.add();
+
+        HistoricTaskLogEntry historicTaskLogEntry = null;
+        try {
+            assertEquals(0l, cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId("1").count());
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+            assertEquals(1l, cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId("1").count());
+
+            historicTaskLogEntry = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId("1").singleResult();
+            assertTrue(historicTaskLogEntry.getLogNumber() > 0);
+            assertEquals("1", historicTaskLogEntry.getTaskId());
+            assertEquals("testType", historicTaskLogEntry.getType());
+            assertEquals("testUserId", historicTaskLogEntry.getUserId());
+            assertEquals("testScopeId", historicTaskLogEntry.getScopeId());
+            assertEquals("testScopeType", historicTaskLogEntry.getScopeType());
+            assertEquals("testDefinitionId", historicTaskLogEntry.getScopeDefinitionId());
+            assertEquals("testSubScopeId", historicTaskLogEntry.getSubScopeId());
+            assertEquals("testData", historicTaskLogEntry.getData());
+            assertTrue(historicTaskLogEntry.getLogNumber() > 0l);
+            assertEquals(new Date(0), historicTaskLogEntry.getTimeStamp());
+            assertEquals("testTenant", historicTaskLogEntry.getTenantId());
+        } finally {
+            if (historicTaskLogEntry != null) {
+                cmmnHistoryService.deleteHistoricTaskLogEntry(historicTaskLogEntry.getLogNumber());
+            }
+        }
+    }
+
+    @Test
+    public void testAsynchUsertTaskLogEntries() {
+        CaseInstance caseInstance = deployAndStartOneHumanTaskCaseModel();
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        task.setName("newName");
+        task.setPriority(0);
+        cmmnTaskService.saveTask(task);
+        cmmnTaskService.setAssignee(task.getId(), "newAssignee");
+        cmmnTaskService.setOwner(task.getId(), "newOwner");
+        cmmnTaskService.setDueDate(task.getId(), new Date(0));
+        cmmnTaskService.addUserIdentityLink(task.getId(), "testUser", IdentityLinkType.PARTICIPANT);
+        cmmnTaskService.addGroupIdentityLink(task.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        cmmnTaskService.deleteUserIdentityLink(task.getId(), "testUser", IdentityLinkType.PARTICIPANT);
+        cmmnTaskService.deleteGroupIdentityLink(task.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        cmmnTaskService.complete(task.getId());
+
+        assertEquals(0l, cmmnHistoryService.createHistoricTaskLogEntryQuery().count());
+        assertEquals(10l, cmmnManagementService.createHistoryJobQuery().count());
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+
+        assertEquals(11l, cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count());
+        assertEquals(1l, cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type(HistoricTaskLogEntryType.USER_TASK_CREATED.name()).count());
+        assertEquals(1l,
+            cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type(HistoricTaskLogEntryType.USER_TASK_NAME_CHANGED.name()).count());
+        assertEquals(1l,
+            cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type(HistoricTaskLogEntryType.USER_TASK_PRIORITY_CHANGED.name()).count());
+        assertEquals(1l,
+            cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type(HistoricTaskLogEntryType.USER_TASK_ASSIGNEE_CHANGED.name()).count());
+        assertEquals(1l,
+            cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type(HistoricTaskLogEntryType.USER_TASK_OWNER_CHANGED.name()).count());
+        assertEquals(1l,
+            cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type(HistoricTaskLogEntryType.USER_TASK_DUEDATE_CHANGED.name()).count());
+        assertEquals(2l,
+            cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type(HistoricTaskLogEntryType.USER_TASK_IDENTITY_LINK_ADDED.name()).count());
+        assertEquals(2l,
+            cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type(HistoricTaskLogEntryType.USER_TASK_IDENTITY_LINK_REMOVED.name()).count());
+        assertEquals(1l,
+            cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type(HistoricTaskLogEntryType.USER_TASK_COMPLETED.name()).count());
     }
 
 }

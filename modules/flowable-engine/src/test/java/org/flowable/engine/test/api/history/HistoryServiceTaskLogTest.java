@@ -324,7 +324,7 @@ public class HistoryServiceTaskLogTest {
         taskService.saveTask(task);
 
         List<HistoricTaskLogEntry> taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
-        assertThat(taskLogEntries).size().isEqualTo(6);
+        assertThat(taskLogEntries).as("The only event is user task created").size().isEqualTo(1);
     }
 
     @Test

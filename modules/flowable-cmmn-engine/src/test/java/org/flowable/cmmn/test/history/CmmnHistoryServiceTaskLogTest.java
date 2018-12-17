@@ -333,7 +333,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
         cmmnTaskService.saveTask(task);
 
         List<HistoricTaskLogEntry> taskLogEntries = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
-        assertThat(taskLogEntries).size().isEqualTo(5);
+        assertThat(taskLogEntries).as("Only User task created log entry is expected").size().isEqualTo(1);
     }
 
     @Test
