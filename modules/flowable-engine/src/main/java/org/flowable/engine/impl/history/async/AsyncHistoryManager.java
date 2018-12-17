@@ -691,6 +691,16 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
         }
     }
 
+    @Override
+    public void deleteHistoryUserTaskLog(long logNumber) {
+        if (processEngineConfiguration.isEnableHistoricTaskLogging()) {
+            Map<String, String> data = new HashMap<>();
+            putIfNotNull(data, HistoryJsonConstants.LOG_ENTRY_LOGNUMBER, logNumber);
+
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_HISTORIC_TASK_LOG_DELETE, data);
+        }
+    }
+
     /* Helper methods */
 
     protected Map<String, String> getActivityStart(String executionId, String activityId, boolean removeFromAsyncHistorySession) {

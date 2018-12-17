@@ -34,6 +34,11 @@ public class HistoricTaskLogEntryEntityManagerImpl extends AbstractEntityManager
     }
 
     @Override
+    public void insert(HistoricTaskLogEntryEntity entity, boolean fireEvents) {
+        super.insert(entity, fireEvents);
+    }
+
+    @Override
     protected HistoricTaskLogEntryDataManager getDataManager() {
         return taskLogDataManager;
     }
@@ -94,7 +99,7 @@ public class HistoricTaskLogEntryEntityManagerImpl extends AbstractEntityManager
 
         historicTaskLogEntryEntity.setType(historicTaskLogEntryBuilder.getType());
         historicTaskLogEntryEntity.setData(historicTaskLogEntryBuilder.getData());
-        insert(historicTaskLogEntryEntity);
+        getDataManager().insert(historicTaskLogEntryEntity);
     }
 
 }

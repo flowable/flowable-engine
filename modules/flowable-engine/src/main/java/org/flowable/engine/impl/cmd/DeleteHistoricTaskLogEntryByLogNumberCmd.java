@@ -29,7 +29,7 @@ public class DeleteHistoricTaskLogEntryByLogNumberCmd implements Command<Void> {
 
     @Override
     public Void execute(CommandContext commandContext) {
-        CommandContextUtil.getHistoricTaskService(commandContext).deleteHistoricTaskLogEntry(logNumber);
+        CommandContextUtil.getTaskServiceConfiguration(commandContext).getInternalHistoryTaskManager().deleteHistoryUserTaskLog(logNumber);
         return null;
     }
 }

@@ -26,4 +26,9 @@ public interface InternalHistoryTaskManager {
      * Record historyUserTaskLogEntry
      */
     void recordHistoryUserTaskLog(HistoricTaskLogEntryBuilder taskLogEntryBuilder);
+
+    /**
+     * Delete historyUserTaskLogEntry
+     */
+    void deleteHistoryUserTaskLog(long logNumber);
 }

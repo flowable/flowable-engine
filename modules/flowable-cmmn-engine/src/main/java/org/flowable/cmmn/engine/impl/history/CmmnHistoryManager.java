@@ -81,4 +81,10 @@ public interface CmmnHistoryManager {
      * @param taskLogEntryBuilder historic user task log entry description
      */
     void recordHistoricUserTaskLogEntry(HistoricTaskLogEntryBuilder taskLogEntryBuilder);
+
+    /**
+     * Delete historic user task log entry
+     * @param logNumber log identifier
+     */
+    void deleteHistoricUserTaskLogEntry(long logNumber);
 }

@@ -33,7 +33,7 @@ public class HistoricUserTaskLogRecordJsonTransformer extends AbstractHistoryJso
 
     @Override
     public List<String> getTypes() {
-        return Collections.singletonList(CmmnAsyncHistoryConstants.TYPE_HISTORIC_TASK_LOG_RECORD);
+        return Collections.singletonList(CmmnAsyncHistoryConstants.TYPE_HISTORIC_USER_TASK_LOG_RECORD);
     }
 
     @Override

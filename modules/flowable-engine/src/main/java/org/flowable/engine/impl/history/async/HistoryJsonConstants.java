@@ -75,6 +75,7 @@ public interface HistoryJsonConstants {
     String TYPE_PROCESS_INSTANCE_DELETED_BY_PROCDEF_ID = "process-instance-deleted-by-process-definition-id";
     String TYPE_UPDATE_HISTORIC_ACTIVITY_INSTANCE = "activity-update";
     String TYPE_HISTORIC_TASK_LOG_RECORD = "historic-user-task-log-record";
+    String TYPE_HISTORIC_TASK_LOG_DELETE = "historic-user-task-log-delete";
 
 
     String DATA = "data";
@@ -216,4 +217,6 @@ public interface HistoryJsonConstants {
     String LOG_ENTRY_TYPE = "logEntryType";
 
     String LOG_ENTRY_DATA = "logEntryData";
+
+    String LOG_ENTRY_LOGNUMBER = "logNumber";
 }

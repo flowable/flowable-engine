@@ -38,6 +38,11 @@ public class DefaultHistoryTaskManager implements InternalHistoryTaskManager {
         CommandContextUtil.getHistoryManager().recordHistoricUserTaskLogEntry(taskLogEntryBuilder);
     }
 
+    @Override
+    public void deleteHistoryUserTaskLog(long logNumber) {
+        CommandContextUtil.getHistoryManager().deleteHistoryUserTaskLog(logNumber);
+    }
+
     protected ActivityInstanceEntityManager getActivityInstanceEntityManager() {
         return processEngineConfiguration.getActivityInstanceEntityManager();
     }

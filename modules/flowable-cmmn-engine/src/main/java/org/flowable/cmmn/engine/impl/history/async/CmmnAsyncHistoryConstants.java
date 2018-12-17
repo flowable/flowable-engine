@@ -48,7 +48,8 @@ public interface CmmnAsyncHistoryConstants {
     String TYPE_VARIABLE_CREATED = "cmmn-variable-created";
     String TYPE_VARIABLE_REMOVED = "cmmn-variable-removed";
     String TYPE_VARIABLE_UPDATED = "cmmn-variable-updated";
-    String TYPE_HISTORIC_TASK_LOG_RECORD = "cmmn-historic-user-task-log-record";
+    String TYPE_HISTORIC_USER_TASK_LOG_RECORD = "cmmn-historic-user-task-log-record";
+    String TYPE_HISTORIC_USER_TASK_LOG_DELETE = "cmmn-historic-user-task-log-delete";
 
     List<String> ORDERED_TYPES = Arrays.asList(
             TYPE_CASE_INSTANCE_START,
@@ -151,5 +152,6 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_VARIABLE_TYPE = "variableType";
     String FIELD_LOG_ENTRY_TYPE = "logEntryType";
     String FIELD_LOG_ENTRY_DATA = "logEntryData";
+    String FIELD_LOG_ENTRY_LOGNUMBER = "logNumber";
 
 }

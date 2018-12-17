@@ -566,6 +566,11 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         CommandContextUtil.getHistoricTaskService().createHistoricTaskLogEntry(taskLogEntryBuilder);
     }
 
+    @Override
+    public void deleteHistoryUserTaskLog(long logNumber) {
+        CommandContextUtil.getHistoricTaskService().deleteHistoricTaskLogEntry(logNumber);
+    }
+
     protected HistoricActivityInstanceEntity createHistoricActivityInstance(ActivityInstance activityInstance) {
         HistoricActivityInstanceEntity historicActivityInstanceEntity = getHistoricActivityInstanceEntityManager().create();
 

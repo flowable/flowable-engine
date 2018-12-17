@@ -37,4 +37,9 @@ public class CmmnHistoryTaskManager implements InternalHistoryTaskManager {
     public void recordHistoryUserTaskLog(HistoricTaskLogEntryBuilder taskLogEntryBuilder) {
         CommandContextUtil.getCmmnHistoryManager().recordHistoricUserTaskLogEntry(taskLogEntryBuilder);
     }
+
+    @Override
+    public void deleteHistoryUserTaskLog(long logNumber) {
+        CommandContextUtil.getCmmnHistoryManager().deleteHistoricUserTaskLogEntry(logNumber);
+    }
 }

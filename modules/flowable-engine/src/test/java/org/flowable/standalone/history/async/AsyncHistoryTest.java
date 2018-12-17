@@ -561,6 +561,26 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
                 historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type(HistoricTaskLogEntryType.USER_TASK_COMPLETED.name()).count());
     }
 
+    @Test
+    public void testDeleteAsynchUserTaskLogEntries() {
+        deployOneTaskTestProcess();
+        ProcessInstance oneTaskProcess = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        Task task = taskService.createTaskQuery().processInstanceId(oneTaskProcess.getId()).singleResult();
+        assertEquals(0l, historyService.createHistoricTaskLogEntryQuery().count());
+        assertEquals(1l, managementService.createHistoryJobQuery().count());
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 200);
+        List<HistoricTaskLogEntry> historicTaskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
+        assertEquals(1l, historicTaskLogEntries.size());
+
+        historyService.deleteHistoricTaskLogEntry(historicTaskLogEntries.get(0).getLogNumber());
+
+        assertEquals(1l, managementService.createHistoryJobQuery().count());
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 200);
+        assertEquals(0l, historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count());
+    }
+
+
     protected Task startOneTaskprocess() {
         deployOneTaskTestProcess();
         String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();

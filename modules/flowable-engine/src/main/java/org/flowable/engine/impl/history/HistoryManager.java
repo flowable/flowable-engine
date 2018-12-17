@@ -231,4 +231,9 @@ public interface HistoryManager {
      */
     void recordHistoricUserTaskLogEntry(HistoricTaskLogEntryBuilder taskLogEntryBuilder);
 
+    /**
+     * Delete historic user task log entry
+     * @param logNumber log identifier
+     */
+    void deleteHistoryUserTaskLog(long logNumber);
 }

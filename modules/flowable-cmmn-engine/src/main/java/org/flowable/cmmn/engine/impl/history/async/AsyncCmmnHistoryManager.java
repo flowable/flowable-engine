@@ -474,7 +474,17 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LOG_ENTRY_TYPE, taskLogEntryBuilder.getType());
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_USER_ID, taskLogEntryBuilder.getUserId());
 
-            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_HISTORIC_TASK_LOG_RECORD, data, taskLogEntryBuilder.getTenantId());
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_HISTORIC_USER_TASK_LOG_RECORD, data, taskLogEntryBuilder.getTenantId());
+        }
+    }
+
+    @Override
+    public void deleteHistoricUserTaskLogEntry(long logNumber) {
+        if (cmmnEngineConfiguration.getTaskServiceConfiguration().isEnableHistoricTaskLogging()) {
+            Map<String, String> data = new HashMap<>();
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LOG_ENTRY_LOGNUMBER, logNumber);
+
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_HISTORIC_USER_TASK_LOG_DELETE, data);
         }
     }
 
