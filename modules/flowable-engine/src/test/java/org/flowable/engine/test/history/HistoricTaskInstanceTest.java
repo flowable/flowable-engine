@@ -25,6 +25,7 @@ import java.util.Map;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
@@ -109,7 +110,10 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         assertNotNull(historicTaskInstance.getWorkTimeInMillis());
 
         historyService.deleteHistoricTaskInstance(taskId);
-        historyService.createHistoricTaskLogEntryQuery().taskId(taskId).list().forEach(taskLogEntry -> historyService.deleteHistoricTaskLogEntry(taskLogEntry.getLogNumber()));
+        managementService.executeCommand(commandContext -> {
+            CommandContextUtil.getHistoricTaskService(commandContext).deleteHistoricTaskLogEntriesForTaskId(taskId);
+            return null;
+        });
 
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
@@ -801,7 +805,10 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         } catch (FlowableObjectNotFoundException aonfe) {
             assertEquals(HistoricTaskInstance.class, aonfe.getObjectClass());
         }
-        historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list().forEach(taskLogEntry -> historyService.deleteHistoricTaskLogEntry(taskLogEntry.getLogNumber()));
+        managementService.executeCommand(commandContext -> {
+            CommandContextUtil.getHistoricTaskService(commandContext).deleteHistoricTaskLogEntriesForTaskId(task.getId());
+            return null;
+        });
     }
 
     @Test
