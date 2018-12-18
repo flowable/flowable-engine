@@ -119,7 +119,7 @@ public class TaskHelper {
     protected static void logUserTaskCompleted(TaskEntity taskEntity) {
         TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
         if (taskServiceConfiguration.isEnableHistoricTaskLogging()) {
-            BaseHistoricTaskLogEntryBuilderImpl taskLogEntryBuilder = new BaseHistoricTaskLogEntryBuilderImpl(null, taskEntity);
+            BaseHistoricTaskLogEntryBuilderImpl taskLogEntryBuilder = new BaseHistoricTaskLogEntryBuilderImpl(taskEntity);
             ObjectNode data = taskServiceConfiguration.getObjectMapper().createObjectNode();
             taskLogEntryBuilder.timeStamp(taskServiceConfiguration.getClock().getCurrentTime());
             taskLogEntryBuilder.userId(Authentication.getAuthenticatedUserId());

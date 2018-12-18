@@ -286,7 +286,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     }
 
     protected HistoricTaskLogEntryBuilder createHistoricTaskLogEntryBuilder(TaskInfo task, HistoricTaskLogEntryType userTaskCreated) {
-        HistoricTaskLogEntryBuilder taskLogEntryBuilder = new BaseHistoricTaskLogEntryBuilderImpl(null, task);
+        HistoricTaskLogEntryBuilder taskLogEntryBuilder = new BaseHistoricTaskLogEntryBuilderImpl(task);
         taskLogEntryBuilder.timeStamp(this.taskServiceConfiguration.getClock().getCurrentTime());
         taskLogEntryBuilder.userId(Authentication.getAuthenticatedUserId());
         taskLogEntryBuilder.type(userTaskCreated.name());

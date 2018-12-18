@@ -2,7 +2,6 @@ package org.flowable.task.service.impl;
 
 import java.util.Date;
 
-import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 
@@ -12,7 +11,6 @@ import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
  * @author martin.grofcik
  */
 public class BaseHistoricTaskLogEntryBuilderImpl implements HistoricTaskLogEntryBuilder {
-    protected CommandExecutor commandExecutor;
 
     protected String type;
     protected Date timeStamp;
@@ -28,8 +26,7 @@ public class BaseHistoricTaskLogEntryBuilderImpl implements HistoricTaskLogEntry
     protected String tenantId;
     protected String taskId;
 
-    public BaseHistoricTaskLogEntryBuilderImpl(CommandExecutor commandExecutor, TaskInfo task) {
-        this(commandExecutor);
+    public BaseHistoricTaskLogEntryBuilderImpl(TaskInfo task) {
         this.processInstanceId = task.getProcessInstanceId();
         this.processDefinitionId = task.getProcessDefinitionId();
         this.executionId = task.getExecutionId();
@@ -41,8 +38,7 @@ public class BaseHistoricTaskLogEntryBuilderImpl implements HistoricTaskLogEntry
         this.taskId = task.getId();
     }
 
-    public BaseHistoricTaskLogEntryBuilderImpl(CommandExecutor commandExecutor) {
-        this.commandExecutor = commandExecutor;
+    public BaseHistoricTaskLogEntryBuilderImpl() {
     }
 
     @Override

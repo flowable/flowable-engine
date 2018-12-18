@@ -26,12 +26,15 @@ import org.flowable.task.service.impl.util.CommandContextUtil;
  */
 public class HistoricTaskLogEntryBuilderImpl extends BaseHistoricTaskLogEntryBuilderImpl implements Command<Void> {
 
+    protected CommandExecutor commandExecutor;
+
     public HistoricTaskLogEntryBuilderImpl(CommandExecutor commandExecutor, TaskInfo task) {
-        super(commandExecutor, task);
+        super(task);
+        this.commandExecutor = commandExecutor;
     }
 
     public HistoricTaskLogEntryBuilderImpl(CommandExecutor commandExecutor) {
-        super(commandExecutor);
+        this.commandExecutor = commandExecutor;
     }
 
     @Override
