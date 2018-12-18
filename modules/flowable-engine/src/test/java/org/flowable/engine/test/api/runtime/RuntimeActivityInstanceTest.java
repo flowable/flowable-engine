@@ -136,6 +136,18 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    @Deployment(resources = "org/flowable/engine/test/history/oneTaskProcessWithoutSequenceFlowIds.bpmn20.xml")
+    public void testSequenceFlowActivityInstanceWithoutSequenceFlowId() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcessWithoutSequenceFlowIds");
+        assertNotNull(processInstance);
+
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
+
+        ActivityInstance sequenceFlow = runtimeService.createActivityInstanceQuery().activityType("sequenceFlow").singleResult();
+        assertEquals("_noActivityId_theStart->theTask", sequenceFlow.getActivityId());
+    }
+
+    @Test
     @Deployment(resources= "org/flowable/engine/test/api/runtime/RuntimeActivityInstanceTest.testActivityInstanceNoop.bpmn20.xml")
     public void testActivityInstanceQuery() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("noopProcess");
