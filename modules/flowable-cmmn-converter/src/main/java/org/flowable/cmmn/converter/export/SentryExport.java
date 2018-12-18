@@ -16,6 +16,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
+import org.flowable.cmmn.converter.util.CmmnXmlUtil;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
 
@@ -35,6 +36,11 @@ public class SentryExport implements CmmnXmlConstants {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_TRIGGER_MODE, sentry.getTriggerMode());
         }
 
+        boolean didWriteExtensionElement = CmmnXmlUtil.writeExtensionElements(sentry, false, null, xtw);
+        if (didWriteExtensionElement) {
+            xtw.writeEndElement();
+        }
+
         for (SentryOnPart sentryOnPart : sentry.getOnParts()) {
             // start sentry on part element
             xtw.writeStartElement(ELEMENT_PLAN_ITEM_ON_PART);
@@ -46,9 +52,14 @@ public class SentryExport implements CmmnXmlConstants {
             xtw.writeStartElement(ELEMENT_STANDARD_EVENT);
             xtw.writeCharacters(sentryOnPart.getStandardEvent());
             xtw.writeEndElement();
-            
+
             // end sentry on part element
             xtw.writeEndElement();
+
+            didWriteExtensionElement = CmmnXmlUtil.writeExtensionElements(sentryOnPart, false, null, xtw);
+            if (didWriteExtensionElement) {
+                xtw.writeEndElement();
+            }
         }
         
         // If part
@@ -59,7 +70,7 @@ public class SentryExport implements CmmnXmlConstants {
             xtw.writeEndElement();
             xtw.writeEndElement();
         }
-        
+
         // end plan item element
         xtw.writeEndElement();
     }

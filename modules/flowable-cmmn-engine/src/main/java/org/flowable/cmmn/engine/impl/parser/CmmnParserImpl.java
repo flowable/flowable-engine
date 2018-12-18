@@ -82,6 +82,7 @@ public class CmmnParserImpl implements CmmnParser {
             } else if (e instanceof CmmnXMLException) {
                 throw (CmmnXMLException) e;
             } else {
+                e.printStackTrace();
                 throw new FlowableException("Error parsing XML", e);
             }
         }
