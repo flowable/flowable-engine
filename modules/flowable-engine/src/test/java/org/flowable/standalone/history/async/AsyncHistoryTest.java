@@ -508,6 +508,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         } finally {
             if (historicTaskLogEntry != null) {
                 historyService.deleteHistoricTaskLogEntry(historicTaskLogEntry.getLogNumber());
+                waitForHistoryJobExecutorToProcessAllJobs(7000, 200);
             }
         }
 

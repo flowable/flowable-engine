@@ -432,6 +432,7 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         } finally {
             if (historicTaskLogEntry != null) {
                 cmmnHistoryService.deleteHistoricTaskLogEntry(historicTaskLogEntry.getLogNumber());
+                waitForAsyncHistoryExecutorToProcessAllJobs();
             }
         }
     }
