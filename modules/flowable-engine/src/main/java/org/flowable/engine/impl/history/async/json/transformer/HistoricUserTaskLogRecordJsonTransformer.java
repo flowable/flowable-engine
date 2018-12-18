@@ -43,7 +43,7 @@ public class HistoricUserTaskLogRecordJsonTransformer extends AbstractHistoryJso
 
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-        BaseHistoricTaskLogEntryBuilderImpl taskLogEntryBuilder = new BaseHistoricTaskLogEntryBuilderImpl(null);
+        BaseHistoricTaskLogEntryBuilderImpl taskLogEntryBuilder = new BaseHistoricTaskLogEntryBuilderImpl();
 
         taskLogEntryBuilder.data(getStringFromJson(historicalData, HistoryJsonConstants.LOG_ENTRY_DATA));
         taskLogEntryBuilder.processInstanceId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID));
