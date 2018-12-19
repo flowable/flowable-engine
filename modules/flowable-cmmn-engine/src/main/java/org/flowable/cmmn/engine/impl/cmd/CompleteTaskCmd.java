@@ -12,8 +12,6 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
-import static org.flowable.cmmn.engine.impl.util.CommandContextUtil.getTaskService;
-
 import java.util.Map;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -55,7 +53,7 @@ public class CompleteTaskCmd implements Command<Void> {
             throw new FlowableIllegalArgumentException("Null task id");
         }
         
-        TaskEntity taskEntity = getTaskService(commandContext).getTask(taskId);
+        TaskEntity taskEntity = CommandContextUtil.getTaskService(commandContext).getTask(taskId);
         if (taskEntity == null) {
             throw new FlowableObjectNotFoundException("Could not find task entity for id " + taskId, TaskEntity.class);
         }
