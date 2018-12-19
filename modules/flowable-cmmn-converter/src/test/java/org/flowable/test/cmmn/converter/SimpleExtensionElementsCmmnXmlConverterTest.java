@@ -22,6 +22,7 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
 import org.junit.Test;
@@ -84,6 +85,16 @@ public class SimpleExtensionElementsCmmnXmlConverterTest extends AbstractConvert
         extensionElement = extensionElements.get(0);
         assertEquals("test", extensionElement.getName());
         assertEquals("test", extensionElement.getElementText());
+
+        List<Sentry> sentries = planModel.getSentries();
+        assertEquals(3, sentries.size());
+        Sentry sentry = sentries.get(0);
+        assertEquals(1, sentry.getExtensionElements().size());
+        extensionElements = sentry.getExtensionElements().get("test2");
+        assertEquals(1, extensionElements.size());
+        extensionElement = extensionElements.get(0);
+        assertEquals("test2", extensionElement.getName());
+        assertEquals("test2", extensionElement.getElementText());
     }
 
 }
