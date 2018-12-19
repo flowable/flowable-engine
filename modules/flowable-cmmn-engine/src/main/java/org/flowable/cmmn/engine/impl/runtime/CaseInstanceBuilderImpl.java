@@ -33,6 +33,7 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     protected Map<String, Object> transientVariables;
     protected String tenantId;
     protected String outcome;
+    protected Map<String, Object> startFormVariables;
     protected String callbackType;
     protected String callbackId;
     protected String parentId;
@@ -123,6 +124,12 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     }
 
     @Override
+    public CaseInstanceBuilder startFormVariables(Map<String, Object> formVariables) {
+        this.startFormVariables = startFormVariables;
+        return this;
+    }
+
+    @Override
     public CaseInstanceBuilder callbackType(String callbackType) {
         this.callbackType = callbackType;
         return this;
@@ -158,7 +165,7 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
 
     @Override
     public CaseInstance startWithForm() {
-        return cmmnRuntimeService.startCaseInstanceWithForm(this);
+        return cmmnRuntimeService.startCaseInstance(this);
     }
 
     @Override
@@ -199,6 +206,11 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     @Override
     public String getOutcome() {
         return outcome;
+    }
+
+    @Override
+    public Map<String, Object> getStartFormVariables() {
+        return startFormVariables;
     }
 
     @Override

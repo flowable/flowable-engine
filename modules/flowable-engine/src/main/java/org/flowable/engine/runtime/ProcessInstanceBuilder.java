@@ -103,6 +103,21 @@ public interface ProcessInstanceBuilder {
     ProcessInstanceBuilder transientVariable(String variableName, Object value);
 
     /**
+     * Adds variables from a start form to the process instance.
+     */
+    ProcessInstanceBuilder startFormVariables(Map<String, Object> startFormVariables);
+
+    /**
+     * Adds one variable from a start form to the process instance.
+     */
+    ProcessInstanceBuilder startFormVariable(String variableName, Object value);
+
+    /**
+     * Allows to set an outcome for a start form.
+     */
+    ProcessInstanceBuilder outcome(String outcome);
+
+    /**
      * Use default tenant as a fallback in the case when process definition was not found by key and tenant id
      */
     ProcessInstanceBuilder fallbackToDefaultTenant();

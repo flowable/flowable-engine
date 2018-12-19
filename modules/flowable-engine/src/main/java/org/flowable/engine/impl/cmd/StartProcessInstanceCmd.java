@@ -18,6 +18,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -27,9 +32,14 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.form.api.FormFieldHandler;
+import org.flowable.form.api.FormInfo;
+import org.flowable.form.api.FormRepositoryService;
+import org.flowable.form.api.FormService;
 
 /**
  * @author Tom Baeyens
@@ -49,6 +59,8 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
     protected String processInstanceName;
     protected String callbackId;
     protected String callbackType;
+    protected Map<String, Object> startFormVariables;
+    protected String outcome;
     protected boolean fallbackToDefaultTenant;
     protected ProcessInstanceHelper processInstanceHelper;
 
@@ -77,6 +89,8 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
         this.transientVariables = processInstanceBuilder.getTransientVariables();
         this.callbackId = processInstanceBuilder.getCallbackId();
         this.callbackType = processInstanceBuilder.getCallbackType();
+        this.startFormVariables = processInstanceBuilder.getStartFormVariables();
+        this.outcome = processInstanceBuilder.getOutcome();
         this.fallbackToDefaultTenant = processInstanceBuilder.isFallbackToDefaultTenant();
     }
 
@@ -84,10 +98,70 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
     public ProcessInstance execute(CommandContext commandContext) {
 
         processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
-        ProcessInstance processInstance = processInstanceHelper.createProcessInstance(getProcessDefinition(commandContext), businessKey, processInstanceName,
-                        overrideDefinitionTenantId, predefinedProcessInstanceId, variables, transientVariables, callbackId, callbackType, true);
+        ProcessDefinition processDefinition = getProcessDefinition(commandContext);
+
+        ProcessInstance processInstance = null;
+        if (hasStartFormData()) {
+            processInstance = handleProcessInstanceWithForm(commandContext, processDefinition);
+        } else {
+            processInstance = startProcessInstance(processDefinition);
+        }
 
         return processInstance;
+    }
+
+    protected ProcessInstance handleProcessInstanceWithForm(CommandContext commandContext, ProcessDefinition processDefinition) {
+        FormInfo formInfo = null;
+        Map<String, Object> formVariables = null;
+
+        if (hasStartFormData()) {
+
+            FormService formService = CommandContextUtil.getFormService();
+            BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinition.getId());
+            Process process = bpmnModel.getProcessById(processDefinition.getKey());
+            FlowElement startElement = process.getInitialFlowElement();
+
+            if (startElement instanceof StartEvent) {
+                StartEvent startEvent = (StartEvent) startElement;
+                if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
+                    FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService();
+
+                    if (ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
+                        formInfo = formRepositoryService.getFormModelByKey(startEvent.getFormKey());
+                    } else {
+                        formInfo = formRepositoryService.getFormModelByKey(startEvent.getFormKey(), tenantId);
+                    }
+
+                    if (formInfo != null) {
+                        formVariables = formService.getVariablesFromFormSubmission(formInfo, variables, outcome);
+                        if (formVariables != null) {
+                            variables.putAll(formVariables);
+                        }
+                    }
+                }
+            }
+
+        }
+
+        ProcessInstance processInstance = startProcessInstance(processDefinition);
+
+        if (formInfo != null) {
+            FormService formService = CommandContextUtil.getFormService();
+            formService.createFormInstance(formVariables, formInfo, null, processInstance.getId(), processInstance.getProcessDefinitionId());
+            FormFieldHandler formFieldHandler = CommandContextUtil.getProcessEngineConfiguration(commandContext).getFormFieldHandler();
+            formFieldHandler.handleFormFieldsOnSubmit(formInfo, null, processInstance.getId(), null, null, variables);
+        }
+
+        return processInstance;
+    }
+
+    protected ProcessInstance startProcessInstance(ProcessDefinition processDefinition) {
+        return processInstanceHelper.createProcessInstance(processDefinition, businessKey, processInstanceName,
+                            overrideDefinitionTenantId, predefinedProcessInstanceId, variables, transientVariables, callbackId, callbackType, true);
+    }
+
+    protected boolean hasStartFormData() {
+        return startFormVariables != null || outcome != null;
     }
 
     protected ProcessDefinition getProcessDefinition(CommandContext commandContext) {
