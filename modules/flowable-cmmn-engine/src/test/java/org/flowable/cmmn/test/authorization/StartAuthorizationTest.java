@@ -15,14 +15,17 @@ package org.flowable.cmmn.test.authorization;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.idm.api.Group;
@@ -133,8 +136,18 @@ public class StartAuthorizationTest extends FlowableCmmnTestCase {
             assertTrue(containsUserOrGroup(null, "group1", links));
             assertTrue(containsUserOrGroup(null, "group2", links));
 
+            // Case instance identity links should not have an impcat on the identityLinks query
+            Authentication.setAuthenticatedUserId("user1");
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionId(latestCaseDef.getId()).start();
+            List<IdentityLink> identityLinksForCaseInstance = cmmnRuntimeService.getIdentityLinksForCaseInstance(caseInstance.getId());
+            assertTrue(identityLinksForCaseInstance.size() > 0);
+
+            links = cmmnRepositoryService.getIdentityLinksForCaseDefinition(latestCaseDef.getId());
+            assertEquals(3, links.size());
+
         } finally {
             tearDownUsersAndGroups();
+            Authentication.setAuthenticatedUserId(null);
         }
     }
 
