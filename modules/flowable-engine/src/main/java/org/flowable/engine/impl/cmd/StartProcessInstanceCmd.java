@@ -126,7 +126,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
                 if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
                     FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService();
 
-                    if (ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
+                    if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
                         formInfo = formRepositoryService.getFormModelByKey(startEvent.getFormKey());
                     } else {
                         formInfo = formRepositoryService.getFormModelByKey(startEvent.getFormKey(), tenantId);
