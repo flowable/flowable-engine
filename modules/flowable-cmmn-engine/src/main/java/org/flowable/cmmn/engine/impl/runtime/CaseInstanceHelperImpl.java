@@ -219,7 +219,7 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
                 if (formRepositoryService != null) {
 
                     FormInfo formInfo = null;
-                    if (CmmnEngineConfiguration.NO_TENANT_ID.equals(caseInstanceEntity.getTenantId())) {
+                    if (caseInstanceEntity.getTenantId() == null || CmmnEngineConfiguration.NO_TENANT_ID.equals(caseInstanceEntity.getTenantId())) {
                         formInfo = formRepositoryService.getFormModelByKey(planModel.getFormKey());
                     } else {
                         formInfo = formRepositoryService.getFormModelByKey(planModel.getFormKey(), caseInstanceEntity.getTenantId());
