@@ -71,7 +71,6 @@ import org.flowable.engine.impl.cmd.SignalEventReceivedCmd;
 import org.flowable.engine.impl.cmd.StartProcessInstanceAsyncCmd;
 import org.flowable.engine.impl.cmd.StartProcessInstanceByMessageCmd;
 import org.flowable.engine.impl.cmd.StartProcessInstanceCmd;
-import org.flowable.engine.impl.cmd.StartProcessInstanceWithFormCmd;
 import org.flowable.engine.impl.cmd.SuspendProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.TriggerCmd;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationBuilderImpl;
@@ -165,7 +164,12 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
 
     @Override
     public ProcessInstance startProcessInstanceWithForm(String processDefinitionId, String outcome, Map<String, Object> variables, String processInstanceName) {
-        return commandExecutor.execute(new StartProcessInstanceWithFormCmd(processDefinitionId, outcome, variables, processInstanceName));
+        ProcessInstanceBuilder processInstanceBuilder = createProcessInstanceBuilder()
+            .processDefinitionId(processDefinitionId)
+            .outcome(outcome)
+            .startFormVariables(variables)
+            .name(processInstanceName);
+        return processInstanceBuilder.start();
     }
 
     @Override
