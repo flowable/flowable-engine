@@ -27,6 +27,9 @@
             </planItem>
 
             <sentry id="sentryMileStoneTwo">
+                <extensionElements>
+                    <flowable:test2>test2</flowable:test2>
+                </extensionElements>
                 <planItemOnPart id="onPart1" sourceRef="planItemTaskA">
                     <standardEvent>complete</standardEvent>
                 </planItemOnPart>
