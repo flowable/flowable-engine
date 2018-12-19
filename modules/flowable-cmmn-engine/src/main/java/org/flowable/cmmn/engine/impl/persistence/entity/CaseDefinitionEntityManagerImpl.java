@@ -95,9 +95,6 @@ public class CaseDefinitionEntityManagerImpl extends AbstractCmmnEntityManager<C
         
         if (cascadeHistory) {
             
-            HistoricIdentityLinkEntityManager historicIdentityLinkEntityManager = getHistoricIdentityLinkEntityManager();
-            historicIdentityLinkEntityManager.deleteHistoricIdentityLinksByScopeDefinitionIdAndScopeType(caseDefinitionId, ScopeTypes.CMMN);
-            
             // Historic mile stone
             HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager = getHistoricMilestoneInstanceEntityManager();
             List<HistoricMilestoneInstance> historicMilestoneInstances = historicMilestoneInstanceEntityManager
@@ -117,16 +114,21 @@ public class CaseDefinitionEntityManagerImpl extends AbstractCmmnEntityManager<C
             historicPlanItemInstanceEntityManager.findByCaseDefinitionId(caseDefinitionId)
                     .forEach(p -> historicPlanItemInstanceEntityManager.delete(p.getId()));
 
+            HistoricIdentityLinkEntityManager historicIdentityLinkEntityManager = getHistoricIdentityLinkEntityManager();
             HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = getHistoricCaseInstanceEntityManager();
             List<HistoricCaseInstance> historicCaseInstanceEntities = historicCaseInstanceEntityManager
                     .findByCriteria(new HistoricCaseInstanceQueryImpl().caseDefinitionId(caseDefinitionId));
             for (HistoricCaseInstance historicCaseInstanceEntity : historicCaseInstanceEntities) {
+
                 HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager = getHistoricVariableInstanceEntityManager();
                 List<HistoricVariableInstanceEntity> historicVariableInstanceEntities = historicVariableInstanceEntityManager
                         .findHistoricalVariableInstancesByScopeIdAndScopeType(historicCaseInstanceEntity.getId(), ScopeTypes.CMMN);
                 for (HistoricVariableInstanceEntity historicVariableInstanceEntity : historicVariableInstanceEntities) {
                     historicVariableInstanceEntityManager.delete(historicVariableInstanceEntity);
                 }
+
+                historicIdentityLinkEntityManager.deleteHistoricIdentityLinksByScopeIdAndScopeType(historicCaseInstanceEntity.getId(), ScopeTypes.CMMN);
+
                 historicCaseInstanceEntityManager.delete(historicCaseInstanceEntity.getId());
             }
         }
