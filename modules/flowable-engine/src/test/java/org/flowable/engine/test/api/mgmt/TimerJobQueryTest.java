@@ -123,7 +123,7 @@ public class TimerJobQueryTest extends PluggableFlowableTestCase {
     }
     
     @Test
-    public void testByduedateLowerThan() {
+    public void testByDuedateLowerThan() {
         Date date = new Date(testStartTime.getTime() + (10 * 60 * 1000 * 1000));
         assertEquals(3, managementService.createTimerJobQuery().timers().duedateLowerThan(date).count());
         assertEquals(3, managementService.createTimerJobQuery().timers().duedateLowerThan(date).list().size());

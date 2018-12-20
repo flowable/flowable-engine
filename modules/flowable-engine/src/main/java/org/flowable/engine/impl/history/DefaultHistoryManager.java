@@ -161,12 +161,11 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
 
     @Override
     public void recordActivityStart(ActivityInstance activityInstance) {
-        HistoricActivityInstanceEntity historicActivityInstanceEntity = null;
         if (activityInstance != null && isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, activityInstance.getProcessDefinitionId())) {
             if (activityInstance.getActivityId() != null) {
                 // Historic activity instance could have been created (but only in cache, never persisted)
                 // for example when submitting form properties
-                historicActivityInstanceEntity = createHistoricActivityInstance(activityInstance);
+                HistoricActivityInstanceEntity historicActivityInstanceEntity = createHistoricActivityInstance(activityInstance);
                 // Fire event
                 FlowableEventDispatcher eventDispatcher = getEventDispatcher();
                 if (eventDispatcher != null && eventDispatcher.isEnabled()) {
@@ -180,9 +179,8 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
 
     @Override
     public void recordActivityEnd(ActivityInstance activityInstance) {
-        HistoricActivityInstanceEntity historicActivityInstance;
         if (activityInstance != null && isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, activityInstance.getProcessDefinitionId())) {
-            historicActivityInstance = getHistoricActivityInstanceEntityManager().findById(activityInstance.getId());
+            HistoricActivityInstanceEntity historicActivityInstance = getHistoricActivityInstanceEntityManager().findById(activityInstance.getId());
             historicActivityInstance.setDeleteReason(activityInstance.getDeleteReason());
             historicActivityInstance.setEndTime(activityInstance.getEndTime());
             historicActivityInstance.setDurationInMillis(activityInstance.getDurationInMillis());

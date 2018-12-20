@@ -912,6 +912,7 @@
                                 <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
                                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
+                                <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
                             <runOrder>alphabetical</runOrder>
                         </configuration>
@@ -1102,6 +1103,7 @@
                                 <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
                                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
+                                <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
                             <runOrder>alphabetical</runOrder>
                         </configuration>
@@ -1158,6 +1160,7 @@
                                 <exclude>**/HistoricProcessInstanceQueryAndWithExceptionTest.java</exclude>
                                 <exclude>**/HistoricJPAVariableTest.java</exclude>
                                 <exclude>**/VerifyDatabaseOperationsTest.java</exclude>
+                                <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
                             <runOrder>alphabetical</runOrder>
                         </configuration>
