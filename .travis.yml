@@ -1,8 +1,5 @@
 language: java
 
-dist: trusty
-sudo: required
-
 matrix:
   include:
   - jdk: oraclejdk8
