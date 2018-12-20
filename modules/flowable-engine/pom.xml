@@ -1556,7 +1556,7 @@
             <properties>
                 <!-- increase max heap to fix: SurefireBooterForkException: There was an error in the forked process
                     [ERROR] GC overhead limit exceeded -->
-                <argLine>-Xmx2g</argLine>
+                <argLine>-Xmx3g</argLine>
             </properties>
         </profile>
     </profiles>
