@@ -66,7 +66,7 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
 
         int expectedCreatedEvents = 13;
         if (!processEngineConfiguration.getHistoryManager().isHistoryEnabled()) {
-            expectedCreatedEvents = 8;
+            expectedCreatedEvents = 10;
         }
         if (processEngineConfiguration.isAsyncHistoryEnabled()) {
             waitForHistoryJobExecutorToProcessAllJobs(7000L, 200L);

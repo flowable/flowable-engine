@@ -54,7 +54,9 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         assertNotNull(activityInstance.getEndTime());
         assertTrue(activityInstance.getDurationInMillis() >= 0);
 
-        assertActivityInstancesAreSame(historyService.createHistoricActivityInstanceQuery().activityId("noop").singleResult(), activityInstance);
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertActivityInstancesAreSame(historyService.createHistoricActivityInstanceQuery().activityId("noop").singleResult(), activityInstance);
+        }
 
         this.runtimeService.trigger(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult().getId());
         assertEquals(0L, runtimeService.createActivityInstanceQuery().activityId("noop").count());
@@ -77,7 +79,9 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         assertEquals(processInstance.getId(), activityInstance.getProcessInstanceId());
         assertNotNull(activityInstance.getStartTime());
 
-        assertActivityInstancesAreSame(historyService.createHistoricActivityInstanceQuery().activityId("receive").singleResult(), activityInstance);
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertActivityInstancesAreSame(historyService.createHistoricActivityInstanceQuery().activityId("receive").singleResult(), activityInstance);
+        }
 
         Execution execution = runtimeService.createExecutionQuery().onlyChildExecutions().processInstanceId(processInstance.getId()).singleResult();
         runtimeService.trigger(execution.getId());
@@ -93,7 +97,9 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         assertNotNull(activityInstance.getStartTime());
 
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
-        assertActivityInstancesAreSame(historyService.createHistoricActivityInstanceQuery().activityId("receive").singleResult(), activityInstance);
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertActivityInstancesAreSame(historyService.createHistoricActivityInstanceQuery().activityId("receive").singleResult(), activityInstance);
+        }
 
         runtimeService.trigger(execution.getId());
 
@@ -137,40 +143,21 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
 
         assertEquals(0, runtimeService.createActivityInstanceQuery().executionId("nonExistingExecutionId").list().size());
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertEquals(3, runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list().size());
-        } else {
-            assertEquals(0, runtimeService.createActivityInstanceQuery().executionId(processInstance.getId()).list().size());
-        }
+        assertEquals(3, runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list().size());
 
         assertEquals(0, runtimeService.createActivityInstanceQuery().processInstanceId("nonExistingProcessInstanceId").list().size());
-
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertEquals(3, runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list().size());
-        } else {
-            assertEquals(0, runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list().size());
-        }
+        assertEquals(3, runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list().size());
 
         assertEquals(0, runtimeService.createActivityInstanceQuery().processDefinitionId("nonExistingProcessDefinitionId").list().size());
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertEquals(3, runtimeService.createActivityInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).list().size());
-        } else {
-            assertEquals(0, runtimeService.createActivityInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).list().size());
-        }
+        assertEquals(3, runtimeService.createActivityInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).list().size());
 
         assertEquals(1, runtimeService.createActivityInstanceQuery().unfinished().list().size());
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertEquals(2, runtimeService.createActivityInstanceQuery().finished().list().size());
-        } else {
-            assertEquals(0, runtimeService.createActivityInstanceQuery().finished().list().size());
-        }
+        assertEquals(2, runtimeService.createActivityInstanceQuery().finished().list().size());
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            ActivityInstance activityInstance = runtimeService.createActivityInstanceQuery().list().get(0);
-            assertEquals(1, runtimeService.createActivityInstanceQuery().activityInstanceId(activityInstance.getId()).list().size());
-        }
+        ActivityInstance activityInstance = runtimeService.createActivityInstanceQuery().list().get(0);
+        assertEquals(1, runtimeService.createActivityInstanceQuery().activityInstanceId(activityInstance.getId()).list().size());
     }
 
     @Test
@@ -195,8 +182,10 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
     }
 
     protected void assertThatActivityInstancesAreSame(String userTask) {
-        assertActivityInstancesAreSame(historyService.createHistoricActivityInstanceQuery().activityId(userTask).singleResult(),
-            runtimeService.createActivityInstanceQuery().activityId(userTask).singleResult());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertActivityInstancesAreSame(historyService.createHistoricActivityInstanceQuery().activityId(userTask).singleResult(),
+                runtimeService.createActivityInstanceQuery().activityId(userTask).singleResult());
+        }
     }
 
     @Test
@@ -235,12 +224,14 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
 
         ActivityInstance activityInstance = runtimeService.createActivityInstanceQuery().activityId("callSubProcess").singleResult();
 
-        HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("callSubProcess").singleResult();
-        assertActivityInstancesAreSame(historicActivityInstance, activityInstance);
-
-        HistoricProcessInstance oldInstance = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("calledProcess").singleResult();
-
-        assertEquals(oldInstance.getId(), activityInstance.getCalledProcessInstanceId());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("callSubProcess").singleResult();
+            assertActivityInstancesAreSame(historicActivityInstance, activityInstance);
+    
+            HistoricProcessInstance oldInstance = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("calledProcess").singleResult();
+    
+            assertEquals(oldInstance.getId(), activityInstance.getCalledProcessInstanceId());
+        }
     }
 
     @Test
@@ -248,12 +239,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
     public void testSorting() {
         runtimeService.startProcessInstanceByKey("process");
 
-        int expectedActivityInstances;
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            expectedActivityInstances = 2;
-        } else {
-            expectedActivityInstances = 0;
-        }
+        int expectedActivityInstances = 2;
 
         assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByActivityInstanceId().asc().list().size());
         assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByActivityInstanceStartTime().asc().list().size());
@@ -347,11 +333,10 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         assertNotNull(activityInstance.getStartTime());
         assertNotNull(activityInstance.getEndTime());
 
-        assertActivityInstancesAreSame(historyService.createHistoricActivityInstanceQuery().
-            activityId("boundary").
-            processInstanceId(processInstance.getId()).
-            singleResult(),
-            activityInstance);
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertActivityInstancesAreSame(historyService.createHistoricActivityInstanceQuery().activityId("boundary")
+                        .processInstanceId(processInstance.getId()).singleResult(), activityInstance);
+        }
     }
 
     @Test
@@ -499,9 +484,11 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         });
 
         taskService.setOwner(task.getId(), "newOwner");
-        assertEquals(1, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("theTask").count());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertEquals(1, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("theTask").count());
+        }
+        
         taskService.complete(task.getId());
-
 
         assertProcessEnded(processInstance.getId());
     }

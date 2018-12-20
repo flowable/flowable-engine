@@ -275,8 +275,12 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
 
     @Override
     public HistoricActivityInstanceEntity findHistoricActivityInstance(ExecutionEntity execution, boolean endTimeMustBeNull) {
-        String activityId = getActivityIdForExecution(execution);
-        return activityId != null ? findHistoricActivityInstance(execution, activityId, endTimeMustBeNull) : null;
+        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, execution.getProcessDefinitionId())) {
+            String activityId = getActivityIdForExecution(execution);
+            return activityId != null ? findHistoricActivityInstance(execution, activityId, endTimeMustBeNull) : null;
+        }
+        
+        return null;
     }
 
     protected String getActivityIdForExecution(ExecutionEntity execution) {
