@@ -37,6 +37,8 @@ public interface CaseInstanceBuilder {
     CaseInstanceBuilder transientVariable(String variableName, Object value);
 
     CaseInstanceBuilder tenantId(String tenantId);
+
+    CaseInstanceBuilder startFormVariables(Map<String, Object> formVariables);
     
     CaseInstanceBuilder outcome(String outcome);
 
@@ -89,6 +91,8 @@ public interface CaseInstanceBuilder {
     Map<String, Object> getTransientVariables();
 
     String getTenantId();
+
+    Map<String, Object> getStartFormVariables();
 
     String getOutcome();
 

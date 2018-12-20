@@ -123,12 +123,16 @@ public class CaseDefinitionEntityManagerImpl extends AbstractCmmnEntityManager<C
             List<HistoricCaseInstance> historicCaseInstanceEntities = historicCaseInstanceEntityManager
                     .findByCriteria(new HistoricCaseInstanceQueryImpl().caseDefinitionId(caseDefinitionId));
             for (HistoricCaseInstance historicCaseInstanceEntity : historicCaseInstanceEntities) {
+
                 HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager = getHistoricVariableInstanceEntityManager();
                 List<HistoricVariableInstanceEntity> historicVariableInstanceEntities = historicVariableInstanceEntityManager
                         .findHistoricalVariableInstancesByScopeIdAndScopeType(historicCaseInstanceEntity.getId(), ScopeTypes.CMMN);
                 for (HistoricVariableInstanceEntity historicVariableInstanceEntity : historicVariableInstanceEntities) {
                     historicVariableInstanceEntityManager.delete(historicVariableInstanceEntity);
                 }
+
+                historicIdentityLinkEntityManager.deleteHistoricIdentityLinksByScopeIdAndScopeType(historicCaseInstanceEntity.getId(), ScopeTypes.CMMN);
+
                 historicCaseInstanceEntityManager.delete(historicCaseInstanceEntity.getId());
             }
         }

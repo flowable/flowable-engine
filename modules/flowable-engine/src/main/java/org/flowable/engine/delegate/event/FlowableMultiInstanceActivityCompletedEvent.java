@@ -1,5 +1,3 @@
-package org.flowable.engine.delegate.event;
-
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +10,7 @@ package org.flowable.engine.delegate.event;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.flowable.engine.delegate.event;
 
 public interface FlowableMultiInstanceActivityCompletedEvent extends FlowableMultiInstanceActivityEvent {
     public int getNumberOfInstances();
