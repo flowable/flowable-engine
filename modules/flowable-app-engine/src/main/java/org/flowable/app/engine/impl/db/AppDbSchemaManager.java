@@ -48,7 +48,6 @@ public class AppDbSchemaManager implements SchemaManager {
     }
     
     public void initSchema(AppEngineConfiguration appEngineConfiguration, String databaseSchemaUpdate) {
-        Liquibase liquibase = null;
         try {
             if (AppEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)) {
                 schemaCreate();
@@ -62,12 +61,9 @@ public class AppDbSchemaManager implements SchemaManager {
                 
             } else if (AppEngineConfiguration.DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
                schemaCheckVersion();
-                
             }
         } catch (Exception e) {
             throw new FlowableException("Error initialising app data model", e);
-        } finally {
-            closeDatabase(liquibase);
         }
     }
 

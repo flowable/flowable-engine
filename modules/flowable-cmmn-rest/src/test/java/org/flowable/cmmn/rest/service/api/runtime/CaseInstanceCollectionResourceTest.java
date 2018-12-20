@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
@@ -41,6 +42,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * 
  * @author Tijs Rademakers
  * @author Filip Hrisafov
+ * @author Jose Antonio Alvarez
  */
 public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
 
@@ -120,7 +122,7 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
     }
 
     /**
-     * Test getting a list of process instance, using all tenant filters.
+     * Test getting a list of case instance, using all tenant filters.
      */
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstancesTenant() throws Exception {
@@ -159,6 +161,62 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
     }
+
+    /**
+     * Test getting a list of case instance, using the variable selector
+     */
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testGetCaseInstancesWithVariables() throws Exception {
+        runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").variable("someVar", "someValue").start();
+
+        // Test without any parameters, no variables included by default
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION);
+
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertTrue(rootNode.size() > 0);
+        assertEquals(1, rootNode.get("data").size());
+        JsonNode dataNode = rootNode.get("data").get(0);
+        JsonNode variableNodes = dataNode.get("variables");
+        assertEquals(0, variableNodes.size());
+
+        // Test excluding variables
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?includeCaseVariables=false";
+
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertTrue(rootNode.size() > 0);
+        assertEquals(1, rootNode.get("data").size());
+        dataNode = rootNode.get("data").get(0);
+        variableNodes = dataNode.get("variables");
+        assertEquals(0, variableNodes.size());
+
+        // Test including variables
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?includeCaseVariables=true";
+
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertTrue(rootNode.size() > 0);
+        assertEquals(1, rootNode.get("data").size());
+        dataNode = rootNode.get("data").get(0);
+        variableNodes = dataNode.get("variables");
+        assertEquals(1, variableNodes.size());
+
+        variableNodes = dataNode.get("variables");
+        assertEquals(1, variableNodes.size());
+        assertNotNull(variableNodes.get(0).get("name"));
+        assertNotNull(variableNodes.get(0).get("value"));
+
+        assertEquals("someVar", variableNodes.get(0).get("name").asText());
+        assertEquals("someValue", variableNodes.get(0).get("value").asText());
+    }
+
 
     /**
      * Test starting a case instance using caseDefinitionId, key caseDefinitionKey business-key.

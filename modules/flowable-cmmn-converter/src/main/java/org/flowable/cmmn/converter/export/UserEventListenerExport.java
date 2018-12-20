@@ -14,7 +14,6 @@ package org.flowable.cmmn.converter.export;
 
 import org.flowable.cmmn.model.UserEventListener;
 
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 /**

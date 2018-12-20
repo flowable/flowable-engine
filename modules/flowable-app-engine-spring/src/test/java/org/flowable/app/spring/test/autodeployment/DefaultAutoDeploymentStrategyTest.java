@@ -21,13 +21,10 @@ import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import org.flowable.app.spring.autodeployment.DefaultAutoDeploymentStrategy;
-import org.flowable.common.engine.api.FlowableException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
