@@ -10,7 +10,7 @@
     <groupId>org.flowable</groupId>
     <artifactId>flowable-root</artifactId>
     <relativePath>../..</relativePath>
-    <version>6.4.0-15</version>
+    <version>6.4.0-16</version>
   </parent>
 
   <dependencies>
@@ -27,7 +27,7 @@
     <dependency>
       <groupId>org.flowable</groupId>
       <artifactId>flowable5-test</artifactId>
-      <version>6.4.0-15</version>
+      <version>6.4.0-16</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

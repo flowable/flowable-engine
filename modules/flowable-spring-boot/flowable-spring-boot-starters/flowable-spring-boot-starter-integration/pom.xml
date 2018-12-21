@@ -9,7 +9,7 @@
     <parent>
         <groupId>org.flowable</groupId>
         <artifactId>flowable-spring-boot-starters</artifactId>
-        <version>6.4.0-15</version>
+        <version>6.4.0-16</version>
     </parent>
 
     <artifactId>flowable-spring-boot-starter-integration</artifactId>
