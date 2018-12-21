@@ -133,8 +133,11 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
                     }
 
                     if (formInfo != null) {
-                        formVariables = formService.getVariablesFromFormSubmission(formInfo, variables, outcome);
+                        formVariables = formService.getVariablesFromFormSubmission(formInfo, startFormVariables, outcome);
                         if (formVariables != null) {
+                            if (variables == null) {
+                                variables = new HashMap<>();
+                            }
                             variables.putAll(formVariables);
                         }
                     }
