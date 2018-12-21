@@ -227,7 +227,10 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
 
                     if (formInfo != null) {
                         Map<String, Object> formVariables = formService.getVariablesFromFormSubmission(formInfo,
-                            caseInstanceBuilder.getVariables(), caseInstanceBuilder.getOutcome());
+                            startFormVariables, caseInstanceBuilder.getOutcome());
+                        for (String variableName : startFormVariables.keySet()) {
+                            caseInstanceEntity.setVariable(variableName, startFormVariables.get(variableName));
+                        }
 
                         formService.createFormInstanceWithScopeId(formVariables, formInfo, null, caseInstanceEntity.getId(),
                             ScopeTypes.CMMN, caseInstanceEntity.getCaseDefinitionId());
