@@ -66,7 +66,35 @@
             "PROCESSES": "流程模型",
             "PROCESSES-COUNT": "一共有 {{total}}个流程模型",
             "PROCESSES-ONE": "有一个流程模型",
-            "PROCESSES-EMPTY": "目前还没有创建流程模型。您可以设计流程模型、用户表单，然后将它们捆绑到app中。第一步是创建流程模型:",
+            "PROCESSES-EMPTY": "目前还
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		创建流程模型。您可以设计流程模型、用户表单，然后将它们捆绑到app中。第一步是创建流程模型:",
             "PROCESSES-BPMN-HINT": "使用BPMN可视化编辑器创建BPMN模型.",
             "PROCESSES-BPMN-IMPORT-HINT": "还可以导入现有的BPMN模型。",
             "FILTER-TEXT": ", 匹配 \"{{filterText}}\"",
@@ -734,7 +762,7 @@
     "ELEMENT.DATE_CREATED" : "创建日期",
 
     "PROPERTY.REMOVED" : "移除",
-    "PROPERTY.EMPTY" : "没有值",
+    "PROPERTY.EMPTY" : "空值",
     "PROPERTY.PROPERTY.EDIT.TITLE" : "更改值为",
 
     "PROPERTY.FEEDBACK.TITLE" : "请填写您的反馈意见",
@@ -747,7 +775,7 @@
     "PROPERTY.ASSIGNMENT.MATCHING" : "使用 &uparrow; 和 &downarrow;选择并按Enter确认或使用鼠标",
     "PROPERTY.ASSIGNMENT.ASSIGNEE_PLACEHOLDER" : "输入分配人",
     "PROPERTY.ASSIGNMENT.EMPTY" : "没有选择分配人",
-    "PROPERTY.ASSIGNMENT.NONE" : "没有 ...",
+    "PROPERTY.ASSIGNMENT.NONE" : "未分配经办人",
     "PROPERTY.ASSIGNMENT.PLACEHOLDER-SEARCHUSER": "搜索用户",
     "PROPERTY.ASSIGNMENT.PLACEHOLDER-SEARCHGROUP": "搜索组",
     "PROPERTY.ASSIGNMENT.SEARCH": "搜索: ",
