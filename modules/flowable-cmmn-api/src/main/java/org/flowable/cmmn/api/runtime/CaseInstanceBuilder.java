@@ -38,6 +38,11 @@ public interface CaseInstanceBuilder {
 
     CaseInstanceBuilder tenantId(String tenantId);
 
+    /**
+     * Allows to pass any variables if they come from a form.
+     * The difference with regular {@link #variables(Map)} is that the  start form will be fetched
+     * and the variables matched with the {@link org.flowable.form.api.FormInfo}.
+     */
     CaseInstanceBuilder startFormVariables(Map<String, Object> formVariables);
     
     CaseInstanceBuilder outcome(String outcome);
