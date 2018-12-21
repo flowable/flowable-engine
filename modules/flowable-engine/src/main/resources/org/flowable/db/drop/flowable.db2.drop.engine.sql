@@ -94,17 +94,15 @@ alter table ACT_PROCDEF_INFO
 alter table ACT_PROCDEF_INFO 
 	drop foreign key ACT_FK_INFO_PROCDEF;
 
-alter table ACT_RU_ACTINST
-    drop foreign key ACT_FK_RU_ACTINST_PROCINST;
-
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_;
 drop index ACT_IDX_ATHRZ_PROCEDEF;
 
-drop index ACT_IDX_RU_ACT_INST_START;
-drop index ACT_IDX_RU_ACT_INST_END;
-drop index ACT_IDX_RU_ACT_INST_PROCINST;
-drop index ACT_IDX_RU_ACT_INST_EXEC;
-drop index ACT_IDX_ACTINST_EXECUTION;
+drop index ACT_IDX_RU_ACTI_START;
+drop index ACT_IDX_RU_ACTI_END;
+drop index ACT_IDX_RU_ACTI_PROC;
+drop index ACT_IDX_RU_ACTI_PROC_ACT;
+drop index ACT_IDX_RU_ACTI_EXEC;
+drop index ACT_IDX_RU_ACTI_EXEC_ACT;
 
 drop table ACT_RU_ACTINST;
 drop table ACT_RE_DEPLOYMENT;
