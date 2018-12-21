@@ -13,18 +13,7 @@
 
 package org.flowable.image.impl;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineBreakMeasurer;
 import java.awt.font.TextAttribute;
@@ -49,9 +38,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import org.flowable.bpmn.model.AssociationDirection;
-import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.GraphicInfo;
-import org.flowable.bpmn.model.Transaction;
 import org.flowable.image.exception.FlowableImageException;
 import org.flowable.image.util.ReflectUtil;
 import org.slf4j.Logger;

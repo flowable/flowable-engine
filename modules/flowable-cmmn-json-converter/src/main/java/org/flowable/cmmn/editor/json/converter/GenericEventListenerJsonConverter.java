@@ -12,6 +12,9 @@
  */
 package org.flowable.cmmn.editor.json.converter;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.Map;
 
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
@@ -21,10 +24,6 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.GenericEventListener;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
-import org.flowable.cmmn.model.UserEventListener;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez

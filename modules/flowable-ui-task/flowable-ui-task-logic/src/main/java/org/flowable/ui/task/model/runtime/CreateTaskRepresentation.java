@@ -12,8 +12,6 @@
  */
 package org.flowable.ui.task.model.runtime;
 
-import java.util.Map;
-
 import org.flowable.ui.common.model.AbstractRepresentation;
 
 /**

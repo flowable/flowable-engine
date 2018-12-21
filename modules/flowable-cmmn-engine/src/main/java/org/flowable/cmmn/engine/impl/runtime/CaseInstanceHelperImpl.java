@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
@@ -26,10 +27,12 @@ import org.flowable.cmmn.engine.impl.job.AsyncInitializePlanModelJobHandler;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.IdentityLinkUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -37,14 +40,22 @@ import org.flowable.common.engine.impl.callback.CallbackData;
 import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.form.api.FormFieldHandler;
+import org.flowable.form.api.FormInfo;
+import org.flowable.form.api.FormRepositoryService;
+import org.flowable.form.api.FormService;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Joram Barrez
  */
 public class CaseInstanceHelperImpl implements CaseInstanceHelper {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CaseInstanceHelperImpl.class);
 
     @Override
     public CaseInstanceEntity startCaseInstance(CaseInstanceBuilder caseInstanceBuilder) {
@@ -149,14 +160,14 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         CaseInstanceBuilder caseInstanceBuilder) {
         CaseInstanceEntity caseInstanceEntity = createCaseInstanceEntityFromDefinition(commandContext, caseDefinition);
 
-        applyCaseInstanceBuilder(caseInstanceBuilder, caseInstanceEntity);
+        applyCaseInstanceBuilder(caseInstanceBuilder, caseInstanceEntity, caseDefinition);
 
         callCaseInstanceStateChangeCallbacks(commandContext, caseInstanceEntity, null, CaseInstanceState.ACTIVE);
         CommandContextUtil.getCmmnHistoryManager().recordCaseInstanceStart(caseInstanceEntity);
         return caseInstanceEntity;
     }
 
-    protected void applyCaseInstanceBuilder(CaseInstanceBuilder caseInstanceBuilder, CaseInstanceEntity caseInstanceEntity) {
+    protected void applyCaseInstanceBuilder(CaseInstanceBuilder caseInstanceBuilder, CaseInstanceEntity caseInstanceEntity, CaseDefinition caseDefinition) {
         if (caseInstanceBuilder.getName() != null) {
             caseInstanceEntity.setName(caseInstanceBuilder.getName());
         }
@@ -192,6 +203,42 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         if (transientVariables != null) {
             for (String variableName : transientVariables.keySet()) {
                 caseInstanceEntity.setTransientVariable(variableName, transientVariables.get(variableName));
+            }
+        }
+
+        Map<String, Object> startFormVariables = caseInstanceBuilder.getStartFormVariables();
+        if (startFormVariables != null || caseInstanceBuilder.getOutcome() != null) {
+
+            FormService formService = CommandContextUtil.getFormService();
+
+            CmmnModel cmmnModel = CaseDefinitionUtil.getCmmnModel(caseDefinition.getId());
+            Case caze = cmmnModel.getCaseById(caseDefinition.getKey());
+            Stage planModel = caze.getPlanModel();
+            if (planModel != null && StringUtils.isNotEmpty(planModel.getFormKey())) {
+                FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService();
+                if (formRepositoryService != null) {
+
+                    FormInfo formInfo = null;
+                    if (caseInstanceEntity.getTenantId() == null || CmmnEngineConfiguration.NO_TENANT_ID.equals(caseInstanceEntity.getTenantId())) {
+                        formInfo = formRepositoryService.getFormModelByKey(planModel.getFormKey());
+                    } else {
+                        formInfo = formRepositoryService.getFormModelByKey(planModel.getFormKey(), caseInstanceEntity.getTenantId());
+                    }
+
+                    if (formInfo != null) {
+                        Map<String, Object> formVariables = formService.getVariablesFromFormSubmission(formInfo,
+                            caseInstanceBuilder.getVariables(), caseInstanceBuilder.getOutcome());
+
+                        formService.createFormInstanceWithScopeId(formVariables, formInfo, null, caseInstanceEntity.getId(),
+                            ScopeTypes.CMMN, caseInstanceEntity.getCaseDefinitionId());
+                        FormFieldHandler formFieldHandler = CommandContextUtil.getCmmnEngineConfiguration().getFormFieldHandler();
+                        formFieldHandler.handleFormFieldsOnSubmit(formInfo, null, null,
+                            caseInstanceEntity.getId(), ScopeTypes.CMMN, caseInstanceBuilder.getVariables());
+                    }
+
+                } else {
+                    LOGGER.warn("Requesting form model {} without configured formRepositoryService", planModel.getFormKey());
+                }
             }
         }
 

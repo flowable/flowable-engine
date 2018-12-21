@@ -10,13 +10,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.api;
+package org.flowable.task.service.impl.persistence.entity.data.impl.cachematcher;
 
-public class FlowableForbiddenException extends FlowableException {
+import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcherAdapter;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
-    private static final long serialVersionUID = 1L;
+/**
+ * @author Filip Hrisafov
+ */
+public class TasksByProcessInstanceIdMatcher extends CachedEntityMatcherAdapter<TaskEntity> {
 
-    public FlowableForbiddenException(String message) {
-        super(message);
+    @Override
+    public boolean isRetained(TaskEntity taskEntity, Object parameter) {
+        return taskEntity.getProcessInstanceId() != null && parameter.equals(taskEntity.getProcessInstanceId());
     }
+
 }

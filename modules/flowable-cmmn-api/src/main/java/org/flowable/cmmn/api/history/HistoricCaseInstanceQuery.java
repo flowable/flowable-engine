@@ -17,7 +17,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.common.engine.api.query.Query;
 
 /**

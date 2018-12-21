@@ -13,10 +13,8 @@
 
 package org.flowable.spring.configurator;
 
-import java.io.IOException;
 import java.util.zip.ZipInputStream;
 
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.slf4j.Logger;
