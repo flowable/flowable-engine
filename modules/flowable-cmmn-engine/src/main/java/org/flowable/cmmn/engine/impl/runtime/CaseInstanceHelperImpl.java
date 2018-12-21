@@ -236,7 +236,7 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
                             ScopeTypes.CMMN, caseInstanceEntity.getCaseDefinitionId());
                         FormFieldHandler formFieldHandler = CommandContextUtil.getCmmnEngineConfiguration().getFormFieldHandler();
                         formFieldHandler.handleFormFieldsOnSubmit(formInfo, null, null,
-                            caseInstanceEntity.getId(), ScopeTypes.CMMN, caseInstanceBuilder.getVariables());
+                            caseInstanceEntity.getId(), ScopeTypes.CMMN, formVariables);
                     }
 
                 } else {
