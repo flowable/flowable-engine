@@ -66,7 +66,7 @@
             "PROCESSES": "流程模型",
             "PROCESSES-COUNT": "一共有 {{total}}个流程模型",
             "PROCESSES-ONE": "有一个流程模型",
-            "PROCESSES-EMPTY": "目前还创建流程模型。您可以设计流程模型、用户表单，然后将它们捆绑到app中。第一步是创建流程模型:",
+            "PROCESSES-EMPTY": "目前还没有创建流程模型。您可以设计流程模型、用户表单，然后将它们捆绑到app中。第一步是创建流程模型:",
             "PROCESSES-BPMN-HINT": "使用BPMN可视化编辑器创建BPMN模型.",
             "PROCESSES-BPMN-IMPORT-HINT": "还可以导入现有的BPMN模型。",
             "FILTER-TEXT": ", 匹配 \"{{filterText}}\"",
