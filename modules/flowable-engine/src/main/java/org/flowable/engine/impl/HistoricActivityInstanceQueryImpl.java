@@ -54,6 +54,8 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     protected Date finishedAfter;
     protected String[] tenantIds;
 
+    
+
 
     public HistoricActivityInstanceQueryImpl() {
     }
