@@ -34,12 +34,23 @@
             org.flowable.common.engine.impl.util,
             org.flowable.common.engine.impl.util.io,
             org.flowable.common.engine.impl.runtime,
+            org.flowable.common.db.properties,
         </flowable.osgi.export.additional>
         <flowable.osgi.import.additional>
             org.junit.jupiter.api*;resolution:=optional,
             org.springframework*;resolution:=optional,
             javax.transaction;resolution:=optional,
+            org.flowable.db.mapping;resolution:=optional,
             org.flowable.idm.engine.impl.persistence;resolution:=optional,
+            org.flowable.common.db;resolution:=optional,
+            org.flowable.identitylink.service.db;resolution:=optional,
+            org.flowable.entitylink.service.db;resolution:=optional,
+            org.flowable.task.service.db;resolution:=optional,
+            org.flowable.variable.service.db;resolution:=optional,
+            org.flowable.job.service.db;resolution:=optional,
+            org.flowable.idm.db;resolution:=optional,
+            org.flowable.idm.db.mapping;resolution:=optional,
+            org.flowable.db;resolution:=optional,
         </flowable.osgi.import.additional>
     </properties>
 

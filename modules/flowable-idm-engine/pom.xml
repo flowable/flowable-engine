@@ -18,6 +18,12 @@
 		<flowable.artifact>
 			org.flowable.idm.engine
 		</flowable.artifact>
+        <flowable.osgi.export.additional>
+            org.flowable.idm.db.create,
+            org.flowable.idm.db.update,
+            org.flowable.idm.db.mapping,
+            org.flowable.idm.db.mapping.entity,
+        </flowable.osgi.export.additional>
         <flowable.osgi.import.additional>
             junit*;resolution:=optional,
             org.junit*;resolution:=optional,

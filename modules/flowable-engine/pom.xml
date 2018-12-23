@@ -238,7 +238,10 @@
             org.flowable.engine
         </flowable.artifact>
         <flowable.osgi.export.additional>
-            org.flowable.db.mapping.entity
+            org.flowable.db.create,
+            org.flowable.db.update,
+            org.flowable.db.mapping,
+            org.flowable.db.mapping.entity,
         </flowable.osgi.export.additional>
         <flowable.osgi.import.additional>
             junit*;resolution:=optional,
