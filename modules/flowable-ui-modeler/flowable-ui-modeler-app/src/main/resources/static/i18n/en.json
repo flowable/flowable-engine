@@ -941,6 +941,11 @@
     "PROPERTY.MESSAGEDEFINITIONS.ID" : "Id",
     "PROPERTY.MESSAGEDEFINITIONS.NAME" : "Name",
 
+    "PROPERTY.ERRORDEFINITIONS.DISPLAY" : "{{length}} error definitions",
+    "PROPERTY.ERRORDEFINITIONS.EMPTY" : "No error definitions configured",
+    "PROPERTY.ERRORDEFINITIONS.ID" : "Id",
+    "PROPERTY.ERRORDEFINITIONS.ERRORCODE" : "errorcode",
+
     "PROPERTY.SEQUENCEFLOW.ORDER.EMPTY" : "No sequence flow order determined",
     "PROPERTY.SEQUENCEFLOW.ORDER.NOT.EMPTY" : "Sequence flow order set",
     "PROPERTY.SEQUENCEFLOW.ORDER.NO.OUTGOING.SEQUENCEFLOW.FOUND" : "No outgoing sequence flow found.",

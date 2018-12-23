@@ -811,6 +811,11 @@
     "PROPERTY.MESSAGEDEFINITIONS.ID" : "Identificador",
     "PROPERTY.MESSAGEDEFINITIONS.NAME" : "Nombre",
 
+    "PROPERTY.ERRORDEFINITIONS.DISPLAY" : "{{length}} error definitions",
+    "PROPERTY.ERRORDEFINITIONS.EMPTY" : "No error definitions configured",
+    "PROPERTY.ERRORDEFINITIONS.ID" : "Identificador",
+    "PROPERTY.ERRORDEFINITIONS.ERRORCODE" : "errorcode",
+
     "PROPERTY.SEQUENCEFLOW.ORDER.EMPTY" : "No se definio el orden de los flujos de secuencia",
     "PROPERTY.SEQUENCEFLOW.ORDER.NOT.EMPTY" : "Orden de flujos de secuencia fijado",
     "PROPERTY.SEQUENCEFLOW.ORDER.NO.OUTGOING.SEQUENCEFLOW.FOUND" : "No se encontro un flujo de secuencia de salida.",

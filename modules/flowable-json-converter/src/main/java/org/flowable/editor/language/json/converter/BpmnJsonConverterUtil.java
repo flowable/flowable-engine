@@ -15,7 +15,8 @@ package org.flowable.editor.language.json.converter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
+import java.util.Map;
+import java.util.Iterator;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BooleanDataObject;
@@ -128,6 +129,25 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
         }
 
         propertiesNode.set(propertyName, messagesNode);
+    }
+
+    public static void convertErrorsToJson(Map<String, String> errorMap, ObjectNode propertiesNode) {
+        String propertyName = "errordefinitions";
+
+        ArrayNode errorsNode = objectMapper.createArrayNode();
+
+        Iterator<Map.Entry<String, String>> errorMapiterator = errorMap.entrySet().iterator();
+        while (errorMapiterator.hasNext()){
+            Map.Entry<String, String> errorEntry = errorMapiterator.next();
+            String errorId = errorEntry.getKey();
+            String errorCode = errorEntry.getValue();
+            ObjectNode propertyItemNode = objectMapper.createObjectNode();
+            propertyItemNode.put(PROPERTY_ERROR_DEFINITION_ID, errorId);
+            propertyItemNode.put(PROPERTY_ERROR_CODE, errorCode);
+            errorsNode.add(propertyItemNode);
+        }
+
+        propertiesNode.set(propertyName, errorsNode);
     }
 
     public static void convertListenersToJson(List<FlowableListener> listeners, boolean isExecutionListener, ObjectNode propertiesNode) {
@@ -292,6 +312,14 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
         }
     }
 
+    public static void convertJsonToErrors(JsonNode objectNode, BpmnModel element) {
+        JsonNode errorDefinitionNode = getProperty(PROPERTY_ERROR_DEFINITIONS, objectNode);
+        if (errorDefinitionNode != null) {
+            errorDefinitionNode = validateIfNodeIsTextual(errorDefinitionNode);
+            parseErrors(errorDefinitionNode, element);
+        }
+    }
+
     public static void convertJsonToMessages(JsonNode objectNode, BpmnModel element) {
         JsonNode messagesNode = getProperty(PROPERTY_MESSAGE_DEFINITIONS, objectNode);
         if (messagesNode != null) {
@@ -383,6 +411,19 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
 
             if (StringUtils.isNotEmpty(messageId)) {
                 element.addMessage(message);
+            }
+        }
+    }
+
+    protected static void parseErrors(JsonNode errorsNode, BpmnModel element) {
+        if (errorsNode == null)
+            return;
+
+        for (JsonNode errorNode : errorsNode) {
+            String errorId = getValueAsString(PROPERTY_ERROR_DEFINITION_ID, errorNode);
+            String errorCode = getValueAsString(PROPERTY_ERROR_CODE, errorNode);
+            if (StringUtils.isNotEmpty(errorId) && StringUtils.isNotEmpty(errorCode)){
+                element.addError(errorId,errorCode);
             }
         }
     }

@@ -1165,7 +1165,17 @@
       "description" : "Message definitions",
       "popular" : true
     } ]
-  }, {
+  },{
+      "name" : "errordefinitionspackage",
+      "properties" : [ {
+        "id" : "errordefinitions",
+        "type" : "multiplecomplex",
+        "title" : "error definitions",
+        "value" : "",
+        "description" : "error definitions",
+        "popular" : true
+      } ]
+    }, {
     "name" : "istransactionpackage",
     "properties" : [ {
       "id" : "istransaction",
@@ -1278,7 +1288,7 @@
     "groups" : [ "Diagram" ],
     "mayBeRoot" : true,
     "hide" : true,
-    "propertyPackages" : [ "process_idpackage", "namepackage", "documentationpackage", "process_authorpackage", "process_versionpackage", "process_namespacepackage", "process_historylevelpackage", "isexecutablepackage", "datapropertiespackage", "executionlistenerspackage", "eventlistenerspackage", "signaldefinitionspackage", "messagedefinitionspackage", "process_potentialstarteruserpackage","process_potentialstartergrouppackage", "process_iseagerexecutionfetchpackage" ],
+    "propertyPackages" : [ "process_idpackage", "namepackage", "documentationpackage", "process_authorpackage", "process_versionpackage", "process_namespacepackage", "process_historylevelpackage", "isexecutablepackage", "datapropertiespackage", "executionlistenerspackage", "eventlistenerspackage", "signaldefinitionspackage", "messagedefinitionspackage","errordefinitionspackage", "process_potentialstarteruserpackage","process_potentialstartergrouppackage", "process_iseagerexecutionfetchpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ ]
   }, {

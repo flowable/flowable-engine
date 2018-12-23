@@ -115,6 +115,8 @@ public interface StencilConstants {
 
     final String PROPERTY_ERRORREF = "errorref";
 
+    final String PROPERTY_ERROR_CODE = "errorcode";
+
     final String PROPERTY_INTERRUPTING = "interrupting";
 
     final String PROPERTY_CANCEL_ACTIVITY = "cancelactivity";
@@ -258,6 +260,10 @@ public interface StencilConstants {
     final String PROPERTY_SIGNAL_DEFINITION_ID = "id";
     final String PROPERTY_SIGNAL_DEFINITION_NAME = "name";
     final String PROPERTY_SIGNAL_DEFINITION_SCOPE = "scope";
+
+    final String PROPERTY_ERROR_DEFINITIONS = "errordefinitions";
+    final String PROPERTY_ERROR_DEFINITION_ID = "id";
+    final String PROPERTY_ERROR_DEFINITION_ERRORCODE = "errorcode";
 
     final String PROPERTY_TERMINATE_ALL = "terminateall";
     final String PROPERTY_TERMINATE_MULTI_INSTANCE = "terminateMultiInstance";

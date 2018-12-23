@@ -518,6 +518,9 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                 TerminateEventDefinition terminateEventDefinition = (TerminateEventDefinition) eventDefinition;
                 propertiesNode.put(PROPERTY_TERMINATE_ALL, terminateEventDefinition.isTerminateAll());
                 propertiesNode.put(PROPERTY_TERMINATE_MULTI_INSTANCE, terminateEventDefinition.isTerminateMultiInstance());
+            }else if (eventDefinition instanceof ErrorEventDefinition) {
+                ErrorEventDefinition errorEventDefinition = (ErrorEventDefinition) eventDefinition;
+                propertiesNode.put(PROPERTY_ERRORREF, errorEventDefinition.getErrorCode());
             }
         }
     }

@@ -43,6 +43,7 @@ import org.flowable.bpmn.model.FlowElementsContainer;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.Gateway;
 import org.flowable.bpmn.model.GraphicInfo;
+import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.Lane;
 import org.flowable.bpmn.model.Message;
 import org.flowable.bpmn.model.MessageEventDefinition;
@@ -54,6 +55,8 @@ import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.ValuedDataObject;
+
+import org.flowable.bpmn.model.Process;
 import org.flowable.editor.constants.EditorJsonConstants;
 import org.flowable.editor.constants.StencilConstants;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
@@ -278,6 +281,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         propertiesNode.put(PROPERTY_IS_EAGER_EXECUTION_FETCHING, Boolean.valueOf(mainProcess.isEnableEagerExecutionTreeFetching()));
 
         BpmnJsonConverterUtil.convertMessagesToJson(model.getMessages(), propertiesNode);
+        BpmnJsonConverterUtil.convertErrorsToJson(model.getErrors(), propertiesNode);
 
         BpmnJsonConverterUtil.convertListenersToJson(mainProcess.getExecutionListeners(), true, propertiesNode);
         BpmnJsonConverterUtil.convertEventListenersToJson(mainProcess.getEventListeners(), propertiesNode);
@@ -589,7 +593,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
             }
 
             BpmnJsonConverterUtil.convertJsonToMessages(modelNode, bpmnModel);
-
+            BpmnJsonConverterUtil.convertJsonToErrors(modelNode, bpmnModel);
             BpmnJsonConverterUtil.convertJsonToListeners(modelNode, process);
             JsonNode eventListenersNode = BpmnJsonConverterUtil.getProperty(PROPERTY_EVENT_LISTENERS, modelNode);
             if (eventListenersNode != null) {
@@ -779,6 +783,13 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                         if (StringUtils.isNotEmpty(messageEventDef.getMessageRef())) {
                             if (bpmnModel.getMessage(messageEventDef.getMessageRef()) == null) {
                                 bpmnModel.addMessage(new Message(messageEventDef.getMessageRef(), messageEventDef.getMessageRef(), null));
+                            }
+                        }
+                    }else if (eventDef instanceof ErrorEventDefinition) {
+                        ErrorEventDefinition errorEventDef = (ErrorEventDefinition) eventDef;
+                        if (StringUtils.isNotEmpty(errorEventDef.getErrorCode())) {
+                            if (bpmnModel.getErrors().get(errorEventDef.getErrorCode())==null) {
+                                bpmnModel.addError(errorEventDef.getId(),errorEventDef.getErrorCode());
                             }
                         }
                     }

@@ -941,6 +941,11 @@
     "PROPERTY.MESSAGEDEFINITIONS.ID" : "Identifiant",
     "PROPERTY.MESSAGEDEFINITIONS.NAME" : "Nom",
 
+    "PROPERTY.ERRORDEFINITIONS.DISPLAY" : "{{length}} error definitions",
+    "PROPERTY.ERRORDEFINITIONS.EMPTY" : "No error definitions configured",
+    "PROPERTY.ERRORDEFINITIONS.ID" : "Identificador",
+    "PROPERTY.ERRORDEFINITIONS.ERRORCODE" : "errorcode",
+
     "PROPERTY.SEQUENCEFLOW.ORDER.EMPTY" : "Aucune ordre de flux de séquence défini",
     "PROPERTY.SEQUENCEFLOW.ORDER.NOT.EMPTY" : "Ordre flux de séquence order défini",
     "PROPERTY.SEQUENCEFLOW.ORDER.NO.OUTGOING.SEQUENCEFLOW.FOUND" : "Aucun flux de séquence sortant trouvé.",
