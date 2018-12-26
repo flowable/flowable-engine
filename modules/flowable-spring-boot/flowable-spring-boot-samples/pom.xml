@@ -17,6 +17,7 @@
     	<module>flowable-spring-boot-sample-app</module>
         <module>flowable-spring-boot-sample-process</module>
         <module>flowable-spring-boot-sample-jpa</module>
+        <module>flowable-spring-boot-sample-jpa-all</module>
         <module>flowable-spring-boot-sample-security</module>
         <module>flowable-spring-boot-sample-rest-api</module>      
 		<module>flowable-spring-boot-sample-rest-api-security</module>

@@ -20,11 +20,13 @@ import org.flowable.variable.api.types.VariableType;
  */
 public class NullType implements VariableType {
 
+    public static final String TYPE_NAME = "null";
+
     private static final long serialVersionUID = 1L;
 
     @Override
     public String getTypeName() {
-        return "null";
+        return TYPE_NAME;
     }
 
     @Override

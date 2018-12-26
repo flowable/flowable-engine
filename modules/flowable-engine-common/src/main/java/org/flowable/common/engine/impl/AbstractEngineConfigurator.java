@@ -218,6 +218,7 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
         initSessionFactories(engineConfiguration, targetEngineConfiguration);
         initEventDispatcher(engineConfiguration, targetEngineConfiguration);
         initClock(engineConfiguration, targetEngineConfiguration);
+        initVariableTypes(engineConfiguration, targetEngineConfiguration);
     }
 
     protected void initEngineConfigurations(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
@@ -284,6 +285,12 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
 
     protected void initClock(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
         targetEngineConfiguration.setClock(engineConfiguration.getClock());
+    }
+
+    protected void initVariableTypes(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
+        if (engineConfiguration instanceof HasVariableTypes && targetEngineConfiguration instanceof HasVariableTypes) {
+            ((HasVariableTypes) targetEngineConfiguration).setVariableTypes(((HasVariableTypes) engineConfiguration).getVariableTypes());
+        }
     }
 
     protected abstract List<Class<? extends Entity>> getEntityInsertionOrder();

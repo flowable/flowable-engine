@@ -23,6 +23,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class LongJsonType extends SerializableType {
 
+    public static final String TYPE_NAME = "longJson";
+
     protected final int minLength;
     protected ObjectMapper objectMapper;
 
@@ -33,7 +35,7 @@ public class LongJsonType extends SerializableType {
 
     @Override
     public String getTypeName() {
-        return "longJson";
+        return TYPE_NAME;
     }
 
     @Override
