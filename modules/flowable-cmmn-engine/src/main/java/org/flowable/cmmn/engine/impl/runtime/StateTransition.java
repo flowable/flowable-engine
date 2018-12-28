@@ -127,9 +127,6 @@ public class StateTransition {
     }
 
     protected static boolean isEventListenerTransitionPossible(String currentState, String transition) {
-        if (EVENT_LISTENER_TRANSITIONS.get(currentState) == null) {
-            System.out.println("BLIEP" + currentState);
-        }
         return EVENT_LISTENER_TRANSITIONS.get(currentState).contains(transition);
     }
 

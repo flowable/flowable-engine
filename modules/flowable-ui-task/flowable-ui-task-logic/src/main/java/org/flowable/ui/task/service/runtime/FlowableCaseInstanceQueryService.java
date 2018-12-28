@@ -168,7 +168,8 @@ public class FlowableCaseInstanceQueryService {
                 }
 
                 CaseDefinition caseDefinition = cmmnRepositoryService.getCaseDefinition(caseInstance.getCaseDefinitionId());
-                CaseInstanceRepresentation instanceRepresentation = new CaseInstanceRepresentation(caseInstance, caseDefinition, userRep);
+                CaseInstanceRepresentation instanceRepresentation = new CaseInstanceRepresentation(caseInstance, caseDefinition, 
+                                caseDefinition.hasGraphicalNotation(), userRep);
                 result.add(instanceRepresentation);
             }
 

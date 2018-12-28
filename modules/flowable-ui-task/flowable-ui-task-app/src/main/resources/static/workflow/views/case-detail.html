@@ -47,6 +47,9 @@
             <button ng-if="!model.caseInstance.ended" class="btn" ng-click="cancelCase()" translate="CASE.ACTION.CANCEL"></button>
             <button ng-if="model.caseInstance.ended" class="btn" ng-click="deleteCase()" translate="CASE.ACTION.DELETE"></button>
         </div>
+        <div class="btn-group pull-right" ng-show="model.caseInstance.graphicalNotationDefined">
+            <button class="btn" id="caseDiagramTrigger" translate="PROCESS.ACTION.SHOW-DIAGRAM" ng-click="showDiagram()"></button>
+        </div>
         <h2> {{model.caseInstance.name && model.caseInstance.name || model.caseInstance.caseDefinitionName}}</h2>
 
         <div class="detail">

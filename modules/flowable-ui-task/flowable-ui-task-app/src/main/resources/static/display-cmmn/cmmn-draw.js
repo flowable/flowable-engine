@@ -14,10 +14,12 @@
 function _cmmnGetColor(element, defaultColor)
 {
     var strokeColor;
-    if(element.current) {
+    if (element.current) {
         strokeColor = CURRENT_COLOR;
-    } else if(element.completed) {
+    } else if (element.completed) {
         strokeColor = COMPLETED_COLOR;
+    } else if (element.available) {
+        strokeColor = AVAILABLE_COLOR;
     } else {
         strokeColor = defaultColor;
     }

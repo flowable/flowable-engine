@@ -103,7 +103,8 @@ public class FlowableCaseInstanceService {
             }
         }
 
-        CaseInstanceRepresentation caseInstanceResult = new CaseInstanceRepresentation(caseInstance, caseDefinition, userRep);
+        CaseInstanceRepresentation caseInstanceResult = new CaseInstanceRepresentation(caseInstance, caseDefinition, 
+                        caseDefinition.hasGraphicalNotation(), userRep);
 
         return caseInstanceResult;
     }
@@ -260,7 +261,7 @@ public class FlowableCaseInstanceService {
                 user = cachedUser.getUser();
             }
         }
-        return new CaseInstanceRepresentation(caseInstance, caseDefinition, user);
+        return new CaseInstanceRepresentation(caseInstance, caseDefinition, caseDefinition.hasGraphicalNotation(), user);
     }
 
     public ResultListDataRepresentation getCaseInstanceAvailableUserEventListeners(String caseInstanceId) {

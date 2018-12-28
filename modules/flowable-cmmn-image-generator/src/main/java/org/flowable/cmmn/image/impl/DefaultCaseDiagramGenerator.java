@@ -86,6 +86,16 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
                 caseDiagramCanvas.drawUserEventListener(graphicInfo, scaleFactor);
             }
         });
+        
+        // generic event listener
+        activityDrawInstructions.put(GenericEventListener.class, new ActivityDrawInstruction() {
+            @Override
+            public void draw(DefaultCaseDiagramCanvas caseDiagramCanvas, CmmnModel cmmnModel, CaseElement caseElement) {
+                GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(caseElement.getId());
+                caseDiagramCanvas.drawGenericEventListener(graphicInfo, scaleFactor);
+            }
+        });
+        
         // task
         activityDrawInstructions.put(Task.class, new ActivityDrawInstruction() {
 

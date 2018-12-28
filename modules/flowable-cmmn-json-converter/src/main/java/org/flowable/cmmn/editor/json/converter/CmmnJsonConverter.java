@@ -106,6 +106,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
     static {
         DI_CIRCLES.add(STENCIL_TIMER_EVENT_LISTENER);
         DI_CIRCLES.add(STENCIL_USER_EVENT_LISTENER);
+        DI_CIRCLES.add(STENCIL_GENERIC_EVENT_LISTENER);
 
         DI_RECTANGLES.add(STENCIL_TASK);
         DI_RECTANGLES.add(STENCIL_TASK_HUMAN);
@@ -439,7 +440,25 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
             if (planItemDefinition == null) {
                 continue;
             }
-
+            
+            boolean isExitCriterionOnStage = false;
+            PlanItemDefinition stageDefinition = null;
+            if (criterion.isExitCriterion()) {
+                String attachedToRefid = criterion.getAttachedToRefId();
+                stageDefinition = cmmnModel.findPlanItemDefinition(attachedToRefid);
+                if (stageDefinition instanceof Stage) {
+                    Stage stage = (Stage) stageDefinition;
+                    if (!stage.isPlanModel()) {
+                        isExitCriterionOnStage = true;
+                    }
+                }
+            }
+            
+            if (isExitCriterionOnStage) {
+                PlanItem stagePlanItem = cmmnModel.findPlanItem(stageDefinition.getPlanItemRef());
+                stagePlanItem.addCriteriaRef(criterion.getId());
+            }
+            
             PlanItem planItem = cmmnModel.findPlanItem(planItemDefinition.getPlanItemRef());
             if (sourceIsCriterion) {
                 association.setSourceElement(criterion);
@@ -485,7 +504,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
                 }
             }
 
-             if (CollectionUtils.isNotEmpty(planItem.getCriteriaRefs())) {
+            if (CollectionUtils.isNotEmpty(planItem.getCriteriaRefs())) {
                  createSentryParts(planItem.getCriteriaRefs(), parentStage, associationMap, cmmnModel, cmmnModelIdHelper, planItem, planItem);
             }
 
