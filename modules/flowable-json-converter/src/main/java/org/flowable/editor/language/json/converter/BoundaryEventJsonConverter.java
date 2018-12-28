@@ -12,6 +12,8 @@
  */
 package org.flowable.editor.language.json.converter;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 
@@ -87,9 +89,24 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
         ObjectNode dockNode = objectMapper.createObjectNode();
         GraphicInfo graphicInfo = model.getGraphicInfo(boundaryEvent.getId());
         GraphicInfo parentGraphicInfo = model.getGraphicInfo(boundaryEvent.getAttachedToRef().getId());
-        dockNode.put(EDITOR_BOUNDS_X, graphicInfo.getX() - parentGraphicInfo.getX());
-        dockNode.put(EDITOR_BOUNDS_Y, graphicInfo.getY() - parentGraphicInfo.getY());
+        BigDecimal parentX = new BigDecimal(parentGraphicInfo.getX());
+        BigDecimal parentY = new BigDecimal(parentGraphicInfo.getY());
+
+        BigDecimal boundaryX = new BigDecimal(graphicInfo.getX());
+        BigDecimal boundaryWidth = new BigDecimal(graphicInfo.getWidth());
+        BigDecimal boundaryXMid = boundaryWidth.divide(new BigDecimal(2));
+
+        BigDecimal boundaryY = new BigDecimal(graphicInfo.getY());
+        BigDecimal boundaryHeight = new BigDecimal(graphicInfo.getHeight());
+        BigDecimal boundaryYMid = boundaryHeight.divide(new BigDecimal(2));
+
+        BigDecimal xBound = boundaryX.add(boundaryXMid).subtract(parentX).setScale(0, RoundingMode.HALF_UP);
+        BigDecimal yBound = boundaryY.add(boundaryYMid).subtract(parentY).setScale(0,RoundingMode.HALF_UP);
+
+        dockNode.put(EDITOR_BOUNDS_X, xBound.intValue());
+        dockNode.put(EDITOR_BOUNDS_Y, yBound.intValue());
         dockersArrayNode.add(dockNode);
+
         flowElementNode.set("dockers", dockersArrayNode);
 
         propertiesNode.put(PROPERTY_CANCEL_ACTIVITY, boundaryEvent.isCancelActivity());
