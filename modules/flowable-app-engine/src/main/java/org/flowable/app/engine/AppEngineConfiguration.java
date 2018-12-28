@@ -57,6 +57,7 @@ import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
+import org.flowable.common.engine.impl.HasVariableTypes;
 import org.flowable.common.engine.impl.calendar.BusinessCalendarManager;
 import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
@@ -100,7 +101,7 @@ import org.flowable.variable.service.impl.types.UUIDType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class AppEngineConfiguration extends AbstractEngineConfiguration implements
-        AppEngineConfigurationApi, HasExpressionManagerEngineConfiguration {
+        AppEngineConfigurationApi, HasExpressionManagerEngineConfiguration, HasVariableTypes {
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/app/db/mapping/mappings.xml";
     public static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_APP_";
@@ -654,10 +655,12 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         return this;
     }
 
+    @Override
     public VariableTypes getVariableTypes() {
         return variableTypes;
     }
 
+    @Override
     public AppEngineConfiguration setVariableTypes(VariableTypes variableTypes) {
         this.variableTypes = variableTypes;
         return this;

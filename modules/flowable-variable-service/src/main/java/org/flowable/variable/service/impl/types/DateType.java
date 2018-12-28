@@ -22,9 +22,11 @@ import org.flowable.variable.api.types.VariableType;
  */
 public class DateType implements VariableType {
 
+    public static final String TYPE_NAME = "date";
+
     @Override
     public String getTypeName() {
-        return "date";
+        return TYPE_NAME;
     }
 
     @Override

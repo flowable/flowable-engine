@@ -178,6 +178,7 @@ import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
+import org.flowable.common.engine.impl.HasVariableTypes;
 import org.flowable.common.engine.impl.ScriptingEngineAwareEngineConfiguration;
 import org.flowable.common.engine.impl.calendar.BusinessCalendarManager;
 import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
@@ -277,7 +278,7 @@ import org.flowable.variable.service.impl.types.UUIDType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi,
-        ScriptingEngineAwareEngineConfiguration, HasExpressionManagerEngineConfiguration {
+        ScriptingEngineAwareEngineConfiguration, HasExpressionManagerEngineConfiguration, HasVariableTypes {
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/cmmn/db/mapping/mappings.xml";
     public static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_CMMN_";
@@ -2361,10 +2362,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    @Override
     public VariableTypes getVariableTypes() {
         return variableTypes;
     }
 
+    @Override
     public CmmnEngineConfiguration setVariableTypes(VariableTypes variableTypes) {
         this.variableTypes = variableTypes;
         return this;

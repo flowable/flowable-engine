@@ -25,6 +25,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class JsonType implements VariableType {
 
+    public static final String TYPE_NAME = "json";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonType.class);
 
     protected final int maxLength;
@@ -37,7 +39,7 @@ public class JsonType implements VariableType {
 
     @Override
     public String getTypeName() {
-        return "json";
+        return TYPE_NAME;
     }
 
     @Override

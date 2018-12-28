@@ -45,6 +45,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
+import org.flowable.common.engine.impl.HasVariableTypes;
 import org.flowable.common.engine.impl.ScriptingEngineAwareEngineConfiguration;
 import org.flowable.common.engine.impl.calendar.BusinessCalendarManager;
 import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
@@ -128,7 +129,6 @@ import org.flowable.engine.impl.agenda.AgendaSessionFactory;
 import org.flowable.engine.impl.agenda.DefaultFlowableEngineAgendaFactory;
 import org.flowable.engine.impl.app.AppDeployer;
 import org.flowable.engine.impl.app.AppResourceConverterImpl;
-import org.flowable.engine.impl.bpmn.data.ItemInstance;
 import org.flowable.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.flowable.engine.impl.bpmn.deployer.BpmnDeploymentHelper;
 import org.flowable.engine.impl.bpmn.deployer.CachingAndArtifactsManager;
@@ -178,7 +178,6 @@ import org.flowable.engine.impl.bpmn.parser.handler.TaskParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.TimerEventDefinitionParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.TransactionParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.UserTaskParseHandler;
-import org.flowable.engine.impl.bpmn.webservice.MessageInstance;
 import org.flowable.engine.impl.cmd.RedeployV5ProcessDefinitionsCmd;
 import org.flowable.engine.impl.cmd.ValidateExecutionRelatedEntityCountCfgCmd;
 import org.flowable.engine.impl.cmd.ValidateTaskRelatedEntityCountCfgCmd;
@@ -378,7 +377,6 @@ import org.flowable.variable.service.impl.db.IbatisVariableTypeHandler;
 import org.flowable.variable.service.impl.db.VariableDbSchemaManager;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.ByteArrayType;
-import org.flowable.variable.service.impl.types.CustomObjectType;
 import org.flowable.variable.service.impl.types.DateType;
 import org.flowable.variable.service.impl.types.DefaultVariableTypes;
 import org.flowable.variable.service.impl.types.DoubleType;
@@ -406,7 +404,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Joram Barrez
  */
 public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfiguration implements
-        ScriptingEngineAwareEngineConfiguration, HasExpressionManagerEngineConfiguration {
+        ScriptingEngineAwareEngineConfiguration, HasExpressionManagerEngineConfiguration, HasVariableTypes {
 
     public static final String DEFAULT_WS_SYNC_FACTORY = "org.flowable.engine.impl.webservice.CxfWebServiceClientFactory";
 
@@ -2177,8 +2175,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             variableTypes.addType(new LongJsonType(getMaxLengthString() + 1, objectMapper));
             variableTypes.addType(new ByteArrayType());
             variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects));
-            variableTypes.addType(new CustomObjectType("item", ItemInstance.class));
-            variableTypes.addType(new CustomObjectType("message", MessageInstance.class));
             if (customPostVariableTypes != null) {
                 for (VariableType customVariableType : customPostVariableTypes) {
                     variableTypes.addType(customVariableType);
@@ -2819,10 +2815,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    @Override
     public VariableTypes getVariableTypes() {
         return variableTypes;
     }
 
+    @Override
     public ProcessEngineConfigurationImpl setVariableTypes(VariableTypes variableTypes) {
         this.variableTypes = variableTypes;
         return this;
