@@ -45,6 +45,7 @@ public final class CmmnRestUrls {
     public static final String SEGMENT_EVENTS = "events";
     public static final String SEGMENT_IDENTITYLINKS_FAMILY_GROUPS = "groups";
     public static final String SEGMENT_IDENTITYLINKS_FAMILY_USERS = "users";
+    public static final String SEGMENT_FORM = "form";
     public static final String SEGMENT_VARIABLE_DATA = "data";
     public static final String SEGMENT_HISTORIC_CASE_INSTANCE_RESOURCE = "historic-case-instances";
     public static final String SEGMENT_HISTORIC_TASK_INSTANCE_RESOURCE = "historic-task-instances";
@@ -77,6 +78,7 @@ public final class CmmnRestUrls {
     public static final String SEGMENT_DIAGRAM = "diagram";
     public static final String SEGMENT_SIGNALS = "signals";
     public static final String SEGMENT_IMAGE = "image";
+    public static final String SEGMENT_START_FORM = "start-form";
     public static final String SEGMENT_DECISION_TABLES = "decision-tables";
     public static final String SEGMENT_FORM_DEFINITIONS = "form-definitions";
     public static final String SEGMENT_STAGE_OVERVIEW = "stage-overview";
@@ -131,6 +133,11 @@ public final class CmmnRestUrls {
      */
     public static final String[] URL_CASE_DEFINITION_IDENTITYLINK = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_CASE_DEFINITION_RESOURCE, "{0}", SEGMENT_IDENTITYLINKS, "{1}", "{2}" };
 
+    /**
+     * URL template for the start form of a case definition: <i>cmmn-repository/case-definitions/{0:caseDefinitionId}/start-form</i>
+     */
+    public static final String[] URL_CASE_DEFINITION_START_FORM = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_CASE_DEFINITION_RESOURCE, "{0}", SEGMENT_START_FORM };
+    
     /**
      * URL template for the image of a case definition: <i>cmmn-repository/case-definitions/{0:caseDefinitionId}/image</i>
      */
@@ -190,6 +197,11 @@ public final class CmmnRestUrls {
      * URL template for an identitylink on a task: <i>runtime/tasks/{0:taskId}/identitylinks /{1:family}/{2:identityId}/{3:type}</i>
      */
     public static final String[] URL_TASK_IDENTITYLINK = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_TASK_RESOURCE, "{0}", SEGMENT_IDENTITYLINKS, "{1}", "{2}", "{3}" };
+    
+    /**
+     * URL template for a task form: <i>runtime/tasks/{0:taskId}/form</i>
+     */
+    public static final String[] URL_TASK_FORM = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_TASK_RESOURCE, "{0}", SEGMENT_FORM };
     
     /**
      * URL template for an task's events: <i>runtime/tasks/{0:taskId}/events</i>

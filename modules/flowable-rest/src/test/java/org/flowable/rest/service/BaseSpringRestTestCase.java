@@ -71,6 +71,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.TestHelper;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.form.api.FormRepositoryService;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
@@ -100,7 +101,9 @@ public class BaseSpringRestTestCase {
     
     protected static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
             "ACT_GE_PROPERTY",
-            "ACT_ID_PROPERTY");
+            "ACT_ID_PROPERTY",
+            "ACT_FO_DATABASECHANGELOG",
+            "ACT_FO_DATABASECHANGELOGLOCK");
     
     @Rule 
     public TestName testName = new TestName();
@@ -123,6 +126,8 @@ public class BaseSpringRestTestCase {
     protected IdentityService identityService;
     protected ManagementService managementService;
     protected DynamicBpmnService dynamicBpmnService;
+    protected FormRepositoryService formRepositoryService;
+    protected org.flowable.form.api.FormService formEngineFormService;
 
     protected static CloseableHttpClient client;
     protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<>();
@@ -169,6 +174,8 @@ public class BaseSpringRestTestCase {
         identityService = appContext.getBean(IdentityService.class);
         managementService = appContext.getBean(ManagementService.class);
         dynamicBpmnService = appContext.getBean(DynamicBpmnService.class);
+        formRepositoryService = appContext.getBean(FormRepositoryService.class);
+        formEngineFormService = appContext.getBean(org.flowable.form.api.FormService.class);
         
         if (server == null) {
             TestServer testServer = TestServerUtil.createAndStartServer(appContext);

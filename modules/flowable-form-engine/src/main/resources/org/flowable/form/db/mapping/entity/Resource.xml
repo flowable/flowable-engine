@@ -43,6 +43,10 @@
   </update>
 
   <!-- RESOURCE DELETE -->
+  
+  <delete id="deleteFormResource" parameterType="string">
+    delete from ${prefix}ACT_FO_FORM_RESOURCE where ID_ = #{id}
+  </delete>
 
   <delete id="deleteFormResourcesByDeploymentId" parameterType="string">
     delete from ${prefix}ACT_FO_FORM_RESOURCE where DEPLOYMENT_ID_ = #{id}

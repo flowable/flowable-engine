@@ -131,6 +131,11 @@
 
         <!-- Test dependencies -->
         <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-form-spring-configurator</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>

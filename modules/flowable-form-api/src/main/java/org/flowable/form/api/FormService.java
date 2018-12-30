@@ -100,4 +100,14 @@ public interface FormService {
             String scopeId, String scopeType, Map<String, Object> variables, String tenantId);
 
     FormInstanceQuery createFormInstanceQuery();
+    
+    byte[] getFormInstanceValues(String formInstanceId);
+    
+    void deleteFormInstance(String formInstanceId);
+    
+    void deleteFormInstancesByFormDefinition(String formDefinitionId);
+    
+    void deleteFormInstancesByProcessDefinition(String processDefinitionId);
+    
+    void deleteFormInstancesByScopeDefinition(String scopeDefinitionId);
 }

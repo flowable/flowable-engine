@@ -22,8 +22,13 @@ import org.flowable.form.api.FormInstanceQuery;
 import org.flowable.form.api.FormService;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.cmd.CreateFormInstanceCmd;
+import org.flowable.form.engine.impl.cmd.DeleteFormInstanceCmd;
+import org.flowable.form.engine.impl.cmd.DeleteFormInstancesByFormDefinitionCmd;
+import org.flowable.form.engine.impl.cmd.DeleteFormInstancesByProcessDefinitionCmd;
+import org.flowable.form.engine.impl.cmd.DeleteFormInstancesByScopeDefinitionCmd;
 import org.flowable.form.engine.impl.cmd.GetFormInstanceByScopeModelCmd;
 import org.flowable.form.engine.impl.cmd.GetFormInstanceModelCmd;
+import org.flowable.form.engine.impl.cmd.GetFormInstanceValuesCmd;
 import org.flowable.form.engine.impl.cmd.GetFormModelWithVariablesCmd;
 import org.flowable.form.engine.impl.cmd.GetVariablesFromFormSubmissionCmd;
 import org.flowable.form.engine.impl.cmd.SaveFormInstanceCmd;
@@ -179,9 +184,34 @@ public class FormServiceImpl extends CommonEngineServiceImpl<FormEngineConfigura
         return commandExecutor.execute(new GetFormInstanceByScopeModelCmd(formDefinitionKey, parentDeploymentId, 
                         scopeId, scopeType, tenantId, variables));
     }
+    
+    @Override
+    public byte[] getFormInstanceValues(String formInstanceId) {
+        return commandExecutor.execute(new GetFormInstanceValuesCmd(formInstanceId));
+    }
 
     @Override
     public FormInstanceQuery createFormInstanceQuery() {
         return new FormInstanceQueryImpl(commandExecutor);
+    }
+
+    @Override
+    public void deleteFormInstance(String formInstanceId) {
+        commandExecutor.execute(new DeleteFormInstanceCmd(formInstanceId));
+    }
+
+    @Override
+    public void deleteFormInstancesByFormDefinition(String formDefinitionId) {
+        commandExecutor.execute(new DeleteFormInstancesByFormDefinitionCmd(formDefinitionId));
+    }
+
+    @Override
+    public void deleteFormInstancesByProcessDefinition(String processDefinitionId) {
+        commandExecutor.execute(new DeleteFormInstancesByProcessDefinitionCmd(processDefinitionId));
+    }
+
+    @Override
+    public void deleteFormInstancesByScopeDefinition(String scopeDefinitionId) {
+        commandExecutor.execute(new DeleteFormInstancesByScopeDefinitionCmd(scopeDefinitionId));
     }
 }

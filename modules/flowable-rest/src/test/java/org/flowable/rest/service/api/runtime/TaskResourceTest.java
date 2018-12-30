@@ -13,6 +13,11 @@
 
 package org.flowable.rest.service.api.runtime;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Calendar;
 import java.util.List;
 
@@ -25,8 +30,12 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.form.api.FormDefinition;
+import org.flowable.form.api.FormDeployment;
+import org.flowable.form.api.FormInstance;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.DelegationState;
@@ -38,8 +47,6 @@ import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to a single Task resource.
@@ -448,6 +455,93 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery().list();
             for (HistoricTaskInstance task : historicTasks) {
                 historyService.deleteHistoricTaskInstance(task.getId());
+            }
+        }
+    }
+    
+    @Test
+    @Deployment
+    public void testCompleteTaskWithForm() throws Exception {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").singleResult();
+        try {
+            formRepositoryService.createDeployment().addClasspathResource("org/flowable/rest/service/api/runtime/simple.form").deploy();
+            
+            FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
+            assertNotNull(formDefinition);
+            
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            String taskId = task.getId();
+            
+            String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_FORM, taskId);
+            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+            JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+            closeResponse(response);
+            assertEquals(formDefinition.getId(), responseNode.get("id").asText());
+            assertEquals(formDefinition.getKey(), responseNode.get("key").asText());
+            assertEquals(formDefinition.getName(), responseNode.get("name").asText());
+            assertEquals(2, responseNode.get("fields").size());
+            
+            ObjectNode requestNode = objectMapper.createObjectNode();
+            ArrayNode variablesNode = objectMapper.createArrayNode();
+            requestNode.put("action", "complete");
+            requestNode.put("formDefinitionId", formDefinition.getId());
+            requestNode.set("variables", variablesNode);
+
+            ObjectNode var1 = objectMapper.createObjectNode();
+            variablesNode.add(var1);
+            var1.put("name", "user");
+            var1.put("value", "First value");
+            ObjectNode var2 = objectMapper.createObjectNode();
+            variablesNode.add(var2);
+            var2.put("name", "number");
+            var2.put("value", 789);
+
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));
+            httpPost.setEntity(new StringEntity(requestNode.toString()));
+            closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
+
+            task = taskService.createTaskQuery().taskId(taskId).singleResult();
+            assertNull(task);
+            
+            FormInstance formInstance = formEngineFormService.createFormInstanceQuery().taskId(taskId).singleResult();
+            assertNotNull(formInstance);
+            byte[] valuesBytes = formEngineFormService.getFormInstanceValues(formInstance.getId());
+            assertNotNull(valuesBytes);
+            JsonNode instanceNode = objectMapper.readTree(valuesBytes);
+            JsonNode valuesNode = instanceNode.get("values");
+            assertEquals("First value", valuesNode.get("user").asText());
+            assertEquals(789, valuesNode.get("number").asInt());
+
+            if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+                HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
+                assertNotNull(historicTaskInstance);
+                List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).list();
+                assertNotNull(variables);
+                assertEquals(2, variables.size());
+                boolean foundFirst = false;
+                boolean foundSecond = false;
+
+                for (HistoricVariableInstance variable : variables) {
+                    if (variable.getVariableName().equals("user")) {
+                        assertEquals("First value", variable.getValue());
+                        foundFirst = true;
+                    } else if (variable.getVariableName().equals("number")) {
+                        assertEquals(789, variable.getValue());
+                        foundSecond = true;
+                    }
+                }
+
+                assertTrue(foundFirst);
+                assertTrue(foundSecond);
+            }
+
+        } finally {
+            formEngineFormService.deleteFormInstancesByProcessDefinition(processDefinition.getId());
+            
+            List<FormDeployment> formDeployments = formRepositoryService.createDeploymentQuery().list();
+            for (FormDeployment formDeployment : formDeployments) {
+                formRepositoryService.deleteDeployment(formDeployment.getId());
             }
         }
     }

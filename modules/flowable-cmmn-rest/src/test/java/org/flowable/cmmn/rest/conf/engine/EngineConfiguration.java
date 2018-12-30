@@ -24,6 +24,10 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.spring.CmmnEngineFactoryBean;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.form.api.FormRepositoryService;
+import org.flowable.form.engine.FormEngineConfiguration;
+import org.flowable.form.spring.SpringFormEngineConfiguration;
+import org.flowable.form.spring.configurator.SpringFormEngineConfigurator;
 import org.flowable.idm.api.IdmIdentityService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -79,7 +83,24 @@ public class EngineConfiguration {
         cmmnEngineConfiguration.setTransactionManager(annotationDrivenTransactionManager());
         cmmnEngineConfiguration.setHistoryLevel(HistoryLevel.FULL);
         cmmnEngineConfiguration.setEnableEntityLinks(true);
+        cmmnEngineConfiguration.addConfigurator(formEngineConfigurator());
         return cmmnEngineConfiguration;
+    }
+    
+    @Bean
+    public SpringFormEngineConfigurator formEngineConfigurator() {
+        SpringFormEngineConfigurator formEngineConfigurator =  new SpringFormEngineConfigurator();
+        formEngineConfigurator.setFormEngineConfiguration(formEngineConfiguration());
+        return formEngineConfigurator;
+    }
+    
+    @Bean(name = "formEngineConfiguration")
+    public FormEngineConfiguration formEngineConfiguration() {
+        SpringFormEngineConfiguration formEngineConfiguration = new SpringFormEngineConfiguration();
+        formEngineConfiguration.setDataSource(dataSource());
+        formEngineConfiguration.setDatabaseSchemaUpdate(FormEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+        formEngineConfiguration.setTransactionManager(annotationDrivenTransactionManager());
+        return formEngineConfiguration;
     }
 
     @Bean
@@ -110,5 +131,15 @@ public class EngineConfiguration {
     @Bean
     public IdmIdentityService idmIdentityService() {
         return cmmnEngine().getCmmnEngineConfiguration().getIdmIdentityService();
+    }
+    
+    @Bean
+    public FormRepositoryService formRepositoryService(CmmnEngine cmmnEngine) {
+        return formEngineConfiguration().getFormRepositoryService();
+    }
+    
+    @Bean
+    public org.flowable.form.api.FormService formEngineFormService(CmmnEngine cmmnEngine) {
+        return formEngineConfiguration().getFormService();
     }
 }

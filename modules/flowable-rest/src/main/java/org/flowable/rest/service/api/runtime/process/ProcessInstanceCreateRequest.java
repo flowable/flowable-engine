@@ -13,15 +13,17 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Modified to add a "returnVariables" flag, which determines whether the variables that exist within the process instance when the first wait state is encountered (or when the process instance
@@ -41,6 +43,8 @@ public class ProcessInstanceCreateRequest {
     protected String businessKey;
     protected List<RestVariable> variables;
     protected List<RestVariable> transientVariables;
+    protected List<RestVariable> startFormVariables;
+    protected String outcome;
     protected String tenantId;
     protected String overrideDefinitionTenantId;
 
@@ -126,6 +130,23 @@ public class ProcessInstanceCreateRequest {
 
     public void setTransientVariables(List<RestVariable> transientVariables) {
         this.transientVariables = transientVariables;
+    }
+    
+    @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
+    public List<RestVariable> getStartFormVariables() {
+        return startFormVariables;
+    }
+
+    public void setStartFormVariables(List<RestVariable> startFormVariables) {
+        this.startFormVariables = startFormVariables;
+    }
+
+    public String getOutcome() {
+        return outcome;
+    }
+
+    public void setOutcome(String outcome) {
+        this.outcome = outcome;
     }
 
     @JsonIgnore
