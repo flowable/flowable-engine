@@ -61,6 +61,8 @@ public class AppEngineImpl implements AppEngine {
     @Override
     public void close() {
         AppEngines.unregister(this);
+        appEngineConfiguration.close();
+
     }
     
     @Override
