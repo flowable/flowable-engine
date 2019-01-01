@@ -149,6 +149,32 @@ public class CmmnModel {
 
         return foundPlanItem;
     }
+    
+    public PlanItem findPlanItemByPlanItemDefinitionId(String id) {
+        PlanItem foundPlanItem = null;
+        for (Case caseModel : cases) {
+            foundPlanItem = caseModel.getPlanModel().findPlanItemForPlanItemDefinitionInPlanFragmentOrUpwards(id);
+            if (foundPlanItem != null) {
+                break;
+            }
+        }
+
+        if (foundPlanItem == null) {
+            for (Case caseModel : cases) {
+                for (Stage stage : caseModel.getPlanModel().findPlanItemDefinitionsOfType(Stage.class, true)) {
+                    foundPlanItem = stage.findPlanItemForPlanItemDefinitionInPlanFragmentOrUpwards(id);
+                    if (foundPlanItem != null) {
+                        break;
+                    }
+                }
+                if (foundPlanItem != null) {
+                    break;
+                }
+            }
+        }
+
+        return foundPlanItem;
+    }
 
     public void addAssociation(Association association) {
         associations.add(association);

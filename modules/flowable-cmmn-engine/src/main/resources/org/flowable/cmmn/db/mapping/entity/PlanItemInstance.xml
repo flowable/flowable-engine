@@ -292,8 +292,13 @@
   <select id="selectPlanItemInstance" parameterType="string" resultMap="planItemInstanceResultMap">
       select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where ID_ = #{id, jdbcType=VARCHAR}
   </select>
+  
+  <select id="selectPlanItemInstancesByCaseInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="planItemInstanceResultMap">
+      select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST RES
+      where CASE_INST_ID_ = #{parameter}
+  </select>
 
-  <select id="selectPlanItemInstanceByCaseInstanceIdAndPlanItemId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="planItemInstanceResultMap">
+  <select id="selectPlanItemInstancesByCaseInstanceIdAndPlanItemId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="planItemInstanceResultMap">
       select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST RES
       where CASE_INST_ID_ = #{parameter.caseInstanceId} and ELEMENT_ID_ = #{parameter.planItemId}
   </select>
@@ -443,6 +448,9 @@
         </if>
         <if test="completeable">
             and RES.IS_COMPLETEABLE_ = #{completeable, jdbcType=BOOLEAN}
+        </if>
+        <if test="onlyStages">
+            and RES.IS_STAGE_ = #{onlyStages, jdbcType=BOOLEAN}
         </if>
         <if test="entryCriterionId != null">
             and RES.ENTRY_CRITERION_ID_ = #{entryCriterionId, jdbcType=VARCHAR}

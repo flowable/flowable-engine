@@ -78,6 +78,7 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
     PlanItemInstanceQuery planItemInstanceEntryCriterionId(String entryCriterionId);
     PlanItemInstanceQuery planItemInstanceExitCriterionId(String exitCriterionId);
     PlanItemInstanceQuery planItemInstanceCompleteable();
+    PlanItemInstanceQuery onlyStages();
     PlanItemInstanceQuery planItemInstanceTenantId(String tenantId);
     PlanItemInstanceQuery planItemInstanceWithoutTenantId();
     

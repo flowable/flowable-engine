@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
+import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
 import org.flowable.cmmn.api.runtime.GenericEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
@@ -185,5 +186,10 @@ public interface CmmnRuntimeService {
      *            id of case instance for which the start form should be retrieved.
      */
     FormInfo getStartFormModel(String caseDefinitionId, String caseInstanceId);
+    
+    /**
+     * Create a {@link ChangePlanItemStateBuilder}, that allows to set various options for changing the state of a process instance.
+     */
+    ChangePlanItemStateBuilder createChangePlanItemStateBuilder();
     
 }

@@ -166,7 +166,9 @@ import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCac
 import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelperImpl;
+import org.flowable.cmmn.engine.impl.runtime.CmmnDynamicStateManager;
 import org.flowable.cmmn.engine.impl.runtime.CmmnRuntimeServiceImpl;
+import org.flowable.cmmn.engine.impl.runtime.DefaultCmmnDynamicStateManager;
 import org.flowable.cmmn.engine.impl.scripting.CmmnVariableScopeResolverFactory;
 import org.flowable.cmmn.engine.impl.task.DefaultCmmnTaskVariableScopeResolver;
 import org.flowable.cmmn.image.CaseDiagramGenerator;
@@ -323,6 +325,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CaseInstanceHelper caseInstanceHelper;
     protected CmmnHistoryManager cmmnHistoryManager;
     protected ProcessInstanceService processInstanceService;
+    protected CmmnDynamicStateManager dynamicStateManager;
     protected Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks;
     protected Map<String, List<PlanItemInstanceLifecycleListener>> planItemInstanceLifecycleListeners;
 
@@ -764,6 +767,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initCaseInstanceHelper();
         initCandidateManager();
         initHistoryManager();
+        initDynamicStateManager();
         initCaseInstanceCallbacks();
         initFormFieldHandler();
         initClock();
@@ -1219,6 +1223,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             } else {
                 cmmnHistoryManager = new DefaultCmmnHistoryManager(this);
             }
+        }
+    }
+    
+    public void initDynamicStateManager() {
+        if (dynamicStateManager == null) {
+            dynamicStateManager = new DefaultCmmnDynamicStateManager();
         }
     }
 
@@ -2023,6 +2033,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setCmmnHistoryManager(CmmnHistoryManager cmmnHistoryManager) {
         this.cmmnHistoryManager = cmmnHistoryManager;
+        return this;
+    }
+
+    public CmmnDynamicStateManager getDynamicStateManager() {
+        return dynamicStateManager;
+    }
+
+    public CmmnEngineConfiguration setDynamicStateManager(CmmnDynamicStateManager dynamicStateManager) {
+        this.dynamicStateManager = dynamicStateManager;
         return this;
     }
 
