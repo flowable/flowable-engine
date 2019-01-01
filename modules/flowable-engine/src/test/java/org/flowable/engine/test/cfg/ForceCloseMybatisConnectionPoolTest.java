@@ -34,6 +34,8 @@ public class ForceCloseMybatisConnectionPoolTest {
         // given
         // that the process engine is configured with forceCloseMybatisConnectionPool = true
         StandaloneInMemProcessEngineConfiguration standaloneInMemProcessEngineConfiguration =  new StandaloneInMemProcessEngineConfiguration();
+        standaloneInMemProcessEngineConfiguration.setJdbcUrl("jdbc:h2:mem:forceCloseMybatisConnectionPoolTest");
+
         standaloneInMemProcessEngineConfiguration.setForceCloseMybatisConnectionPool(true);
 
         ProcessEngine processEngine = standaloneInMemProcessEngineConfiguration.buildProcessEngine();
@@ -58,7 +60,7 @@ public class ForceCloseMybatisConnectionPoolTest {
         // that the process engine is configured with forceCloseMybatisConnectionPool = false
         StandaloneInMemProcessEngineConfiguration standaloneInMemProcessEngineConfiguration =  new StandaloneInMemProcessEngineConfiguration();
         standaloneInMemProcessEngineConfiguration.setForceCloseMybatisConnectionPool(false);
-
+        standaloneInMemProcessEngineConfiguration.setJdbcUrl("jdbc:h2:mem:forceCloseMybatisConnectionPoolTest");
         ProcessEngine processEngine = standaloneInMemProcessEngineConfiguration.buildProcessEngine();
 
         PooledDataSource pooledDataSource = (PooledDataSource) standaloneInMemProcessEngineConfiguration.getDataSource();
