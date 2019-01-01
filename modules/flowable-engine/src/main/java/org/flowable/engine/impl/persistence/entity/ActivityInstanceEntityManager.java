@@ -96,4 +96,10 @@ public interface ActivityInstanceEntityManager extends EntityManager<ActivityIns
      */
     void updateActivityInstancesProcessDefinitionId(String newProcessDefinitionId, String processInstanceId);
 
+    /**
+     * record that sequence flow was taken
+     *
+     * @param execution execution which executed sequence flow
+     */
+    void recordSequenceFlowTaken(ExecutionEntity execution);
 }

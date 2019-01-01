@@ -16,7 +16,6 @@ import java.util.Map;
 
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.common.engine.impl.history.HistoryLevel;
-import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -222,5 +221,16 @@ public interface HistoryManager {
      */
     void updateActivity(ExecutionEntity executionEntity, String oldActivityId, FlowElement newFlowElement, TaskEntity task);
 
-    void updateHistoricActivityInstance(ActivityInstanceEntity activityInstance);
+    /**
+     * Update historic activity instance according to changes done in the runtime activity
+     * @param activityInstance
+     */
+    void updateHistoricActivityInstance(ActivityInstance activityInstance);
+
+    /**
+     * Create new historic activity instance from runtime activity instance
+     *
+     * @param activityInstance activity instance template
+     */
+    void createHistoricActivityInstance(ActivityInstance activityInstance);
 }

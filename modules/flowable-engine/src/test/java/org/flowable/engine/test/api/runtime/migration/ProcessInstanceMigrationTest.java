@@ -183,7 +183,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
             }
 
             List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).list();
-            assertEquals(3, historicActivityInstances.size());
+            assertEquals(5, historicActivityInstances.size());
             for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
                 assertEquals(version2ProcessDef.getId(), historicActivityInstance.getProcessDefinitionId());
             }
@@ -241,7 +241,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
             }
 
             List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).list();
-            assertEquals(3, historicActivityInstances.size());
+            assertEquals(5, historicActivityInstances.size());
             for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
                 assertEquals(version2ProcessDef.getId(), historicActivityInstance.getProcessDefinitionId());
             }
@@ -304,7 +304,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
             }
 
             List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).list();
-            assertEquals(6, historicActivityInstances.size());
+            assertEquals(10, historicActivityInstances.size());
             for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
                 assertEquals(version2ProcessDef.getId(), historicActivityInstance.getProcessDefinitionId());
             }
@@ -378,7 +378,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
             }
 
             List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).list();
-            assertEquals(6, historicActivityInstances.size());
+            assertEquals(9, historicActivityInstances.size());
             for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
                 assertEquals(version2ProcessDef.getId(), historicActivityInstance.getProcessDefinitionId());
             }

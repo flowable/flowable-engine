@@ -77,7 +77,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
     Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
     assertNotNull(task);
     
-    assertEquals(2, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count());
+    assertEquals(3, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count());
     
     taskService.claim(task.getId(), "test");
     taskService.setOwner(task.getId(), "test");
@@ -93,7 +93,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
     
     assertTrue(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count() == 1);
     assertTrue(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count() == 0);
-    assertEquals(3, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count());
+    assertEquals(5, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count());
     
     assertEquals(2, historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count());
     
@@ -135,7 +135,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
     Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
     assertNotNull(task);
     
-    assertEquals(2, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count());
+    assertEquals(3, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count());
     
     taskService.claim(task.getId(), "test");
     taskService.setOwner(task.getId(), "test");
@@ -151,7 +151,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
     
     assertTrue(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count() == 1);
     assertTrue(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count() == 1);
-    assertEquals(3, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count());
+    assertEquals(5, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count());
     
     HistoricTaskInstance historicTask = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
     assertEquals("test", historicTask.getOwner());
@@ -201,7 +201,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
     Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
     assertNotNull(task);
     
-    assertEquals(2, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count());
+    assertEquals(3, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count());
     
     taskService.claim(task.getId(), "test");
     taskService.setOwner(task.getId(), "test");
@@ -217,7 +217,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
     
     assertTrue(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count() == 1);
     assertTrue(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count() == 1);
-    assertEquals(3, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count());
+    assertEquals(5, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count());
     
     HistoricTaskInstance historicTask = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
     assertEquals("test", historicTask.getOwner());

@@ -119,11 +119,13 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
             assertNotNull(historicTaskInstance.getDurationInMillis());
 
             List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).list();
-            assertEquals(3, historicActivityInstances.size());
+            assertEquals(5, historicActivityInstances.size());
             for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
                 assertNotNull(historicActivityInstance.getActivityId());
-                assertNotNull(historicActivityInstance.getActivityName());
                 assertNotNull(historicActivityInstance.getActivityType());
+                if (!historicActivityInstance.getActivityType().equals("sequenceFlow")) {
+                    assertNotNull(historicActivityInstance.getActivityName());
+                }
                 assertNotNull(historicActivityInstance.getProcessDefinitionId());
                 assertNotNull(historicActivityInstance.getProcessInstanceId());
                 assertNotNull(historicActivityInstance.getExecutionId());
@@ -168,8 +170,8 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         waitForHistoryJobExecutorToProcessAllJobs(70000L, 100L);
         assertNull(managementService.createHistoryJobQuery().singleResult());
 
-        // 1002 -> (start, 1) + (end, 1) + (gateway, 500), + (service task, 500)
-        assertEquals(1002, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).count());
+        // 2003 -> (start, 1) + -->(1) + (service task, 500) + -->(500) + (gateway, 500), + <--(499) + -->(1) + (end, 1)
+        assertEquals(2003, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).count());
     }
 
     @Test

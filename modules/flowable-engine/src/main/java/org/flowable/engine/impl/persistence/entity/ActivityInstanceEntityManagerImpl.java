@@ -38,6 +38,9 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
  */
 public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<ActivityInstanceEntity> implements ActivityInstanceEntityManager {
 
+    protected static final String NO_ACTIVITY_ID_PREFIX = "_noActivityId_";
+    protected static final String NO_ACTIVITY_ID_SEPARATOR = "->";
+
     protected ActivityInstanceDataManager activityInstanceDataManager;
 
     protected final boolean usePrefixId;
@@ -103,6 +106,14 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
         } else {
             getHistoryManager().recordActivityEnd(activityInstance);
         }
+    }
+
+    @Override
+    public void recordSequenceFlowTaken(ExecutionEntity executionEntity) {
+        ActivityInstanceEntity activityInstance = createActivityInstanceEntity(executionEntity);
+        activityInstance.setDurationInMillis(0l);
+        activityInstance.setEndTime(activityInstance.getStartTime());
+        getHistoryManager().createHistoricActivityInstance(activityInstance);
     }
 
     @Override
@@ -299,7 +310,16 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
         activityInstanceEntity.setProcessDefinitionId(processDefinitionId);
         activityInstanceEntity.setProcessInstanceId(processInstanceId);
         activityInstanceEntity.setExecutionId(execution.getId());
-        activityInstanceEntity.setActivityId(execution.getActivityId());
+        if (execution.getActivityId() != null ) {
+            activityInstanceEntity.setActivityId(execution.getActivityId());
+        } else {
+            // sequence flow activity id can be null
+            if (execution.getCurrentFlowElement() instanceof SequenceFlow) {
+                SequenceFlow currentFlowElement = (SequenceFlow) execution.getCurrentFlowElement();
+                activityInstanceEntity.setActivityId(getArtificialSequenceFlowId(currentFlowElement));
+            }
+        }
+
         if (execution.getCurrentFlowElement() != null) {
             activityInstanceEntity.setActivityName(execution.getCurrentFlowElement().getName());
             activityInstanceEntity.setActivityType(parseActivityType(execution.getCurrentFlowElement()));
@@ -368,6 +388,10 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
 
         insert(activityInstanceEntity);
         return activityInstanceEntity;
+    }
+
+    protected String getArtificialSequenceFlowId(SequenceFlow sequenceFlow) {
+        return NO_ACTIVITY_ID_PREFIX + sequenceFlow.getSourceRef() + NO_ACTIVITY_ID_SEPARATOR + sequenceFlow.getTargetRef();
     }
 
 }

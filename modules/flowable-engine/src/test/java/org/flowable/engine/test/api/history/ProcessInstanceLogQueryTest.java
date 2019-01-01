@@ -132,7 +132,7 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
     public void testIncludeActivities() {
         ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeActivities().singleResult();
         List<HistoricData> events = log.getHistoricData();
-        assertEquals(5, events.size());
+        assertEquals(9, events.size());
 
         for (HistoricData event : events) {
             assertTrue(event instanceof HistoricActivityInstance);
@@ -171,7 +171,7 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
             ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeTasks().includeActivities().includeComments().includeVariables()
                     .includeVariableUpdates().singleResult();
             List<HistoricData> events = log.getHistoricData();
-            assertEquals(15, events.size());
+            assertEquals(19, events.size());
         }
     }
 

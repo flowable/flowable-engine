@@ -100,7 +100,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         HistoricActivityInstanceQuery historicActivityInstanceQuery = historyService.createHistoricActivityInstanceQuery();
 
         long finishedActivityInstanceCount = historicActivityInstanceQuery.finished().count();
-        assertEquals("The Start event is completed", 1, finishedActivityInstanceCount);
+        assertEquals("The Start event and sequence flow are completed", 2, finishedActivityInstanceCount);
 
         long unfinishedActivityInstanceCount = historicActivityInstanceQuery.unfinished().count();
         assertEquals("One active (unfinished) User org.flowable.task.service.Task", 1, unfinishedActivityInstanceCount);
@@ -127,7 +127,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         assertEquals(0, historyService.createHistoricActivityInstanceQuery().executionId("nonExistingExecutionId").list().size());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertEquals(3, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).list().size());
+            assertEquals(5, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).list().size());
         } else {
             assertEquals(0, historyService.createHistoricActivityInstanceQuery().executionId(processInstance.getId()).list().size());
         }
@@ -135,7 +135,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         assertEquals(0, historyService.createHistoricActivityInstanceQuery().processInstanceId("nonExistingProcessInstanceId").list().size());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertEquals(3, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).list().size());
+            assertEquals(5, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).list().size());
         } else {
             assertEquals(0, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).list().size());
         }
@@ -143,7 +143,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         assertEquals(0, historyService.createHistoricActivityInstanceQuery().processDefinitionId("nonExistingProcessDefinitionId").list().size());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertEquals(3, historyService.createHistoricActivityInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).list().size());
+            assertEquals(5, historyService.createHistoricActivityInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).list().size());
         } else {
             assertEquals(0, historyService.createHistoricActivityInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).list().size());
         }
@@ -151,7 +151,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         assertEquals(0, historyService.createHistoricActivityInstanceQuery().unfinished().list().size());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertEquals(3, historyService.createHistoricActivityInstanceQuery().finished().list().size());
+            assertEquals(5, historyService.createHistoricActivityInstanceQuery().finished().list().size());
         } else {
             assertEquals(0, historyService.createHistoricActivityInstanceQuery().finished().list().size());
         }
@@ -233,7 +233,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
 
         int expectedActivityInstances;
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            expectedActivityInstances = 2;
+            expectedActivityInstances = 3;
         } else {
             expectedActivityInstances = 0;
         }
