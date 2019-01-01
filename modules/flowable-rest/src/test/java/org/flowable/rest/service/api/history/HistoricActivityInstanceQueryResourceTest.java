@@ -13,6 +13,9 @@
 
 package org.flowable.rest.service.api.history;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,8 +37,6 @@ import org.junit.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import static org.junit.Assert.*;
 
 /**
  * Test for REST-operation related to the historic activity instance query resource.
@@ -119,7 +120,7 @@ public class HistoricActivityInstanceQueryResourceTest extends BaseSpringRestTes
 
         requestNode = objectMapper.createObjectNode();
         requestNode.put("processDefinitionId", processInstance.getProcessDefinitionId());
-        assertResultsPresentInDataResponse(url, requestNode, 8, "theStart", "flow1", "flow1", "processTask", "flow2", "processTask2");
+        assertResultsPresentInDataResponse(url, requestNode, 8, "theStart", "flow1", "processTask", "flow2", "processTask2");
 
         requestNode = objectMapper.createObjectNode();
         requestNode.put("taskAssignee", "kermit");

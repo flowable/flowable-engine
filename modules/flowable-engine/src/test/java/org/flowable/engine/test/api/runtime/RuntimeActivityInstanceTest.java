@@ -150,7 +150,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
         ActivityInstance sequenceFlow = runtimeService.createActivityInstanceQuery().activityType("sequenceFlow").singleResult();
-        assertEquals("_noActivityId_theStart->theTask", sequenceFlow.getActivityId());
+        assertEquals("_flow_theStart__theTask", sequenceFlow.getActivityId());
     }
 
     @Test

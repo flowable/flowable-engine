@@ -373,7 +373,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
                 } else if ("theEnd".equals(historicActivityInstance.getActivityId())) {
                     endCount++;
 
-                } else if (historicActivityInstance.getActivityId().contains("->")) {
+                } else if (historicActivityInstance.getActivityId().contains("_flow_")) {
                     sequenceFlowCount++;
 
                 } else {
@@ -413,7 +413,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
                 } else if ("theEnd".equals(historicActivityInstance.getActivityId())) {
                     endCount++;
 
-                } else if (historicActivityInstance.getActivityId().contains("->")) {
+                } else if (historicActivityInstance.getActivityId().contains("_flow_")) {
                     sequenceFlowCount++;
 
                 } else {
@@ -470,7 +470,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
                 } else if ("theEnd".equals(historicActivityInstance.getActivityId())) {
                     endCount++;
 
-                } else if (historicActivityInstance.getActivityId().contains("->")) {
+                } else if (historicActivityInstance.getActivityId().contains("_flow_")) {
                     sequenceFlowCount++;
 
                 } else {
@@ -510,7 +510,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
                 } else if ("theEnd".equals(historicActivityInstance.getActivityId())) {
                     endCount++;
 
-                } else if (historicActivityInstance.getActivityId().contains("->")) {
+                } else if (historicActivityInstance.getActivityId().contains("_flow_")) {
                     sequenceFlowCount++;
 
                 } else {

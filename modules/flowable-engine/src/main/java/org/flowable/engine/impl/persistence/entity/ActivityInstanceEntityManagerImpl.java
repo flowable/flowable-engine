@@ -38,8 +38,8 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
  */
 public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<ActivityInstanceEntity> implements ActivityInstanceEntityManager {
 
-    protected static final String NO_ACTIVITY_ID_PREFIX = "_noActivityId_";
-    protected static final String NO_ACTIVITY_ID_SEPARATOR = "->";
+    protected static final String NO_ACTIVITY_ID_PREFIX = "_flow_";
+    protected static final String NO_ACTIVITY_ID_SEPARATOR = "__";
 
     protected ActivityInstanceDataManager activityInstanceDataManager;
 
