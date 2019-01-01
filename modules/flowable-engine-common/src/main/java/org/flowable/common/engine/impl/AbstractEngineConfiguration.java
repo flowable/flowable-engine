@@ -372,12 +372,6 @@ public abstract class AbstractEngineConfiguration {
                 }
                 dataSource = pooledDataSource;
             }
-
-            if (dataSource instanceof PooledDataSource) {
-                // ACT-233: connection pool of Ibatis is not properly
-                // initialized if this is not called!
-                ((PooledDataSource) dataSource).forceCloseAll();
-            }
         }
 
         if (databaseType == null) {
