@@ -79,6 +79,8 @@ import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javafx.beans.binding.When;
+
 public abstract class AbstractEngineConfiguration {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
@@ -102,6 +104,8 @@ public abstract class AbstractEngineConfiguration {
      * Upon building of the process engine, a check is performed and an update of the schema is performed if it is necessary.
      */
     public static final String DB_SCHEMA_UPDATE_TRUE = "true";
+
+    protected boolean forceCloseMybatisConnectionPool = true;
 
     protected String databaseType;
     protected String jdbcDriver = "org.h2.Driver";
@@ -834,7 +838,18 @@ public abstract class AbstractEngineConfiguration {
 
         }
     }
-    
+
+    public void close() {
+        if (forceCloseMybatisConnectionPool && dataSource instanceof PooledDataSource) {
+            /*
+             * When the datasource is created by a Flowable engine (i.e. it's an instance of PooledDataSource),
+             * the connection pool needs to be closed when closing the engine.
+             * Note that calling forceCloseAll() multiple times (as is the case when running with multiple engine) is ok.
+             */
+            ((PooledDataSource) dataSource).forceCloseAll();
+        }
+    }
+
     protected List<EngineConfigurator> getEngineSpecificEngineConfigurators() {
         // meant to be overridden if needed
         return Collections.emptyList();
@@ -1535,4 +1550,12 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
+    public AbstractEngineConfiguration setForceCloseMybatisConnectionPool(boolean forceCloseMybatisConnectionPool) {
+        this.forceCloseMybatisConnectionPool = forceCloseMybatisConnectionPool;
+        return this;
+    }
+
+    public boolean isForceCloseMybatisConnectionPool() {
+        return forceCloseMybatisConnectionPool;
+    }
 }
