@@ -12,15 +12,14 @@
  */
 package org.flowable.content.engine.test;
 
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
+
 import org.apache.ibatis.datasource.pooled.PoolState;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.flowable.content.engine.ContentEngine;
 import org.flowable.content.engine.impl.cfg.StandaloneInMemContentEngineConfiguration;
 import org.junit.Test;
-
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
-
 
 /**
  * @author Zheng Ji
@@ -34,6 +33,7 @@ public class ForceCloseMybatisConnectionPoolTest {
         // given
         // that the AbstractEngineConfiguration is configured with forceCloseMybatisConnectionPool = true
         StandaloneInMemContentEngineConfiguration standaloneInMemContentEngineConfiguration =  new StandaloneInMemContentEngineConfiguration();
+        standaloneInMemContentEngineConfiguration.setJdbcUrl("jdbc:h2:mem:flowable-content-" + this.getClass().getName());
         standaloneInMemContentEngineConfiguration.setForceCloseMybatisConnectionPool(true);
 
         ContentEngine contentEngine = standaloneInMemContentEngineConfiguration.buildContentEngine();
@@ -41,14 +41,14 @@ public class ForceCloseMybatisConnectionPoolTest {
 
         PooledDataSource pooledDataSource = (PooledDataSource) standaloneInMemContentEngineConfiguration.getDataSource();
         PoolState state = pooledDataSource.getPoolState();
-
+        assertTrue(state.getIdleConnectionCount() > 0);
 
         // then
         // if the  engine is closed
         contentEngine.close();
 
         // the idle connections are closed
-        assertTrue(state.getIdleConnectionCount() == 0);
+        assertEquals(0, state.getIdleConnectionCount());
 
     }
 
@@ -58,13 +58,14 @@ public class ForceCloseMybatisConnectionPoolTest {
         // given
         // that the AbstractEngineConfiguration is configured with forceCloseMybatisConnectionPool = false
         StandaloneInMemContentEngineConfiguration standaloneInMemContentEngineConfiguration =  new StandaloneInMemContentEngineConfiguration();
+        standaloneInMemContentEngineConfiguration.setJdbcUrl("jdbc:h2:mem:flowable-content-" + this.getClass().getName());
         standaloneInMemContentEngineConfiguration.setForceCloseMybatisConnectionPool(false);
 
         ContentEngine contentEngine = standaloneInMemContentEngineConfiguration.buildContentEngine();
 
         PooledDataSource pooledDataSource = (PooledDataSource) standaloneInMemContentEngineConfiguration.getDataSource();
         PoolState state = pooledDataSource.getPoolState();
-        int idleConnections = state.getIdleConnectionCount();
+        assertTrue(state.getIdleConnectionCount() > 0);
 
 
         // then
@@ -72,11 +73,10 @@ public class ForceCloseMybatisConnectionPoolTest {
         contentEngine.close();
 
         // the idle connections are not closed
-        assertEquals(state.getIdleConnectionCount(), idleConnections);
+        assertTrue(state.getIdleConnectionCount() > 0);
 
         pooledDataSource.forceCloseAll();
-
-        assertTrue(state.getIdleConnectionCount() == 0);
+        assertEquals(0, state.getIdleConnectionCount());
     }
 
 }

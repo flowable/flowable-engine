@@ -12,15 +12,14 @@
  */
 package org.flowable.idm.engine.test.api.identity;
 
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
+
 import org.apache.ibatis.datasource.pooled.PoolState;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.impl.cfg.StandaloneInMemIdmEngineConfiguration;
 import org.junit.Test;
-
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
-
 
 /**
  * @author Zheng Ji
@@ -34,23 +33,22 @@ public class ForceCloseMybatisConnectionPoolTest {
         // given
         // that the AbstractEngineConfiguration is configured with forceCloseMybatisConnectionPool = true
         StandaloneInMemIdmEngineConfiguration standaloneInMemIdmEngineConfiguration =  new StandaloneInMemIdmEngineConfiguration();
+        standaloneInMemIdmEngineConfiguration.setJdbcUrl("jdbc:h2:mem:flowable-idm-" + this.getClass().getName());
         standaloneInMemIdmEngineConfiguration.setForceCloseMybatisConnectionPool(true);
         standaloneInMemIdmEngineConfiguration.setDatabaseSchemaUpdate("drop-create");
 
         IdmEngine idmEngine = standaloneInMemIdmEngineConfiguration.buildIdmEngine();
 
-
         PooledDataSource pooledDataSource = (PooledDataSource) standaloneInMemIdmEngineConfiguration.getDataSource();
         PoolState state = pooledDataSource.getPoolState();
-
+        assertTrue(state.getIdleConnectionCount() > 0);
 
         // then
         // if the  engine is closed
         idmEngine.close();
 
         // the idle connections are closed
-        assertTrue(state.getIdleConnectionCount() == 0);
-
+        assertEquals(0, state.getIdleConnectionCount());
     }
 
     @Test
@@ -59,6 +57,7 @@ public class ForceCloseMybatisConnectionPoolTest {
         // given
         // that the AbstractEngineConfiguration is configured with forceCloseMybatisConnectionPool = false
         StandaloneInMemIdmEngineConfiguration standaloneInMemIdmEngineConfiguration =  new StandaloneInMemIdmEngineConfiguration();
+        standaloneInMemIdmEngineConfiguration.setJdbcUrl("jdbc:h2:mem:flowable-idm-" + this.getClass().getName());
         standaloneInMemIdmEngineConfiguration.setForceCloseMybatisConnectionPool(false);
         standaloneInMemIdmEngineConfiguration.setDatabaseSchemaUpdate("drop-create");
 
@@ -66,19 +65,17 @@ public class ForceCloseMybatisConnectionPoolTest {
 
         PooledDataSource pooledDataSource = (PooledDataSource) standaloneInMemIdmEngineConfiguration.getDataSource();
         PoolState state = pooledDataSource.getPoolState();
-        int idleConnections = state.getIdleConnectionCount();
-
+        assertTrue(state.getIdleConnectionCount() > 0);
 
         // then
         // if the  engine is closed
         idmEngine.close();
 
         // the idle connections are not closed
-        assertEquals(state.getIdleConnectionCount(), idleConnections);
+        assertTrue(state.getIdleConnectionCount() > 0);
 
         pooledDataSource.forceCloseAll();
-
-        assertTrue(state.getIdleConnectionCount() == 0);
+        assertEquals(0, state.getIdleConnectionCount());
     }
 
 }

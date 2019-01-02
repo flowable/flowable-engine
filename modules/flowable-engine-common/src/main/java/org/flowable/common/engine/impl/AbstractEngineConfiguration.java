@@ -79,6 +79,8 @@ import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javafx.beans.binding.When;
+
 public abstract class AbstractEngineConfiguration {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
@@ -838,10 +840,12 @@ public abstract class AbstractEngineConfiguration {
     }
 
     public void close() {
-        if (forceCloseMybatisConnectionPool
-                && dataSource instanceof PooledDataSource) {
-
-            // ACT-233: connection pool of Ibatis is not properely initialized if this is not called!
+        if (forceCloseMybatisConnectionPool && dataSource instanceof PooledDataSource) {
+            /*
+             * When the datasource is created by a Flowable engine (i.e. it's an instance of PooledDataSource),
+             * the connection pool needs to be closed when closing the engine.
+             * Note that calling forceCloseAll() multiple times (as is the case when running with multiple engine) is ok.
+             */
             ((PooledDataSource) dataSource).forceCloseAll();
         }
     }
