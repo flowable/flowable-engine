@@ -501,6 +501,16 @@
                 </plugins>
             </build>
         </profile>
+        
+        <profile>
+            <id>java8</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
+            <properties>
+                <argLine>-Xmx1g</argLine>
+            </properties>
+        </profile>
     </profiles>
 
 </project>
