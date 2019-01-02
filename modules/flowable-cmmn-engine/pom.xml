@@ -508,7 +508,7 @@
                 <jdk>1.8</jdk>
             </activation>
             <properties>
-                <argLine>-Xmx1g</argLine>
+                <argLine>-Xmx3g</argLine>
             </properties>
         </profile>
     </profiles>
