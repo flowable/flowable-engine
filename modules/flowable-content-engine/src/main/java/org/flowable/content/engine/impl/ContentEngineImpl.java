@@ -54,6 +54,7 @@ public class ContentEngineImpl implements ContentEngine {
     @Override
     public void close() {
         ContentEngines.unregister(this);
+        engineConfiguration.close();
     }
 
     // getters and setters
