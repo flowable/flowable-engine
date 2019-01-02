@@ -24,6 +24,7 @@ import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
@@ -233,4 +234,16 @@ public interface HistoryManager {
      * @param activityInstance activity instance template
      */
     void createHistoricActivityInstance(ActivityInstance activityInstance);
+
+    /**
+     * Record historic user task log entry
+     * @param taskLogEntryBuilder historic user task log entry description
+     */
+    void recordHistoricUserTaskLogEntry(HistoricTaskLogEntryBuilder taskLogEntryBuilder);
+
+    /**
+     * Delete historic user task log entry
+     * @param logNumber log identifier
+     */
+    void deleteHistoryUserTaskLog(long logNumber);
 }

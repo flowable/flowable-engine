@@ -233,6 +233,26 @@ public enum FlowableEngineEventType implements FlowableEventType {
     TASK_COMPLETED,
 
     /**
+     * A task owner has been changed. This is thrown alongside with an {@link #ENTITY_UPDATED} event.
+     */
+    TASK_OWNER_CHANGED,
+
+    /**
+     * A task priority has been changed. This is thrown alongside with an {@link #ENTITY_UPDATED} event.
+     */
+    TASK_PRIORITY_CHANGED,
+
+    /**
+     * A task dueDate has been changed. This is thrown alongside with an {@link #ENTITY_UPDATED} event.
+     */
+    TASK_DUEDATE_CHANGED,
+
+    /**
+     * A task name has been changed. This is thrown alongside with an {@link #ENTITY_UPDATED} event.
+     */
+    TASK_NAME_CHANGED,
+
+    /**
      * A process instance has been created. All basic properties have been set, but variables not yet.
      */
     PROCESS_CREATED,

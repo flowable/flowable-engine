@@ -72,6 +72,8 @@ import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstance
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.EntityLinkCreatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.EntityLinkDeletedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.HistoricCaseInstanceDeletedHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.HistoricUserTaskLogDeleteJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.HistoricUserTaskLogRecordJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.IdentityLinkCreatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.IdentityLinkDeletedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.MilestoneReachedHistoryJsonTransformer;
@@ -682,6 +684,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected FormFieldHandler formFieldHandler;
 
     protected BusinessCalendarManager businessCalendarManager;
+
+    /**
+     * Enable user task event logging
+     */
+    protected boolean enableHistoricTaskLogging;
 
     /**
      * postprocessor for a task builder
@@ -1350,6 +1357,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.taskServiceConfiguration.setClock(this.clock);
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
         this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        this.taskServiceConfiguration.setEnableHistoricTaskLogging(this.enableHistoricTaskLogging);
 
         if (this.taskPostProcessor != null) {
             this.taskServiceConfiguration.setTaskPostProcessor(this.taskPostProcessor);
@@ -1513,7 +1521,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         historyJsonTransformers.add(new PlanItemInstanceStartedHistoryJsonTransformer());
         historyJsonTransformers.add(new PlanItemInstanceSuspendedHistoryJsonTransformer());
         historyJsonTransformers.add(new PlanItemInstanceTerminatedHistoryJsonTransformer());
-        
+
+        historyJsonTransformers.add(new HistoricUserTaskLogRecordJsonTransformer());
+        historyJsonTransformers.add(new HistoricUserTaskLogDeleteJsonTransformer());
+
         return historyJsonTransformers;
     }
 
@@ -3272,5 +3283,13 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         if (this.clock != null) {
             clock.reset();
         }
+    }
+
+    public boolean isEnableHistoricTaskLogging() {
+        return enableHistoricTaskLogging;
+    }
+
+    public void setEnableHistoricTaskLogging(boolean enableHistoricTaskLogging) {
+        this.enableHistoricTaskLogging = enableHistoricTaskLogging;
     }
 }

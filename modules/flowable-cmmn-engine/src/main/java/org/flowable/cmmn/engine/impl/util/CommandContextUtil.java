@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.util;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
@@ -91,6 +92,10 @@ public class CommandContextUtil {
     
     public static CmmnTaskService getCmmnTaskService() {
         return getCmmnEngineConfiguration().getCmmnTaskService();
+    }
+
+    public static CmmnHistoryService getCmmnHistoryService() {
+        return getCmmnEngineConfiguration().getCmmnHistoryService();
     }
 
     public static ExpressionManager getExpressionManager() {

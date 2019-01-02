@@ -82,6 +82,7 @@ public class DeploymentEntityManagerImpl extends AbstractEntityManager<Deploymen
 
         if (cascade) {
             deleteProcessInstancesForProcessDefinitions(processDefinitions);
+            deleteHistoricTaskEventLogEntriesForProcessDefinitions(processDefinitions);
         }
 
         for (ProcessDefinition processDefinition : processDefinitions) {
@@ -134,6 +135,12 @@ public class DeploymentEntityManagerImpl extends AbstractEntityManager<Deploymen
     protected void deleteProcessInstancesForProcessDefinitions(List<ProcessDefinition> processDefinitions) {
         for (ProcessDefinition processDefinition : processDefinitions) {
             getExecutionEntityManager().deleteProcessInstancesByProcessDefinition(processDefinition.getId(), "deleted deployment", true);
+        }
+    }
+
+    protected void deleteHistoricTaskEventLogEntriesForProcessDefinitions(List<ProcessDefinition> processDefinitions) {
+        for (ProcessDefinition processDefinition : processDefinitions) {
+            CommandContextUtil.getHistoricTaskService().deleteHistoricTaskLogEntriesForProcessDefinition(processDefinition.getId());
         }
     }
 

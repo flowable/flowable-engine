@@ -33,6 +33,7 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.api.runtime.ProcessInstanceQueryTest;
@@ -980,6 +981,11 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertThat(historicIdentityLink.getType()).isEqualTo(IdentityLinkType.PARTICIPANT);
         assertThat(historicIdentityLink.getUserId()).isEqualTo("johndoe");
         assertThat(historicIdentityLink.getCreateTime()).isEqualTo(taskCompleteTime);
+
+        managementService.executeCommand(commandContext -> {
+            CommandContextUtil.getHistoricTaskService().deleteHistoricTaskLogEntriesForProcessDefinition(processInstance.getProcessDefinitionId());
+            return null;
+        });
     }
 
 }

@@ -12,6 +12,7 @@
  */
 package org.flowable.task.service.history;
 
+import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 public interface InternalHistoryTaskManager {
@@ -21,4 +22,13 @@ public interface InternalHistoryTaskManager {
      */
     void recordTaskInfoChange(TaskEntity taskEntity);
 
+    /**
+     * Record historyUserTaskLogEntry
+     */
+    void recordHistoryUserTaskLog(HistoricTaskLogEntryBuilder taskLogEntryBuilder);
+
+    /**
+     * Delete historyUserTaskLogEntry
+     */
+    void deleteHistoryUserTaskLog(long logNumber);
 }

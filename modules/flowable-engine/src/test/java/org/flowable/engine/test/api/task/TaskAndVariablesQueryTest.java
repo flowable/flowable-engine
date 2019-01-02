@@ -359,10 +359,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
                 assertThat(updatedHistoricTask.getTaskDefinitionId(), is("testTaskDefinitionId"));
             }
         } finally {
-            this.taskService.deleteTask("testTaskId");
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-                this.historyService.deleteHistoricTaskInstance("testTaskId");
-            }
+            this.taskService.deleteTask("testTaskId", true);
         }
     }
     
@@ -382,12 +379,8 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
                 assertThat(updatedHistoricTasks.size(), is(2));
             }
         } finally {
-            this.taskService.deleteTask("testTaskId1");
-            this.taskService.deleteTask("testTaskId2");
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-                this.historyService.deleteHistoricTaskInstance("testTaskId1");
-                this.historyService.deleteHistoricTaskInstance("testTaskId2");
-            }
+            this.taskService.deleteTask("testTaskId1", true);
+            this.taskService.deleteTask("testTaskId2", true);
         }
     }
 

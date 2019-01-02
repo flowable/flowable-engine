@@ -219,6 +219,8 @@ import org.flowable.engine.impl.history.async.json.transformer.EntityLinkCreated
 import org.flowable.engine.impl.history.async.json.transformer.EntityLinkDeletedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.FormPropertiesSubmittedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.HistoricDetailVariableUpdateHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.HistoricUserTaskLogDeleteJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.HistoricUserTaskLogRecordJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.IdentityLinkCreatedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.IdentityLinkDeletedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceDeleteHistoryByProcessDefinitionIdJsonTransformer;
@@ -841,6 +843,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     // Event logging to database
     protected boolean enableDatabaseEventLogging;
+    protected boolean enableHistoricTaskLogging;
 
     /**
      * Using field injection together with a delegate expression for a service task / execution listener / task listener is not thread-sade , see user guide section 'Field Injection' for more
@@ -1424,6 +1427,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.taskServiceConfiguration.setClock(this.clock);
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
         this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        this.taskServiceConfiguration.setEnableHistoricTaskLogging(this.enableHistoricTaskLogging);
 
         if (this.taskPostProcessor != null) {
             this.taskServiceConfiguration.setTaskPostProcessor(this.taskPostProcessor);
@@ -1958,6 +1962,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         historyJsonTransformers.add(new VariableRemovedHistoryJsonTransformer());
         historyJsonTransformers.add(new HistoricDetailVariableUpdateHistoryJsonTransformer());
         historyJsonTransformers.add(new FormPropertiesSubmittedHistoryJsonTransformer());
+
+        historyJsonTransformers.add(new HistoricUserTaskLogRecordJsonTransformer());
+        historyJsonTransformers.add(new HistoricUserTaskLogDeleteJsonTransformer());
         return historyJsonTransformers;
     }
 
@@ -3490,6 +3497,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setEnableDatabaseEventLogging(boolean enableDatabaseEventLogging) {
         this.enableDatabaseEventLogging = enableDatabaseEventLogging;
+        return this;
+    }
+
+    public boolean isEnableHistoricTaskLogging() {
+        return enableHistoricTaskLogging;
+    }
+
+    public ProcessEngineConfigurationImpl setEnableHistoricTaskLogging(boolean enableHistoricTaskLogging) {
+        this.enableHistoricTaskLogging = enableHistoricTaskLogging;
         return this;
     }
 

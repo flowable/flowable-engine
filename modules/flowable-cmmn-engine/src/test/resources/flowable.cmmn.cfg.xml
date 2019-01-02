@@ -17,6 +17,8 @@
         <property name="asyncFailedJobWaitTime" value="1" />
         
         <property name="enableEntityLinks" value="true" />
+
+        <property name="enableHistoricTaskLogging" value="true" />
     </bean>
 
     <bean id="testBean" class="org.flowable.cmmn.test.delegate.TestBean" />

@@ -221,8 +221,7 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
             assertThat(taskFromQuery.getScopeId(), is("testScopeId"));
             assertThat(taskFromQuery.getScopeType(), is("testScopeType"));
         } finally {
-            cmmnTaskService.deleteTask(task.getId());
-            cmmnHistoryService.deleteHistoricTaskInstance(task.getId());
+            cmmnTaskService.deleteTask(task.getId(), true);
         }
     }
 
@@ -235,8 +234,7 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
             assertThat(taskFromQuery.getScopeId(), nullValue());
             assertThat(taskFromQuery.getScopeType(), nullValue());
         } finally {
-            cmmnTaskService.deleteTask(task.getId());
-            cmmnHistoryService.deleteHistoricTaskInstance(task.getId());
+            cmmnTaskService.deleteTask(task.getId(), true);
         }
     }
 

@@ -221,8 +221,7 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
     }
 
     protected void deleteTask(String taskId) {
-        taskService.deleteTask(taskId);
-        historyService.deleteHistoricTaskInstance(taskId);
+        taskService.deleteTask(taskId, true);
     }
 
     protected void deleteTasks(List<org.flowable.task.api.Task> tasks) {

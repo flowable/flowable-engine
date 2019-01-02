@@ -59,8 +59,8 @@ public class TaskHelper {
             deleteTask(task, deleteReason, cascade, true);
             
         } else if (cascade) {
+            deleteHistoricTaskLogEntries(taskId);
             deleteHistoricTask(taskId);
-
         }
     }
 
@@ -104,6 +104,7 @@ public class TaskHelper {
             
             if (cascade) {
                 deleteHistoricTask(task.getId());
+                deleteHistoricTaskLogEntries(task.getId());
             } else {
                 CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskEnd(task, deleteReason);
             }
@@ -155,6 +156,7 @@ public class TaskHelper {
                 List<HistoricTaskInstanceEntity> subTasks = historicTaskService.findHistoricTasksByParentTaskId(historicTaskInstance.getId());
                 for (HistoricTaskInstance subTask : subTasks) {
                     deleteHistoricTask(subTask.getId());
+                    deleteHistoricTaskLogEntries(subTask.getId());
                 }
     
                 CommandContextUtil.getHistoricVariableService().deleteHistoricVariableInstancesByTaskId(taskId);
@@ -162,6 +164,12 @@ public class TaskHelper {
     
                 historicTaskService.deleteHistoricTask(historicTaskInstance);
             }
+        }
+    }
+
+    public static void deleteHistoricTaskLogEntries(String taskId) {
+        if (CommandContextUtil.getTaskServiceConfiguration().isEnableHistoricTaskLogging()) {
+            CommandContextUtil.getHistoricTaskService().deleteHistoricTaskLogEntriesForTaskId(taskId);
         }
     }
     

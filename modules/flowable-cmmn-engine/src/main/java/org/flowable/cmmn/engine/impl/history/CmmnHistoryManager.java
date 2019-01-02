@@ -17,6 +17,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
@@ -75,4 +76,15 @@ public interface CmmnHistoryManager {
 
     void recordPlanItemInstanceExit(PlanItemInstanceEntity planItemInstanceEntity);
 
+    /**
+     * Record historic user task log entry
+     * @param taskLogEntryBuilder historic user task log entry description
+     */
+    void recordHistoricUserTaskLogEntry(HistoricTaskLogEntryBuilder taskLogEntryBuilder);
+
+    /**
+     * Delete historic user task log entry
+     * @param logNumber log identifier
+     */
+    void deleteHistoricUserTaskLogEntry(long logNumber);
 }

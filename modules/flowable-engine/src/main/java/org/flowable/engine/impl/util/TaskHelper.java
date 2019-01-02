@@ -34,14 +34,19 @@ import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEnt
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.TaskService;
+import org.flowable.task.service.TaskServiceConfiguration;
+import org.flowable.task.service.impl.BaseHistoricTaskLogEntryBuilderImpl;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.event.impl.FlowableVariableEventBuilder;
 import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayRef;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
@@ -89,6 +94,8 @@ public class TaskHelper {
                     Authentication.getAuthenticatedUserId(), null, IdentityLinkType.PARTICIPANT);
         }
 
+        logUserTaskCompleted(taskEntity);
+
         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
         if (eventDispatcher.isEnabled()) {
             if (variables != null) {
@@ -106,6 +113,19 @@ public class TaskHelper {
         if (taskEntity.getExecutionId() != null) {
             ExecutionEntity executionEntity = CommandContextUtil.getExecutionEntityManager(commandContext).findById(taskEntity.getExecutionId());
             CommandContextUtil.getAgenda(commandContext).planTriggerExecutionOperation(executionEntity);
+        }
+    }
+
+    protected static void logUserTaskCompleted(TaskEntity taskEntity) {
+        TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
+        if (taskServiceConfiguration.isEnableHistoricTaskLogging()) {
+            BaseHistoricTaskLogEntryBuilderImpl taskLogEntryBuilder = new BaseHistoricTaskLogEntryBuilderImpl(taskEntity);
+            ObjectNode data = taskServiceConfiguration.getObjectMapper().createObjectNode();
+            taskLogEntryBuilder.timeStamp(taskServiceConfiguration.getClock().getCurrentTime());
+            taskLogEntryBuilder.userId(Authentication.getAuthenticatedUserId());
+            taskLogEntryBuilder.data(data.toString());
+            taskLogEntryBuilder.type(HistoricTaskLogEntryType.USER_TASK_COMPLETED.name());
+            taskServiceConfiguration.getInternalHistoryTaskManager().recordHistoryUserTaskLog(taskLogEntryBuilder);
         }
     }
 
@@ -313,6 +333,7 @@ public class TaskHelper {
     protected static void handleTaskHistory(CommandContext commandContext, TaskEntity task, String deleteReason, boolean cascade) {
         if (cascade) {
             deleteHistoricTask(task.getId());
+            deleteHistoricTaskEventLogEntries(task.getId());
         } else {
             ExecutionEntity execution = null;
             if (task.getExecutionId() != null) {
@@ -361,6 +382,7 @@ public class TaskHelper {
             deleteTask(task, deleteReason, cascade, true, true);
         } else if (cascade) {
             deleteHistoricTask(taskId);
+            deleteHistoricTaskEventLogEntries(taskId);
         }
     }
 
@@ -421,6 +443,10 @@ public class TaskHelper {
                 historicTaskService.deleteHistoricTask(historicTaskInstance);
             }
         }
+    }
+
+    public static void deleteHistoricTaskEventLogEntries(String taskId) {
+        CommandContextUtil.getHistoricTaskService().deleteHistoricTaskLogEntriesForTaskId(taskId);
     }
 
     protected static void fireAssignmentEvents(TaskEntity taskEntity) {
