@@ -52,10 +52,7 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     protected Date startedAfter;
     protected Date finishedBefore;
     protected Date finishedAfter;
-    protected String[] tenantIds;
-
-    
-
+    protected List<String> tenantIds;
 
     public HistoricActivityInstanceQueryImpl() {
     }
@@ -196,7 +193,7 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
         return this;
     }
 
-    public HistoricActivityInstanceQuery tenantIdIn(String... tenantIds) {
+    public HistoricActivityInstanceQuery tenantIdIn(List<String> tenantIds) {
         this.tenantIds = tenantIds;
         return this;
     }
@@ -344,20 +341,24 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     public String getDeleteReasonLike() {
         return deleteReasonLike;
     }
+    
     public Date getStartedAfter() {
         return startedAfter;
     }
+    
     public Date getStartedBefore() {
         return startedBefore;
     }
+    
     public Date getFinishedAfter() {
         return finishedAfter;
     }
+    
     public Date getFinishedBefore() {
         return finishedBefore;
     }
-
-    public String[] getTenantIds() {
+    
+    public List<String> getTenantIds() {
         return tenantIds;
     }
 }

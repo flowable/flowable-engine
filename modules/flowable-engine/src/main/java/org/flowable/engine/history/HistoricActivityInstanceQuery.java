@@ -13,10 +13,11 @@
 
 package org.flowable.engine.history;
 
-import org.flowable.common.engine.api.query.Query;
-
-import java.util.Set;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
+
+import org.flowable.common.engine.api.query.Query;
 
 /**
  * Programmatic querying for {@link HistoricActivityInstance}s.
@@ -96,7 +97,7 @@ public interface HistoricActivityInstanceQuery extends Query<HistoricActivityIns
     HistoricActivityInstanceQuery activityTenantId(String tenantId);
 
     /** Only select historic activity instances with one of the given tenant ids. */
-    HistoricActivityInstanceQuery tenantIdIn(String... tenantIds);
+    HistoricActivityInstanceQuery tenantIdIn(List<String> tenantIds);
 
     /**
      * Only select historic activity instances with a tenant id like the given one.

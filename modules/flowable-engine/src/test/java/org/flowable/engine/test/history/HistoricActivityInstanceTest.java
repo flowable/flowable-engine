@@ -16,7 +16,9 @@ package org.flowable.engine.test.history;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -60,8 +62,11 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testOneTaskProcessActivityTypes() {
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcessActivityTypesProcess");
-
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                        .processDefinitionKey("oneTaskProcessActivityTypesProcess")
+                        .overrideProcessDefinitionTenantId("tenant1")
+                        .start();
+    
         Set<String> activityTypes = new HashSet<>();
         activityTypes.add("startEvent");
 
@@ -74,7 +79,6 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
 
         assertEquals(2, historicActivityInstance2.size());
 
-        Calendar startTime = Calendar.getInstance();
         Calendar hourAgo = Calendar.getInstance();
         hourAgo.add(Calendar.HOUR_OF_DAY, -1);
         Calendar hourFromNow = Calendar.getInstance();
@@ -99,9 +103,33 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finishedAfter(hourAgo.getTime()).count());
         assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finishedAfter(hourFromNow.getTime()).count());
         assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finishedBefore(hourAgo.getTime()).finishedAfter(hourFromNow.getTime()).count());
-
-
-
+    
+        ProcessInstance processInstance2 = runtimeService.createProcessInstanceBuilder()
+                        .processDefinitionKey("oneTaskProcessActivityTypesProcess")
+                        .overrideProcessDefinitionTenantId("tenant1")
+                        .start();
+        
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult().getId());
+        
+        ProcessInstance otherTenantProcessInstance = runtimeService.createProcessInstanceBuilder()
+                        .processDefinitionKey("oneTaskProcessActivityTypesProcess")
+                        .overrideProcessDefinitionTenantId("tenant2")
+                        .start();
+        
+        taskService.complete(taskService.createTaskQuery().processInstanceId(otherTenantProcessInstance.getId()).singleResult().getId());
+        
+        assertEquals(3, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finished().count());
+        
+        List<String> tenantIds = new ArrayList<>();
+        tenantIds.add("tenant1");
+        tenantIds.add("tenant2");
+        assertEquals(3, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finished().tenantIdIn(tenantIds).count());
+        
+        assertEquals(2, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finished().tenantIdIn(Collections.singletonList("tenant1")).count());
+        
+        assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finished().tenantIdIn(Collections.singletonList("tenant2")).count());
+        
+        assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finished().tenantIdIn(Collections.singletonList("unexisting")).count());
     }
 
     @Test

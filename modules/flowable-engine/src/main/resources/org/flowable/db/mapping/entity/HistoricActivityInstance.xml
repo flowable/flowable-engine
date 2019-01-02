@@ -277,11 +277,10 @@
       <if test="tenantId != null">
         and RES.TENANT_ID_ = #{tenantId}
       </if>
-      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+      <if test="tenantIds != null &amp;&amp; !tenantIds.isEmpty()">
         and RES.TENANT_ID_ in
-        <foreach item="tenantId" index="index" collection="tenantIds"
-                     open="(" separator="," close=")">
-                #{tenantId}
+        <foreach item="tenantId" index="index" collection="tenantIds" open="(" separator="," close=")">
+            #{tenantId}
          </foreach>
       </if>
       <if test="tenantIdLike != null">
