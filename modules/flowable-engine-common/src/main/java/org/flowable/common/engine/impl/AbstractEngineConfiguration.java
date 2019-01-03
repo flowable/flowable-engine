@@ -79,8 +79,6 @@ import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javafx.beans.binding.When;
-
 public abstract class AbstractEngineConfiguration {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
