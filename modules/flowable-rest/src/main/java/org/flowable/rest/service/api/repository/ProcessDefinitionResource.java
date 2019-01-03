@@ -25,6 +25,7 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.exception.FlowableConflictException;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.form.api.FormInfo;
@@ -52,6 +53,9 @@ import io.swagger.annotations.Authorization;
 @RestController
 @Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
+    
+    @Autowired
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
     
     @Autowired(required=false)
     protected FormRepositoryService formRepositoryService;
@@ -148,7 +152,7 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
             if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
                 Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(processDefinition.getDeploymentId()).singleResult();
                 formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(startEvent.getFormKey(),
-                                deployment.getParentDeploymentId(), processDefinition.getTenantId());
+                                deployment.getParentDeploymentId(), processDefinition.getTenantId(), processEngineConfiguration.isFallbackToDefaultTenant());
             }
         }
 

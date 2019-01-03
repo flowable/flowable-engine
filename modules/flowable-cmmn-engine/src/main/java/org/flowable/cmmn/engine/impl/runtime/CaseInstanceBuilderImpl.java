@@ -32,6 +32,7 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     protected Map<String, Object> variables;
     protected Map<String, Object> transientVariables;
     protected String tenantId;
+    protected String overrideDefinitionTenantId;
     protected String outcome;
     protected Map<String, Object> startFormVariables;
     protected String callbackType;
@@ -114,6 +115,12 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     @Override
     public CaseInstanceBuilder tenantId(String tenantId) {
         this.tenantId = tenantId;
+        return this;
+    }
+    
+    @Override
+    public CaseInstanceBuilder overrideCaseDefinitionTenantId(String tenantId) {
+        this.overrideDefinitionTenantId = tenantId;
         return this;
     }
     
@@ -201,6 +208,11 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     @Override
     public String getTenantId() {
         return tenantId;
+    }
+    
+    @Override
+    public String getOverrideDefinitionTenantId() {
+        return overrideDefinitionTenantId;
     }
     
     @Override

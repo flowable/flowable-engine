@@ -10,9 +10,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.editor.language;
+package org.flowable.editor.language.xml;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -24,28 +25,28 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IOParameter;
 import org.junit.Test;
 
-public class CallActivityConverterTest extends AbstractConverterTest {
+public class CallActivityWithFallbackValueFalseConverterTest extends AbstractConverterTest {
 
     @Test
-    public void convertJsonToModel() throws Exception {
-        BpmnModel bpmnModel = readJsonFile();
+    public void convertXMLToModel() throws Exception {
+        BpmnModel bpmnModel = readXMLFile();
         validateModel(bpmnModel);
     }
 
     @Test
-    public void doubleConversionValidation() throws Exception {
-        BpmnModel bpmnModel = readJsonFile();
-        bpmnModel = convertToJsonAndBack(bpmnModel);
-        validateModel(bpmnModel);
+    public void convertModelToXML() throws Exception {
+        BpmnModel bpmnModel = readXMLFile();
+        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
+        validateModel(parsedModel);
     }
 
     @Override
     protected String getResource() {
-        return "test.callactivitymodel.json";
+        return "callactivityFallbackValueFalse.bpmn";
     }
 
     private void validateModel(BpmnModel model) {
-        FlowElement flowElement = model.getMainProcess().getFlowElement("callactivity", true);
+        FlowElement flowElement = model.getMainProcess().getFlowElement("callactivity");
         assertNotNull(flowElement);
         assertTrue(flowElement instanceof CallActivity);
         CallActivity callActivity = (CallActivity) flowElement;
@@ -53,12 +54,8 @@ public class CallActivityConverterTest extends AbstractConverterTest {
         assertEquals("Call activity", callActivity.getName());
 
         assertEquals("processId", callActivity.getCalledElement());
-        assertEquals("id", callActivity.getCalledElementType());
-        assertTrue(callActivity.getFallbackToDefaultTenant());
-        assertTrue(callActivity.isInheritVariables());
-        assertTrue(callActivity.isSameDeployment());
-        assertTrue(callActivity.isInheritBusinessKey());
-        assertTrue(callActivity.isUseLocalScopeForOutParameters());
+
+        assertFalse(callActivity.getFallbackToDefaultTenant());
 
         List<IOParameter> parameters = callActivity.getInParameters();
         assertEquals(2, parameters.size());

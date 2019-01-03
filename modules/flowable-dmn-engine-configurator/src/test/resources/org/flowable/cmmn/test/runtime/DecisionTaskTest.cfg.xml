@@ -13,9 +13,14 @@
         <property name="configurators">
             <list>
                 <bean class="org.flowable.dmn.engine.configurator.DmnEngineConfigurator">
+                    <property name="dmnEngineConfiguration" ref="dmnEngineConfiguration" />
                 </bean>
             </list>
         </property>
+    </bean>
+    
+    <bean id="dmnEngineConfiguration" class="org.flowable.dmn.engine.DmnEngineConfiguration">
+        <property name="historyEnabled" value="true" />
     </bean>
 
     <bean id="testBean" class="org.flowable.cmmn.test.delegate.TestBean" />

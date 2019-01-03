@@ -39,7 +39,9 @@ public class DefaultFormFieldHandler implements FormFieldHandler {
      * content so we can retrieve it later.
      */
     @Override
-    public void handleFormFieldsOnSubmit(FormInfo formInfo, String taskId, String processInstanceId, String scopeId, String scopeType, Map<String, Object> variables) {
+    public void handleFormFieldsOnSubmit(FormInfo formInfo, String taskId, String processInstanceId, String scopeId, 
+                    String scopeType, Map<String, Object> variables, String tenantId) {
+        
         ContentService contentService = CommandContextUtil.getContentService();
         if (contentService == null || formInfo == null) {
             return;
@@ -66,6 +68,7 @@ public class DefaultFormFieldHandler implements FormFieldHandler {
                                 contentItem.setScopeId(scopeId);
                                 contentItem.setScopeType(scopeType);
                                 contentItem.setField(formField.getId());
+                                contentItem.setTenantId(tenantId);
                                 contentService.saveContentItem(contentItem);
                             }
                         }

@@ -45,9 +45,9 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
     protected Process process;
     protected Expression processRefExpression;
     protected String processRef;
-    List<IOParameter> inParameters;
-    List<IOParameter> outParameters;
-    protected boolean fallbackToDefaultTenant;
+    protected List<IOParameter> inParameters;
+    protected List<IOParameter> outParameters;
+    protected Boolean fallbackToDefaultTenant;
 
     public ProcessTaskActivityBehavior(Process process, Expression processRefExpression, ProcessTask processTask) {
         super(processTask.isBlocking(), processTask.getBlockingExpression());
@@ -56,7 +56,7 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
         this.processRef = processTask.getProcessRef();
         this.inParameters = processTask.getInParameters();
         this.outParameters = processTask.getOutParameters();
-        this.fallbackToDefaultTenant = processTask.isFallbackToDefaultTenant();
+        this.fallbackToDefaultTenant = processTask.getFallbackToDefaultTenant();
     }
 
     @Override

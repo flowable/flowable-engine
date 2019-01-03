@@ -245,30 +245,42 @@ public class CommandContextUtil {
     public static FormEngineConfigurationApi getFormEngineConfiguration(CommandContext commandContext) {
         return (FormEngineConfigurationApi) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
     }
-
+    
     public static FormRepositoryService getFormRepositoryService() {
+        return getFormRepositoryService(getCommandContext());
+    }
+
+    public static FormRepositoryService getFormRepositoryService(CommandContext commandContext) {
         FormRepositoryService formRepositoryService = null;
-        FormEngineConfigurationApi formEngineConfiguration = getFormEngineConfiguration();
+        FormEngineConfigurationApi formEngineConfiguration = getFormEngineConfiguration(commandContext);
         if (formEngineConfiguration != null) {
             formRepositoryService = formEngineConfiguration.getFormRepositoryService();
         }
 
         return formRepositoryService;
     }
-
+    
     public static FormService getFormService() {
+        return getFormService(getCommandContext());
+    }
+
+    public static FormService getFormService(CommandContext commandContext) {
         FormService formService = null;
-        FormEngineConfigurationApi formEngineConfiguration = getFormEngineConfiguration();
+        FormEngineConfigurationApi formEngineConfiguration = getFormEngineConfiguration(commandContext);
         if (formEngineConfiguration != null) {
             formService = formEngineConfiguration.getFormService();
         }
 
         return formService;
     }
-
+    
     public static FormManagementService getFormManagementService() {
+        return getFormManagementService(getCommandContext());
+    }
+
+    public static FormManagementService getFormManagementService(CommandContext commandContext) {
         FormManagementService formManagementService = null;
-        FormEngineConfigurationApi formEngineConfiguration = getFormEngineConfiguration();
+        FormEngineConfigurationApi formEngineConfiguration = getFormEngineConfiguration(commandContext);
         if (formEngineConfiguration != null) {
             formManagementService = formEngineConfiguration.getFormManagementService();
         }
@@ -285,10 +297,14 @@ public class CommandContextUtil {
     public static ContentEngineConfigurationApi getContentEngineConfiguration(CommandContext commandContext) {
         return (ContentEngineConfigurationApi) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_CONTENT_ENGINE_CONFIG);
     }
-
+    
     public static ContentService getContentService() {
+        return getContentService(getCommandContext());
+    }
+
+    public static ContentService getContentService(CommandContext commandContext) {
         ContentService contentService = null;
-        ContentEngineConfigurationApi contentEngineConfiguration = getContentEngineConfiguration();
+        ContentEngineConfigurationApi contentEngineConfiguration = getContentEngineConfiguration(commandContext);
         if (contentEngineConfiguration != null) {
             contentService = contentEngineConfiguration.getContentService();
         }

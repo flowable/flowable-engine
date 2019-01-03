@@ -56,7 +56,11 @@ public class FormModelWithVariablesResource {
     @PostMapping(value = "/form/model", produces = "application/json")
     public FormModelResponse getFormModel(@RequestBody FormRequest formRequest, HttpServletRequest request) {
 
-        FormInfo formModel;
+        FormInfo formModel = null;
+        boolean fallbackToDefaultTenant = false;
+        if (formRequest.getFallbackToDefaultTenant() != null) {
+            fallbackToDefaultTenant = formRequest.getFallbackToDefaultTenant();
+        }
 
         if (formRequest.getParentDeploymentId() != null) {
             formModel = formService.getFormModelWithVariablesByKeyAndParentDeploymentId(
@@ -64,21 +68,24 @@ public class FormModelWithVariablesResource {
                     formRequest.getParentDeploymentId(),
                     formRequest.getTaskId(),
                     formRequest.getVariables(),
-                    formRequest.getTenantId());
+                    formRequest.getTenantId(),
+                    fallbackToDefaultTenant);
             
         } else if (formRequest.getFormDefinitionKey() != null) {
             formModel = formService.getFormModelWithVariablesByKey(
                     formRequest.getFormDefinitionKey(),
                     formRequest.getTaskId(),
                     formRequest.getVariables(),
-                    formRequest.getTenantId()); 
+                    formRequest.getTenantId(),
+                    fallbackToDefaultTenant); 
             
         } else if (formRequest.getFormDefinitionId() != null) {
             formModel = formService.getFormModelWithVariablesById(
                     formRequest.getFormDefinitionId(),
                     formRequest.getTaskId(),
                     formRequest.getVariables(),
-                    formRequest.getTenantId());
+                    formRequest.getTenantId(),
+                    fallbackToDefaultTenant);
             
         } else {
             throw new FlowableIllegalArgumentException("Either parent deployment key, form definition key or form definition id must be provided in the request");

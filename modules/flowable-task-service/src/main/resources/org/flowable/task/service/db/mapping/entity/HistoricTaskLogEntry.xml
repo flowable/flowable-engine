@@ -23,7 +23,7 @@
       #{tenantId, jdbcType=VARCHAR},
       #{timeStamp, jdbcType=TIMESTAMP}, 
       #{userId, jdbcType=VARCHAR},
-      #{data, jdbcType=VARCHAR},
+      #{data, jdbcType=VARCHAR}
     )
   </insert>
   
@@ -45,7 +45,7 @@
         #{taskLog.tenantId, jdbcType=VARCHAR},
         #{taskLog.timeStamp, jdbcType=TIMESTAMP},
         #{taskLog.userId, jdbcType=VARCHAR},
-        #{taskLog.data, jdbcType=VARCHAR},
+        #{taskLog.data, jdbcType=VARCHAR})
       </foreach>
   </insert>
 
@@ -67,10 +67,7 @@
       #{tenantId, jdbcType=VARCHAR},
       #{timeStamp, jdbcType=TIMESTAMP},
       #{userId, jdbcType=VARCHAR},
-      #{data, jdbcType=VARCHAR},
-      #{lockOwner, jdbcType=VARCHAR},
-      #{lockTime, jdbcType=TIMESTAMP},
-      #{isProcessed, jdbcType=INTEGER} 
+      #{data, jdbcType=VARCHAR}
     )  
   </insert>
 
@@ -79,7 +76,7 @@
       <foreach collection="list" item="taskLog" index="index">
         into ${prefix}ACT_HI_TSK_LOG(ID_, TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_,
                                      SCOPE_ID_, SCOPE_DEFINITION_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_,
-                                     TENANT_ID_, TIME_STAMP_, USER_ID_, DATA_, LOCK_OWNER_, LOCK_TIME_, IS_PROCESSED_) VALUES
+                                     TENANT_ID_, TIME_STAMP_, USER_ID_, DATA_) VALUES
             (${prefix}ACT_HI_TASK_EVT_LOG_SEQ.nextVal,
              #{taskLog.type, jdbcType=VARCHAR},
              #{taskLog.taskId, jdbcType=VARCHAR},
@@ -93,7 +90,7 @@
              #{taskLog.tenantId, jdbcType=VARCHAR},
              #{taskLog.timeStamp, jdbcType=TIMESTAMP},
              #{taskLog.userId, jdbcType=VARCHAR},
-             #{taskLog.data, jdbcType=VARCHAR},
+             #{taskLog.data, jdbcType=VARCHAR})
       </foreach>
     SELECT * FROM dual
   </insert>

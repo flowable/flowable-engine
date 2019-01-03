@@ -37,12 +37,12 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 public class CaseTaskActivityBehavior extends TaskActivityBehavior implements PlanItemActivityBehavior {
 
     protected Expression caseRefExpression;
-    protected boolean fallbackToDefaultTenant;
+    protected Boolean fallbackToDefaultTenant;
 
-    public CaseTaskActivityBehavior(Expression caseRefExpression,CaseTask caseTask) {
+    public CaseTaskActivityBehavior(Expression caseRefExpression, CaseTask caseTask) {
         super(caseTask.isBlocking(), caseTask.getBlockingExpression());
         this.caseRefExpression = caseRefExpression;
-        this.fallbackToDefaultTenant = caseTask.isFallbackToDefaultTenant();
+        this.fallbackToDefaultTenant = caseTask.getFallbackToDefaultTenant();
     }
 
     @Override
@@ -53,9 +53,12 @@ public class CaseTaskActivityBehavior extends TaskActivityBehavior implements Pl
                 caseDefinitionKey(caseRefExpression.getValue(planItemInstanceEntity).toString());
         if (StringUtils.isNotEmpty(planItemInstanceEntity.getTenantId())) {
             caseInstanceBuilder.tenantId(planItemInstanceEntity.getTenantId());
+            caseInstanceBuilder.overrideCaseDefinitionTenantId(planItemInstanceEntity.getTenantId());
         }
+        
         caseInstanceBuilder.parentId(planItemInstanceEntity.getCaseInstanceId());
-        if (fallbackToDefaultTenant) {
+        
+        if (fallbackToDefaultTenant != null && fallbackToDefaultTenant) {
             caseInstanceBuilder.fallbackToDefaultTenant();
         }
 

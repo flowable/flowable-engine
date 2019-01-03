@@ -56,7 +56,12 @@ public class FormInstanceModelResource {
     @PostMapping(value = "/form/form-instance-model", produces = "application/json")
     public FormInstanceModelResponse getFormInstanceModel(@ApiParam(name = "formInstanceModelRequest") @RequestBody FormRequest formRequest, HttpServletRequest request) {
 
-        FormInstanceInfo formInstanceModel;
+        FormInstanceInfo formInstanceModel = null;
+        
+        boolean fallbackToDefaultTenant = false;
+        if (formRequest.getFallbackToDefaultTenant() != null) {
+            fallbackToDefaultTenant = formRequest.getFallbackToDefaultTenant();
+        }
 
         if (formRequest.getFormInstanceId() != null) {
             formInstanceModel = formService.getFormInstanceModelById(
@@ -69,7 +74,8 @@ public class FormInstanceModelResource {
                     formRequest.getTaskId(),
                     formRequest.getProcessInstanceId(),
                     formRequest.getVariables(),
-                    formRequest.getTenantId());
+                    formRequest.getTenantId(),
+                    fallbackToDefaultTenant);
             
         } else if (formRequest.getFormDefinitionKey() != null) {
             formInstanceModel = formService.getFormInstanceModelByKey(
@@ -77,7 +83,8 @@ public class FormInstanceModelResource {
                     formRequest.getTaskId(),
                     formRequest.getProcessInstanceId(),
                     formRequest.getVariables(),
-                    formRequest.getTenantId());
+                    formRequest.getTenantId(),
+                    fallbackToDefaultTenant);
             
         } else if (formRequest.getFormDefinitionId() != null) {
             formInstanceModel = formService.getFormInstanceModelById(
@@ -85,7 +92,8 @@ public class FormInstanceModelResource {
                     formRequest.getTaskId(),
                     formRequest.getProcessInstanceId(),
                     formRequest.getVariables(),
-                    formRequest.getTenantId());
+                    formRequest.getTenantId(),
+                    fallbackToDefaultTenant);
             
         } else {
             throw new FlowableIllegalArgumentException("Either parent deployment key, form definition key or form definition id must be provided in the request");

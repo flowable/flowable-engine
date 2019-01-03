@@ -24,6 +24,7 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -53,6 +54,9 @@ public class FlowableProcessDefinitionService {
 
     @Autowired
     protected RepositoryService repositoryService;
+    
+    @Autowired
+    protected ProcessEngineConfiguration processEngineConfiguration;
     
     @Autowired
     protected AppRepositoryService appRepositoryService;
@@ -122,8 +126,8 @@ public class FlowableProcessDefinitionService {
             StartEvent startEvent = (StartEvent) startElement;
             if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
                 Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(processDefinition.getDeploymentId()).singleResult();
-                formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(startEvent.getFormKey(),
-                                deployment.getParentDeploymentId(), processDefinition.getTenantId());
+                formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(startEvent.getFormKey(), deployment.getParentDeploymentId(), 
+                                processDefinition.getTenantId(), processEngineConfiguration.isFallbackToDefaultTenant());
             }
         }
 

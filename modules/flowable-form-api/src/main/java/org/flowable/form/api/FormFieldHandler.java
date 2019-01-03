@@ -21,7 +21,8 @@ import java.util.Map;
  */
 public interface FormFieldHandler {
 
-    void handleFormFieldsOnSubmit(FormInfo formInfo, String taskId, String processInstanceId, String scopeId, String scopeType, Map<String, Object> variables);
+    void handleFormFieldsOnSubmit(FormInfo formInfo, String taskId, String processInstanceId, String scopeId, 
+                    String scopeType, Map<String, Object> variables, String tenantId);
     
     void enrichFormFields(FormInfo formInfo);
 

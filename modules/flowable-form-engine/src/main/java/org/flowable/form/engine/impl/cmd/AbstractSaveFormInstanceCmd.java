@@ -13,7 +13,6 @@
 package org.flowable.form.engine.impl.cmd;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -47,44 +46,57 @@ public abstract class AbstractSaveFormInstanceCmd implements Command<FormInstanc
     protected String scopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
+    protected String tenantId;
 
-    public AbstractSaveFormInstanceCmd(FormInfo formInfo, Map<String, Object> variables, String taskId, String processInstanceId, String processDefinitionId) {
+    public AbstractSaveFormInstanceCmd(FormInfo formInfo, Map<String, Object> variables, String taskId, String processInstanceId, 
+                    String processDefinitionId, String tenantId) {
+        
         this.formInfo = formInfo;
         this.variables = variables;
         this.taskId = taskId;
         this.processInstanceId = processInstanceId;
         this.processDefinitionId = processDefinitionId;
+        this.tenantId = tenantId;
     }
 
-    public AbstractSaveFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String processInstanceId, String processDefinitionId) {
+    public AbstractSaveFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String processInstanceId, 
+                    String processDefinitionId, String tenantId) {
+        
         this.formModelId = formModelId;
         this.variables = variables;
         this.taskId = taskId;
         this.processInstanceId = processInstanceId;
         this.processDefinitionId = processDefinitionId;
+        this.tenantId = tenantId;
     }
     
-    public AbstractSaveFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String scopeId, String scopeType, String scopeDefinitionId) {
+    public AbstractSaveFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String scopeId, String scopeType, 
+                    String scopeDefinitionId, String tenantId) {
+        
         this.formModelId = formModelId;
         this.variables = variables;
         this.taskId = taskId;
         this.scopeId = scopeId;
         this.scopeType = scopeType;
         this.scopeDefinitionId = scopeDefinitionId;
+        this.tenantId = tenantId;
     }
     
-    public AbstractSaveFormInstanceCmd(FormInfo formInfo, Map<String, Object> variables, String taskId, String scopeId, String scopeType, String scopeDefinitionId) {
+    public AbstractSaveFormInstanceCmd(FormInfo formInfo, Map<String, Object> variables, String taskId, String scopeId, String scopeType, 
+                    String scopeDefinitionId, String tenantId) {
+        
         this.formInfo = formInfo;
         this.variables = variables;
         this.taskId = taskId;
         this.scopeId = scopeId;
         this.scopeType = scopeType;
         this.scopeDefinitionId = scopeDefinitionId;
+        this.tenantId = tenantId;
     }
 
     @Override
     public FormInstance execute(CommandContext commandContext) {
-
+        FormEngineConfiguration formEngineConfiguration = CommandContextUtil.getFormEngineConfiguration();
         if (formInfo == null) {
             if (formModelId == null) {
                 throw new FlowableException("Invalid form model and no form model Id provided");
@@ -96,7 +108,7 @@ public abstract class AbstractSaveFormInstanceCmd implements Command<FormInstanc
             throw new FlowableException("Invalid form model provided");
         }
 
-        ObjectMapper objectMapper = CommandContextUtil.getFormEngineConfiguration().getObjectMapper();
+        ObjectMapper objectMapper = formEngineConfiguration.getObjectMapper();
         ObjectNode submittedFormValuesJson = objectMapper.createObjectNode();
 
         ObjectNode valuesNode = submittedFormValuesJson.putObject("values");
@@ -147,7 +159,7 @@ public abstract class AbstractSaveFormInstanceCmd implements Command<FormInstanc
         }
 
         FormInstanceEntityManager formInstanceEntityManager = CommandContextUtil.getFormInstanceEntityManager(commandContext);
-        FormInstanceEntity formInstanceEntity = findExistingFormInstance(CommandContextUtil.getFormEngineConfiguration());
+        FormInstanceEntity formInstanceEntity = findExistingFormInstance(formEngineConfiguration);
 
         if (formInstanceEntity == null) {
             formInstanceEntity = formInstanceEntityManager.create();
@@ -166,8 +178,12 @@ public abstract class AbstractSaveFormInstanceCmd implements Command<FormInstanc
             formInstanceEntity.setScopeDefinitionId(scopeDefinitionId);
         }
 
-        formInstanceEntity.setSubmittedDate(new Date());
+        formInstanceEntity.setSubmittedDate(formEngineConfiguration.getClock().getCurrentTime());
         formInstanceEntity.setSubmittedBy(Authentication.getAuthenticatedUserId());
+        
+        if (tenantId != null) {
+            formInstanceEntity.setTenantId(tenantId);
+        }
 
         try {
             formInstanceEntity.setFormValueBytes(objectMapper.writeValueAsBytes(submittedFormValuesJson));

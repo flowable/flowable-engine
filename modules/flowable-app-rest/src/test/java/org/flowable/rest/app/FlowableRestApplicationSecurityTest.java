@@ -74,7 +74,6 @@ public class FlowableRestApplicationSecurityTest {
             "scheduledtasks",
             "httptrace",
             "mappings"
-
         )
     );
 

@@ -12,18 +12,19 @@
  */
 package org.flowable.editor.language.json.converter;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IOParameter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
@@ -88,8 +89,8 @@ public class CallActivityJsonConverter extends BaseBpmnJsonConverter {
             propertiesNode.put(PROPERTY_CALLACTIVITY_COMPLETE_ASYNC, callActivity.isCompleteAsync());
         }
 
-        if (callActivity.isFallbackToDefaultTenant()) {
-            propertiesNode.put(PROPERTY_CALLACTIVITY_FALLBACK_TO_DEFAULT_TENANT, callActivity.isFallbackToDefaultTenant());
+        if (callActivity.getFallbackToDefaultTenant() != null) {
+            propertiesNode.put(PROPERTY_CALLACTIVITY_FALLBACK_TO_DEFAULT_TENANT, callActivity.getFallbackToDefaultTenant());
         }
 
         addJsonParameters(PROPERTY_CALLACTIVITY_IN, "inParameters", callActivity.getInParameters(), propertiesNode);

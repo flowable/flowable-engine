@@ -700,6 +700,125 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
             "Unable to recognize fallbackToDefaultTenant value 1"
         );
     }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcessWithFallback.bpmn20.xml",
+        "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"},
+        tenantId = "defaultFlowable"
+    )
+    public void testCallSimpleSubProcessWithDefaultTenantFallback() {
+        String originalDefaultTenantValue = processEngineConfiguration.getDefaultTenantValue();
+        processEngineConfiguration.setDefaultTenantValue("defaultFlowable");
+        try {
+            ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                            .processDefinitionKey("callSimpleSubProcess")
+                            .tenantId("someTenant")
+                            .fallbackToDefaultTenant()
+                            .start();
+            
+            assertEquals("someTenant", processInstance.getTenantId());
+    
+            // one task in the subprocess should be active after starting the process instance
+            TaskQuery taskQuery = taskService.createTaskQuery().taskTenantId("someTenant");
+            Task taskInSubProcess = taskQuery.singleResult();
+            assertEquals("Task in subprocess", taskInSubProcess.getName());
+            assertEquals("someTenant", taskInSubProcess.getTenantId());
+    
+            // Completing the task in the subprocess, finishes the subprocess
+            taskService.complete(taskInSubProcess.getId());
+            assertProcessEnded(processInstance.getId());
+            
+        } finally {
+            processEngineConfiguration.setDefaultTenantValue(originalDefaultTenantValue);
+        }
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml",
+        "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"},
+        tenantId = "defaultFlowable"
+    )
+    public void testCallSimpleSubProcessWithGlobalDefaultTenantFallback() {
+        String originalDefaultTenantValue = processEngineConfiguration.getDefaultTenantValue();
+        processEngineConfiguration.setDefaultTenantValue("defaultFlowable");
+        processEngineConfiguration.setFallbackToDefaultTenant(true);
+        try {
+            ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                            .processDefinitionKey("callSimpleSubProcess")
+                            .tenantId("someTenant")
+                            .fallbackToDefaultTenant()
+                            .start();
+            
+            assertEquals("someTenant", processInstance.getTenantId());
+    
+            // one task in the subprocess should be active after starting the process instance
+            Task taskBeforeSubProcess = taskService.createTaskQuery().singleResult();
+            assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
+            assertEquals("someTenant", taskBeforeSubProcess.getTenantId());
+            taskService.complete(taskBeforeSubProcess.getId());
+            
+            Task taskInSubProcess = taskService.createTaskQuery().singleResult();
+            assertEquals("Task in subprocess", taskInSubProcess.getName());
+            assertEquals("someTenant", taskInSubProcess.getTenantId());
+            
+            // Delete child process instance: parent process instance should continue
+            assertNotEquals(processInstance.getId(), taskInSubProcess.getProcessInstanceId());
+            runtimeService.deleteProcessInstance(taskInSubProcess.getProcessInstanceId(), null);
+            
+            Task taskAfterSubProcess = taskService.createTaskQuery().singleResult();
+            assertNotNull(taskAfterSubProcess);
+            assertEquals("Task after subprocess", taskAfterSubProcess.getName());
+            
+            taskService.complete(taskAfterSubProcess.getId());
+            
+            assertProcessEnded(processInstance.getId());
+            
+        } finally {
+            processEngineConfiguration.setDefaultTenantValue(originalDefaultTenantValue);
+            processEngineConfiguration.setFallbackToDefaultTenant(false);
+        }
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcessWithFallback.bpmn20.xml",
+        "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"},
+        tenantId = "defaultFlowable"
+    )
+    public void testCallSimpleSubProcessWithDefaultTenantFallbackAndEmptyDefaultTenant() {
+        try {
+            runtimeService.createProcessInstanceBuilder()
+                            .processDefinitionKey("callSimpleSubProcess")
+                            .tenantId("someTenant")
+                            .fallbackToDefaultTenant()
+                            .start();
+            fail("Expected process definition not found");
+            
+        } catch (FlowableObjectNotFoundException e) {
+            // expected exception
+        }
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml",
+        "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"},
+        tenantId = "defaultFlowable"
+    )
+    public void testCallSimpleSubProcessWithGlobalDefaultTenantFallbackAndEmptyDefaultTenant() {
+        processEngineConfiguration.setFallbackToDefaultTenant(true);
+        try {
+            runtimeService.createProcessInstanceBuilder()
+                            .processDefinitionKey("callSimpleSubProcess")
+                            .tenantId("someTenant")
+                            .fallbackToDefaultTenant()
+                            .start();
+            fail("Expected process definition not found");
+            
+        } catch (FlowableObjectNotFoundException e) {
+            // expected exception
+        } finally {
+            processEngineConfiguration.setFallbackToDefaultTenant(false);
+        }
+    }
 
     protected void assertCallActivityToFallback() {
         org.flowable.engine.repository.Deployment deployment = this.repositoryService.createDeployment().
@@ -719,6 +838,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
 
         Task taskInSubProcess = taskService.createTaskQuery().singleResult();
         assertEquals("Task in subprocess", taskInSubProcess.getName());
+        assertEquals("flowable", taskInSubProcess.getTenantId());
 
         // Completing the task in the subprocess, finishes the processes
         taskService.complete(taskInSubProcess.getId());

@@ -146,18 +146,54 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
-    public void createCaseInstanceWithFallBack() {
+    public void createCaseInstanceWithFallback() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
             caseDefinitionKey("oneTaskCase").
             tenantId("flowable").
+            overrideCaseDefinitionTenantId("flowable").
             fallbackToDefaultTenant().
             start();
 
         assertThat(caseInstance, is(notNullValue()));
+        assertThat(caseInstance.getTenantId(), is("flowable"));
+    }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn", tenantId="defaultFlowable")
+    public void createCaseInstanceWithFallbackAndOverrideTenantId() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            tenantId("defaultFlowable").
+            overrideCaseDefinitionTenantId("someTenant").
+            start();
+
+        assertThat(caseInstance, is(notNullValue()));
+        assertThat(caseInstance.getTenantId(), is("someTenant"));
+    }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn", tenantId="defaultFlowable")
+    public void createCaseInstanceWithGlobalFallbackAndDefaultTenantValue() {
+        String originalDefaultTenantValue = cmmnEngineConfiguration.getDefaultTenantValue();
+        cmmnEngineConfiguration.setFallbackToDefaultTenant(true);
+        cmmnEngineConfiguration.setDefaultTenantValue("defaultFlowable");
+        try {
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
+                caseDefinitionKey("oneTaskCase").
+                tenantId("someTenant").
+                start();
+    
+            assertThat(caseInstance, is(notNullValue()));
+            assertThat(caseInstance.getTenantId(), is("someTenant"));
+            
+        } finally {
+            cmmnEngineConfiguration.setFallbackToDefaultTenant(false);
+            cmmnEngineConfiguration.setDefaultTenantValue(originalDefaultTenantValue);
+        }
     }
 
     @Test
-    public void createCaseInstanceWithFallBack_DefinitionNotFound() {
+    public void createCaseInstanceWithFallbackDefinitionNotFound() {
         this.expectedException.expect(FlowableObjectNotFoundException.class);
         this.expectedException.expectMessage("Case definition was not found by key 'oneTaskCase'. Fallback to default tenant was also used.");
 
@@ -167,10 +203,31 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
             fallbackToDefaultTenant().
             start();
     }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn", tenantId="tenant1")
+    public void createCaseInstanceWithGlobalFallbackDefinitionNotFound() {
+        String originalDefaultTenantValue = cmmnEngineConfiguration.getDefaultTenantValue();
+        cmmnEngineConfiguration.setFallbackToDefaultTenant(true);
+        cmmnEngineConfiguration.setDefaultTenantValue("defaultFlowable");
+        
+        this.expectedException.expect(FlowableObjectNotFoundException.class);
+        
+        try {
+            cmmnRuntimeService.createCaseInstanceBuilder().
+                caseDefinitionKey("oneTaskCase").
+                tenantId("someTenant").
+                start();
+            
+        } finally {
+            cmmnEngineConfiguration.setFallbackToDefaultTenant(false);
+            cmmnEngineConfiguration.setDefaultTenantValue(originalDefaultTenantValue);
+        }
+    }
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
-    public void createCaseInstanceAsyncWithFallBack() {
+    public void createCaseInstanceAsyncWithFallback() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
             caseDefinitionKey("oneTaskCase").
             tenantId("flowable").
@@ -181,7 +238,7 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
     }
 
     @Test
-    public void createCaseInstanceAsyncWithFallBack_DefinitionNotFound() {
+    public void createCaseInstanceAsyncWithFallbackDefinitionNotFound() {
         this.expectedException.expect(FlowableObjectNotFoundException.class);
         this.expectedException.expectMessage("Case definition was not found by key 'oneTaskCase'. Fallback to default tenant was also used.");
 

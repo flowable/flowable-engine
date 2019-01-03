@@ -64,18 +64,17 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     protected String calledElement;
     protected String calledElementType;
     protected Expression calledElementExpression;
-    protected boolean fallbackToDefaultTenant;
+    protected Boolean fallbackToDefaultTenant;
     protected List<MapExceptionEntry> mapExceptions;
 
-    public CallActivityBehavior(String processDefinitionKey, String calledElementType,
-        boolean fallbackToDefaultTenant, List<MapExceptionEntry> mapExceptions) {
+    public CallActivityBehavior(String processDefinitionKey, String calledElementType, Boolean fallbackToDefaultTenant, List<MapExceptionEntry> mapExceptions) {
         this.calledElement = processDefinitionKey;
         this.calledElementType = calledElementType;
         this.mapExceptions = mapExceptions;
         this.fallbackToDefaultTenant = fallbackToDefaultTenant;
     }
 
-    public CallActivityBehavior(Expression processDefinitionExpression, String calledElementType, List<MapExceptionEntry> mapExceptions, boolean fallbackToDefaultTenant) {
+    public CallActivityBehavior(Expression processDefinitionExpression, String calledElementType, List<MapExceptionEntry> mapExceptions, Boolean fallbackToDefaultTenant) {
         this.calledElementExpression = processDefinitionExpression;
         this.calledElementType = calledElementType;
         this.mapExceptions = mapExceptions;
@@ -87,8 +86,12 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
 
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
         CallActivity callActivity = (CallActivity) executionEntity.getCurrentFlowElement();
+        
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
 
-        ProcessDefinition processDefinition = getProcessDefinition(execution, callActivity);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+
+        ProcessDefinition processDefinition = getProcessDefinition(execution, callActivity, processEngineConfiguration);
 
         // Get model from cache
         Process subProcess = ProcessDefinitionUtil.getProcess(processDefinition.getId());
@@ -106,9 +109,6 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
             throw new FlowableException("Cannot start process instance. Process definition " + processDefinition.getName() + " (id = " + processDefinition.getId() + ") is suspended");
         }
 
-        CommandContext commandContext = CommandContextUtil.getCommandContext();
-
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
 
@@ -188,14 +188,14 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(subProcessInitialExecution, variables, false));
         }
     }
-    private ProcessDefinition getProcessDefinition(DelegateExecution execution, CallActivity callActivity) {
+    private ProcessDefinition getProcessDefinition(DelegateExecution execution, CallActivity callActivity, ProcessEngineConfigurationImpl processEngineConfiguration) {
         ProcessDefinition processDefinition;
         switch (StringUtils.isNotEmpty(calledElementType) ? calledElementType : CALLED_ELEMENT_TYPE_KEY) {
             case CALLED_ELEMENT_TYPE_ID:
                 processDefinition = getProcessDefinitionById(execution);
                 break;
             case CALLED_ELEMENT_TYPE_KEY:
-                processDefinition = getProcessDefinitionByKey(execution, callActivity.isSameDeployment());
+                processDefinition = getProcessDefinitionByKey(execution, callActivity.isSameDeployment(), processEngineConfiguration);
                 break;
             default:
                 throw new FlowableException("Unrecognized calledElementType [" + calledElementType + "]");
@@ -241,7 +241,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
             .findDeployedProcessDefinitionById(getCalledElementValue(execution));
     }
 
-    protected ProcessDefinition getProcessDefinitionByKey(DelegateExecution execution, boolean isSameDeployment) {
+    protected ProcessDefinition getProcessDefinitionByKey(DelegateExecution execution, boolean isSameDeployment, ProcessEngineConfigurationImpl processEngineConfiguration) {
         String processDefinitionKey = getCalledElementValue(execution);
         String tenantId = execution.getTenantId();
 
@@ -265,8 +265,14 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
             processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKey(processDefinitionKey);
         } else {
             processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
-            if (processDefinition == null && this.fallbackToDefaultTenant) {
-                processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKey(processDefinitionKey);
+            if (processDefinition == null && ((this.fallbackToDefaultTenant != null && this.fallbackToDefaultTenant) || processEngineConfiguration.isFallbackToDefaultTenant())) {
+                
+                if (StringUtils.isNotEmpty(processEngineConfiguration.getDefaultTenantValue())) {
+                    processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKeyAndTenantId(
+                                    processDefinitionKey, processEngineConfiguration.getDefaultTenantValue());
+                } else {
+                    processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKey(processDefinitionKey);
+                }
             }
         }
 

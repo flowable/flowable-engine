@@ -240,6 +240,16 @@ public abstract class AbstractEngineConfiguration {
      * will not be used here - since the schema is taken into account already, adding a prefix for the table-check will result in wrong table-names.
      */
     protected boolean tablePrefixIsSchema;
+    
+    /**
+     * Set to true if by default lookups should fallback to the default tenant (an empty string by default or a defined tenant value)
+     */
+    protected boolean fallbackToDefaultTenant;
+    
+    /**
+     * Default tenant value that is used when looking up definitions when the global or local fallback to default tenant value is true
+     */
+    protected String defaultTenantValue = NO_TENANT_ID;
 
     /**
      * Enables the MyBatis plugin that logs the execution time of sql statements.
@@ -1369,6 +1379,24 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setTablePrefixIsSchema(boolean tablePrefixIsSchema) {
         this.tablePrefixIsSchema = tablePrefixIsSchema;
+        return this;
+    }
+
+    public boolean isFallbackToDefaultTenant() {
+        return fallbackToDefaultTenant;
+    }
+
+    public AbstractEngineConfiguration setFallbackToDefaultTenant(boolean fallbackToDefaultTenant) {
+        this.fallbackToDefaultTenant = fallbackToDefaultTenant;
+        return this;
+    }
+
+    public String getDefaultTenantValue() {
+        return defaultTenantValue;
+    }
+
+    public AbstractEngineConfiguration setDefaultTenantValue(String defaultTenantValue) {
+        this.defaultTenantValue = defaultTenantValue;
         return this;
     }
 

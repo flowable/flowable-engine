@@ -91,13 +91,13 @@ public class BaseFormInstanceResource {
             query.submittedByLike(queryRequest.getSubmittedByLike());
         }
         if (queryRequest.getTenantId() != null) {
-            query.deploymentTenantId(queryRequest.getTenantId());
+            query.tenantId(queryRequest.getTenantId());
         }
         if (queryRequest.getTenantIdLike() != null) {
-            query.deploymentTenantIdLike(queryRequest.getTenantIdLike());
+            query.tenantIdLike(queryRequest.getTenantIdLike());
         }
         if (Boolean.TRUE.equals(queryRequest.isWithoutTenantId())) {
-            query.deploymentWithoutTenantId();
+            query.withoutTenantId();
         }
         
         if (restApiInterceptor != null) {

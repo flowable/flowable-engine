@@ -53,19 +53,20 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
 
     @Override
     public String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId,
-        String tenantId, boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap) {
+        String tenantId, Boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap) {
         
         return startProcessInstanceByKey(processDefinitionKey, predefinedProcessInstanceId, null, tenantId, fallbackToDefaultTenant, inParametersMap);
     }
 
     @Override
     public String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, 
-                    String planItemInstanceId, String tenantId, boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap) {
+                    String planItemInstanceId, String tenantId, Boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap) {
         
         ProcessInstanceBuilder processInstanceBuilder = processEngineConfiguration.getRuntimeService().createProcessInstanceBuilder();
         processInstanceBuilder.processDefinitionKey(processDefinitionKey);
         if (tenantId != null) {
             processInstanceBuilder.tenantId(tenantId);
+            processInstanceBuilder.overrideProcessDefinitionTenantId(tenantId);
         }
         
         processInstanceBuilder.predefineProcessInstanceId(predefinedProcessInstanceId);
@@ -79,7 +80,7 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
             processInstanceBuilder.variable(target, inParametersMap.get(target));
         }
 
-        if (fallbackToDefaultTenant) {
+        if (fallbackToDefaultTenant != null && fallbackToDefaultTenant) {
             processInstanceBuilder.fallbackToDefaultTenant();
         }
 

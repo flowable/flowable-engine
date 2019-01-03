@@ -19,18 +19,19 @@ import java.util.Map;
  */
 public class FormRequest {
 
-    private String formInstanceId;
-    private String formDefinitionId;
-    private String formDefinitionKey;
-    private String taskId;
-    private String processInstanceId;
-    private String processDefinitionId;
-    private String scopeId;
-    private String scopeType;
-    private String scopeDefinitionId;
-    private String tenantId;
-    private String parentDeploymentId;
-    private Map<String, Object> variables;
+    protected String formInstanceId;
+    protected String formDefinitionId;
+    protected String formDefinitionKey;
+    protected String taskId;
+    protected String processInstanceId;
+    protected String processDefinitionId;
+    protected String scopeId;
+    protected String scopeType;
+    protected String scopeDefinitionId;
+    protected String tenantId;
+    protected String parentDeploymentId;
+    protected Map<String, Object> variables;
+    protected Boolean fallbackToDefaultTenant;
 
     public String getFormInstanceId() {
         return formInstanceId;
@@ -126,5 +127,13 @@ public class FormRequest {
 
     public void setVariables(Map<String, Object> variables) {
         this.variables = variables;
+    }
+
+    public Boolean getFallbackToDefaultTenant() {
+        return fallbackToDefaultTenant;
+    }
+
+    public void setFallbackToDefaultTenant(Boolean fallbackToDefaultTenant) {
+        this.fallbackToDefaultTenant = fallbackToDefaultTenant;
     }
 }

@@ -130,18 +130,18 @@ public class FormRepositoryServiceImpl extends CommonEngineServiceImpl<FormEngin
     }
 
     @Override
-    public FormInfo getFormModelByKey(String formDefinitionKey, String tenantId) {
-        return commandExecutor.execute(new GetFormModelCmd(formDefinitionKey, null, tenantId));
+    public FormInfo getFormModelByKey(String formDefinitionKey, String tenantId, boolean fallbackToDefaultTenant) {
+        return commandExecutor.execute(new GetFormModelCmd(formDefinitionKey, null, tenantId, fallbackToDefaultTenant));
     }
 
     @Override
     public FormInfo getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId) {
-        return commandExecutor.execute(new GetFormModelCmd(formDefinitionKey, null, null, parentDeploymentId));
+        return commandExecutor.execute(new GetFormModelCmd(formDefinitionKey, null, null, parentDeploymentId, false));
     }
 
     @Override
-    public FormInfo getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String tenantId) {
-        return commandExecutor.execute(new GetFormModelCmd(formDefinitionKey, null, tenantId, parentDeploymentId));
+    public FormInfo getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String tenantId, boolean fallbackToDefaultTenant) {
+        return commandExecutor.execute(new GetFormModelCmd(formDefinitionKey, null, tenantId, parentDeploymentId, fallbackToDefaultTenant));
     }
 
     @Override

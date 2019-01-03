@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Stage;
@@ -48,6 +49,9 @@ import io.swagger.annotations.Authorization;
 @RestController
 @Api(tags = { "Case Definitions" }, description = "Manage Case Definitions", authorizations = { @Authorization(value = "basicAuth") })
 public class CaseDefinitionResource extends BaseCaseDefinitionResource {
+    
+    @Autowired
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
     
     @Autowired(required=false)
     protected FormRepositoryService formRepositoryService;
@@ -128,7 +132,7 @@ public class CaseDefinitionResource extends BaseCaseDefinitionResource {
         if (StringUtils.isNotEmpty(stage.getFormKey())) {
             CmmnDeployment deployment = repositoryService.createDeploymentQuery().deploymentId(caseDefinition.getDeploymentId()).singleResult();
             formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(stage.getFormKey(),
-                            deployment.getParentDeploymentId(), caseDefinition.getTenantId());
+                            deployment.getParentDeploymentId(), caseDefinition.getTenantId(), cmmnEngineConfiguration.isFallbackToDefaultTenant());
         }
 
         if (formInfo == null) {

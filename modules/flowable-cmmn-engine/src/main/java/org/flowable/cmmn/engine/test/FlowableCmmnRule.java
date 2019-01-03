@@ -250,6 +250,10 @@ public class FlowableCmmnRule implements TestRule {
         this.cmmnEngine = cmmnEngine;
         initializeServices();
     }
+    
+    public CmmnEngineConfiguration getCmmnEngineConfiguration() {
+        return cmmnEngineConfiguration;
+    }
 
     public CmmnRepositoryService getCmmnRepositoryService() {
         return cmmnRepositoryService;

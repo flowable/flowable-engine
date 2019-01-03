@@ -24,11 +24,11 @@ public interface ProcessInstanceService {
     
     String generateNewProcessInstanceId();
 
-    String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String tenantId, boolean fallbackToDefaultTenant,
-                    Map<String, Object> inParametersMap);
+    String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String tenantId, 
+                    Boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap);
 
     String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String planItemInstanceId,
-                    String tenantId, boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap);
+                    String tenantId, Boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap);
     
     void triggerCaseTask(String executionId, Map<String, Object> variables);
     

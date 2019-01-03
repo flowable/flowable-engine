@@ -32,7 +32,7 @@ public class CallActivity extends Activity {
     protected boolean inheritBusinessKey;
     protected boolean useLocalScopeForOutParameters;
     protected boolean completeAsync;
-    protected boolean fallbackToDefaultTenant;
+    protected Boolean fallbackToDefaultTenant;
 
     public String getCalledElement() {
         return calledElement;
@@ -114,11 +114,11 @@ public class CallActivity extends Activity {
         this.completeAsync = completeAsync;
     }
 
-    public boolean isFallbackToDefaultTenant() {
+    public Boolean getFallbackToDefaultTenant() {
         return fallbackToDefaultTenant;
     }
 
-    public void setFallbackToDefaultTenant(boolean fallbackToDefaultTenant) {
+    public void setFallbackToDefaultTenant(Boolean fallbackToDefaultTenant) {
         this.fallbackToDefaultTenant = fallbackToDefaultTenant;
     }
 
@@ -139,7 +139,7 @@ public class CallActivity extends Activity {
         setSameDeployment(otherElement.isSameDeployment());
         setUseLocalScopeForOutParameters(otherElement.isUseLocalScopeForOutParameters());
         setCompleteAsync(otherElement.isCompleteAsync());
-        setFallbackToDefaultTenant(otherElement.isFallbackToDefaultTenant());
+        setFallbackToDefaultTenant(otherElement.getFallbackToDefaultTenant());
 
         inParameters = new ArrayList<>();
         if (otherElement.getInParameters() != null && !otherElement.getInParameters().isEmpty()) {

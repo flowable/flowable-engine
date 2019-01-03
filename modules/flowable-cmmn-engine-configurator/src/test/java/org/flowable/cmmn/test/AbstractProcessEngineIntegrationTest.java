@@ -53,6 +53,7 @@ public abstract class AbstractProcessEngineIntegrationTest {
     protected RepositoryService processEngineRepositoryService;
     protected RuntimeService processEngineRuntimeService;
     protected TaskService processEngineTaskService;
+    protected ProcessEngineConfiguration processEngineConfiguration;
 
     @BeforeClass
     public static void bootProcessEngine() {
@@ -76,6 +77,7 @@ public abstract class AbstractProcessEngineIntegrationTest {
         this.processEngineRepositoryService = processEngine.getRepositoryService();
         this.processEngineRuntimeService = processEngine.getRuntimeService();
         this.processEngineTaskService = processEngine.getTaskService();
+        this.processEngineConfiguration = processEngine.getProcessEngineConfiguration();
     }
 
     @After

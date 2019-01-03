@@ -21,6 +21,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.DmnDeployment;
+import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl;
 import org.flowable.dmn.engine.impl.ExecuteDecisionBuilderImpl;
 import org.flowable.dmn.engine.impl.ExecuteDecisionInfo;
@@ -58,7 +59,8 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
 
     protected DmnDecisionTable resolveDecisionTable() {
         DmnDecisionTable decisionTable = null;
-        DecisionTableEntityManager decisionTableManager = CommandContextUtil.getDmnEngineConfiguration().getDecisionTableEntityManager();
+        DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
+        DecisionTableEntityManager decisionTableManager = dmnEngineConfiguration.getDecisionTableEntityManager();
 
         String decisionKey = executeDecisionInfo.getDecisionKey();
         String parentDeploymentId = executeDecisionInfo.getParentDeploymentId();
@@ -79,11 +81,20 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
 
                 if (decisionTable == null) {
                     // if fallback to default tenant is enabled do a final lookup query
-                    if (executeDecisionInfo.isFallbackToDefaultTenant()) {
-                        decisionTable = decisionTableManager.findLatestDecisionTableByKey(decisionKey);
-                        if (decisionTable == null) {
-                            throw new FlowableObjectNotFoundException("No decision found for key: " + decisionKey +
-                                ". There was also no fall back decision table found without tenant.");
+                    if (executeDecisionInfo.isFallbackToDefaultTenant() || dmnEngineConfiguration.isFallbackToDefaultTenant()) {
+                        if (StringUtils.isNotEmpty(dmnEngineConfiguration.getDefaultTenantValue())) {
+                            decisionTable = decisionTableManager.findLatestDecisionTableByKeyAndTenantId(decisionKey, dmnEngineConfiguration.getDefaultTenantValue());
+                            if (decisionTable == null) {
+                                throw new FlowableObjectNotFoundException("No decision found for key: " + decisionKey +
+                                    ". There was also no fall back decision table found for default tenant " + dmnEngineConfiguration.getDefaultTenantValue());
+                            }
+                            
+                        } else {
+                            decisionTable = decisionTableManager.findLatestDecisionTableByKey(decisionKey);
+                            if (decisionTable == null) {
+                                throw new FlowableObjectNotFoundException("No decision found for key: " + decisionKey +
+                                    ". There was also no fall back decision table found without tenant.");
+                            }
                         }
                         
                     } else {
@@ -112,14 +123,27 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
                         ". There was also no fall back decision table found without parent deployment id.");
                 }
             }
+            
         } else if (StringUtils.isNotEmpty(decisionKey) && StringUtils.isNotEmpty(tenantId)) {
             decisionTable = decisionTableManager.findLatestDecisionTableByKeyAndTenantId(decisionKey, tenantId);
             if (decisionTable == null) {
-                if (executeDecisionInfo.isFallbackToDefaultTenant()) {
-                    decisionTable = decisionTableManager.findLatestDecisionTableByKey(decisionKey);
-                    if (decisionTable == null) {
-                        throw new FlowableObjectNotFoundException("No decision found for key: " + decisionKey +
-                            ". There was also no fall back decision table found without tenant.");                    }
+                if (executeDecisionInfo.isFallbackToDefaultTenant() || dmnEngineConfiguration.isFallbackToDefaultTenant()) {
+                    if (StringUtils.isNotEmpty(dmnEngineConfiguration.getDefaultTenantValue())) {
+                        decisionTable = decisionTableManager.findLatestDecisionTableByKeyAndTenantId(decisionKey, dmnEngineConfiguration.getDefaultTenantValue());
+                        if (decisionTable == null) {
+                            throw new FlowableObjectNotFoundException("No decision found for key: " + decisionKey +
+                                ". There was also no fall back decision table found for default tenant " + 
+                                            dmnEngineConfiguration.getDefaultTenantValue() + ".");
+                        }
+                        
+                    } else {
+                        decisionTable = decisionTableManager.findLatestDecisionTableByKey(decisionKey);
+                        if (decisionTable == null) {
+                            throw new FlowableObjectNotFoundException("No decision found for key: " + decisionKey +
+                                ". There was also no fall back decision table found without tenant.");
+                        }
+                    }
+                    
                 } else {
                     throw new FlowableObjectNotFoundException(
                         "Decision table for key [" + decisionKey + "] and tenantId [" + tenantId + "] was not found");
