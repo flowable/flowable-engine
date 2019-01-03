@@ -13,6 +13,9 @@
 
 package org.flowable.rest.service.api.identity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,8 +32,6 @@ import org.flowable.rest.service.HttpMultipartHelper;
 import org.flowable.rest.service.api.RestUrls;
 import org.junit.Test;
 import org.springframework.http.MediaType;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Frederik Heremans
