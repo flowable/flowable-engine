@@ -57,6 +57,7 @@ public class IdmEngineImpl implements IdmEngine {
     @Override
     public void close() {
         IdmEngines.unregister(this);
+        engineConfiguration.close();
     }
 
     // getters and setters

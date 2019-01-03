@@ -60,6 +60,7 @@ public class DmnEngineImpl implements DmnEngine {
     @Override
     public void close() {
         DmnEngines.unregister(this);
+        dmnEngineConfiguration.close();
     }
 
     // getters and setters

@@ -103,6 +103,8 @@ public abstract class AbstractEngineConfiguration {
      */
     public static final String DB_SCHEMA_UPDATE_TRUE = "true";
 
+    protected boolean forceCloseMybatisConnectionPool = true;
+
     protected String databaseType;
     protected String jdbcDriver = "org.h2.Driver";
     protected String jdbcUrl = "jdbc:h2:tcp://localhost/~/flowable";
@@ -844,7 +846,18 @@ public abstract class AbstractEngineConfiguration {
 
         }
     }
-    
+
+    public void close() {
+        if (forceCloseMybatisConnectionPool && dataSource instanceof PooledDataSource) {
+            /*
+             * When the datasource is created by a Flowable engine (i.e. it's an instance of PooledDataSource),
+             * the connection pool needs to be closed when closing the engine.
+             * Note that calling forceCloseAll() multiple times (as is the case when running with multiple engine) is ok.
+             */
+            ((PooledDataSource) dataSource).forceCloseAll();
+        }
+    }
+
     protected List<EngineConfigurator> getEngineSpecificEngineConfigurators() {
         // meant to be overridden if needed
         return Collections.emptyList();
@@ -1563,4 +1576,12 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
+    public AbstractEngineConfiguration setForceCloseMybatisConnectionPool(boolean forceCloseMybatisConnectionPool) {
+        this.forceCloseMybatisConnectionPool = forceCloseMybatisConnectionPool;
+        return this;
+    }
+
+    public boolean isForceCloseMybatisConnectionPool() {
+        return forceCloseMybatisConnectionPool;
+    }
 }

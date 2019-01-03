@@ -75,6 +75,23 @@ public class PlanFragment extends PlanItemDefinition {
         return null;
     }
 
+    public PlanItem findPlanItemForPlanItemDefinitionInPlanFragmentOrDownwards(String planItemDefinitionId) {
+        if (planItemDefinitionToItemMap.containsKey(planItemDefinitionId)) {
+            return planItemDefinitionToItemMap.get(planItemDefinitionId);
+        }
+
+        for (PlanItem planItem : planItemMap.values()) {
+            if (planItem.getPlanItemDefinition() instanceof PlanFragment) {
+                PlanItem p = ((PlanFragment) planItem.getPlanItemDefinition()).findPlanItemForPlanItemDefinitionInPlanFragmentOrDownwards(planItemDefinitionId);
+                if (p != null) {
+                    return p;
+                }
+            }
+        }
+
+        return null;
+    }
+
     public Sentry findSentry(String sentryId) {
         for (Sentry sentry : sentries) {
             if (sentry.getId().equals(sentryId)) {
