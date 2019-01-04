@@ -1017,7 +1017,7 @@ public class MyConfiguration {
 
 [IMPORTANT]
 ======
-If you define a custom `TaskExecutor` bean the Flowable creation of the bean is not trigerred.
+If you define a custom `TaskExecutor` bean the Flowable creation of the bean is not triggered.
 Which means that if you define a bean qualified with `@Process` you have to define one with `@Cmmn` or `@Primary`, otherwise the Cmmn Async Executor will use the one for the Process
 ======
 

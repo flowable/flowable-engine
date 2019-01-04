@@ -348,7 +348,7 @@ It is however possible to disable strict mode.
 </beans>
 ----
 
-The effect will be that a result will not be invalidated when a hit policy contstraint is violated. A possible violation will be logged in the audit log as a validation message.
+The effect will be that a result will not be invalidated when a hit policy constraint is violated. A possible violation will be logged in the audit log as a validation message.
 
 
 

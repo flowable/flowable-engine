@@ -479,8 +479,8 @@ This property type expects the class member you have annotated to also have an a
 
 [source,java,linenums]
 ----
-@Property(type = PropertyType.RADIO_CHOICE, displayName = "Withdrawl limit", required = true)
-@Help(displayHelpShort = "The maximum daily withdrawl amount ", 
+@Property(type = PropertyType.RADIO_CHOICE, displayName = "Withdrawal limit", required = true)
+@Help(displayHelpShort = "The maximum daily withdrawal amount ",
     displayHelpLong = "Choose the maximum daily amount that can be withdrawn from the account.")
 @PropertyItems({ LIMIT_LOW_LABEL, LIMIT_LOW_VALUE, LIMIT_MEDIUM_LABEL, LIMIT_MEDIUM_VALUE, 
     LIMIT_HIGH_LABEL, LIMIT_HIGH_VALUE })
