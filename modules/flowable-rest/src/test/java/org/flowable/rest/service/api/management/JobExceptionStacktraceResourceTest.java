@@ -12,6 +12,10 @@
  */
 package org.flowable.rest.service.api.management;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.util.Calendar;
 import java.util.Collections;
 
@@ -26,8 +30,6 @@ import org.flowable.job.api.Job;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to the Job collection and a single job resource.

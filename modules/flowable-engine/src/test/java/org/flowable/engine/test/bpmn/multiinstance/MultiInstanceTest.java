@@ -13,9 +13,6 @@
 
 package org.flowable.engine.test.bpmn.multiinstance;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;

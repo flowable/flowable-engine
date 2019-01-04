@@ -12,6 +12,8 @@
  */
 package org.flowable.rest.service.api.repository;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Calendar;
 import java.util.List;
 
@@ -24,8 +26,6 @@ import org.flowable.rest.service.api.RestUrls;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
-import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to the Deployment collection.

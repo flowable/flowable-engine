@@ -13,6 +13,10 @@
 
 package org.flowable.rest.service.api.history;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,8 +32,6 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
-
-import static org.junit.Assert.*;
 
 /**
  * Test for REST-operation related to the historic process instance identity links resource.
