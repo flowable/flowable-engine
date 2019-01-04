@@ -38,7 +38,7 @@ public class HistoricTaskLogEntryBuilderImpl extends BaseHistoricTaskLogEntryBui
     }
 
     @Override
-    public void add() {
+    public void create() {
         this.commandExecutor.execute(this);
     }
 
@@ -50,7 +50,7 @@ public class HistoricTaskLogEntryBuilderImpl extends BaseHistoricTaskLogEntryBui
         if (StringUtils.isEmpty(getUserId())) {
             userId(Authentication.getAuthenticatedUserId());
         }
-        if (getTimeStamp() == null) {
+        if (timeStamp == null) {
             timeStamp(CommandContextUtil.getTaskServiceConfiguration().getClock().getCurrentTime());
         }
 

@@ -397,6 +397,8 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
     @Test
     public void createUserTaskLogEntity() {
         HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = cmmnHistoryService.createHistoricTaskLogEntryBuilder();
+        
+        Date todayDate = new Date();
         historicTaskLogEntryBuilder.taskId("1");
         historicTaskLogEntryBuilder.type("testType");
         historicTaskLogEntryBuilder.userId("testUserId");
@@ -405,10 +407,10 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         historicTaskLogEntryBuilder.scopeType("testScopeType");
         historicTaskLogEntryBuilder.scopeDefinitionId("testDefinitionId");
         historicTaskLogEntryBuilder.subScopeId("testSubScopeId");
-        historicTaskLogEntryBuilder.timeStamp(new Date(0));
+        historicTaskLogEntryBuilder.timeStamp(todayDate);
         historicTaskLogEntryBuilder.tenantId("testTenant");
 
-        historicTaskLogEntryBuilder.add();
+        historicTaskLogEntryBuilder.create();
 
         HistoricTaskLogEntry historicTaskLogEntry = null;
         try {
@@ -427,7 +429,7 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
             assertEquals("testSubScopeId", historicTaskLogEntry.getSubScopeId());
             assertEquals("testData", historicTaskLogEntry.getData());
             assertTrue(historicTaskLogEntry.getLogNumber() > 0l);
-            assertEquals(new Date(0), historicTaskLogEntry.getTimeStamp());
+            assertEquals(todayDate, historicTaskLogEntry.getTimeStamp());
             assertEquals("testTenant", historicTaskLogEntry.getTenantId());
         } finally {
             if (historicTaskLogEntry != null) {
@@ -447,7 +449,7 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         cmmnTaskService.saveTask(task);
         cmmnTaskService.setAssignee(task.getId(), "newAssignee");
         cmmnTaskService.setOwner(task.getId(), "newOwner");
-        cmmnTaskService.setDueDate(task.getId(), new Date(0));
+        cmmnTaskService.setDueDate(task.getId(), new Date());
         cmmnTaskService.addUserIdentityLink(task.getId(), "testUser", IdentityLinkType.PARTICIPANT);
         cmmnTaskService.addGroupIdentityLink(task.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
         cmmnTaskService.deleteUserIdentityLink(task.getId(), "testUser", IdentityLinkType.PARTICIPANT);

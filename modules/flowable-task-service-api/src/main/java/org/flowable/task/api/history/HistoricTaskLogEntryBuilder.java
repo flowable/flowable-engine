@@ -73,6 +73,6 @@ public interface HistoricTaskLogEntryBuilder {
 
     String getTenantId();
 
-    void add();
+    void create();
 
 }

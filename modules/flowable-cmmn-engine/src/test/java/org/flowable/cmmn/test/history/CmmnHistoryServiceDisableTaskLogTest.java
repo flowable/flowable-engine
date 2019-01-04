@@ -72,7 +72,7 @@ public class CmmnHistoryServiceDisableTaskLogTest extends CustomCmmnConfiguratio
         task = cmmnTaskService.createTaskBuilder().
             assignee("testAssignee").
             create();
-        cmmnHistoryService.createHistoricTaskLogEntryBuilder().taskId(task.getId()).add();
+        cmmnHistoryService.createHistoricTaskLogEntryBuilder().taskId(task.getId()).create();
     }
 
 }

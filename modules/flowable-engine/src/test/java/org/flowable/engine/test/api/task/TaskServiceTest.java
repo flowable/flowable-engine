@@ -87,13 +87,14 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
     @Test
     public void testCreateTaskWithBuilder() {
+        Date todayDate = new Date();
         task = taskService.createTaskBuilder().
                         name("testName").
                         description("testDescription").
                         priority(35).
                         owner("testOwner").
                         assignee("testAssignee").
-                        dueDate(new Date(0)).
+                        dueDate(todayDate).
                         category("testCategory").
                         parentTaskId("testParentTaskId").
                         tenantId("testTenantId").
@@ -110,7 +111,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         assertThat(updatedTask.getPriority(), is(35));
         assertThat(updatedTask.getOwner(), is("testOwner"));
         assertThat(updatedTask.getAssignee(), is("testAssignee"));
-        assertThat(updatedTask.getDueDate(), is(new Date(0)));
+        assertThat(updatedTask.getDueDate(), is(todayDate));
         assertThat(updatedTask.getCategory(), is("testCategory"));
         assertThat(updatedTask.getParentTaskId(), is("testParentTaskId"));
         assertThat(updatedTask.getTenantId(), is("testTenantId"));

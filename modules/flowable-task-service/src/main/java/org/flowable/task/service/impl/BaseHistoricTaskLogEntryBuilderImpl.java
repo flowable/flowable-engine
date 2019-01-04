@@ -184,7 +184,7 @@ public class BaseHistoricTaskLogEntryBuilderImpl implements HistoricTaskLogEntry
     }
 
     @Override
-    public void add() {
+    public void create() {
         // add is not supported by default
         throw new RuntimeException("Operation is not supported");
     }

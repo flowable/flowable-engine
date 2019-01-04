@@ -2,7 +2,7 @@ create table ACT_HI_TSK_LOG (
   ID_ bigint auto_increment,
   TYPE_ varchar(64),
   TASK_ID_ varchar(64) not null,
-  TIME_STAMP_ datetime not null,
+  TIME_STAMP_ timestamp(3) not null,
   USER_ID_ varchar(255),
   DATA_ varchar(4000),
   EXECUTION_ID_ varchar(64),
