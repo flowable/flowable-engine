@@ -453,7 +453,7 @@ paths:
                   format: byte
         '404':
           description: >-
-            Indicates the content item was not found or the content item doesn?t
+            Indicates the content item was not found or the content item does not
             have a binary stream available. Status message provides additional
             information.
       security:

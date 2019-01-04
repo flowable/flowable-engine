@@ -6679,7 +6679,7 @@ paths:
         - Task Identity Links
       summary: List identity links for a task for either groups or users
       description: >-
-        Returns only identity links targetting either users or groups. Response
+        Returns only identity links targeting either users or groups. Response
         body and status-codes are exactly the same as when getting the full list
         of identity links for a task.
       operationId: listIdentityLinksForFamily
