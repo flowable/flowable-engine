@@ -2559,7 +2559,7 @@ paths:
         - Jobs
       summary: Delete a suspended job
       description: ''
-      operationId: deleteSuspendeJob
+      operationId: deleteSuspendedJob
       parameters:
         - name: jobId
           in: path
