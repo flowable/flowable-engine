@@ -36,6 +36,7 @@ import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.mapping.Environment;
+import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
@@ -176,6 +177,8 @@ public abstract class AbstractEngineConfiguration {
 
     protected Set<Class<?>> customMybatisMappers;
     protected Set<String> customMybatisXMLMappers;
+    protected List<Interceptor> customMybatisInterceptors;
+
 
     protected Set<String> dependentEngineMyBatisXmlMappers;
     protected List<MybatisTypeAliasConfigurator> dependentEngineMybatisTypeAliasConfigs;
@@ -712,7 +715,7 @@ public abstract class AbstractEngineConfiguration {
 
         initCustomMybatisMappers(configuration);
         initMybatisTypeHandlers(configuration);
-
+        initCustomMybatisInterceptors(configuration);
         if (isEnableLogSqlExecutionTime()) {
             initMyBatisLogSqlExecutionTimePlugin(configuration);
         }
@@ -731,6 +734,14 @@ public abstract class AbstractEngineConfiguration {
 
     public void initMybatisTypeHandlers(Configuration configuration) {
         // To be extended
+    }
+
+    public void initCustomMybatisInterceptors(Configuration configuration) {
+      if (customMybatisInterceptors!=null){
+        for (Interceptor interceptor :customMybatisInterceptors){
+            configuration.addInterceptor(interceptor);
+        }
+      }
     }
 
     public void initMyBatisLogSqlExecutionTimePlugin(Configuration configuration) {
@@ -1298,6 +1309,15 @@ public abstract class AbstractEngineConfiguration {
 
     public Set<String> getDependentEngineMyBatisXmlMappers() {
         return dependentEngineMyBatisXmlMappers;
+    }
+
+    public AbstractEngineConfiguration setCustomMybatisInterceptors(List<Interceptor> customMybatisInterceptors) {
+        this.customMybatisInterceptors = customMybatisInterceptors;
+        return  this;
+    }
+
+    public List<Interceptor> getCustomMybatisInterceptors() {
+        return customMybatisInterceptors;
     }
 
     public AbstractEngineConfiguration setDependentEngineMyBatisXmlMappers(Set<String> dependentEngineMyBatisXmlMappers) {
