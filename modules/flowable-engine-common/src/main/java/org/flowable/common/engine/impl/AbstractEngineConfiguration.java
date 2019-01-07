@@ -38,6 +38,7 @@ import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
@@ -178,6 +179,9 @@ public abstract class AbstractEngineConfiguration {
     protected Set<Class<?>> customMybatisMappers;
     protected Set<String> customMybatisXMLMappers;
     protected List<Interceptor> customMybatisInterceptors;
+    /** the number of seconds the jdbc driver will wait for a response from the database */
+    protected Integer jdbcStatementTimeout;
+    protected boolean jdbcBatchProcessing = true;
 
 
     protected Set<String> dependentEngineMyBatisXmlMappers;
@@ -719,7 +723,10 @@ public abstract class AbstractEngineConfiguration {
         if (isEnableLogSqlExecutionTime()) {
             initMyBatisLogSqlExecutionTimePlugin(configuration);
         }
-
+        configuration.setDefaultStatementTimeout(jdbcStatementTimeout);
+        if (isJdbcBatchProcessing()) {
+            configuration.setDefaultExecutorType(ExecutorType.BATCH);
+        }
         configuration = parseMybatisConfiguration(parser);
         return configuration;
     }
@@ -1603,5 +1610,23 @@ public abstract class AbstractEngineConfiguration {
 
     public boolean isForceCloseMybatisConnectionPool() {
         return forceCloseMybatisConnectionPool;
+    }
+
+    public AbstractEngineConfiguration setJdbcStatementTimeout(Integer jdbcStatementTimeout) {
+        this.jdbcStatementTimeout = jdbcStatementTimeout;
+        return  this;
+    }
+
+    public AbstractEngineConfiguration setJdbcBatchProcessing(boolean jdbcBatchProcessing) {
+        this.jdbcBatchProcessing = jdbcBatchProcessing;
+        return  this;
+    }
+
+    public Integer getJdbcStatementTimeout() {
+        return jdbcStatementTimeout;
+    }
+
+    public boolean isJdbcBatchProcessing() {
+        return jdbcBatchProcessing;
     }
 }
