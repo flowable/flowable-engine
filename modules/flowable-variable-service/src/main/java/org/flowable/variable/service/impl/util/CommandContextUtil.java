@@ -79,8 +79,7 @@ public class CommandContextUtil {
         AbstractEngineConfiguration currentEngineConfiguration = getCommandContext().getCurrentEngineConfiguration();
         if (currentEngineConfiguration instanceof HasExpressionManagerEngineConfiguration) {
             return ((HasExpressionManagerEngineConfiguration) currentEngineConfiguration).getExpressionManager();
-        } else {
-            throw new FlowableException("Unable to obtain expression manager from the current engine configuration" + currentEngineConfiguration);
         }
+        throw new FlowableException("Unable to obtain expression manager from the current engine configuration: " + currentEngineConfiguration);
     }
 }

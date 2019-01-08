@@ -31,7 +31,7 @@ public class SpringFormEngineConfigurator extends FormEngineConfigurator {
         if (formEngineConfiguration == null) {
             formEngineConfiguration = new SpringFormEngineConfiguration();
         } else if (!(formEngineConfiguration instanceof SpringFormEngineConfiguration)) {
-            throw new IllegalArgumentException("Expected formEngine configuration to be of type"
+            throw new IllegalArgumentException("Expected formEngine configuration to be of type "
                 + SpringFormEngineConfiguration.class + " but was " + formEngineConfiguration.getClass());
         }
         initialiseCommonProperties(engineConfiguration, formEngineConfiguration);
