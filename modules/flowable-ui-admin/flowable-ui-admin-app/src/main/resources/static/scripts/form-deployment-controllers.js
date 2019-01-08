@@ -76,7 +76,7 @@ flowableAdminApp.controller('FormDeploymentController', ['$scope', '$rootScope',
             
             modalInstance.result.then(function (result) {
                 if (result === true) {
-                    $http({method: 'DELETE', url: '/app/rest/admin/form-deployments/' + $routeParams.deploymentId}).
+                    $http({method: 'DELETE', url: '/app/rest/admin/form-deployments/' + $routeParams.formDeploymentId}).
                     success(function(data, status, headers, config) {
                         $scope.addAlert($translate.instant('ALERT.FORM-DEPLOYMENT.DELETED-DEPLOYMENT', $scope.formDeployment), 'info');
                         $scope.returnToList();
