@@ -1163,6 +1163,9 @@
                                 <exclude>**/HistoricProcessInstanceQueryAndWithExceptionTest.java</exclude>
                                 <exclude>**/HistoricJPAVariableTest.java</exclude>
                                 <exclude>**/VerifyDatabaseOperationsTest.java</exclude>
+                                <exclude>**/AsyncHistoryTest.java</exclude>
+                                <exclude>**/AsyncHistoryUpgradeTest.java</exclude>
+                                <exclude>**/ProcessInstanceLogQueryTest.java</exclude>
                                 <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
                             <runOrder>alphabetical</runOrder>

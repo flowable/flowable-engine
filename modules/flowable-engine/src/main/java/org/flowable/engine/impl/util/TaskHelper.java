@@ -446,7 +446,10 @@ public class TaskHelper {
     }
 
     public static void deleteHistoricTaskEventLogEntries(String taskId) {
-        CommandContextUtil.getHistoricTaskService().deleteHistoricTaskLogEntriesForTaskId(taskId);
+        TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
+        if (taskServiceConfiguration.isEnableHistoricTaskLogging()) {
+            CommandContextUtil.getHistoricTaskService().deleteHistoricTaskLogEntriesForTaskId(taskId);
+        }
     }
 
     protected static void fireAssignmentEvents(TaskEntity taskEntity) {

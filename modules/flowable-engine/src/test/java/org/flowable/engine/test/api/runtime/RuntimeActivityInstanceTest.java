@@ -173,40 +173,22 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
 
         assertEquals(0, runtimeService.createActivityInstanceQuery().executionId("nonExistingExecutionId").list().size());
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertEquals(5, runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list().size());
-        } else {
-            assertEquals(0, runtimeService.createActivityInstanceQuery().executionId(processInstance.getId()).list().size());
-        }
+        assertEquals(5, runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list().size());
 
         assertEquals(0, runtimeService.createActivityInstanceQuery().processInstanceId("nonExistingProcessInstanceId").list().size());
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertEquals(5, runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list().size());
-        } else {
-            assertEquals(0, runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list().size());
-        }
+        assertEquals(5, runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list().size());
 
         assertEquals(0, runtimeService.createActivityInstanceQuery().processDefinitionId("nonExistingProcessDefinitionId").list().size());
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertEquals(5, runtimeService.createActivityInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).list().size());
-        } else {
-            assertEquals(0, runtimeService.createActivityInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).list().size());
-        }
+        assertEquals(5, runtimeService.createActivityInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).list().size());
 
         assertEquals(1, runtimeService.createActivityInstanceQuery().unfinished().list().size());
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertEquals(4, runtimeService.createActivityInstanceQuery().finished().list().size());
-        } else {
-            assertEquals(0, runtimeService.createActivityInstanceQuery().finished().list().size());
-        }
+        assertEquals(4, runtimeService.createActivityInstanceQuery().finished().list().size());
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            ActivityInstance activityInstance = runtimeService.createActivityInstanceQuery().list().get(0);
-            assertEquals(1, runtimeService.createActivityInstanceQuery().activityInstanceId(activityInstance.getId()).list().size());
-        }
+        ActivityInstance activityInstance = runtimeService.createActivityInstanceQuery().list().get(0);
+        assertEquals(1, runtimeService.createActivityInstanceQuery().activityInstanceId(activityInstance.getId()).list().size());
     }
 
     @Test
@@ -288,12 +270,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
     public void testSorting() {
         runtimeService.startProcessInstanceByKey("process");
 
-        int expectedActivityInstances;
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            expectedActivityInstances = 3;
-        } else {
-            expectedActivityInstances = 0;
-        }
+        int expectedActivityInstances = 3;
 
         assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByActivityInstanceId().asc().list().size());
         assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByActivityInstanceStartTime().asc().list().size());

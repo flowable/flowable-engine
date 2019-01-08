@@ -50,9 +50,11 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
         this.processInstanceId = runtimeService.startProcessInstanceByKey("twoTasksProcess", vars).getId();
 
         // Add some comments
-        taskService.addComment(null, processInstanceId, "Hello World");
-        taskService.addComment(null, processInstanceId, "Hello World2");
-        taskService.addComment(null, processInstanceId, "Hello World3");
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            taskService.addComment(null, processInstanceId, "Hello World");
+            taskService.addComment(null, processInstanceId, "Hello World2");
+            taskService.addComment(null, processInstanceId, "Hello World3");
+        }
 
         // Change some variables
         runtimeService.setVariable(processInstanceId, "var1", "new Value");
