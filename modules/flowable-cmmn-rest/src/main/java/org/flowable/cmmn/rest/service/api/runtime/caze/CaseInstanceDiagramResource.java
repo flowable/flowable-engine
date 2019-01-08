@@ -56,7 +56,7 @@ public class CaseInstanceDiagramResource extends BaseCaseInstanceResource {
     @ApiOperation(value = "Get diagram for a case instance", tags = { "Case Instances" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the case instance was found and the diagram was returned."),
-            @ApiResponse(code = 400, message = "Indicates the requested case instance was not found but the process doesn’t contain any graphical information (CMMN DI) and no diagram can be created."),
+            @ApiResponse(code = 400, message = "Indicates the requested case instance was not found but the process does not contain any graphical information (CMMN DI) and no diagram can be created."),
             @ApiResponse(code = 404, message = "Indicates the requested case instance was not found.")
     })
     @GetMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/diagram")

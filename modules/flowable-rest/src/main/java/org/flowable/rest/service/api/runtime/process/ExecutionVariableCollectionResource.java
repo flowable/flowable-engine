@@ -59,7 +59,7 @@ public class ExecutionVariableCollectionResource extends BaseVariableCollectionR
     @ApiOperation(value = "Update variables on an execution", tags = { "Executions" }, nickname = "createOrUpdateExecutionVariable",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (array of RestVariable) or by passing a multipart/form-data Object.\n"
             + "Any number of variables can be passed into the request body array.\n"
-            + "NB: Swagger V2 specification doesn't support this use case that's why this endpoint might be buggy/incomplete if used with other tools.")
+            + "NB: Swagger V2 specification does not support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "body", type = "org.flowable.rest.service.api.engine.variable.RestVariable", value = "Update a task variable", paramType = "body", example = "{\n" +
                     "    \"name\":\"intProcVar\"\n" +
@@ -86,7 +86,7 @@ public class ExecutionVariableCollectionResource extends BaseVariableCollectionR
     @ApiOperation(value = "Create variables on an execution", tags = { "Executions" }, nickname = "createExecutionVariable",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (array of RestVariable) or by passing a multipart/form-data Object.\n"
             + "Any number of variables can be passed into the request body array.\n"
-            + "NB: Swagger V2 specification doesn't support this use case that's why this endpoint might be buggy/incomplete if used with other tools.")
+            + "NB: Swagger V2 specification does not support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "body", type = "org.flowable.rest.service.api.engine.variable.RestVariable", value = "Update a task variable", paramType = "body", example = "{\n" +
                     "    \"name\":\"intProcVar\"\n" +

@@ -54,7 +54,7 @@ public class TaskAttachmentResource extends TaskBaseResource {
 
         Attachment attachment = taskService.getAttachment(attachmentId);
         if (attachment == null || !task.getId().equals(attachment.getTaskId())) {
-            throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' doesn't have an attachment with id '" + attachmentId + "'.", Comment.class);
+            throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' does not have an attachment with id '" + attachmentId + "'.", Comment.class);
         }
 
         return restResponseFactory.createAttachmentResponse(attachment);
@@ -72,7 +72,7 @@ public class TaskAttachmentResource extends TaskBaseResource {
 
         Attachment attachment = taskService.getAttachment(attachmentId);
         if (attachment == null || !task.getId().equals(attachment.getTaskId())) {
-            throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' doesn't have an attachment with id '" + attachmentId + "'.", Comment.class);
+            throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' does not have an attachment with id '" + attachmentId + "'.", Comment.class);
         }
 
         taskService.deleteAttachment(attachmentId);

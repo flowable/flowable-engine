@@ -237,7 +237,7 @@ public class ContentItemCollectionResource extends ContentItemBaseResource {
 
     @ApiOperation(value = "Create a new content item, with content item information and an optional attached file", tags = { "Content item" },
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (ContentItemRequest) to link an external resource or by passing a multipart/form-data Object to attach a file.\n"
-                    + "NB: Swagger V2 specification doesn't support this use case that's why this endpoint might be buggy/incomplete if used with other tools.")
+                    + "NB: Swagger V2 specification doesn't support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "body", type = "org.flowable.rest.service.api.engine.ContentItemRequest", value = "Create a new content item, with content item information", paramType = "body", example = "{\n" + "  \"name\":\"Simple content item\",\n" + "  \"mimeType\":\"application/pdf\",\n"
                     + "  \"taskId\":\"12345\",\n" + "  \"processInstanceId\":\"1234\"\n"

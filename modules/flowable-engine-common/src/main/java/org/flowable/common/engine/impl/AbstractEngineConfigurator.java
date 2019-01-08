@@ -83,7 +83,7 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
     protected abstract List<EngineDeployer> getCustomDeployers();
 
     /**
-     * @return The path to the Mybatis cfg file that's normally used for the engine (so the full cfg, not an individual mapper).
+     * @return The path to the Mybatis cfg file that is normally used for the engine (so the full cfg, not an individual mapper).
      *         Return null in case no custom mappers should be loaded.
      */
     protected abstract String getMybatisCfgPath();
