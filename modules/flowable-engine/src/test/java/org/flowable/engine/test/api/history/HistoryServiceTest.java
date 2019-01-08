@@ -956,7 +956,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         HistoricIdentityLink historicIdentityLink = historicIdentityLinks.get(0);
         assertThat(historicIdentityLink.getType()).isEqualTo(IdentityLinkType.STARTER);
         assertThat(historicIdentityLink.getUserId()).isEqualTo("johndoe");
-        assertThat(historicIdentityLink.getCreateTime()).isEqualTo(processInstanceStartTime);
+        assertThat(historicIdentityLink.getCreateTime()).isNotNull();
 
         HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
         assertEquals("johndoe", historicProcessInstance.getStartUserId());
@@ -980,7 +980,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         historicIdentityLink = historicIdentityLinks.get(1);
         assertThat(historicIdentityLink.getType()).isEqualTo(IdentityLinkType.PARTICIPANT);
         assertThat(historicIdentityLink.getUserId()).isEqualTo("johndoe");
-        assertThat(historicIdentityLink.getCreateTime()).isEqualTo(taskCompleteTime);
+        assertThat(historicIdentityLink.getCreateTime()).isNotNull();
 
         managementService.executeCommand(commandContext -> {
             CommandContextUtil.getHistoricTaskService().deleteHistoricTaskLogEntriesForProcessDefinition(processInstance.getProcessDefinitionId());

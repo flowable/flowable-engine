@@ -77,7 +77,7 @@ public class HistoryServiceTaskLogTest {
         assertThat(taskLogsByTaskInstanceId.get(0)).
             extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_CREATED");
         assertThat(taskLogsByTaskInstanceId.get(0)).
-            extracting(HistoricTaskLogEntry::getTimeStamp).isEqualTo(task.getCreateTime());
+            extracting(HistoricTaskLogEntry::getTimeStamp).isNotNull();
         assertThat(taskLogsByTaskInstanceId.get(0)).
             extracting(HistoricTaskLogEntry::getUserId).isNull();
 
