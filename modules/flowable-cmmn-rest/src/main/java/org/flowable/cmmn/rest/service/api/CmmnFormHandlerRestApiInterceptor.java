@@ -15,10 +15,13 @@ package org.flowable.cmmn.rest.service.api;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.form.api.FormInfo;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 public interface CmmnFormHandlerRestApiInterceptor {
 
     String convertStartFormInfo(FormInfo formInfo, CaseDefinition caseDefinition);
     
     String convertTaskFormInfo(FormInfo formInfo, Task task);
+    
+    String convertHistoricTaskFormInfo(FormInfo formInfo, HistoricTaskInstance task);
 }

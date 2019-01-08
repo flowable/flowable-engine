@@ -314,7 +314,9 @@ public class BaseSpringRestTestCase {
             int responseStatusCode = response.getStatusLine().getStatusCode();
             if (expectedStatusCode != responseStatusCode) {
                 LOGGER.info("Wrong status code : {}, but should be {}", responseStatusCode, expectedStatusCode);
-                LOGGER.info("Response body: {}", IOUtils.toString(response.getEntity().getContent()));
+                if (response.getEntity() != null && response.getEntity().getContent() != null) {
+                    LOGGER.info("Response body: {}", IOUtils.toString(response.getEntity().getContent()));
+                }
             }
 
             Assert.assertEquals(expectedStatusCode, responseStatusCode);

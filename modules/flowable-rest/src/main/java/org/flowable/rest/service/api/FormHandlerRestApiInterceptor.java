@@ -15,10 +15,13 @@ package org.flowable.rest.service.api;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.form.api.FormInfo;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 public interface FormHandlerRestApiInterceptor {
 
     String convertStartFormInfo(FormInfo formInfo, ProcessDefinition processDefinition);
     
     String convertTaskFormInfo(FormInfo formInfo, Task task);
+    
+    String convertHistoricTaskFormInfo(FormInfo formInfo, HistoricTaskInstance task);
 }

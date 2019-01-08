@@ -59,10 +59,10 @@ public class GetTaskFormModelCmd implements Command<FormInfo>, Serializable {
             throw new FlowableIllegalArgumentException("Form engine is not initialized");
         }
 
-        TaskInfo task = CommandContextUtil.getTaskService().getTask(taskId);
+        TaskInfo task = CommandContextUtil.getTaskService(commandContext).getTask(taskId);
         Date endTime = null;
         if (task == null) {
-            task = CommandContextUtil.getHistoricTaskService().getHistoricTask(taskId);
+            task = CommandContextUtil.getHistoricTaskService(commandContext).getHistoricTask(taskId);
             if (task != null) {
                 endTime = ((HistoricTaskInstance) task).getEndTime();
             }

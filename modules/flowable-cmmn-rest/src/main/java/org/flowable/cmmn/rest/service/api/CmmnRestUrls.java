@@ -381,10 +381,15 @@ public final class CmmnRestUrls {
     public static final String[] URL_HISTORIC_TASK_INSTANCE_IDENTITY_LINKS = { SEGMENT_HISTORY_RESOURCES, SEGMENT_HISTORIC_TASK_INSTANCE_RESOURCE, "{0}", SEGMENT_IDENTITYLINKS };
 
     /**
-     * URL template for a single historic task instance: <i>history/historic-task -instances/{0:taskId}/variables/{1:variableName}</i>
+     * URL template for a single historic task instance: <i>history/historic-task-instances/{0:taskId}/variables/{1:variableName}</i>
      */
     public static final String[] URL_HISTORIC_TASK_INSTANCE_VARIABLE_DATA = { SEGMENT_HISTORY_RESOURCES, SEGMENT_HISTORIC_TASK_INSTANCE_RESOURCE, "{0}", SEGMENT_VARIABLES, "{1}", SEGMENT_VARIABLE_DATA };
 
+    /**
+     * URL template for a historic task instance form: <i>history/historic-task-instances/{0:taskId}/form</i>
+     */
+    public static final String[] URL_HISTORIC_TASK_INSTANCE_FORM = { SEGMENT_HISTORY_RESOURCES, SEGMENT_HISTORIC_TASK_INSTANCE_RESOURCE, "{0}", SEGMENT_FORM };
+    
     /**
      * URL template for historic activity instance query: <i>history/historic-activity-instances</i>
      */

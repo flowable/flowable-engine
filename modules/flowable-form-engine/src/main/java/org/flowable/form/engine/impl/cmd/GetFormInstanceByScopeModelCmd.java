@@ -30,7 +30,7 @@ public class GetFormInstanceByScopeModelCmd extends AbstractGetFormInstanceModel
     public GetFormInstanceByScopeModelCmd(String formDefinitionKey, String parentDeploymentId, String scopeId, String scopeType, 
                     String tenantId, Map<String, Object> variables, boolean fallbackToDefaultTenant) {
 
-        initializeValuesForScope(formDefinitionKey, parentDeploymentId, formDefinitionKey, tenantId, 
+        initializeValuesForScope(formDefinitionKey, parentDeploymentId, null, tenantId, 
                         scopeId, scopeType, variables, fallbackToDefaultTenant);
     }
 }
