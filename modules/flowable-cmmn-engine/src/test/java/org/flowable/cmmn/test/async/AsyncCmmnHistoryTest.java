@@ -429,7 +429,7 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
             assertEquals("testSubScopeId", historicTaskLogEntry.getSubScopeId());
             assertEquals("testData", historicTaskLogEntry.getData());
             assertTrue(historicTaskLogEntry.getLogNumber() > 0l);
-            assertEquals(todayDate, historicTaskLogEntry.getTimeStamp());
+            assertNotNull(historicTaskLogEntry.getTimeStamp());
             assertEquals("testTenant", historicTaskLogEntry.getTenantId());
         } finally {
             if (historicTaskLogEntry != null) {
