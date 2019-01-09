@@ -3452,6 +3452,24 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" },
+        tenantId = "testTenant"
+    )
+    public void testIncludeTaskLocalAndProcessInstanceVariableHasTenant() {
+        for (int i = 0; i < 10; i++) {
+            runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", Collections.singletonMap("simpleVar", "simpleVarValue"), "testTenant");
+        }
+
+        List<Task> tasks = taskService.createTaskQuery().includeProcessVariables().includeTaskLocalVariables()
+            .list();
+
+        assertEquals(10, tasks.size());
+        for (Task task : tasks) {
+            assertEquals("testTenant", task.getTenantId());
+        }
+    }
+
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml" })
     public void testLocalizeTasks() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
