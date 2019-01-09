@@ -64,9 +64,6 @@ public class HitPolicyOutputOrderTest {
 
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
 
-        Map<String, Object> inputVariables = new HashMap<>();
-        inputVariables.put("inputVariable1", 5);
-
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")
                 .variable("inputVariable1", 5)
@@ -90,9 +87,6 @@ public class HitPolicyOutputOrderTest {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
-
-        Map<String, Object> inputVariables = new HashMap<>();
-        inputVariables.put("inputVariable1", 5);
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")
