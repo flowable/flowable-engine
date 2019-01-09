@@ -3460,7 +3460,8 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", Collections.singletonMap("simpleVar", "simpleVarValue"), "testTenant");
         }
 
-        List<Task> tasks = taskService.createTaskQuery().includeProcessVariables().includeTaskLocalVariables()
+        List<Task> tasks = taskService.createTaskQuery().processDefinitionKey("oneTaskProcess").
+            includeProcessVariables().includeTaskLocalVariables()
             .list();
 
         assertEquals(10, tasks.size());
