@@ -1157,6 +1157,8 @@
                                 <exclude>**/HistoryLevelServiceTest.java</exclude>
                                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                                 <exclude>**/ProcessInstanceLogQueryTest.java</exclude>
+                                <exclude>**/HistoryServiceTaskLogTest.java</exclude>
+                                <exclude>**/HistoryServiceDisableTaskLogTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
                                 <exclude>**/HistoricProcessInstanceQueryVersionTest.java</exclude>
                                 <exclude>**/NonCascadeDeleteTest.java</exclude>

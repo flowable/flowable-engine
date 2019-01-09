@@ -68,9 +68,7 @@ public class HistoryServiceTaskLogTest {
             create();
 
         List<HistoricTaskLogEntry> taskLogsByTaskInstanceId = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
-        assertThat(
-            taskLogsByTaskInstanceId
-        ).size().isEqualTo(1);
+        assertThat(taskLogsByTaskInstanceId).size().isEqualTo(1);
 
         assertThat(taskLogsByTaskInstanceId.get(0)).
             extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
@@ -95,9 +93,7 @@ public class HistoryServiceTaskLogTest {
                 create();
 
             List<HistoricTaskLogEntry> taskLogsByTaskInstanceId = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
-            assertThat(
-                taskLogsByTaskInstanceId
-            ).size().isEqualTo(1);
+            assertThat(taskLogsByTaskInstanceId).size().isEqualTo(1);
 
             assertThat(taskLogsByTaskInstanceId.get(0)).
                 extracting(HistoricTaskLogEntry::getUserId).isEqualTo("testUser");
@@ -108,14 +104,11 @@ public class HistoryServiceTaskLogTest {
 
     @Test
     public void queryForNonExistingTaskLogEntries(TaskService taskService, HistoryService historyService) {
-        task = taskService.createTaskBuilder().
-            create();
+        task = taskService.createTaskBuilder().create();
 
         List<HistoricTaskLogEntry> taskLogsByTaskInstanceId = historyService.createHistoricTaskLogEntryQuery().taskId("NON-EXISTING-TASK-ID").list();
 
-        assertThat(
-            taskLogsByTaskInstanceId
-        ).isEmpty();
+        assertThat(taskLogsByTaskInstanceId).isEmpty();
     }
 
     @Test
@@ -141,16 +134,12 @@ public class HistoryServiceTaskLogTest {
             assignee("testAssignee").
             create();
         List<HistoricTaskLogEntry> taskLogsByTaskInstanceId = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
-        assertThat(
-            taskLogsByTaskInstanceId
-        ).size().isEqualTo(1);
+        assertThat(taskLogsByTaskInstanceId).size().isEqualTo(1);
 
         historyService.deleteHistoricTaskLogEntry(taskLogsByTaskInstanceId.get(0).getLogNumber());
 
         taskLogsByTaskInstanceId = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
-        assertThat(
-            taskLogsByTaskInstanceId
-        ).isEmpty();
+        assertThat(taskLogsByTaskInstanceId).isEmpty();
     }
 
     @Test
