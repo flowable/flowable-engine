@@ -119,7 +119,16 @@ public abstract class InternalFlowableExtension implements AfterEachCallback, Be
             }
         }
 
+        HistoryManager asyncHistoryManager = null;
         try {
+            if (isAsyncHistoryEnabled) {
+                processEngineConfiguration.setAsyncHistoryEnabled(false);
+                asyncHistoryManager = processEngineConfiguration.getHistoryManager();
+                processEngineConfiguration
+                    .setHistoryManager(new DefaultHistoryManager(processEngineConfiguration, 
+                            processEngineConfiguration.getHistoryLevel(), processEngineConfiguration.isUsePrefixId()));
+            }
+
             String annotationDeploymentKey = context.getUniqueId() + ANNOTATION_DEPLOYMENT_ID_KEY;
             String deploymentIdFromDeploymentAnnotation = getStore(context).get(annotationDeploymentKey, String.class);
             if (deploymentIdFromDeploymentAnnotation != null) {
@@ -132,18 +141,19 @@ public abstract class InternalFlowableExtension implements AfterEachCallback, Be
                 .ifPresent(cleanTest -> removeDeployments(processEngine.getRepositoryService()));
 
             AbstractFlowableTestCase.cleanDeployments(processEngine);
-
-            if (isAsyncHistoryEnabled) {
-                HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, processEngineConfiguration.getManagementService(),
-                    30000, 200);
-            }
-
+            
             if (context.getTestInstanceLifecycle().orElse(TestInstance.Lifecycle.PER_METHOD) == lifecycleForClean
                     && processEngineConfiguration.isUsingRelationalDatabase()) { // the logic only is applicable to a relational database with tables
                 cleanTestAndAssertAndEnsureCleanDb(context, processEngine);
             }
 
         } finally {
+
+            if (isAsyncHistoryEnabled) {
+                processEngineConfiguration.setAsyncHistoryEnabled(true);
+                processEngineConfiguration.setHistoryManager(asyncHistoryManager);
+            }
+
             processEngineConfiguration.getClock().reset();
         }
     }
