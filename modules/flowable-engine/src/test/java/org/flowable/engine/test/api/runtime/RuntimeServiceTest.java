@@ -389,6 +389,22 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertNotNull(task.getProcessVariables());
     }
 
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testStartProcessInstanceFormWithoutVariables() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+        ProcessInstance processInstance = runtimeService.startProcessInstanceWithForm(processDefinition.getId(), "outcome", null, null);
+        assertEquals(0, runtimeService.getVariables(processInstance.getId()).size());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testStartProcessInstanceFormWithEmptyVariables() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+        ProcessInstance processInstance = runtimeService.startProcessInstanceWithForm(processDefinition.getId(), "outcome", new HashMap<>(), null);
+        assertEquals(0, runtimeService.getVariables(processInstance.getId()).size());
+    }
+
     // some databases might react strange on having multiple times null for the
     // business key
     // when the unique constraint is {processDefinitionId, businessKey}
