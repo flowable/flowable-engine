@@ -84,13 +84,13 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior im
             }
         }
 
-        // Is needed to set the endTime for all historic activity joins
-        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityEnd(execution, null);
-
         // If no execution can reach the gateway, the gateway activates and executes fork behavior
         if (!oneExecutionCanReachGatewayInstance) {
 
             LOGGER.debug("Inclusive gateway cannot be reached by any execution and is activated");
+
+            // Is needed to set the endTime for all historic activity joins
+            CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityEnd(execution, null);
 
             // Kill all executions here (except the incoming)
             Collection<ExecutionEntity> executionsInGateway = executionEntityManager
