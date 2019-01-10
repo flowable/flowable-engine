@@ -12,10 +12,14 @@
  */
 package org.flowable.editor.language;
 
-import org.flowable.bpmn.model.*;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.Gateway;
+import org.flowable.bpmn.model.UserTask;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 /**
  * @author Zheng Ji
  */
