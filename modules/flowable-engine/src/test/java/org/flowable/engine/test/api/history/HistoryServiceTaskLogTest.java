@@ -379,9 +379,10 @@ public class HistoryServiceTaskLogTest {
 
     @Test
     public void createCustomTaskEventLog(TaskService taskService, HistoryService historyService,
-        ProcessEngineConfiguration processEngineConfiguration, ManagementService mananagementService) {
+        ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService) {
         task = taskService.createTaskBuilder().create();
-        
+        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+
         Date todayDate = new Date();
         HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = historyService.createHistoricTaskLogEntryBuilder(task);
         historicTaskLogEntryBuilder.timeStamp(todayDate);
@@ -390,7 +391,7 @@ public class HistoryServiceTaskLogTest {
         historicTaskLogEntryBuilder.data("testData");
         historicTaskLogEntryBuilder.create();
 
-        processAsyncHistoryIfNecessary(processEngineConfiguration, mananagementService);
+        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
 
         List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
 
@@ -452,6 +453,7 @@ public class HistoryServiceTaskLogTest {
         ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService) {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertNotNull(processInstance);
+        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
 
         try {
             runtimeService.suspendProcessInstanceById(processInstance.getId());
@@ -534,6 +536,7 @@ public class HistoryServiceTaskLogTest {
         ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService) {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
         try {
             assertNotNull(processInstance);
             assertNotNull(task);
