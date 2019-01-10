@@ -705,6 +705,10 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
             putIfNotNull(data, HistoryJsonConstants.CREATE_TIME, taskLogEntryBuilder.getTimeStamp());
             putIfNotNull(data, HistoryJsonConstants.USER_ID, taskLogEntryBuilder.getUserId());
             putIfNotNull(data, HistoryJsonConstants.LOG_ENTRY_TYPE, taskLogEntryBuilder.getType());
+            putIfNotNull(data, HistoryJsonConstants.SCOPE_ID, taskLogEntryBuilder.getScopeId());
+            putIfNotNull(data, HistoryJsonConstants.SUB_SCOPE_ID, taskLogEntryBuilder.getSubScopeId());
+            putIfNotNull(data, HistoryJsonConstants.SCOPE_TYPE, taskLogEntryBuilder.getScopeType());
+            putIfNotNull(data, HistoryJsonConstants.SCOPE_DEFINITION_ID, taskLogEntryBuilder.getScopeDefinitionId());
 
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_HISTORIC_TASK_LOG_RECORD, data,
                 taskLogEntryBuilder.getTenantId());

@@ -197,7 +197,9 @@ public interface HistoryJsonConstants {
     String CALLED_PROCESS_INSTANCE_ID = "calledProcessInstanceId";
 
     String SCOPE_ID = "scopeId";
-    
+
+    String SUB_SCOPE_ID = "subScopeId";
+
     String SCOPE_TYPE = "scopeType";
     
     String SCOPE_DEFINITION_ID = "scopeDefinitionId";

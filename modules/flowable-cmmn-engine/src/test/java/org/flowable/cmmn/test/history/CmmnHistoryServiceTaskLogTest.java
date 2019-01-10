@@ -25,6 +25,7 @@ import java.util.function.Consumer;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.identity.Authentication;
@@ -71,6 +72,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
         task = cmmnTaskService.createTaskBuilder().
             assignee("testAssignee").
             create();
+        processAsyncHistoryIfNecessary();
 
         List<HistoricTaskLogEntry> taskLogsByTaskInstanceId = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
         assertThat(taskLogsByTaskInstanceId).size().isEqualTo(1);
@@ -93,6 +95,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
             task = cmmnTaskService.createTaskBuilder().
                 assignee("testAssignee").
                 create();
+            processAsyncHistoryIfNecessary();
 
             List<HistoricTaskLogEntry> taskLogsByTaskInstanceId = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(taskLogsByTaskInstanceId).size().isEqualTo(1);
@@ -107,6 +110,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
     @Test
     public void queryForNonExistingTaskLogEntries() {
         task = cmmnTaskService.createTaskBuilder().create();
+        processAsyncHistoryIfNecessary();
 
         List<HistoricTaskLogEntry> taskLogsByTaskInstanceId = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId("NON-EXISTING-TASK-ID").list();
 
@@ -118,6 +122,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
         Task taskA = cmmnTaskService.createTaskBuilder().create();
         Task taskB = cmmnTaskService.createTaskBuilder().create();
         Task taskC = cmmnTaskService.createTaskBuilder().create();
+        processAsyncHistoryIfNecessary();
 
         try {
             List<HistoricTaskLogEntry> taskLogsByTaskInstanceId = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(null).list();
@@ -136,12 +141,15 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
         task = cmmnTaskService.createTaskBuilder().
             assignee("testAssignee").
             create();
+        processAsyncHistoryIfNecessary();
+
         List<HistoricTaskLogEntry> taskLogsByTaskInstanceId = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
         assertThat(
             taskLogsByTaskInstanceId
         ).size().isEqualTo(1);
 
         cmmnHistoryService.deleteHistoricTaskLogEntry(taskLogsByTaskInstanceId.get(0).getLogNumber());
+        processAsyncHistoryIfNecessary();
 
         taskLogsByTaskInstanceId = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
         assertThat(
@@ -155,6 +163,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
         
         // non existing log entry delete should be successful
         cmmnHistoryService.deleteHistoricTaskLogEntry(9999);
+        processAsyncHistoryIfNecessary();
 
         assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list().size()).isEqualTo(1);
     }
@@ -164,13 +173,16 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
         task = cmmnTaskService.createTaskBuilder().
             assignee("initialAssignee").
             create();
+        processAsyncHistoryIfNecessary();
 
         cmmnTaskService.setAssignee(task.getId(), "newAssignee");
+        processAsyncHistoryIfNecessary();
+
         List<HistoricTaskLogEntry> taskLogEntries = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
 
         assertThat(taskLogEntries).size().isEqualTo(2);
         assertThat(taskLogEntries.get(1)).
-            extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
+            extracting(HistoricTaskLogEntry::getData).
             isEqualTo("{\"newAssigneeId\":\"newAssignee\",\"previousAssigneeId\":\"initialAssignee\"}");
         assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getTimeStamp).isNotNull();
         assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
@@ -251,8 +263,10 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
     @Test
     public void changePriority() {
         task = cmmnTaskService.createTaskBuilder().create();
+        processAsyncHistoryIfNecessary();
 
         cmmnTaskService.setPriority(task.getId(), Integer.MAX_VALUE);
+        processAsyncHistoryIfNecessary();
         List<HistoricTaskLogEntry> taskLogEntries = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
 
         assertThat(taskLogEntries).size().isEqualTo(2);
@@ -277,9 +291,12 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
         task = cmmnTaskService.createTaskBuilder().
             assignee("testAssignee").
             create();
+        processAsyncHistoryIfNecessary();
+
         Authentication.setAuthenticatedUserId("testUser");
         try {
             functionToAssert.accept(task.getId());
+            processAsyncHistoryIfNecessary();
 
             List<HistoricTaskLogEntry> taskLogsByTaskInstanceId = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(taskLogsByTaskInstanceId).size().isEqualTo(2);
@@ -294,8 +311,11 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
     @Test
     public void changeDueDate() {
         task = cmmnTaskService.createTaskBuilder().create();
+        processAsyncHistoryIfNecessary();
 
         cmmnTaskService.setDueDate(task.getId(), new Date());
+        processAsyncHistoryIfNecessary();
+
         List<HistoricTaskLogEntry> taskLogEntries = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
 
         assertThat(taskLogEntries).size().isEqualTo(2);
@@ -317,6 +337,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
         task.setPriority(Integer.MAX_VALUE);
         task.setDueDate(new Date());
         cmmnTaskService.saveTask(task);
+        processAsyncHistoryIfNecessary();
 
         List<HistoricTaskLogEntry> taskLogEntries = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
         assertThat(taskLogEntries).as("Only User task created log entry is expected").size().isEqualTo(1);
@@ -333,11 +354,14 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
     public void createCustomTaskEventLog() {
         task = cmmnTaskService.createTaskBuilder().create();
         HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = cmmnHistoryService.createHistoricTaskLogEntryBuilder(task);
+        processAsyncHistoryIfNecessary();
+
         historicTaskLogEntryBuilder.timeStamp(getInsertDate());
         historicTaskLogEntryBuilder.userId("testUser");
         historicTaskLogEntryBuilder.type("customType");
         historicTaskLogEntryBuilder.data("testData");
         historicTaskLogEntryBuilder.create();
+        processAsyncHistoryIfNecessary();
 
         List<HistoricTaskLogEntry> logEntries = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
 
@@ -355,9 +379,12 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
     @Test
     public void createCustomTaskEventLog_taskIdIsEnoughToCreateTaskLogEntry() {
         task = cmmnTaskService.createTaskBuilder().create();
+        processAsyncHistoryIfNecessary();
 
         HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = cmmnHistoryService.createHistoricTaskLogEntryBuilder(task);
         historicTaskLogEntryBuilder.create();
+        processAsyncHistoryIfNecessary();
+
         List<HistoricTaskLogEntry> logEntries = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
 
         MatcherAssert.assertThat(logEntries.size(), is(2));
@@ -373,12 +400,14 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
     @Test
     public void createCustomTaskEventLog_withoutTimeStamp_addsDefault() {
         task = cmmnTaskService.createTaskBuilder().create();
+        processAsyncHistoryIfNecessary();
 
         HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = cmmnHistoryService.createHistoricTaskLogEntryBuilder(task);
         historicTaskLogEntryBuilder.userId("testUser");
         historicTaskLogEntryBuilder.type("customType");
         historicTaskLogEntryBuilder.data("testData");
         historicTaskLogEntryBuilder.create();
+        processAsyncHistoryIfNecessary();
 
         List<HistoricTaskLogEntry> logEntries = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
 
@@ -396,36 +425,40 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
 
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(oneTaskCase.getId()).singleResult();
         assertNotNull(task);
+        processAsyncHistoryIfNecessary();
         try {
             cmmnTaskService.setAssignee(task.getId(), "newAssignee");
+            processAsyncHistoryIfNecessary();
             cmmnTaskService.setOwner(task.getId(), "newOwner");
+            processAsyncHistoryIfNecessary();
             cmmnTaskService.complete(task.getId());
+            processAsyncHistoryIfNecessary();
 
             List<HistoricTaskLogEntry> logEntries = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(logEntries).size().isEqualTo(4);
             assertThat(logEntries.get(0)).
-                extracting(taskLogEntry -> taskLogEntry.getType()).isEqualTo("USER_TASK_CREATED")
+                extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_CREATED")
             ;
             assertThat(logEntries.get(0)).
-                extracting(taskLogEntry -> taskLogEntry.getScopeType()).isEqualTo(ScopeTypes.CMMN)
+                extracting(HistoricTaskLogEntry::getScopeType).isEqualTo(ScopeTypes.CMMN)
             ;
             assertThat(logEntries.get(0)).
-                extracting(taskLogEntry -> taskLogEntry.getScopeId()).isEqualTo(oneTaskCase.getId())
+                extracting(HistoricTaskLogEntry::getScopeId).isEqualTo(oneTaskCase.getId())
             ;
             assertThat(logEntries.get(0)).
-                extracting(taskLogEntry -> taskLogEntry.getSubScopeId()).isEqualTo(task.getSubScopeId())
+                extracting(HistoricTaskLogEntry::getSubScopeId).isEqualTo(task.getSubScopeId())
             ;
             assertThat(logEntries.get(0)).
-                extracting(taskLogEntry -> taskLogEntry.getScopeDefinitionId()).isEqualTo(oneTaskCase.getCaseDefinitionId())
+                extracting(HistoricTaskLogEntry::getScopeDefinitionId).isEqualTo(oneTaskCase.getCaseDefinitionId())
             ;
             assertThat(logEntries.get(1)).
-                extracting(taskLogEntry -> taskLogEntry.getType()).isEqualTo("USER_TASK_ASSIGNEE_CHANGED")
+                extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_ASSIGNEE_CHANGED")
             ;
             assertThat(logEntries.get(2)).
-                extracting(taskLogEntry -> taskLogEntry.getType()).isEqualTo("USER_TASK_OWNER_CHANGED")
+                extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_OWNER_CHANGED")
             ;
             assertThat(logEntries.get(3)).
-                extracting(taskLogEntry -> taskLogEntry.getType()).isEqualTo("USER_TASK_COMPLETED")
+                extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_COMPLETED")
             ;
         } finally {
             deleteTaskWithLogEntries(task.getId());
@@ -438,12 +471,14 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
         CaseInstance oneTaskCase = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
         assertNotNull(oneTaskCase);
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(oneTaskCase.getId()).singleResult();
+        processAsyncHistoryIfNecessary();
 
         try {
             assertNotNull(oneTaskCase);
             assertNotNull(task);
 
             cmmnTaskService.addUserIdentityLink(task.getId(), "newCandidateUser", IdentityLinkType.CANDIDATE);
+            processAsyncHistoryIfNecessary();
 
             List<HistoricTaskLogEntry> logEntries = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(logEntries).size().isEqualTo(2);
@@ -466,15 +501,17 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
         assertNotNull(oneTaskCase);
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(oneTaskCase.getId()).singleResult();
         assertNotNull(task);
+        processAsyncHistoryIfNecessary();
         try {
 
             cmmnTaskService.addGroupIdentityLink(task.getId(), "newCandidateGroup", IdentityLinkType.CANDIDATE);
+            processAsyncHistoryIfNecessary();
 
             List<HistoricTaskLogEntry> logEntries = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(logEntries).size().isEqualTo(2);
             assertThat(logEntries.get(1)).
                 extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_ADDED");
-            assertThat(new String(logEntries.get(1).getData())).contains(
+            assertThat(logEntries.get(1).getData()).contains(
                 "\"type\":\"candidate\"",
                 "\"groupId\":\"newCandidateGroup\""
             );
@@ -493,15 +530,17 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
         assertNotNull(task);
 
         cmmnTaskService.addGroupIdentityLink(task.getId(), "newCandidateGroup", IdentityLinkType.CANDIDATE);
+        processAsyncHistoryIfNecessary();
         try {
 
             cmmnTaskService.deleteGroupIdentityLink(task.getId(), "newCandidateGroup", IdentityLinkType.CANDIDATE);
+            processAsyncHistoryIfNecessary();
 
             List<HistoricTaskLogEntry> logEntries = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(logEntries).size().isEqualTo(3);
             assertThat(logEntries.get(2)).
                 extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_REMOVED");
-            assertThat(new String(logEntries.get(2).getData())).contains(
+            assertThat(logEntries.get(2).getData()).contains(
                 "\"type\":\"candidate\"",
                 "\"groupId\":\"newCandidateGroup\""
             );
@@ -519,14 +558,17 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(oneTaskCase.getId()).singleResult();
         assertNotNull(task);
         cmmnTaskService.addUserIdentityLink(task.getId(), "newCandidateUser", IdentityLinkType.CANDIDATE);
+        processAsyncHistoryIfNecessary();
 
         try {
             cmmnTaskService.deleteUserIdentityLink(task.getId(), "newCandidateUser", IdentityLinkType.CANDIDATE);
+            processAsyncHistoryIfNecessary();
+
             List<HistoricTaskLogEntry> logEntries = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(logEntries).size().isEqualTo(3);
             assertThat(logEntries.get(2)).
                 extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_REMOVED");
-            assertThat(new String(logEntries.get(2).getData())).contains(
+            assertThat(logEntries.get(2).getData()).contains(
                 "\"type\":\"candidate\"",
                 "\"userId\":\"newCandidateUser\""
             );
@@ -542,6 +584,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
             assignee("testAssignee").
             create();
         Task anotherTask = cmmnTaskService.createTaskBuilder().create();
+        processAsyncHistoryIfNecessary();
 
         try {
             List<HistoricTaskLogEntry> logEntries = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
@@ -550,7 +593,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
 
             assertThat(
                 cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count()
-            ).isEqualTo(1l);
+            ).isEqualTo(1L);
         } finally {
             deleteTaskWithLogEntries(anotherTask.getId());
         }
@@ -572,6 +615,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
         historicTaskLogEntryBuilder.taskId(task.getId()).create();
         historicTaskLogEntryBuilder.taskId(task.getId()).create();
         historicTaskLogEntryBuilder.taskId(task.getId()).create();
+        processAsyncHistoryIfNecessary();
 
         try {
             List<HistoricTaskLogEntry> logEntries = historicTaskLogEntryQuery.list();
@@ -658,7 +702,8 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
         historicTaskLogEntryBuilder.taskId(task.getId()).create();
         historicTaskLogEntryBuilder.taskId(task.getId()).create();
         historicTaskLogEntryBuilder.taskId(task.getId()).create();
-    
+        processAsyncHistoryIfNecessary();
+
         try {
             List<HistoricTaskLogEntry> logEntries = historicTaskLogEntryQuery.list();
             assertThat(logEntries.size()).isEqualTo(5);
@@ -719,6 +764,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
         historicTaskLogEntryBuilder.taskId(task.getId()).create();
         historicTaskLogEntryBuilder.taskId(task.getId()).create();
         historicTaskLogEntryBuilder.taskId(task.getId()).create();
+        processAsyncHistoryIfNecessary();
 
         List<HistoricTaskLogEntry> allLogEntries = cmmnHistoryService.createHistoricTaskLogEntryQuery().list();
 
@@ -731,7 +777,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
             assertThat(logEntries.size()).isEqualTo(3);
             assertThat(logEntries).extracting(HistoricTaskLogEntry::getTaskId).containsExactly(anotherTask.getId(), task.getId(), task.getId());
 
-            assertThat(historicTaskLogEntryQuery.count()).isEqualTo(3l);
+            assertThat(historicTaskLogEntryQuery.count()).isEqualTo(3L);
 
             List<HistoricTaskLogEntry> pagedLogEntries = historicTaskLogEntryQuery.listPage(1, 1);
             assertThat(pagedLogEntries.size()).isEqualTo(1);
@@ -749,6 +795,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
         historicTaskLogEntryBuilder.taskId("1").create();
         historicTaskLogEntryBuilder.taskId("2").create();
         historicTaskLogEntryBuilder.taskId("3").create();
+        processAsyncHistoryIfNecessary();
 
         try {
             assertEquals(3,
@@ -768,17 +815,24 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
     }
     
     protected Date getInsertDate() {
-        Calendar cal = new GregorianCalendar(2020, 3, 10);
+        Calendar cal = new GregorianCalendar(2020, Calendar.APRIL, 10);
         return cal.getTime();
     }
     
     protected Date getCompareBeforeDate() {
-        Calendar cal = new GregorianCalendar(2020, 3, 9);
+        Calendar cal = new GregorianCalendar(2020, Calendar.APRIL, 9);
         return cal.getTime();
     }
     
     protected Date getCompareAfterDate() {
-        Calendar cal = new GregorianCalendar(2020, 3, 11);
+        Calendar cal = new GregorianCalendar(2020, Calendar.APRIL, 11);
         return cal.getTime();
     }
+
+    protected void processAsyncHistoryIfNecessary() {
+        if (cmmnEngineConfiguration.isAsyncHistoryEnabled()) {
+            CmmnJobTestHelper.waitForAsyncHistoryExecutorToProcessAllJobs(cmmnEngineConfiguration, 7000, 200, true);
+        }
+    }
+
 }

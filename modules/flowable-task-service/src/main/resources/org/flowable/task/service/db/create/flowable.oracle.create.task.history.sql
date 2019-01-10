@@ -47,7 +47,7 @@ create table ACT_HI_TSK_LOG (
     primary key (ID_)
 );
 
-create sequence act_hi_task_evt_log_seq;
+create sequence act_hi_task_evt_log_seq start with 1 increment by 1 cache 10000 order;
 
 create index ACT_IDX_HI_TASK_SCOPE on ACT_HI_TASKINST(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_HI_TASK_SUB_SCOPE on ACT_HI_TASKINST(SUB_SCOPE_ID_, SCOPE_TYPE_);
