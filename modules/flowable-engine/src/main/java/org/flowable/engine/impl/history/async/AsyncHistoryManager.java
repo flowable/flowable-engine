@@ -224,8 +224,7 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
                 putIfNotNull(data, HistoryJsonConstants.DELETE_REASON, activityInstance.getDeleteReason());
                 putIfNotNull(data, HistoryJsonConstants.END_TIME, getClock().getCurrentTime());
 
-                Map<String, String> correspondingActivityStartData = getActivityStart(activityInstance.getExecutionId(), activityInstance.getActivityId(),
-                    true);
+                Map<String, String> correspondingActivityStartData = getActivityStart(activityInstance.getExecutionId(), activityInstance.getActivityId(), true);
                 if (correspondingActivityStartData == null) {
                     getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_ACTIVITY_END, data);
                 } else {

@@ -62,7 +62,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
         
         // The current execution always stops here
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
-        executionEntityManager.deleteExecutionAndRelatedData(executionEntity, createDeleteReason(executionEntity.getCurrentActivityId()));
+        executionEntityManager.deleteExecutionAndRelatedData(executionEntity, createDeleteReason(executionEntity.getCurrentActivityId()), false);
         
         if (terminateAll) {
             terminateAllBehaviour(executionEntity, commandContext, executionEntityManager);
@@ -212,7 +212,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
         
         CommandContextUtil.getExecutionEntityManager().deleteChildExecutions(rootExecutionEntity, null, null, deleteReason, true, terminateEndEvent);
         sendProcessInstanceCompletedEvent(rootExecutionEntity, terminateEndEvent);
-        executionEntityManager.deleteExecutionAndRelatedData(rootExecutionEntity, deleteReason);
+        executionEntityManager.deleteExecutionAndRelatedData(rootExecutionEntity, deleteReason, false);
     }
 
     protected void sendProcessInstanceCompletedEvent(ExecutionEntity execution, FlowElement terminateEndEvent) {

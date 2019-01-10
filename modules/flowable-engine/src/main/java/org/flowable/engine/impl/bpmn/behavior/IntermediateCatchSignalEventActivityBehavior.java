@@ -75,7 +75,7 @@ public class IntermediateCatchSignalEventActivityBehavior extends IntermediateCa
     public void eventCancelledByEventGateway(DelegateExecution execution) {
         deleteSignalEventSubscription(execution);
         CommandContextUtil.getExecutionEntityManager().deleteExecutionAndRelatedData((ExecutionEntity) execution,
-                DeleteReason.EVENT_BASED_GATEWAY_CANCEL);
+                DeleteReason.EVENT_BASED_GATEWAY_CANCEL, false);
     }
 
     protected ExecutionEntity deleteSignalEventSubscription(DelegateExecution execution) {

@@ -230,7 +230,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
         if (flowNode.getOutgoingFlows().size() > 0) {
             leaveFlowNode(flowNode);
         } else {
-            CommandContextUtil.getExecutionEntityManager(commandContext).deleteExecutionAndRelatedData(execution, null);
+            CommandContextUtil.getExecutionEntityManager(commandContext).deleteExecutionAndRelatedData(execution, null, false);
         }
 
         if (completeAdhocSubProcess) {
@@ -259,7 +259,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
     protected void cleanupCompensation() {
 
         // The compensation is at the end here. Simply stop the execution.
-        CommandContextUtil.getExecutionEntityManager(commandContext).deleteExecutionAndRelatedData(execution, null);
+        CommandContextUtil.getExecutionEntityManager(commandContext).deleteExecutionAndRelatedData(execution, null, false);
 
         ExecutionEntity parentExecutionEntity = execution.getParent();
         if (parentExecutionEntity.isScope() && !parentExecutionEntity.isProcessInstanceType()) {
@@ -315,7 +315,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
                 Collection<ExecutionEntity> childExecutions = CommandContextUtil.getExecutionEntityManager(commandContext).findChildExecutionsByParentExecutionId(execution.getId());
                 for (ExecutionEntity childExecution : childExecutions) {
                     if (childExecution.getCurrentFlowElement() == null || !notToDeleteEvents.contains(childExecution.getCurrentFlowElement().getId())) {
-                        CommandContextUtil.getExecutionEntityManager(commandContext).deleteExecutionAndRelatedData(childExecution, null);
+                        CommandContextUtil.getExecutionEntityManager(commandContext).deleteExecutionAndRelatedData(childExecution, null, false);
                     }
                 }
             }

@@ -571,7 +571,7 @@
                 <exclude.tests>**/ProcessInstanceMigration*Test.java</exclude.tests>
                 <exclude.tests2>**/ChangeState*Test.java</exclude.tests2>
             </properties>
-            <!-- <build>
+            <build>
                 <plugins>
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
@@ -617,7 +617,7 @@
                         </executions>
                     </plugin>
                 </plugins>
-            </build> -->
+            </build>
         </profile>
 
         <profile>
