@@ -825,12 +825,9 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
             addClasspathResource("org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml").
             tenantId(ProcessEngineConfiguration.NO_TENANT_ID).
             deploy();
+        deploymentIdsForAutoCleanup.add(deployment.getId());
 
-        try {
-            assertProcessExecuted();
-        } finally {
-            repositoryService.deleteDeployment(deployment.getId(), true);
-        }
+        assertProcessExecuted();
     }
 
     protected void assertProcessExecuted() {

@@ -222,7 +222,7 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
                 }
 
                 putIfNotNull(data, HistoryJsonConstants.DELETE_REASON, activityInstance.getDeleteReason());
-                putIfNotNull(data, HistoryJsonConstants.END_TIME, getClock().getCurrentTime());
+                putIfNotNull(data, HistoryJsonConstants.END_TIME, activityInstance.getEndTime());
 
                 Map<String, String> correspondingActivityStartData = getActivityStart(activityInstance.getExecutionId(), activityInstance.getActivityId(),
                     true);
@@ -608,6 +608,7 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
             putIfNotNull(data, HistoryJsonConstants.REF_SCOPE_ID, entityLink.getReferenceScopeId());
             putIfNotNull(data, HistoryJsonConstants.REF_SCOPE_TYPE, entityLink.getReferenceScopeType());
             putIfNotNull(data, HistoryJsonConstants.REF_SCOPE_DEFINITION_ID, entityLink.getReferenceScopeDefinitionId());
+            putIfNotNull(data, HistoryJsonConstants.HIERARCHY_TYPE, entityLink.getHierarchyType());
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_ENTITY_LINK_CREATED, data);
         }
     }
