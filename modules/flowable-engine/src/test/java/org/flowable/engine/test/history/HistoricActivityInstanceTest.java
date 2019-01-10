@@ -69,6 +69,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
     
         Set<String> activityTypes = new HashSet<>();
         activityTypes.add("startEvent");
+        processAsyncHistoryIfNecessary();
 
         List<HistoricActivityInstance> historicActivityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityTypes(activityTypes).list();
 
@@ -97,6 +98,8 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
 
         // After finishing process
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+        processAsyncHistoryIfNecessary();
+
         assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finished().count());
         assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finishedBefore(hourAgo.getTime()).count());
         assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finishedBefore(hourFromNow.getTime()).count());
@@ -117,7 +120,8 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
                         .start();
         
         taskService.complete(taskService.createTaskQuery().processInstanceId(otherTenantProcessInstance.getId()).singleResult().getId());
-        
+        processAsyncHistoryIfNecessary();
+
         assertEquals(3, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finished().count());
         
         List<String> tenantIds = new ArrayList<>();
@@ -503,6 +507,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
     )
     public void callSubProcess() {
         ProcessInstance pi = this.runtimeService.startProcessInstanceByKey("callActivity");
+        processAsyncHistoryIfNecessary();
 
         HistoricActivityInstance callSubProcessActivityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(pi.getId())
             .activityId("callSubProcess").singleResult();
