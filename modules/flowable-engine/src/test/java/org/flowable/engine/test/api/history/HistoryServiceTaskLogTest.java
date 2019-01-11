@@ -23,6 +23,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
@@ -54,10 +55,9 @@ public class HistoryServiceTaskLogTest {
     protected Task task;
 
     @AfterEach
-    public void deleteTasks(TaskService taskService) {
+    public void deleteTasks(TaskService taskService, HistoryService historyService) {
         if (task != null) {
             deleteTaskWithLogEntries(taskService, task.getId());
-            taskService.deleteTask(task.getId());
         }
     }
 
@@ -72,12 +72,10 @@ public class HistoryServiceTaskLogTest {
             assignee("testAssignee").
             create();
 
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         List<HistoricTaskLogEntry> taskLogsByTaskInstanceId = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
-        assertThat(
-            taskLogsByTaskInstanceId
-        ).size().isEqualTo(1);
+        assertThat(taskLogsByTaskInstanceId).size().isEqualTo(1);
 
         assertThat(taskLogsByTaskInstanceId.get(0)).
             extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
@@ -90,7 +88,7 @@ public class HistoryServiceTaskLogTest {
 
         taskService.deleteTask(task.getId());
 
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         assertThat(historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count()).isGreaterThan(0L);
     }
@@ -104,12 +102,10 @@ public class HistoryServiceTaskLogTest {
             task = taskService.createTaskBuilder().
                 assignee("testAssignee").
                 create();
-            processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+            HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
             List<HistoricTaskLogEntry> taskLogsByTaskInstanceId = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
-            assertThat(
-                taskLogsByTaskInstanceId
-            ).size().isEqualTo(1);
+            assertThat(taskLogsByTaskInstanceId).size().isEqualTo(1);
 
             assertThat(taskLogsByTaskInstanceId.get(0)).
                 extracting(HistoricTaskLogEntry::getUserId).isEqualTo("testUser");
@@ -123,13 +119,11 @@ public class HistoryServiceTaskLogTest {
         ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService) {
         task = taskService.createTaskBuilder().
             create();
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         List<HistoricTaskLogEntry> taskLogsByTaskInstanceId = historyService.createHistoricTaskLogEntryQuery().taskId("NON-EXISTING-TASK-ID").list();
 
-        assertThat(
-            taskLogsByTaskInstanceId
-        ).isEmpty();
+        assertThat(taskLogsByTaskInstanceId).isEmpty();
     }
 
     @Test
@@ -138,7 +132,7 @@ public class HistoryServiceTaskLogTest {
         Task taskA = taskService.createTaskBuilder().create();
         Task taskB = taskService.createTaskBuilder().create();
         Task taskC = taskService.createTaskBuilder().create();
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         try {
             List<HistoricTaskLogEntry> taskLogsByTaskInstanceId = historyService.createHistoricTaskLogEntryQuery().taskId(null).list();
@@ -157,20 +151,16 @@ public class HistoryServiceTaskLogTest {
         task = taskService.createTaskBuilder().
             assignee("testAssignee").
             create();
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         List<HistoricTaskLogEntry> taskLogsByTaskInstanceId = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
-        assertThat(
-            taskLogsByTaskInstanceId
-        ).size().isEqualTo(1);
+        assertThat(taskLogsByTaskInstanceId).size().isEqualTo(1);
 
         historyService.deleteHistoricTaskLogEntry(taskLogsByTaskInstanceId.get(0).getLogNumber());
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         taskLogsByTaskInstanceId = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
-        assertThat(
-            taskLogsByTaskInstanceId
-        ).isEmpty();
+        assertThat(taskLogsByTaskInstanceId).isEmpty();
     }
 
     @Test
@@ -178,7 +168,7 @@ public class HistoryServiceTaskLogTest {
         ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService) {
         task = taskService.createTaskBuilder().
             create();
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         // non existing log entry delete should be successful
         historyService.deleteHistoricTaskLogEntry(Long.MIN_VALUE);
@@ -194,7 +184,7 @@ public class HistoryServiceTaskLogTest {
             create();
 
         taskService.setAssignee(task.getId(), "newAssignee");
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         List<HistoricTaskLogEntry> taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
 
@@ -222,7 +212,7 @@ public class HistoryServiceTaskLogTest {
             create();
 
         taskService.setOwner(task.getId(), "newOwner");
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         List<HistoricTaskLogEntry> taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
 
@@ -248,10 +238,10 @@ public class HistoryServiceTaskLogTest {
         ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService) {
         task = taskService.createTaskBuilder().
             create();
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         taskService.claim(task.getId(), "testUser");
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         List<HistoricTaskLogEntry> taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
         assertThat(taskLogEntries).size().isEqualTo(2);
@@ -270,7 +260,7 @@ public class HistoryServiceTaskLogTest {
             create();
 
         taskService.unclaim(task.getId());
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         List<HistoricTaskLogEntry> taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
         assertThat(taskLogEntries).size().isEqualTo(2);
@@ -289,7 +279,7 @@ public class HistoryServiceTaskLogTest {
             create();
 
         taskService.setPriority(task.getId(), Integer.MAX_VALUE);
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         List<HistoricTaskLogEntry> taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
 
@@ -319,7 +309,7 @@ public class HistoryServiceTaskLogTest {
         Authentication.setAuthenticatedUserId("testUser");
         try {
             functionToAssert.accept(task.getId());
-            processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+            HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
             List<HistoricTaskLogEntry> taskLogsByTaskInstanceId = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(
@@ -340,7 +330,7 @@ public class HistoryServiceTaskLogTest {
             create();
 
         taskService.setDueDate(task.getId(), new Date());
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         List<HistoricTaskLogEntry> taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
 
@@ -354,7 +344,7 @@ public class HistoryServiceTaskLogTest {
 
     @Test
     public void saveTask(TaskService taskService, HistoryService historyService,
-        ProcessEngineConfiguration processEngineConfiguration, ManagementService mananagementService) {
+        ProcessEngineConfiguration processEngineConfiguration) {
         task = taskService.createTaskBuilder().
             create();
 
@@ -365,7 +355,7 @@ public class HistoryServiceTaskLogTest {
         task.setDueDate(new Date());
         taskService.saveTask(task);
 
-        processAsyncHistoryIfNecessary(processEngineConfiguration, mananagementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         List<HistoricTaskLogEntry> taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
         assertThat(taskLogEntries).as("The only event is user task created").size().isEqualTo(1);
@@ -383,7 +373,7 @@ public class HistoryServiceTaskLogTest {
     public void createCustomTaskEventLog(TaskService taskService, HistoryService historyService,
         ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService) {
         task = taskService.createTaskBuilder().create();
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         Date todayDate = new Date();
         HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = historyService.createHistoricTaskLogEntryBuilder(task);
@@ -393,7 +383,7 @@ public class HistoryServiceTaskLogTest {
         historicTaskLogEntryBuilder.data("testData");
         historicTaskLogEntryBuilder.create();
 
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
 
@@ -415,7 +405,7 @@ public class HistoryServiceTaskLogTest {
 
         HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = historyService.createHistoricTaskLogEntryBuilder(task);
         historicTaskLogEntryBuilder.create();
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
 
@@ -439,7 +429,7 @@ public class HistoryServiceTaskLogTest {
         historicTaskLogEntryBuilder.type("customType");
         historicTaskLogEntryBuilder.data("testData");
         historicTaskLogEntryBuilder.create();
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
 
@@ -455,13 +445,13 @@ public class HistoryServiceTaskLogTest {
         ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService) {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertNotNull(processInstance);
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         try {
             runtimeService.suspendProcessInstanceById(processInstance.getId());
             org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             assertNotNull(task);
-            processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+            HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
             List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(logEntries).size().isEqualTo(2);
@@ -470,7 +460,7 @@ public class HistoryServiceTaskLogTest {
             ;
 
             runtimeService.activateProcessInstanceById(processInstance.getId());
-            processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+            HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
             logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(logEntries).size().isEqualTo(3);
@@ -498,11 +488,11 @@ public class HistoryServiceTaskLogTest {
         assertNotNull(task);
         try {
             taskService.setAssignee(task.getId(), "newAssignee");
-            processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+            HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
             taskService.setOwner(task.getId(), "newOwner");
-            processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+            HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
             taskService.complete(task.getId());
-            processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+            HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
             List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(logEntries).size().isEqualTo(4);
@@ -538,13 +528,13 @@ public class HistoryServiceTaskLogTest {
         ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService) {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
         try {
             assertNotNull(processInstance);
             assertNotNull(task);
 
             taskService.addCandidateUser(task.getId(), "newCandidateUser");
-            processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+            HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
             List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(logEntries).size().isEqualTo(2);
@@ -566,13 +556,13 @@ public class HistoryServiceTaskLogTest {
         ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService) {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
         try {
             assertNotNull(processInstance);
             assertNotNull(task);
 
             taskService.addUserIdentityLink(task.getId(), "newCandidateUser", IdentityLinkType.PARTICIPANT);
-            processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+            HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
             List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(logEntries).size().isEqualTo(2);
@@ -596,12 +586,12 @@ public class HistoryServiceTaskLogTest {
         assertNotNull(processInstance);
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         try {
 
             taskService.addCandidateGroup(task.getId(), "newCandidateGroup");
-            processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+            HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
             List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(logEntries).size().isEqualTo(2);
@@ -625,11 +615,11 @@ public class HistoryServiceTaskLogTest {
         assertNotNull(processInstance);
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
         try {
 
             taskService.addGroupIdentityLink(task.getId(), "newCandidateGroup", IdentityLinkType.PARTICIPANT);
-            processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+            HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
             List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(logEntries).size().isEqualTo(2);
@@ -657,7 +647,7 @@ public class HistoryServiceTaskLogTest {
         try {
 
             taskService.deleteCandidateGroup(task.getId(), "newCandidateGroup");
-            processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+            HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
             List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(logEntries).size().isEqualTo(3);
@@ -682,11 +672,11 @@ public class HistoryServiceTaskLogTest {
         assertNotNull(processInstance);
         assertNotNull(task);
         taskService.addCandidateUser(task.getId(), "newCandidateUser");
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         try {
             taskService.deleteCandidateUser(task.getId(), "newCandidateUser");
-            processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+            HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
             List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(logEntries).size().isEqualTo(3);
@@ -710,7 +700,7 @@ public class HistoryServiceTaskLogTest {
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskInvolvedUser("kermit").list();
         assertThat(tasks).size().isEqualTo(1);
         task = tasks.get(0);
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
         // create, identityLinkAdded, identityLinkAdded
@@ -730,7 +720,7 @@ public class HistoryServiceTaskLogTest {
         );
 
         taskService.complete(tasks.get(0).getId());
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
         // + completed event. Do not expect identity link removed events
@@ -746,7 +736,7 @@ public class HistoryServiceTaskLogTest {
             assignee("testAssignee").
             create();
         Task anotherTask = taskService.createTaskBuilder().create();
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         try {
             List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
@@ -780,7 +770,7 @@ public class HistoryServiceTaskLogTest {
         historicTaskLogEntryBuilder.taskId(task.getId()).create();
         historicTaskLogEntryBuilder.taskId(task.getId()).create();
         historicTaskLogEntryBuilder.taskId(task.getId()).create();
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         try {
             List<HistoricTaskLogEntry> logEntries = historicTaskLogEntryQuery.list();
@@ -866,7 +856,7 @@ public class HistoryServiceTaskLogTest {
         historicTaskLogEntryBuilder.taskId(task.getId()).create();
         historicTaskLogEntryBuilder.taskId(task.getId()).create();
         historicTaskLogEntryBuilder.taskId(task.getId()).create();
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         try {
             List<HistoricTaskLogEntry> logEntries = historicTaskLogEntryQuery.list();
@@ -913,7 +903,7 @@ public class HistoryServiceTaskLogTest {
         historicTaskLogEntryBuilder.taskId(task.getId()).create();
         historicTaskLogEntryBuilder.taskId(task.getId()).create();
         historicTaskLogEntryBuilder.taskId(task.getId()).create();
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         List<HistoricTaskLogEntry> allLogEntries = historyService.createHistoricTaskLogEntryQuery().list();
 
@@ -947,7 +937,7 @@ public class HistoryServiceTaskLogTest {
         historicTaskLogEntryBuilder.taskId("1").create();
         historicTaskLogEntryBuilder.taskId("2").create();
         historicTaskLogEntryBuilder.taskId("3").create();
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         try {
             assertEquals(3,
@@ -973,7 +963,7 @@ public class HistoryServiceTaskLogTest {
         historicTaskLogEntryBuilder.taskId("1").timeStamp(getInsertDate()).create();
         historicTaskLogEntryBuilder.taskId("2").timeStamp(getCompareAfterDate()).create();
         historicTaskLogEntryBuilder.taskId("3").timeStamp(getCompareBeforeDate()).create();
-        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         try {
 
@@ -1006,12 +996,6 @@ public class HistoryServiceTaskLogTest {
     protected Date getCompareAfterDate() {
         Calendar cal = new GregorianCalendar(2020, Calendar.APRIL, 11);
         return cal.getTime();
-    }
-
-    protected void processAsyncHistoryIfNecessary(ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService) {
-        if (((ProcessEngineConfigurationImpl) processEngineConfiguration).isAsyncHistoryEnabled()) {
-            HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 14000, 200);
-        }
     }
 
 }

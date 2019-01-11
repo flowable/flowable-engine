@@ -27,7 +27,7 @@ public class SpringIdmEngineConfigurator extends IdmEngineConfigurator {
         if (idmEngineConfiguration == null) {
             idmEngineConfiguration = new SpringIdmEngineConfiguration();
         } else if (!(idmEngineConfiguration instanceof SpringIdmEngineConfiguration)) {
-            throw new IllegalArgumentException("Expected idmEngine configuration to be of type"
+            throw new IllegalArgumentException("Expected idmEngine configuration to be of type "
                 + SpringIdmEngineConfiguration.class + " but was " + idmEngineConfiguration.getClass());
         }
         initialiseCommonProperties(engineConfiguration, idmEngineConfiguration);

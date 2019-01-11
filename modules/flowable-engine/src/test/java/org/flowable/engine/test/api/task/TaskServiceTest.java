@@ -99,7 +99,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
                         parentTaskId("testParentTaskId").
                         tenantId("testTenantId").
                         formKey("testFormKey").
-                        taskDefinitionId("testDefintionId").
+                        taskDefinitionId("testDefinitionId").
                         taskDefinitionKey("testDefinitionKey").
                         scopeType(ScopeTypes.CMMN).
                         scopeId("scopeIdValue").
@@ -116,7 +116,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         assertThat(updatedTask.getParentTaskId(), is("testParentTaskId"));
         assertThat(updatedTask.getTenantId(), is("testTenantId"));
         assertThat(updatedTask.getFormKey(), is("testFormKey"));
-        assertThat(updatedTask.getTaskDefinitionId(), is("testDefintionId"));
+        assertThat(updatedTask.getTaskDefinitionId(), is("testDefinitionId"));
         assertThat(updatedTask.getTaskDefinitionKey(), is("testDefinitionKey"));
         assertThat(updatedTask.getScopeId(), is("scopeIdValue"));
         assertThat(updatedTask.getScopeType(), is(ScopeTypes.CMMN));

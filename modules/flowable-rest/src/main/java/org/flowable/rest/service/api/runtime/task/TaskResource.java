@@ -91,7 +91,7 @@ public class TaskResource extends TaskBaseResource {
 
         // Save the task and fetch again, it's possible that an
         // assignment-listener has updated
-        // fields after it was saved so we can't use the in-memory task
+        // fields after it was saved so we can not use the in-memory task
         taskService.saveTask(task);
         task = taskService.createTaskQuery().taskId(task.getId()).singleResult();
 
@@ -152,7 +152,7 @@ public class TaskResource extends TaskBaseResource {
 
         Task taskToDelete = getTaskFromRequest(taskId);
         if (taskToDelete.getExecutionId() != null) {
-            // Can't delete a task that is part of a process instance
+            // Can not delete a task that is part of a process instance
             throw new FlowableForbiddenException("Cannot delete a task that is part of a process-instance.");
         }
 

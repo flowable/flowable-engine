@@ -30,7 +30,7 @@ public class SpringContentEngineConfigurator extends ContentEngineConfigurator {
         if (contentEngineConfiguration == null) {
             contentEngineConfiguration = new SpringContentEngineConfiguration();
         } else if (!(contentEngineConfiguration instanceof SpringContentEngineConfiguration)) {
-            throw new IllegalArgumentException("Expected contentEngine configuration to be of type"
+            throw new IllegalArgumentException("Expected contentEngine configuration to be of type "
                 + SpringContentEngineConfiguration.class + " but was " + engineConfiguration.getClass());
         }
         initialiseCommonProperties(engineConfiguration, contentEngineConfiguration);

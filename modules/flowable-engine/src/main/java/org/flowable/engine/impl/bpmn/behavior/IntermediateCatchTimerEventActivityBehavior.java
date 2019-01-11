@@ -57,7 +57,7 @@ public class IntermediateCatchTimerEventActivityBehavior extends IntermediateCat
         }
 
         CommandContextUtil.getExecutionEntityManager().deleteExecutionAndRelatedData((ExecutionEntity) execution,
-                DeleteReason.EVENT_BASED_GATEWAY_CANCEL);
+                DeleteReason.EVENT_BASED_GATEWAY_CANCEL, false);
     }
 
 }

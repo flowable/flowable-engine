@@ -640,7 +640,7 @@
     from ${prefix}ACT_RU_EXECUTION RES
     inner join ${prefix}ACT_RE_PROCDEF P on RES.PROC_DEF_ID_ = P.ID_
     <if test="includeProcessVariables">
-      left outer join ${prefix}ACT_RU_VARIABLE VAR ON RES.PROC_INST_ID_ = VAR.EXECUTION_ID_ and VAR.TASK_ID_ is null
+        left outer join ${prefix}ACT_RU_VARIABLE VAR ON RES.PROC_INST_ID_ = VAR.EXECUTION_ID_
     </if>
     <include refid="commonSelectExecutionsByQueryCriteriaSql"/>
   </sql>

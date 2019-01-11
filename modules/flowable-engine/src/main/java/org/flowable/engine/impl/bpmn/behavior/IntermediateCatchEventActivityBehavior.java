@@ -60,7 +60,7 @@ public class IntermediateCatchEventActivityBehavior extends AbstractBpmnActivity
      */
     public void eventCancelledByEventGateway(DelegateExecution execution) {
         CommandContextUtil.getExecutionEntityManager().deleteExecutionAndRelatedData((ExecutionEntity) execution,
-                DeleteReason.EVENT_BASED_GATEWAY_CANCEL);
+                DeleteReason.EVENT_BASED_GATEWAY_CANCEL, false);
     }
 
     protected EventGateway getPrecedingEventBasedGateway(DelegateExecution execution) {

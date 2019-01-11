@@ -46,7 +46,7 @@ public class ProcessInstanceIdentityLinkResource extends BaseProcessInstanceReso
     @ApiOperation(value = "Get a specific involved people from process instance", tags = { "Process Instance Identity Links" }, nickname = "getProcessInstanceIdentityLinks")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the process instance was found and the specified link is retrieved."),
-            @ApiResponse(code = 404, message = "Indicates the requested process instance was not found or the link to delete doesn’t exist. The response status contains additional information about the error.")
+            @ApiResponse(code = 404, message = "Indicates the requested process instance was not found or the link to delete does not exist. The response status contains additional information about the error.")
     })
     @GetMapping(value = "/runtime/process-instances/{processInstanceId}/identitylinks/users/{identityId}/{type}", produces = "application/json")
     public RestIdentityLink getIdentityLink(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
@@ -64,7 +64,7 @@ public class ProcessInstanceIdentityLinkResource extends BaseProcessInstanceReso
     @ApiOperation(value = "Remove an involved user to from process instance", tags = { "Process Instance Identity Links" }, nickname = "deleteProcessInstanceIdentityLinks")
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the process instance was found and the link has been deleted. Response body is left empty intentionally."),
-            @ApiResponse(code = 404, message = "Indicates the requested process instance was not found or the link to delete doesn’t exist. The response status contains additional information about the error.")
+            @ApiResponse(code = 404, message = "Indicates the requested process instance was not found or the link to delete does not exist. The response status contains additional information about the error.")
     })
     @DeleteMapping(value = "/runtime/process-instances/{processInstanceId}/identitylinks/users/{identityId}/{type}")
     public void deleteIdentityLink(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,

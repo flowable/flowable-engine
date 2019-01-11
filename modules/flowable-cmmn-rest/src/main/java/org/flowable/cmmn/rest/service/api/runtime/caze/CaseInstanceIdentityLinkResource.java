@@ -47,7 +47,7 @@ public class CaseInstanceIdentityLinkResource extends BaseCaseInstanceResource {
     @ApiOperation(value = "Get a specific involved people from case instance", tags = { "Case Instance Identity Links" }, nickname = "getCaseInstanceIdentityLinks")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the case instance was found and the specified link is retrieved."),
-            @ApiResponse(code = 404, message = "Indicates the requested case instance was not found or the link to delete doesn’t exist. The response status contains additional information about the error.")
+            @ApiResponse(code = 404, message = "Indicates the requested case instance was not found or the link to delete does not exist. The response status contains additional information about the error.")
     })
     @GetMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/identitylinks/users/{identityId}/{type}", produces = "application/json")
     public RestIdentityLink getIdentityLink(@ApiParam(name = "caseInstanceId") @PathVariable("caseInstanceId") String caseInstanceId, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
@@ -65,7 +65,7 @@ public class CaseInstanceIdentityLinkResource extends BaseCaseInstanceResource {
     @ApiOperation(value = "Remove an involved user to from case instance", tags = { "Case Instance Identity Links" }, nickname = "deleteCaseInstanceIdentityLinks")
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the case instance was found and the link has been deleted. Response body is left empty intentionally."),
-            @ApiResponse(code = 404, message = "Indicates the requested case instance was not found or the link to delete doesn’t exist. The response status contains additional information about the error.")
+            @ApiResponse(code = 404, message = "Indicates the requested case instance was not found or the link to delete does not exist. The response status contains additional information about the error.")
     })
     @DeleteMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/identitylinks/users/{identityId}/{type}")
     public void deleteIdentityLink(@ApiParam(name = "caseInstanceId") @PathVariable("caseInstanceId") String caseInstanceId, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
