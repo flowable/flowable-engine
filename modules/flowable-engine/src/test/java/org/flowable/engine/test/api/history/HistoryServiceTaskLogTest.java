@@ -119,9 +119,11 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void queryForNonExistingTaskLogEntries(TaskService taskService, HistoryService historyService) {
+    public void queryForNonExistingTaskLogEntries(TaskService taskService, HistoryService historyService,
+        ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService) {
         task = taskService.createTaskBuilder().
             create();
+        processAsyncHistoryIfNecessary(processEngineConfiguration, managementService);
 
         List<HistoricTaskLogEntry> taskLogsByTaskInstanceId = historyService.createHistoricTaskLogEntryQuery().taskId("NON-EXISTING-TASK-ID").list();
 
