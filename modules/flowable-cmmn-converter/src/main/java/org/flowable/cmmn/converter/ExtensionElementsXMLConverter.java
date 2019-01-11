@@ -272,7 +272,7 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
                 HumanTask humanTask = (HumanTask) currentCmmnElement;
                 humanTask.getTaskListeners().add(flowableListener);
             } else {
-                throw new FlowableException("Programmatic error: task listener added to an element that is not a human task, but a" + currentCmmnElement.getClass());
+                throw new FlowableException("Programmatic error: task listener added to an element that is not a human task, but a " + currentCmmnElement.getClass());
             }
         }
 

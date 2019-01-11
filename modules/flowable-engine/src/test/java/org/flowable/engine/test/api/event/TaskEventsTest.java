@@ -254,8 +254,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
                 String taskId = task.getId();
                 task = taskService.createTaskQuery().taskId(taskId).singleResult();
                 if (task != null) {
-                    // If task still exists, delete it to have a clean DB after
-                    // test
+                    // If task still exists, delete it to have a clean DB after test
                     taskService.deleteTask(taskId);
                 }
                 historyService.deleteHistoricTaskInstance(taskId);

@@ -98,7 +98,7 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior im
             for (ExecutionEntity executionEntityInGateway : executionsInGateway) {
                 if (!executionEntityInGateway.getId().equals(execution.getId()) && executionEntityInGateway.getParentId().equals(execution.getParentId())) {
                     CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityEnd(executionEntityInGateway, null);
-                    executionEntityManager.deleteExecutionAndRelatedData(executionEntityInGateway, null);
+                    executionEntityManager.deleteExecutionAndRelatedData(executionEntityInGateway, null, false);
                 }
             }
 

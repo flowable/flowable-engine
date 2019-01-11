@@ -571,7 +571,7 @@
                 <exclude.tests>**/ProcessInstanceMigration*Test.java</exclude.tests>
                 <exclude.tests2>**/ChangeState*Test.java</exclude.tests2>
             </properties>
-            <!-- <build>
+            <build>
                 <plugins>
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
@@ -617,7 +617,7 @@
                         </executions>
                     </plugin>
                 </plugins>
-            </build> -->
+            </build>
         </profile>
 
         <profile>
@@ -1157,12 +1157,17 @@
                                 <exclude>**/HistoryLevelServiceTest.java</exclude>
                                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                                 <exclude>**/ProcessInstanceLogQueryTest.java</exclude>
+                                <exclude>**/HistoryServiceTaskLogTest.java</exclude>
+                                <exclude>**/HistoryServiceDisableTaskLogTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
                                 <exclude>**/HistoricProcessInstanceQueryVersionTest.java</exclude>
                                 <exclude>**/NonCascadeDeleteTest.java</exclude>
                                 <exclude>**/HistoricProcessInstanceQueryAndWithExceptionTest.java</exclude>
                                 <exclude>**/HistoricJPAVariableTest.java</exclude>
                                 <exclude>**/VerifyDatabaseOperationsTest.java</exclude>
+                                <exclude>**/AsyncHistoryTest.java</exclude>
+                                <exclude>**/AsyncHistoryUpgradeTest.java</exclude>
+                                <exclude>**/ProcessInstanceLogQueryTest.java</exclude>
                                 <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
                             <runOrder>alphabetical</runOrder>

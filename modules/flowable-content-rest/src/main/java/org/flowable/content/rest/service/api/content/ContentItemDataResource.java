@@ -96,7 +96,7 @@ public class ContentItemDataResource extends ContentItemBaseResource {
         }
     }
 
-    @ApiOperation(value = "Save the content item data", tags = { "Content item" }, notes = "Save the content item data with an attached file"
+    @ApiOperation(value = "Save the content item data", tags = { "Content item" }, notes = "Save the content item data with an attached file. "
             + "The request should be of type multipart/form-data. There should be a single file-part included with the binary value of the content item.")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "file", dataType = "file", paramType = "form", required = true)

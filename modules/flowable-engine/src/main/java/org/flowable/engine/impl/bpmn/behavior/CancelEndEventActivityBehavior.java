@@ -148,7 +148,7 @@ public class CancelEndEventActivityBehavior extends FlowNodeActivityBehavior {
             }
         }
 
-        executionEntityManager.deleteExecutionAndRelatedData(parentExecution, deleteReason);
+        executionEntityManager.deleteExecutionAndRelatedData(parentExecution, deleteReason, false);
     }
 
 }

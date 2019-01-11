@@ -58,7 +58,7 @@ public class CompleteAdhocSubProcessCmd implements Command<Void>, Serializable {
         ExecutionEntity outgoingFlowExecution = executionEntityManager.createChildExecution(execution.getParent());
         outgoingFlowExecution.setCurrentFlowElement(execution.getCurrentFlowElement());
 
-        executionEntityManager.deleteExecutionAndRelatedData(execution, null);
+        executionEntityManager.deleteExecutionAndRelatedData(execution, null, false);
 
         CommandContextUtil.getAgenda().planTakeOutgoingSequenceFlowsOperation(outgoingFlowExecution, true);
 

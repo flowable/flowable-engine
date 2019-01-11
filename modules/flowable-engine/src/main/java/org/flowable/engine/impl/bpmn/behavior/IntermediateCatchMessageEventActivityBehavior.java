@@ -72,7 +72,7 @@ public class IntermediateCatchMessageEventActivityBehavior extends IntermediateC
     public void eventCancelledByEventGateway(DelegateExecution execution) {
         deleteMessageEventSubScription(execution);
         CommandContextUtil.getExecutionEntityManager().deleteExecutionAndRelatedData((ExecutionEntity) execution,
-                DeleteReason.EVENT_BASED_GATEWAY_CANCEL);
+                DeleteReason.EVENT_BASED_GATEWAY_CANCEL, false);
     }
 
     protected ExecutionEntity deleteMessageEventSubScription(DelegateExecution execution) {
