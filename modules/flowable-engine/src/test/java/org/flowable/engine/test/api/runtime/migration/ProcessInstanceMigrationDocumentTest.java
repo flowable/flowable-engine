@@ -112,14 +112,6 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
 
         String definitionId = "someProcessId";
 
-        HashMap<String, Object> newActivity2xVars = new HashMap<String, Object>() {
-
-            {
-                put("var1ForNewActivity2.x", "varValue");
-                put("var2ForNewActivity2.x", 1234.567);
-            }
-        };
-
         HashMap<String, Map<String, Object>> activityLocalVariables = new HashMap<String, Map<String, Object>>() {
 
             {
@@ -212,9 +204,6 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
     public void testSerializeDuplicatedFromActivity() {
 
         String definitionId = "someProcessId";
-        List<ActivityMigrationMapping> activityMappings = new ArrayList<>();
-        activityMappings.add(ActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1"));
-        activityMappings.add(ActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity2"));
 
         try {
             ProcessInstanceMigrationDocument document = new ProcessInstanceMigrationBuilderImpl(null)

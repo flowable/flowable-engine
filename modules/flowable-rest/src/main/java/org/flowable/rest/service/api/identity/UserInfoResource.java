@@ -86,7 +86,7 @@ public class UserInfoResource extends BaseUserResource {
         if (userRequest.getKey() == null || validKey.equals(userRequest.getKey())) {
             identityService.setUserInfo(user.getId(), key, userRequest.getValue());
         } else {
-            throw new FlowableIllegalArgumentException("Key provided in request body doesn't match the key in the resource URL.");
+            throw new FlowableIllegalArgumentException("Key provided in request body does not match the key in the resource URL.");
         }
 
         return restResponseFactory.createUserInfoResponse(key, userRequest.getValue(), user.getId());

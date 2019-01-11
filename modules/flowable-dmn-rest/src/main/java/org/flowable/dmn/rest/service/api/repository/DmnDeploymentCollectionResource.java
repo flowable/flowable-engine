@@ -81,7 +81,7 @@ public class DmnDeploymentCollectionResource {
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return decision table deployments with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return decision table deployments with a name like the given name.", paramType = "query"),
             @ApiImplicitParam(name = "category", dataType = "string", value = "Only return decision table deployments with the given category.", paramType = "query"),
-            @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return decision table deployments which don’t have the given category.", paramType = "query"),
+            @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return decision table deployments which do not have the given category.", paramType = "query"),
             @ApiImplicitParam(name = "parentDeploymentId", dataType = "string", value = "Only return decision table deployments with the given parent deployment id.", paramType = "query"),
             @ApiImplicitParam(name = "parentDeploymentIdLike", dataType = "string", value = "Only return decision table deployments with a parent deployment id like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return decision table deployments with the given tenantId.", paramType = "query"),
