@@ -55,12 +55,13 @@ public class AsyncHistoryUpgradeTest extends CustomConfigurationFlowableTestCase
     protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
         // Enable it, but don't start the executor automatically, it will be started in the tests themselves.
         processEngineConfiguration.setAsyncHistoryEnabled(true);
+        processEngineConfiguration.setAsyncHistoryJsonGroupingEnabled(true);
+        processEngineConfiguration.setAsyncHistoryJsonGroupingThreshold(1);
         processEngineConfiguration.setAsyncFailedJobWaitTime(100);
         processEngineConfiguration.setDefaultFailedJobWaitTime(100);
         processEngineConfiguration.setAsyncHistoryExecutorNumberOfRetries(10);
         processEngineConfiguration.setAsyncHistoryExecutorDefaultAsyncJobAcquireWaitTime(100);
         processEngineConfiguration.setAsyncExecutorActivate(false);
-        processEngineConfiguration.setAsyncHistoryJsonGzipCompressionEnabled(false);
     }
 
     @AfterEach
