@@ -58,7 +58,7 @@ public class TaskVariableResource extends TaskVariableBaseResource {
     @ApiImplicitParams(@ApiImplicitParam(name = "scope", dataType = "string", value = "Scope of variable to be returned. When local, only task-local variable value is returned. When global, only variable value from the task’s parent execution-hierarchy are returned. When the parameter is omitted, a local variable will be returned if it exists, otherwise a global variable.", paramType = "query"))
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task was found and the requested variables are returned."),
-            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task does nothave a variable with the given name (in the given scope). Status message provides additional information.")
+            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task does not have a variable with the given name (in the given scope). Status message provides additional information.")
     })
     @GetMapping(value = "/runtime/tasks/{taskId}/variables/{variableName}", produces = "application/json")
     public RestVariable getVariable(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
@@ -71,9 +71,9 @@ public class TaskVariableResource extends TaskVariableBaseResource {
     // FIXME OASv3 to solve Multiple Endpoint issue
     @ApiOperation(value = "Update an existing variable on a task", tags = { "Task Variables" }, nickname = "updateTaskInstanceVariable",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable) or by passing a multipart/form-data Object.\n"
-                    + "It's possible to update simple (non-binary) variable or  binary variable \n"
+                    + "It is possible to update simple (non-binary) variable or  binary variable \n"
                     + "Any number of variables can be passed into the request body array.\n"
-                    + "NB: Swagger V2 specification doesn't support this use case that's why this endpoint might be buggy/incomplete if used with other tools.")
+                    + "NB: Swagger V2 specification does not support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "body", type = "org.flowable.rest.service.api.engine.variable.RestVariable", value = "Update a task variable", paramType = "body", example = "{\n" +
                     "    \"name\":\"intProcVar\"\n" +
@@ -149,7 +149,7 @@ public class TaskVariableResource extends TaskVariableBaseResource {
         }
 
         if (!hasVariableOnScope(task, variableName, scope)) {
-            throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' doesn't have a variable '" + variableName + "' in scope " + scope.name().toLowerCase(), VariableInstanceEntity.class);
+            throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' does not have a variable '" + variableName + "' in scope " + scope.name().toLowerCase(), VariableInstanceEntity.class);
         }
 
         if (scope == RestVariableScope.LOCAL) {

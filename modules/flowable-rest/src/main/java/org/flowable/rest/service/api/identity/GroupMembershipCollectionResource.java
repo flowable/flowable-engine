@@ -55,10 +55,8 @@ public class GroupMembershipCollectionResource extends BaseGroupResource {
             throw new FlowableIllegalArgumentException("UserId cannot be null.");
         }
 
-        // Check if user is member of group since API doesn't return typed
-        // exception
+        // Check if user is member of group since API does not return typed exception
         if (identityService.createUserQuery().memberOfGroup(group.getId()).userId(memberShip.getUserId()).count() > 0) {
-
             throw new FlowableConflictException("User '" + memberShip.getUserId() + "' is already part of group '" + group.getId() + "'.");
         }
 

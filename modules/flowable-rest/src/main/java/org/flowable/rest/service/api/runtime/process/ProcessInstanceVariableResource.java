@@ -72,7 +72,7 @@ public class ProcessInstanceVariableResource extends BaseExecutionVariableResour
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable) or by passing a multipart/form-data Object.\n"
                     + "Nonexistent variables are created on the process-instance and existing ones are overridden without any error.\n"
                     + "Note that scope is ignored, only local variables can be set in a process instance.\n"
-                    + "NB: Swagger V2 specification doesn't support this use case that's why this endpoint might be buggy/incomplete if used with other tools.")
+                    + "NB: Swagger V2 specification does not support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "body", type = "org.flowable.rest.service.api.engine.variable.RestVariable", value = "Create a variable on a process instance", paramType = "body", example = "{\n" +
                     "    \"name\":\"intProcVar\"\n" +
@@ -139,7 +139,7 @@ public class ProcessInstanceVariableResource extends BaseExecutionVariableResour
         }
 
         if (!hasVariableOnScope(execution, variableName, variableScope)) {
-            throw new FlowableObjectNotFoundException("Execution '" + execution.getId() + "' doesn't have a variable '" + variableName + "' in scope " + variableScope.name().toLowerCase(),
+            throw new FlowableObjectNotFoundException("Execution '" + execution.getId() + "' does not have a variable '" + variableName + "' in scope " + variableScope.name().toLowerCase(),
                     VariableInstanceEntity.class);
         }
 

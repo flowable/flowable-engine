@@ -132,7 +132,7 @@ public class UserInfoResourceTest extends BaseSpringRestTestCase {
     }
 
     /**
-     * Test getting the info for a user who doesn't have that info set
+     * Test getting the info for a user who does not have that info set
      */
     @Test
     public void testGetInfoForUserWithoutInfo() throws Exception {
@@ -240,7 +240,7 @@ public class UserInfoResourceTest extends BaseSpringRestTestCase {
     }
 
     /**
-     * Test deleting the info for a user who doesn't have that info set
+     * Test deleting the info for a user who does not have that info set
      */
     @Test
     public void testUpdateUnexistingInfo() throws Exception {
@@ -278,7 +278,7 @@ public class UserInfoResourceTest extends BaseSpringRestTestCase {
     }
 
     /**
-     * Test deleting the info for a user who doesn't have that info set
+     * Test deleting the info for a user who does not have that info set
      */
     @Test
     public void testDeleteInfoForUserWithoutInfo() throws Exception {

@@ -95,7 +95,7 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
             }
 
             if (inputVariables == null || inputVariables.size() == 0) {
-                throw new FlowableIllegalArgumentException("Request didn't contain a list of variables to create.");
+                throw new FlowableIllegalArgumentException("Request did not contain a list of variables to create.");
             }
 
             RestVariableScope sharedScope = null;

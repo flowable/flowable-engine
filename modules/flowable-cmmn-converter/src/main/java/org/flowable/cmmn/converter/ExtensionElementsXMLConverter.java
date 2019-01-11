@@ -288,7 +288,7 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
                 PlanItemDefinition planItemDefinition = (PlanItemDefinition) currentCmmnElement;
                 planItemDefinition.getLifecycleListeners().add(flowableListener);
             } else {
-                throw new FlowableException("Programmatic error: task listener added to an element that's not a plan item definition, but a " + currentCmmnElement.getClass());
+                throw new FlowableException("Programmatic error: task listener added to an element that is not a plan item definition, but a " + currentCmmnElement.getClass());
             }
         }
 

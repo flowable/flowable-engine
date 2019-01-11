@@ -391,7 +391,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
 
-            // Task shouldn't exist anymore
+            // Task should not exist anymore
             task = taskService.createTaskQuery().taskId(taskId).singleResult();
             assertNull(task);
 
@@ -583,7 +583,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             assertEquals("newAssignee", task.getAssignee());
             assertEquals(0L, taskService.createTaskQuery().taskCandidateUser("newAssignee").count());
 
-            // Claiming with the same user shouldn't cause an exception
+            // Claiming with the same user should not cause an exception
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
             task = taskService.createTaskQuery().taskId(taskId).singleResult();
@@ -688,7 +688,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             assertEquals("initialAssignee", task.getOwner());
             assertEquals(DelegationState.PENDING, task.getDelegationState());
 
-            // Delegating again shouldn't cause an exception and should delegate
+            // Delegating again should not cause an exception and should delegate
             // to user without affecting initial delegator (owner)
             requestNode.put("assignee", "anotherAssignee");
             httpPost.setEntity(new StringEntity(requestNode.toString()));
@@ -733,7 +733,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             assertEquals("initialAssignee", task.getOwner());
             assertEquals(DelegationState.RESOLVED, task.getDelegationState());
 
-            // Resolving again shouldn't cause an exception
+            // Resolving again should not cause an exception
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
             task = taskService.createTaskQuery().taskId(taskId).singleResult();
