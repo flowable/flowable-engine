@@ -73,7 +73,7 @@ public class AppDefinitionResource {
     @ApiOperation(value = "Execute actions for an app definition", tags = { "Case Definitions" },
             notes = "Execute actions for an app definition (Update category)")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates action has been executed for the specified app defintion. (category altered)"),
+            @ApiResponse(code = 200, message = "Indicates action has been executed for the specified app definition. (category altered)"),
             @ApiResponse(code = 400, message = "Indicates no category was defined in the request body."),
             @ApiResponse(code = 404, message = "Indicates the requested app definition was not found.")
     })

@@ -1078,17 +1078,17 @@ public class RestResponseFactory {
         return createUserResponseList(users, false);
     }
 
-    public List<UserResponse> createUserResponseList(List<User> users, boolean incudePassword) {
+    public List<UserResponse> createUserResponseList(List<User> users, boolean includePassword) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         List<UserResponse> responseList = new ArrayList<>();
         for (User instance : users) {
-            responseList.add(createUserResponse(instance, incudePassword, urlBuilder));
+            responseList.add(createUserResponse(instance, includePassword, urlBuilder));
         }
         return responseList;
     }
 
-    public UserResponse createUserResponse(User user, boolean incudePassword) {
-        return createUserResponse(user, incudePassword, createUrlBuilder());
+    public UserResponse createUserResponse(User user, boolean includePassword) {
+        return createUserResponse(user, includePassword, createUrlBuilder());
     }
 
     public UserResponse createUserResponse(User user, boolean incudePassword, RestUrlBuilder urlBuilder) {

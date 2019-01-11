@@ -47,10 +47,8 @@ public class GroupMembershipResource extends BaseGroupResource {
 
         Group group = getGroupFromRequest(groupId);
 
-        // Check if user is not a member of group since API doesn't return typed
-        // exception
+        // Check if user is not a member of group since API does not return typed exception
         if (identityService.createUserQuery().memberOfGroup(group.getId()).userId(userId).count() != 1) {
-
             throw new FlowableObjectNotFoundException("User '" + userId + "' is not part of group '" + group.getId() + "'.", null);
         }
 
