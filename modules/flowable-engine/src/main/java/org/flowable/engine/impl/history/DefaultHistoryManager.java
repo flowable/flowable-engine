@@ -181,18 +181,15 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     public void recordActivityEnd(ActivityInstance activityInstance) {
         if (activityInstance != null && isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, activityInstance.getProcessDefinitionId())) {
             HistoricActivityInstanceEntity historicActivityInstance = getHistoricActivityInstanceEntityManager().findById(activityInstance.getId());
-            // historic activity instance can be null in the case when deployment is deleted during the test
-            if (historicActivityInstance != null) {
-                historicActivityInstance.setDeleteReason(activityInstance.getDeleteReason());
-                historicActivityInstance.setEndTime(activityInstance.getEndTime());
-                historicActivityInstance.setDurationInMillis(activityInstance.getDurationInMillis());
+            historicActivityInstance.setDeleteReason(activityInstance.getDeleteReason());
+            historicActivityInstance.setEndTime(activityInstance.getEndTime());
+            historicActivityInstance.setDurationInMillis(activityInstance.getDurationInMillis());
 
-                // Fire event
-                FlowableEventDispatcher eventDispatcher = getEventDispatcher();
-                if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-                    eventDispatcher.dispatchEvent(
-                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance));
-                }
+            // Fire event
+            FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(
+                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance));
             }
         }
     }
