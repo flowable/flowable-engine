@@ -402,7 +402,7 @@
     from ${prefix}ACT_HI_PROCINST RES
     left outer join ${prefix}ACT_RE_PROCDEF DEF on RES.PROC_DEF_ID_ = DEF.ID_
     <if test="includeProcessVariables">
-      left outer join ${prefix}ACT_HI_VARINST VAR ON RES.PROC_INST_ID_ = VAR.EXECUTION_ID_ and VAR.TASK_ID_ is null
+        left outer join ${prefix}ACT_HI_VARINST VAR ON RES.PROC_INST_ID_ = VAR.EXECUTION_ID_
     </if>
     <include refid="commonSelectHistoricProcessInstancesByQueryCriteriaSql"/>
   </sql>
