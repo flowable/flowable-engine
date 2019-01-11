@@ -39,11 +39,6 @@ public class HistoricCaseInstanceIdentityLinkCollectionResourceTest extends Base
      */
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testGetIdentityLinks() throws Exception {
-        HashMap<String, Object> caseVariables = new HashMap<>();
-        caseVariables.put("stringVar", "Azerty");
-        caseVariables.put("intVar", 67890);
-        caseVariables.put("booleanVar", false);
-
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         taskService.complete(task.getId());
