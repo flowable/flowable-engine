@@ -50,6 +50,10 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior im
         // executions leave the gateway.
 
         execution.inactivate();
+
+        // Is needed to set the endTime for all historic activity joins
+        CommandContextUtil.getActivityInstanceEntityManager(Context.getCommandContext()).recordActivityEnd((ExecutionEntity) execution, null);
+
         executeInclusiveGatewayLogic((ExecutionEntity) execution);
     }
 
@@ -89,15 +93,12 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior im
 
             LOGGER.debug("Inclusive gateway cannot be reached by any execution and is activated");
 
-            // Is needed to set the endTime for all historic activity joins
-            CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityEnd(execution, null);
 
             // Kill all executions here (except the incoming)
             Collection<ExecutionEntity> executionsInGateway = executionEntityManager
                 .findInactiveExecutionsByActivityIdAndProcessInstanceId(execution.getCurrentActivityId(), execution.getProcessInstanceId());
             for (ExecutionEntity executionEntityInGateway : executionsInGateway) {
                 if (!executionEntityInGateway.getId().equals(execution.getId()) && executionEntityInGateway.getParentId().equals(execution.getParentId())) {
-                    CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityEnd(executionEntityInGateway, null);
                     executionEntityManager.deleteExecutionAndRelatedData(executionEntityInGateway, null, false);
                 }
             }
