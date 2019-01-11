@@ -49,7 +49,21 @@ public class CmmnJobTestHelper {
             
         }, maxMillisToWait, intervalMillis, shutdownExecutorWhenFinished);
     }
-    
+
+    public static boolean isHistoricTaskLoggingEnabled(CmmnEngineConfiguration engineConfiguration) {
+        if (engineConfiguration.isEnableHistoricTaskLogging()) {
+
+            // When using async history, we need to process all the historic jobs first before the task log history can be checked
+            if (engineConfiguration.isAsyncHistoryEnabled()) {
+                waitForAsyncHistoryExecutorToProcessAllJobs(engineConfiguration, 10000, 200, true);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
     public static void waitForAsyncHistoryExecutorToProcessAllJobs(final CmmnEngineConfiguration cmmnEngineConfiguration, final long maxMillisToWait, 
             final long intervalMillis, final boolean shutdownExecutorWhenFinished) {
         

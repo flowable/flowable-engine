@@ -52,6 +52,20 @@ public class HistoryTestHelper {
         waitForJobExecutorToProcessAllHistoryJobs(activitiRule.getProcessEngine().getProcessEngineConfiguration(), activitiRule.getManagementService(), maxMillisToWait, intervalMillis);
     }
 
+    public static boolean isHistoricTaskLoggingEnabled(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        if (processEngineConfiguration.isEnableHistoricTaskLogging()) {
+
+            // When using async history, we need to process all the historic jobs first before the task log history can be checked
+            if (processEngineConfiguration.isAsyncHistoryEnabled()) {
+                waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, processEngineConfiguration.getManagementService(), 10000, 200);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
     public static void waitForJobExecutorToProcessAllHistoryJobs(ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService, 
             long maxMillisToWait, long intervalMillis) {
         waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, maxMillisToWait, intervalMillis, true);

@@ -488,7 +488,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
             CommandContextUtil.getActivityInstanceEntityManager(commandContext).deleteActivityInstancesByProcessInstanceId(processInstance.getId());
             return null;
         });
-        processAsyncHistoryIfNecessary();
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration);
 
         taskService.claim(task.getId(), "newAssignee");
 

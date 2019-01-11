@@ -69,7 +69,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
     
         Set<String> activityTypes = new HashSet<>();
         activityTypes.add("startEvent");
-        processAsyncHistoryIfNecessary();
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration);
 
         List<HistoricActivityInstance> historicActivityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityTypes(activityTypes).list();
 
@@ -98,7 +98,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
 
         // After finishing process
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
-        processAsyncHistoryIfNecessary();
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration);
 
         assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finished().count());
         assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finishedBefore(hourAgo.getTime()).count());
@@ -120,7 +120,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
                         .start();
         
         taskService.complete(taskService.createTaskQuery().processInstanceId(otherTenantProcessInstance.getId()).singleResult().getId());
-        processAsyncHistoryIfNecessary();
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration);
 
         assertEquals(3, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finished().count());
         
@@ -507,7 +507,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
     )
     public void callSubProcess() {
         ProcessInstance pi = this.runtimeService.startProcessInstanceByKey("callActivity");
-        processAsyncHistoryIfNecessary();
+        HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration);
 
         HistoricActivityInstance callSubProcessActivityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(pi.getId())
             .activityId("callSubProcess").singleResult();

@@ -478,9 +478,4 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
         } while (!tasks.isEmpty());
     }
 
-    protected void processAsyncHistoryIfNecessary() {
-        if (processEngineConfiguration.isAsyncHistoryEnabled()) {
-            HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
-        }
-    }
 }
