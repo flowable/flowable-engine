@@ -111,9 +111,6 @@ public class HitPolicyPriorityTest {
 
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
 
-        Map<String, Object> inputVariables = new HashMap<>();
-        inputVariables.put("inputVariable1", 5);
-
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")
                 .variable("inputVariable1", 5)
