@@ -31,9 +31,11 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
     private static final String PROCESS_DEFINITION_KEY = "oneTaskProcess";
     private static final String PROCESS_DEFINITION_KEY_2 = "oneTaskProcess2";
     private static final String PROCESS_DEFINITION_KEY_3 = "oneTaskProcess3";
+    private static final String PROCESS_DEFINITION_KEY_4 = "oneTaskProcess4";
 
     /**
      * Setup starts 4 process instances of oneTaskProcess and 1 instance of oneTaskProcess2
+     * oneTaskProcess4 contains a task variable added via an execution task listener (which shouldn't be returned in the query)
      */
     @BeforeEach
     protected void setUp() throws Exception {
@@ -41,6 +43,7 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
                 .addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
                 .addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml")
                 .addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess3.bpmn20.xml")
+            .addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess4.bpmn20.xml")
                 .deploy();
 
         Map<String, Object> startMap = new HashMap<>();
@@ -57,6 +60,10 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
         startMap.clear();
         startMap.put("casetest", "MyCaseTest");
         runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_3, "1", startMap);
+
+        startMap.clear();
+        startMap.put("test4", "test4");
+        runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_4, "1", startMap);
     }
 
     @AfterEach
@@ -74,7 +81,7 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
         assertEquals(123, variableMap.get("anothertest"));
 
         List<ProcessInstance> instanceList = runtimeService.createProcessInstanceQuery().includeProcessVariables().list();
-        assertEquals(6, instanceList.size());
+        assertEquals(7, instanceList.size());
 
         processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables()
                 .variableValueLike("casetest", "MyCase%").singleResult();
@@ -131,6 +138,11 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
 
         instanceList = runtimeService.createProcessInstanceQuery().includeProcessVariables().processDefinitionKey(PROCESS_DEFINITION_KEY).orderByProcessDefinitionKey().asc().listPage(4, 5);
         assertEquals(0, instanceList.size());
+
+        processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables().variableValueEquals("test4", "test4").singleResult();
+        variableMap = processInstance.getProcessVariables();
+        assertEquals(1, variableMap.size());
+        assertEquals("test4", variableMap.get("test4"));
     }
 
     @Test
