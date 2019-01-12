@@ -12,6 +12,10 @@
  */
 package org.flowable.editor.language;
 
+import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
+
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.FlowElement;
@@ -20,10 +24,6 @@ import org.flowable.bpmn.model.StartEvent;
 import org.junit.Test;
 
 import java.util.List;
-
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Zheng Ji

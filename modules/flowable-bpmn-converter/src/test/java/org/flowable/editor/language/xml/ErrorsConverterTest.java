@@ -12,24 +12,18 @@
  */
 package org.flowable.editor.language.xml;
 
+import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
-import org.junit.Test;
-
 import java.util.List;
 
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
-import java.util.List;
-
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
 /**
  * @author Zheng Ji
  */
@@ -55,22 +49,21 @@ public class ErrorsConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         assertEquals(1, model.getProcesses().size());
-        assertEquals(2,model.getErrors().size());
-
+        assertEquals(2, model.getErrors().size());
 
         FlowElement flowElement = model.getMainProcess().getFlowElement("sid-DC9C1AEF-C999-40B9-BAC5-6532CC6D7F89");
         assertNotNull(flowElement);
         assertTrue(flowElement instanceof StartEvent);
 
-        StartEvent startEvent= (StartEvent) flowElement;
+        StartEvent startEvent = (StartEvent) flowElement;
         List<EventDefinition> eventDefinitions = startEvent.getEventDefinitions();
-        assertEquals(1,eventDefinitions.size());
+        assertEquals(1, eventDefinitions.size());
 
         EventDefinition eventDefinition = eventDefinitions.get(0);
         assertTrue(eventDefinition instanceof ErrorEventDefinition);
 
-        ErrorEventDefinition errorEventDefinition= (ErrorEventDefinition) eventDefinition;
+        ErrorEventDefinition errorEventDefinition = (ErrorEventDefinition) eventDefinition;
         String errorCode = errorEventDefinition.getErrorCode();
-        assertEquals("shareniu-b",errorCode);
+        assertEquals("shareniu-b", errorCode);
     }
 }
