@@ -701,6 +701,8 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
             org.flowable.task.api.Task bTask = taskService.createTaskQuery().taskName("B").singleResult();
 
             taskService.complete(bTask.getId());
+            
+            HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 20000, 200);
 
             if (i != 8) {
                 aTasks = taskService.createTaskQuery().taskName("A").list();

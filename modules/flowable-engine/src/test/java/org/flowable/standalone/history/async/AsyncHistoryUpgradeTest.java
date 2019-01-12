@@ -338,7 +338,7 @@ public class AsyncHistoryUpgradeTest extends CustomConfigurationFlowableTestCase
             try {
                 HistoryJob historyJob = managementService.createHistoryJobQuery().singleResult();
                 List<Map<String, Object>> configurations = processEngineConfiguration.getObjectMapper().readValue(
-                    new String(((HistoryJobEntity) historyJob).getAdvancedJobHandlerConfiguration().getBytes()),
+                    new String(((HistoryJobEntity) historyJob).getAdvancedJobHandlerConfiguration().getBytes(), "utf-8"),
                     List.class
                 );
 

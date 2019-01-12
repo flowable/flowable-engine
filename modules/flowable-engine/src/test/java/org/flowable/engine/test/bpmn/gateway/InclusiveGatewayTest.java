@@ -29,6 +29,7 @@ import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.AbstractFlowableTestCase;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -354,6 +355,8 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
         taskService.complete(task.getId());
         assertEquals(0, taskService.createTaskQuery().count());
+        
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 20000, 200);
 
         assertEquals("Found executions: " + runtimeService.createExecutionQuery().list(), 0, runtimeService.createExecutionQuery().count());
         assertProcessEnded(pi.getId());
@@ -740,6 +743,8 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
         //Finish the process
         taskService.complete(task.getId());
+        
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 20000, 200);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -864,6 +869,8 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
         //Finish the process
         taskService.complete(task.getId());
+        
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 20000, 200);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1017,6 +1024,8 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
         //Finish the process
         tasks.forEach(this::completeTask);
+        
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 20000, 200);
 
         assertProcessEnded(processInstance.getId());
     }
