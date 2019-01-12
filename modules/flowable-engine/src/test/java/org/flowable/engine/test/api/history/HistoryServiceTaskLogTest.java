@@ -187,14 +187,15 @@ public class HistoryServiceTaskLogTest {
         taskService.setAssignee(task.getId(), "newAssignee");
         HistoryTestHelper.isHistoricTaskLoggingEnabled((ProcessEngineConfigurationImpl) processEngineConfiguration);
 
-        List<HistoricTaskLogEntry> taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
+        List<HistoricTaskLogEntry> taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).
+            type("USER_TASK_ASSIGNEE_CHANGED").
+            list();
 
-        assertThat(taskLogEntries).size().isEqualTo(2);
-        assertThat(taskLogEntries.get(1).getData()).contains("\"newAssigneeId\":\"newAssignee\"","\"previousAssigneeId\":\"initialAssignee\"");
-        assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getTimeStamp).isNotNull();
-        assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
-        assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getUserId).isNull();
-        assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_ASSIGNEE_CHANGED");
+        assertThat(taskLogEntries).size().isEqualTo(1);
+        assertThat(taskLogEntries.get(0).getData()).contains("\"newAssigneeId\":\"newAssignee\"","\"previousAssigneeId\":\"initialAssignee\"");
+        assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getTimeStamp).isNotNull();
+        assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
+        assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getUserId).isNull();
     }
 
     @Test
@@ -215,15 +216,16 @@ public class HistoryServiceTaskLogTest {
         taskService.setOwner(task.getId(), "newOwner");
         HistoryTestHelper.isHistoricTaskLoggingEnabled((ProcessEngineConfigurationImpl) processEngineConfiguration);
 
-        List<HistoricTaskLogEntry> taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
+        List<HistoricTaskLogEntry> taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).
+            type("USER_TASK_OWNER_CHANGED").
+            list();
 
-        assertThat(taskLogEntries).size().isEqualTo(2);
-        assertThat(taskLogEntries.get(1).getData()).
+        assertThat(taskLogEntries).size().isEqualTo(1);
+        assertThat(taskLogEntries.get(0).getData()).
             contains("\"previousOwnerId\":null","\"newOwnerId\":\"newOwner\"");
-        assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getTimeStamp).isNotNull();
-        assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
-        assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getUserId).isNull();
-        assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_OWNER_CHANGED");
+        assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getTimeStamp).isNotNull();
+        assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
+        assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getUserId).isNull();
     }
 
     @Test
@@ -244,13 +246,14 @@ public class HistoryServiceTaskLogTest {
         taskService.claim(task.getId(), "testUser");
         HistoryTestHelper.isHistoricTaskLoggingEnabled((ProcessEngineConfigurationImpl) processEngineConfiguration);
 
-        List<HistoricTaskLogEntry> taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
-        assertThat(taskLogEntries).size().isEqualTo(2);
-        assertThat(taskLogEntries.get(1).getData()).contains("\"newAssigneeId\":\"testUser\"","\"previousAssigneeId\":null");
-        assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getTimeStamp).isNotNull();
-        assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
-        assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getUserId).isNull();
-        assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_ASSIGNEE_CHANGED");
+        List<HistoricTaskLogEntry> taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).
+            type("USER_TASK_ASSIGNEE_CHANGED").
+            list();
+        assertThat(taskLogEntries).size().isEqualTo(1);
+        assertThat(taskLogEntries.get(0).getData()).contains("\"newAssigneeId\":\"testUser\"","\"previousAssigneeId\":null");
+        assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getTimeStamp).isNotNull();
+        assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
+        assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getUserId).isNull();
     }
 
     @Test
@@ -263,14 +266,15 @@ public class HistoryServiceTaskLogTest {
         taskService.unclaim(task.getId());
         HistoryTestHelper.isHistoricTaskLoggingEnabled((ProcessEngineConfigurationImpl) processEngineConfiguration);
 
-        List<HistoricTaskLogEntry> taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
-        assertThat(taskLogEntries).size().isEqualTo(2);
-        assertThat(taskLogEntries.get(1).getData()).
+        List<HistoricTaskLogEntry> taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).
+            type("USER_TASK_ASSIGNEE_CHANGED").
+            list();
+        assertThat(taskLogEntries).size().isEqualTo(1);
+        assertThat(taskLogEntries.get(0).getData()).
             contains("\"newAssigneeId\":null","\"previousAssigneeId\":\"initialAssignee\"");
-        assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getTimeStamp).isNotNull();
-        assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
-        assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getUserId).isNull();
-        assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_ASSIGNEE_CHANGED");
+        assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getTimeStamp).isNotNull();
+        assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
+        assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getUserId).isNull();
     }
 
     @Test
@@ -282,15 +286,16 @@ public class HistoryServiceTaskLogTest {
         taskService.setPriority(task.getId(), Integer.MAX_VALUE);
         HistoryTestHelper.isHistoricTaskLoggingEnabled((ProcessEngineConfigurationImpl) processEngineConfiguration);
 
-        List<HistoricTaskLogEntry> taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
+        List<HistoricTaskLogEntry> taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).
+            type("USER_TASK_PRIORITY_CHANGED").
+            list();
 
-        assertThat(taskLogEntries).size().isEqualTo(2);
-        assertThat(taskLogEntries.get(1).getData()).
+        assertThat(taskLogEntries).size().isEqualTo(1);
+        assertThat(taskLogEntries.get(0).getData()).
             contains("\"newPriority\":2147483647","\"previousPriority\":50}");
-        assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getTimeStamp).isNotNull();
-        assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
-        assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getUserId).isNull();
-        assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_PRIORITY_CHANGED");
+        assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getTimeStamp).isNotNull();
+        assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
+        assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getUserId).isNull();
     }
 
     @Test
@@ -312,13 +317,12 @@ public class HistoryServiceTaskLogTest {
             functionToAssert.accept(task.getId());
             HistoryTestHelper.isHistoricTaskLoggingEnabled((ProcessEngineConfigurationImpl) processEngineConfiguration);
 
-            List<HistoricTaskLogEntry> taskLogsByTaskInstanceId = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
+            List<HistoricTaskLogEntry> taskLogsByTaskInstanceId = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).
+                userId("testUser").
+                list();
             assertThat(
                 taskLogsByTaskInstanceId
-            ).size().isEqualTo(2);
-
-            assertThat(taskLogsByTaskInstanceId.get(1)).
-                extracting(HistoricTaskLogEntry::getUserId).isEqualTo("testUser");
+            ).size().isEqualTo(1);
         } finally {
             Authentication.setAuthenticatedUserId(previousUserId);
         }
@@ -335,11 +339,13 @@ public class HistoryServiceTaskLogTest {
         List<HistoricTaskLogEntry> taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
 
         assertThat(taskLogEntries).size().isEqualTo(2);
-        assertThat(taskLogEntries.get(1).getData()).contains("\"newDueDate\"","\"previousDueDate\":null}");
-        assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getTimeStamp).isNotNull();
-        assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
-        assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getUserId).isNull();
-        assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_DUEDATE_CHANGED");
+        Optional<HistoricTaskLogEntry> event = taskLogEntries.stream().filter(logEntry -> "USER_TASK_DUEDATE_CHANGED".equals(logEntry.getType())).findFirst();
+
+        assertTrue(event.isPresent());
+        assertThat(event.get().getData()).contains("\"newDueDate\"","\"previousDueDate\":null}");
+        assertThat(event.get()).extracting(HistoricTaskLogEntry::getTimeStamp).isNotNull();
+        assertThat(event.get()).extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
+        assertThat(event.get()).extracting(HistoricTaskLogEntry::getUserId).isNull();
     }
 
     @Test
@@ -385,14 +391,13 @@ public class HistoryServiceTaskLogTest {
 
         HistoryTestHelper.isHistoricTaskLoggingEnabled((ProcessEngineConfigurationImpl) processEngineConfiguration);
 
-        List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
+        List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type("customType").list();
 
-        MatcherAssert.assertThat(logEntries.size(), is(2));
-        HistoricTaskLogEntry historicTaskLogEntry = logEntries.get(1);
+        MatcherAssert.assertThat(logEntries.size(), is(1));
+        HistoricTaskLogEntry historicTaskLogEntry = logEntries.get(0);
         assertThat(historicTaskLogEntry.getLogNumber()).isNotNull();
         assertThat(historicTaskLogEntry.getUserId()).isEqualTo("testUser");
         assertThat(historicTaskLogEntry.getTaskId()).isEqualTo(task.getId());
-        assertThat(historicTaskLogEntry.getType()).isEqualTo("customType");
         assertThat(historicTaskLogEntry.getTimeStamp()).isEqualTo(todayDate);
         assertThat(historicTaskLogEntry.getData()).isEqualTo("testData");
         historyService.deleteHistoricTaskLogEntry(logEntries.get(0).getLogNumber());
@@ -410,13 +415,6 @@ public class HistoryServiceTaskLogTest {
         List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
 
         MatcherAssert.assertThat(logEntries.size(), is(2));
-        HistoricTaskLogEntry historicTaskLogEntry = logEntries.get(1);
-        assertThat(historicTaskLogEntry.getLogNumber()).isNotNull();
-        assertThat(historicTaskLogEntry.getUserId()).isNull();
-        assertThat(historicTaskLogEntry.getTaskId()).isEqualTo(task.getId());
-        assertThat(historicTaskLogEntry.getType()).isNull();
-        assertThat(historicTaskLogEntry.getTimeStamp()).isNotNull();
-        assertThat(historicTaskLogEntry.getData()).isNull();
     }
 
     @Test
@@ -434,7 +432,10 @@ public class HistoryServiceTaskLogTest {
         List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
 
         MatcherAssert.assertThat(logEntries.size(), is(2));
-        HistoricTaskLogEntry historicTaskLogEntry = logEntries.get(1);
+        HistoricTaskLogEntry historicTaskLogEntry = logEntries.get(0);
+        assertThat(historicTaskLogEntry.getLogNumber()).isNotNull();
+        assertThat(historicTaskLogEntry.getTimeStamp()).isNotNull();
+        historicTaskLogEntry = logEntries.get(1);
         assertThat(historicTaskLogEntry.getLogNumber()).isNotNull();
         assertThat(historicTaskLogEntry.getTimeStamp()).isNotNull();
     }
@@ -585,11 +586,9 @@ public class HistoryServiceTaskLogTest {
             taskService.addCandidateGroup(task.getId(), "newCandidateGroup");
             HistoryTestHelper.isHistoricTaskLoggingEnabled((ProcessEngineConfigurationImpl) processEngineConfiguration);
 
-            List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
-            assertThat(logEntries).size().isEqualTo(2);
-            assertThat(logEntries.get(1)).
-                extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_ADDED");
-            assertThat(logEntries.get(1).getData()).contains(
+            List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type("USER_TASK_IDENTITY_LINK_ADDED").list();
+            assertThat(logEntries).size().isEqualTo(1);
+            assertThat(logEntries.get(0).getData()).contains(
                 "\"type\":\"candidate\"",
                 "\"groupId\":\"newCandidateGroup\""
             );
@@ -670,11 +669,11 @@ public class HistoryServiceTaskLogTest {
             taskService.deleteCandidateUser(task.getId(), "newCandidateUser");
             HistoryTestHelper.isHistoricTaskLoggingEnabled((ProcessEngineConfigurationImpl) processEngineConfiguration);
 
-            List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
-            assertThat(logEntries).size().isEqualTo(3);
-            assertThat(logEntries.get(2)).
-                extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_REMOVED");
-            assertThat(logEntries.get(2).getData()).contains(
+            List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).
+                type("USER_TASK_IDENTITY_LINK_REMOVED").
+                list();
+            assertThat(logEntries).size().isEqualTo(1);
+            assertThat(logEntries.get(0).getData()).contains(
                 "\"type\":\"candidate\"",
                 "\"userId\":\"newCandidateUser\""
             );
@@ -694,22 +693,10 @@ public class HistoryServiceTaskLogTest {
         task = tasks.get(0);
         HistoryTestHelper.isHistoricTaskLoggingEnabled((ProcessEngineConfigurationImpl) processEngineConfiguration);
 
-        List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
-        // create, identityLinkAdded, identityLinkAdded
-        assertThat(logEntries).size().isEqualTo(3);
-
-        assertThat(logEntries.get(1)).
-            extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_ADDED");
-        assertThat(logEntries.get(1).getData()).contains(
-            "\"type\":\"businessAdministrator\"",
-            "\"userId\":\"kermit\""
-        );
-        assertThat(logEntries.get(2)).
-            extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_ADDED");
-        assertThat(logEntries.get(2).getData()).contains(
-            "\"type\":\"businessAdministrator\"",
-            "\"groupId\":\"management\""
-        );
+        List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).
+            type("USER_TASK_IDENTITY_LINK_ADDED").
+            list();
+        assertThat(logEntries).size().isEqualTo(2);
 
         taskService.complete(tasks.get(0).getId());
         HistoryTestHelper.isHistoricTaskLoggingEnabled((ProcessEngineConfigurationImpl) processEngineConfiguration);
@@ -717,8 +704,6 @@ public class HistoryServiceTaskLogTest {
         logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
         // + completed event. Do not expect identity link removed events
         assertThat(logEntries).size().isEqualTo(4);
-        assertThat(logEntries.get(3)).
-            extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_COMPLETED");
     }
 
     @Test
