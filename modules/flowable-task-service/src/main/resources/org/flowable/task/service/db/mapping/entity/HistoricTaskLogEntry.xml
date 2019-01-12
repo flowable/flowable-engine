@@ -190,6 +190,10 @@
   </sql>
 
   <!-- DELETE -->
+  <delete id="deleteHistoricTaskLogEntry" parameterType="org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityImpl">
+    delete from ${prefix}ACT_HI_TSK_LOG where ID_ = #{id}
+  </delete>
+  
   <delete id="deleteHistoricTaskLogEntryByLogNumber" parameterType="long">
     delete from ${prefix}ACT_HI_TSK_LOG where ID_ = #{logNr}
   </delete>

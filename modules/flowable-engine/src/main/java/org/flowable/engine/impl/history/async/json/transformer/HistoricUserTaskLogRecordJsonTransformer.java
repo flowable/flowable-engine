@@ -54,6 +54,10 @@ public class HistoricUserTaskLogRecordJsonTransformer extends AbstractHistoryJso
         taskLogEntryBuilder.timeStamp(getDateFromJson(historicalData, HistoryJsonConstants.CREATE_TIME));
         taskLogEntryBuilder.type(getStringFromJson(historicalData, HistoryJsonConstants.LOG_ENTRY_TYPE));
         taskLogEntryBuilder.userId(getStringFromJson(historicalData, HistoryJsonConstants.USER_ID));
+        taskLogEntryBuilder.scopeType(getStringFromJson(historicalData, HistoryJsonConstants.SCOPE_TYPE));
+        taskLogEntryBuilder.scopeId(getStringFromJson(historicalData, HistoryJsonConstants.SCOPE_ID));
+        taskLogEntryBuilder.subScopeId(getStringFromJson(historicalData, HistoryJsonConstants.SUB_SCOPE_ID));
+        taskLogEntryBuilder.scopeDefinitionId(getStringFromJson(historicalData, HistoryJsonConstants.SCOPE_DEFINITION_ID));
 
         CommandContextUtil.getHistoricTaskService().createHistoricTaskLogEntry(taskLogEntryBuilder);
     }

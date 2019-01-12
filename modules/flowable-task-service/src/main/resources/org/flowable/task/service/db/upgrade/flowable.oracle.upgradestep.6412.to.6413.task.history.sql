@@ -16,4 +16,4 @@ create table ACT_HI_TSK_LOG (
   primary key (ID_)
 );
 
-create sequence act_hi_task_evt_log_seq;
+create sequence act_hi_task_evt_log_seq start with 1 increment by 1;

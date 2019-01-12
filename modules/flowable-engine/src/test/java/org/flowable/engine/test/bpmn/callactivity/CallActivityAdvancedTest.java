@@ -592,7 +592,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Final task", task.getName());
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration, 30000)) {
             List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
                     .superProcessInstanceId(processInstance.getId()).list();
             assertEquals(3, historicProcessInstances.size());
@@ -842,7 +842,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
 
         // Completing the task in the subprocess, finishes the processes
         taskService.complete(taskInSubProcess.getId());
-        assertProcessEnded(processInstance.getId());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
     }
 
 }
