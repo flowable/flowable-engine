@@ -76,7 +76,7 @@ public class HistoryServiceTaskLogTest {
                 HistoricTaskLogEntryEntityManager historicTaskLogEntryEntityManager = CommandContextUtil.getTaskServiceConfiguration(commandContext).getHistoricTaskLogEntryEntityManager();
                 List<HistoricTaskLogEntry> taskLogEntries = historicTaskLogEntryEntityManager.findHistoricTaskLogEntriesByQueryCriteria(new HistoricTaskLogEntryQueryImpl(processEngineConfiguration.getCommandExecutor()));
                 for (HistoricTaskLogEntry historicTaskLogEntry : taskLogEntries) {
-                    historicTaskLogEntryEntityManager.delete((HistoricTaskLogEntryEntity) historicTaskLogEntry, false);
+                    historicTaskLogEntryEntityManager.deleteHistoricTaskLogEntry(historicTaskLogEntry.getLogNumber());
                 }
                 
                 HistoryJobService historyJobService = CommandContextUtil.getHistoryJobService(commandContext);
