@@ -57,6 +57,7 @@ public class AsyncHistoryUpgradeTest extends CustomConfigurationFlowableTestCase
         processEngineConfiguration.setAsyncHistoryEnabled(true);
         processEngineConfiguration.setAsyncHistoryJsonGroupingEnabled(true);
         processEngineConfiguration.setAsyncHistoryJsonGroupingThreshold(1);
+        processEngineConfiguration.setAsyncHistoryJsonGzipCompressionEnabled(false);
         processEngineConfiguration.setAsyncFailedJobWaitTime(100);
         processEngineConfiguration.setDefaultFailedJobWaitTime(100);
         processEngineConfiguration.setAsyncHistoryExecutorNumberOfRetries(10);
