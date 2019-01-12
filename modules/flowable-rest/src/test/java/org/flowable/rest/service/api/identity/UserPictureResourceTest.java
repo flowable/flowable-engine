@@ -82,7 +82,7 @@ public class UserPictureResourceTest extends BaseSpringRestTestCase {
     }
 
     /**
-     * Test getting the picture for a user who doesn't have a pîcture set
+     * Test getting the picture for a user who does not have a picture set
      */
     @Test
     public void testGetPictureForUserWithoutPicture() throws Exception {

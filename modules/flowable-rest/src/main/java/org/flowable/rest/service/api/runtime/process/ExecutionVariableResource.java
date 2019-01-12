@@ -73,7 +73,7 @@ public class ExecutionVariableResource extends BaseExecutionVariableResource {
     // FIXME OASv3 to solve Multiple Endpoint issue
     @ApiOperation(value = "Update a variable on an execution", tags = { "Executions" }, nickname = "updateExecutionVariable",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable) or by passing a multipart/form-data Object.\n"
-                    + "NB: Swagger V2 specification doesn't support this use case that's why this endpoint might be buggy/incomplete if used with other tools.")
+                    + "NB: Swagger V2 specification does not support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "body", type = "org.flowable.rest.service.api.engine.variable.RestVariable", value = "Update a variable on an execution", paramType = "body", example = "{\n" +
                     "    \"name\":\"intProcVar\"\n" +
@@ -144,7 +144,7 @@ public class ExecutionVariableResource extends BaseExecutionVariableResource {
         }
 
         if (!hasVariableOnScope(execution, variableName, variableScope)) {
-            throw new FlowableObjectNotFoundException("Execution '" + execution.getId() + "' doesn't have a variable '" + variableName + "' in scope " + variableScope.name().toLowerCase(),
+            throw new FlowableObjectNotFoundException("Execution '" + execution.getId() + "' does not have a variable '" + variableName + "' in scope " + variableScope.name().toLowerCase(),
                     VariableInstanceEntity.class);
         }
 

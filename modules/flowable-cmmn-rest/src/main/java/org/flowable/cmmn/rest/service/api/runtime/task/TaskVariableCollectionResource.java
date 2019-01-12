@@ -95,9 +95,9 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
     // FIXME OASv3 to solve Multiple Endpoint issue
     @ApiOperation(value = "Create new variables on a task", tags = { "Tasks", "Task Variables" },
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable or an Array of RestVariable) or by passing a multipart/form-data Object.\n"
-                    + "It's possible to create simple (non-binary) variable or list of variables or new binary variable \n"
+                    + "It is possible to create simple (non-binary) variable or list of variables or new binary variable \n"
                     + "Any number of variables can be passed into the request body array.\n"
-                    + "NB: Swagger V2 specification doesn't support this use case that's why this endpoint might be buggy/incomplete if used with other tools.")
+                    + "NB: Swagger V2 specification does not support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "body", type = "org.flowable.rest.service.api.engine.variable.RestVariable", value = "Create a variable on a task", paramType = "body", example = "{\n" +
                     "    \"name\":\"intProcVar\"\n" +

@@ -117,7 +117,7 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
         // After process start, there should be timer created
         ProcessInstance pi1 = runtimeService.startProcessInstanceByKey("intermediateTimerEventExample", variables1);
         ProcessInstance pi2 = runtimeService.startProcessInstanceByKey("intermediateTimerEventExample", variables2);
-        ProcessInstance pi3 = runtimeService.startProcessInstanceByKey("intermediateTimerEventExample", variables2);
+        ProcessInstance pi3 = runtimeService.startProcessInstanceByKey("intermediateTimerEventExample", variables3);
 
         assertEquals(1, managementService.createTimerJobQuery().processInstanceId(pi1.getId()).count());
         assertEquals(1, managementService.createTimerJobQuery().processInstanceId(pi2.getId()).count());

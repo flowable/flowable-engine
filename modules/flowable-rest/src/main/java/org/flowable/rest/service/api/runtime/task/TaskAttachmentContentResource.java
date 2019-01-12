@@ -48,7 +48,7 @@ public class TaskAttachmentContentResource extends TaskBaseResource {
             notes = "The response body contains the binary content. By default, the content-type of the response is set to application/octet-stream unless the attachment type contains a valid Content-type.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task and attachment was found and the requested content is returned."),
-            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task does not have an attachment with the given id or the attachment doesn’t have a binary stream available. Status message provides additional information.")
+            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task does not have an attachment with the given id or the attachment does not have a binary stream available. Status message provides additional information.")
     })
     @GetMapping(value = "/runtime/tasks/{taskId}/attachments/{attachmentId}/content")
     public ResponseEntity<byte[]> getAttachmentContent(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "attachmentId") @PathVariable("attachmentId") String attachmentId, HttpServletResponse response) {
@@ -57,12 +57,12 @@ public class TaskAttachmentContentResource extends TaskBaseResource {
         Attachment attachment = taskService.getAttachment(attachmentId);
 
         if (attachment == null || !task.getId().equals(attachment.getTaskId())) {
-            throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' doesn't have an attachment with id '" + attachmentId + "'.", Attachment.class);
+            throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' does not have an attachment with id '" + attachmentId + "'.", Attachment.class);
         }
 
         InputStream attachmentStream = taskService.getAttachmentContent(attachmentId);
         if (attachmentStream == null) {
-            throw new FlowableObjectNotFoundException("Attachment with id '" + attachmentId + "' doesn't have content associated with it.", Attachment.class);
+            throw new FlowableObjectNotFoundException("Attachment with id '" + attachmentId + "' does not have content associated with it.", Attachment.class);
         }
 
         HttpHeaders responseHeaders = new HttpHeaders();

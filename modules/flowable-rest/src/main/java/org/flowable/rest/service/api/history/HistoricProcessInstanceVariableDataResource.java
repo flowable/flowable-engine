@@ -56,7 +56,7 @@ public class HistoricProcessInstanceVariableDataResource extends HistoricProcess
 
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the process instance was found and the requested variable data is returned."),
-            @ApiResponse(code = 404, message = "Indicates the requested process instance was not found or the process instance doesn’t have a variable with the given name or the variable doesn’t have a binary stream available. Status message provides additional information.") })
+            @ApiResponse(code = 404, message = "Indicates the requested process instance was not found or the process instance does not have a variable with the given name or the variable does not have a binary stream available. Status message provides additional information.") })
     @ApiOperation(value = "Get the binary data for a historic process instance variable", tags = {"History Process" }, nickname = "getHistoricProcessInstanceVariableData",
             notes = "The response body contains the binary value of the variable. When the variable is of type binary, the content-type of the response is set to application/octet-stream, regardless of the content of the variable or the request accept-type header. In case of serializable, application/x-java-serialized-object is used as content-type.")
     @GetMapping(value = "/history/historic-process-instances/{processInstanceId}/variables/{variableName}/data")
@@ -94,7 +94,7 @@ public class HistoricProcessInstanceVariableDataResource extends HistoricProcess
         HistoricProcessInstance processObject = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).includeProcessVariables().singleResult();
 
         if (processObject == null) {
-            throw new FlowableObjectNotFoundException("Historic process instance '" + processInstanceId + "' couldn't be found.", HistoricProcessInstanceEntity.class);
+            throw new FlowableObjectNotFoundException("Historic process instance '" + processInstanceId + "' could not be found.", HistoricProcessInstanceEntity.class);
         }
         
         if (restApiInterceptor != null) {
@@ -104,7 +104,7 @@ public class HistoricProcessInstanceVariableDataResource extends HistoricProcess
         Object value = processObject.getProcessVariables().get(variableName);
 
         if (value == null) {
-            throw new FlowableObjectNotFoundException("Historic process instance '" + processInstanceId + "' variable value for " + variableName + " couldn't be found.", VariableInstanceEntity.class);
+            throw new FlowableObjectNotFoundException("Historic process instance '" + processInstanceId + "' variable value for " + variableName + " could not be found.", VariableInstanceEntity.class);
         } else {
             return restResponseFactory.createRestVariable(variableName, value, null, processInstanceId, RestResponseFactory.VARIABLE_HISTORY_PROCESS, includeBinary);
         }

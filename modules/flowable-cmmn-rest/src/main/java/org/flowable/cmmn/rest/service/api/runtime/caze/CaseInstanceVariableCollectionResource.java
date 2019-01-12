@@ -62,7 +62,7 @@ public class CaseInstanceVariableCollectionResource extends BaseVariableResource
                     + "Nonexistent variables are created on the process-instance and existing ones are overridden without any error.\n"
                     + "Any number of variables can be passed into the request body array.\n"
                     + "Note that scope is ignored, only local variables can be set in a case instance.\n"
-                    + "NB: Swagger V2 specification doesn't support this use case that's why this endpoint might be buggy/incomplete if used with other tools.")
+                    + "NB: Swagger V2 specification doesn't support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "body", type = "org.flowable.rest.cmmn.service.api.engine.variable.RestVariable", value = "Create a variable on a process instance", paramType = "body", example = "{\n" +
                     "    \"name\":\"intProcVar\"\n" +
@@ -92,7 +92,7 @@ public class CaseInstanceVariableCollectionResource extends BaseVariableResource
                     + "Nonexistent variables are created on the process-instance and existing ones are overridden without any error.\n"
                     + "Any number of variables can be passed into the request body array.\n"
                     + "Note that scope is ignored, only local variables can be set in a case instance.\n"
-                    + "NB: Swagger V2 specification doesn't support this use case that's why this endpoint might be buggy/incomplete if used with other tools.")
+                    + "NB: Swagger V2 specification doesn't support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "body", type = "org.flowable.rest.cmmn.service.api.engine.variable.RestVariable", value = "Create a variable on a case instance", paramType = "body", example = "{\n" +
                     "    \"name\":\"intProcVar\"\n" +

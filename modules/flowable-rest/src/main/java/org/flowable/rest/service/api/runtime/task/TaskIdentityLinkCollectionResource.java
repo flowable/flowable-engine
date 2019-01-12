@@ -53,7 +53,7 @@ public class TaskIdentityLinkCollectionResource extends TaskBaseResource {
     }
 
     @ApiOperation(value = "Create an identity link on a task", tags = { "Task Identity Links" }, nickname = "createTaskInstanceIdentityLinks",
-            notes = "It's possible to add either a user or a group.")
+            notes = "It is possible to add either a user or a group.")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the task was found and the identity link was created."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task does not have the requested identityLink. The status contains additional information about this error.")

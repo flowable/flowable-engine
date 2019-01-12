@@ -511,7 +511,7 @@
           left outer join ${prefix}ACT_RU_VARIABLE VAR ON RES.ID_ = VAR.TASK_ID_
         </if>
         <if test="includeProcessVariables">
-          left outer join ${prefix}ACT_RU_VARIABLE VAR ON RES.PROC_INST_ID_ = VAR.EXECUTION_ID_ and VAR.TASK_ID_ is null
+            left outer join ${prefix}ACT_RU_VARIABLE VAR ON RES.PROC_INST_ID_ = VAR.EXECUTION_ID_
         </if>
       </otherwise>
     </choose>

@@ -40,9 +40,6 @@ public class HitPolicyRuleOrderTest {
 
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
 
-        Map<String, Object> inputVariables = new HashMap<>();
-        inputVariables.put("inputVariable1", 13);
-
         List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")
                 .variable("inputVariable1", 13)

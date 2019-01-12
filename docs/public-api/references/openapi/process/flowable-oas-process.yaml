@@ -4135,7 +4135,7 @@ paths:
       tags:
         - Process Definitions
       summary: Add a candidate starter to a process definition
-      description: It's possible to add either a user or a group.
+      description: It is possible to add either a user or a group.
       operationId: createIdentityLink
       parameters:
         - name: processDefinitionId
@@ -4155,7 +4155,7 @@ paths:
             Indicates the process definition was found and the identity link was
             created.
         '400':
-          description: Indicates the body doesn't contains the correct information.
+          description: Indicates the body does not contain the correct information.
         '404':
           description: Indicates the requested process definition was not found.
       security:

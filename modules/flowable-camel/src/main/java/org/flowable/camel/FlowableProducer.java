@@ -138,7 +138,7 @@ public class FlowableProducer extends DefaultProducer {
             }
         }
         if (execution == null) {
-            throw new FlowableException("Couldn't find activity " + activity + " for processId " + processInstanceId +
+            throw new FlowableException("Could not find activity " + activity + " for processId " + processInstanceId +
                     " in defined timeout of " + timeout + " ms.");
         }
 
