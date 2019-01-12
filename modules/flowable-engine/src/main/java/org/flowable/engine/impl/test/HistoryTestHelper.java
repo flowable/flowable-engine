@@ -108,6 +108,21 @@ public class HistoryTestHelper {
     public static boolean areHistoryJobsAvailable(ManagementService managementService) {
         return !managementService.createHistoryJobQuery().list().isEmpty();
     }
+    
+    public static boolean isHistoricTaskLoggingEnabled(ProcessEngineConfiguration configuration) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) configuration;
+        if (processEngineConfiguration.isEnableHistoricTaskLogging()) {
+
+            // When using async history, we need to process all the historic jobs first before the task log history can be checked
+            if (processEngineConfiguration.isAsyncHistoryEnabled()) {
+                waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, processEngineConfiguration.getManagementService(), 10000, 200);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
 
     private static class InterruptTask extends TimerTask {
 

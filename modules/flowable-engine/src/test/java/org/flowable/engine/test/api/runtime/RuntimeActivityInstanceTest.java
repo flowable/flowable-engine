@@ -224,8 +224,6 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
     public void testActivityInstanceProperties() {
         // Start process instance
         runtimeService.startProcessInstanceByKey("taskAssigneeProcess");
-        
-        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
         // Get task list
         ActivityInstance activityInstance = runtimeService.createActivityInstanceQuery().activityId("theTask").singleResult();
@@ -482,9 +480,9 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertNotNull(processInstance);
 
-//        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
-
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 10000, 200);
 
         managementService.executeCommand(commandContext -> {
             CommandContextUtil.getActivityInstanceEntityManager(commandContext).deleteActivityInstancesByProcessInstanceId(processInstance.getId());
