@@ -568,6 +568,7 @@
                                     }),
                                     success: function() {
                                         paper.clear();
+                                        $('#changeStateButton').hide();
                                         _showProcessDiagram();
                                     }
                                 });
@@ -679,6 +680,8 @@
                                         migrationMappedElements = new Array();
                                         $('#targetModel').hide();
                                         $('#migrationDivider').hide();
+                                        $('#executeMigrationDocument').hide();
+                                        $('#currentMappingValues').hide();
                                         _showProcessDiagram();
                                     }
                                 });
