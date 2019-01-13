@@ -101,7 +101,7 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         assertNull(historicCaseInstance.getParentId());
         assertEquals("someBusinessKey", historicCaseInstance.getBusinessKey());
         assertEquals(caseInstance.getCaseDefinitionId(), historicCaseInstance.getCaseDefinitionId());
-        assertEquals(CaseInstanceState.ACTIVE, historicCaseInstance.getState());
+        assertEquals(CaseInstanceState.COMPLETED, historicCaseInstance.getState());
         assertNotNull(historicCaseInstance.getStartTime());
         assertNotNull(historicCaseInstance.getEndTime());
     }
