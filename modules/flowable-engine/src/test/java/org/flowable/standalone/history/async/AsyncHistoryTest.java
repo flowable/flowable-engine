@@ -14,6 +14,7 @@ package org.flowable.standalone.history.async;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -45,6 +46,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
+    
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     public AsyncHistoryTest() {
         super("asyncHistoryTest");
@@ -506,7 +509,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
             assertThat(historicTaskLogEntry.getExecutionId()).isEqualTo("testExecutionId");
             assertThat(historicTaskLogEntry.getData()).isEqualTo("testData");
             assertThat(historicTaskLogEntry.getLogNumber()).isGreaterThan(0L);
-            assertThat(historicTaskLogEntry.getTimeStamp()).isEqualTo(todayDate);
+            assertThat(simpleDateFormat.format(historicTaskLogEntry.getTimeStamp())).isEqualTo(simpleDateFormat.format(todayDate));
             assertThat(historicTaskLogEntry.getTenantId()).isEqualTo("testTenant");
 
         } finally {

@@ -77,6 +77,7 @@ import org.junit.jupiter.api.Test;
 public class TaskServiceTest extends PluggableFlowableTestCase {
 
     private Task task = null;
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     @AfterEach
     public void tearDown() throws Exception {
@@ -111,7 +112,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         assertThat(updatedTask.getPriority(), is(35));
         assertThat(updatedTask.getOwner(), is("testOwner"));
         assertThat(updatedTask.getAssignee(), is("testAssignee"));
-        assertThat(updatedTask.getDueDate(), is(todayDate));
+        assertThat(simpleDateFormat.format(updatedTask.getDueDate()), is(simpleDateFormat.format(todayDate)));
         assertThat(updatedTask.getCategory(), is("testCategory"));
         assertThat(updatedTask.getParentTaskId(), is("testParentTaskId"));
         assertThat(updatedTask.getTenantId(), is("testTenantId"));
