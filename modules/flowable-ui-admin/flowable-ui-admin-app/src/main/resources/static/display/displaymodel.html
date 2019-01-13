@@ -533,7 +533,7 @@
 			}
 			
 			$(document).ready(function () {
-			     $(document).on('click', '#changeStateButton', function(e) {
+			     $('#changeStateButton').on('click', function(e) {
                     e.preventDefault();
                     
                     var startElementText = '';
@@ -580,7 +580,7 @@
                     });
                  });
                  
-                 $(document).on('click', '#addMappingButton', function(e) {
+                 $('#addMappingButton').on('click', function(e) {
                     e.preventDefault();
                     
                     var fromActivityIds = new Array();
@@ -629,10 +629,9 @@
                     
                     $('#executeMigrationDocument').show();
                     $('#addMappingButton').hide();
-                    
                  });
                  
-                 $(document).on('click', '#executeMigrationDocument', function(e) {
+                 $('#executeMigrationDocument').on('click', function(e) {
                     e.preventDefault();
                     
                     var migrationDocumentPayload = {
@@ -695,7 +694,19 @@
 			     
 			});
 			
-			_showProcessDiagram();
+			elementsAdded = new Array();
+            elementsRemoved = new Array();
+            changeStateStartElementIds = new Array();
+            changeStateStartElements = new Array();
+            changeStateStartGlowElements = new Array();
+            changeStateEndElementIds = new Array();
+            changeStateEndElements = new Array();
+            changeStateEndGlowElements = new Array();
+            
+            migrationMappedElements = new Array();
+            migrationMappedElementsText = new Array();
+            
+            _showProcessDiagram();
 			
 		</script>
     </head>
