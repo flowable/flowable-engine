@@ -180,8 +180,19 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
                 $scope.loadJobs();
                 $scope.loadDecisionTables()
 
-                $scope.tabData.tabs.push({id: 'decisionTables', name: 'PROCESS-INSTANCE.TITLE.DECISION-TABLES'});
-                $scope.tabData.tabs.push({id: 'forms', name: 'PROCESS-INSTANCE.TITLE.FORM-INSTANCES'});
+                var extraTabsAlreadyPresent = false;
+                for (var i = 0; i < $scope.tabData.tabs.length; i++) {
+                    if ($scope.tabData.tabs[i].id == 'decisionTables') {
+                        extraTabsAlreadyPresent = true;
+                        break;
+                    }
+                }
+                
+                if (!extraTabsAlreadyPresent) {
+                    $scope.tabData.tabs.push({id: 'decisionTables', name: 'PROCESS-INSTANCE.TITLE.DECISION-TABLES'});
+                    $scope.tabData.tabs.push({id: 'forms', name: 'PROCESS-INSTANCE.TITLE.FORM-INSTANCES'});
+                }
+                
                 //TODO: implement when decision task runtime data is stored
                 // $scope.loadDecisionTables();
                 $scope.loadFormInstances();
