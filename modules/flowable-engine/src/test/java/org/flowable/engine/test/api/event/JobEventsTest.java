@@ -12,13 +12,13 @@
  */
 package org.flowable.engine.test.api.event;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.apache.commons.lang3.time.DateUtils;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
@@ -42,6 +42,7 @@ import org.junit.jupiter.api.Test;
 public class JobEventsTest extends PluggableFlowableTestCase {
 
     private TestFlowableEntityEventListener listener;
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     /**
      * Test create, update and delete events of jobs entities.
@@ -176,7 +177,7 @@ public class JobEventsTest extends PluggableFlowableTestCase {
         Job newTimerJob = (Job) ((FlowableEntityEvent) event).getEntity();
         checkEventContext(event, rescheduledJob);
         assertEquals(rescheduledJob.getId(), newTimerJob.getId());
-        assertEquals(DateUtils.truncate(rescheduledJob.getDuedate(), Calendar.SECOND), DateUtils.truncate(newTimerJob.getDuedate(), Calendar.SECOND));
+        assertEquals(simpleDateFormat.format(rescheduledJob.getDuedate()), simpleDateFormat.format(newTimerJob.getDuedate()));
 
         event = (FlowableEngineEvent) listener.getEventsReceived().get(4);
         assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());
