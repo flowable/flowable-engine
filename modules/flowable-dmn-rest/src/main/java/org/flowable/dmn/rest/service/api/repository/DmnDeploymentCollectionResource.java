@@ -183,6 +183,10 @@ public class DmnDeploymentCollectionResource {
                 deploymentBuilder.tenantId(tenantId);
             }
 
+            if (restApiInterceptor != null) {
+                restApiInterceptor.enhanceDeployment(deploymentBuilder);
+            }
+
             DmnDeployment deployment = deploymentBuilder.deploy();
 
             response.setStatus(HttpStatus.CREATED.value());
