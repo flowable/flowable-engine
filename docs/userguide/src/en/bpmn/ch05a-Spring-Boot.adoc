@@ -625,7 +625,7 @@ Flowable also provides a Spring Boot `InfoContributor` which looks like:
 ----
 {
   "flowable": {
-    "version": "6.4.1"
+    "version": "6.5.0-SNAPSHOT"
   }
 }
 ----
