@@ -103,6 +103,12 @@
 			<fileset dir="../modules/flowable-identitylink-service/target">
                 <include name="flowable-identitylink-service-*.jar" />
             </fileset>
+            <fileset dir="../modules/flowable-entitylink-service-api/target">
+                <include name="flowable-entitylink-service-api-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-entitylink-service/target">
+                <include name="flowable-entitylink-service-*.jar" />
+            </fileset>
 			<fileset dir="../modules/flowable-job-service-api/target">
                 <include name="flowable-job-service-api-*.jar" />
             </fileset>
