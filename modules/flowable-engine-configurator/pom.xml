@@ -53,6 +53,11 @@
             <artifactId>flowable-cmmn-engine-configurator</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-form-engine-configurator</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <profiles>

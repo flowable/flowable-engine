@@ -27,6 +27,28 @@
 
 <h1>Flowable Release Notes</h1>
 
+<h3>Release Notes - Flowable - 6.4.1</h3>
+
+<h4>Highlights</h4>
+
+<ul>
+    <li>A runtime activity instance table has been added to allow you to query for the activity instances that have been executed for a running process instance without needing
+    to go to the history tables. This includes active and completed activity instances. When a process instance is completed or terminated, the runtime activity instance will be deleted and only available in the historic activity instance table.</li>
+    <li>The sequence flows that are taken are now also stored as part of the runtime and historic activity instance data. This provides a more complete audit history of the process instance execution.</li>
+    <li>A new table has been added to keep track of all changes that happen with a user task. A HistoricTaskLogEntry is created when the assignee of a task changes, or the owner, or for example the due date.
+    By default the user task logging is disabled, with the enableHistoricTaskLogging property in the process engine configuration, the user task logging can be enabled.</li>
+    <li>Several improvements have fixes have been done to the CMMN Engine.</li>
+    <li>A new runtime and historic entity link table has been added to store the relationship between parent entities and all children. This means for example that when a parent process instance has a sub process, and the sub process has a user task, that for the user task
+    two entity links are created, one between the parent process instance and the user task, and another with the sub process instance and the user task. The same is true when a case instance starts a process instance via the CMMN Process Task for example. This makes it possible
+    to get all child tasks for a parent process instance for example. By default, storing entity links is not enabled in the Flowable Engines, but using the enableEntityLinks property in the process engine configuration and/or cmmn engine configuration this can be enabled.</li>
+    <li>A first version of case instance change state has been added to the Flowable CMMN Engine. In the CmmnRuntimeService you can now use the createChangePlanItemStateBuilder to define and execute the case instance change state logic.
+    This first version supports changing state focused on human tasks. In the next version more support will be added for more complex cases.</li>
+    <li>REST services have been added to make it easier to fetch a form definition associated with a user task or a start event. Also, completing a form for a user task or starting a process instance with a form is now a lot easier via REST.
+    Getting a BPMN user task form can be done via GET process-api/runtime/tasks/{taskId}/form for example, and completing a user task can be done via POST process-api/runtime/tasks/{taskId} as it was possible already before. But now the payload can contain a form definition id 
+    and outcome value to complete the user task with a form.</li>
+    <li>Various small bugfixes and improvements all around.</li>
+</ul>
+
 <h3>Release Notes - Flowable - 6.4.0</h3>
 
 <h4>Highlights</h4>

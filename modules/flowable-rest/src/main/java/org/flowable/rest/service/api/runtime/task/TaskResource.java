@@ -98,8 +98,7 @@ public class TaskResource extends TaskBaseResource {
         return restResponseFactory.createTaskResponse(task);
     }
 
-    @ApiOperation(value = "Tasks actions", tags = { "Tasks" },
-            notes = "")
+    @ApiOperation(value = "Tasks actions", tags = { "Tasks" }, notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the action was executed."),
             @ApiResponse(code = 400, message = "When the body contains an invalid value or when the assignee is missing when the action requires it."),

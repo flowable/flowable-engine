@@ -41,7 +41,7 @@ public class GetIdentityLinksForProcessInstanceCmd implements Command<List<Ident
         ExecutionEntity processInstance = CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstanceId);
 
         if (processInstance == null) {
-            throw new FlowableObjectNotFoundException("Cannot find process definition with id " + processInstanceId, ExecutionEntity.class);
+            throw new FlowableObjectNotFoundException("Cannot find process instance with id " + processInstanceId, ExecutionEntity.class);
         }
 
         return (List) processInstance.getIdentityLinks();
