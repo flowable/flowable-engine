@@ -22,6 +22,7 @@ import org.flowable.cmmn.api.history.HistoricVariableInstanceQuery;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
+import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.api.repository.CmmnDeploymentQuery;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
@@ -87,6 +88,8 @@ public interface CmmnRestApiInterceptor {
     void accessDeploymentsWithQuery(CmmnDeploymentQuery deploymentQuery);
     
     void executeNewDeploymentForTenantId(String tenantId);
+
+    void enhanceDeployment(CmmnDeploymentBuilder cmmnDeploymentBuilder);
     
     void deleteDeployment(CmmnDeployment deployment);
     
