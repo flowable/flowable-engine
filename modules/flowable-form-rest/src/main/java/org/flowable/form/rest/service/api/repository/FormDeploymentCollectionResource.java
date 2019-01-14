@@ -180,6 +180,10 @@ public class FormDeploymentCollectionResource {
                 deploymentBuilder.tenantId(tenantId);
             }
 
+            if (restApiInterceptor != null) {
+                restApiInterceptor.enhanceDeployment(deploymentBuilder);
+            }
+
             FormDeployment deployment = deploymentBuilder.deploy();
             response.setStatus(HttpStatus.CREATED.value());
 

@@ -202,6 +202,10 @@ public class AppDeploymentCollectionResource {
                 deploymentBuilder.tenantId(tenantId);
             }
 
+            if (restApiInterceptor != null) {
+                restApiInterceptor.enhanceDeployment(deploymentBuilder);
+            }
+
             AppDeployment deployment = deploymentBuilder.deploy();
             response.setStatus(HttpStatus.CREATED.value());
 
