@@ -38,7 +38,7 @@
     By default the user / human task logging is disabled, with the enableHistoricTaskLogging property in the process or cmmn engine configuration, the user / human task logging can be enabled.</li>
     <li>A new runtime and historic entity link table has been added to store the relationship between parent entities and all children. This means for example that when a parent process instance has a sub process, and the sub process has a user task, that for the user task
     two entity links are created, one between the parent process instance and the user task, and another with the sub process instance and the user task. The same is true when a case instance starts a process instance via the CMMN Process Task for example. This makes it possible
-    to get all child tasks for a parent process instance for example. By default, storing entity links is not enabled in the Flowable Engines, but using the enableEntityLinks property in the process engine configuration and/or CMMN engine configuration this can be enabled.</li>
+    to get all child tasks for a parent process instance for example. By default, storing entity links is not enabled in the Flowable engines, but using the enableEntityLinks property in the process engine configuration and/or CMMN engine configuration this can be enabled.</li>
     <li>Support for DMN 1.2 (<a href="https://www.omg.org/spec/DMN">https://www.omg.org/spec/DMN</a>, still in beta). This is foremost a XSD and parse support.</li>
     <li>Various small bugfixes and improvements all around.</li>
 </ul>
@@ -64,9 +64,9 @@
 <ul>
     <li>Plan item instances are now stored in the runtime tables until the case instance is finished. This allows to query the state of a case instance without having to use the historical api's or data.</li>
     <li>The engine will automatically detect when event listeners (user, generic or timer) are not useful anymore and remove the event listener instances.</li>
-    <li>Addition of a new 'trigger mode' called "on event" for event resolving in sentries that allows to scope the event evaluation to that evaluation cycle only (versus with memory as is the default). This enabled advanced models where events only should be evaluated within a specific moment.</li>
-    <li>Addition of task and plan item lifecycle listener, similar to task and execution listeners in BPMN.</li>
-    <li>To support modeling arbitrary user or automated actions in CMMN, it is now possible to use a 'generic event listeners'. This event listeners behaves like user event listeners, but can be triggered programmatically through an API (see the CmmnRuntimeService).</li>
+    <li>Addition of a new 'trigger mode' called "on event" for event resolving in sentries that allows to scope the event evaluation to that evaluation cycle only (versus with memory as is the default). This enables advanced models where events (and consequentially the related sentries) only should be evaluated at the moment they happen.</li>
+    <li>Addition of the task and plan item lifecycle listener, similar to task and execution listeners in BPMN.</li>
+    <li>To support modeling arbitrary user or automated actions in CMMN, it is now possible to use a 'generic event listeners'. This event listener behaves like a user event listener, but can be triggered programmatically through an API (see the CmmnRuntimeService).</li>
     <li>It is now possible to make a user or generic event listeners repeatable, which allows a more natural way of modeling cases where a certain event happens multiple times.</li>
     <li>Greatly improved cross border resolving of sentry dependencies (across multiple and potentially nested stages).</li>
     <li>A first version of case instance change state has been added to the Flowable CMMN Engine. In the CmmnRuntimeService you can now use the createChangePlanItemStateBuilder to define and execute the case instance change state logic.
