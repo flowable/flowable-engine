@@ -249,16 +249,18 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
     @Override
     public void recordTaskCreated(TaskEntity task, ExecutionEntity execution) {
         String processDefinitionId = null;
+        String tenantId = null;
         if (execution != null) {
             processDefinitionId = execution.getProcessDefinitionId();
         } else if (task != null) {
             processDefinitionId = task.getProcessDefinitionId();
+            tenantId = task.getTenantId();
         }
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processDefinitionId)) {
             Map<String, String> data = new HashMap<>();
             addCommonTaskFields(task, execution, data);
 
-            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_TASK_CREATED, data, task.getTenantId());
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_TASK_CREATED, data, tenantId);
         }
     }
     
@@ -503,9 +505,8 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
     public void recordFormPropertiesSubmitted(ExecutionEntity execution, Map<String, String> properties, String taskId) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, execution.getProcessDefinitionId())) {
             Map<String, String> data = new HashMap<>();
-            if (execution != null) {
-                addProcessDefinitionFields(data, execution.getProcessDefinitionId());
-            }
+            addProcessDefinitionFields(data, execution.getProcessDefinitionId());
+
             putIfNotNull(data, HistoryJsonConstants.PROCESS_INSTANCE_ID, execution.getProcessInstanceId());
             putIfNotNull(data, HistoryJsonConstants.EXECUTION_ID, execution.getId());
             putIfNotNull(data, HistoryJsonConstants.TASK_ID, taskId);
