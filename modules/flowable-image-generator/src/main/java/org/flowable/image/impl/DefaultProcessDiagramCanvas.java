@@ -288,9 +288,7 @@ public class DefaultProcessDiagramCanvas {
         minX = (minX <= 5) ? 5 : minX;
         minY = (minY <= 5) ? 5 : minY;
         BufferedImage imageToSerialize = processDiagram;
-        if (minX >= 0 && minY >= 0) {
-            imageToSerialize = processDiagram.getSubimage(minX - 5, minY - 5, canvasWidth - minX + 5, canvasHeight - minY + 5);
-        }
+        imageToSerialize = processDiagram.getSubimage(minX - 5, minY - 5, canvasWidth - minX + 5, canvasHeight - minY + 5);
         return imageToSerialize;
     }
 
