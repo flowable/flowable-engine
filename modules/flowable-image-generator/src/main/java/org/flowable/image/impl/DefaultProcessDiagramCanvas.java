@@ -796,14 +796,14 @@ public class DefaultProcessDiagramCanvas {
             }
         }
 
-        int currentY = y + (centered ? ((boxHeight - currentHeight) / 2) : 0);
-        int currentX = 0;
+        float currentY = y + (centered ? ((boxHeight - currentHeight) / 2) : 0);
+        float currentX = 0;
 
         // Actually draw the lines
         for (TextLayout textLayout : layouts) {
 
             currentY += textLayout.getAscent();
-            currentX = x + (centered ? ((boxWidth - ((Double) textLayout.getBounds().getWidth()).intValue()) / 2) : 0);
+            currentX = x + (centered ? ((boxWidth - ((Double) textLayout.getBounds().getWidth()).floatValue()) / 2) : 0);
 
             textLayout.draw(g, currentX, currentY);
             currentY += textLayout.getDescent() + textLayout.getLeading();
@@ -1135,7 +1135,6 @@ public class DefaultProcessDiagramCanvas {
         g.setFont(ANNOTATION_FONT);
 
         Path2D path = new Path2D.Double();
-        x += .5;
         int lineLength = 18;
         path.moveTo(x + lineLength, y);
         path.lineTo(x, y);
@@ -1180,7 +1179,7 @@ public class DefaultProcessDiagramCanvas {
             g.setFont(LABEL_FONT);
 
             int wrapWidth = 100;
-            int textY = (int) graphicInfo.getY();
+            double textY = graphicInfo.getY();
 
             // TODO: use drawMultilineText()
             AttributedString as = new AttributedString(text);
@@ -1198,7 +1197,7 @@ public class DefaultProcessDiagramCanvas {
                 if (centered) {
                     tX += (int) (graphicInfo.getWidth() / 2 - bb.getWidth() / 2);
                 }
-                tl.draw(g, (float) tX, textY);
+                tl.draw(g, (float) tX, (float) textY);
                 textY += tl.getDescent() + tl.getLeading() + (interline - 1.0f) * tl.getAscent();
             }
 
