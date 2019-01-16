@@ -273,7 +273,7 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         int engineMajorVersion = Integer.valueOf(cleanEngineVersionSplitted[0]);
         int engineMinorVersion = Integer.valueOf(cleanEngineVersionSplitted[1]);
 
-        if ((dbMajorVersion > engineMajorVersion) || ((dbMajorVersion <= engineMajorVersion) && (dbMinorVersion > engineMinorVersion))) {
+        if ((dbMajorVersion > engineMajorVersion) || (dbMinorVersion > engineMinorVersion)) {
             throw new FlowableException("Version of flowable database (" + versionInDatabase + ") is more recent than the engine (" + ProcessEngine.VERSION + ")");
         } else if (cleanDbVersion.compareTo(cleanEngineVersion) == 0) {
             // Versions don't match exactly, possibly snapshot is being used
