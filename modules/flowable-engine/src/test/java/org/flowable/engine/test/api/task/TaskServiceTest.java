@@ -66,6 +66,8 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.TaskPostProcessor;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -993,6 +995,96 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         // Verify task parameters set on execution
         Execution subExecution = runtimeService.createExecutionQuery().parentId(processInstance.getId()).singleResult();
         assertEquals("myUpdatedName", subExecution.getName());
+    }
+
+    @Test
+    @Deployment(resources = {"org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml"})
+    public void testCompleteWithExistingVariableParametersTask_withoutBase() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess",
+                Collections.singletonMap("newVariable", "oldValue")
+            );
+
+        // Fetch first task
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("First task", task.getName());
+
+        // Complete first task
+        Map<String, Object> taskParams = new HashMap<>();
+        taskParams.put("${newVariable}", "newVariableValue");
+        taskService.complete(task.getId(), taskParams);
+
+        // Verify task parameters set on execution
+        Execution subExecution = runtimeService.createExecutionQuery().parentId(processInstance.getId()).singleResult();
+        Map<String, VariableInstance> variableInstances = runtimeService.getVariableInstances(subExecution.getId());
+        assertEquals("newVariableValue", variableInstances.get("newVariable").getTextValue());
+
+        HistoricVariableInstance historicVariableInstance = this.historyService.createHistoricVariableInstanceQuery().id(variableInstances.get("newVariable").getId())
+            .singleResult();
+        assertEquals("newVariableValue", historicVariableInstance.getValue());
+    }
+
+    @Test
+    @Deployment(resources = {"org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml"})
+    public void testCompleteWithExistingNewVariableParametersTask_withoutBase() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
+
+        // Fetch first task
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("First task", task.getName());
+
+        // Complete first task
+        Map<String, Object> taskParams = new HashMap<>();
+        taskParams.put("${newVariable}", "newVariableValue");
+
+        try {
+            taskService.complete(task.getId(), taskParams);
+            fail("expected exception");
+        } catch (FlowableException e) {
+            // expected exception.
+        }
+    }
+
+    @Test
+    @Deployment(resources = {"org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml"})
+    public void testCompleteWithExistingNewVariableParametersTask() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
+
+        // Fetch first task
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("First task", task.getName());
+
+        // Complete first task
+        Map<String, Object> taskParams = new HashMap<>();
+        taskParams.put("${execution.newVariable}", "newVariableValue");
+
+        try {
+            taskService.complete(task.getId(), taskParams);
+            fail("expected exception");
+        } catch (FlowableException e) {
+            // expected exception.
+        }
+    }
+
+    @Test
+    @Deployment(resources = {"org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml"})
+    public void testCompleteWithExistingVariableParametersTask() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess",
+            Collections.singletonMap("newVariable", "oldValue")
+        );
+
+        // Fetch first task
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("First task", task.getName());
+
+        // Complete first task
+        Map<String, Object> taskParams = new HashMap<>();
+        taskParams.put("${execution.newVariable}", "newVariableValue");
+        try {
+            taskService.complete(task.getId(), taskParams);
+            fail("expected exception");
+        } catch (FlowableException e) {
+            // expected exception.
+        }
     }
 
     @Test
