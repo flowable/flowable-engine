@@ -57,6 +57,9 @@ public class VariableCreatedHistoryJsonTransformer extends AbstractHistoryJsonTr
         historicVariableInstanceEntity.setTaskId(getStringFromJson(historicalData, HistoryJsonConstants.TASK_ID));
         historicVariableInstanceEntity.setRevision(getIntegerFromJson(historicalData, HistoryJsonConstants.REVISION));
         historicVariableInstanceEntity.setName(getStringFromJson(historicalData, HistoryJsonConstants.NAME));
+        historicVariableInstanceEntity.setScopeId(getStringFromJson(historicalData, HistoryJsonConstants.SCOPE_ID));
+        historicVariableInstanceEntity.setSubScopeId(getStringFromJson(historicalData, HistoryJsonConstants.SUB_SCOPE_ID));
+        historicVariableInstanceEntity.setScopeType(getStringFromJson(historicalData, HistoryJsonConstants.SCOPE_TYPE));
         
         VariableTypes variableTypes = CommandContextUtil.getProcessEngineConfiguration().getVariableTypes();
         VariableType variableType = variableTypes.getVariableType(getStringFromJson(historicalData, HistoryJsonConstants.VARIABLE_TYPE));
