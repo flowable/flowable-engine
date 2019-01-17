@@ -218,8 +218,9 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SCOPE_ID, identityLink.getScopeId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CASE_INSTANCE_ID, identityLink.getScopeId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SCOPE_TYPE, identityLink.getScopeType());
-        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CASE_DEFINITION_ID, identityLink.getScopeType());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CASE_DEFINITION_ID, identityLink.getScopeDefinitionId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_TASK_ID, identityLink.getTaskId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_PROCESS_INSTANCE_ID, identityLink.getProcessInstanceId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_IDENTITY_LINK_TYPE, identityLink.getType());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_USER_ID, identityLink.getUserId());
     }
@@ -308,6 +309,9 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_TASK_ID, variable.getTaskId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REVISION, variable.getRevision());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_NAME, variable.getName());
+        
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_EXECUTION_ID, variable.getExecutionId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_PROCESS_INSTANCE_ID, variable.getProcessInstanceId());
         
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CASE_INSTANCE_ID, variable.getScopeId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SCOPE_ID, variable.getScopeId());
