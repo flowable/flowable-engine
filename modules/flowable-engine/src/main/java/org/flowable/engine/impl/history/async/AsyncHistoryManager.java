@@ -249,18 +249,16 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
     @Override
     public void recordTaskCreated(TaskEntity task, ExecutionEntity execution) {
         String processDefinitionId = null;
-        String tenantId = null;
         if (execution != null) {
             processDefinitionId = execution.getProcessDefinitionId();
-        } else if (task != null) {
+        } else {
             processDefinitionId = task.getProcessDefinitionId();
-            tenantId = task.getTenantId();
         }
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processDefinitionId)) {
             Map<String, String> data = new HashMap<>();
             addCommonTaskFields(task, execution, data);
 
-            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_TASK_CREATED, data, tenantId);
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_TASK_CREATED, data, task.getTenantId());
         }
     }
     
