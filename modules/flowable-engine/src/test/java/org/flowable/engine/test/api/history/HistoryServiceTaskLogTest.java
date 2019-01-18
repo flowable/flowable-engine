@@ -13,6 +13,7 @@
 package org.flowable.engine.test.api.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.flowable.engine.test.util.TestProcessUtil.equalToDbVendorDate;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -412,7 +413,7 @@ public class HistoryServiceTaskLogTest {
             assertThat(historicTaskLogEntry.getUserId()).isEqualTo("testUser");
             assertThat(historicTaskLogEntry.getTaskId()).isEqualTo(task.getId());
             assertThat(historicTaskLogEntry.getType()).isEqualTo("customType");
-            assertThat(historicTaskLogEntry.getTimeStamp()).isEqualTo(todayDate);
+            assertThat(historicTaskLogEntry.getTimeStamp()).is(equalToDbVendorDate(processEngineConfiguration.getDatabaseType(), todayDate));
             assertThat(historicTaskLogEntry.getData()).isEqualTo("testData");
             historyService.deleteHistoricTaskLogEntry(historicTaskLogEntry.getLogNumber());
         }

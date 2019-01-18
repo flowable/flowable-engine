@@ -12,6 +12,14 @@
  */
 package org.flowable.engine.test.util;
 
+import static org.flowable.common.engine.impl.AbstractEngineConfiguration.DATABASE_TYPE_MSSQL;
+
+import java.time.Instant;
+import java.util.Date;
+import java.util.function.Predicate;
+
+import org.assertj.core.api.Condition;
+import org.assertj.core.util.DateUtil;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.SequenceFlow;
@@ -22,6 +30,8 @@ import org.flowable.bpmn.model.UserTask;
  * @author Joram Barrez
  */
 public class TestProcessUtil {
+
+    public static final int MSSQL_TIMESTAMP_PRECISION_IN_MILLIS = 5;
 
     /**
      * Since the 'one task process' is used everywhere the actual process content doesn't matter, instead of copying around the BPMN 2.0 xml one could use this method which gives a {@link BpmnModel}
@@ -92,6 +102,34 @@ public class TestProcessUtil {
         process.addFlowElement(new SequenceFlow("task2", "theEnd"));
 
         return model;
+    }
+
+    /**
+     * Equal condition for DB vendor specific time stamps. MsSql time stamp precision is +/- 3.3 ms.
+     *
+     * @param databaseType database type identifier
+     * @param expectedDate expected date
+     * @return isEqualTo condition for timestamps
+     */
+    public static Condition<? super Date> equalToDbVendorDate(String databaseType, Date expectedDate) {
+        Predicate<Date> datePredicate;
+        if (DATABASE_TYPE_MSSQL.equalsIgnoreCase(databaseType)) {
+            datePredicate = date -> {
+                if (date == null && expectedDate == null) {
+                    return true;
+                }
+                if (date == null || expectedDate == null) {
+                    return false;
+                }
+                Instant dateInstant = date.toInstant();
+                Instant expectedInstant = expectedDate.toInstant();
+                return dateInstant.isAfter(expectedInstant.minusMillis(MSSQL_TIMESTAMP_PRECISION_IN_MILLIS)) && dateInstant.isBefore(expectedInstant.minusMillis(MSSQL_TIMESTAMP_PRECISION_IN_MILLIS));
+            };
+        } else {
+            datePredicate = date -> expectedDate.equals(date);
+        }
+        return new Condition<>(datePredicate, DateUtil.newIsoDateTimeWithMsFormat().format(expectedDate));
+
     }
 
 }
