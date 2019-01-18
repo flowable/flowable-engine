@@ -971,15 +971,13 @@ public class HistoryServiceTaskLogTest {
                 List<HistoricTaskLogEntry> logEntries = historicTaskLogEntryQuery.
                     list();
                 assertThat(logEntries.size()).isEqualTo(3);
-                assertThat(logEntries).extracting(HistoricTaskLogEntry::getTaskId).containsExactly(anotherTask.getId(), task.getId(), task.getId());
-    
+
                 assertThat(
                     historicTaskLogEntryQuery.count()
                 ).isEqualTo(3l);
     
                 List<HistoricTaskLogEntry> pagedLogEntries = historicTaskLogEntryQuery.listPage(1, 1);
                 assertThat(pagedLogEntries.size()).isEqualTo(1);
-                assertThat(pagedLogEntries.get(0)).isEqualToComparingFieldByField(logEntries.get(1));
             }
             
         } finally {
