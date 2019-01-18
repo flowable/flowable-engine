@@ -54,6 +54,14 @@ public class FlowableVersion {
     }
 
     @Override
+    public int hashCode() {
+        int result = 0;
+        result = 31 * result + (mainVersion != null ? mainVersion.hashCode() : 0);
+        result = 31 * result + (alternativeVersionStrings != null ? alternativeVersionStrings.hashCode() : 0);
+        return result;
+    }
+    
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof FlowableVersion)) {
             return false;
