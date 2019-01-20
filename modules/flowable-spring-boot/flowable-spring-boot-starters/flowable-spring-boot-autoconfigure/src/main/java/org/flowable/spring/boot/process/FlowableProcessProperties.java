@@ -35,7 +35,7 @@ public class FlowableProcessProperties {
 
     /**
      * The maximum amount of process definitions available in the process definition cache.
-     * Per default it is 1 (all process definitions)
+     * Per default it is -1 (all process definitions).
      */
     protected int definitionCacheLimit = -1;
 
