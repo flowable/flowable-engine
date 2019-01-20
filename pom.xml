@@ -1358,14 +1358,6 @@
 			</modules>
 		</profile>
 		<profile>
-			<id>checkspring</id> <!-- [Joram] Is this still used?? -->
-			<modules>
-                <module>modules/flowable-spring-common</module>
-				<module>modules/flowable-idm-spring</module>
-				<module>modules/flowable-spring</module>
-			</modules>
-		</profile>
-		<profile>
 			<id>checkcdi</id>
 			<modules>
 				<module>modules/flowable-cdi</module>
