@@ -171,7 +171,7 @@ public class TaskResource extends TaskBaseResource {
             @ApiResponse(code = 200, message = "Indicates request was successful and the task form is returned"),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
     })
-    @GetMapping(value = "/runtime/tasks/{taskId}/form", produces = "application/json")
+    @GetMapping(value = "/runtime/tasks/{taskId}/form", produces = "application/json;charset=UTF-8")
     public String getTaskForm(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
         Task task = getTaskFromRequest(taskId);
         if (StringUtils.isEmpty(task.getFormKey())) {
