@@ -165,11 +165,11 @@ public abstract class LiquibaseBasedSchemaManager implements SchemaManager {
             return new Liquibase(changeLogFile, new ClassLoaderResourceAccessor(), database);
 
         } catch (Exception e) {
-            throw new FlowableException("Error creating " + context + "liquibase instance", e);
-        } finally {
+            // We only close the connection if an exception occurred, otherwise the Liquibase instance cannot be used
             if (jdbcConnection != null && closeConnection) {
                 jdbcConnection.close();
             }
+            throw new FlowableException("Error creating " + context + "liquibase instance", e);
         }
     }
 
