@@ -19,8 +19,8 @@ import org.flowable.ldap.LDAPGroupCache;
 import org.flowable.ldap.LDAPIdentityServiceImpl;
 import org.flowable.ldap.LDAPQueryBuilder;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
-import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.FlowableSecurityAutoConfiguration;
+import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnLdap;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
 import org.flowable.spring.security.FlowableAuthenticationProvider;
@@ -30,6 +30,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
@@ -87,7 +88,12 @@ public class FlowableLdapAutoConfiguration {
             .setIdmIdentityService(new LDAPIdentityServiceImpl(ldapConfiguration, createCache(idmEngineConfiguration, ldapConfiguration)));
     }
 
+    // We need a custom AuthenticationProvider for the LDAP Support
+    // since the default (DaoAuthenticationProvider) from Spring Security
+    // uses a Password encoder to perform the matching and we need to use
+    // the IdmIdentityService for LDAP
     @Bean
+    @ConditionalOnMissingBean(AuthenticationProvider.class)
     public FlowableAuthenticationProvider flowableAuthenticationProvider(IdmIdentityService idmIdentitySerivce,
         UserDetailsService userDetailsService) {
         return new FlowableAuthenticationProvider(idmIdentitySerivce, userDetailsService);
