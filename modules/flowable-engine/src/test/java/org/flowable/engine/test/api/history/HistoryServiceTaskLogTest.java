@@ -978,8 +978,8 @@ public class HistoryServiceTaskLogTest {
     
                 List<HistoricTaskLogEntry> pagedLogEntries = historicTaskLogEntryQuery.listPage(1, 1);
                 assertThat(pagedLogEntries.size()).isEqualTo(1);
+                assertThat(pagedLogEntries.get(0).getLogNumber()).isEqualTo(logEntries.get(1).getLogNumber());
             }
-            
         } finally {
             deleteTaskWithLogEntries(taskService, managementService, processEngineConfiguration, anotherTask.getId());
         }
