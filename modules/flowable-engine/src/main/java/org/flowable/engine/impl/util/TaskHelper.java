@@ -20,6 +20,7 @@ import java.util.Map;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -371,6 +372,8 @@ public class TaskHelper {
         if (task != null) {
             if (task.getExecutionId() != null) {
                 throw new FlowableException("The task cannot be deleted because is part of a running process");
+            } else if (task.getScopeId() != null && ScopeTypes.CMMN.equals(task.getScopeType())) {
+                throw new FlowableException("The task cannot be deleted because is part of a running case");
             }
 
             if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext,task.getProcessDefinitionId())) {
