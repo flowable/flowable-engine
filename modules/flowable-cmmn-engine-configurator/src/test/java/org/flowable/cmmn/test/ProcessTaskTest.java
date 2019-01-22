@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.test;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -33,6 +34,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -738,4 +740,16 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         }
     }
 
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/ProcessTaskTest.testOneTaskProcessBlocking.cmmn")
+    public void testDeleteProcessTaskShouldNotBePossible() {
+        CaseInstance caseInstance = startCaseInstanceWithOneTaskProcess();
+
+        Task task = processEngine.getTaskService().createTaskQuery().singleResult();
+
+        assertThatThrownBy(() -> cmmnTaskService.deleteTask(task.getId()))
+            .isExactlyInstanceOf(FlowableException.class)
+            .hasMessageContaining("The task cannot be deleted")
+            .hasMessageContaining("running process");
+    }
 }
