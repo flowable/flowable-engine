@@ -40,7 +40,7 @@ import liquibase.util.StringUtils;
 /**
  * @author Joram Barrez
  */
-public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements PlanItemActivityBehavior {
+public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior implements PlanItemActivityBehavior {
 
     protected Process process;
     protected Expression processRefExpression;
@@ -60,7 +60,7 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
     }
 
     @Override
-    public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+    public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, Map<String, Object> variables) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         ProcessInstanceService processInstanceService = cmmnEngineConfiguration.getProcessInstanceService();
         if (processInstanceService == null) {
@@ -103,6 +103,10 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
             }
 
             inParametersMap.put(variableName, variableValue);
+        }
+        
+        if (variables != null && !variables.isEmpty()) {
+            inParametersMap.putAll(variables);
         }
 
         String processInstanceId = processInstanceService.generateNewProcessInstanceId();
