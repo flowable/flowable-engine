@@ -55,6 +55,8 @@ public class TaskHelper {
         if (task != null) {
             if (task.getScopeId() != null && ScopeTypes.CMMN.equals(task.getScopeType())) {
                 throw new FlowableException("The task cannot be deleted because is part of a running case instance");
+            } else if (task.getExecutionId() != null) {
+                throw new FlowableException("The task cannot be deleted because is part of a running process instance");
             }
             deleteTask(task, deleteReason, cascade, true);
             
