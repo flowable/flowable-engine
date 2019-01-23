@@ -17,7 +17,6 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
-import org.flowable.cmmn.editor.json.converter.util.ListenerConverterUtil;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanItem;
@@ -29,7 +28,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Joram Barrez
  */
-public class TimerEventListenerJsonConverter extends BaseCmmnJsonConverter {
+public class TimerEventListenerJsonConverter extends AbstractEventListenerJsonConverter {
     
     @Override
     protected String getStencilId(BaseElement baseElement) {
@@ -64,7 +63,7 @@ public class TimerEventListenerJsonConverter extends BaseCmmnJsonConverter {
             propertiesNode.put(PROPERTY_TIMER_START_TRIGGER_STANDARD_EVENT, timerEventListener.getTimerStartTriggerStandardEvent());
         }
 
-        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, timerEventListener);
+        convertCommonElementToJson(elementNode, propertiesNode, baseElement);
     }
 
     @Override
@@ -88,8 +87,8 @@ public class TimerEventListenerJsonConverter extends BaseCmmnJsonConverter {
             }
         }
 
-        ListenerConverterUtil.convertJsonToLifeCycleListeners(elementNode, timerEventListener);
-        
+        convertCommonJsonToElement(elementNode, timerEventListener);
+
         return timerEventListener;
         
     }
