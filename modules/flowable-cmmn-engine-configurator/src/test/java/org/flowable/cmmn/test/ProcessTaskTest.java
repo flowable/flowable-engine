@@ -454,7 +454,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         CaseInstance caseInstance = caseInstanceBuilder.start();
 
         assertEquals(0, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
-        assertEquals(0L, processEngineRuntimeService.createProcessInstanceQuery().count());
+        assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
 
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())

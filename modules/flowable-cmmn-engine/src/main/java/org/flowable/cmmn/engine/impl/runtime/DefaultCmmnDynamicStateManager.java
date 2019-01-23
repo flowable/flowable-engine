@@ -22,6 +22,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
@@ -31,14 +32,32 @@ public class DefaultCmmnDynamicStateManager extends AbstractCmmnDynamicStateMana
 
     @Override
     public void movePlanItemInstanceState(ChangePlanItemStateBuilderImpl changePlanItemStateBuilder, CommandContext commandContext) {
-        List<MovePlanItemInstanceEntityContainer> movePlanItemInstanceEntityContainerList = resolveMovePlanItemInstanceEntityContainers(changePlanItemStateBuilder, null, changePlanItemStateBuilder.getCaseVariables(), commandContext);
-        List<PlanItemInstanceEntity> planItemInstances = movePlanItemInstanceEntityContainerList.iterator().next().getPlanItemInstances();
-        String caseInstanceId = planItemInstances.iterator().next().getCaseInstanceId();
+        List<MovePlanItemInstanceEntityContainer> movePlanItemInstanceEntityContainerList = resolveMovePlanItemInstanceEntityContainers(changePlanItemStateBuilder, 
+                        null, changePlanItemStateBuilder.getCaseVariables(), commandContext);
+        
+        String caseInstanceId = null;
+        if (movePlanItemInstanceEntityContainerList.size() > 0) {
+            List<PlanItemInstanceEntity> planItemInstances = movePlanItemInstanceEntityContainerList.iterator().next().getPlanItemInstances();
+            caseInstanceId = planItemInstances.iterator().next().getCaseInstanceId();
+        
+        } else if (!changePlanItemStateBuilder.getActivatePlanItemDefinitionIdList().isEmpty()) {
+            caseInstanceId = changePlanItemStateBuilder.getCaseInstanceId();
+        
+        } else if (!changePlanItemStateBuilder.getChangePlanItemToAvailableIdList().isEmpty()) {
+            caseInstanceId = changePlanItemStateBuilder.getCaseInstanceId();
+        }
+        
+        if (caseInstanceId == null) {
+            throw new FlowableException("Could not resolve case instance id");
+        }
         
         CaseInstanceChangeState caseInstanceChangeState = new CaseInstanceChangeState()
             .setCaseInstanceId(caseInstanceId)
             .setMovePlanItemInstanceEntityContainers(movePlanItemInstanceEntityContainerList)
-            .setCaseVariables(changePlanItemStateBuilder.getCaseVariables());
+            .setActivatePlanItemDefinitionIds(changePlanItemStateBuilder.getActivatePlanItemDefinitionIdList())
+            .setChangePlanItemToAvailableIdList(changePlanItemStateBuilder.getChangePlanItemToAvailableIdList())
+            .setCaseVariables(changePlanItemStateBuilder.getCaseVariables())
+            .setChildInstanceTaskVariables(changePlanItemStateBuilder.getChildInstanceTaskVariables());
         
         doMovePlanItemState(caseInstanceChangeState, commandContext);
     }

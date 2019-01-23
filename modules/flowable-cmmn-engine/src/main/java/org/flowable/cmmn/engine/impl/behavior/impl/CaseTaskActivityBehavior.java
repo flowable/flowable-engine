@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
@@ -34,7 +36,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 /**
  * @author Joram Barrez
  */
-public class CaseTaskActivityBehavior extends TaskActivityBehavior implements PlanItemActivityBehavior {
+public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implements PlanItemActivityBehavior {
 
     protected Expression caseRefExpression;
     protected Boolean fallbackToDefaultTenant;
@@ -46,7 +48,7 @@ public class CaseTaskActivityBehavior extends TaskActivityBehavior implements Pl
     }
 
     @Override
-    public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+    public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, Map<String, Object> variables) {
 
         CaseInstanceHelper caseInstanceHelper = CommandContextUtil.getCaseInstanceHelper(commandContext);
         CaseInstanceBuilder caseInstanceBuilder = new CaseInstanceBuilderImpl().
@@ -60,6 +62,10 @@ public class CaseTaskActivityBehavior extends TaskActivityBehavior implements Pl
         
         if (fallbackToDefaultTenant != null && fallbackToDefaultTenant) {
             caseInstanceBuilder.fallbackToDefaultTenant();
+        }
+        
+        if (variables != null && !variables.isEmpty()) {
+            caseInstanceBuilder.variables(variables);
         }
 
         CaseInstanceEntity caseInstanceEntity = caseInstanceHelper.startCaseInstance(caseInstanceBuilder);
