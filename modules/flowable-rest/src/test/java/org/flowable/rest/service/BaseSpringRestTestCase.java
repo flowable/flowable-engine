@@ -328,6 +328,13 @@ public class BaseSpringRestTestCase {
         }
     }
 
+    public JsonNode readContent(CloseableHttpResponse response) {
+        try {
+            return objectMapper.readTree(response.getEntity().getContent());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
     public void closeResponse(CloseableHttpResponse response) {
         if (response != null) {
             try {

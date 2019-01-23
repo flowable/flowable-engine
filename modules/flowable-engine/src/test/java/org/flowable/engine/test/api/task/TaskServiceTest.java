@@ -102,7 +102,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
                         formKey("testFormKey").
                         taskDefinitionId("testDefinitionId").
                         taskDefinitionKey("testDefinitionKey").
-                        scopeType(ScopeTypes.CMMN).
+                        scopeType(ScopeTypes.TASK).
                         scopeId("scopeIdValue").
                         create();
         Task updatedTask = taskService.createTaskQuery().taskId(task.getId()).singleResult();
@@ -120,7 +120,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         assertThat(updatedTask.getTaskDefinitionId(), is("testDefinitionId"));
         assertThat(updatedTask.getTaskDefinitionKey(), is("testDefinitionKey"));
         assertThat(updatedTask.getScopeId(), is("scopeIdValue"));
-        assertThat(updatedTask.getScopeType(), is(ScopeTypes.CMMN));
+        assertThat(updatedTask.getScopeType(), is(ScopeTypes.TASK));
     }
 
     @Test
