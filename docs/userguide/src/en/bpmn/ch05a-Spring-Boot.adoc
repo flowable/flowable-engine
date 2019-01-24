@@ -166,7 +166,7 @@ The XML content of the process definition is shown below. Notice that, for the m
     <process id="oneTaskProcess" name="The One Task Process">
         <startEvent id="theStart" />
         <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
-        <userTask id="theTask" name="my task" assignee="kermit" />
+        <userTask id="theTask" name="my task" flowable:assignee="kermit" />
         <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd" />
         <endEvent id="theEnd" />
     </process>
