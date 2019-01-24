@@ -35,10 +35,10 @@ public class InitPlanModelInstanceOperation extends AbstractCaseInstanceOperatio
         super.run();
         
         Stage stage = CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId()).getPlanModel();
-        createPlanItemInstances(commandContext, 
+        createPlanItemInstancesForNewStage(commandContext,
                 stage.getPlanItems(), 
                 caseInstanceEntity.getCaseDefinitionId(), 
-                caseInstanceEntity.getId(), 
+                caseInstanceEntity,
                 null, 
                 caseInstanceEntity.getTenantId());
         

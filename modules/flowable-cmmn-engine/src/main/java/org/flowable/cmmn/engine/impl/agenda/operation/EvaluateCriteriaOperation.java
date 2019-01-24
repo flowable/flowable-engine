@@ -13,10 +13,12 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
@@ -190,6 +192,17 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             }
         }
 
+        // There are potentially plan items with a 'create condition' that haven't been created before
+        List<PlanItemInstanceEntity> newlyCreatedPlanItemInstances = evaluatePlanItemsWithCreateCondition(planItemInstanceContainer);
+        if (!newlyCreatedPlanItemInstances.isEmpty()) {
+            if (newChildPlanItemInstances == null) {
+                newChildPlanItemInstances = new ArrayList<>(newlyCreatedPlanItemInstances.size());
+            }
+            newChildPlanItemInstances.addAll(newlyCreatedPlanItemInstances);
+        }
+
+        // The direct child plan item instance have been checked.
+        // However, the event which triggered this evaluation could also impact cross border dependencies.
         evaluateDependentPlanItems();
 
         // After the loop, the newly created plan item instances can be added
@@ -210,7 +223,8 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         return null;
     }
 
-    protected String evaluateExitCriteria(EntityWithSentryPartInstances entityWithSentryPartInstances, HasExitCriteria hasExitCriteria) { // EntityWithSentryPartInstances -> can be used for both case instance and plan item instance
+    // EntityWithSentryPartInstances -> can be used for both case instance and plan item instance
+    protected String evaluateExitCriteria(EntityWithSentryPartInstances entityWithSentryPartInstances, HasExitCriteria hasExitCriteria) {
         List<Criterion> criteria = hasExitCriteria.getExitCriteria();
         if (criteria != null && !criteria.isEmpty()) {
             return evaluateCriteria(entityWithSentryPartInstances, criteria);
@@ -460,6 +474,49 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         }
     }
 
+    protected List<PlanItemInstanceEntity> evaluatePlanItemsWithCreateCondition(PlanItemInstanceContainer planItemInstanceContainer) {
+        if (!planItemInstanceContainer.getPlanItems().isEmpty()) {
+
+            // Find event listeners with a create condition
+            List<PlanItem> planItemsToCreate = planItemInstanceContainer.getPlanItems().stream()
+                .filter(planItem -> planItem.getPlanItemDefinition() instanceof EventListener // Only event listeners have a create condition currently
+                    && StringUtils.isNotEmpty(((EventListener) planItem.getPlanItemDefinition()).getCreateConditionExpression())
+                    && !childPlanItemInstanceForPlanItemExists(planItemInstanceContainer, planItem)
+                    // To check if the plan item instance hasn't been created before
+                    && evaluateCreateCondition(commandContext, planItem, (VariableContainer) planItemInstanceContainer))
+                .collect(Collectors.toList());
+
+            // Create the plan item instance for the found plan items
+            if (!planItemsToCreate.isEmpty()) {
+
+                List<PlanItemInstanceEntity> planItemInstances = new ArrayList<>(planItemsToCreate.size());
+                for (PlanItem planItem : planItemsToCreate) {
+
+                    PlanItemInstanceEntity stagePlanItemInstanceEntity = null;
+                    if (planItemInstanceContainer instanceof PlanItemInstanceEntity) {
+                        stagePlanItemInstanceEntity = (PlanItemInstanceEntity) planItemInstanceContainer;
+                    }
+
+                    PlanItemInstanceEntity childPlanItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
+                        .createChildPlanItemInstance(planItem,
+                            caseInstanceEntity.getCaseDefinitionId(),
+                            caseInstanceEntity.getId(),
+                            stagePlanItemInstanceEntity != null ? stagePlanItemInstanceEntity.getId() : null,
+                            caseInstanceEntity.getTenantId(),
+                            false);
+
+                    CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(childPlanItemInstanceEntity);
+                    planItemInstances.add(childPlanItemInstanceEntity);
+
+                }
+                return planItemInstances;
+
+            }
+        }
+
+        return Collections.emptyList();
+    }
+
     protected void evaluateDependentPlanItems() {
 
         if (planItemLifeCycleEvent == null) {
@@ -483,7 +540,8 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
                 if (childPlanItemInstances.isEmpty() // runtime state
                         && (potentialTerminatedPlanItemInstances.isEmpty()
-                            || (hasRepetitionRule(entryDependentPlanItem) && evaluateRepetitionRule(caseInstanceEntity, entryDependentPlanItem.getItemControl().getRepetitionRule().getCondition())))) { // (terminated state) the plan item instance should not have been created anytime before
+                                // (terminated state) the plan item instance should not have been created anytime before
+                            || (hasRepetitionRule(entryDependentPlanItem) && evaluateRepetitionRule(caseInstanceEntity, entryDependentPlanItem.getItemControl().getRepetitionRule().getCondition())))) {
 
                     // If the sentry satisfied, the plan item becomes active and all parent stages that are not yet activate are made active
                     String satisfiedCriterion = evaluateDependentPlanItemEntryCriteria(entryDependentPlanItem);

@@ -864,13 +864,13 @@
       "popular" : true
     } ]
   }, {
-      "name" : "entryconditionpackage",
+      "name" : "createconditionpackage",
       "properties" : [ {
-        "id" : "entrycondition",
+        "id" : "createcondition",
         "type" : "String",
-        "title" : "Entry condition",
+        "title" : "Create condition",
         "value" : "",
-        "description" : "An optional condition expression on an event listener to indicate to determine when it becomes available.",
+        "description" : "An optional condition expression on an event listener to indicate to determine when it becomes illegible for creation.",
         "popular" : true
       }]
     }
@@ -1190,7 +1190,7 @@
         "requiredrulepackage",
         "repetitionrulepackage",
         "planitemlifecyclelistenerspackage",
-        "entryconditionpackage"],
+        "createconditionpackage"],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
     }, {
@@ -1210,7 +1210,7 @@
         "completionneutralrulepackage",
         "requiredrulepackage",
         "planitemlifecyclelistenerspackage",
-        "entryconditionpackage"],
+        "createconditionpackage"],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
     }, {
@@ -1229,7 +1229,7 @@
         "requiredrulepackage",
         "repetitionrulepackage",
         "planitemlifecyclelistenerspackage",
-        "entryconditionpackage"],
+        "createconditionpackage"],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {

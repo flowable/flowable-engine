@@ -40,8 +40,8 @@ public class UserEventListenerXmlConverter extends PlanItemDefinitiomXmlConverte
 
     private UserEventListener convertCommonAttributes(XMLStreamReader xtr, UserEventListener listener) {
         listener.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
-        listener.setEntryConditionExpression(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE,
-            CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_ENTRY_CONDITION));
+        listener.setCreateConditionExpression(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE,
+            CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_CREATE_CONDITION));
 
         String csvRoles = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_AUTHORIZED_ROLE_REFS);
         if (StringUtils.isNotBlank(csvRoles)) {

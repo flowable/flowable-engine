@@ -161,7 +161,7 @@ public interface CmmnXmlConstants {
 
     String ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE = "autoStoreVariables";
 
-    String ATTRIBUTE_EVENT_LISTENER_ENTRY_CONDITION = "entryCondition";
+    String ATTRIBUTE_EVENT_LISTENER_CREATE_CONDITION = "createCondition";
 
     String ELEMENT_DI_CMMN = "CMMNDI";
     String ELEMENT_DI_DIAGRAM = "CMMNDiagram";
