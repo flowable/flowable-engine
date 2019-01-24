@@ -790,6 +790,25 @@ User event listeners can be queried using the _org.flowable.cmmn.api.runtime.Use
 
 A user event listener can be completed by calling the _cmmnRuntimeService.completeUserEventListenerInstance(id)_ method.
 
+===== Generic Event Listener
+
+A generic event listener is used to typically model a programmatic interaction (e.g. a external system that calls out to change something in a case instance).
+
+image::images/cmmn.generic-event-listener.png[align="center"]
+
+The API to retrieve and complete these event listeners is on the _CmmnRuntimeService_:
+
+[source,java,linenums]
+----
+GenericEventListenerInstanceQuery createGenericEventListenerInstanceQuery();
+void completeGenericEventListenerInstance(String genericEventListenerInstanceId);
+----
+
+Similar to _user event listeners_, this API is a wrapper on top of the _PlanItemInstance_ queries and operations. This means that the data can also be retrieved through the regular _PlanItemInstanceQuery_
+
+Note that generic event listeners are not part of the CMMN specification, but are a Flowable-specific addition.
+
+
 ===== Automatic removal of event listeners
 
 The engine will automatically detect when event listeners (user or timer) are not useful anymore.
