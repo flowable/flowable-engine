@@ -26,7 +26,7 @@ public class IsStageCompletableExpressionEnhancerTest {
     
     @Test
     public void testRegexDefault() {
-        assertRegexCorrect("${util:isStageCompletable()}", "${util:isStageCompletable(planItemInstance)}");
+        assertRegexCorrect("${cmmn:isStageCompletable()}", "${cmmn:isStageCompletable(planItemInstance)}");
     }
 
     public void assertRegexCorrect(String in, String out) {

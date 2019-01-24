@@ -36,7 +36,7 @@
             <modeler:flowable-idm-initiator xmlns:modeler="http://flowable.org/modeler"><![CDATA[true]]></modeler:flowable-idm-initiator>
           </extensionElements>
         </humanTask>
-        <userEventListener id="sid-2B988DDF-4EE1-4E94-90EA-D16CA1171AAA" name="Complete case" flowable:createCondition="${util:isStageCompletable()}"></userEventListener>
+        <userEventListener id="sid-2B988DDF-4EE1-4E94-90EA-D16CA1171AAA" name="Complete case" flowable:createCondition="${cmmn:isStageCompletable()}"></userEventListener>
       </stage>
       <stage id="sid-351D6047-97A6-4041-B651-62BCD3E7B4EC" name="Stage 2">
         <planItem id="planItem5" name="C" definitionRef="sid-013DD84C-623C-473F-885B-BF481F98D931"></planItem>

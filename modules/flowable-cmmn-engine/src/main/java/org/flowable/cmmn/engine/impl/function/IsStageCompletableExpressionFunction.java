@@ -19,7 +19,7 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 /**
  * @author Joram Barrez
  */
-public class IsStageCompletableExpressionFunction extends AbstractUtilExpressionFunction {
+public class IsStageCompletableExpressionFunction extends AbstractCmmnExpressionFunction {
 
     public IsStageCompletableExpressionFunction() {
         super("isStageCompletable");
