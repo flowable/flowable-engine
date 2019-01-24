@@ -38,10 +38,10 @@ public class TimerEventListenerExport extends AbstractPlanItemDefinitionExport<T
     protected void writePlanItemDefinitionSpecificAttributes(TimerEventListener timerEventListener, XMLStreamWriter xtw) throws Exception {
         super.writePlanItemDefinitionSpecificAttributes(timerEventListener, xtw);
 
-        if (StringUtils.isNotEmpty(timerEventListener.getEntryConditionExpression())) {
+        if (StringUtils.isNotEmpty(timerEventListener.getCreateConditionExpression())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE,
-                CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_ENTRY_CONDITION,
-                timerEventListener.getEntryConditionExpression());
+                CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_CREATE_CONDITION,
+                timerEventListener.getCreateConditionExpression());
         }
     }
 

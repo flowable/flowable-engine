@@ -38,10 +38,10 @@ public class GenericEventListenerExport extends AbstractPlanItemDefinitionExport
     protected void writePlanItemDefinitionSpecificAttributes(GenericEventListener genericEventListener, XMLStreamWriter xtw) throws Exception {
         super.writePlanItemDefinitionSpecificAttributes(genericEventListener, xtw);
 
-        if (StringUtils.isNotEmpty(genericEventListener.getEntryConditionExpression())) {
+        if (StringUtils.isNotEmpty(genericEventListener.getCreateConditionExpression())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE,
-                CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_ENTRY_CONDITION,
-                genericEventListener.getEntryConditionExpression());
+                CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_CREATE_CONDITION,
+                genericEventListener.getCreateConditionExpression());
         }
     }
 

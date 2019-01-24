@@ -171,6 +171,6 @@ public interface CmmnStencilConstants {
     String PROPERTY_TIMER_START_TRIGGER_SOURCE_REF = "timerstarttriggersourceref";
     String PROPERTY_TIMER_START_TRIGGER_STANDARD_EVENT = "transitionevent";
 
-    String PROPERTY_EVENT_LISTENER_ENTRY_CONDITION = "entrycondition";
+    String PROPERTY_EVENT_LISTENER_CREATE_CONDITION = "createcondition";
 
 }

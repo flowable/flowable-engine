@@ -39,10 +39,10 @@ public class InitStageInstanceOperation extends AbstractPlanItemInstanceOperatio
 
         planItemInstanceEntity.setStage(true);
         
-        createPlanItemInstances(commandContext, 
+        createPlanItemInstancesForNewStage(commandContext,
                 stage.getPlanItems(), 
                 planItemInstanceEntity.getCaseDefinitionId(), 
-                planItemInstanceEntity.getCaseInstanceId(), 
+                null,
                 planItemInstanceEntity,
                 planItemInstanceEntity.getTenantId());
 

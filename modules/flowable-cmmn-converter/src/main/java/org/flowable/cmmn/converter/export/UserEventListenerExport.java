@@ -43,10 +43,10 @@ public class UserEventListenerExport extends AbstractPlanItemDefinitionExport<Us
             xtw.writeAttribute(ATTRIBUTE_AUTHORIZED_ROLE_REFS, String.join(",", authorizedRoleRefs));
         }
 
-        if (StringUtils.isNotEmpty(userEventListener.getEntryConditionExpression())) {
+        if (StringUtils.isNotEmpty(userEventListener.getCreateConditionExpression())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE,
-                CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_ENTRY_CONDITION,
-                userEventListener.getEntryConditionExpression());
+                CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_CREATE_CONDITION,
+                userEventListener.getCreateConditionExpression());
         }
     }
 }

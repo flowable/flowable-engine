@@ -17,13 +17,13 @@ package org.flowable.cmmn.model;
  */
 public abstract class EventListener extends PlanItemDefinition {
 
-    protected String entryConditionExpression;
+    protected String createConditionExpression;
 
-    public String getEntryConditionExpression() {
-        return entryConditionExpression;
+    public String getCreateConditionExpression() {
+        return createConditionExpression;
     }
 
-    public void setEntryConditionExpression(String entryConditionExpression) {
-        this.entryConditionExpression = entryConditionExpression;
+    public void setCreateConditionExpression(String createConditionExpression) {
+        this.createConditionExpression = createConditionExpression;
     }
 }
