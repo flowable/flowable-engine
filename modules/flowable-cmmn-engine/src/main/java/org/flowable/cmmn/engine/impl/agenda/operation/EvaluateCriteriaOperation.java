@@ -88,7 +88,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             if (evaluateCaseInstanceCompleted 
                     && !criteriaChangeOrActiveChildren
                     && !CaseInstanceState.END_STATES.contains(caseInstanceEntity.getState())
-                    && isPlanModelComplete()){
+                    && evaluatePlanModelComplete()){
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("No active plan items found for plan model, completing case instance");
                 }
@@ -372,7 +372,9 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 if (isRequiredPlanItemInstance(childPlanItemInstance)) {
                     return false;
                 }
-                return isEndStateReachedForAllChildPlanItems(childPlanItemInstance);
+                if(!isEndStateReachedForAllChildPlanItems(childPlanItemInstance)) {
+                    return false;
+                }
             }
         }
         return true;
@@ -455,10 +457,24 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         }
     }
     
-    protected boolean isPlanModelComplete() {
+    protected boolean evaluatePlanModelComplete() {
         boolean allRequiredChildrenInEndState = isEndStateReachedForAllRequiredChildPlanItems(caseInstanceEntity);
         if (allRequiredChildrenInEndState) {
+            boolean previousCompleteableState = caseInstanceEntity.isCompleteable();
             caseInstanceEntity.setCompleteable(true);
+
+            // When the case entity changes, the plan items with create condition can be become ready for creation
+            if (previousCompleteableState != caseInstanceEntity.isCompleteable()) {
+                List<PlanItemInstanceEntity> createdPlanItemInstances = evaluatePlanItemsWithCreateCondition(caseInstanceEntity);
+                if (!createdPlanItemInstances.isEmpty()) {
+                    caseInstanceEntity.getChildPlanItemInstances().addAll(createdPlanItemInstances);
+                    // If new plan items are created, this could lead to changing of the fact that the case instance entity is completable
+                    allRequiredChildrenInEndState = isEndStateReachedForAllRequiredChildPlanItems(caseInstanceEntity);
+                    if (!allRequiredChildrenInEndState) {
+                        caseInstanceEntity.setCompleteable(false);
+                    }
+                }
+            }
         }
         
         boolean isAutoComplete = CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId()).getPlanModel().isAutoComplete();

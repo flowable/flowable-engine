@@ -33,6 +33,8 @@ public class CreateConditionTest extends FlowableCmmnTestCase {
     public void testCreateConditionInPlanModelPlanItemInstance() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCreateConditionInPlanModelPlanItemInstance").start();
 
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).list()).hasSize(0);
+
         // After case instance start human task A should be active, human taskA B should be enabled
         Task taskA = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(taskA.getName()).isEqualTo("A");
@@ -42,6 +44,8 @@ public class CreateConditionTest extends FlowableCmmnTestCase {
 
         // Completing the human task A should mark the stage as completable
         cmmnTaskService.complete(taskA.getId());
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateEnabled().singleResult()).isNotNull();
 
         // The stage being completable, this should create the user event listener
         PlanItemInstance userEventListenerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
@@ -62,6 +66,8 @@ public class CreateConditionTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testCreateConditionWithEventListenerInStage() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCreateCondition").start();
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).list()).hasSize(0);
 
         // After case instance start human task A should be active, human taskA B should be enabled
         Task taskA = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();

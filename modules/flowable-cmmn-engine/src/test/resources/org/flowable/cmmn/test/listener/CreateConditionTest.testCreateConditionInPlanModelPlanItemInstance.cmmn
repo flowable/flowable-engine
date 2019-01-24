@@ -24,7 +24,7 @@
           <modeler:flowable-idm-initiator xmlns:modeler="http://flowable.org/modeler"><![CDATA[true]]></modeler:flowable-idm-initiator>
         </extensionElements>
       </humanTask>
-      <userEventListener id="sid-6C64E782-675F-4489-9330-0318C49D819C" name="Complete task"></userEventListener>
+      <userEventListener id="sid-6C64E782-675F-4489-9330-0318C49D819C" name="Complete task" flowable:createCondition="${cmmn:isStageCompletable()}"></userEventListener>
       <exitCriterion id="sid-BBEFCD70-91A7-4EA0-AAE1-236371BEFAD9" sentryRef="sentry1"></exitCriterion>
     </casePlanModel>
   </case>

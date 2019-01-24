@@ -20,15 +20,15 @@ import org.flowable.common.engine.impl.el.function.AbstractFlowableShortHandExpr
 /**
  * @author Joram Barrez
  */
-public abstract class AbstractUtilExpressionFunction extends AbstractFlowableShortHandExpressionFunction {
+public abstract class AbstractCmmnExpressionFunction extends AbstractFlowableShortHandExpressionFunction {
 
     public static final String VARIABLE_SCOPE_NAME = "planItemInstance";
 
-    public static final List<String> FUNCTION_PREFIXES = Collections.singletonList("util");
+    public static final String FINAL_FUNCTION_PREFIX = "cmmn";
 
-    public static final String FINAL_FUNCTION_PREFIX = "util";
+    public static final List<String> FUNCTION_PREFIXES = Collections.singletonList(FINAL_FUNCTION_PREFIX);
 
-    public AbstractUtilExpressionFunction(String functionName) {
+    public AbstractCmmnExpressionFunction(String functionName) {
         super(VARIABLE_SCOPE_NAME, Collections.singletonList(functionName), functionName);
     }
 
