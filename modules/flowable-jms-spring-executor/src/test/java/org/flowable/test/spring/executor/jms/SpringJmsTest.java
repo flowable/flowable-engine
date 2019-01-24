@@ -33,7 +33,7 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestExecutionListeners.MergeMode;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.jayway.awaitility.Awaitility;
+import org.awaitility.Awaitility;
 
 @TestExecutionListeners(value = CleanTestExecutionListener.class, mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
 @ContextConfiguration(classes = SpringJmsConfig.class)
@@ -58,12 +58,8 @@ public class SpringJmsTest {
         processEngine.getRuntimeService().startProcessInstanceByKey("AsyncProcess", vars);
 
         // Wait until the process is completely finished
-        Awaitility.waitAtMost(1, TimeUnit.MINUTES).pollInterval(500, TimeUnit.MILLISECONDS).until(new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                return processEngine.getRuntimeService().createProcessInstanceQuery().count() == 0;
-            }
-        });
+        Awaitility.await().atMost(1, TimeUnit.MINUTES).pollInterval(500, TimeUnit.MILLISECONDS).until(
+            () -> processEngine.getRuntimeService().createProcessInstanceQuery().count() == 0);
 
         Assert.assertEquals(0L, processEngine.getRuntimeService().createProcessInstanceQuery().count());
 
