@@ -21,6 +21,7 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.history.CmmnHistoryHelper;
 import org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.history.HistoricMilestoneInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseDefinitionDataManager;
@@ -123,20 +124,7 @@ public class CaseDefinitionEntityManagerImpl extends AbstractCmmnEntityManager<C
             List<HistoricCaseInstance> historicCaseInstanceEntities = historicCaseInstanceEntityManager
                     .findByCriteria(new HistoricCaseInstanceQueryImpl().caseDefinitionId(caseDefinitionId));
             for (HistoricCaseInstance historicCaseInstanceEntity : historicCaseInstanceEntities) {
-
-                HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager = getHistoricVariableInstanceEntityManager();
-                List<HistoricVariableInstanceEntity> historicVariableInstanceEntities = historicVariableInstanceEntityManager
-                        .findHistoricalVariableInstancesByScopeIdAndScopeType(historicCaseInstanceEntity.getId(), ScopeTypes.CMMN);
-                for (HistoricVariableInstanceEntity historicVariableInstanceEntity : historicVariableInstanceEntities) {
-                    historicVariableInstanceEntityManager.delete(historicVariableInstanceEntity);
-                }
-
-                historicIdentityLinkEntityManager.deleteHistoricIdentityLinksByScopeIdAndScopeType(historicCaseInstanceEntity.getId(), ScopeTypes.CMMN);
-                if (cmmnEngineConfiguration.isEnableEntityLinks()) {
-                    getHistoricEntityLinkEntityManager().deleteHistoricEntityLinksByScopeIdAndScopeType(historicCaseInstanceEntity.getId(), ScopeTypes.CMMN);
-                }
-
-                historicCaseInstanceEntityManager.delete(historicCaseInstanceEntity.getId());
+                CmmnHistoryHelper.deleteHistoricCaseInstance(cmmnEngineConfiguration, historicCaseInstanceEntity.getId());
             }
         }
         
