@@ -153,5 +153,9 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_LOG_ENTRY_TYPE = "logEntryType";
     String FIELD_LOG_ENTRY_DATA = "logEntryData";
     String FIELD_LOG_ENTRY_LOGNUMBER = "logNumber";
+    
+    String FIELD_EXECUTION_ID = "executionId";
+    String FIELD_PROCESS_INSTANCE_ID = "processInstanceId";
+    String FIELD_PROCESS_DEFINITION_ID = "processDefinitionId";
 
 }

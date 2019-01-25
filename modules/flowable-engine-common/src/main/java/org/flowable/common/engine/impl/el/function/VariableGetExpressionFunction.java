@@ -27,8 +27,7 @@ public class VariableGetExpressionFunction extends AbstractFlowableVariableExpre
     }
     
     public static Object get(VariableScope variableScope, String variableName) {
-        Object variableValue = getVariableValue(variableScope, variableName);
-        return variableValue;
+        return getVariableValue(variableScope, variableName);
     }
     
     @Override

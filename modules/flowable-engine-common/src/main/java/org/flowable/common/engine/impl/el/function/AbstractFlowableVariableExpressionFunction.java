@@ -13,6 +13,7 @@
 package org.flowable.common.engine.impl.el.function;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -28,7 +29,7 @@ public abstract class AbstractFlowableVariableExpressionFunction extends Abstrac
     private static final String FINAL_FUNCTION_PREFIX = "variables";
     
     public AbstractFlowableVariableExpressionFunction(String variableScopeName, String functionName) {
-        this(variableScopeName, Arrays.asList(functionName), functionName);
+        this(variableScopeName, Collections.singletonList(functionName), functionName);
     }
     
     public AbstractFlowableVariableExpressionFunction(String variableScopeName, List<String> functionNameOptions, String functionName) {

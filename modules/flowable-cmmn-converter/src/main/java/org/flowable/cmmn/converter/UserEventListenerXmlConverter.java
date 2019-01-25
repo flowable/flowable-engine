@@ -12,11 +12,11 @@
  */
 package org.flowable.cmmn.converter;
 
+import javax.xml.stream.XMLStreamReader;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.UserEventListener;
-
-import javax.xml.stream.XMLStreamReader;
 
 /**
  * @author Dennis Federico
@@ -40,6 +40,8 @@ public class UserEventListenerXmlConverter extends PlanItemDefinitiomXmlConverte
 
     private UserEventListener convertCommonAttributes(XMLStreamReader xtr, UserEventListener listener) {
         listener.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
+        listener.setCreateConditionExpression(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE,
+            CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_CREATE_CONDITION));
 
         String csvRoles = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_AUTHORIZED_ROLE_REFS);
         if (StringUtils.isNotBlank(csvRoles)) {

@@ -63,6 +63,26 @@ public interface ChangePlanItemStateBuilder {
     ChangePlanItemStateBuilder moveSinglePlanItemDefinitionIdToPlanItemDefinitionIds(String currentPlanItemDefinitionId, List<String> newPlanItemDefinitionIds);
 
     /**
+     * Activate a plan item by definition id without terminating another plan item instance.
+     */
+    ChangePlanItemStateBuilder activatePlanItemDefinitionId(String planItemDefinitionId);
+    
+    /**
+     * Activate multiple plan items by definition id without terminating another plan item instance.
+     */
+    ChangePlanItemStateBuilder activatePlanItemDefinitionIds(List<String> planItemDefinitionIds);
+    
+    /**
+     * Set an enabled or active plan item to available state by definition id.
+     */
+    ChangePlanItemStateBuilder changePlanItemInstanceToAvailableByPlanItemDefinitionId(String planItemDefinitionId);
+    
+    /**
+     * Set multiple enabled or active plan items to available state by definition id.
+     */
+    ChangePlanItemStateBuilder changePlanItemInstancesToAvailableByPlanItemDefinitionId(List<String> planItemDefinitionIds);
+    
+    /**
      * Set the case variable that should be set as part of the change plan item state action.
      */
     ChangePlanItemStateBuilder caseVariable(String caseVariableName, Object caseVariableValue);
@@ -71,6 +91,16 @@ public interface ChangePlanItemStateBuilder {
      * Set the case variable that should be set as part of the change plan item state action.
      */
     ChangePlanItemStateBuilder caseVariables(Map<String, Object> caseVariables);
+    
+    /**
+     * Set the case variable that should be set as part of the change process or case task state action.
+     */
+    ChangePlanItemStateBuilder childInstanceTaskVariable(String planItemDefinitionId, String name, Object value);
+    
+    /**
+     * Set the case variable that should be set as part of the change process or case task state action.
+     */
+    ChangePlanItemStateBuilder childInstanceTaskVariables(String planItemDefinitionId, Map<String, Object> variables);
     
     /**
      * Changes the case instance state

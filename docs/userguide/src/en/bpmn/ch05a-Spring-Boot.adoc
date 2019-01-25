@@ -166,7 +166,7 @@ The XML content of the process definition is shown below. Notice that, for the m
     <process id="oneTaskProcess" name="The One Task Process">
         <startEvent id="theStart" />
         <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
-        <userTask id="theTask" name="my task" assignee="kermit" />
+        <userTask id="theTask" name="my task" flowable:assignee="kermit" />
         <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd" />
         <endEvent id="theEnd" />
     </process>
@@ -661,7 +661,7 @@ flowable.process-definition-location-prefix=classpath*:/processes/ # The folder 
 flowable.process-definition-location-suffixes=**.bpmn20.xml,**.bpmn # The suffixes (extensions) of the files that needs to be deployed from the 'processDefinitionLocationPrefix' location.
 
 # Process {sc-flowable-boot}/process/FlowableProcessProperties.java[FlowableProcessProperties]
-flowable.process.definition-cache-limit=-1 # The maximum amount of process definitions available in the process definition cache. Per default it is 1 (all process definitions).
+flowable.process.definition-cache-limit=-1 # The maximum amount of process definitions available in the process definition cache. Per default it is -1 (all process definitions).
 flowable.process.enable-safe-xml=true # Enables extra checks on the BPMN xml that is parsed. See https://www.flowable.org/docs/userguide/index.html#advanced.safe.bpmn.xml. Unfortunately, this feature is not available on some platforms (JDK 6, JBoss), hence you need to disable if your platform does not allow the use of StaxSource during XML parsing.
 flowable.process.servlet.load-on-startup=-1 # Load on startup of the Process dispatcher servlet.
 flowable.process.servlet.name=Flowable BPMN Rest API # The name of the Process servlet.
@@ -834,7 +834,7 @@ If empty no authentication would be used.
 |flowable.process-definitions.cache.max
 |-1
 |The maximum amount of process definitions available in the process definition cache.
- Per default it is 1 (all process definitions)
+ Per default it is -1 (all process definitions)
 |===============
 
 [[springBootFlowableAutoConfiguration]]

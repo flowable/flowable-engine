@@ -258,31 +258,6 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         return isTablePresent("ACT_HI_PROCINST");
     }
 
-    protected boolean isUpgradeNeeded(String versionInDatabase) {
-        if (ProcessEngine.VERSION.equals(versionInDatabase)) {
-            return false;
-        }
-
-        String cleanDbVersion = getCleanVersion(versionInDatabase);
-        String[] cleanDbVersionSplitted = cleanDbVersion.split("\\.");
-        int dbMajorVersion = Integer.valueOf(cleanDbVersionSplitted[0]);
-        int dbMinorVersion = Integer.valueOf(cleanDbVersionSplitted[1]);
-
-        String cleanEngineVersion = getCleanVersion(ProcessEngine.VERSION);
-        String[] cleanEngineVersionSplitted = cleanEngineVersion.split("\\.");
-        int engineMajorVersion = Integer.valueOf(cleanEngineVersionSplitted[0]);
-        int engineMinorVersion = Integer.valueOf(cleanEngineVersionSplitted[1]);
-
-        if ((dbMajorVersion > engineMajorVersion) || ((dbMajorVersion <= engineMajorVersion) && (dbMinorVersion > engineMinorVersion))) {
-            throw new FlowableException("Version of flowable database (" + versionInDatabase + ") is more recent than the engine (" + ProcessEngine.VERSION + ")");
-        } else if (cleanDbVersion.compareTo(cleanEngineVersion) == 0) {
-            // Versions don't match exactly, possibly snapshot is being used
-            logger.warn("Engine-version is the same, but not an exact match: {} vs. {}. Not performing database-upgrade.", versionInDatabase, ProcessEngine.VERSION);
-            return false;
-        }
-        return true;
-    }
-
     protected String getCleanVersion(String versionString) {
         Matcher matcher = CLEAN_VERSION_REGEX.matcher(versionString);
         if (!matcher.find()) {

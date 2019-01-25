@@ -15,11 +15,8 @@ package org.flowable.cmmn.editor.json.converter;
 import java.util.Map;
 
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
-import org.flowable.cmmn.editor.json.converter.util.ListenerConverterUtil;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.cmmn.model.PlanItem;
-import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.UserEventListener;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,8 +24,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Dennis Federico
+ * @author Joram Barrez
  */
-public class UserEventListenerJsonConverter extends BaseCmmnJsonConverter {
+public class UserEventListenerJsonConverter extends AbstractEventListenerJsonConverter {
 
 
     public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap,
@@ -47,14 +45,13 @@ public class UserEventListenerJsonConverter extends BaseCmmnJsonConverter {
 
     @Override
     protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement, CmmnModel cmmnModel) {
-        PlanItemDefinition planItemDefinition = ((PlanItem) baseElement).getPlanItemDefinition();
-        ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, planItemDefinition);
+        convertCommonElementToJson(elementNode, propertiesNode, baseElement);
     }
 
     @Override
     protected BaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnJsonConverter.CmmnModelIdHelper cmmnModelIdHelper) {
         UserEventListener userEventListener = new UserEventListener();
-        ListenerConverterUtil.convertJsonToLifeCycleListeners(elementNode, userEventListener);
+        convertCommonJsonToElement(elementNode, userEventListener);
         return userEventListener;
     }
 

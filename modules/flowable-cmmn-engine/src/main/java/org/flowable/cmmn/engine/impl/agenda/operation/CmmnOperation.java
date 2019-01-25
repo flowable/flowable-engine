@@ -17,9 +17,11 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceContainer;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
@@ -62,8 +64,8 @@ public abstract class CmmnOperation implements Runnable {
     }
     
     
-    protected List<PlanItemInstanceEntity> createPlanItemInstances(CommandContext commandContext, List<PlanItem> planItems, String caseDefinitionId,
-            String caseInstanceId, PlanItemInstanceEntity stagePlanItemInstanceEntity, String tenantId) {
+    protected List<PlanItemInstanceEntity> createPlanItemInstancesForNewStage(CommandContext commandContext, List<PlanItem> planItems, String caseDefinitionId,
+            CaseInstanceEntity caseInstanceEntity, PlanItemInstanceEntity stagePlanItemInstanceEntity, String tenantId) {
 
         List<PlanItemInstanceEntity> planItemInstances = new ArrayList<>();
         for (PlanItem planItem : planItems) {
@@ -72,22 +74,33 @@ public abstract class CmmnOperation implements Runnable {
             // As such, it doesn't need to be created again (this is the if check here, which goes against the cache)
 
             if (stagePlanItemInstanceEntity == null || !childPlanItemInstanceForPlanItemExists(stagePlanItemInstanceEntity, planItem)) {
-                PlanItemInstanceEntity childPlanItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
-                    .createChildPlanItemInstance(planItem,
-                        caseDefinitionId,
-                        caseInstanceId,
-                        stagePlanItemInstanceEntity != null ? stagePlanItemInstanceEntity.getId() : null,
-                        tenantId,
-                        true);
-                planItemInstances.add(childPlanItemInstance);
-                CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(childPlanItemInstance);
+
+                String caseInstanceId = null;
+                if (caseInstanceEntity != null) {
+                    caseInstanceId = caseInstanceEntity.getId();
+                } else if (stagePlanItemInstanceEntity != null) {
+                    caseInstanceId = stagePlanItemInstanceEntity.getCaseInstanceId();
+                }
+
+                if (evaluateCreateCondition(commandContext, planItem, stagePlanItemInstanceEntity != null ? stagePlanItemInstanceEntity : caseInstanceEntity)) {
+                    PlanItemInstanceEntity childPlanItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
+                        .createChildPlanItemInstance(planItem,
+                            caseDefinitionId,
+                            caseInstanceId,
+                            stagePlanItemInstanceEntity != null ? stagePlanItemInstanceEntity.getId() : null,
+                            tenantId,
+                            true);
+                    planItemInstances.add(childPlanItemInstance);
+                    CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(childPlanItemInstance);
+                }
+
             }
         }
         return planItemInstances;
     }
 
-    protected boolean childPlanItemInstanceForPlanItemExists(PlanItemInstanceEntity stagePlanItemInstanceEntity, PlanItem planItem) {
-        List<PlanItemInstanceEntity> childPlanItemInstances = stagePlanItemInstanceEntity.getChildPlanItemInstances();
+    protected boolean childPlanItemInstanceForPlanItemExists(PlanItemInstanceContainer planItemInstanceContainer, PlanItem planItem) {
+        List<PlanItemInstanceEntity> childPlanItemInstances = planItemInstanceContainer.getChildPlanItemInstances();
         if (childPlanItemInstances != null && !childPlanItemInstances.isEmpty()) {
             for (PlanItemInstanceEntity childPlanItemInstanceEntity : childPlanItemInstances) {
                 if (childPlanItemInstanceEntity.getPlanItem() != null && planItem.getId().equals(childPlanItemInstanceEntity.getPlanItem().getId())) {
@@ -96,6 +109,22 @@ public abstract class CmmnOperation implements Runnable {
             }
         }
         return false;
+    }
+
+    protected boolean evaluateCreateCondition(CommandContext commandContext, PlanItem planItem, VariableContainer expressionContext) {
+        if (planItem.getPlanItemDefinition() instanceof EventListener) {
+            EventListener eventListener = (EventListener) planItem.getPlanItemDefinition();
+            if (StringUtils.isNotEmpty(eventListener.getCreateConditionExpression())) {
+                Expression expression = CommandContextUtil.getExpressionManager(commandContext).createExpression(eventListener.getCreateConditionExpression());
+                Object result = expression.getValue(expressionContext);
+                if (result instanceof Boolean) {
+                    return (Boolean) result;
+                } else {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     protected PlanItemInstanceEntity copyAndInsertPlanItemInstance(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntityToCopy, boolean addToParent) {

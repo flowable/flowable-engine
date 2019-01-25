@@ -37,8 +37,10 @@ public class GenericEventListenerXmlConverter extends PlanItemDefinitiomXmlConve
         return convertCommonAttributes(xtr, new GenericEventListener());
     }
 
-    private GenericEventListener convertCommonAttributes(XMLStreamReader xtr, GenericEventListener listener) {
+    protected GenericEventListener convertCommonAttributes(XMLStreamReader xtr, GenericEventListener listener) {
         listener.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
+        listener.setCreateConditionExpression(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE,
+            CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_CREATE_CONDITION));
         return listener;
     }
 }
