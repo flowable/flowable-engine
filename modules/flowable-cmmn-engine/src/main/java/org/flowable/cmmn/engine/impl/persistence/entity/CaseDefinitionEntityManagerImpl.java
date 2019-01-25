@@ -100,7 +100,7 @@ public class CaseDefinitionEntityManagerImpl extends AbstractCmmnEntityManager<C
             HistoricIdentityLinkEntityManager historicIdentityLinkEntityManager = getHistoricIdentityLinkEntityManager();
             historicIdentityLinkEntityManager.deleteHistoricIdentityLinksByScopeDefinitionIdAndScopeType(caseDefinitionId, ScopeTypes.CMMN);
             
-            // Historic mile stone
+            // Historic milestone
             HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager = getHistoricMilestoneInstanceEntityManager();
             List<HistoricMilestoneInstance> historicMilestoneInstances = historicMilestoneInstanceEntityManager
                     .findHistoricMilestoneInstancesByQueryCriteria(new HistoricMilestoneInstanceQueryImpl().milestoneInstanceCaseDefinitionId(caseDefinitionId));
@@ -132,6 +132,7 @@ public class CaseDefinitionEntityManagerImpl extends AbstractCmmnEntityManager<C
                 }
 
                 historicIdentityLinkEntityManager.deleteHistoricIdentityLinksByScopeIdAndScopeType(historicCaseInstanceEntity.getId(), ScopeTypes.CMMN);
+                getHistoricEntityLinkEntityManager().deleteHistoricEntityLinksByScopeIdAndScopeType(historicCaseInstanceEntity.getId(), ScopeTypes.CMMN);
 
                 historicCaseInstanceEntityManager.delete(historicCaseInstanceEntity.getId());
             }

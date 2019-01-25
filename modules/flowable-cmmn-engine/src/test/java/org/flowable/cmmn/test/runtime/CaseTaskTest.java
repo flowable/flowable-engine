@@ -480,4 +480,26 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         assertBlockingCaseTaskFlow(caseInstance);
     }
 
+    @Test
+    public void testEntityLinksAreDeleted() {
+        String deploymentId = cmmnRepositoryService.createDeployment()
+            .addClasspathResource("org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn").deploy().getId();
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        try {
+            Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            assertEquals("Sub task", task.getName());
+
+            assertEquals(1, cmmnRuntimeService.getEntityLinkChildrenForCaseInstance(caseInstance.getId()).size());
+            assertEquals(1, cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(caseInstance.getId()).size());
+
+            cmmnTaskService.complete(task.getId());
+
+            assertEquals(1, cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(caseInstance.getId()).size());
+        } finally {
+            cmmnRepositoryService.deleteDeployment(deploymentId, true);
+        }
+
+        assertEquals(0, cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(caseInstance.getId()).size());
+    }
 }
