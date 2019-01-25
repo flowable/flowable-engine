@@ -113,6 +113,7 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
                 .caseDefinitionKey("oneHumanTaskCase")
                 .name("someName")
                 .businessKey("someBusinessKey")
+                .variable("test", "test")
                 .start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         cmmnTaskService.complete(task.getId());
