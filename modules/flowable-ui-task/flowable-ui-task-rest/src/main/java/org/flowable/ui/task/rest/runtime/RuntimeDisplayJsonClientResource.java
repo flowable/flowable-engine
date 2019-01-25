@@ -598,7 +598,7 @@ public class RuntimeDisplayJsonClientResource {
                     List<SequenceFlow> outgoingFlows = ((FlowNode) activity).getOutgoingFlows();
                     for (SequenceFlow flow : outgoingFlows) {
                         String destinationFlowId = flow.getTargetRef();
-                        if (destinationFlowId.equals(activities.get(index + 1))) {
+                        if (activities.contains(destinationFlowId)) {
                             completedFlows.add(flow.getId());
                         }
                     }
