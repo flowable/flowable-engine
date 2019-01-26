@@ -202,8 +202,13 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
         return activityInstance;
     }
 
+    @SuppressWarnings("unchecked")
     protected Object getOriginalAssignee(TaskEntity taskEntity) {
-        return ((Map<String, Object>) taskEntity.getOriginalPersistentState()).get("assignee");
+        if (taskEntity.getOriginalPersistentState() != null) {
+            return ((Map<String, Object>) taskEntity.getOriginalPersistentState()).get("assignee");
+        } else {
+            return null;
+        }
     }
 
     protected ActivityInstance recordRuntimeActivityStart(ExecutionEntity executionEntity) {

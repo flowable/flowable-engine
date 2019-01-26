@@ -46,7 +46,6 @@ import org.flowable.engine.history.HistoricVariableUpdate;
 import org.flowable.engine.impl.TaskServiceImpl;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
-import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ActivityInstance;
@@ -518,6 +517,22 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
             // TODO: Bad API design. Need to fix attachment/comment properly
             ((TaskServiceImpl) taskService).deleteComments(null, processInstanceId);
         }
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void saveUserTaskTest() {
+        Map<String, Object> startMap = new HashMap<>();
+        startMap.put("titleId", "testTitleId");
+        startMap.put("otherVariable", "testOtherVariable");
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", startMap);
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+            .includeIdentityLinks()
+            .singleResult();
+        task.setDueDate(new Date());
+        task.setCategory("main");
+        taskService.saveTask(task);
     }
 
     @Test

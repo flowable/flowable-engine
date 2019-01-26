@@ -326,12 +326,21 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected boolean wasPersisted(TaskEntity task) {
-        return ((Map<String, Object>) task.getOriginalPersistentState()).size() > 0;
+        if (task.getOriginalPersistentState() != null && ((Map<String, Object>) task.getOriginalPersistentState()).size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
+    @SuppressWarnings("unchecked")
     protected Object getOriginalState(TaskEntity task, String stateKey) {
-        return ((Map<String, Object>) task.getOriginalPersistentState()).get(stateKey);
+        if (task.getOriginalPersistentState() != null) {
+            return ((Map<String, Object>) task.getOriginalPersistentState()).get(stateKey);
+        }
+        return null;
     }
 
     protected void recordHistoryUserTaskLog(HistoricTaskLogEntryType logEntryType, TaskInfo task, ObjectNode dataNode) {
