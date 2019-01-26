@@ -1608,6 +1608,14 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().taskId(task.getId()).singleResult();
         assertNull(task.getDueDate());
 
+        // Call saveTask to update due date
+        task = taskService.createTaskQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
+        now = new Date();
+        task.setDueDate(now);
+        taskService.saveTask(task);
+        task = taskService.createTaskQuery().taskId(task.getId()).singleResult();
+        assertEquals(now, task.getDueDate());
+
         taskService.deleteTask(task.getId(), true);
     }
 
