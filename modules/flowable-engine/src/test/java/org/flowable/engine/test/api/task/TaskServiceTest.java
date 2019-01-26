@@ -15,6 +15,7 @@ package org.flowable.engine.test.api.task;
 
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.flowable.engine.impl.test.HistoryTestHelper.isHistoryLevelAtLeast;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -66,6 +67,8 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.TaskPostProcessor;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -158,7 +161,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         assertThat(updatedTask.getIdentityLinks().size(), is(2));
         assertThat(updatedTask.getPriority(), is(Task.DEFAULT_PRIORITY));
         
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
             assertThat(historicTaskInstance, notNullValue());
             assertThat(historicTaskInstance.getName(), is("testName"));
@@ -190,7 +193,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
             assertThat(updatedTask.getName(), is("testName"));
             assertThat(updatedTask.getIdentityLinks().size(), is(2));
             
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
                 HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
                 assertThat(historicTaskInstance, notNullValue());
                 assertThat(historicTaskInstance.getName(), is("testName"));
@@ -231,7 +234,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
             assertThat(updatedTask.getOwner(), is("testOwner"));
             assertThat(updatedTask.getIdentityLinks().size(), is(4));
             
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
                 HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
                 assertThat(historicTaskInstance, notNullValue());
                 assertThat(historicTaskInstance.getName(), is("testNameFromPostProcessor"));
@@ -289,7 +292,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         assertEquals(dueDate, task.getDueDate());
         assertEquals(1, task.getPriority());
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
             assertEquals("updatedtaskname", historicTaskInstance.getName());
             assertEquals("updateddescription", historicTaskInstance.getDescription());
@@ -325,7 +328,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
     @Test
     public void testTaskComments() {
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             org.flowable.task.api.Task task = taskService.newTask();
             task.setOwner("johndoe");
             taskService.saveTask(task);
@@ -356,7 +359,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
     @Test
     public void testCustomTaskComments() {
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             org.flowable.task.api.Task task = taskService.newTask();
             task.setOwner("johndoe");
             taskService.saveTask(task);
@@ -399,7 +402,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
     
     @Test
     public void testUpdateTaskComments() {
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             org.flowable.task.api.Task task = taskService.newTask();
             task.setOwner("johndoe");
             taskService.saveTask(task);
@@ -430,7 +433,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
     @Test
     public void testTaskAttachments() {
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             org.flowable.task.api.Task task = taskService.newTask();
             task.setOwner("johndoe");
             taskService.saveTask(task);
@@ -461,7 +464,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
     @Test
     public void testSaveTaskAttachment() {
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             org.flowable.task.api.Task task = taskService.newTask();
             task.setOwner("johndoe");
             taskService.saveTask(task);
@@ -494,7 +497,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testTaskAttachmentWithProcessInstanceId() {
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
 
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -848,7 +851,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         String taskId = task.getId();
         taskService.complete(taskId, null);
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             historyService.deleteHistoricTaskInstance(taskId);
         }
 
@@ -871,7 +874,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         String taskId = task.getId();
         taskService.complete(taskId, Collections.EMPTY_MAP);
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             historyService.deleteHistoricTaskInstance(taskId);
         }
 
@@ -996,6 +999,99 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    @Deployment(resources = {"org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml"})
+    public void testCompleteWithExistingVariableParametersTask_withoutBase() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess",
+                Collections.singletonMap("newVariable", "oldValue")
+            );
+
+        // Fetch first task
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("First task", task.getName());
+
+        // Complete first task
+        Map<String, Object> taskParams = new HashMap<>();
+        taskParams.put("${newVariable}", "newVariableValue");
+        taskService.complete(task.getId(), taskParams);
+
+        // Verify task parameters set on execution
+        Execution subExecution = runtimeService.createExecutionQuery().parentId(processInstance.getId()).singleResult();
+        Map<String, VariableInstance> variableInstances = runtimeService.getVariableInstances(subExecution.getId());
+        assertEquals("newVariableValue", variableInstances.get("newVariable").getTextValue());
+
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration )) {
+            HistoricVariableInstance historicVariableInstance = this.historyService.createHistoricVariableInstanceQuery()
+                .id(variableInstances.get("newVariable").getId())
+                .singleResult();
+            assertEquals("newVariableValue", historicVariableInstance.getValue());
+        }
+    }
+
+    @Test
+    @Deployment(resources = {"org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml"})
+    public void testCompleteWithExistingNewVariableParametersTask_withoutBase() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
+
+        // Fetch first task
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("First task", task.getName());
+
+        // Complete first task
+        Map<String, Object> taskParams = new HashMap<>();
+        taskParams.put("${newVariable}", "newVariableValue");
+
+        try {
+            taskService.complete(task.getId(), taskParams);
+            fail("expected exception");
+        } catch (FlowableException e) {
+            // expected exception.
+        }
+    }
+
+    @Test
+    @Deployment(resources = {"org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml"})
+    public void testCompleteWithExistingNewVariableParametersTask() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
+
+        // Fetch first task
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("First task", task.getName());
+
+        // Complete first task
+        Map<String, Object> taskParams = new HashMap<>();
+        taskParams.put("${execution.newVariable}", "newVariableValue");
+
+        try {
+            taskService.complete(task.getId(), taskParams);
+            fail("expected exception");
+        } catch (FlowableException e) {
+            // expected exception.
+        }
+    }
+
+    @Test
+    @Deployment(resources = {"org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml"})
+    public void testCompleteWithExistingVariableParametersTask() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess",
+            Collections.singletonMap("newVariable", "oldValue")
+        );
+
+        // Fetch first task
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("First task", task.getName());
+
+        // Complete first task
+        Map<String, Object> taskParams = new HashMap<>();
+        taskParams.put("${execution.newVariable}", "newVariableValue");
+        try {
+            taskService.complete(task.getId(), taskParams);
+            fail("expected exception");
+        } catch (FlowableException e) {
+            // expected exception.
+        }
+    }
+
+    @Test
     @Deployment
     public void testCompleteWithTaskLocalParameters() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testTaskLocalVars");
@@ -1039,7 +1135,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         // Complete task
         taskService.complete(task.getId());
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricTaskInstance historicTask = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
             assertEquals("my task", historicTask.getName());
             assertEquals("myFormKey", historicTask.getFormKey());
@@ -1571,7 +1667,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
     }
 
     private void checkHistoricVariableUpdateEntity(String variableName, String processInstanceId) {
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             boolean deletedVariableUpdateFound = false;
 
             List<HistoricDetail> resultSet = historyService.createHistoricDetailQuery().processInstanceId(processInstanceId).list();
@@ -1798,7 +1894,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testGetVariableByHistoricActivityInstance() throws Exception {
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
             assertNotNull(processInstance);
             org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
@@ -1842,7 +1938,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testGetVariableByActivityInstance() throws Exception {
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
             assertNotNull(processInstance);
             org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
@@ -1908,7 +2004,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
     public void testDeleteTaskWithDeleteReason() {
         // ACT-900: deleteReason can be manually specified - can only be
         // validated when historyLevel > ACTIVITY
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
 
             org.flowable.task.api.Task task = taskService.newTask();
             task.setName("test task");
@@ -1961,7 +2057,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         String taskId = task.getId();
         taskService.resolveTask(taskId, null);
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             historyService.deleteHistoricTaskInstance(taskId);
         }
 
@@ -1982,7 +2078,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         String taskId = task.getId();
         taskService.resolveTask(taskId, Collections.EMPTY_MAP);
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             historyService.deleteHistoricTaskInstance(taskId);
         }
 
@@ -2081,7 +2177,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().singleResult();
         assertEquals("form-changed.json", task.getFormKey());
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
             assertEquals("form-changed.json", historicTaskInstance.getFormKey());
         }
