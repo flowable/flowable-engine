@@ -247,6 +247,11 @@ public abstract class AbstractEngineConfiguration {
     protected boolean tablePrefixIsSchema;
     
     /**
+     * Set to true if the latest version of a definition should be retrieved, ignoring a possible parent deployment id value
+     */
+    protected boolean alwaysLookupLatestDefinitionVersion;
+    
+    /**
      * Set to true if by default lookups should fallback to the default tenant (an empty string by default or a defined tenant value)
      */
     protected boolean fallbackToDefaultTenant;
@@ -1412,6 +1417,15 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setTablePrefixIsSchema(boolean tablePrefixIsSchema) {
         this.tablePrefixIsSchema = tablePrefixIsSchema;
+        return this;
+    }
+
+    public boolean isAlwaysLookupLatestDefinitionVersion() {
+        return alwaysLookupLatestDefinitionVersion;
+    }
+
+    public AbstractEngineConfiguration setAlwaysLookupLatestDefinitionVersion(boolean alwaysLookupLatestDefinitionVersion) {
+        this.alwaysLookupLatestDefinitionVersion = alwaysLookupLatestDefinitionVersion;
         return this;
     }
 

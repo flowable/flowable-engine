@@ -85,7 +85,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
         DecisionTable currentDecisionTable = (DecisionTable) decision.getExpression();
 
         // create execution context and audit trail
-        ELExecutionContext executionContext = ELExecutionContextBuilder.build(decision, executeDecisionInfo.getVariables());
+        ELExecutionContext executionContext = ELExecutionContextBuilder.build(decision, executeDecisionInfo);
 
         try {
             sanityCheckDecisionTable(currentDecisionTable);

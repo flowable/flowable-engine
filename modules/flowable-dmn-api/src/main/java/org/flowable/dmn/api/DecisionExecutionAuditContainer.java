@@ -35,6 +35,7 @@ public class DecisionExecutionAuditContainer {
 
     protected String decisionKey;
     protected String decisionName;
+    protected int decisionVersion;
     protected String hitPolicy;
     protected String dmnDeploymentId;
     protected Date startTime;
@@ -52,12 +53,13 @@ public class DecisionExecutionAuditContainer {
     public DecisionExecutionAuditContainer() {
     }
 
-    public DecisionExecutionAuditContainer(String decisionKey, String decisionName, HitPolicy hitPolicy, 
+    public DecisionExecutionAuditContainer(String decisionKey, String decisionName, int decisionVersion, HitPolicy hitPolicy, 
                     Boolean strictMode, Map<String, Object> inputVariables) {
         
-        startTime = new Date();
+        this.startTime = new Date();
         this.decisionKey = decisionKey;
         this.decisionName = decisionName;
+        this.decisionVersion = decisionVersion;
         this.hitPolicy = hitPolicy.getValue();
         this.strictMode = strictMode;
 
@@ -141,6 +143,10 @@ public class DecisionExecutionAuditContainer {
 
     public String getDecisionName() {
         return decisionName;
+    }
+    
+    public int getDecisionVersion() {
+        return decisionVersion;
     }
 
     public String getHitPolicy() {
