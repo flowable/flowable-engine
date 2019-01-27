@@ -15,11 +15,9 @@ package org.flowable.test.spring.executor.jms;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import javax.jms.ConnectionFactory;
-
+import org.awaitility.Awaitility;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.spring.impl.test.CleanTestExecutionListener;
@@ -33,8 +31,6 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestExecutionListeners.MergeMode;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import org.awaitility.Awaitility;
-
 @TestExecutionListeners(value = CleanTestExecutionListener.class, mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
 @ContextConfiguration(classes = SpringJmsConfig.class)
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -42,9 +38,6 @@ public class SpringJmsTest {
 
     @Autowired
     private ProcessEngine processEngine;
-
-    @Autowired
-    private ConnectionFactory connectionFactory;
 
     @Test
     public void testMessageQueueAsyncExecutor() {
@@ -58,10 +51,8 @@ public class SpringJmsTest {
         processEngine.getRuntimeService().startProcessInstanceByKey("AsyncProcess", vars);
 
         // Wait until the process is completely finished
-        Awaitility.await().atMost(1, TimeUnit.MINUTES).pollInterval(500, TimeUnit.MILLISECONDS).until(
-            () -> processEngine.getRuntimeService().createProcessInstanceQuery().count() == 0);
-
-        Assert.assertEquals(0L, processEngine.getRuntimeService().createProcessInstanceQuery().count());
+        Awaitility.await().atMost(1, TimeUnit.MINUTES).pollInterval(500, TimeUnit.MILLISECONDS).untilAsserted(
+            () -> Assert.assertEquals(0L, processEngine.getRuntimeService().createProcessInstanceQuery().count()));
 
         for (String activityName : Arrays.asList("A", "B", "C", "D", "E", "F", "After boundary", "The user task", "G", "G1", "G2", "G3", "H", "I", "J", "K", "L")) {
             Assert.assertNotNull(processEngine.getHistoryService().createHistoricActivityInstanceQuery().activityName(activityName).singleResult());
