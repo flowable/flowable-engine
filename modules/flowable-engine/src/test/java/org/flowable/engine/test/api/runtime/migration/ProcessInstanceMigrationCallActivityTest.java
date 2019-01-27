@@ -142,7 +142,7 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         ProcessDefinition procDefWithCallActivityV1 = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-with-call-activity-v3.bpmn20.xml");
         ProcessDefinition procDefSubProcessV1 = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/parallel-gateway-two-splits-four-tasks.bpmn20.xml");
         ProcessDefinition procDefWithCallActivityV2 = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-with-call-activity.bpmn20.xml");
-        ProcessDefinition procDefSubProcessV2 = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml");
+        deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml");
 
         //Start the processInstance and confirm the migration state to validate
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefWithCallActivityV1.getId());
@@ -190,7 +190,7 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
     public void testValidationOfInvalidActivityInMigrationMappingToCallActivitySubProcess() {
         ProcessDefinition procDefSimpleOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
         ProcessDefinition procDefWithCallActivity = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-with-call-activity.bpmn20.xml");
-        ProcessDefinition procDefCallActivity = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml");
+        deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml");
 
         //Start the processInstance
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefSimpleOneTask.getId());
@@ -226,7 +226,7 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
     public void testValidationOfInvalidCallActivityInMigrateMappingToCallActivitySubProcess() {
         ProcessDefinition procDefSimpleOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
         ProcessDefinition procDefWithCallActivity = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-with-call-activity.bpmn20.xml");
-        ProcessDefinition procDefCallActivity = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml");
+        deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml");
 
         //Start the processInstance
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefSimpleOneTask.getId());
@@ -263,7 +263,7 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         ProcessDefinition procDefSimpleOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml");
         ProcessDefinition procDefWithCallActivity = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-with-call-activity-v2.bpmn20.xml");
         ProcessDefinition procDefCallActivityV1 = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
-        ProcessDefinition procDefCallActivityV2 = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process-v2.bpmn20.xml");
+        deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process-v2.bpmn20.xml");
 
         //Start the processInstance
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefSimpleOneTask.getId());

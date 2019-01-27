@@ -269,7 +269,6 @@ public abstract class AbstractDynamicStateManager {
 
                 moveExecutionContainer.setCallActivity(callActivity);
                 ProcessDefinition callActivityProcessDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionIdOfCallActivity);
-                String deploymentId = callActivityProcessDefinition.getDeploymentId();
                 String tenantId = callActivityProcessDefinition.getTenantId();
                 Integer calledProcessVersion = moveExecutionContainer.getCallActivitySubProcessVersion();
                 String calledProcessDefKey = callActivity.getCalledElement();

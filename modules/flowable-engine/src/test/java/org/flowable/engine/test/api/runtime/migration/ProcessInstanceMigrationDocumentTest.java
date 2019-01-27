@@ -206,7 +206,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         String definitionId = "someProcessId";
 
         try {
-            ProcessInstanceMigrationDocument document = new ProcessInstanceMigrationBuilderImpl(null)
+            new ProcessInstanceMigrationBuilderImpl(null)
                 .migrateToProcessDefinition(definitionId)
                 .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1").withLocalVariable("varForNewActivity1", "varValue"))
                 .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity2"))
@@ -226,7 +226,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         String jsonAsStr = IoUtil.readFileAsString("org/flowable/engine/test/api/runtime/migration/duplicatedFromActivitiesInFromMappingMigrationDocument.json");
 
         try {
-            ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentImpl.fromProcessInstanceMigrationDocumentJson(jsonAsStr);
+            ProcessInstanceMigrationDocumentImpl.fromProcessInstanceMigrationDocumentJson(jsonAsStr);
             fail("Should not allow duplicated values in 'from' activity");
         } catch (FlowableException e) {
             assertTextPresent("From activity '[originalActivity1, originalActivity2]' is mapped more than once", e.getMessage());
