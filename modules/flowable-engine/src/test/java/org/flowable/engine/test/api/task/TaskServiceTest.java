@@ -1045,7 +1045,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
     @Test
     @Deployment(resources = {"org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml"})
     public void testCompleteWithExistingNewVariableParametersTask_withoutBase() {
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
+        runtimeService.startProcessInstanceByKey("twoTasksProcess");
 
         // Fetch first task
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
@@ -1066,7 +1066,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
     @Test
     @Deployment(resources = {"org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml"})
     public void testCompleteWithExistingNewVariableParametersTask() {
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
+        runtimeService.startProcessInstanceByKey("twoTasksProcess");
 
         // Fetch first task
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
@@ -1087,7 +1087,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
     @Test
     @Deployment(resources = {"org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml"})
     public void testCompleteWithExistingVariableParametersTask() {
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess",
+        runtimeService.startProcessInstanceByKey("twoTasksProcess",
             Collections.singletonMap("newVariable", "oldValue")
         );
 
