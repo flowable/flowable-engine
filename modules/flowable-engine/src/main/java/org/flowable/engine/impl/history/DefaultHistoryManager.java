@@ -379,10 +379,10 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     }
 
     @Override
-    public void recordFormPropertiesSubmitted(ExecutionEntity processInstance, Map<String, String> properties, String taskId) {
+    public void recordFormPropertiesSubmitted(ExecutionEntity processInstance, Map<String, Object> properties, String taskId) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processInstance.getProcessDefinitionId())) {
             for (String propertyId : properties.keySet()) {
-                String propertyValue = properties.get(propertyId);
+                Object propertyValue = properties.get(propertyId);
                 getHistoricDetailEntityManager().insertHistoricFormPropertyEntity(processInstance, propertyId, propertyValue, taskId);
             }
         }

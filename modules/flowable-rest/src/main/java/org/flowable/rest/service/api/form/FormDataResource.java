@@ -115,7 +115,7 @@ public class FormDataResource {
             restApiInterceptor.submitFormData(submitRequest);
         }
 
-        Map<String, String> propertyMap = new HashMap<>();
+        Map<String, Object> propertyMap = new HashMap<>();
         if (submitRequest.getProperties() != null) {
             for (RestFormProperty formProperty : submitRequest.getProperties()) {
                 propertyMap.put(formProperty.getId(), formProperty.getValue());

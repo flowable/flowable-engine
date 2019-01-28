@@ -46,8 +46,8 @@ public class UserTaskSpringTest extends SpringFlowableTestCase {
         assertEquals("startDate", formProperties.get(1).getId());
         assertEquals("vacationMotivation", formProperties.get(2).getId());
 
-        Map<String, String> startProperties = new HashMap<>();
-        startProperties.put("numberOfDays", "10");
+        Map<String, Object> startProperties = new HashMap<>();
+        startProperties.put("numberOfDays", 10);
         startProperties.put("startDate", "02-02-2018 12:00");
         startProperties.put("vacationMotivation", "Badly needed");
         ProcessInstance processInstance = formService.submitStartFormData(processDefinition.getId(), startProperties);
@@ -62,8 +62,8 @@ public class UserTaskSpringTest extends SpringFlowableTestCase {
         assertEquals("vacationApproved", formProperties.get(0).getId());
         assertEquals("managerMotivation", formProperties.get(1).getId());
 
-        Map<String, String> taskProperties = new HashMap<>();
-        taskProperties.put("vacationApproved", "true");
+        Map<String, Object> taskProperties = new HashMap<>();
+        taskProperties.put("vacationApproved", true);
         formService.submitTaskFormData(requestTask.getId(), taskProperties);
 
         assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult());

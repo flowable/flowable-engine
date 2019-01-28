@@ -25,7 +25,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  */
 public interface HistoricDetailEntityManager extends EntityManager<HistoricDetailEntity> {
 
-    HistoricFormPropertyEntity insertHistoricFormPropertyEntity(ExecutionEntity execution, String propertyId, String propertyValue, String taskId);
+    HistoricFormPropertyEntity insertHistoricFormPropertyEntity(ExecutionEntity execution, String propertyId, Object propertyValue, String taskId);
 
     HistoricDetailVariableInstanceUpdateEntity copyAndInsertHistoricDetailVariableInstanceUpdateEntity(VariableInstanceEntity variableInstance);
 

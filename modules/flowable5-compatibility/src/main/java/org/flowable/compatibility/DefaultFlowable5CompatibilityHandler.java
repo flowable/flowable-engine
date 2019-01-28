@@ -716,10 +716,14 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
     }
 
     @Override
-    public ProcessInstance submitStartFormData(String processDefinitionId, String businessKey, Map<String, String> properties) {
+    public ProcessInstance submitStartFormData(String processDefinitionId, String businessKey, Map<String, Object> properties) {
         org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(Authentication.getAuthenticatedUserId());
+
+        // go back to Map<String, String> for backward compat
+        Map<String, String> compatMap = new HashMap<>();
+        properties.keySet().forEach((e) -> compatMap.put(e, String.valueOf(properties.get(e))));
         try {
-            return new Flowable5ProcessInstanceWrapper(getProcessEngine().getFormService().submitStartFormData(processDefinitionId, businessKey, properties));
+            return new Flowable5ProcessInstanceWrapper(getProcessEngine().getFormService().submitStartFormData(processDefinitionId, businessKey, compatMap));
         } catch (org.activiti.engine.ActivitiException e) {
             handleActivitiException(e);
             return null;

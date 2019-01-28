@@ -132,7 +132,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         Object renderedStartForm = formService.getRenderedStartForm(procDefId);
         assertEquals("start form content", renderedStartForm);
 
-        Map<String, String> properties = new HashMap<>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("room", "5b");
         properties.put("speaker", "Mike");
         String processInstanceId = formService.submitStartFormData(procDefId, properties).getId();
@@ -169,7 +169,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testFormPropertyHandling() {
-        Map<String, String> properties = new HashMap<>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("room", "5b"); // default
         properties.put("speaker", "Mike"); // variable name mapping
         properties.put("duration", "45"); // type conversion
@@ -279,7 +279,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
 
         assertEquals(2, formProperties.size());
 
-        Map<String, String> properties = new HashMap<>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("street", "Broadway");
         formService.submitTaskFormData(taskId, properties);
 
@@ -349,7 +349,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testSubmitStartFormDataWithBusinessKey() {
-        Map<String, String> properties = new HashMap<>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("duration", "45");
         properties.put("speaker", "Mike");
         String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
@@ -451,7 +451,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
-        Map<String, String> properties = new HashMap<>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("room", "5b");
 
         formService.submitTaskFormData(task.getId(), properties);
@@ -477,7 +477,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
 
         String taskId = task.getId();
 
-        Map<String, String> properties = new HashMap<>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("room", "5b");
 
         Map<String, String> expectedVariables = new HashMap<>();

@@ -36,9 +36,9 @@ public class SubmitStartFormCmd extends NeedsActiveProcessDefinitionCmd<ProcessI
     private static final long serialVersionUID = 1L;
 
     protected final String businessKey;
-    protected Map<String, String> properties;
+    protected Map<String, Object> properties;
 
-    public SubmitStartFormCmd(String processDefinitionId, String businessKey, Map<String, String> properties) {
+    public SubmitStartFormCmd(String processDefinitionId, String businessKey, Map<String, Object> properties) {
         super(processDefinitionId);
         this.businessKey = businessKey;
         this.properties = properties;

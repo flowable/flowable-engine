@@ -191,7 +191,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
         // get task from first subprocess
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
 
-        Map<String, String> taskFormVariables = new HashMap<>();
+        Map<String, Object> taskFormVariables = new HashMap<>();
         taskFormVariables.put("test", "begin");
         formService.submitTaskFormData(task.getId(), taskFormVariables);
 

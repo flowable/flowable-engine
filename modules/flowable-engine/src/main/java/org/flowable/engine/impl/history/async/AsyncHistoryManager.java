@@ -500,7 +500,7 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
     }
 
     @Override
-    public void recordFormPropertiesSubmitted(ExecutionEntity execution, Map<String, String> properties, String taskId) {
+    public void recordFormPropertiesSubmitted(ExecutionEntity execution, Map<String, Object> properties, String taskId) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, execution.getProcessDefinitionId())) {
             Map<String, String> data = new HashMap<>();
             if (execution != null) {
@@ -518,9 +518,9 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
             
             int counter = 1;
             for (String propertyId : properties.keySet()) {
-                String propertyValue = properties.get(propertyId);
+                Object propertyValue = properties.get(propertyId);
                 data.put(HistoryJsonConstants.FORM_PROPERTY_ID + counter, propertyId);
-                data.put(HistoryJsonConstants.FORM_PROPERTY_VALUE + counter, propertyValue);
+                data.put(HistoryJsonConstants.FORM_PROPERTY_VALUE + counter, propertyValue.toString());
                 counter++;
             }
             

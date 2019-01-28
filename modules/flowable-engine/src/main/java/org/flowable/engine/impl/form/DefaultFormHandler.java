@@ -87,8 +87,8 @@ public class DefaultFormHandler implements FormHandler {
     }
 
     @Override
-    public void submitFormProperties(Map<String, String> properties, ExecutionEntity execution) {
-        Map<String, String> propertiesCopy = new HashMap<>(properties);
+    public void submitFormProperties(Map<String, Object> properties, ExecutionEntity execution) {
+        Map<String, Object> propertiesCopy = new HashMap<>(properties);
         for (FormPropertyHandler formPropertyHandler : formPropertyHandlers) {
             // submitFormProperty will remove all the keys which it takes care
             // of
