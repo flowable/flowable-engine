@@ -19,7 +19,7 @@ import java.util.Set;
 public interface PlanItemInstanceState {
 
     /*
-     * The case states according to the CMMN spec
+     * The plan item states according to the CMMN spec
      */
     String ACTIVE = "active";
     String AVAILABLE = "available";
@@ -28,9 +28,16 @@ public interface PlanItemInstanceState {
     String COMPLETED = "completed";
     String FAILED = "failed";
     String SUSPENDED = "suspended";
-    String CLOSED = "closed";
     String TERMINATED = "terminated";
-    
+
+    /**
+     * Non-spec state, only possible for event listeners.
+     *
+     * Indicates the event listener was created, but it didn't yet moved to available.
+     * This could be for example because there is an 'available condition' that stops it from moving to that state.
+     */
+    String UNAVAILABLE = "unavailable";
+
     /*
      * Non-spec state, indicating the plan item instance is waiting to be repeated.
      * The repetition will happen when both the repetition rule is resolving to true and a sentry is satisfied.

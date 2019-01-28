@@ -34,8 +34,8 @@ public abstract class AbstractEventListenerJsonConverter extends BaseCmmnJsonCon
 
         if (planItemDefinition instanceof EventListener) {
             EventListener eventListener = (EventListener) planItemDefinition;
-            if (StringUtils.isNotEmpty(eventListener.getCreateConditionExpression())) {
-                propertiesNode.put(CmmnStencilConstants.PROPERTY_EVENT_LISTENER_CREATE_CONDITION, eventListener.getCreateConditionExpression());
+            if (StringUtils.isNotEmpty(eventListener.getAvailableConditionExpression())) {
+                propertiesNode.put(CmmnStencilConstants.PROPERTY_EVENT_LISTENER_AVAILABLE_CONDITION, eventListener.getAvailableConditionExpression());
             }
         }
     }
@@ -43,9 +43,9 @@ public abstract class AbstractEventListenerJsonConverter extends BaseCmmnJsonCon
     protected void convertCommonJsonToElement(JsonNode elementNode, EventListener eventListener) {
         ListenerConverterUtil.convertJsonToLifeCycleListeners(elementNode, eventListener);
 
-        String createCondition = CmmnJsonConverterUtil.getPropertyValueAsString(CmmnStencilConstants.PROPERTY_EVENT_LISTENER_CREATE_CONDITION, elementNode);
-        if (StringUtils.isNotEmpty(createCondition)) {
-            eventListener.setCreateConditionExpression(createCondition);
+        String availableCondition = CmmnJsonConverterUtil.getPropertyValueAsString(CmmnStencilConstants.PROPERTY_EVENT_LISTENER_AVAILABLE_CONDITION, elementNode);
+        if (StringUtils.isNotEmpty(availableCondition)) {
+            eventListener.setAvailableConditionExpression(availableCondition);
         }
     }
 

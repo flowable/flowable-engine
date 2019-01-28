@@ -193,7 +193,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         }
 
         // There are potentially plan items with a 'create condition' that haven't been created before
-        List<PlanItemInstanceEntity> newlyCreatedPlanItemInstances = evaluatePlanItemsWithCreateCondition(planItemInstanceContainer);
+        List<PlanItemInstanceEntity> newlyCreatedPlanItemInstances = evaluatePlanItemsWithAvailableCondition(planItemInstanceContainer);
         if (!newlyCreatedPlanItemInstances.isEmpty()) {
             if (newChildPlanItemInstances == null) {
                 newChildPlanItemInstances = new ArrayList<>(newlyCreatedPlanItemInstances.size());
@@ -465,7 +465,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
             // When the case entity changes, the plan items with create condition can be become ready for creation
             if (previousCompleteableState != caseInstanceEntity.isCompleteable()) {
-                List<PlanItemInstanceEntity> createdPlanItemInstances = evaluatePlanItemsWithCreateCondition(caseInstanceEntity);
+                List<PlanItemInstanceEntity> createdPlanItemInstances = evaluatePlanItemsWithAvailableCondition(caseInstanceEntity);
                 if (!createdPlanItemInstances.isEmpty()) {
                     caseInstanceEntity.getChildPlanItemInstances().addAll(createdPlanItemInstances);
                     // If new plan items are created, this could lead to changing of the fact that the case instance entity is completable
@@ -490,44 +490,24 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         }
     }
 
-    protected List<PlanItemInstanceEntity> evaluatePlanItemsWithCreateCondition(PlanItemInstanceContainer planItemInstanceContainer) {
+    protected List<PlanItemInstanceEntity> evaluatePlanItemsWithAvailableCondition(PlanItemInstanceContainer planItemInstanceContainer) {
         if (!planItemInstanceContainer.getPlanItems().isEmpty()) {
 
             // Find event listeners with a create condition
-            List<PlanItem> planItemsToCreate = planItemInstanceContainer.getPlanItems().stream()
-                .filter(planItem -> planItem.getPlanItemDefinition() instanceof EventListener // Only event listeners have a create condition currently
-                    && StringUtils.isNotEmpty(((EventListener) planItem.getPlanItemDefinition()).getCreateConditionExpression())
-                    && !childPlanItemInstanceForPlanItemExists(planItemInstanceContainer, planItem)
-                    // To check if the plan item instance hasn't been created before
-                    && evaluateCreateCondition(commandContext, planItem, (VariableContainer) planItemInstanceContainer))
+            List<PlanItemInstanceEntity> planItemInstanceToBecomeAvailable = planItemInstanceContainer.getChildPlanItemInstances().stream()
+                .filter(planItemInstance -> PlanItemInstanceState.UNAVAILABLE.equals(planItemInstance.getState())
+                    && isEventListenerWithAvailableCondition(planItemInstance.getPlanItem())
+                    && evaluateAvailableCondition(commandContext, planItemInstance.getPlanItem(), (VariableContainer) planItemInstanceContainer))
                 .collect(Collectors.toList());
 
             // Create the plan item instance for the found plan items
-            if (!planItemsToCreate.isEmpty()) {
-
-                List<PlanItemInstanceEntity> planItemInstances = new ArrayList<>(planItemsToCreate.size());
-                for (PlanItem planItem : planItemsToCreate) {
-
-                    PlanItemInstanceEntity stagePlanItemInstanceEntity = null;
-                    if (planItemInstanceContainer instanceof PlanItemInstanceEntity) {
-                        stagePlanItemInstanceEntity = (PlanItemInstanceEntity) planItemInstanceContainer;
-                    }
-
-                    PlanItemInstanceEntity childPlanItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
-                        .createChildPlanItemInstance(planItem,
-                            caseInstanceEntity.getCaseDefinitionId(),
-                            caseInstanceEntity.getId(),
-                            stagePlanItemInstanceEntity != null ? stagePlanItemInstanceEntity.getId() : null,
-                            caseInstanceEntity.getTenantId(),
-                            false);
-
-                    CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(childPlanItemInstanceEntity);
-                    planItemInstances.add(childPlanItemInstanceEntity);
-
+            if (!planItemInstanceToBecomeAvailable.isEmpty()) {
+                for (PlanItemInstanceEntity planItemInstanceEntity : planItemInstanceToBecomeAvailable) {
+                    CommandContextUtil.getAgenda(commandContext).planInitiatePlanItemInstanceOperation(planItemInstanceEntity);
                 }
-                return planItemInstances;
-
+                return planItemInstanceToBecomeAvailable;
             }
+
         }
 
         return Collections.emptyList();

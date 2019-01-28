@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
-  <case id="testCreateConditionInPlanModelPlanItemInstance" name="testCreateConditionInPlanModelPlanItemInstance" flowable:initiatorVariableName="initiator">
+  <case id="testAvailableConditionInPlanModelPlanItemInstance" name="testAvailableConditionInPlanModelPlanItemInstance" flowable:initiatorVariableName="initiator">
     <casePlanModel id="casePlanModel" flowable:includeInStageOverview="false">
       <planItem id="planItem1" name="A" definitionRef="sid-F669ABCB-9668-497B-9737-36FE7F97793D"></planItem>
       <planItem id="planItem2" name="B" definitionRef="sid-BF0E4BC5-9DE4-44B0-96A4-DEE8470EE56A">
@@ -24,12 +24,12 @@
           <modeler:flowable-idm-initiator xmlns:modeler="http://flowable.org/modeler"><![CDATA[true]]></modeler:flowable-idm-initiator>
         </extensionElements>
       </humanTask>
-      <userEventListener id="sid-6C64E782-675F-4489-9330-0318C49D819C" name="Complete task" flowable:createCondition="${cmmn:isStageCompletable()}"></userEventListener>
+      <userEventListener id="sid-6C64E782-675F-4489-9330-0318C49D819C" name="Complete task" flowable:availableCondition="${cmmn:isStageCompletable()}"></userEventListener>
       <exitCriterion id="sid-BBEFCD70-91A7-4EA0-AAE1-236371BEFAD9" sentryRef="sentry1"></exitCriterion>
     </casePlanModel>
   </case>
   <cmmndi:CMMNDI>
-    <cmmndi:CMMNDiagram id="CMMNDiagram_testCreateConditionInPlanModelPlanItemInstance">
+    <cmmndi:CMMNDiagram id="CMMNDiagram_testAvailableConditionInPlanModelPlanItemInstance">
       <cmmndi:CMMNShape id="CMMNShape_casePlanModel" cmmnElementRef="casePlanModel">
         <dc:Bounds height="513.0" width="712.0" x="30.0" y="30.0"></dc:Bounds>
         <cmmndi:CMMNLabel></cmmndi:CMMNLabel>

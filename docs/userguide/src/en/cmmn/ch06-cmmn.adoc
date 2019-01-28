@@ -838,9 +838,9 @@ image::images/cmmn.user-event-listener-removal-4.png[align="center"]
 
 Here, human task _C_ is not yet created when a case instance is started for this case definition. The user event listener will not be removed as long that _C_ has a parent stage that is in a non-terminal state, as this means that the event could still be listened to in the future.
 
-===== Create condition
+===== Available condition
 
-All types of event listeners can be configured to have a *create condition*: an expressions that will guard the creation of the event listener. To explain the use case, take the following case definition:
+All types of event listeners can be configured to have a *available condition*: an expressions that will guard the available state of the event listener. To explain the use case, take the following case definition:
 
 image::images/cmmn.create-condition.png[align="center"]
 
@@ -851,7 +851,7 @@ This means that a user could trigger it after start and the stage would be exite
 
 In some use case however, the event listener shouldn't be _available_ for the user to interact with (or a timer shouldn't start, when using a timer event listener) unless a certain condition is true.
 
-In the example above, we want to only create it when the stage doesn't have any active children (or required) anymore. Setting the *createCondition* to *${cmmn:isStageCompletable()}* will allow the event listener to be created which makes it move immediately to _available_. Concretely in this model, when human task A is completed Stage 1 becomes _completable_ (as human task B is manually activated and non-required). This makes the _createCondition_ of the event listener _true_ and the event listener is now available for a user to decide to exit the stage.
+In the example above, we want to only create it when the stage doesn't have any active children (or required) anymore. Setting the *availableCondition* to *${cmmn:isStageCompletable()}* will allow the event listener to be created which makes it move immediately to _available_. Concretely in this model, when human task A is completed Stage 1 becomes _completable_ (as human task B is manually activated and non-required). This makes the _availbleCondition_ of the event listener _true_ and the event listener is now available for a user to decide to exit the stage.
 
 Note: this is a Flowable specific addition to the CMMN specification. Without this addition, the event listener would have to be nested within a substage which is protected with entry criteria that listens to the completion of task A.
 

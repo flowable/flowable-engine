@@ -157,7 +157,7 @@
             "overrideid": "stopTaskBUserEvent",
             "name": "Stop Task B",
             "documentation": "",
-            "createcondition": "${someCondition}"
+            "availablecondition": "${someCondition}"
           },
           "stencil": {
             "id": "UserEventListener"
