@@ -85,7 +85,7 @@ public class UserEventListenerConverterTest extends AbstractConverterTest {
 
         PlanItemDefinition planItemDefinition = model.findPlanItemDefinitionInStageOrDownwards("stopTaskBUserEvent");
         assertTrue(planItemDefinition instanceof EventListener);
-        assertEquals(((EventListener) planItemDefinition).getCreateConditionExpression(), "${someCondition}");
+        assertEquals(((EventListener) planItemDefinition).getAvailableConditionExpression(), "${someCondition}");
 
     }
 

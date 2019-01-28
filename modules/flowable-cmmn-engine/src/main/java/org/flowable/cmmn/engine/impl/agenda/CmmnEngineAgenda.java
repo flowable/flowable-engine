@@ -32,6 +32,8 @@ public interface CmmnEngineAgenda extends Agenda {
 
     void planCreatePlanItemInstanceForRepetitionOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
+    void planInitiatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+
     void planActivatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId);
     
     void planStartPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId);

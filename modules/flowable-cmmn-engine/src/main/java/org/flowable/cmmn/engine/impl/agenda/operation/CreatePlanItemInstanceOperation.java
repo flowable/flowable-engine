@@ -49,7 +49,11 @@ public class CreatePlanItemInstanceOperation extends AbstractChangePlanItemInsta
 
     @Override
     protected String getNewState() {
-        return PlanItemInstanceState.AVAILABLE;
+        if (isEventListenerWithAvailableCondition(planItemInstanceEntity.getPlanItem())) {
+            return PlanItemInstanceState.UNAVAILABLE;
+        } else {
+            return PlanItemInstanceState.AVAILABLE;
+        }
     }
 
     @Override

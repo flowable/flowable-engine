@@ -82,17 +82,15 @@ public abstract class CmmnOperation implements Runnable {
                     caseInstanceId = stagePlanItemInstanceEntity.getCaseInstanceId();
                 }
 
-                if (evaluateCreateCondition(commandContext, planItem, stagePlanItemInstanceEntity != null ? stagePlanItemInstanceEntity : caseInstanceEntity)) {
-                    PlanItemInstanceEntity childPlanItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
-                        .createChildPlanItemInstance(planItem,
-                            caseDefinitionId,
-                            caseInstanceId,
-                            stagePlanItemInstanceEntity != null ? stagePlanItemInstanceEntity.getId() : null,
-                            tenantId,
-                            true);
-                    planItemInstances.add(childPlanItemInstance);
-                    CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(childPlanItemInstance);
-                }
+                PlanItemInstanceEntity childPlanItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
+                    .createChildPlanItemInstance(planItem,
+                        caseDefinitionId,
+                        caseInstanceId,
+                        stagePlanItemInstanceEntity != null ? stagePlanItemInstanceEntity.getId() : null,
+                        tenantId,
+                        true);
+                planItemInstances.add(childPlanItemInstance);
+                CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(childPlanItemInstance);
 
             }
         }
@@ -111,11 +109,19 @@ public abstract class CmmnOperation implements Runnable {
         return false;
     }
 
-    protected boolean evaluateCreateCondition(CommandContext commandContext, PlanItem planItem, VariableContainer expressionContext) {
-        if (planItem.getPlanItemDefinition() instanceof EventListener) {
+    protected boolean isEventListenerWithAvailableCondition(PlanItem planItem) {
+        if (planItem.getPlanItemDefinition() != null && planItem.getPlanItemDefinition() instanceof EventListener) {
             EventListener eventListener = (EventListener) planItem.getPlanItemDefinition();
-            if (StringUtils.isNotEmpty(eventListener.getCreateConditionExpression())) {
-                Expression expression = CommandContextUtil.getExpressionManager(commandContext).createExpression(eventListener.getCreateConditionExpression());
+            return StringUtils.isNotEmpty(eventListener.getAvailableConditionExpression());
+        }
+        return false;
+    }
+
+    protected boolean evaluateAvailableCondition(CommandContext commandContext, PlanItem planItem, VariableContainer expressionContext) {
+        if (isEventListenerWithAvailableCondition(planItem)) {
+            EventListener eventListener = (EventListener) planItem.getPlanItemDefinition();
+            if (StringUtils.isNotEmpty(eventListener.getAvailableConditionExpression())) {
+                Expression expression = CommandContextUtil.getExpressionManager(commandContext).createExpression(eventListener.getAvailableConditionExpression());
                 Object result = expression.getValue(expressionContext);
                 if (result instanceof Boolean) {
                     return (Boolean) result;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
-  <case id="testCreateCondition" name="testCreateCondition" flowable:initiatorVariableName="initiator">
+  <case id="testAvailableCondition" name="testAvailableCondition" flowable:initiatorVariableName="initiator">
     <casePlanModel id="casePlanModel" flowable:includeInStageOverview="false">
       <planItem id="planItem4" name="Stage 1" definitionRef="sid-C29976F0-3B84-417C-806C-D0C6FA737BC4">
         <exitCriterion id="sid-478A0CF4-1416-46DE-A4F0-D5DDF7B4E8B6" sentryRef="sentry1"></exitCriterion>
@@ -36,7 +36,7 @@
             <modeler:flowable-idm-initiator xmlns:modeler="http://flowable.org/modeler"><![CDATA[true]]></modeler:flowable-idm-initiator>
           </extensionElements>
         </humanTask>
-        <userEventListener id="sid-2B988DDF-4EE1-4E94-90EA-D16CA1171AAA" name="Complete case" flowable:createCondition="${cmmn:isStageCompletable()}"></userEventListener>
+        <userEventListener id="sid-2B988DDF-4EE1-4E94-90EA-D16CA1171AAA" name="Complete case" flowable:availableCondition="${cmmn:isStageCompletable()}"></userEventListener>
       </stage>
       <stage id="sid-351D6047-97A6-4041-B651-62BCD3E7B4EC" name="Stage 2">
         <planItem id="planItem5" name="C" definitionRef="sid-013DD84C-623C-473F-885B-BF481F98D931"></planItem>
@@ -49,7 +49,7 @@
     </casePlanModel>
   </case>
   <cmmndi:CMMNDI>
-    <cmmndi:CMMNDiagram id="CMMNDiagram_testCreateCondition">
+    <cmmndi:CMMNDiagram id="CMMNDiagram_testAvailableCondition">
       <cmmndi:CMMNShape id="CMMNShape_casePlanModel" cmmnElementRef="casePlanModel">
         <dc:Bounds height="714.0" width="718.0" x="40.0" y="40.0"></dc:Bounds>
         <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
