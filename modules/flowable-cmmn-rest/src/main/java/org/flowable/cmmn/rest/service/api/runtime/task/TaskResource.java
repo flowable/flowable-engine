@@ -90,6 +90,10 @@ public class TaskResource extends TaskBaseResource {
         // Populate the task properties based on the request
         populateTaskFromRequest(task, taskRequest);
 
+        if (restApiInterceptor != null) {
+            restApiInterceptor.updateTask(task, taskRequest);
+        }
+
         // Save the task and fetch again, it's possible that an
         // assignment-listener has updated
         // fields after it was saved so we can't use the in-memory task
