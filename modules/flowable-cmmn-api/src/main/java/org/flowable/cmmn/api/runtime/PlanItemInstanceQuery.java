@@ -48,6 +48,7 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
     PlanItemInstanceQuery planItemInstanceStateActive();
     PlanItemInstanceQuery planItemInstanceStateAsyncActive();
     PlanItemInstanceQuery planItemInstanceStateAvailable();
+    PlanItemInstanceQuery planItemInstanceStateUnavailable();
     PlanItemInstanceQuery planItemInstanceStateCompleted();
     PlanItemInstanceQuery planItemInstanceStateTerminated();
     PlanItemInstanceQuery planItemInstanceCreatedBefore(Date createdBefore);

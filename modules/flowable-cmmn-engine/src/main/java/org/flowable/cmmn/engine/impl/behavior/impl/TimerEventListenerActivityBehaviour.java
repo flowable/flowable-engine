@@ -71,8 +71,7 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
     }
 
     protected void handleCreateTransition(CommandContext commandContext, PlanItemInstanceEntity planItemInstance) {
-        PlanItemInstanceEntity planItemInstanceEntity = planItemInstance;
-        Object timerValue = resolveTimerExpression(commandContext, planItemInstanceEntity);
+        Object timerValue = resolveTimerExpression(commandContext, planItemInstance);
 
         Date timerDueDate = null;
         boolean isRepeating = false;
@@ -119,7 +118,7 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
                     + "an ISO8601 date/duration/repetition string or a cron expression");
         }
 
-        scheduleTimerJob(commandContext, planItemInstanceEntity, timerValue, timerDueDate, isRepeating);
+        scheduleTimerJob(commandContext, planItemInstance, timerValue, timerDueDate, isRepeating);
     }
 
     protected void scheduleTimerJob(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity,

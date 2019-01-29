@@ -61,6 +61,6 @@ public interface PlanItemInstanceState {
         return TERMINAL_STATES.contains(planItemInstance.getState());
     }
 
-    Set<String> END_STATES = new HashSet<>(Arrays.asList(DISABLED, COMPLETED, TERMINATED, FAILED, WAITING_FOR_REPETITION));
+    Set<String> END_STATES = new HashSet<>(Arrays.asList(UNAVAILABLE, DISABLED, COMPLETED, TERMINATED, FAILED, WAITING_FOR_REPETITION));
     
 }

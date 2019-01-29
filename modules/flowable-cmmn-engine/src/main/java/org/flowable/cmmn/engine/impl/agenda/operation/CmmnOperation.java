@@ -21,12 +21,11 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceContaine
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
-import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
@@ -117,22 +116,6 @@ public abstract class CmmnOperation implements Runnable {
         return false;
     }
 
-    protected boolean evaluateAvailableCondition(CommandContext commandContext, PlanItem planItem, VariableContainer expressionContext) {
-        if (isEventListenerWithAvailableCondition(planItem)) {
-            EventListener eventListener = (EventListener) planItem.getPlanItemDefinition();
-            if (StringUtils.isNotEmpty(eventListener.getAvailableConditionExpression())) {
-                Expression expression = CommandContextUtil.getExpressionManager(commandContext).createExpression(eventListener.getAvailableConditionExpression());
-                Object result = expression.getValue(expressionContext);
-                if (result instanceof Boolean) {
-                    return (Boolean) result;
-                } else {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
     protected PlanItemInstanceEntity copyAndInsertPlanItemInstance(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntityToCopy, boolean addToParent) {
         PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).createChildPlanItemInstance(
                 planItemInstanceEntityToCopy.getPlanItem(),
@@ -190,21 +173,9 @@ public abstract class CmmnOperation implements Runnable {
 
     protected boolean evaluateRepetitionRule(VariableContainer variableContainer, String repetitionCondition) {
         if (StringUtils.isNotEmpty(repetitionCondition)) {
-            return evaluateBooleanExpression(commandContext, variableContainer, repetitionCondition);
+            return ExpressionUtil.evaluateBooleanExpression(commandContext, variableContainer, repetitionCondition);
         } else {
             return true; // no condition set, but a repetition rule defined is assumed to be defaulting to true
-        }
-    }
-
-    protected boolean evaluateBooleanExpression(CommandContext commandContext, VariableContainer variableContainer, String condition) {
-        Expression expression = CommandContextUtil.getExpressionManager(commandContext).createExpression(condition);
-        Object evaluationResult = expression.getValue(variableContainer);
-        if (evaluationResult instanceof Boolean) {
-            return (boolean) evaluationResult;
-        } else if (evaluationResult instanceof String) {
-            return ((String) evaluationResult).toLowerCase().equals("true");
-        } else {
-            throw new FlowableException("Expression condition " + condition + " did not evaluate to a boolean value");
         }
     }
 

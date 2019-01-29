@@ -22,9 +22,9 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  *
  * @author Joram Barrez
  */
-public class InitiatePlanItemInstanceOperation extends AbstractChangePlanItemInstanceStateOperation {
+public class DismissPlanItemInstanceOperation extends AbstractChangePlanItemInstanceStateOperation {
 
-    public InitiatePlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+    public DismissPlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
     }
 
@@ -35,12 +35,12 @@ public class InitiatePlanItemInstanceOperation extends AbstractChangePlanItemIns
 
     @Override
     protected String getNewState() {
-        return PlanItemInstanceState.AVAILABLE;
+        return PlanItemInstanceState.UNAVAILABLE;
     }
 
     @Override
     protected String getLifeCycleTransition() {
-        return PlanItemTransition.INITIATE;
+        return PlanItemTransition.DISMISS;
     }
 
 }
