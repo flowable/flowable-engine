@@ -864,13 +864,13 @@
       "popular" : true
     } ]
   }, {
-      "name" : "createconditionpackage",
+      "name" : "availableconditionpackage",
       "properties" : [ {
-        "id" : "createcondition",
+        "id" : "availablecondition",
         "type" : "String",
-        "title" : "Create condition",
+        "title" : "Available condition",
         "value" : "",
-        "description" : "An optional condition expression on an event listener to indicate to determine when it becomes illegible for creation.",
+        "description" : "An optional condition expression on an event listener to indicate to determine when it becomes available.",
         "popular" : true
       }]
     }
@@ -1190,7 +1190,7 @@
         "requiredrulepackage",
         "repetitionrulepackage",
         "planitemlifecyclelistenerspackage",
-        "createconditionpackage"],
+        "availableconditionpackage"],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
     }, {
@@ -1210,7 +1210,7 @@
         "completionneutralrulepackage",
         "requiredrulepackage",
         "planitemlifecyclelistenerspackage",
-        "createconditionpackage"],
+        "availableconditionpackage"],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
     }, {
@@ -1229,7 +1229,7 @@
         "requiredrulepackage",
         "repetitionrulepackage",
         "planitemlifecyclelistenerspackage",
-        "createconditionpackage"],
+        "availableconditionpackage"],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {

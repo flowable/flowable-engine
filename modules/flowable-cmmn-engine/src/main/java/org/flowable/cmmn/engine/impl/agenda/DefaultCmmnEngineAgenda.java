@@ -24,6 +24,7 @@ import org.flowable.cmmn.engine.impl.agenda.operation.CompletePlanItemInstanceOp
 import org.flowable.cmmn.engine.impl.agenda.operation.CreatePlanItemInstanceForRepetitionOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.CreatePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.DisablePlanItemInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.DismissPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.EnablePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.EvaluateCriteriaOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ExitPlanItemInstanceOperation;
@@ -170,6 +171,11 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     @Override
     public void planInitiatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new InitiatePlanItemInstanceOperation(commandContext, planItemInstanceEntity), planItemInstanceEntity.getCaseInstanceId());
+    }
+
+    @Override
+    public void planDismissPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new DismissPlanItemInstanceOperation(commandContext, planItemInstanceEntity), planItemInstanceEntity.getCaseInstanceId());
     }
 
     @Override
