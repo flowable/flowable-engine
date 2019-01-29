@@ -91,6 +91,7 @@ public class StateTransition {
             PlanItemTransition.SUSPEND);
 
         addEventListenerTransition(PlanItemInstanceState.AVAILABLE,
+            PlanItemTransition.DISMISS,
             PlanItemTransition.TERMINATE,
             PlanItemTransition.OCCUR,
             PlanItemTransition.EXIT,
