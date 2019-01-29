@@ -397,7 +397,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             boolean previousCompleteableState = caseInstanceEntity.isCompleteable();
             caseInstanceEntity.setCompleteable(true);
 
-            // When the case entity changes, the plan items with create condition can be become ready for creation
+            // When the case entity changes, the plan items with an available condition can be become ready for creation
             if (previousCompleteableState != caseInstanceEntity.isCompleteable()) {
                 boolean planItemInstancesChanged = evaluatePlanItemsWithAvailableCondition(caseInstanceEntity);
                 if (planItemInstancesChanged) {
@@ -424,7 +424,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
     protected boolean evaluatePlanItemsWithAvailableCondition(PlanItemInstanceContainer planItemInstanceContainer) {
         if (!planItemInstanceContainer.getPlanItems().isEmpty()) {
 
-            // Find event listeners with a create condition to become available
+            // Find event listeners with an available condition to become available
             List<PlanItemInstanceEntity> planItemInstanceToInitiate = findChangedEventListenerInstances(planItemInstanceContainer,
                 PlanItemInstanceState.UNAVAILABLE, true);
             if (!planItemInstanceToInitiate.isEmpty()) {
@@ -434,7 +434,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 return true;
             }
 
-            // Find event listeners with a create condition to become unavailable
+            // Find event listeners with an available condition to become unavailable
             List<PlanItemInstanceEntity> planItemInstanceToDismiss = findChangedEventListenerInstances(planItemInstanceContainer,
                 PlanItemInstanceState.AVAILABLE, false);
             if (!planItemInstanceToDismiss.isEmpty()) {
