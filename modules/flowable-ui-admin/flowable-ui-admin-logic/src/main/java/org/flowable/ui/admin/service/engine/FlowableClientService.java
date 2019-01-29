@@ -13,6 +13,7 @@
 package org.flowable.ui.admin.service.engine;
 
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -25,7 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.apache.http.auth.AUTH;
 import org.apache.http.auth.AuthScope;
@@ -33,6 +33,7 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -48,6 +49,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.flowable.ui.admin.domain.ServerConfig;
+import org.flowable.ui.admin.properties.FlowableAdminAppProperties;
 import org.flowable.ui.admin.service.AttachmentResponseInfo;
 import org.flowable.ui.admin.service.ResponseInfo;
 import org.flowable.ui.admin.service.engine.exception.FlowableServiceException;
@@ -56,7 +58,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.util.UriBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -144,6 +149,15 @@ public class FlowableClientService {
      * {@link FlowableServiceException} is thrown with the error message received from the client, if possible.
      */
     public JsonNode executeRequest(HttpUriRequest request, String userName, String password, int expectedStatusCode) {
+
+        LOGGER.warn("[mattydebie] request method: {}", request.getMethod());
+        LOGGER.warn("[mattydebie] request uri: {}", request.getURI().toString());
+
+        String tenantId;
+
+        if( (tenantId = SecurityUtils.getCurrentUserObject().getTenantId()) != null ) {
+            request.addHeader("x-tenant", tenantId);
+        }
 
         FlowableServiceException exception = null;
         CloseableHttpClient client = getHttpClient(userName, password);
@@ -592,10 +606,6 @@ public class FlowableClientService {
         }
 
         URIBuilder builder = createUriBuilder(finalUrl + uri);
-
-        if (SecurityUtils.getCurrentUserObject().getTenantId() != null) {
-            builder.setParameter("tenantId", SecurityUtils.getCurrentUserObject().getTenantId());
-        }
 
         return builder.toString();
     }

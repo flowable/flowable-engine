@@ -53,8 +53,8 @@ public class ModelSourceResource extends BaseModelSourceResource {
     })
     @GetMapping("/repository/models/{modelId}/source")
     @ResponseBody
-    public byte[] getModelBytes(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletResponse response) {
-        Model model = getModelFromRequest(modelId);
+    public byte[] getModelBytes(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletRequest request, HttpServletResponse response) {
+        Model model = getModelFromRequest(modelId, request.getHeader("x-tenant"));
         byte[] editorSource = repositoryService.getModelEditorSource(model.getId());
         if (editorSource == null) {
             throw new FlowableObjectNotFoundException("Model with id '" + modelId + "' does not have source available.", String.class);
@@ -74,7 +74,7 @@ public class ModelSourceResource extends BaseModelSourceResource {
     })
     @PutMapping(value = "/repository/models/{modelId}/source", consumes = "multipart/form-data")
     public void setModelSource(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletRequest request, HttpServletResponse response) {
-        Model model = getModelFromRequest(modelId);
+        Model model = getModelFromRequest(modelId, request.getHeader("x-tenant"));
         if (!(request instanceof MultipartHttpServletRequest)) {
                 throw new FlowableIllegalArgumentException("Multipart request is required");
         }

@@ -15,6 +15,8 @@ package org.flowable.rest.service.api.repository;
 
 import java.io.InputStream;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.io.IOUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -46,8 +48,8 @@ public class ProcessDefinitionImageResource extends BaseProcessDefinitionResourc
             @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
     })
     @GetMapping("/repository/process-definitions/{processDefinitionId}/image")
-    public ResponseEntity<byte[]> getModelResource(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId) {
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+    public ResponseEntity<byte[]> getModelResource(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId, HttpServletRequest request) {
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId, request.getHeader("x-tenant"));
         InputStream imageStream = repositoryService.getProcessDiagram(processDefinition.getId());
 
         if (imageStream != null) {

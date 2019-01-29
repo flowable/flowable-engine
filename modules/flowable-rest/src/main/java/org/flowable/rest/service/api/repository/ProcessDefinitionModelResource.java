@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.repository;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,8 +41,8 @@ public class ProcessDefinitionModelResource extends BaseProcessDefinitionResourc
             @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
     })
     @GetMapping(value = "/repository/process-definitions/{processDefinitionId}/model", produces = "application/json")
-    public BpmnModel getModelResource(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId) {
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+    public BpmnModel getModelResource(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId, HttpServletRequest request) {
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId, request.getHeader("x-tenant"));
         return repositoryService.getBpmnModel(processDefinition.getId());
     }
 

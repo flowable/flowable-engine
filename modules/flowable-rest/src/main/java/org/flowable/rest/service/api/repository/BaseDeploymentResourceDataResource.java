@@ -25,6 +25,7 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.DeploymentQuery;
 import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -43,6 +44,10 @@ public class BaseDeploymentResourceDataResource {
     protected BpmnRestApiInterceptor restApiInterceptor;
 
     protected byte[] getDeploymentResourceData(String deploymentId, String resourceName, HttpServletResponse response) {
+        return getDeploymentResourceData(deploymentId, resourceName, response, null);
+    }
+
+    protected byte[] getDeploymentResourceData(String deploymentId, String resourceName, HttpServletResponse response, String tenantId) {
 
         if (deploymentId == null) {
             throw new FlowableIllegalArgumentException("No deployment id provided");
@@ -51,8 +56,13 @@ public class BaseDeploymentResourceDataResource {
             throw new FlowableIllegalArgumentException("No resource name provided");
         }
 
-        // Check if deployment exists
-        Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
+        // Check if deployment exists and tenantId can access
+        DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery().deploymentId(deploymentId);
+
+        if( tenantId != null )
+            deploymentQuery.deploymentTenantId(tenantId);
+
+        Deployment deployment = deploymentQuery.singleResult();
         if (deployment == null) {
             throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.", Deployment.class);
         }

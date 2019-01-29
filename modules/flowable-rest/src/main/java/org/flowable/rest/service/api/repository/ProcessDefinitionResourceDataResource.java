@@ -13,10 +13,12 @@
 
 package org.flowable.rest.service.api.repository;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.repository.ProcessDefinitionQuery;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,8 +43,9 @@ public class ProcessDefinitionResourceDataResource extends BaseDeploymentResourc
             @ApiResponse(code = 404, message = "Indicates the requested process definition was not found or there is no resource with the given id present in the process definition. The status-description contains additional information.")
     })
     @GetMapping(value = "/repository/process-definitions/{processDefinitionId}/resourcedata")
-    public byte[] getProcessDefinitionResource(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId, HttpServletResponse response) {
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+    public byte[] getProcessDefinitionResource(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
+        HttpServletRequest request, HttpServletResponse response) {
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId, request.getHeader("x-tenant"));
         return getDeploymentResourceData(processDefinition.getDeploymentId(), processDefinition.getResourceName(), response);
     }
 
@@ -50,7 +53,16 @@ public class ProcessDefinitionResourceDataResource extends BaseDeploymentResourc
      * Returns the {@link ProcessDefinition} that is requested. Throws the right exceptions when bad request was made or definition was not found.
      */
     protected ProcessDefinition getProcessDefinitionFromRequest(String processDefinitionId) {
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
+        return getProcessDefinitionFromRequest(processDefinitionId, null);
+    }
+
+    protected ProcessDefinition getProcessDefinitionFromRequest(String processDefinitionId, String tenantId) {
+        ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId);
+
+        if (tenantId != null )
+            processDefinitionQuery.processDefinitionTenantId(tenantId);
+
+        ProcessDefinition processDefinition = processDefinitionQuery.singleResult();
 
         if (processDefinition == null) {
             throw new FlowableObjectNotFoundException("Could not find a process definition with id '" + processDefinitionId + "'.", ProcessDefinition.class);

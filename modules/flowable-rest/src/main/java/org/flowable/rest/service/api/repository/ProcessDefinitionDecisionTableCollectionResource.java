@@ -46,7 +46,7 @@ public class ProcessDefinitionDecisionTableCollectionResource extends BaseProces
             @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
             HttpServletRequest request) {
 
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId, request.getHeader("x-tenant"));
         
         List<DmnDecisionTable> decisionTables = repositoryService.getDecisionTablesForProcessDefinition(processDefinition.getId());
 

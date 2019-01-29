@@ -50,7 +50,7 @@ public class ProcessDefinitionIdentityLinkCollectionResource extends BaseProcess
     })
     @GetMapping(value = "/repository/process-definitions/{processDefinitionId}/identitylinks", produces = "application/json")
     public List<RestIdentityLink> getIdentityLinks(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId, HttpServletRequest request) {
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId, request.getHeader("x-tenant"));
         return restResponseFactory.createRestIdentityLinks(repositoryService.getIdentityLinksForProcessDefinition(processDefinition.getId()));
     }
 
@@ -64,7 +64,7 @@ public class ProcessDefinitionIdentityLinkCollectionResource extends BaseProcess
     @PostMapping(value = "/repository/process-definitions/{processDefinitionId}/identitylinks", produces = "application/json")
     public RestIdentityLink createIdentityLink(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId, @RequestBody RestIdentityLink identityLink, HttpServletRequest request, HttpServletResponse response) {
 
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId, request.getHeader("x-tenant"));
 
         if (identityLink.getGroup() == null && identityLink.getUser() == null) {
             throw new FlowableIllegalArgumentException("A group or a user is required to create an identity link.");

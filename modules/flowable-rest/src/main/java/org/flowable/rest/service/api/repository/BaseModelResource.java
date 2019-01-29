@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,6 +16,7 @@ package org.flowable.rest.service.api.repository;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Model;
+import org.flowable.engine.repository.ModelQuery;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
@@ -31,24 +32,33 @@ public class BaseModelResource {
 
     @Autowired
     protected RepositoryService repositoryService;
-    
-    @Autowired(required=false)
+
+    @Autowired(required = false)
     protected BpmnRestApiInterceptor restApiInterceptor;
 
     /**
      * Returns the {@link Model} that is requested. Throws the right exceptions when bad request was made or model was not found.
      */
     protected Model getModelFromRequest(String modelId) {
-        Model model = repositoryService.createModelQuery().modelId(modelId).singleResult();
+        return getModelFromRequest(modelId, null);
+    }
+
+    protected Model getModelFromRequest(String modelId, String tenantId) {
+        ModelQuery modelQuery = repositoryService.createModelQuery().modelId(modelId);
+
+        if( tenantId != null )
+            modelQuery.modelTenantId(tenantId);
+
+        Model model = modelQuery.singleResult();
 
         if (model == null) {
             throw new FlowableObjectNotFoundException("Could not find a model with id '" + modelId + "'.", ProcessDefinition.class);
         }
-        
+
         if (restApiInterceptor != null) {
             restApiInterceptor.accessModelInfoById(model);
         }
-        
+
         return model;
     }
 }
