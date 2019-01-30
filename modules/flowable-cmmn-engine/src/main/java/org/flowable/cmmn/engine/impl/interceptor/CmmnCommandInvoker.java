@@ -46,15 +46,9 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
                     commandContext.setResult(command.execute(commandContext));
                 }
             });
+
             executeOperations(commandContext);
-            
-            Set<String> involvedCaseInstanceIds = CommandContextUtil.getInvolvedCaseInstanceIds(commandContext);
-            if (involvedCaseInstanceIds != null) {
-                for (String caseInstanceId : involvedCaseInstanceIds) {
-                    CommandContextUtil.getAgenda(commandContext).planEvaluateCriteriaOperation(caseInstanceId, true);
-                }
-                executeOperations(commandContext);
-            }
+            evaluateUntilStable(commandContext);
         }
         
         return (T) commandContext.getResult();
@@ -68,6 +62,24 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
                 logger.debug("Executing agenda operation {}", runnable);
             }
             runnable.run();
+        }
+    }
+
+    protected void evaluateUntilStable(CommandContext commandContext) {
+        Set<String> involvedCaseInstanceIds = CommandContextUtil.getInvolvedCaseInstanceIds(commandContext);
+        if (involvedCaseInstanceIds != null) {
+            for (String caseInstanceId : involvedCaseInstanceIds) {
+                CommandContextUtil.getAgenda(commandContext).planEvaluateCriteriaOperation(caseInstanceId, true);
+            }
+
+            involvedCaseInstanceIds.clear(); // Clearing after scheduling the evaluation. If anything changes, new operations will add ids again.
+            executeOperations(commandContext);
+
+            // If new involvedCaseInstanceIds have new entries, this means the evaluation has triggered new operations and data has changed.
+            // Need to retrigger the evaluations to make sure no new things can fire now.
+            if (!involvedCaseInstanceIds.isEmpty()) {
+                evaluateUntilStable(commandContext);
+            }
         }
     }
     

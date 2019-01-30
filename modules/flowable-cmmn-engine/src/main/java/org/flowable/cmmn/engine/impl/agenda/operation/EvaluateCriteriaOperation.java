@@ -79,6 +79,10 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
     public void run() {
         super.run();
 
+        if (caseInstanceEntity.isDeleted()) {
+            return;
+        }
+
         String satisfiedExitCriterion = evaluateExitCriteria(caseInstanceEntity, getPlanModel(caseInstanceEntity));
         if (satisfiedExitCriterion != null) {
             CommandContextUtil.getAgenda(commandContext).planTerminateCaseInstanceOperation(caseInstanceEntity.getId(), satisfiedExitCriterion);
