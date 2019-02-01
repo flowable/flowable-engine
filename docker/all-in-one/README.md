@@ -14,7 +14,7 @@ docker run -p 8080:8080 flowable/all-in-one
 
 ### Tomcat
 
-version 8.5.34
+version 9.0.14
 
 ### Database
 
