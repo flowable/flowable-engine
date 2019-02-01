@@ -83,7 +83,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             HistoricVariableInstanceEntity historicVariable = (HistoricVariableInstanceEntity) variables.get(0);
             assertEquals("test456", historicVariable.getTextValue());
 
-            assertEquals(5, historyService.createHistoricActivityInstanceQuery().count());
+            assertEquals(9, historyService.createHistoricActivityInstanceQuery().count());
             assertEquals(3, historyService.createHistoricDetailQuery().count());
         }
     }
@@ -103,7 +103,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             HistoricVariableInstanceEntity historicVariable = (HistoricVariableInstanceEntity) variables.get(0);
             assertEquals("test456", historicVariable.getTextValue());
 
-            assertEquals(4, historyService.createHistoricActivityInstanceQuery().count());
+            assertEquals(7, historyService.createHistoricActivityInstanceQuery().count());
             assertEquals(2, historyService.createHistoricDetailQuery().count());
         }
     }
@@ -137,7 +137,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             assertEquals("myVar1", historicVariable1.getName());
             assertEquals("test456", historicVariable1.getTextValue());
 
-            assertEquals(8, historyService.createHistoricActivityInstanceQuery().count());
+            assertEquals(15, historyService.createHistoricActivityInstanceQuery().count());
             assertEquals(5, historyService.createHistoricDetailQuery().count());
         }
     }
@@ -159,7 +159,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             HistoricVariableInstanceEntity historicVariable = (HistoricVariableInstanceEntity) variables.get(0);
             assertEquals("test456", historicVariable.getTextValue());
 
-            assertEquals(7, historyService.createHistoricActivityInstanceQuery().count());
+            assertEquals(13, historyService.createHistoricActivityInstanceQuery().count());
             assertEquals(2, historyService.createHistoricDetailQuery().count());
         }
     }
@@ -186,7 +186,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             assertEquals("myVar1", historicVariable1.getName());
             assertEquals("test789", historicVariable1.getTextValue());
 
-            assertEquals(18, historyService.createHistoricActivityInstanceQuery().count());
+            assertEquals(32, historyService.createHistoricActivityInstanceQuery().count());
             assertEquals(7, historyService.createHistoricDetailQuery().count());
         }
     }
@@ -226,7 +226,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableValueEquals("myVar1", "test666").count());
             assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableValueEquals("myVar1", "test666").list().size());
 
-            assertEquals(8, historyService.createHistoricActivityInstanceQuery().count());
+            assertEquals(14, historyService.createHistoricActivityInstanceQuery().count());
             assertEquals(5, historyService.createHistoricDetailQuery().count());
         }
     }
@@ -725,7 +725,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             HistoricVariableInstanceEntity historicVariable = (HistoricVariableInstanceEntity) variables.get(0);
             assertEquals("test456", historicVariable.getTextValue());
 
-            assertEquals(5, historyService.createHistoricActivityInstanceQuery().count());
+            assertEquals(9, historyService.createHistoricActivityInstanceQuery().count());
             assertEquals(3, historyService.createHistoricDetailQuery().count());
         }
     }

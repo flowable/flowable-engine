@@ -20,11 +20,13 @@ import org.flowable.variable.api.types.VariableType;
  */
 public class IntegerType implements VariableType {
 
+    public static final String TYPE_NAME = "integer";
+
     private static final long serialVersionUID = 1L;
 
     @Override
     public String getTypeName() {
-        return "integer";
+        return TYPE_NAME;
     }
 
     @Override

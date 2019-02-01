@@ -29,6 +29,24 @@ create table ACT_HI_TASKINST (
     primary key (ID_)
 );
 
+create table ACT_HI_TSK_LOG (
+    ID_ numeric(19,0) IDENTITY (1,1),
+    TYPE_ nvarchar(64),
+    TASK_ID_ nvarchar(64) not null,
+    TIME_STAMP_ datetime not null,
+    USER_ID_ nvarchar(255),
+    DATA_ nvarchar(4000),
+    EXECUTION_ID_ nvarchar(64),
+    PROC_INST_ID_ nvarchar(64),
+    PROC_DEF_ID_ nvarchar(64),
+    SCOPE_ID_ nvarchar(255),
+    SCOPE_DEFINITION_ID_ nvarchar(255),
+    SUB_SCOPE_ID_ nvarchar(255),
+    SCOPE_TYPE_ nvarchar(255),
+    TENANT_ID_ nvarchar(255) default '',
+    primary key (ID_)
+);
+
 create index ACT_IDX_HI_TASK_SCOPE on ACT_HI_TASKINST(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_HI_TASK_SUB_SCOPE on ACT_HI_TASKINST(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_HI_TASK_SCOPE_DEF on ACT_HI_TASKINST(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);

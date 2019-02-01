@@ -74,6 +74,9 @@ public interface HistoryJsonConstants {
     String TYPE_PROCESS_INSTANCE_DELETED = "process-instance-deleted";
     String TYPE_PROCESS_INSTANCE_DELETED_BY_PROCDEF_ID = "process-instance-deleted-by-process-definition-id";
     String TYPE_UPDATE_HISTORIC_ACTIVITY_INSTANCE = "activity-update";
+    String TYPE_HISTORIC_TASK_LOG_RECORD = "historic-user-task-log-record";
+    String TYPE_HISTORIC_TASK_LOG_DELETE = "historic-user-task-log-delete";
+
 
     String DATA = "data";
 
@@ -195,6 +198,8 @@ public interface HistoryJsonConstants {
 
     String SCOPE_ID = "scopeId";
     
+    String SUB_SCOPE_ID = "subScopeId";
+    
     String SCOPE_TYPE = "scopeType";
     
     String SCOPE_DEFINITION_ID = "scopeDefinitionId";
@@ -210,5 +215,10 @@ public interface HistoryJsonConstants {
     String RUNTIME_ACTIVITY_INSTANCE_ID = "runtimeActivityInstanceId";
 
     String TIMESTAMP = "__timeStamp"; // Two underscores to avoid clashes with other fields
-    
+
+    String LOG_ENTRY_TYPE = "logEntryType";
+
+    String LOG_ENTRY_DATA = "logEntryData";
+
+    String LOG_ENTRY_LOGNUMBER = "logNumber";
 }

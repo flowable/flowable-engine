@@ -12,11 +12,12 @@
  */
 package org.flowable.job.service.impl.history.async;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandContextCloseListener;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
@@ -25,8 +26,6 @@ import org.flowable.job.service.impl.history.async.AsyncHistorySession.AsyncHist
 import org.flowable.job.service.impl.history.async.transformer.HistoryJsonTransformer;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.job.service.impl.util.CommandContextUtil;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * A listener for command context lifecycle close events that generates JSON

@@ -34,7 +34,6 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
-import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
@@ -145,7 +144,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
     @Test
     public void testSimpleMigrationWithTaskMapping() {
         //Deploy first version of the process
-        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
+        deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
 
         //Start and instance of the recent first version of the process for migration and one for reference
         ProcessInstance processInstanceToMigrate = runtimeService.startProcessInstanceByKey("MP");
@@ -184,7 +183,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
             }
 
             List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).list();
-            assertEquals(3, historicActivityInstances.size());
+            assertEquals(5, historicActivityInstances.size());
             for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
                 assertEquals(version2ProcessDef.getId(), historicActivityInstance.getProcessDefinitionId());
             }
@@ -203,7 +202,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
     @Test
     public void testSimpleMigrationWithTaskJsonMapping() {
         //Deploy first version of the process
-        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
+        deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
 
         //Start and instance of the recent first version of the process for migration and one for reference
         ProcessInstance processInstanceToMigrate = runtimeService.startProcessInstanceByKey("MP");
@@ -242,7 +241,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
             }
 
             List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).list();
-            assertEquals(3, historicActivityInstances.size());
+            assertEquals(5, historicActivityInstances.size());
             for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
                 assertEquals(version2ProcessDef.getId(), historicActivityInstance.getProcessDefinitionId());
             }
@@ -261,7 +260,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
     @Test
     public void testMigrationWithParallelTaskMapping() {
         //Deploy first version of the process
-        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/parallel-gateway-two-tasks.bpmn20.xml");
+        deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/parallel-gateway-two-tasks.bpmn20.xml");
 
         //Start and instance of the recent first version of the process for migration and one for reference
         ProcessInstance processInstanceToMigrate = runtimeService.startProcessInstanceByKey("startParallelProcess");
@@ -305,7 +304,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
             }
 
             List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).list();
-            assertEquals(6, historicActivityInstances.size());
+            assertEquals(10, historicActivityInstances.size());
             for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
                 assertEquals(version2ProcessDef.getId(), historicActivityInstance.getProcessDefinitionId());
             }
@@ -332,7 +331,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
     @Test
     public void testMigrationWithNewSubProcessScope() {
         //Deploy first version of the process
-        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
+        deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
 
         //Start and instance of the recent first version of the process for migration and one for reference
         ProcessInstance processInstanceToMigrate = runtimeService.startProcessInstanceByKey("MP");
@@ -379,7 +378,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
             }
 
             List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).list();
-            assertEquals(6, historicActivityInstances.size());
+            assertEquals(9, historicActivityInstances.size());
             for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
                 assertEquals(version2ProcessDef.getId(), historicActivityInstance.getProcessDefinitionId());
             }

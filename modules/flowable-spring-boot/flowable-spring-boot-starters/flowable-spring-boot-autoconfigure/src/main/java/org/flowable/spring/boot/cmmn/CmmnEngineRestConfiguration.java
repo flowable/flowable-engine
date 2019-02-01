@@ -14,9 +14,12 @@ package org.flowable.spring.boot.cmmn;
 
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.spring.boot.DispatcherServletConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Component scan for the CMMN Rest API Configuration.
@@ -26,9 +29,12 @@ import org.springframework.context.annotation.Import;
 @Import(DispatcherServletConfiguration.class)
 @ComponentScan("org.flowable.cmmn.rest.service.api")
 public class CmmnEngineRestConfiguration {
+    
+    @Autowired
+    protected ObjectMapper objectMapper;
 
     @Bean
     public CmmnRestResponseFactory cmmnRestResponseFactory() {
-        return new CmmnRestResponseFactory();
+        return new CmmnRestResponseFactory(objectMapper);
     }
 }

@@ -14,12 +14,9 @@ package org.flowable.cmmn.converter.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.flowable.cmmn.model.Criterion;
-import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
-import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
 

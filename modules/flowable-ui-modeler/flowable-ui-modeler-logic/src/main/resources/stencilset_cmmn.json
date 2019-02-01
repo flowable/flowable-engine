@@ -863,7 +863,18 @@
       "description" : "The type of the transition event",
       "popular" : true
     } ]
-  } ],
+  }, {
+      "name" : "availableconditionpackage",
+      "properties" : [ {
+        "id" : "availablecondition",
+        "type" : "String",
+        "title" : "Available condition",
+        "value" : "",
+        "description" : "An optional condition expression on an event listener to indicate to determine when it becomes available.",
+        "popular" : true
+      }]
+    }
+  ],
   "stencils" : [ {
     "type" : "node",
     "id" : "CMMNDiagram",
@@ -1178,7 +1189,8 @@
         "completionneutralrulepackage",
         "requiredrulepackage",
         "repetitionrulepackage",
-        "planitemlifecyclelistenerspackage"],
+        "planitemlifecyclelistenerspackage",
+        "availableconditionpackage"],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
     }, {
@@ -1197,7 +1209,8 @@
         "timerstarttriggerpackage",
         "completionneutralrulepackage",
         "requiredrulepackage",
-        "planitemlifecyclelistenerspackage"],
+        "planitemlifecyclelistenerspackage",
+        "availableconditionpackage"],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
     }, {
@@ -1215,7 +1228,8 @@
         "completionneutralrulepackage",
         "requiredrulepackage",
         "repetitionrulepackage",
-        "planitemlifecyclelistenerspackage"],
+        "planitemlifecyclelistenerspackage",
+        "availableconditionpackage"],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {

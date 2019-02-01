@@ -187,8 +187,7 @@ public class AttachmentEventsTest extends PluggableFlowableTestCase {
 
             } finally {
                 if (task != null && task.getId() != null) {
-                    taskService.deleteTask(task.getId());
-                    historyService.deleteHistoricTaskInstance(task.getId());
+                    taskService.deleteTask(task.getId(), true);
                 }
             }
         }
@@ -222,8 +221,7 @@ public class AttachmentEventsTest extends PluggableFlowableTestCase {
 
             } finally {
                 if (task != null && task.getId() != null) {
-                    taskService.deleteTask(task.getId());
-                    historyService.deleteHistoricTaskInstance(task.getId());
+                    taskService.deleteTask(task.getId(), true);
                 }
             }
         }

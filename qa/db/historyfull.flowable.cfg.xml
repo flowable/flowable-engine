@@ -46,6 +46,7 @@
     
     <property name="enableProcessDefinitionHistoryLevel" value="true" />
     <property name="enableProcessDefinitionInfoCache" value="true" />
+    <property name="enableHistoricTaskLogging" value="true"/>
   </bean>
   
   <bean id="asyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">

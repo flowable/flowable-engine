@@ -62,6 +62,7 @@ import org.flowable.cmmn.rest.util.TestServerUtil.TestServer;
 import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.form.api.FormRepositoryService;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
@@ -107,6 +108,8 @@ public abstract class BaseSpringRestTestCase extends TestCase {
     protected static CmmnHistoryService historyService;
     protected static CmmnManagementService managementService;
     protected static IdmIdentityService identityService;
+    protected static FormRepositoryService formRepositoryService;
+    protected static org.flowable.form.api.FormService formEngineFormService;
 
     protected static CloseableHttpClient client;
     protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<>();
@@ -130,6 +133,8 @@ public abstract class BaseSpringRestTestCase extends TestCase {
         historyService = appContext.getBean(CmmnHistoryService.class);
         managementService = appContext.getBean(CmmnManagementService.class);
         identityService = appContext.getBean(IdmIdentityService.class);
+        formRepositoryService = appContext.getBean(FormRepositoryService.class);
+        formEngineFormService = appContext.getBean(org.flowable.form.api.FormService.class);
 
         // Create http client for all tests
         CredentialsProvider provider = new BasicCredentialsProvider();

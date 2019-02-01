@@ -12,17 +12,17 @@
  */
 package org.flowable.editor.language;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.List;
+
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IOParameter;
 import org.junit.Test;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class CallActivityConverterTest extends AbstractConverterTest {
 
@@ -54,7 +54,7 @@ public class CallActivityConverterTest extends AbstractConverterTest {
 
         assertEquals("processId", callActivity.getCalledElement());
         assertEquals("id", callActivity.getCalledElementType());
-        assertTrue(callActivity.isFallbackToDefaultTenant());
+        assertTrue(callActivity.getFallbackToDefaultTenant());
         assertTrue(callActivity.isInheritVariables());
         assertTrue(callActivity.isSameDeployment());
         assertTrue(callActivity.isInheritBusinessKey());

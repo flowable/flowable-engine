@@ -750,10 +750,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         List<org.flowable.task.api.Task> allTasks = taskService.createTaskQuery().list();
         for (org.flowable.task.api.Task task : allTasks) {
             if (task.getExecutionId() == null) {
-                taskService.deleteTask(task.getId());
-                if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                    historyService.deleteHistoricTaskInstance(task.getId());
-                }
+                taskService.deleteTask(task.getId(), true);
             }
         }
     }
@@ -1447,10 +1444,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertEquals(12, tasks.size());
 
         org.flowable.task.api.Task assigneeToKermit = taskService.createTaskQuery().taskName("assigneeToKermit").singleResult();
-        taskService.deleteTask(assigneeToKermit.getId());
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            historyService.deleteHistoricTaskInstance(assigneeToKermit.getId());
-        }
+        taskService.deleteTask(assigneeToKermit.getId(), true);
     }
 
     @Test
@@ -1489,10 +1483,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertEquals(12, tasks.size());
 
         org.flowable.task.api.Task assigneeToKermit = taskService.createTaskQuery().or().taskId("invalid").taskName("assigneeToKermit").singleResult();
-        taskService.deleteTask(assigneeToKermit.getId());
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            historyService.deleteHistoricTaskInstance(assigneeToKermit.getId());
-        }
+        taskService.deleteTask(assigneeToKermit.getId(), true);
     }
     
     @Test
@@ -3458,6 +3449,25 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                 .endOr()
                 .list()
                 .size());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" },
+        tenantId = "testTenant"
+    )
+    public void testIncludeTaskLocalAndProcessInstanceVariableHasTenant() {
+        for (int i = 0; i < 10; i++) {
+            runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", Collections.singletonMap("simpleVar", "simpleVarValue"), "testTenant");
+        }
+
+        List<Task> tasks = taskService.createTaskQuery().processDefinitionKey("oneTaskProcess").
+            includeProcessVariables().includeTaskLocalVariables()
+            .list();
+
+        assertEquals(10, tasks.size());
+        for (Task task : tasks) {
+            assertEquals("testTenant", task.getTenantId());
+        }
     }
 
     @Test

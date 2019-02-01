@@ -12,6 +12,11 @@
  */
 package org.flowable.cmmn.engine.impl.history;
 
+import static org.flowable.entitylink.service.impl.util.CommandContextUtil.getHistoricEntityLinkEntityManager;
+import static org.flowable.variable.service.impl.util.CommandContextUtil.getHistoricVariableInstanceEntityManager;
+
+import java.util.List;
+
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityManager;
@@ -19,6 +24,8 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanc
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityManager;
 
 /**
  * Contains logic that is shared by multiple classes around history.
@@ -43,6 +50,13 @@ public class CmmnHistoryHelper {
         
         if (cmmnEngineConfiguration.isEnableEntityLinks()) {
             CommandContextUtil.getHistoricEntityLinkService().deleteHistoricEntityLinksByScopeIdAndScopeType(historicCaseInstance.getId(), ScopeTypes.CMMN);
+        }
+
+        HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager = getHistoricVariableInstanceEntityManager();
+        List<HistoricVariableInstanceEntity> historicVariableInstanceEntities = historicVariableInstanceEntityManager
+            .findHistoricalVariableInstancesByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
+        for (HistoricVariableInstanceEntity historicVariableInstanceEntity : historicVariableInstanceEntities) {
+            historicVariableInstanceEntityManager.delete(historicVariableInstanceEntity);
         }
 
         historicCaseInstanceEntityManager.delete(historicCaseInstance);

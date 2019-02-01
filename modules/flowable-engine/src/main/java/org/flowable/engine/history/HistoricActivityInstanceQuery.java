@@ -13,6 +13,10 @@
 
 package org.flowable.engine.history;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+
 import org.flowable.common.engine.api.query.Query;
 
 /**
@@ -20,6 +24,7 @@ import org.flowable.common.engine.api.query.Query;
  * 
  * @author Tom Baeyens
  * @author Joram Barrez
+ * @author Zheng Ji
  */
 public interface HistoricActivityInstanceQuery extends Query<HistoricActivityInstanceQuery, HistoricActivityInstance> {
 
@@ -55,6 +60,11 @@ public interface HistoricActivityInstanceQuery extends Query<HistoricActivityIns
     HistoricActivityInstanceQuery activityType(String activityType);
 
     /**
+     * Only select historic activity instances whose activity type is in the given set of activity types.
+     */
+    HistoricActivityInstanceQuery activityTypes(Set<String>  activityTypes);
+
+    /**
      * Only select historic activity instances for userTask activities assigned to the given user
      */
     HistoricActivityInstanceQuery taskAssignee(String userId);
@@ -65,6 +75,18 @@ public interface HistoricActivityInstanceQuery extends Query<HistoricActivityIns
     /** Only select historic activity instances that are not finished yet. */
     HistoricActivityInstanceQuery unfinished();
 
+    /** Only select historic activity instances that were started before the given date. */
+    HistoricActivityInstanceQuery startedBefore(Date date);
+
+    /** Only select historic activity instances that were started after the given date. */
+    HistoricActivityInstanceQuery startedAfter(Date date);
+
+    /** Only select historic activity instances that were started before the given date. */
+    HistoricActivityInstanceQuery finishedBefore(Date date);
+
+    /** Only select historic activity instances that were started after the given date. */
+    HistoricActivityInstanceQuery finishedAfter(Date date);
+
     /** Only select historic activity instances with a specific delete reason. */
     HistoricActivityInstanceQuery deleteReason(String deleteReason);
 
@@ -73,6 +95,9 @@ public interface HistoricActivityInstanceQuery extends Query<HistoricActivityIns
 
     /** Only select historic activity instances that have the given tenant id. */
     HistoricActivityInstanceQuery activityTenantId(String tenantId);
+
+    /** Only select historic activity instances with one of the given tenant ids. */
+    HistoricActivityInstanceQuery tenantIdIn(List<String> tenantIds);
 
     /**
      * Only select historic activity instances with a tenant id like the given one.

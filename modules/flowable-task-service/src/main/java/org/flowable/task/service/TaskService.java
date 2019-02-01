@@ -36,7 +36,7 @@ public interface TaskService {
     List<Task> findTasksByParentTaskId(String parentTaskId);
     
     List<TaskEntity> findTasksBySubScopeIdScopeType(String subScopeId, String scopeType);
-    
+
     TaskQuery createTaskQuery();
     
     void changeTaskAssignee(TaskEntity taskEntity, String userId);

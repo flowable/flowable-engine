@@ -55,7 +55,7 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
             @ApiImplicitParam(name = "involvedUser", dataType = "string", value = "An involved user of the historic process instance.", paramType = "query"),
             @ApiImplicitParam(name = "finished", dataType = "boolean", value = "Indication if the historic process instance is finished.", paramType = "query"),
             @ApiImplicitParam(name = "superProcessInstanceId", dataType = "string", value = "An optional parent process id of the historic process instance.", paramType = "query"),
-            @ApiImplicitParam(name = "excludeSubprocesses", dataType = "boolean", value = "Return only historic process instances which aren’t sub processes.", paramType = "query"),
+            @ApiImplicitParam(name = "excludeSubprocesses", dataType = "boolean", value = "Return only historic process instances which are not sub processes.", paramType = "query"),
             @ApiImplicitParam(name = "finishedAfter", dataType = "string", format="date-time",  value = "Return only historic process instances that were finished after this date.", paramType = "query"),
             @ApiImplicitParam(name = "finishedBefore", dataType = "string", format="date-time", value = "Return only historic process instances that were finished before this date.", paramType = "query"),
             @ApiImplicitParam(name = "startedAfter", dataType = "string", format="date-time", value = "Return only historic process instances that were started after this date.", paramType = "query"),

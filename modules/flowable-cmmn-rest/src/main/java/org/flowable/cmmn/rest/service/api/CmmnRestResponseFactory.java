@@ -49,6 +49,7 @@ import org.flowable.cmmn.rest.service.api.repository.FormDefinitionResponse;
 import org.flowable.cmmn.rest.service.api.runtime.caze.CaseInstanceResponse;
 import org.flowable.cmmn.rest.service.api.runtime.planitem.PlanItemInstanceResponse;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskResponse;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
@@ -69,6 +70,8 @@ import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Default implementation of a {@link CmmnRestResponseFactory}.
@@ -93,9 +96,11 @@ public class CmmnRestResponseFactory {
     public static final String BYTE_ARRAY_VARIABLE_TYPE = "binary";
     public static final String SERIALIZABLE_VARIABLE_TYPE = "serializable";
 
+    protected ObjectMapper objectMapper;
     protected List<RestVariableConverter> variableConverters = new ArrayList<>();
 
-    public CmmnRestResponseFactory() {
+    public CmmnRestResponseFactory(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
         initializeVariableConverters();
     }
 
@@ -230,6 +235,14 @@ public class CmmnRestResponseFactory {
             response.setDiagramResource(urlBuilder.buildUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, caseDefinition.getDeploymentId(), caseDefinition.getDiagramResourceName()));
         }
         return response;
+    }
+    
+    public String getFormModelString(FormModelResponse formModelResponse) {
+        try {
+            return objectMapper.writeValueAsString(formModelResponse);
+        } catch (Exception e) {
+            throw new FlowableException("Error writing form model response", e);
+        }
     }
 
     public List<RestVariable> createRestVariables(Map<String, Object> variables, String id, int variableType) {
@@ -447,6 +460,10 @@ public class CmmnRestResponseFactory {
         result.setCallbackId(caseInstance.getCallbackId());
         result.setCallbackType(caseInstance.getCallbackType());
         result.setTenantId(caseInstance.getTenantId());
+
+        for (String name : caseInstance.getCaseVariables().keySet()) {
+            result.addVariable(createRestVariable(name, caseInstance.getCaseVariables().get(name), RestVariableScope.LOCAL, caseInstance.getId(), VARIABLE_CASE, false, urlBuilder));
+        }
 
         return result;
     }

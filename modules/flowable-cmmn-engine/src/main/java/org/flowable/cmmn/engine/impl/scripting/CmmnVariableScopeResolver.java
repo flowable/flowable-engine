@@ -14,9 +14,8 @@ package org.flowable.cmmn.engine.impl.scripting;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
+
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.scripting.Resolver;

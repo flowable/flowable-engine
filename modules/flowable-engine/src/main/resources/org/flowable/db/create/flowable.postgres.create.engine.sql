@@ -153,10 +153,12 @@ create index ACT_IDX_VARIABLE_TASK_ID on ACT_RU_VARIABLE(TASK_ID_);
 
 create index ACT_IDX_BYTEAR_DEPL on ACT_GE_BYTEARRAY(DEPLOYMENT_ID_);
 
-create index ACT_IDX_RU_ACT_INST_START on ACT_RU_ACTINST(START_TIME_);
-create index ACT_IDX_RU_ACT_INST_END on ACT_RU_ACTINST(END_TIME_);
-create index ACT_IDX_RU_ACT_INST_PROCINST on ACT_RU_ACTINST(PROC_INST_ID_, ACT_ID_);
-create index ACT_IDX_RU_ACT_INST_EXEC on ACT_RU_ACTINST(EXECUTION_ID_, ACT_ID_);
+create index ACT_IDX_RU_ACTI_START on ACT_RU_ACTINST(START_TIME_);
+create index ACT_IDX_RU_ACTI_END on ACT_RU_ACTINST(END_TIME_);
+create index ACT_IDX_RU_ACTI_PROC on ACT_RU_ACTINST(PROC_INST_ID_);
+create index ACT_IDX_RU_ACTI_PROC_ACT on ACT_RU_ACTINST(PROC_INST_ID_, ACT_ID_);
+create index ACT_IDX_RU_ACTI_EXEC on ACT_RU_ACTINST(EXECUTION_ID_);
+create index ACT_IDX_RU_ACTI_EXEC_ACT on ACT_RU_ACTINST(EXECUTION_ID_, ACT_ID_);
 
 alter table ACT_GE_BYTEARRAY
     add constraint ACT_FK_BYTEARR_DEPL
@@ -353,14 +355,8 @@ alter table ACT_PROCDEF_INFO
     add constraint ACT_UNIQ_INFO_PROCDEF
     unique (PROC_DEF_ID_);
 
-create index ACT_IDX_ACTINST_EXECUTION on ACT_RU_ACTINST(PROC_INST_ID_);
-alter table ACT_RU_ACTINST
-    add constraint ACT_FK_RU_ACTINST_PROCINST
-    foreign key (PROC_INST_ID_)
-    references ACT_RU_EXECUTION (ID_);
+insert into ACT_GE_PROPERTY
+values ('schema.version', '6.5.0.0', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.4.1.2', 1);
-
-insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.4.1.2)', 1);
+values ('schema.history', 'create(6.5.0.0)', 1);

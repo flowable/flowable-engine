@@ -63,7 +63,7 @@
         delete from ${prefix}ACT_CMMN_RU_MIL_INST where CASE_INST_ID_ = #{value}
     </delete>
 
-    <resultMap id="mileStoneInstanceResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityImpl">
+    <resultMap id="milestoneInstanceResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityImpl">
         <id property="id" column="ID_" jdbcType="VARCHAR" />
         <result property="name" column="NAME_" jdbcType="VARCHAR" />
         <result property="timeStamp" column="TIME_STAMP_" jdbcType="TIMESTAMP" />
@@ -73,11 +73,11 @@
         <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     </resultMap>
 
-    <select id="selectMilestone" parameterType="string" resultMap="mileStoneInstanceResultMap">
+    <select id="selectMilestone" parameterType="string" resultMap="milestoneInstanceResultMap">
         select * from ${prefix}ACT_CMMN_RU_MIL_INST where ID_ = #{id, jdbcType=VARCHAR}
     </select>
 
-    <select id="selectMilestoneInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.MilestoneInstanceQueryImpl" resultMap="mileStoneInstanceResultMap">
+    <select id="selectMilestoneInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.MilestoneInstanceQueryImpl" resultMap="milestoneInstanceResultMap">
         <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
         select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
         <include refid="selectMilestoneInstancesByQueryCriteriaSql" />

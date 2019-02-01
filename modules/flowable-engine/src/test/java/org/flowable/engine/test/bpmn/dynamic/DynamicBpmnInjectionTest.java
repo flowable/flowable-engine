@@ -147,8 +147,9 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
             }
             
             List<HistoricActivityInstance> historicActivities = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).list();
-            assertEquals(4, historicActivities.size());
+            assertEquals(5, historicActivities.size());
             for (HistoricActivityInstance historicActivityInstance : historicActivities) {
+                assertActivityInstancesAreSame(historicActivityInstance, runtimeService.createActivityInstanceQuery().activityInstanceId(historicActivityInstance.getId()).singleResult());
                 assertEquals(derivedFromDefinition.getId(), historicActivityInstance.getProcessDefinitionId());
             }
         }

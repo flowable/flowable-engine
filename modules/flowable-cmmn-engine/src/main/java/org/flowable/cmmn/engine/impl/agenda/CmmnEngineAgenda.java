@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.agenda;
 
+import java.util.Map;
+
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -30,9 +32,15 @@ public interface CmmnEngineAgenda extends Agenda {
 
     void planCreatePlanItemInstanceForRepetitionOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
+    void planInitiatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+
+    void planDismissPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+
     void planActivatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId);
     
     void planStartPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId);
+    
+    void planStartPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId, Map<String, Object> variables);
     
     void planEnablePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId);
 
@@ -49,6 +57,8 @@ public interface CmmnEngineAgenda extends Agenda {
     void planTerminatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
     void planTriggerPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+    
+    void planChangePlanItemInstanceToAvailableOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
     void planCompleteCaseInstanceOperation(CaseInstanceEntity caseInstanceEntity);
 

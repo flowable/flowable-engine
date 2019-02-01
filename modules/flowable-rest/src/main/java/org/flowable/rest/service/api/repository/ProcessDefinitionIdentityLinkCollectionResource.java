@@ -55,7 +55,7 @@ public class ProcessDefinitionIdentityLinkCollectionResource extends BaseProcess
     }
 
     @ApiOperation(value = "Add a candidate starter to a process definition", tags = { "Process Definitions" },
-            notes = "It's possible to add either a user or a group.")
+            notes = "It is possible to add either a user or a group.")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the process definition was found and the identity link was created."),
             @ApiResponse(code = 400, message = "Indicates the body does not contain the correct information."),

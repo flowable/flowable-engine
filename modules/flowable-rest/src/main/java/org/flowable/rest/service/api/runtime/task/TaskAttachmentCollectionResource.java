@@ -75,7 +75,7 @@ public class TaskAttachmentCollectionResource extends TaskBaseResource {
     // FIXME OASv3 to solve Multiple Endpoint issue
     @ApiOperation(value = "Create a new attachment on a task, containing a link to an external resource or an attached file", tags = { "Task Attachments" },
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (AttachmentRequest) to link an external resource or by passing a multipart/form-data Object to attach a file.\n"
-                    + "NB: Swagger V2 specification doesn't support this use case that's why this endpoint might be buggy/incomplete if used with other tools.")
+                    + "NB: Swagger V2 specification does not support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "body", type = "org.flowable.rest.service.api.engine.AttachmentRequest", value = "create an attachment containing a link to an external resource", paramType = "body", example = "{\n" + "  \"name\":\"Simple attachment\",\n" + "  \"description\":\"Simple attachment description\",\n"
                     + "  \"type\":\"simpleType\",\n" + "  \"externalUrl\":\"http://flowable.org\"\n" + "}"),

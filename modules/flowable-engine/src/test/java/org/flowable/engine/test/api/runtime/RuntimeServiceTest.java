@@ -210,7 +210,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testStartProcessInstanceByProcessInstanceBuilderAsync() {
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+        repositoryService.createProcessDefinitionQuery().singleResult();
 
         ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
 
@@ -387,6 +387,22 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceWithForm(processDefinition.getId(), null, vars, null);
         org.flowable.task.api.Task task = taskService.createTaskQuery().includeProcessVariables().singleResult();
         assertNotNull(task.getProcessVariables());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testStartProcessInstanceFormWithoutVariables() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+        ProcessInstance processInstance = runtimeService.startProcessInstanceWithForm(processDefinition.getId(), "outcome", null, null);
+        assertEquals(0, runtimeService.getVariables(processInstance.getId()).size());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testStartProcessInstanceFormWithEmptyVariables() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+        ProcessInstance processInstance = runtimeService.startProcessInstanceWithForm(processDefinition.getId(), "outcome", new HashMap<>(), null);
+        assertEquals(0, runtimeService.getVariables(processInstance.getId()).size());
     }
 
     // some databases might react strange on having multiple times null for the

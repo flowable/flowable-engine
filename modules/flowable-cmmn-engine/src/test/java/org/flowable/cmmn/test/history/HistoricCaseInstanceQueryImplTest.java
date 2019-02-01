@@ -1,11 +1,24 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.flowable.cmmn.test.history;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 
+import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -30,16 +43,11 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
         deplId = cmmnRepositoryService.createDeployment().
             addClasspathResource("org/flowable/cmmn/test/runtime/CaseTaskTest.testBasicBlocking.cmmn").
             addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCase.cmmn").
-            deploy()
-            .getId();
-        cmmnEngineConfiguration.getClock().setCurrentTime(new Date(0));
-        try {
-            cmmnRuntimeService.createCaseInstanceBuilder().
+            deploy().getId();
+        
+        cmmnRuntimeService.createCaseInstanceBuilder().
                 caseDefinitionKey("myCase").
                 start();
-        } finally {
-            cmmnEngineConfiguration.getClock().reset();
-        }
     }
 
     @After
@@ -261,31 +269,29 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
 
     @Test
     public void getCaseInstanceByStartedBefore() {
-        cmmnEngineConfiguration.getClock().setCurrentTime(new Date(0));
-        try {
-            cmmnRuntimeService.createCaseInstanceBuilder().
-                caseDefinitionKey("oneTaskCase").
-                start();
+        cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            start();
+        
+        Calendar todayCal = new GregorianCalendar();
+        Calendar dateCal = new GregorianCalendar(todayCal.get(Calendar.YEAR) + 1, todayCal.get(Calendar.MONTH), todayCal.get(Calendar.DAY_OF_YEAR));
 
-            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().startedBefore(new Date(100)).count(), is(2L));
-            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().startedBefore(new Date(100)).list().size(),
-                is(2));
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().startedBefore(dateCal.getTime()).count(), is(2L));
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().startedBefore(dateCal.getTime()).list().size(),
+            is(2));
 
-            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().
-                or().
-                startedBefore(new Date(100)).
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().
+            or().
+                startedBefore(dateCal.getTime()).
                 caseDefinitionName("undefinedId").
-                endOr().
-                count(), is(2L));
-            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().
-                or().
-                startedBefore(new Date(100)).
+            endOr().
+            count(), is(2L));
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().
+            or().
+                startedBefore(dateCal.getTime()).
                 caseDefinitionName("undefinedId").
-                endOr().
-                list().size(), is(2));
-        } finally {
-            cmmnEngineConfiguration.getClock().reset();
-        }
+            endOr().
+            list().size(), is(2));
     }
 
     @Test
@@ -294,19 +300,21 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
             caseDefinitionKey("oneTaskCase").
             start();
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().startedAfter(new Date(0)).count(), is(2L));
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().startedAfter(new Date(0)).list().size(),
+        Calendar todayCal = new GregorianCalendar();
+        Calendar dateCal = new GregorianCalendar(todayCal.get(Calendar.YEAR) - 1, todayCal.get(Calendar.MONTH), todayCal.get(Calendar.DAY_OF_YEAR));
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().startedAfter(dateCal.getTime()).count(), is(2L));
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().startedAfter(dateCal.getTime()).list().size(),
             is(2));
 
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().
             or().
-            startedAfter(new Date(0)).
+                startedAfter(dateCal.getTime()).
                 caseDefinitionName("undefinedId").
             endOr().
             count(), is(2L));
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().
             or().
-                startedAfter(new Date(0)).
+                startedAfter(dateCal.getTime()).
                 caseDefinitionName("undefinedId").
             endOr().
             list().size(), is(2));

@@ -19,6 +19,7 @@ import org.flowable.engine.history.HistoricDetailQuery;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.repository.DeploymentQuery;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
@@ -74,6 +75,8 @@ public interface BpmnRestApiInterceptor {
     
     void createTask(Task task, TaskRequest request);
     
+    void updateTask(Task task, TaskRequest request);
+
     void deleteTask(Task task);
     
     void executeTaskAction(Task task, TaskActionRequest actionRequest);
@@ -113,6 +116,8 @@ public interface BpmnRestApiInterceptor {
     void accessDeploymentsWithQuery(DeploymentQuery deploymentQuery);
     
     void executeNewDeploymentForTenantId(String tenantId);
+
+    void enhanceDeployment(DeploymentBuilder deploymentBuilder);
     
     void deleteDeployment(Deployment deployment);
     

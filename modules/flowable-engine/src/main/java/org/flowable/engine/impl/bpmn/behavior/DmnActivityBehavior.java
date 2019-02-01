@@ -146,15 +146,14 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         leave(execution);
     }
 
-    protected ExecuteDecisionBuilder applyFallbackToDefaultTenant(DelegateExecution execution, ExecuteDecisionBuilder executeDecisionBuilder) {
+    protected void applyFallbackToDefaultTenant(DelegateExecution execution, ExecuteDecisionBuilder executeDecisionBuilder) {
         FieldExtension fallbackfieldExtension = DelegateHelper.getFlowElementField(execution, EXPRESSION_DECISION_TABLE_FALLBACK_TO_DEFAULT_TENANT);
         if (fallbackfieldExtension != null && ((fallbackfieldExtension.getStringValue() != null && fallbackfieldExtension.getStringValue().length() != 0))) {
             String fallbackToDefaultTenant = fallbackfieldExtension.getStringValue();
-            if (Boolean.parseBoolean(fallbackToDefaultTenant)) {
-                return executeDecisionBuilder.fallbackToDefaultTenant();
+            if (StringUtils.isNotEmpty(fallbackToDefaultTenant) && Boolean.parseBoolean(fallbackToDefaultTenant)) {
+                executeDecisionBuilder.fallbackToDefaultTenant();
             }
         }
-        return executeDecisionBuilder;
     }
 
     protected void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper) {

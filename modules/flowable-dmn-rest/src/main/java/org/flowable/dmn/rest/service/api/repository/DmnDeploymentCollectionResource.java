@@ -81,7 +81,7 @@ public class DmnDeploymentCollectionResource {
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return decision table deployments with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return decision table deployments with a name like the given name.", paramType = "query"),
             @ApiImplicitParam(name = "category", dataType = "string", value = "Only return decision table deployments with the given category.", paramType = "query"),
-            @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return decision table deployments which don’t have the given category.", paramType = "query"),
+            @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return decision table deployments which do not have the given category.", paramType = "query"),
             @ApiImplicitParam(name = "parentDeploymentId", dataType = "string", value = "Only return decision table deployments with the given parent deployment id.", paramType = "query"),
             @ApiImplicitParam(name = "parentDeploymentIdLike", dataType = "string", value = "Only return decision table deployments with a parent deployment id like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return decision table deployments with the given tenantId.", paramType = "query"),
@@ -135,7 +135,7 @@ public class DmnDeploymentCollectionResource {
         return paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties, dmnRestResponseFactory::createDmnDeploymentResponseList);
     }
 
-    @ApiOperation(value = "Create a new decision table deployment", nickname = "uploadDecistionTableDeployment", tags = {
+    @ApiOperation(value = "Create a new decision table deployment", nickname = "uploadDecisionTableDeployment", tags = {
             "Deployment" }, consumes = "multipart/form-data", produces = "application/json", notes = "The request body should contain data of type multipart/form-data. There should be exactly one file in the request, any additional files will be ignored. The deployment name is the name of the file-field passed in. If multiple resources need to be deployed in a single deployment, compress the resources in a zip and make sure the file-name ends with .bar or .zip.\n"
                     + "\n"
                     + "An additional parameter (form-field) can be passed in the request body with name tenantId. The value of this field will be used as the id of the tenant this deployment is done in.")
@@ -181,6 +181,10 @@ public class DmnDeploymentCollectionResource {
 
             if (tenantId != null) {
                 deploymentBuilder.tenantId(tenantId);
+            }
+
+            if (restApiInterceptor != null) {
+                restApiInterceptor.enhanceDeployment(deploymentBuilder);
             }
 
             DmnDeployment deployment = deploymentBuilder.deploy();

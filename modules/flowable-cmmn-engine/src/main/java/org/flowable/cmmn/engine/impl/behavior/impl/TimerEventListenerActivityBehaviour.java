@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.behavior.impl;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
@@ -48,31 +49,29 @@ import org.joda.time.format.ISODateTimeFormat;
  * @author Joram Barrez
  */
 public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavior implements PlanItemActivityBehavior {
-    
-    protected String timerExpression;
-    protected String startTriggerSourceRef;
-    protected String startTriggerStandardEvent;
-    
+
+    protected TimerEventListener timerEventListener;
+
     public TimerEventListenerActivityBehaviour(TimerEventListener timerEventListener) {
-        this.timerExpression = timerEventListener.getTimerExpression();
-        this.startTriggerSourceRef = timerEventListener.getTimerStartTriggerSourceRef();
-        this.startTriggerStandardEvent = timerEventListener.getTimerStartTriggerStandardEvent();
+        this.timerEventListener = timerEventListener;
     }
     
     @Override
     public void onStateTransition(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition) {
-        if (PlanItemTransition.CREATE.equals(transition)) {
+        if (PlanItemTransition.CREATE.equals(transition) && StringUtils.isEmpty(timerEventListener.getAvailableConditionExpression())) {
             handleCreateTransition(commandContext, (PlanItemInstanceEntity) planItemInstance);
 
-        } else if (PlanItemTransition.TERMINATE.equals(transition)) {
-            handleTerminateTransition(commandContext, (PlanItemInstanceEntity) planItemInstance);
+        } else if (PlanItemTransition.INITIATE.equals(transition)) {
+            handleCreateTransition(commandContext, (PlanItemInstanceEntity) planItemInstance);
+
+        } else if (PlanItemTransition.DISMISS.equals(transition) || PlanItemTransition.TERMINATE.equals(transition)) {
+            removeTimerJob(commandContext, (PlanItemInstanceEntity) planItemInstance);
 
         }
     }
 
     protected void handleCreateTransition(CommandContext commandContext, PlanItemInstanceEntity planItemInstance) {
-        PlanItemInstanceEntity planItemInstanceEntity = planItemInstance;
-        Object timerValue = resolveTimerExpression(commandContext, planItemInstanceEntity);
+        Object timerValue = resolveTimerExpression(commandContext, planItemInstance);
 
         Date timerDueDate = null;
         boolean isRepeating = false;
@@ -115,11 +114,11 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
         }
 
         if (timerDueDate == null) {
-            throw new FlowableException("Timer expression '" + timerExpression + "' did not resolve to java.util.Date, org.joda.time.DateTime, "
+            throw new FlowableException("Timer expression '" + timerEventListener.getTimerExpression() + "' did not resolve to java.util.Date, org.joda.time.DateTime, "
                     + "an ISO8601 date/duration/repetition string or a cron expression");
         }
 
-        scheduleTimerJob(commandContext, planItemInstanceEntity, timerValue, timerDueDate, isRepeating);
+        scheduleTimerJob(commandContext, planItemInstance, timerValue, timerDueDate, isRepeating);
     }
 
     protected void scheduleTimerJob(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity,
@@ -146,7 +145,7 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
         }
     }
 
-    protected void handleTerminateTransition(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+    protected void removeTimerJob(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         TimerJobEntityManager timerJobEntityManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getJobServiceConfiguration().getTimerJobEntityManager();
         List<TimerJobEntity> timerJobsEntities = timerJobEntityManager
             .findJobsByScopeIdAndSubScopeId(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId());
@@ -162,7 +161,7 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
 
     protected Object resolveTimerExpression(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         ExpressionManager expressionManager = CommandContextUtil.getExpressionManager(commandContext);
-        Expression expression = expressionManager.createExpression(timerExpression);
+        Expression expression = expressionManager.createExpression(timerEventListener.getTimerExpression());
         return expression.getValue(planItemInstanceEntity);
     }
     

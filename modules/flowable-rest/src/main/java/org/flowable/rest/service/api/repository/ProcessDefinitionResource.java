@@ -14,13 +14,25 @@
 package org.flowable.rest.service.api.repository;
 
 import java.util.Date;
-
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.StartEvent;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.exception.FlowableConflictException;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.slf4j.LoggerFactory;
+import org.flowable.form.api.FormInfo;
+import org.flowable.form.api.FormRepositoryService;
+import org.flowable.form.model.SimpleFormModel;
+import org.flowable.rest.service.api.FormHandlerRestApiInterceptor;
+import org.flowable.rest.service.api.FormModelResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -41,6 +53,15 @@ import io.swagger.annotations.Authorization;
 @RestController
 @Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
+    
+    @Autowired
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    
+    @Autowired(required=false)
+    protected FormRepositoryService formRepositoryService;
+    
+    @Autowired(required=false)
+    protected FormHandlerRestApiInterceptor formHandlerRestApiInterceptor;
 
     @ApiOperation(value = "Get a process definition", tags = { "Process Definitions" })
     @ApiResponses(value = {
@@ -101,6 +122,49 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
 
             throw new FlowableIllegalArgumentException("Invalid action: '" + actionRequest.getAction() + "'.");
         }
+    }
+    
+    @ApiOperation(value = "Get a process definition start form", tags = { "Process Definitions" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates request was successful and the process definition form is returned"),
+            @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
+    })
+    @GetMapping(value = "/repository/process-definitions/{processDefinitionId}/start-form", produces = "application/json")
+    public String getProcessDefinitionStartForm(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId, HttpServletRequest request) {
+        if (formRepositoryService == null) {
+            return null;
+        }
+        
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        FormInfo formInfo = getStartForm(processDefinition);
+        if (formHandlerRestApiInterceptor != null) {
+            return formHandlerRestApiInterceptor.convertStartFormInfo(formInfo, processDefinition);
+        } else {
+            SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();
+            return restResponseFactory.getFormModelString(new FormModelResponse(formInfo, formModel));
+        }
+    }
+    
+    protected FormInfo getStartForm(ProcessDefinition processDefinition) {
+        FormInfo formInfo = null;
+        BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
+        Process process = bpmnModel.getProcessById(processDefinition.getKey());
+        FlowElement startElement = process.getInitialFlowElement();
+        if (startElement instanceof StartEvent) {
+            StartEvent startEvent = (StartEvent) startElement;
+            if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
+                Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(processDefinition.getDeploymentId()).singleResult();
+                formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(startEvent.getFormKey(),
+                                deployment.getParentDeploymentId(), processDefinition.getTenantId(), processEngineConfiguration.isFallbackToDefaultTenant());
+            }
+        }
+
+        if (formInfo == null) {
+            // Definition found, but no form attached
+            throw new FlowableObjectNotFoundException("Process definition does not have a form defined: " + processDefinition.getId());
+        }
+        
+        return formInfo;
     }
 
     protected ProcessDefinitionResponse activateProcessDefinition(ProcessDefinition processDefinition, boolean suspendInstances, Date date) {

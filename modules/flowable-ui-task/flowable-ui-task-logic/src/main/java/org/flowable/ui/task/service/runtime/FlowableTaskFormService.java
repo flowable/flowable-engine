@@ -95,11 +95,11 @@ public class FlowableTaskFormService {
         
         if (task.getProcessInstanceId() != null) {
             formService.saveFormInstanceByFormDefinitionId(formVariables, saveFormRepresentation.getFormId(), taskId, 
-                            task.getProcessInstanceId(), task.getProcessDefinitionId());
+                            task.getProcessInstanceId(), task.getProcessDefinitionId(), task.getTenantId());
             
         } else {
             formService.saveFormInstanceWithScopeId(formVariables, saveFormRepresentation.getFormId(), taskId, 
-                            task.getScopeId(), task.getScopeType(), task.getScopeDefinitionId());
+                            task.getScopeId(), task.getScopeType(), task.getScopeDefinitionId(), task.getTenantId());
         }
 
     }

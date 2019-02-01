@@ -191,7 +191,7 @@ public class EndExecutionOperation extends AbstractOperation {
 
         // Delete current execution
         LOGGER.debug("Ending execution {}", execution.getId());
-        executionEntityManager.deleteExecutionAndRelatedData(execution, null);
+        executionEntityManager.deleteExecutionAndRelatedData(execution, null, false);
 
         LOGGER.debug("Parent execution found. Continuing process using execution {}", parentExecution.getId());
 
@@ -219,7 +219,7 @@ public class EndExecutionOperation extends AbstractOperation {
 
             if (hasNonInterruptingStartEvent) {
                 executionEntityManager.deleteChildExecutions(parentExecution, null, false);
-                executionEntityManager.deleteExecutionAndRelatedData(parentExecution, null);
+                executionEntityManager.deleteExecutionAndRelatedData(parentExecution, null, false);
 
                 CommandContextUtil.getEventDispatcher(commandContext).dispatchEvent(
                         FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, subProcess.getId(), subProcess.getName(),
@@ -262,7 +262,7 @@ public class EndExecutionOperation extends AbstractOperation {
             
             if (!activeSiblings) {
                 for (ExecutionEntity eventScopeExecution : eventScopeExecutions) {
-                    executionEntityManager.deleteExecutionAndRelatedData(eventScopeExecution, null);                    
+                    executionEntityManager.deleteExecutionAndRelatedData(eventScopeExecution, null, false);                    
                 }
             }
         }
@@ -341,7 +341,7 @@ public class EndExecutionOperation extends AbstractOperation {
         }
 
         executionEntityManager.deleteChildExecutions(parentExecution, null, false);
-        executionEntityManager.deleteExecutionAndRelatedData(parentExecution, null);
+        executionEntityManager.deleteExecutionAndRelatedData(parentExecution, null, false);
 
         CommandContextUtil.getEventDispatcher(commandContext).dispatchEvent(
                 FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, subProcess.getId(), subProcess.getName(),
@@ -371,7 +371,7 @@ public class EndExecutionOperation extends AbstractOperation {
                     executionToContinue.setCurrentFlowElement(parentExecution.getCurrentFlowElement());
 
                     executionEntityManager.deleteChildExecutions(parentExecution, null, false);
-                    executionEntityManager.deleteExecutionAndRelatedData(parentExecution, null);
+                    executionEntityManager.deleteExecutionAndRelatedData(parentExecution, null, false);
 
                 } else {
                     executionToContinue = parentExecution;

@@ -27,6 +27,55 @@
 
 <h1>Flowable Release Notes</h1>
 
+<h3>Release Notes - Flowable - 6.4.1</h3>
+
+<h4>Highlights</h4>
+
+<h4>GENERAL</h4>
+
+<ul>
+    <li>A new table has been added to keep track of all changes that happen with a user / human task. A HistoricTaskLogEntry is created when the assignee of a task changes, or the owner, or for example the due date.
+    By default the user / human task logging is disabled, with the enableHistoricTaskLogging property in the process or cmmn engine configuration, the user / human task logging can be enabled.</li>
+    <li>A new runtime and historic entity link table has been added to store the relationship between parent entities and all children. This means for example that when a parent process instance has a sub process, and the sub process has a user task, that for the user task
+    two entity links are created, one between the parent process instance and the user task, and another with the sub process instance and the user task. The same is true when a case instance starts a process instance via the CMMN Process Task for example. This makes it possible
+    to get all child tasks for a parent process instance for example. By default, storing entity links is not enabled in the Flowable engines, but using the enableEntityLinks property in the process engine configuration and/or CMMN engine configuration this can be enabled.</li>
+    <li>Support for DMN 1.2 (<a href="https://www.omg.org/spec/DMN">https://www.omg.org/spec/DMN</a>, still in beta). This is foremost a XSD and parse support.</li>
+    <li>Various small bugfixes and improvements all around.</li>
+</ul>
+
+<h4>BPMN</h4>
+
+<ul>
+    <li>A runtime activity instance table has been added to allow you to query for the activity instances that have been executed for a running process instance without needing
+    to go to the history tables. This includes active and completed activity instances. When a process instance is completed or terminated, the runtime activity instance will be deleted and only available in the historic activity instance table.</li>
+    <li>The sequence flows that are taken are now also stored as part of the runtime and historic activity instance data. This provides a more complete audit history of the process instance execution.</li>
+    <li>The process instance migration feature has been extended with logic to allow migrating process instances with call activities and support moving the current active state from a parent process instance to a sub process instance and vice versa.</li>
+    <li>The admin app now contains a migrate process instance button in the process instance view, that allows for simple migration cases to define the activity mappings and execute the migration.</li>
+    <li>Multi tenancy improvements to support lookups for process, case, form, and decision table definitions within the tenant, but also allow for a fallback lookup in a default tenant of choice. This makes it possible to share common definitions in a default tenant, and only
+    use tenant specific definitions when necessary.</li>
+    <li>REST services have been added to make it easier to fetch a form definition associated with a user task or a start event. Also, completing a form for a user task or starting a process instance with a form is now a lot easier via REST.
+    Getting a BPMN user task form can be done via GET process-api/runtime/tasks/{taskId}/form for example, and completing a user task can be done via POST process-api/runtime/tasks/{taskId} as it was possible already before. But now the payload can contain a form definition id 
+    and outcome value to complete the user task with a form.</li>
+    <li>Using transient variables in the BPMN web service task instead of using process variables for values that should not be persisted in the variables table.</li>
+</ul>
+
+<h4>CMMN</h4>
+
+<ul>
+    <li>Plan item instances are now stored in the runtime tables until the case instance is finished. This allows to query the state of a case instance without having to use the historical api's or data.</li>
+    <li>The engine will automatically detect when event listeners (user, generic or timer) are not useful anymore and remove the event listener instances.</li>
+    <li>Addition of a new 'trigger mode' called "on event" for event resolving in sentries that allows to scope the event evaluation to that evaluation cycle only (versus with memory as is the default). This enables advanced models where events (and consequentially the related sentries) only should be evaluated at the moment they happen.</li>
+    <li>Addition of the task and plan item lifecycle listener, similar to task and execution listeners in BPMN.</li>
+    <li>To support modeling arbitrary user or automated actions in CMMN, it is now possible to use a 'generic event listeners'. This event listener behaves like a user event listener, but can be triggered programmatically through an API (see the CmmnRuntimeService).</li>
+    <li>It is now possible to make a user or generic event listeners repeatable, which allows a more natural way of modeling cases where a certain event happens multiple times.</li>
+    <li>Greatly improved cross border resolving of sentry dependencies (across multiple and potentially nested stages).</li>
+    <li>A first version of case instance change state has been added to the Flowable CMMN Engine. In the CmmnRuntimeService you can now use the createChangePlanItemStateBuilder to define and execute the case instance change state logic.
+    This first version supports changing state focused on human tasks. In the next version more support will be added for more complex cases.</li>
+    <li>REST services have been added to make it easier to fetch a form definition associated with a human task or a plan model. Also, completing a form for a human task or starting a case instance with a form is now a lot easier via REST.
+    Getting a CMMN human task form can be done via GET cmmn-api/cmmn-runtime/tasks/{taskId}/form for example, and completing a human task can be done via POST cmmn-api/runtime/tasks/{taskId} as it was possible already before. But now the payload can contain a form definition id 
+    and outcome value to complete the user task with a form.</li>
+</ul>
+
 <h3>Release Notes - Flowable - 6.4.0</h3>
 
 <h4>Highlights</h4>

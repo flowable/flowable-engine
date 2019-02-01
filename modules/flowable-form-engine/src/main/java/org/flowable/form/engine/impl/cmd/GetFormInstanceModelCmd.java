@@ -22,25 +22,25 @@ public class GetFormInstanceModelCmd extends AbstractGetFormInstanceModelCmd {
     private static final long serialVersionUID = 1L;
 
     public GetFormInstanceModelCmd(String formInstanceId, Map<String, Object> variables) {
-        initializeValues(null, null, null, null, null, null, variables);
+        initializeValues(null, null, null, null, null, null, variables, false);
         this.formInstanceId = formInstanceId;
     }
 
     public GetFormInstanceModelCmd(String formDefinitionKey, String formDefinitionId, String taskId,
             String processInstanceId, Map<String, Object> variables) {
 
-        initializeValues(formDefinitionKey, null, formDefinitionId, null, taskId, processInstanceId, variables);
+        initializeValues(formDefinitionKey, null, formDefinitionId, null, taskId, processInstanceId, variables, false);
     }
 
     public GetFormInstanceModelCmd(String formDefinitionKey, String parentDeploymentId, String formDefinitionId, String taskId,
             String processInstanceId, Map<String, Object> variables) {
 
-        initializeValues(formDefinitionKey, parentDeploymentId, formDefinitionId, null, taskId, processInstanceId, variables);
+        initializeValues(formDefinitionKey, parentDeploymentId, formDefinitionId, null, taskId, processInstanceId, variables, false);
     }
 
     public GetFormInstanceModelCmd(String formDefinitionKey, String parentDeploymentId, String formDefinitionId, String taskId,
-            String processInstanceId, String tenantId, Map<String, Object> variables) {
+            String processInstanceId, String tenantId, Map<String, Object> variables, boolean fallbackToDefaultTenant) {
 
-        initializeValues(formDefinitionKey, parentDeploymentId, formDefinitionId, tenantId, taskId, processInstanceId, variables);
+        initializeValues(formDefinitionKey, parentDeploymentId, formDefinitionId, tenantId, taskId, processInstanceId, variables, fallbackToDefaultTenant);
     }
 }

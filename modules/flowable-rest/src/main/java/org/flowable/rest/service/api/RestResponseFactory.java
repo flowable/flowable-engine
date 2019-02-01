@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
 import org.flowable.common.rest.util.RestUrlBuilder;
@@ -256,6 +257,14 @@ public class RestResponseFactory {
             response.setDiagramResource(urlBuilder.buildUrl(RestUrls.URL_DEPLOYMENT_RESOURCE, processDefinition.getDeploymentId(), processDefinition.getDiagramResourceName()));
         }
         return response;
+    }
+    
+    public String getFormModelString(FormModelResponse formModelResponse) {
+        try {
+            return objectMapper.writeValueAsString(formModelResponse);
+        } catch (Exception e) {
+            throw new FlowableException("Error writing form model response", e);
+        }
     }
 
     public List<RestVariable> createRestVariables(Map<String, Object> variables, String id, int variableType, RestVariableScope scope) {
@@ -1069,17 +1078,17 @@ public class RestResponseFactory {
         return createUserResponseList(users, false);
     }
 
-    public List<UserResponse> createUserResponseList(List<User> users, boolean incudePassword) {
+    public List<UserResponse> createUserResponseList(List<User> users, boolean includePassword) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         List<UserResponse> responseList = new ArrayList<>();
         for (User instance : users) {
-            responseList.add(createUserResponse(instance, incudePassword, urlBuilder));
+            responseList.add(createUserResponse(instance, includePassword, urlBuilder));
         }
         return responseList;
     }
 
-    public UserResponse createUserResponse(User user, boolean incudePassword) {
-        return createUserResponse(user, incudePassword, createUrlBuilder());
+    public UserResponse createUserResponse(User user, boolean includePassword) {
+        return createUserResponse(user, includePassword, createUrlBuilder());
     }
 
     public UserResponse createUserResponse(User user, boolean incudePassword, RestUrlBuilder urlBuilder) {

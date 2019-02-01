@@ -64,13 +64,13 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
         try {
             if (ioSpecification != null) {
                 this.ioSpecification.initialize(execution);
-                ItemInstance inputItem = (ItemInstance) execution.getVariable(this.ioSpecification.getFirstDataInputName());
+                ItemInstance inputItem = (ItemInstance) execution.getTransientVariable(this.ioSpecification.getFirstDataInputName());
                 message = new MessageInstance(this.operation.getInMessage(), inputItem);
             } else {
                 message = this.operation.getInMessage().createInstance();
             }
 
-            execution.setVariable(CURRENT_MESSAGE, message);
+            execution.setTransientVariable(CURRENT_MESSAGE, message);
 
             this.fillMessage(message, execution);
 
@@ -78,19 +78,19 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
             MessageInstance receivedMessage = this.operation.sendMessage(message,
                     processEngineConfig.getWsOverridenEndpointAddresses());
 
-            execution.setVariable(CURRENT_MESSAGE, receivedMessage);
+            execution.setTransientVariable(CURRENT_MESSAGE, receivedMessage);
 
             if (ioSpecification != null) {
                 String firstDataOutputName = this.ioSpecification.getFirstDataOutputName();
                 if (firstDataOutputName != null) {
-                    ItemInstance outputItem = (ItemInstance) execution.getVariable(firstDataOutputName);
+                    ItemInstance outputItem = (ItemInstance) execution.getTransientVariable(firstDataOutputName);
                     outputItem.getStructureInstance().loadFrom(receivedMessage.getStructureInstance().toArray());
                 }
             }
 
             this.returnMessage(receivedMessage, execution);
 
-            execution.setVariable(CURRENT_MESSAGE, null);
+            execution.setTransientVariable(CURRENT_MESSAGE, null);
             leave(execution);
         } catch (Exception exc) {
 

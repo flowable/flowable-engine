@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.history;
 
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
@@ -32,4 +33,13 @@ public class CmmnHistoryTaskManager implements InternalHistoryTaskManager {
         CommandContextUtil.getCmmnHistoryManager().recordTaskInfoChange(taskEntity);
     }
 
+    @Override
+    public void recordHistoryUserTaskLog(HistoricTaskLogEntryBuilder taskLogEntryBuilder) {
+        CommandContextUtil.getCmmnHistoryManager().recordHistoricUserTaskLogEntry(taskLogEntryBuilder);
+    }
+
+    @Override
+    public void deleteHistoryUserTaskLog(long logNumber) {
+        CommandContextUtil.getCmmnHistoryManager().deleteHistoricUserTaskLogEntry(logNumber);
+    }
 }

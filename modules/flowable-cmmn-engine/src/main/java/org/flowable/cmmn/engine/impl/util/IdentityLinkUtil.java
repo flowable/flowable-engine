@@ -16,18 +16,24 @@ import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.api.history.HistoricTaskLogEntryType;
+import org.flowable.task.service.TaskServiceConfiguration;
+import org.flowable.task.service.impl.BaseHistoricTaskLogEntryBuilderImpl;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
  */
 public class IdentityLinkUtil {
-    
+
     public static IdentityLinkEntity createCaseInstanceIdentityLink(CaseInstance caseInstance, String userId, String groupId, String type) {
         IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createScopeIdentityLink(
-                        caseInstance.getCaseDefinitionId(), caseInstance.getId(), ScopeTypes.CMMN, userId, groupId, type);
+                        null, caseInstance.getId(), ScopeTypes.CMMN, userId, groupId, type);
         
         CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkCreated(identityLinkEntity);
         
@@ -63,6 +69,8 @@ public class IdentityLinkUtil {
             countingTaskEntity.setIdentityLinkCount(countingTaskEntity.getIdentityLinkCount() + 1);
         }
 
+        logTaskIdentityLinkEvent(HistoricTaskLogEntryType.USER_TASK_IDENTITY_LINK_ADDED.name(), taskEntity, identityLinkEntity);
+
         taskEntity.getIdentityLinks().add(identityLinkEntity);
         CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLinkToParent(taskEntity, identityLinkEntity.getUserId());
     }
@@ -76,8 +84,29 @@ public class IdentityLinkUtil {
             if (cascaseHistory) {
                 CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkDeleted(identityLinkEntity);
             }
+            logTaskIdentityLinkEvent(HistoricTaskLogEntryType.USER_TASK_IDENTITY_LINK_REMOVED.name(), taskEntity, identityLinkEntity);
         }
 
         taskEntity.getIdentityLinks().removeAll(identityLinks);
     }
+
+    protected static void logTaskIdentityLinkEvent(String eventType, TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity) {
+        TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
+        if (taskServiceConfiguration.isEnableHistoricTaskLogging()) {
+            BaseHistoricTaskLogEntryBuilderImpl taskLogEntryBuilder = new BaseHistoricTaskLogEntryBuilderImpl(taskEntity);
+            ObjectNode data = CommandContextUtil.getTaskServiceConfiguration().getObjectMapper().createObjectNode();
+            if (identityLinkEntity.isUser()) {
+                data.put("userId", identityLinkEntity.getUserId());
+            } else if (identityLinkEntity.isGroup()) {
+                data.put("groupId", identityLinkEntity.getGroupId());
+            }
+            data.put("type", identityLinkEntity.getType());
+            taskLogEntryBuilder.timeStamp(taskServiceConfiguration.getClock().getCurrentTime());
+            taskLogEntryBuilder.userId(Authentication.getAuthenticatedUserId());
+            taskLogEntryBuilder.data(data.toString());
+            taskLogEntryBuilder.type(eventType);
+            taskServiceConfiguration.getInternalHistoryTaskManager().recordHistoryUserTaskLog(taskLogEntryBuilder);
+        }
+    }
+
 }

@@ -15,7 +15,6 @@ package org.flowable.cmmn.engine.impl.listener;
 
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.common.engine.api.delegate.Expression;
 
 /**

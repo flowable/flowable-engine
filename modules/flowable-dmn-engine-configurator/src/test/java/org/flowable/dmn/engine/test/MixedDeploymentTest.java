@@ -24,6 +24,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.DmnEngines;
@@ -138,6 +139,14 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
     public void testDecisionTaskExecutionInAnotherDeploymentAndTenant() {
         deployDecisionAndAssertProcessExecuted();
     }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/dmn/engine/test/deployment/oneDecisionTaskProcessFallBackToDefaultTenant.bpmn20.xml" },
+        tenantId = "someTenant"
+    )
+    public void testDecisionTaskExecutionWithGlobalTenantFallback() {
+        deployDecisionWithGlobalTenantFallback();
+    }
 
     @Test
     @Deployment(resources = { "org/flowable/dmn/engine/test/deployment/oneDecisionTaskProcess.bpmn20.xml" }
@@ -214,6 +223,46 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
             deleteAllDmnDeployments();
         }
     }
+    
+    protected void deployDecisionWithGlobalTenantFallback() {
+        DmnEngineConfiguration dmnEngineConfiguration = (DmnEngineConfiguration) processEngineConfiguration.getEngineConfigurations().get(
+                        EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
+        
+        String originalDefaultTenantValue = dmnEngineConfiguration.getDefaultTenantValue();
+        dmnEngineConfiguration.setFallbackToDefaultTenant(true);
+        dmnEngineConfiguration.setDefaultTenantValue("defaultFlowable");
+        
+        org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().
+            addClasspathResource("org/flowable/dmn/engine/test/deployment/simple.dmn").
+            tenantId("defaultFlowable").
+            deploy();
+        
+        try {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKeyAndTenantId(
+                "oneDecisionTaskProcess", Collections.singletonMap("inputVariable1", (Object) 1), "someTenant");
+            List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery()
+                .processInstanceId(processInstance.getId()).orderByVariableName().asc().list();
+
+            assertEquals("inputVariable1", variables.get(0).getVariableName());
+            assertEquals(1, variables.get(0).getValue());
+            assertEquals("outputVariable1", variables.get(1).getVariableName());
+            assertEquals("result1", variables.get(1).getValue());
+            
+            DmnHistoricDecisionExecution decisionExecution = dmnEngineConfiguration.getDmnHistoryService()
+                            .createHistoricDecisionExecutionQuery()
+                            .instanceId(processInstance.getId())
+                            .singleResult();
+            
+            assertNotNull(decisionExecution);
+            assertEquals("someTenant", decisionExecution.getTenantId());
+            
+        } finally {
+            dmnEngineConfiguration.setFallbackToDefaultTenant(false);
+            dmnEngineConfiguration.setDefaultTenantValue(originalDefaultTenantValue);
+            this.repositoryService.deleteDeployment(deployment.getId(), true);
+            deleteAllDmnDeployments();
+        }
+    }
 
     protected void assertDmnProcessExecuted() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKeyAndTenantId(
@@ -227,6 +276,16 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
         assertEquals(1, variables.get(0).getValue());
         assertEquals("outputVariable1", variables.get(1).getVariableName());
         assertEquals("result1", variables.get(1).getValue());
+        
+        DmnEngineConfiguration dmnEngineConfiguration = (DmnEngineConfiguration) processEngineConfiguration.getEngineConfigurations().get(
+                        EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
+        DmnHistoricDecisionExecution decisionExecution = dmnEngineConfiguration.getDmnHistoryService()
+                        .createHistoricDecisionExecutionQuery()
+                        .instanceId(processInstance.getId())
+                        .singleResult();
+        
+        assertNotNull(decisionExecution);
+        assertEquals("flowable", decisionExecution.getTenantId());
     }
 
 

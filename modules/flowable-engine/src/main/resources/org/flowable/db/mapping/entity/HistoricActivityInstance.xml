@@ -253,11 +253,35 @@
       <if test="activityType != null">
         and RES.ACT_TYPE_ = #{activityType}
       </if>
+      <if test="activityTypes != null and !activityTypes.isEmpty()">
+        and RES.ACT_TYPE_ in
+         <foreach item="item" index="index" collection="activityTypes" open="(" separator="," close=")">
+              #{item}
+         </foreach>
+      </if>
+      <if test="startedBefore != null">
+          and RES.START_TIME_ &lt;= #{startedBefore}
+      </if>
+      <if test="startedAfter != null">
+          and RES.START_TIME_ &gt;= #{startedAfter}
+      </if>
+      <if test="finishedBefore != null">
+          and RES.END_TIME_ &lt;= #{finishedBefore}
+      </if>
+      <if test="finishedAfter != null">
+        and RES.END_TIME_ &gt;= #{finishedAfter}
+      </if>
       <if test="assignee != null">
         and RES.ASSIGNEE_ = #{assignee}
       </if>
       <if test="tenantId != null">
         and RES.TENANT_ID_ = #{tenantId}
+      </if>
+      <if test="tenantIds != null &amp;&amp; !tenantIds.isEmpty()">
+        and RES.TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="tenantIds" open="(" separator="," close=")">
+            #{tenantId}
+         </foreach>
       </if>
       <if test="tenantIdLike != null">
         and RES.TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}

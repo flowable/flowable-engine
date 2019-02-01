@@ -67,6 +67,7 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     protected String referenceId;
     protected String referenceType;
     protected boolean completeable;
+    protected boolean onlyStages;
     protected String entryCriterionId;
     protected String exitCriterionId;
     protected String tenantId;
@@ -206,7 +207,12 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     public PlanItemInstanceQuery planItemInstanceStateAvailable() {
         return planItemInstanceState(PlanItemInstanceState.AVAILABLE);
     }
-    
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceStateUnavailable() {
+        return planItemInstanceState(PlanItemInstanceState.UNAVAILABLE);
+    }
+
     @Override
     public PlanItemInstanceQuery planItemInstanceStateCompleted() {
         return planItemInstanceState(PlanItemInstanceState.COMPLETED);
@@ -452,6 +458,12 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
         this.completeable = true;
         return this;
     }
+    
+    @Override
+    public PlanItemInstanceQuery onlyStages() {
+        this.onlyStages = true;
+        return this;
+    }
 
     @Override
     public PlanItemInstanceQuery planItemInstanceEntryCriterionId(String entryCriterionId) {
@@ -694,6 +706,9 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     }
     public boolean isCompleteable() {
         return completeable;
+    }
+    public boolean isOnlyStages() {
+        return onlyStages;
     }
     public String getEntryCriterionId() {
         return entryCriterionId;

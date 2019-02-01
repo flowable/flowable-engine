@@ -59,6 +59,7 @@ public class CaseInstanceEndHistoryJsonTransformer extends AbstractNeedsHistoric
            } else {
                Date endTime = getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_END_TIME);
                historicCaseInstanceEntity.setEndTime(endTime);
+               historicCaseInstanceEntity.setState(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_STATE));
                historicCaseInstanceEntityManager.update(historicCaseInstanceEntity);
                
            }

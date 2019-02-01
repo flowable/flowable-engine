@@ -22,11 +22,13 @@ import org.flowable.variable.api.types.VariableType;
  */
 public class UUIDType implements VariableType {
 
+    public static final String TYPE_NAME = "uuid";
+
     private static final long serialVersionUID = 1L;
 
     @Override
     public String getTypeName() {
-        return "uuid";
+        return TYPE_NAME;
     }
 
     @Override

@@ -22,9 +22,7 @@ import java.util.Map;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventType;
-import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -425,10 +423,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
 
             // Cleanup task and history to ensure a clean DB after test success/failure
             if (newTask.getId() != null) {
-                taskService.deleteTask(newTask.getId());
-                if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-                    historyService.deleteHistoricTaskInstance(newTask.getId());
-                }
+                taskService.deleteTask(newTask.getId(), true);
             }
         }
 

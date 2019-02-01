@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -23,6 +25,7 @@ import java.util.Map;
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -125,6 +128,55 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
             processEngine.getTaskService().complete(processTasks.get(0).getId());
             assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
             
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/CaseTaskTest.testCaseTask.cmmn")
+    public void testDeleteCaseTaskShouldNotBePossible() {
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+            .addClasspathResource("org/flowable/cmmn/test/caseTaskProcess.bpmn20.xml")
+            .deploy();
+
+        try {
+            ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("caseTask");
+            List<Task> processTasks = processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+            assertThat(processTasks).hasSize(1);
+
+            processEngineTaskService.complete(processTasks.get(0).getId());
+
+            Execution execution = processEngineRuntimeService.createExecutionQuery().onlyChildExecutions()
+                .processInstanceId(processInstance.getId())
+                .singleResult();
+
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceCallbackId(execution.getId())
+                .caseInstanceCallbackType(CallbackTypes.EXECUTION_CHILD_CASE)
+                .singleResult();
+
+            assertThat(caseInstance).isNotNull();
+
+            List<Task> caseTasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+            assertThat(caseTasks).hasSize(1);
+
+            assertThatThrownBy(() -> processEngineTaskService.deleteTask(caseTasks.get(0).getId()))
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessageContaining("The task cannot be deleted")
+                .hasMessageContaining("running case");
+
+
+            cmmnTaskService.complete(caseTasks.get(0).getId());
+
+            CaseInstance dbCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            assertNull(dbCaseInstance);
+
+            processTasks = processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+            assertEquals(1, processTasks.size());
+
+            processEngine.getTaskService().complete(processTasks.get(0).getId());
+            assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
+
         } finally {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
         }

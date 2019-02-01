@@ -39,6 +39,7 @@ import org.flowable.form.engine.impl.FormDeploymentQueryImpl;
 import org.flowable.form.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.form.engine.impl.persistence.deploy.FormDefinitionCacheEntry;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
+import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntityManager;
 import org.flowable.form.engine.impl.persistence.entity.FormInstanceEntity;
 import org.flowable.form.engine.impl.util.CommandContextUtil;
 import org.flowable.form.model.ExpressionFormField;
@@ -76,11 +77,12 @@ public class AbstractGetFormInstanceModelCmd implements Command<FormInstanceInfo
     protected String scopeType;
     protected String tenantId;
     protected Map<String, Object> variables;
+    protected boolean fallbackToDefaultTenant;
 
     @Override
     public FormInstanceInfo execute(CommandContext commandContext) {
         if (formInstanceId == null && (taskId == null && processInstanceId == null && scopeId == null)) {
-            throw new FlowableException("A processtask id or process instance id or scope id should be provided");
+            throw new FlowableException("A task id or process instance id or scope id should be provided");
         }
 
         FormDefinitionCacheEntry formDefinitionCacheEntry = resolveFormDefinition(commandContext);
@@ -91,7 +93,7 @@ public class AbstractGetFormInstanceModelCmd implements Command<FormInstanceInfo
     }
 
     protected void initializeValues(String formDefinitionKey, String parentDeploymentId, String formDefinitionId, String tenantId,
-            String taskId, String processInstanceId, Map<String, Object> variables) {
+            String taskId, String processInstanceId, Map<String, Object> variables, boolean fallbackToDefaultTenant) {
 
         this.formDefinitionKey = formDefinitionKey;
         this.parentDeploymentId = parentDeploymentId;
@@ -104,10 +106,11 @@ public class AbstractGetFormInstanceModelCmd implements Command<FormInstanceInfo
         } else {
             this.variables = new HashMap<>();
         }
+        this.fallbackToDefaultTenant = fallbackToDefaultTenant;
     }
     
     protected void initializeValuesForScope(String formDefinitionKey, String parentDeploymentId, String formDefinitionId, String tenantId,
-            String scopeId, String scopeType, Map<String, Object> variables) {
+            String scopeId, String scopeType, Map<String, Object> variables, boolean fallbackToDefaultTenant) {
 
         this.formDefinitionKey = formDefinitionKey;
         this.parentDeploymentId = parentDeploymentId;
@@ -120,6 +123,7 @@ public class AbstractGetFormInstanceModelCmd implements Command<FormInstanceInfo
         } else {
             this.variables = new HashMap<>();
         }
+        this.fallbackToDefaultTenant = fallbackToDefaultTenant;
     }
 
     protected void fillFormFieldValues(FormInstance formInstance, FormInstanceInfo formInstanceModel, CommandContext commandContext) {
@@ -226,7 +230,9 @@ public class AbstractGetFormInstanceModelCmd implements Command<FormInstanceInfo
     }
 
     protected FormDefinitionCacheEntry resolveFormDefinition(CommandContext commandContext) {
-        DeploymentManager deploymentManager = CommandContextUtil.getFormEngineConfiguration().getDeploymentManager();
+        FormEngineConfiguration formEngineConfiguration = CommandContextUtil.getFormEngineConfiguration();
+        DeploymentManager deploymentManager = formEngineConfiguration.getDeploymentManager();
+        FormDefinitionEntityManager formDefinitionEntityManager = formEngineConfiguration.getFormDefinitionEntityManager();
 
         // Find the form definition
         FormDefinitionEntity formDefinitionEntity = null;
@@ -250,16 +256,27 @@ public class AbstractGetFormInstanceModelCmd implements Command<FormInstanceInfo
                 throw new FlowableObjectNotFoundException("No form definition found for id = '" + formDefinitionId + "'", FormDefinitionEntity.class);
             }
 
-        } else if (formDefinitionKey != null && (tenantId == null || FormEngineConfiguration.NO_TENANT_ID.equals(tenantId)) && parentDeploymentId == null) {
+        } else if (formDefinitionKey != null && (tenantId == null || FormEngineConfiguration.NO_TENANT_ID.equals(tenantId)) && 
+                        (parentDeploymentId == null || formEngineConfiguration.isAlwaysLookupLatestDefinitionVersion())) {
 
             formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKey(formDefinitionKey);
             if (formDefinitionEntity == null) {
                 throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey + "'", FormDefinitionEntity.class);
             }
 
-        } else if (formDefinitionKey != null && tenantId != null && !FormEngineConfiguration.NO_TENANT_ID.equals(tenantId) && parentDeploymentId == null) {
+        } else if (formDefinitionKey != null && tenantId != null && !FormEngineConfiguration.NO_TENANT_ID.equals(tenantId) && 
+                        (parentDeploymentId == null || formEngineConfiguration.isAlwaysLookupLatestDefinitionVersion())) {
 
-            formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, tenantId);
+            formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, tenantId);
+            
+            if (formDefinitionEntity == null && (fallbackToDefaultTenant || formEngineConfiguration.isFallbackToDefaultTenant())) {
+                if (StringUtils.isNotEmpty(formEngineConfiguration.getDefaultTenantValue())) {
+                    formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, formEngineConfiguration.getDefaultTenantValue());
+                } else {
+                    formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKey(formDefinitionKey);
+                }
+            }
+            
             if (formDefinitionEntity == null) {
                 throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey + "' for tenant identifier " + tenantId, FormDefinitionEntity.class);
             }
@@ -270,7 +287,11 @@ public class AbstractGetFormInstanceModelCmd implements Command<FormInstanceInfo
                             new FormDeploymentQueryImpl().parentDeploymentId(parentDeploymentId));
             
             if (formDeployments != null && formDeployments.size() > 0) {
-                formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKeyAndDeploymentId(formDefinitionKey, formDeployments.get(0).getId());
+                formDefinitionEntity = formDefinitionEntityManager.findFormDefinitionByDeploymentAndKey(formDeployments.get(0).getId(), formDefinitionKey);
+            }
+            
+            if (formDefinitionEntity == null) {
+                formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKey(formDefinitionKey);
             }
             
             if (formDefinitionEntity == null) {
@@ -284,8 +305,20 @@ public class AbstractGetFormInstanceModelCmd implements Command<FormInstanceInfo
                             new FormDeploymentQueryImpl().parentDeploymentId(parentDeploymentId).deploymentTenantId(tenantId));
             
             if (formDeployments != null && formDeployments.size() > 0) {
-                formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKeyDeploymentIdAndTenantId(
-                                formDefinitionKey, formDeployments.get(0).getId(), tenantId);
+                formDefinitionEntity = formDefinitionEntityManager.findFormDefinitionByDeploymentAndKeyAndTenantId(
+                                formDeployments.get(0).getId(), formDefinitionKey, tenantId);
+            }
+            
+            if (formDefinitionEntity == null) {
+                formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, tenantId);
+            }
+            
+            if (formDefinitionEntity == null && (fallbackToDefaultTenant || formEngineConfiguration.isFallbackToDefaultTenant())) {
+                if (StringUtils.isNotEmpty(formEngineConfiguration.getDefaultTenantValue())) {
+                    formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, formEngineConfiguration.getDefaultTenantValue());
+                } else {
+                    formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKey(formDefinitionKey);
+                }
             }
             
             if (formDefinitionEntity == null) {

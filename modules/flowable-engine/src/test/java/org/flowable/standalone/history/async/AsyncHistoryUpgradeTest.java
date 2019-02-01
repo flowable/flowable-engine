@@ -57,6 +57,7 @@ public class AsyncHistoryUpgradeTest extends CustomConfigurationFlowableTestCase
         processEngineConfiguration.setAsyncHistoryEnabled(true);
         processEngineConfiguration.setAsyncHistoryJsonGroupingEnabled(true);
         processEngineConfiguration.setAsyncHistoryJsonGroupingThreshold(1);
+        processEngineConfiguration.setAsyncHistoryJsonGzipCompressionEnabled(false);
         processEngineConfiguration.setAsyncFailedJobWaitTime(100);
         processEngineConfiguration.setDefaultFailedJobWaitTime(100);
         processEngineConfiguration.setAsyncHistoryExecutorNumberOfRetries(10);
@@ -94,11 +95,11 @@ public class AsyncHistoryUpgradeTest extends CustomConfigurationFlowableTestCase
         removeRuntimeActivityInstances(processInstanceId);
         downgradeHistoryJobConfigurations();
 
-        waitForHistoryJobExecutorToProcessAllJobs(70000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(70000L, 200L);
         assertNull(managementService.createHistoryJobQuery().singleResult());
 
-        // 1002 -> (start, 1) + (end, 1) + (gateway, 500), + (service task, 500)
-        assertEquals(1002, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).count());
+        // 203 -> (start, 1) + -->(1) + (service task, 50) + -->(50) + (gateway, 50), + <--(49) + -->(1) + (end, 1)
+        assertEquals(203, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).count());
     }
 
     @Test
@@ -136,7 +137,7 @@ public class AsyncHistoryUpgradeTest extends CustomConfigurationFlowableTestCase
 
         taskService.setAssignee(task.getId(), null);
 
-        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(20000L, 100L);
         HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
         assertNull(historicTaskInstance.getClaimTime());
         HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(task.getProcessInstanceId())
@@ -149,7 +150,7 @@ public class AsyncHistoryUpgradeTest extends CustomConfigurationFlowableTestCase
 
         downgradeHistoryJobConfigurations();
 
-        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(20000L, 100L);
         historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(historicTaskInstance.getId()).singleResult();
         assertNotNull(historicTaskInstance.getClaimTime());
         assertNotNull(historicTaskInstance.getAssignee());
@@ -338,7 +339,7 @@ public class AsyncHistoryUpgradeTest extends CustomConfigurationFlowableTestCase
             try {
                 HistoryJob historyJob = managementService.createHistoryJobQuery().singleResult();
                 List<Map<String, Object>> configurations = processEngineConfiguration.getObjectMapper().readValue(
-                    new String(((HistoryJobEntity) historyJob).getAdvancedJobHandlerConfiguration().getBytes()),
+                    new String(((HistoryJobEntity) historyJob).getAdvancedJobHandlerConfiguration().getBytes(), "utf-8"),
                     List.class
                 );
 

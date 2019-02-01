@@ -74,11 +74,11 @@ public interface FormRepositoryService {
 
     FormInfo getFormModelByKey(String formDefinitionKey);
 
-    FormInfo getFormModelByKey(String formDefinitionKey, String tenantId);
+    FormInfo getFormModelByKey(String formDefinitionKey, String tenantId, boolean fallbackToDefaultTenant);
 
     FormInfo getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId);
 
-    FormInfo getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String tenantId);
+    FormInfo getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String tenantId, boolean fallbackToDefaultTenant);
 
     InputStream getFormDefinitionResource(String formDefinitionId);
 

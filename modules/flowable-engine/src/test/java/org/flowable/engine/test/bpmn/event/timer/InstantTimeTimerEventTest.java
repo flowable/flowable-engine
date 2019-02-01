@@ -13,7 +13,7 @@
 package org.flowable.engine.test.bpmn.event.timer;
 
 import java.time.Instant;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -51,37 +51,48 @@ public class InstantTimeTimerEventTest extends ResourceFlowableTestCase {
         HashMap<String, Object> variables = new HashMap<>();
         variables.put("duration", Instant.ofEpochSecond(100));
 
-        processEngineConfiguration.getClock().setCurrentTime(new Date(0));
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("testExpressionOnBoundaryTimer", variables);
 
         TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
         List<Job> jobs = jobQuery.list();
         assertEquals(1, jobs.size());
 
-        processEngineConfiguration.getClock().setCurrentTime(new Date(200*1000));
-        waitForJobExecutorToProcessAllJobs(10000L, 25L);
-        assertEquals(0L, jobQuery.count());
+        Calendar nowCal = processEngineConfiguration.getClock().getCurrentCalendar();
+        nowCal.add(Calendar.MINUTE, 3);
+        processEngineConfiguration.getClock().setCurrentTime(nowCal.getTime());
         
-        assertProcessEnded(pi.getId());
-        processEngineConfiguration.getClock().reset();
+        try {
+            waitForJobExecutorToProcessAllJobs(10000L, 25L);
+            assertEquals(0L, jobQuery.count());
+            
+            assertProcessEnded(pi.getId());
+        } finally {
+            processEngineConfiguration.getClock().reset();
+        }
     }
 
     @Test
     @Deployment
     public void testBeanExpressionBoundaryTimerEvent() {
-        processEngineConfiguration.getClock().setCurrentTime(new Date(0));
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("testExpressionOnBoundaryTimer");
 
         TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
         List<Job> jobs = jobQuery.list();
         assertEquals(1, jobs.size());
 
-        processEngineConfiguration.getClock().setCurrentTime(new Date(200*1000));
-        waitForJobExecutorToProcessAllJobs(10000L, 25L);
-        assertEquals(0L, jobQuery.count());
+        Calendar nowCal = processEngineConfiguration.getClock().getCurrentCalendar();
+        nowCal.add(Calendar.MINUTE, 3);
+        processEngineConfiguration.getClock().setCurrentTime(nowCal.getTime());
         
-        assertProcessEnded(pi.getId());
-        processEngineConfiguration.getClock().reset();
+        try {
+            waitForJobExecutorToProcessAllJobs(10000L, 25L);
+            assertEquals(0L, jobQuery.count());
+            
+            assertProcessEnded(pi.getId());
+            
+        } finally {
+            processEngineConfiguration.getClock().reset();
+        }
     }
 
 }

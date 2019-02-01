@@ -60,6 +60,7 @@ import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.el.CmmnExpressionManager;
 import org.flowable.cmmn.engine.impl.form.DefaultFormFieldHandler;
+import org.flowable.cmmn.engine.impl.function.IsStageCompletableExpressionFunction;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryTaskManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryVariableManager;
@@ -72,6 +73,8 @@ import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstance
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.EntityLinkCreatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.EntityLinkDeletedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.HistoricCaseInstanceDeletedHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.HistoricUserTaskLogDeleteJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.HistoricUserTaskLogRecordJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.IdentityLinkCreatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.IdentityLinkDeletedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.MilestoneReachedHistoryJsonTransformer;
@@ -166,7 +169,9 @@ import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCac
 import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelperImpl;
+import org.flowable.cmmn.engine.impl.runtime.CmmnDynamicStateManager;
 import org.flowable.cmmn.engine.impl.runtime.CmmnRuntimeServiceImpl;
+import org.flowable.cmmn.engine.impl.runtime.DefaultCmmnDynamicStateManager;
 import org.flowable.cmmn.engine.impl.scripting.CmmnVariableScopeResolverFactory;
 import org.flowable.cmmn.engine.impl.task.DefaultCmmnTaskVariableScopeResolver;
 import org.flowable.cmmn.image.CaseDiagramGenerator;
@@ -178,6 +183,7 @@ import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
+import org.flowable.common.engine.impl.HasVariableTypes;
 import org.flowable.common.engine.impl.ScriptingEngineAwareEngineConfiguration;
 import org.flowable.common.engine.impl.calendar.BusinessCalendarManager;
 import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
@@ -277,7 +283,7 @@ import org.flowable.variable.service.impl.types.UUIDType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi,
-        ScriptingEngineAwareEngineConfiguration, HasExpressionManagerEngineConfiguration {
+        ScriptingEngineAwareEngineConfiguration, HasExpressionManagerEngineConfiguration, HasVariableTypes {
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/cmmn/db/mapping/mappings.xml";
     public static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_CMMN_";
@@ -322,6 +328,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CaseInstanceHelper caseInstanceHelper;
     protected CmmnHistoryManager cmmnHistoryManager;
     protected ProcessInstanceService processInstanceService;
+    protected CmmnDynamicStateManager dynamicStateManager;
     protected Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks;
     protected Map<String, List<PlanItemInstanceLifecycleListener>> planItemInstanceLifecycleListeners;
 
@@ -680,6 +687,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected BusinessCalendarManager businessCalendarManager;
 
     /**
+     * Enable user task event logging
+     */
+    protected boolean enableHistoricTaskLogging;
+
+    /**
      * postprocessor for a task builder
      */
     protected TaskPostProcessor taskPostProcessor;
@@ -763,6 +775,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initCaseInstanceHelper();
         initCandidateManager();
         initHistoryManager();
+        initDynamicStateManager();
         initCaseInstanceCallbacks();
         initFormFieldHandler();
         initClock();
@@ -873,6 +886,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             shortHandExpressionFunctions.add(new VariableLowerThanOrEqualsExpressionFunction(variableScopeName));
             shortHandExpressionFunctions.add(new VariableGreaterThanExpressionFunction(variableScopeName));
             shortHandExpressionFunctions.add(new VariableGreaterThanOrEqualsExpressionFunction(variableScopeName));
+
+            shortHandExpressionFunctions.add(new IsStageCompletableExpressionFunction());
         }
     }
     
@@ -1220,6 +1235,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             }
         }
     }
+    
+    public void initDynamicStateManager() {
+        if (dynamicStateManager == null) {
+            dynamicStateManager = new DefaultCmmnDynamicStateManager();
+        }
+    }
 
     public void initCaseInstanceCallbacks() {
         if (this.caseInstanceStateChangeCallbacks == null) {
@@ -1339,6 +1360,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.taskServiceConfiguration.setClock(this.clock);
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
         this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        this.taskServiceConfiguration.setEnableHistoricTaskLogging(this.enableHistoricTaskLogging);
 
         if (this.taskPostProcessor != null) {
             this.taskServiceConfiguration.setTaskPostProcessor(this.taskPostProcessor);
@@ -1502,7 +1524,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         historyJsonTransformers.add(new PlanItemInstanceStartedHistoryJsonTransformer());
         historyJsonTransformers.add(new PlanItemInstanceSuspendedHistoryJsonTransformer());
         historyJsonTransformers.add(new PlanItemInstanceTerminatedHistoryJsonTransformer());
-        
+
+        historyJsonTransformers.add(new HistoricUserTaskLogRecordJsonTransformer());
+        historyJsonTransformers.add(new HistoricUserTaskLogDeleteJsonTransformer());
+
         return historyJsonTransformers;
     }
 
@@ -2025,6 +2050,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public CmmnDynamicStateManager getDynamicStateManager() {
+        return dynamicStateManager;
+    }
+
+    public CmmnEngineConfiguration setDynamicStateManager(CmmnDynamicStateManager dynamicStateManager) {
+        this.dynamicStateManager = dynamicStateManager;
+        return this;
+    }
+
     public boolean isEnableSafeCmmnXml() {
         return enableSafeCmmnXml;
     }
@@ -2361,10 +2395,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    @Override
     public VariableTypes getVariableTypes() {
         return variableTypes;
     }
 
+    @Override
     public CmmnEngineConfiguration setVariableTypes(VariableTypes variableTypes) {
         this.variableTypes = variableTypes;
         return this;
@@ -3250,5 +3286,13 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         if (this.clock != null) {
             clock.reset();
         }
+    }
+
+    public boolean isEnableHistoricTaskLogging() {
+        return enableHistoricTaskLogging;
+    }
+
+    public void setEnableHistoricTaskLogging(boolean enableHistoricTaskLogging) {
+        this.enableHistoricTaskLogging = enableHistoricTaskLogging;
     }
 }

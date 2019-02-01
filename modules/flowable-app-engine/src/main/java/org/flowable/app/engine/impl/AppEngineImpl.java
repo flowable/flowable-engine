@@ -17,7 +17,6 @@ import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.engine.AppEngines;
-import org.flowable.app.engine.impl.cmd.SchemaOperationsAppEngineBuild;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +61,8 @@ public class AppEngineImpl implements AppEngine {
     @Override
     public void close() {
         AppEngines.unregister(this);
+        appEngineConfiguration.close();
+
     }
     
     @Override

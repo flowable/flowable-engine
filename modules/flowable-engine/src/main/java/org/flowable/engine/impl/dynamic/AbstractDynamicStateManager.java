@@ -269,7 +269,6 @@ public abstract class AbstractDynamicStateManager {
 
                 moveExecutionContainer.setCallActivity(callActivity);
                 ProcessDefinition callActivityProcessDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionIdOfCallActivity);
-                String deploymentId = callActivityProcessDefinition.getDeploymentId();
                 String tenantId = callActivityProcessDefinition.getTenantId();
                 Integer calledProcessVersion = moveExecutionContainer.getCallActivitySubProcessVersion();
                 String calledProcessDefKey = callActivity.getCalledElement();
@@ -353,7 +352,7 @@ public abstract class AbstractDynamicStateManager {
 
                 executionEntityManager.deleteChildExecutions(execution, "Change parent activity to " + flowElementIdsLine, true);
                 if (!moveExecutionContainer.isDirectExecutionMigration()) {
-                    executionEntityManager.deleteExecutionAndRelatedData(execution, "Change activity to " + flowElementIdsLine, true, execution.getCurrentFlowElement());
+                    executionEntityManager.deleteExecutionAndRelatedData(execution, "Change activity to " + flowElementIdsLine, false, true, execution.getCurrentFlowElement());
                 }
 
                 // Make sure we are not moving the root execution
@@ -476,7 +475,7 @@ public abstract class AbstractDynamicStateManager {
 
                 String flowElementIdsLine = printFlowElementIds(moveToFlowElements);
                 executionEntityManager.deleteChildExecutions(finalDeleteExecution, executionIdsNotToDelete, null, "Change activity to " + flowElementIdsLine, true, null);
-                executionEntityManager.deleteExecutionAndRelatedData(finalDeleteExecution, "Change activity to " + flowElementIdsLine, true, finalDeleteExecution.getCurrentFlowElement());
+                executionEntityManager.deleteExecutionAndRelatedData(finalDeleteExecution, "Change activity to " + flowElementIdsLine, false, true, finalDeleteExecution.getCurrentFlowElement());
             }
         }
 
@@ -502,7 +501,7 @@ public abstract class AbstractDynamicStateManager {
 
                 String flowElementIdsLine = printFlowElementIds(moveToFlowElements);
                 executionEntityManager.deleteChildExecutions(finalDeleteExecution, executionIdsNotToDelete, null, "Change activity to " + flowElementIdsLine, true, null);
-                executionEntityManager.deleteExecutionAndRelatedData(finalDeleteExecution, "Change activity to " + flowElementIdsLine, true, finalDeleteExecution.getCurrentFlowElement());
+                executionEntityManager.deleteExecutionAndRelatedData(finalDeleteExecution, "Change activity to " + flowElementIdsLine, false, true, finalDeleteExecution.getCurrentFlowElement());
             }
         }
 
@@ -970,7 +969,7 @@ public abstract class AbstractDynamicStateManager {
                         timerJobsByExecutionId.forEach(timerJobService::deleteTimerJob);
                     }
                     if (startEventExecution.isPresent()) {
-                        executionEntityManager.deleteExecutionAndRelatedData(startEventExecution.get(), DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + startEvent.getId() + ")");
+                        executionEntityManager.deleteExecutionAndRelatedData(startEventExecution.get(), DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + startEvent.getId() + ")", false);
                     }
 
                     //Remove any other child of the parentScope
@@ -979,7 +978,7 @@ public abstract class AbstractDynamicStateManager {
                         ExecutionEntity childExecutionEntity = childExecutions.get(i);
                         if (!childExecutionEntity.isEnded() && !childExecutionEntity.getId().equals(eventSubProcessExecution.getId()) && !movingExecutionIds.contains(childExecutionEntity.getId())) {
                             executionEntityManager.deleteExecutionAndRelatedData(childExecutionEntity,
-                                DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + startEvent.getId() + ")");
+                                DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + startEvent.getId() + ")", false);
                         }
                     }
                 } else {

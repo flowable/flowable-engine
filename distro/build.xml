@@ -4,7 +4,7 @@
 
 	<property file="${user.home}/.flowable/build.properties" />
 
-	<property name="flowable.version" value="6.4.1-SNAPSHOT" />
+	<property name="flowable.version" value="6.5.0-SNAPSHOT" />
 	<property name="target.distro.root" value="target/zip/flowable-${flowable.version}" />
 	<property name="flowable.website" value="../../flowable-website" />
 
@@ -102,6 +102,12 @@
             </fileset>
 			<fileset dir="../modules/flowable-identitylink-service/target">
                 <include name="flowable-identitylink-service-*.jar" />
+            </fileset>
+            <fileset dir="../modules/flowable-entitylink-service-api/target">
+                <include name="flowable-entitylink-service-api-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-entitylink-service/target">
+                <include name="flowable-entitylink-service-*.jar" />
             </fileset>
 			<fileset dir="../modules/flowable-job-service-api/target">
                 <include name="flowable-job-service-api-*.jar" />

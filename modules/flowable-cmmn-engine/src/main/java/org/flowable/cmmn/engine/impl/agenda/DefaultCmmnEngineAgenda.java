@@ -13,20 +13,24 @@
 package org.flowable.cmmn.engine.impl.agenda;
 
 import java.util.Iterator;
+import java.util.Map;
 
 import org.flowable.cmmn.engine.impl.agenda.operation.ActivateAsyncPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ActivatePlanItemInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.ChangePlanItemInstanceToAvailableOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.CmmnOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.CompleteCaseInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.CompletePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.CreatePlanItemInstanceForRepetitionOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.CreatePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.DisablePlanItemInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.DismissPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.EnablePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.EvaluateCriteriaOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ExitPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.InitPlanModelInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.InitStageInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.InitiatePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.OccurPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.StartPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.TerminateCaseInstanceOperation;
@@ -165,6 +169,16 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     }
 
     @Override
+    public void planInitiatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new InitiatePlanItemInstanceOperation(commandContext, planItemInstanceEntity), planItemInstanceEntity.getCaseInstanceId());
+    }
+
+    @Override
+    public void planDismissPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new DismissPlanItemInstanceOperation(commandContext, planItemInstanceEntity), planItemInstanceEntity.getCaseInstanceId());
+    }
+
+    @Override
     public void planActivatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId) {
         addOperation(new ActivatePlanItemInstanceOperation(commandContext, planItemInstanceEntity, entryCriterionId), planItemInstanceEntity.getCaseInstanceId());
     }
@@ -172,6 +186,12 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     @Override
     public void planStartPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId) {
         addOperation(new StartPlanItemInstanceOperation(commandContext, planItemInstanceEntity, entryCriterionId), planItemInstanceEntity.getCaseInstanceId());
+    }
+    
+    @Override
+    public void planStartPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId, Map<String, Object> variables) {
+        addOperation(new StartPlanItemInstanceOperation(commandContext, planItemInstanceEntity, entryCriterionId, variables), 
+                        planItemInstanceEntity.getCaseInstanceId());
     }
     
     @Override
@@ -207,6 +227,11 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     @Override
     public void planTerminatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new TerminatePlanItemInstanceOperation(commandContext, planItemInstanceEntity), planItemInstanceEntity.getCaseInstanceId());
+    }
+    
+    @Override
+    public void planChangePlanItemInstanceToAvailableOperation(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new ChangePlanItemInstanceToAvailableOperation(commandContext, planItemInstanceEntity), planItemInstanceEntity.getCaseInstanceId());
     }
 
     @Override

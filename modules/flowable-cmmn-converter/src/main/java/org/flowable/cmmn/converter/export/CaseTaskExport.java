@@ -12,10 +12,10 @@
  */
 package org.flowable.cmmn.converter.export;
 
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.CaseTask;
-
-import javax.xml.stream.XMLStreamWriter;
 
 public class CaseTaskExport extends AbstractPlanItemDefinitionExport<CaseTask> {
 
@@ -36,8 +36,8 @@ public class CaseTaskExport extends AbstractPlanItemDefinitionExport<CaseTask> {
         if (StringUtils.isNotEmpty(caseTask.getCaseRef())) {
             xtw.writeAttribute(ATTRIBUTE_CASE_REF, caseTask.getCaseRef());
         }
-        if (caseTask.isFallbackToDefaultTenant()) {
-            xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT, "true");
+        if (caseTask.getFallbackToDefaultTenant() != null) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT, caseTask.getFallbackToDefaultTenant().toString());
         }
     }
 }

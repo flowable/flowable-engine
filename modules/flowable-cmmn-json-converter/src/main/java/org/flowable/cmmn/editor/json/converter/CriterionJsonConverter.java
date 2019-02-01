@@ -15,7 +15,6 @@ package org.flowable.cmmn.editor.json.converter;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.model.Association;
 import org.flowable.cmmn.model.BaseElement;
@@ -74,6 +73,7 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
         GraphicInfo parentGraphicInfo = null;
         Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
         if (criterion.getAttachedToRefId() != null) {
+            
             if (criterion.getAttachedToRefId().equals(planModel.getId())) {
                 parentGraphicInfo = cmmnModel.getGraphicInfo(planModel.getId());
                 
@@ -87,6 +87,7 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
             dockersArrayNode.add(dockNode);
             elementNode.set("dockers", dockersArrayNode);
             elementNode.set("outgoing", getOutgoingArrayNodes(criterion.getId(), cmmnModel));
+            
         } else {
             elementNode.putArray("dockers");
             elementNode.putArray("outgoing");
@@ -140,8 +141,18 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
             criterion.setExitCriterion(true);
         }
 
-        criterion.setAttachedToRefId(lookForAttachedRef(elementNode.get(EDITOR_SHAPE_ID).asText(), modelNode.get(EDITOR_CHILD_SHAPES)));
-
+        String attachedRefId = lookForAttachedRef(elementNode.get(EDITOR_SHAPE_ID).asText(), elementNode, modelNode.get(EDITOR_CHILD_SHAPES));
+        if (attachedRefId == null && criterion.isExitCriterion() && parentElement instanceof Stage) {
+            // exit sentry is on parent container, plan item model sentries are handled separately
+            Stage parentStage = (Stage) parentElement;
+            if (!parentStage.isPlanModel()) {
+                criterion.setAttachedToRefId(parentStage.getId());
+            }
+            
+        } else {
+            criterion.setAttachedToRefId(attachedRefId);
+        }
+        
         if (criterion.getAttachedToRefId() != null) {
             String criterionId = CmmnJsonConverterUtil.getElementId(elementNode);
             cmmnModel.addCriterion(criterionId, criterion);
@@ -173,7 +184,7 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
         criterion.setSentry(sentry);
     }
 
-    private String lookForAttachedRef(String criterionId, JsonNode childShapesNode) {
+    protected String lookForAttachedRef(String criterionId, JsonNode elementNode, JsonNode childShapesNode) {
         String attachedRefId = null;
 
         if (childShapesNode != null) {
@@ -194,7 +205,7 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
                     }
                 }
 
-                attachedRefId = lookForAttachedRef(criterionId, childNode.get(EDITOR_CHILD_SHAPES));
+                attachedRefId = lookForAttachedRef(criterionId, null, childNode.get(EDITOR_CHILD_SHAPES));
 
                 if (attachedRefId != null) {
                     break;

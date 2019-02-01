@@ -75,7 +75,7 @@ public class ProcessTaskCmmnXmlConverterTest extends AbstractConverterTest {
         assertEquals("num", parameter.getSource());
         assertEquals("num3", parameter.getTarget());
 
-        assertTrue(task1.isFallbackToDefaultTenant());
+        assertTrue(task1.getFallbackToDefaultTenant());
     }
 
 }

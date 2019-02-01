@@ -28,8 +28,12 @@ import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEnt
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityManagerImpl;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityManager;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityManagerImpl;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityManager;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityManagerImpl;
 import org.flowable.task.service.impl.persistence.entity.data.HistoricTaskInstanceDataManager;
 import org.flowable.task.service.impl.persistence.entity.data.TaskDataManager;
+import org.flowable.task.service.impl.persistence.entity.data.HistoricTaskLogEntryDataManager;
+import org.flowable.task.service.impl.persistence.entity.data.impl.MyBatisHistoricTaskLogEntryDataManager;
 import org.flowable.task.service.impl.persistence.entity.data.impl.MybatisHistoricTaskInstanceDataManager;
 import org.flowable.task.service.impl.persistence.entity.data.impl.MybatisTaskDataManager;
 
@@ -49,11 +53,13 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
 
     protected TaskDataManager taskDataManager;
     protected HistoricTaskInstanceDataManager historicTaskInstanceDataManager;
+    protected HistoricTaskLogEntryDataManager historicTaskLogDataManager;
 
     // ENTITY MANAGERS /////////////////////////////////////////////////
     protected TaskEntityManager taskEntityManager;
     protected HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager;
-    
+    protected HistoricTaskLogEntryEntityManager historicTaskLogEntryEntityManager;
+
     protected InternalTaskVariableScopeResolver internalTaskVariableScopeResolver;
     protected InternalHistoryTaskManager internalHistoryTaskManager;
     protected InternalTaskLocalizationManager internalTaskLocalizationManager;
@@ -68,6 +74,9 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
     protected int historicTaskQueryLimit;
 
     protected TaskPostProcessor taskPostProcessor;
+
+    // Events
+    protected boolean enableHistoricTaskLogging;
 
     // init
     // /////////////////////////////////////////////////////////////////////
@@ -88,6 +97,9 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         if (historicTaskInstanceDataManager == null) {
             historicTaskInstanceDataManager = new MybatisHistoricTaskInstanceDataManager();
         }
+        if (historicTaskLogDataManager == null) {
+            historicTaskLogDataManager = new MyBatisHistoricTaskLogEntryDataManager();
+        }
     }
 
     public void initEntityManagers() {
@@ -96,6 +108,9 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         }
         if (historicTaskInstanceEntityManager == null) {
             historicTaskInstanceEntityManager = new HistoricTaskInstanceEntityManagerImpl(this, historicTaskInstanceDataManager);
+        }
+        if (historicTaskLogEntryEntityManager == null) {
+            historicTaskLogEntryEntityManager = new HistoricTaskLogEntryEntityManagerImpl(this, historicTaskLogDataManager);
         }
     }
 
@@ -168,6 +183,15 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
 
     public TaskServiceConfiguration setHistoricTaskInstanceEntityManager(HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager) {
         this.historicTaskInstanceEntityManager = historicTaskInstanceEntityManager;
+        return this;
+    }
+
+    public HistoricTaskLogEntryEntityManager getHistoricTaskLogEntryEntityManager() {
+        return historicTaskLogEntryEntityManager;
+    }
+
+    public TaskServiceConfiguration setHistoricTaskLogEntryEntityManager(HistoricTaskLogEntryEntityManager historicTaskLogEntryEntityManager) {
+        this.historicTaskLogEntryEntityManager = historicTaskLogEntryEntityManager;
         return this;
     }
 
@@ -254,6 +278,15 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
 
     public TaskServiceConfiguration setHistoricTaskQueryLimit(int historicTaskQueryLimit) {
         this.historicTaskQueryLimit = historicTaskQueryLimit;
+        return this;
+    }
+
+    public boolean isEnableHistoricTaskLogging() {
+        return enableHistoricTaskLogging;
+    }
+
+    public TaskServiceConfiguration setEnableHistoricTaskLogging(boolean enableHistoricTaskLogging) {
+        this.enableHistoricTaskLogging = enableHistoricTaskLogging;
         return this;
     }
 

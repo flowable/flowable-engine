@@ -16,7 +16,6 @@ import java.util.Map;
 
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.common.engine.impl.history.HistoryLevel;
-import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -25,6 +24,7 @@ import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
@@ -222,5 +222,28 @@ public interface HistoryManager {
      */
     void updateActivity(ExecutionEntity executionEntity, String oldActivityId, FlowElement newFlowElement, TaskEntity task);
 
-    void updateHistoricActivityInstance(ActivityInstanceEntity activityInstance);
+    /**
+     * Update historic activity instance according to changes done in the runtime activity
+     * @param activityInstance
+     */
+    void updateHistoricActivityInstance(ActivityInstance activityInstance);
+
+    /**
+     * Create new historic activity instance from runtime activity instance
+     *
+     * @param activityInstance activity instance template
+     */
+    void createHistoricActivityInstance(ActivityInstance activityInstance);
+
+    /**
+     * Record historic user task log entry
+     * @param taskLogEntryBuilder historic user task log entry description
+     */
+    void recordHistoricUserTaskLogEntry(HistoricTaskLogEntryBuilder taskLogEntryBuilder);
+
+    /**
+     * Delete historic user task log entry
+     * @param logNumber log identifier
+     */
+    void deleteHistoryUserTaskLog(long logNumber);
 }

@@ -10,7 +10,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>6.4.1-SNAPSHOT</version>
+        <version>6.5.0-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -238,7 +238,10 @@
             org.flowable.engine
         </flowable.artifact>
         <flowable.osgi.export.additional>
-            org.flowable.db.mapping.entity
+            org.flowable.db.create,
+            org.flowable.db.update,
+            org.flowable.db.mapping,
+            org.flowable.db.mapping.entity,
         </flowable.osgi.export.additional>
         <flowable.osgi.import.additional>
             junit*;resolution:=optional,
@@ -568,7 +571,7 @@
                 <exclude.tests>**/ProcessInstanceMigration*Test.java</exclude.tests>
                 <exclude.tests2>**/ChangeState*Test.java</exclude.tests2>
             </properties>
-            <!-- <build>
+            <build>
                 <plugins>
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
@@ -614,7 +617,7 @@
                         </executions>
                     </plugin>
                 </plugins>
-            </build> -->
+            </build>
         </profile>
 
         <profile>
@@ -912,6 +915,7 @@
                                 <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
                                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
+                                <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
                             <runOrder>alphabetical</runOrder>
                         </configuration>
@@ -1102,6 +1106,7 @@
                                 <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
                                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
+                                <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
                             <runOrder>alphabetical</runOrder>
                         </configuration>
@@ -1152,12 +1157,18 @@
                                 <exclude>**/HistoryLevelServiceTest.java</exclude>
                                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                                 <exclude>**/ProcessInstanceLogQueryTest.java</exclude>
+                                <exclude>**/HistoryServiceTaskLogTest.java</exclude>
+                                <exclude>**/HistoryServiceDisableTaskLogTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
                                 <exclude>**/HistoricProcessInstanceQueryVersionTest.java</exclude>
                                 <exclude>**/NonCascadeDeleteTest.java</exclude>
                                 <exclude>**/HistoricProcessInstanceQueryAndWithExceptionTest.java</exclude>
                                 <exclude>**/HistoricJPAVariableTest.java</exclude>
                                 <exclude>**/VerifyDatabaseOperationsTest.java</exclude>
+                                <exclude>**/AsyncHistoryTest.java</exclude>
+                                <exclude>**/AsyncHistoryUpgradeTest.java</exclude>
+                                <exclude>**/ProcessInstanceLogQueryTest.java</exclude>
+                                <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
                             <runOrder>alphabetical</runOrder>
                         </configuration>
@@ -1546,6 +1557,18 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+
+        <profile>
+            <id>java8</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
+            <properties>
+                <!-- increase max heap to fix: SurefireBooterForkException: There was an error in the forked process
+                    [ERROR] GC overhead limit exceeded -->
+                <argLine>-Xmx3g</argLine>
+            </properties>
         </profile>
     </profiles>
 

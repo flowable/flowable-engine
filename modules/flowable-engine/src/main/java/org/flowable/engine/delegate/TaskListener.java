@@ -13,8 +13,6 @@
 
 package org.flowable.engine.delegate;
 
-import org.flowable.task.service.delegate.DelegateTask;
-
 /**
  * Here for backwards compatibility, prefer use the {@link org.flowable.task.service.delegate.TaskListener}.
  *

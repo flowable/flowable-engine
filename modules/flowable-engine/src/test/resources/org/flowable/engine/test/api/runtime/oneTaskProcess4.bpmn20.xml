@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+        xmlns:flowable="http://flowable.org/bpmn"
+        xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        targetNamespace="org.flowable.engine.test.api.runtime">
+
+    <process id="oneTaskProcess4" name="oneTaskProcess4Name">
+
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask"/>
+        <userTask id="theTask" name="my task">
+            <extensionElements>
+                <flowable:taskListener event="complete" class="org.flowable.engine.impl.bpmn.listener.ScriptTaskListener">
+                    <flowable:field name="script">
+                        <flowable:string>
+                            <![CDATA[taskService.setVariableLocal(task.getId(), "taskLocalVariableName-1", "taskLocalVariableValue-1");]]></flowable:string>
+                    </flowable:field>
+                    <flowable:field name="language">
+                        <flowable:string><![CDATA[javascript]]></flowable:string>
+                    </flowable:field>
+                </flowable:taskListener>
+                <modeler:activiti-idm-initiator xmlns:modeler="http://flowable.org/modeler"><![CDATA[true]]></modeler:activiti-idm-initiator>
+            </extensionElements>
+        </userTask>
+        <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

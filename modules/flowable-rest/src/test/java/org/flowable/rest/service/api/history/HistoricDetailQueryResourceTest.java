@@ -13,6 +13,9 @@
 
 package org.flowable.rest.service.api.history;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -33,8 +36,6 @@ import org.junit.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import static org.junit.Assert.*;
 
 /**
  * Test for REST-operation related to the historic detail query resource.

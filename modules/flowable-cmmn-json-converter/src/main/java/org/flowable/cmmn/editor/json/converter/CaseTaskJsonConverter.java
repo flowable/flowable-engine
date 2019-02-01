@@ -57,7 +57,9 @@ public class CaseTaskJsonConverter extends BaseCmmnJsonConverter implements Case
         // todo implement rest of the properties
         CaseTask caseTask = (CaseTask) ((PlanItem) baseElement).getPlanItemDefinition();
 
-        propertiesNode.put(PROPERTY_FALLBACK_TO_DEFAULT_TENANT, caseTask.isFallbackToDefaultTenant());
+        if (caseTask.getFallbackToDefaultTenant() != null) {
+            propertiesNode.put(PROPERTY_FALLBACK_TO_DEFAULT_TENANT, caseTask.getFallbackToDefaultTenant());
+        }
         ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, caseTask);
     }
 

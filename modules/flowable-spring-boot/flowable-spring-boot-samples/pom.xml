@@ -7,7 +7,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-spring-boot</artifactId>
         <relativePath>../</relativePath>
-        <version>6.4.1-SNAPSHOT</version>
+        <version>6.5.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>flowable-spring-boot-samples</artifactId>
@@ -17,6 +17,7 @@
     	<module>flowable-spring-boot-sample-app</module>
         <module>flowable-spring-boot-sample-process</module>
         <module>flowable-spring-boot-sample-jpa</module>
+        <module>flowable-spring-boot-sample-jpa-all</module>
         <module>flowable-spring-boot-sample-security</module>
         <module>flowable-spring-boot-sample-rest-api</module>      
 		<module>flowable-spring-boot-sample-rest-api-security</module>

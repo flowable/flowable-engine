@@ -12,19 +12,23 @@
  */
 package org.flowable.cmmn.test.task;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
+
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.Test;
-
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
-
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.*;
 
 /**
  * @author Dennis Federico

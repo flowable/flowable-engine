@@ -36,6 +36,7 @@ import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.mapping.Environment;
+import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
@@ -102,6 +103,8 @@ public abstract class AbstractEngineConfiguration {
      * Upon building of the process engine, a check is performed and an update of the schema is performed if it is necessary.
      */
     public static final String DB_SCHEMA_UPDATE_TRUE = "true";
+
+    protected boolean forceCloseMybatisConnectionPool = true;
 
     protected String databaseType;
     protected String jdbcDriver = "org.h2.Driver";
@@ -174,6 +177,8 @@ public abstract class AbstractEngineConfiguration {
 
     protected Set<Class<?>> customMybatisMappers;
     protected Set<String> customMybatisXMLMappers;
+    protected List<Interceptor> customMybatisInterceptors;
+
 
     protected Set<String> dependentEngineMyBatisXmlMappers;
     protected List<MybatisTypeAliasConfigurator> dependentEngineMybatisTypeAliasConfigs;
@@ -240,6 +245,21 @@ public abstract class AbstractEngineConfiguration {
      * will not be used here - since the schema is taken into account already, adding a prefix for the table-check will result in wrong table-names.
      */
     protected boolean tablePrefixIsSchema;
+    
+    /**
+     * Set to true if the latest version of a definition should be retrieved, ignoring a possible parent deployment id value
+     */
+    protected boolean alwaysLookupLatestDefinitionVersion;
+    
+    /**
+     * Set to true if by default lookups should fallback to the default tenant (an empty string by default or a defined tenant value)
+     */
+    protected boolean fallbackToDefaultTenant;
+    
+    /**
+     * Default tenant value that is used when looking up definitions when the global or local fallback to default tenant value is true
+     */
+    protected String defaultTenantValue = NO_TENANT_ID;
 
     /**
      * Enables the MyBatis plugin that logs the execution time of sql statements.
@@ -371,12 +391,6 @@ public abstract class AbstractEngineConfiguration {
                     pooledDataSource.setDefaultTransactionIsolationLevel(jdbcDefaultTransactionIsolationLevel);
                 }
                 dataSource = pooledDataSource;
-            }
-
-            if (dataSource instanceof PooledDataSource) {
-                // ACT-233: connection pool of Ibatis is not properly
-                // initialized if this is not called!
-                ((PooledDataSource) dataSource).forceCloseAll();
             }
         }
 
@@ -706,7 +720,7 @@ public abstract class AbstractEngineConfiguration {
 
         initCustomMybatisMappers(configuration);
         initMybatisTypeHandlers(configuration);
-
+        initCustomMybatisInterceptors(configuration);
         if (isEnableLogSqlExecutionTime()) {
             initMyBatisLogSqlExecutionTimePlugin(configuration);
         }
@@ -725,6 +739,14 @@ public abstract class AbstractEngineConfiguration {
 
     public void initMybatisTypeHandlers(Configuration configuration) {
         // To be extended
+    }
+
+    public void initCustomMybatisInterceptors(Configuration configuration) {
+      if (customMybatisInterceptors!=null){
+        for (Interceptor interceptor :customMybatisInterceptors){
+            configuration.addInterceptor(interceptor);
+        }
+      }
     }
 
     public void initMyBatisLogSqlExecutionTimePlugin(Configuration configuration) {
@@ -808,7 +830,7 @@ public abstract class AbstractEngineConfiguration {
             }
 
             if (nrOfServiceLoadedConfigurators > 0) {
-                logger.info("Found {} auto-discoverable Process Engine Configurator{}", nrOfServiceLoadedConfigurators++, nrOfServiceLoadedConfigurators > 1 ? "s" : "");
+                logger.info("Found {} auto-discoverable Process Engine Configurator{}", nrOfServiceLoadedConfigurators, nrOfServiceLoadedConfigurators > 1 ? "s" : "");
             }
 
             if (!allConfigurators.isEmpty()) {
@@ -840,7 +862,18 @@ public abstract class AbstractEngineConfiguration {
 
         }
     }
-    
+
+    public void close() {
+        if (forceCloseMybatisConnectionPool && dataSource instanceof PooledDataSource) {
+            /*
+             * When the datasource is created by a Flowable engine (i.e. it's an instance of PooledDataSource),
+             * the connection pool needs to be closed when closing the engine.
+             * Note that calling forceCloseAll() multiple times (as is the case when running with multiple engine) is ok.
+             */
+            ((PooledDataSource) dataSource).forceCloseAll();
+        }
+    }
+
     protected List<EngineConfigurator> getEngineSpecificEngineConfigurators() {
         // meant to be overridden if needed
         return Collections.emptyList();
@@ -1283,6 +1316,15 @@ public abstract class AbstractEngineConfiguration {
         return dependentEngineMyBatisXmlMappers;
     }
 
+    public AbstractEngineConfiguration setCustomMybatisInterceptors(List<Interceptor> customMybatisInterceptors) {
+        this.customMybatisInterceptors = customMybatisInterceptors;
+        return  this;
+    }
+
+    public List<Interceptor> getCustomMybatisInterceptors() {
+        return customMybatisInterceptors;
+    }
+
     public AbstractEngineConfiguration setDependentEngineMyBatisXmlMappers(Set<String> dependentEngineMyBatisXmlMappers) {
         this.dependentEngineMyBatisXmlMappers = dependentEngineMyBatisXmlMappers;
         return this;
@@ -1375,6 +1417,33 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setTablePrefixIsSchema(boolean tablePrefixIsSchema) {
         this.tablePrefixIsSchema = tablePrefixIsSchema;
+        return this;
+    }
+
+    public boolean isAlwaysLookupLatestDefinitionVersion() {
+        return alwaysLookupLatestDefinitionVersion;
+    }
+
+    public AbstractEngineConfiguration setAlwaysLookupLatestDefinitionVersion(boolean alwaysLookupLatestDefinitionVersion) {
+        this.alwaysLookupLatestDefinitionVersion = alwaysLookupLatestDefinitionVersion;
+        return this;
+    }
+
+    public boolean isFallbackToDefaultTenant() {
+        return fallbackToDefaultTenant;
+    }
+
+    public AbstractEngineConfiguration setFallbackToDefaultTenant(boolean fallbackToDefaultTenant) {
+        this.fallbackToDefaultTenant = fallbackToDefaultTenant;
+        return this;
+    }
+
+    public String getDefaultTenantValue() {
+        return defaultTenantValue;
+    }
+
+    public AbstractEngineConfiguration setDefaultTenantValue(String defaultTenantValue) {
+        this.defaultTenantValue = defaultTenantValue;
         return this;
     }
 
@@ -1541,4 +1610,12 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
+    public AbstractEngineConfiguration setForceCloseMybatisConnectionPool(boolean forceCloseMybatisConnectionPool) {
+        this.forceCloseMybatisConnectionPool = forceCloseMybatisConnectionPool;
+        return this;
+    }
+
+    public boolean isForceCloseMybatisConnectionPool() {
+        return forceCloseMybatisConnectionPool;
+    }
 }

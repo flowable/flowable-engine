@@ -59,10 +59,10 @@ public class GetTaskFormModelCmd implements Command<FormInfo>, Serializable {
             throw new FlowableIllegalArgumentException("Form engine is not initialized");
         }
 
-        TaskInfo task = CommandContextUtil.getTaskService().getTask(taskId);
+        TaskInfo task = CommandContextUtil.getTaskService(commandContext).getTask(taskId);
         Date endTime = null;
         if (task == null) {
-            task = CommandContextUtil.getHistoricTaskService().getHistoricTask(taskId);
+            task = CommandContextUtil.getHistoricTaskService(commandContext).getHistoricTask(taskId);
             if (task != null) {
                 endTime = ((HistoricTaskInstance) task).getEndTime();
             }
@@ -95,30 +95,16 @@ public class GetTaskFormModelCmd implements Command<FormInfo>, Serializable {
         FormInfo formInfo = null;
         if (ignoreVariables) {
             FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService();
-            formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId);
-            
-            // fallback to search for a form model without parent deployment id
-            if (formInfo == null && parentDeploymentId != null) {
-                formInfo = formRepositoryService.getFormModelByKey(task.getFormKey());
-            }
+            formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId,
+                            task.getTenantId(), processEngineConfiguration.isFallbackToDefaultTenant());
             
         } else if (endTime != null) {
             formInfo = formService.getFormInstanceModelByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId,
-                            taskId, task.getProcessInstanceId(), variables, task.getTenantId());
-            
-            // fallback to search for a form model without parent deployment id
-            if (formInfo == null && parentDeploymentId != null) {
-                formInfo = formService.getFormInstanceModelByKey(task.getFormKey(), taskId, task.getProcessInstanceId(), variables, task.getTenantId());
-            }
+                            taskId, task.getProcessInstanceId(), variables, task.getTenantId(), processEngineConfiguration.isFallbackToDefaultTenant());
 
         } else {
             formInfo = formService.getFormModelWithVariablesByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId,
-                            taskId, variables, task.getTenantId());
-            
-            // fallback to search for a form model without parent deployment id
-            if (formInfo == null && parentDeploymentId != null) {
-                formInfo = formService.getFormModelWithVariablesByKey(task.getFormKey(), taskId, variables, task.getTenantId());
-            }
+                            taskId, variables, task.getTenantId(), processEngineConfiguration.isFallbackToDefaultTenant());
         }
 
         // If form does not exists, we don't want to leak out this info to just anyone

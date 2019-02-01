@@ -39,6 +39,8 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     protected String predefinedProcessInstanceId;
     protected Map<String, Object> variables;
     protected Map<String, Object> transientVariables;
+    protected Map<String, Object> startFormVariables;
+    protected String outcome;
     protected boolean fallbackToDefaultTenant;
 
     public ProcessInstanceBuilderImpl(RuntimeServiceImpl runtimeService) {
@@ -111,9 +113,7 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
             this.variables = new HashMap<>();
         }
         if (variables != null) {
-            for (String variableName : variables.keySet()) {
-                this.variables.put(variableName, variables.get(variableName));
-            }
+            this.variables.putAll(variables);
         }
         return this;
     }
@@ -133,9 +133,7 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
             this.transientVariables = new HashMap<>();
         }
         if (transientVariables != null) {
-            for (String variableName : transientVariables.keySet()) {
-                this.transientVariables.put(variableName, transientVariables.get(variableName));
-            }
+            this.transientVariables.putAll(transientVariables);
         }
         return this;
     }
@@ -146,6 +144,32 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
             this.transientVariables = new HashMap<>();
         }
         this.transientVariables.put(variableName, value);
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceBuilder startFormVariables(Map<String, Object> startFormVariables) {
+        if (this.startFormVariables == null) {
+            this.startFormVariables = new HashMap<>();
+        }
+        if (startFormVariables != null) {
+            this.startFormVariables.putAll(startFormVariables);
+        }
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceBuilder startFormVariable(String variableName, Object value) {
+        if (this.startFormVariables == null) {
+            this.startFormVariables = new HashMap<>();
+        }
+        this.startFormVariables.put(variableName, value);
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceBuilder outcome(String outcome) {
+        this.outcome = outcome;
         return this;
     }
 
@@ -211,6 +235,13 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
 
     public Map<String, Object> getTransientVariables() {
         return transientVariables;
+    }
+
+    public Map<String, Object> getStartFormVariables() {
+        return startFormVariables;
+    }
+    public String getOutcome() {
+        return outcome;
     }
 
     public boolean isFallbackToDefaultTenant() {

@@ -12,11 +12,6 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +29,11 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.api.ExecuteDecisionBuilder;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import liquibase.util.StringUtils;
 
@@ -88,8 +88,8 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
             variables(planItemInstanceEntity.getVariables()).
             tenantId(planItemInstanceEntity.getTenantId());
 
-        boolean fallBackToDefaultTenant = Boolean.parseBoolean(getFieldString(STRING_DECISION_TABLE_FALLBACK_TO_DEFAULT_TENANT));
-        if (fallBackToDefaultTenant) {
+        String fallBackToDefaultTenantValue = getFieldString(STRING_DECISION_TABLE_FALLBACK_TO_DEFAULT_TENANT);
+        if (fallBackToDefaultTenantValue != null && Boolean.parseBoolean(fallBackToDefaultTenantValue)) {
             executeDecisionBuilder.fallbackToDefaultTenant();
         }
 

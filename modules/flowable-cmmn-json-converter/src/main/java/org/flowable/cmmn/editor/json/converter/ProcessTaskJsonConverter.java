@@ -57,10 +57,13 @@ public class ProcessTaskJsonConverter extends BaseCmmnJsonConverter implements P
     @Override
     protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor,
             BaseElement baseElement, CmmnModel cmmnModel) {
-        // todo implement rest of the properties
+        
         ProcessTask processTask = (ProcessTask) ((PlanItem) baseElement).getPlanItemDefinition();
 
-        propertiesNode.put(PROPERTY_FALLBACK_TO_DEFAULT_TENANT, processTask.isFallbackToDefaultTenant());
+        if (processTask.getFallbackToDefaultTenant() != null) {
+            propertiesNode.put(PROPERTY_FALLBACK_TO_DEFAULT_TENANT, processTask.getFallbackToDefaultTenant());
+        }
+        
         ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, processTask);
     }
 

@@ -67,7 +67,7 @@ public class ModelCollectionResource extends BaseModelResource {
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "category", dataType = "string", value = "Only return models with the given category.", paramType = "query"),
             @ApiImplicitParam(name = "categoryLike", dataType = "string", value = "Only return models with a category like the given name.", paramType = "query"),
-            @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return models which don’t have the given category.", paramType = "query"),
+            @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return models which do not have the given category.", paramType = "query"),
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return models with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return models with a name like the given name.", paramType = "query"),
             @ApiImplicitParam(name = "key", dataType = "string", value = "Only return models with the given key.", paramType = "query"),

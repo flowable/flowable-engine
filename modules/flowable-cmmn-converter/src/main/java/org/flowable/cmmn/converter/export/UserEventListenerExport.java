@@ -12,13 +12,15 @@
  */
 package org.flowable.cmmn.converter.export;
 
-import org.flowable.cmmn.model.UserEventListener;
-
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.converter.CmmnXmlConstants;
+import org.flowable.cmmn.model.UserEventListener;
 
 /**
  * @author Dennis Federico
+ * @author Joram Barrez
  */
 public class UserEventListenerExport extends AbstractPlanItemDefinitionExport<UserEventListener> {
 
@@ -35,9 +37,16 @@ public class UserEventListenerExport extends AbstractPlanItemDefinitionExport<Us
     @Override
     protected void writePlanItemDefinitionSpecificAttributes(UserEventListener userEventListener, XMLStreamWriter xtw) throws Exception {
         super.writePlanItemDefinitionSpecificAttributes(userEventListener, xtw);
+
         String[] authorizedRoleRefs = userEventListener.getAuthorizedRoleRefs();
         if (authorizedRoleRefs != null && authorizedRoleRefs.length > 0) {
             xtw.writeAttribute(ATTRIBUTE_AUTHORIZED_ROLE_REFS, String.join(",", authorizedRoleRefs));
+        }
+
+        if (StringUtils.isNotEmpty(userEventListener.getAvailableConditionExpression())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE,
+                CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_AVAILABLE_CONDITION,
+                userEventListener.getAvailableConditionExpression());
         }
     }
 }

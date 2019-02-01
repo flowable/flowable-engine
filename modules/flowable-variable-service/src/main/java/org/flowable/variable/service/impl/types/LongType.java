@@ -20,11 +20,13 @@ import org.flowable.variable.api.types.VariableType;
  */
 public class LongType implements VariableType {
 
+    public static final String TYPE_NAME = "long";
+
     private static final long serialVersionUID = 1L;
 
     @Override
     public String getTypeName() {
-        return "long";
+        return TYPE_NAME;
     }
 
     @Override

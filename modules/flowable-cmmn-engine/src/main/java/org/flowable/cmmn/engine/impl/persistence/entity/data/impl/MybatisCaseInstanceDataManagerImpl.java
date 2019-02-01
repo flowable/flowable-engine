@@ -24,14 +24,13 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl;
-import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.matcher.CaseInstanceByCaseDefinitionIdMatcher;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Joram Barrez
@@ -79,6 +78,10 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
             params.put("caseInstanceId", caseInstanceId);
         } else if (planItemInstanceId != null) {
             params.put("planItemInstanceId", planItemInstanceId);
+        }
+
+        if (params.isEmpty()) {
+            throw new FlowableIllegalArgumentException("selectCaseInstanceEagerFetchPlanItemInstances needs either caseInstanceId or planItemInstanceId");
         }
 
         // The case instance will be fetched and will have all plan item instances in the childPlanItemInstances property.

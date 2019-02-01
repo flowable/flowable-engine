@@ -354,9 +354,9 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
         taskService.complete(task.getId());
         assertEquals(0, taskService.createTaskQuery().count());
-
+        
         assertEquals("Found executions: " + runtimeService.createExecutionQuery().list(), 0, runtimeService.createExecutionQuery().count());
-        assertProcessEnded(pi.getId());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).count());
     }
 
     @Test
@@ -740,8 +740,8 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
         //Finish the process
         taskService.complete(task.getId());
-
-        assertProcessEnded(processInstance.getId());
+        
+        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
     }
 
     @Test
@@ -864,8 +864,8 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
         //Finish the process
         taskService.complete(task.getId());
-
-        assertProcessEnded(processInstance.getId());
+        
+        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
     }
 
 
@@ -1017,8 +1017,8 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
         //Finish the process
         tasks.forEach(this::completeTask);
-
-        assertProcessEnded(processInstance.getId());
+        
+        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
     }
 
     @Test

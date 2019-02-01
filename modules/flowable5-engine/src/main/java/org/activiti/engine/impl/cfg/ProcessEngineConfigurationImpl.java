@@ -209,8 +209,6 @@ import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.common.engine.impl.util.DefaultClockImpl;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.form.AbstractFormType;
-import org.flowable.engine.impl.bpmn.data.ItemInstance;
-import org.flowable.engine.impl.bpmn.webservice.MessageInstance;
 import org.flowable.engine.impl.cfg.DelegateExpressionFieldInjectionMode;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
@@ -221,7 +219,6 @@ import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.ByteArrayType;
-import org.flowable.variable.service.impl.types.CustomObjectType;
 import org.flowable.variable.service.impl.types.DateType;
 import org.flowable.variable.service.impl.types.DefaultVariableTypes;
 import org.flowable.variable.service.impl.types.DoubleType;
@@ -1364,8 +1361,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             variableTypes.addType(new LongJsonType(maxLengthStringVariableType + 1, objectMapper));
             variableTypes.addType(new ByteArrayType());
             variableTypes.addType(new SerializableType());
-            variableTypes.addType(new CustomObjectType("item", ItemInstance.class));
-            variableTypes.addType(new CustomObjectType("message", MessageInstance.class));
             if (customPostVariableTypes != null) {
                 for (VariableType customVariableType : customPostVariableTypes) {
                     variableTypes.addType(customVariableType);

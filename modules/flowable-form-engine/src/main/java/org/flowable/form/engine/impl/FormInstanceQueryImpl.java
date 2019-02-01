@@ -176,7 +176,7 @@ public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, Form
     }
 
     @Override
-    public FormInstanceQueryImpl deploymentTenantId(String tenantId) {
+    public FormInstanceQueryImpl tenantId(String tenantId) {
         if (tenantId == null) {
             throw new FlowableIllegalArgumentException("deploymentTenantId is null");
         }
@@ -185,7 +185,7 @@ public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, Form
     }
 
     @Override
-    public FormInstanceQueryImpl deploymentTenantIdLike(String tenantIdLike) {
+    public FormInstanceQueryImpl tenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
             throw new FlowableIllegalArgumentException("deploymentTenantIdLike is null");
         }
@@ -194,7 +194,7 @@ public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, Form
     }
 
     @Override
-    public FormInstanceQueryImpl deploymentWithoutTenantId() {
+    public FormInstanceQueryImpl withoutTenantId() {
         this.withoutTenantId = true;
         return this;
     }

@@ -13,6 +13,13 @@
 
 package org.flowable.rest.service.api.runtime;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -30,8 +37,12 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.form.api.FormDefinition;
+import org.flowable.form.api.FormDeployment;
+import org.flowable.form.api.FormInstance;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.junit.Test;
@@ -39,8 +50,6 @@ import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to a single Process instance resource.
@@ -480,6 +489,77 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
 
         assertEquals("simple string value", processVariables.get("stringVariable"));
         assertEquals(1234, processVariables.get("integerVariable"));
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-with-form.bpmn20.xml",
+                    "org/flowable/rest/service/api/runtime/simple.form"})
+    public void testStartProcessWithForm() throws Exception {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("processOne").singleResult();
+        try {
+            FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
+            assertNotNull(formDefinition);
+            
+            FormInstance formInstance = formEngineFormService.createFormInstanceQuery().formDefinitionId(formDefinition.getId()).singleResult();
+            assertNull(formInstance);
+            
+            String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_DEFINITION_START_FORM, processDefinition.getId());
+            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+            JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+            closeResponse(response);
+            assertEquals(formDefinition.getId(), responseNode.get("id").asText());
+            assertEquals(formDefinition.getKey(), responseNode.get("key").asText());
+            assertEquals(formDefinition.getName(), responseNode.get("name").asText());
+            assertEquals(2, responseNode.get("fields").size());
+            
+            ArrayNode formVariablesNode = objectMapper.createArrayNode();
+
+            // String variable
+            ObjectNode stringVarNode = formVariablesNode.addObject();
+            stringVarNode.put("name", "user");
+            stringVarNode.put("value", "simple string value");
+            stringVarNode.put("type", "string");
+
+            ObjectNode integerVarNode = formVariablesNode.addObject();
+            integerVarNode.put("name", "number");
+            integerVarNode.put("value", 1234);
+            integerVarNode.put("type", "integer");
+
+            ObjectNode requestNode = objectMapper.createObjectNode();
+
+            // Start using process definition key, passing in variables
+            requestNode.put("processDefinitionKey", "processOne");
+            requestNode.set("startFormVariables", formVariablesNode);
+
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION));
+            httpPost.setEntity(new StringEntity(requestNode.toString()));
+            response = executeRequest(httpPost, HttpStatus.SC_CREATED);
+            
+            responseNode = objectMapper.readTree(response.getEntity().getContent());
+            closeResponse(response);
+            assertFalse(responseNode.get("ended").asBoolean());
+            
+            String processInstanceId = responseNode.get("id").asText();
+            assertEquals("simple string value", runtimeService.getVariable(processInstanceId, "user"));
+            assertEquals(1234, runtimeService.getVariable(processInstanceId, "number"));
+            
+            formInstance = formEngineFormService.createFormInstanceQuery().formDefinitionId(formDefinition.getId()).singleResult();
+            assertNotNull(formInstance);
+            byte[] valuesBytes = formEngineFormService.getFormInstanceValues(formInstance.getId());
+            assertNotNull(valuesBytes);
+            JsonNode instanceNode = objectMapper.readTree(valuesBytes);
+            JsonNode valuesNode = instanceNode.get("values");
+            assertEquals("simple string value", valuesNode.get("user").asText());
+            assertEquals(1234, valuesNode.get("number").asInt());
+            
+        } finally {
+            formEngineFormService.deleteFormInstancesByProcessDefinition(processDefinition.getId());
+            
+            List<FormDeployment> formDeployments = formRepositoryService.createDeploymentQuery().list();
+            for (FormDeployment formDeployment : formDeployments) {
+                formRepositoryService.deleteDeployment(formDeployment.getId());
+            }
+        }
     }
 
     @Test

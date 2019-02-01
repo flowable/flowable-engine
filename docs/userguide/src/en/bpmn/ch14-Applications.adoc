@@ -380,7 +380,7 @@ As such, if you have a custom implementation of the 'org.flowable.ldap.LDAPIdent
 |flowable.process-definitions.cache.max
 |-1
 |The maximum amount of process definitions available in the process definition cache.
- Per default it is 1 (all process definitions)
+ Per default it is -1 (all process definitions).
 |===============
 
 .Old properties managed by Spring Boot

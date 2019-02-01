@@ -24,19 +24,15 @@ import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
-import org.flowable.engine.impl.ActivityInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.AbstractManager;
-import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
-import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.task.Event;
 import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -279,8 +275,12 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
 
     @Override
     public HistoricActivityInstanceEntity findHistoricActivityInstance(ExecutionEntity execution, boolean endTimeMustBeNull) {
-        String activityId = getActivityIdForExecution(execution);
-        return activityId != null ? findHistoricActivityInstance(execution, activityId, endTimeMustBeNull) : null;
+        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, execution.getProcessDefinitionId())) {
+            String activityId = getActivityIdForExecution(execution);
+            return activityId != null ? findHistoricActivityInstance(execution, activityId, endTimeMustBeNull) : null;
+        }
+        
+        return null;
     }
 
     protected String getActivityIdForExecution(ExecutionEntity execution) {

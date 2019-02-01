@@ -482,10 +482,10 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         List<ExecutionEntity> childExecutions = collectChildren(execution.getProcessInstance());
         for (int i = childExecutions.size() - 1; i >= 0; i--) {
             ExecutionEntity childExecutionEntity = childExecutions.get(i);
-            deleteExecutionAndRelatedData(childExecutionEntity, deleteReason);
+            deleteExecutionAndRelatedData(childExecutionEntity, deleteReason, deleteHistory);
         }
 
-        deleteExecutionAndRelatedData(execution, deleteReason);
+        deleteExecutionAndRelatedData(execution, deleteReason, deleteHistory);
 
         if (deleteHistory) {
             getHistoryManager().recordProcessInstanceDeleted(execution.getId(), execution.getProcessDefinitionId());
@@ -496,13 +496,15 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
     }
 
     @Override
-    public void deleteExecutionAndRelatedData(ExecutionEntity executionEntity, String deleteReason, boolean cancel, FlowElement cancelActivity) {
-        if (executionEntity.isActive()
+    public void deleteExecutionAndRelatedData(ExecutionEntity executionEntity, String deleteReason, boolean deleteHistory, boolean cancel, FlowElement cancelActivity) {
+        if (!deleteHistory && executionEntity.isActive()
                 && executionEntity.getCurrentFlowElement() != null
                 && !executionEntity.isMultiInstanceRoot()
                 && !(executionEntity.getCurrentFlowElement() instanceof BoundaryEvent)) {  // Boundary events will handle the history themselves (see TriggerExecutionOperation for example)
+            
             CommandContextUtil.getActivityInstanceEntityManager().recordActivityEnd(executionEntity, deleteReason);
         }
+        
         deleteRelatedDataForExecution(executionEntity, deleteReason);
         delete(executionEntity);
 
@@ -524,14 +526,14 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
     }
 
     @Override
-    public void deleteExecutionAndRelatedData(ExecutionEntity executionEntity, String deleteReason) {
-        deleteExecutionAndRelatedData(executionEntity, deleteReason, false, null);
+    public void deleteExecutionAndRelatedData(ExecutionEntity executionEntity, String deleteReason, boolean deleteHistory) {
+        deleteExecutionAndRelatedData(executionEntity, deleteReason, deleteHistory, false, null);
     }
 
     @Override
     public void deleteProcessInstanceExecutionEntity(String processInstanceId,
                                                      String currentFlowElementId, 
-                                                     String deleteReason, 
+                                                     String deleteReason,
                                                      boolean cascade, 
                                                      boolean cancel, 
                                                      boolean fireEvents) {
@@ -563,12 +565,12 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         // delete event scope executions
         for (ExecutionEntity childExecution : processInstanceEntity.getExecutions()) {
             if (childExecution.isEventScope()) {
-                deleteExecutionAndRelatedData(childExecution, null);
+                deleteExecutionAndRelatedData(childExecution, null, cascade);
             }
         }
 
         deleteChildExecutions(processInstanceEntity, deleteReason, cancel);
-        deleteExecutionAndRelatedData(processInstanceEntity, deleteReason);
+        deleteExecutionAndRelatedData(processInstanceEntity, deleteReason, cascade);
 
         if (getEventDispatcher().isEnabled() && fireEvents) {
             if (!cancel) {
@@ -611,7 +613,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
                             dispatchExecutionCancelled(childExecutionEntity, 
                                     cancelActivity != null ? cancelActivity : childExecutionEntity.getCurrentFlowElement());
                     }
-                    deleteExecutionAndRelatedData(childExecutionEntity, deleteReason);
+                    deleteExecutionAndRelatedData(childExecutionEntity, deleteReason, false);
                 }
 
             }

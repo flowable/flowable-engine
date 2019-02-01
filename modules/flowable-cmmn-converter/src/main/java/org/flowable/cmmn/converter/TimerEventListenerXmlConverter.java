@@ -35,6 +35,9 @@ public class TimerEventListenerXmlConverter extends PlanItemDefinitiomXmlConvert
     @Override
     protected BaseElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         TimerEventListener timerEventListener = new TimerEventListener();
+        timerEventListener.setAvailableConditionExpression(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE,
+            CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_AVAILABLE_CONDITION));
+
         // Timer expression / start trigger will be handled by dedicated converters
         return timerEventListener;
     }
