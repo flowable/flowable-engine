@@ -104,32 +104,4 @@ public class TestProcessUtil {
         return model;
     }
 
-    /**
-     * Equal condition for DB vendor specific time stamps. MsSql time stamp precision is +/- 3.3 ms.
-     *
-     * @param databaseType database type identifier
-     * @param expectedDate expected date
-     * @return isEqualTo condition for timestamps
-     */
-    public static Condition<? super Date> equalToDbVendorDate(String databaseType, Date expectedDate) {
-        Predicate<Date> datePredicate;
-        if (DATABASE_TYPE_MSSQL.equalsIgnoreCase(databaseType)) {
-            datePredicate = date -> {
-                if (date == null && expectedDate == null) {
-                    return true;
-                }
-                if (date == null || expectedDate == null) {
-                    return false;
-                }
-                Instant dateInstant = date.toInstant();
-                Instant expectedInstant = expectedDate.toInstant();
-                return dateInstant.isAfter(expectedInstant.minusMillis(MSSQL_TIMESTAMP_PRECISION_IN_MILLIS)) && dateInstant.isBefore(expectedInstant.minusMillis(MSSQL_TIMESTAMP_PRECISION_IN_MILLIS));
-            };
-        } else {
-            datePredicate = date -> expectedDate.equals(date);
-        }
-        return new Condition<>(datePredicate, DateUtil.newIsoDateTimeWithMsFormat().format(expectedDate));
-
-    }
-
 }

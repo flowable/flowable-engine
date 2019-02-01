@@ -13,8 +13,8 @@
 package org.flowable.engine.test.bpmn.event.timer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.flowable.engine.test.util.TestProcessUtil.equalToDbVendorDate;
 
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -36,6 +36,8 @@ import org.junit.jupiter.api.Test;
  * @author Filip Hrisafov
  */
 public class DurationTimeTimerEventTest extends PluggableFlowableTestCase {
+
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     private Map<Object, Object> initialBeans;
 
@@ -89,8 +91,7 @@ public class DurationTimeTimerEventTest extends PluggableFlowableTestCase {
         TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
         List<Job> jobs = jobQuery.list();
         assertThat(jobs).hasSize(1);
-        assertThat(jobs.get(0).getDuedate()).is(equalToDbVendorDate(processEngineConfiguration.getDatabaseType(), Date.from(yesterday.plus(100, ChronoUnit.SECONDS))));
-
+        assertThat(simpleDateFormat.format(jobs.get(0).getDuedate())).isEqualTo(simpleDateFormat.format(Date.from(yesterday.plus(100, ChronoUnit.SECONDS))));
         processEngineConfiguration.getClock().setCurrentTime(Date.from(yesterday.plus(200, ChronoUnit.SECONDS)));
 
         waitForJobExecutorToProcessAllJobs(10000L, 25L);
