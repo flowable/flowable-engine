@@ -121,7 +121,7 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
         assertEquals(0, expiredJobs.size());
         
         // Move time to timeout + 1 second. This should trigger the max timeout and the job should be reset (unacquired: reinserted as a new job)
-        processEngineConfiguration.getClock().setCurrentTime(new Date(startOfTestTime.getTime() + (processEngineConfiguration.getAsyncExecutorResetExpiredJobsMaxTimeout() + 1)));
+        processEngineConfiguration.getClock().setCurrentTime(new Date(startOfTestTime.getTime() + (processEngineConfiguration.getAsyncExecutorResetExpiredJobsMaxTimeout() + 1000)));
       
         expiredJobs = managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, jobServiceConfiguration.getJobEntityManager()));
         assertEquals(1, expiredJobs.size());

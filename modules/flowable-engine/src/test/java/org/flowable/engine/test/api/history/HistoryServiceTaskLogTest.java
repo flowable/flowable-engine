@@ -17,6 +17,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -57,6 +58,8 @@ import org.junit.jupiter.api.Test;
  */
 @FlowableTest
 public class HistoryServiceTaskLogTest {
+
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     protected Task task;
 
@@ -412,7 +415,7 @@ public class HistoryServiceTaskLogTest {
             assertThat(historicTaskLogEntry.getUserId()).isEqualTo("testUser");
             assertThat(historicTaskLogEntry.getTaskId()).isEqualTo(task.getId());
             assertThat(historicTaskLogEntry.getType()).isEqualTo("customType");
-            assertThat(historicTaskLogEntry.getTimeStamp()).isEqualTo(todayDate);
+            assertThat(simpleDateFormat.format(historicTaskLogEntry.getTimeStamp())).isEqualTo(simpleDateFormat.format(todayDate));
             assertThat(historicTaskLogEntry.getData()).isEqualTo("testData");
             historyService.deleteHistoricTaskLogEntry(historicTaskLogEntry.getLogNumber());
         }
