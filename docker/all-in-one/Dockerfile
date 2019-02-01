@@ -3,7 +3,7 @@ ADD wait-for-something.sh .
 
 RUN addgroup tomcat && adduser -s /bin/false -G tomcat -h /opt/tomcat -D tomcat
 
-RUN wget http://www-eu.apache.org/dist/tomcat/tomcat-8/v8.5.34/bin/apache-tomcat-8.5.34.tar.gz -O /tmp/tomcat.tar.gz
+RUN wget http://archive.apache.org/dist/tomcat/tomcat-8/v8.5.34/bin/apache-tomcat-8.5.34.tar.gz -O /tmp/tomcat.tar.gz
 RUN cd /tmp && tar xvfz tomcat.tar.gz && cp -Rv /tmp/apache-tomcat-8.5.34/* /opt/tomcat/ && rm -Rf /tmp/apache-tomcat-8.5.34
 
 COPY assets/flowable-idm.war.original /opt/tomcat/webapps/flowable-idm.war
