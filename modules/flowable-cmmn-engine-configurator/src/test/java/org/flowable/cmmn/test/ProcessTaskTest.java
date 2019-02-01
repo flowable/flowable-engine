@@ -436,6 +436,46 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     }
     
+    @Test
+    @CmmnDeployment
+    public void testProcessTaskWithInclusiveGateway() {
+        Deployment deployment = processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/processWithInclusiveGateway.bpmn20.xml").deploy();
+        try {
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+            assertEquals(0, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
+            assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
+
+            List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemDefinitionId("theTask")
+                    .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                    .list();
+            assertEquals(1, planItemInstances.size());
+            cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
+            assertEquals("No process instance started", 1L, processEngineRuntimeService.createProcessInstanceQuery().count());
+            
+            assertEquals(2, processEngineTaskService.createTaskQuery().count());
+            
+            List<Task> tasks = processEngineTaskService.createTaskQuery().list();
+            processEngine.getTaskService().complete(tasks.get(0).getId());
+            processEngine.getTaskService().complete(tasks.get(1).getId());
+            
+            assertEquals(0, processEngineTaskService.createTaskQuery().count());
+            assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
+            
+            planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemDefinitionId("theTask2")
+                    .list();
+            assertEquals(1, planItemInstances.size());
+            assertEquals("Task Two", planItemInstances.get(0).getName());
+            assertEquals(PlanItemInstanceState.ENABLED, planItemInstances.get(0).getState());
+            
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+    
     protected CaseInstance startCaseInstanceWithOneTaskProcess() {
         return startCaseInstanceWithOneTaskProcess(null);
     }
@@ -595,7 +635,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment(resources = {
-        "org/flowable/cmmn/test/ProcesTaskTest.testParentStageTerminatedBeforeProcessStarted.cmmn",
+        "org/flowable/cmmn/test/ProcessTaskTest.testParentStageTerminatedBeforeProcessStarted.cmmn",
         "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml"
     })
     public void testParentStageTerminatedBeforeProcessStarted() {
