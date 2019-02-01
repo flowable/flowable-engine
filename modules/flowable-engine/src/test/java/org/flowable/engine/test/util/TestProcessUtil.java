@@ -31,8 +31,6 @@ import org.flowable.bpmn.model.UserTask;
  */
 public class TestProcessUtil {
 
-    public static final int MSSQL_TIMESTAMP_PRECISION_IN_MILLIS = 5;
-
     /**
      * Since the 'one task process' is used everywhere the actual process content doesn't matter, instead of copying around the BPMN 2.0 xml one could use this method which gives a {@link BpmnModel}
      * version of the same process back.
