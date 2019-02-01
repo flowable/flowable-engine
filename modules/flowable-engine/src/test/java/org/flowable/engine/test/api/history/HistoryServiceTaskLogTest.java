@@ -971,17 +971,18 @@ public class HistoryServiceTaskLogTest {
                 List<HistoricTaskLogEntry> logEntries = historicTaskLogEntryQuery.
                     list();
                 assertThat(logEntries.size()).isEqualTo(3);
-                assertThat(logEntries).extracting(HistoricTaskLogEntry::getTaskId).containsExactly(anotherTask.getId(), task.getId(), task.getId());
-    
+                assertThat(logEntries).extracting(HistoricTaskLogEntry::getLogNumber).containsExactly(
+                    allLogEntries.get(1).getLogNumber(), allLogEntries.get(2).getLogNumber(), allLogEntries.get(3).getLogNumber()
+                );
+
                 assertThat(
                     historicTaskLogEntryQuery.count()
                 ).isEqualTo(3l);
     
                 List<HistoricTaskLogEntry> pagedLogEntries = historicTaskLogEntryQuery.listPage(1, 1);
                 assertThat(pagedLogEntries.size()).isEqualTo(1);
-                assertThat(pagedLogEntries.get(0)).isEqualToComparingFieldByField(logEntries.get(1));
+                assertThat(pagedLogEntries.get(0).getLogNumber()).isEqualTo(logEntries.get(1).getLogNumber());
             }
-            
         } finally {
             deleteTaskWithLogEntries(taskService, managementService, processEngineConfiguration, anotherTask.getId());
         }
