@@ -290,7 +290,7 @@ public class ProcessEngineAutoConfigurationTest {
         List<ProcessDefinition> definitions = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionKey().asc().list();
         assertThat(definitions)
             .extracting(ProcessDefinition::getKey)
-            .containsExactly("integrationGatewayProcess", "simpleTasks", "vacationRequest", "waiter");
+            .containsExactly("inclusiveGateway", "integrationGatewayProcess", "simpleTasks", "vacationRequest", "waiter");
         
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().latestVersion().processDefinitionKey("simpleTasks").singleResult();
         assertThat(processDefinition.getVersion()).isOne();
@@ -300,9 +300,9 @@ public class ProcessEngineAutoConfigurationTest {
         
         List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
 
-        assertThat(deployments).hasSize(3)
+        assertThat(deployments).hasSize(4)
             .extracting(Deployment::getName)
-            .contains("SpringBootAutoDeployment", "simple.bar", "vacationRequest.zip");
+            .contains("SpringBootAutoDeployment", "simple.bar", "vacationRequest.zip", "processTask.bar");
         
         AppRepositoryService appRepositoryService = context.getBean(AppRepositoryService.class);
         List<AppDefinition> appDefinitions = appRepositoryService.createAppDefinitionQuery().list();
@@ -318,9 +318,9 @@ public class ProcessEngineAutoConfigurationTest {
         assertThat(appDefinition.getVersion()).isOne();
         
         List<AppDeployment> appDeployments = appRepositoryService.createDeploymentQuery().list();
-        assertThat(appDeployments).hasSize(2)
+        assertThat(appDeployments).hasSize(3)
             .extracting(AppDeployment::getName)
-            .contains("simple.bar", "vacationRequest.zip");
+            .contains("simple.bar", "vacationRequest.zip", "processTask.bar");
     }
     
     private static ProcessEngineConfiguration processEngine(AppEngine appEngine) {
