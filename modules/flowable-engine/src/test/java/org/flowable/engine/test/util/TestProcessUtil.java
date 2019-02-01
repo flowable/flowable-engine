@@ -12,14 +12,6 @@
  */
 package org.flowable.engine.test.util;
 
-import static org.flowable.common.engine.impl.AbstractEngineConfiguration.DATABASE_TYPE_MSSQL;
-
-import java.time.Instant;
-import java.util.Date;
-import java.util.function.Predicate;
-
-import org.assertj.core.api.Condition;
-import org.assertj.core.util.DateUtil;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.SequenceFlow;
