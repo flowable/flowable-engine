@@ -971,6 +971,9 @@ public class HistoryServiceTaskLogTest {
                 List<HistoricTaskLogEntry> logEntries = historicTaskLogEntryQuery.
                     list();
                 assertThat(logEntries.size()).isEqualTo(3);
+                assertThat(logEntries).extracting(HistoricTaskLogEntry::getLogNumber).containsExactly(
+                    allLogEntries.get(1).getLogNumber(), allLogEntries.get(2).getLogNumber(), allLogEntries.get(3).getLogNumber()
+                );
 
                 assertThat(
                     historicTaskLogEntryQuery.count()
