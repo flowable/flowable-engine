@@ -204,6 +204,12 @@
                     <artifactId>postgresql</artifactId>
                     <scope>compile</scope>
                 </dependency>
+                <dependency>
+                    <groupId>com.microsoft.sqlserver</groupId>
+                    <artifactId>mssql-jdbc</artifactId>
+                    <version>7.0.0.jre8</version>
+                    <scope>compile</scope>
+                </dependency>
             </dependencies>
         </profile>
 
@@ -214,6 +220,12 @@
                 <dependency>
                     <groupId>org.postgresql</groupId>
                     <artifactId>postgresql</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>com.microsoft.sqlserver</groupId>
+                    <artifactId>mssql-jdbc</artifactId>
+                    <version>7.0.0.jre8</version>
                     <scope>compile</scope>
                 </dependency>
             </dependencies>
