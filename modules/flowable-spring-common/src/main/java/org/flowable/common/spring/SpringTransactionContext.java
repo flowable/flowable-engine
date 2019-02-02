@@ -42,10 +42,8 @@ public class SpringTransactionContext implements TransactionContext {
         if (transactionSynchronizationAdapterOrder != null) {
             this.transactionSynchronizationAdapterOrder = transactionSynchronizationAdapterOrder;
         } else {
-            // Revert to default, which is a high number as the behaviour prior
-            // to adding the order would
-            // case the TransactionSynchronizationAdapter to be called AFTER all
-            // Adapters that implement Ordered
+            // Revert to default, which is a high number as the behaviour prior to adding the order would
+            // case the TransactionSynchronizationAdapter to be called AFTER all Adapters that implement Ordered
             this.transactionSynchronizationAdapterOrder = Integer.MAX_VALUE;
         }
     }

@@ -18,6 +18,8 @@ import javax.sql.DataSource;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.spring.SpringTransactionContextFactory;
+import org.flowable.common.spring.SpringTransactionInterceptor;
 import org.flowable.content.engine.ContentEngine;
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.ContentEngines;
