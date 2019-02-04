@@ -13,19 +13,10 @@
 
 package org.flowable.rest.service.api.history;
 
-import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
-
-import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
-import org.flowable.engine.HistoryService;
-import org.flowable.rest.service.api.RestResponseFactory;
-import org.flowable.task.api.history.HistoricTaskLogEntryQuery;
-import org.flowable.task.service.impl.HistoricTaskLogEntryQueryProperty;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,20 +35,7 @@ import io.swagger.annotations.Authorization;
  */
 @RestController
 @Api(tags = { "Historic Task Log Entries" }, description = "Manage Historic Task Log Entries", authorizations = { @Authorization(value = "basicAuth") })
-public class HistoricTaskLogCollectionResource {
-
-    private static Map<String, QueryProperty> allowedSortProperties = new HashMap<>();
-
-    static {
-        allowedSortProperties.put("logNumber", HistoricTaskLogEntryQueryProperty.LOG_NUMBER);
-        allowedSortProperties.put("timeStamp", HistoricTaskLogEntryQueryProperty.TIME_STAMP);
-    }
-
-    @Autowired
-    protected RestResponseFactory restResponseFactory;
-
-    @Autowired
-    protected HistoryService historyService;
+public class HistoricTaskLogCollectionResource extends HistoricTaskLogEntryBaseResource {
 
     @ApiOperation(value = "List historic task log entries", tags = { "History Task" }, nickname = "getHistoricTaskLogEntries")
     @ApiImplicitParams({
@@ -81,64 +59,64 @@ public class HistoricTaskLogCollectionResource {
         @ApiResponse(code = 404, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.") })
     @GetMapping(value = "/history/historic-task-log-entries", produces = "application/json")
     public DataResponse<HistoricTaskLogEntryResponse> getHistoricTaskLogEntries(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
-        HistoricTaskLogEntryQuery query = this.historyService.createHistoricTaskLogEntryQuery();
+        HistoricTaskLogEntryQueryRequest request = new HistoricTaskLogEntryQueryRequest();
 
         if (allRequestParams.containsKey("taskId")) {
-            query.taskId(allRequestParams.get("taskId"));
+            request.setTaskId(allRequestParams.get("taskId"));
         }
 
         if (allRequestParams.containsKey("type")) {
-            query.type(allRequestParams.get("type"));
+            request.setType(allRequestParams.get("type"));
         }
 
         if (allRequestParams.containsKey("userId")) {
-            query.userId(allRequestParams.get("userId"));
+            request.setUserId(allRequestParams.get("userId"));
         }
 
         if (allRequestParams.containsKey("processInstanceId")) {
-            query.processInstanceId(allRequestParams.get("processInstanceId"));
+            request.setProcessInstanceId(allRequestParams.get("processInstanceId"));
         }
 
         if (allRequestParams.containsKey("processDefinitionId")) {
-            query.processDefinitionId(allRequestParams.get("processDefinitionId"));
+            request.setProcessDefinitionId(allRequestParams.get("processDefinitionId"));
         }
 
         if (allRequestParams.containsKey("scopeId")) {
-            query.scopeId(allRequestParams.get("scopeId"));
+            request.setScopeId(allRequestParams.get("scopeId"));
         }
 
         if (allRequestParams.containsKey("scopeDefinitionId")) {
-            query.scopeDefinitionId(allRequestParams.get("scopeDefinitionId"));
+            request.setScopeDefinitionId(allRequestParams.get("scopeDefinitionId"));
         }
 
         if (allRequestParams.containsKey("subScopeId")) {
-            query.subScopeId(allRequestParams.get("subScopeId"));
+            request.setSubScopeId(allRequestParams.get("subScopeId"));
         }
 
         if (allRequestParams.containsKey("scopeType")) {
-            query.scopeType(allRequestParams.get("scopeType"));
+            request.setScopeType(allRequestParams.get("scopeType"));
         }
 
         if (allRequestParams.containsKey("from")) {
-            query.from(RequestUtil.getDate(allRequestParams, "from"));
+            request.setFrom(RequestUtil.getDate(allRequestParams, "from"));
         }
 
         if (allRequestParams.containsKey("to")) {
-            query.to(RequestUtil.getDate(allRequestParams, "to"));
+            request.setTo(RequestUtil.getDate(allRequestParams, "to"));
         }
 
         if (allRequestParams.containsKey("tenantId")) {
-            query.tenantId(allRequestParams.get("tenantId"));
+            request.setTenantId(allRequestParams.get("tenantId"));
         }
 
         if (allRequestParams.containsKey("fromLogNumber")) {
-            query.fromLogNumber(Long.parseLong(allRequestParams.get("fromLogNumber")));
+            request.setFromLogNumber(Long.parseLong(allRequestParams.get("fromLogNumber")));
         }
 
         if (allRequestParams.containsKey("toLogNumber")) {
-            query.toLogNumber(Long.parseLong(allRequestParams.get("toLogNumber")));
+            request.setToLogNumber(Long.parseLong(allRequestParams.get("toLogNumber")));
         }
 
-        return paginateList(allRequestParams, query, "logNumber", allowedSortProperties, restResponseFactory::createHistoricTaskLogEntryResponseList);
+        return getQueryResponse(request, allRequestParams);
     }
 }
