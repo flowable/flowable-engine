@@ -189,8 +189,8 @@ public class ChangeStateActivateHumanTaskTest extends FlowableCmmnTestCase {
                         .start();
         
         assertEquals(0, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
-        
-        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().caseInstanceId(caseInstance.getId()).count());
+        assertEquals(1, cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().caseInstanceId(caseInstance.getId()).count());
+        assertEquals(PlanItemInstanceState.AVAILABLE, cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().caseInstanceId(caseInstance.getId()).singleResult().getState());
         
         cmmnRuntimeService.createChangePlanItemStateBuilder()
             .caseInstanceId(caseInstance.getId())
