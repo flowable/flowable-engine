@@ -2060,4 +2060,18 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
             .as("descending order by startTime")
             .containsExactly(nowPlus1InstanceId, nowInstanceId, nowMinus1InstanceId);
     }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryByInvalidCallbackId() {
+        String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", "now").getId();
+        Assertions.assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).processInstanceCallbackId("foo").list()).isNullOrEmpty();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryByInvalidCallbackType() {
+        String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", "now").getId();
+        Assertions.assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).processInstanceCallbackType("foo").list()).isNullOrEmpty();
+    }
 }

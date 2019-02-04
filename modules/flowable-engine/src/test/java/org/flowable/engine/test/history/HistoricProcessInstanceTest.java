@@ -569,4 +569,24 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         deleteDeployment(deploymentId);
     }
 
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryByInvalidCallbackId() {
+        String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", "now").getId();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertNull(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).processInstanceCallbackId("foo").singleResult());
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryByInvalidCallbackType() {
+        String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", "now").getId();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertNull(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).processInstanceCallbackType("foo").singleResult());
+        }
+    }
+
 }

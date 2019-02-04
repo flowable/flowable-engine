@@ -1079,4 +1079,12 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     public void setStartedBy(String startedBy) {
         this.startedBy = startedBy;
     }
+
+    public String getCallbackId() {
+        return null;
+    }
+
+    public String getCallbackType() {
+        return null;
+    }
 }
