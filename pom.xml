@@ -701,12 +701,12 @@
 			<dependency>
 				<groupId>org.drools</groupId>
 				<artifactId>drools-core</artifactId>
-				<version>7.6.0.Final</version>
+				<version>7.17.0.Final</version>
 			</dependency>
 			<dependency>
 				<groupId>org.drools</groupId>
 				<artifactId>drools-compiler</artifactId>
-				<version>7.6.0.Final</version>
+				<version>7.17.0.Final</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mule.modules</groupId>
