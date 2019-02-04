@@ -18,12 +18,14 @@ import static org.junit.Assert.fail;
 
 import java.util.Collections;
 
+import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
-import org.flowable.cmmn.test.AbstractProcessEngineIntegrationTest;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormRepositoryService;
@@ -34,11 +36,19 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @author martin.grofcik
  */
-public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
+@RunWith(CmmnTestRunner.class)
+public class CaseWithFormTest {
+    protected static CmmnEngineConfiguration cmmnEngineConfiguration;
+    protected static ProcessEngine processEngine;
+
+    protected CmmnRuntimeService cmmnRuntimeService;
+    protected CmmnTaskService cmmnTaskService;
+    protected FormRepositoryService formRepositoryService;
 
     @BeforeClass
     public static void bootProcessEngine() {
@@ -51,8 +61,11 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
     }
 
     @Before
-    public void deployForm() {
-        FormRepositoryService formRepositoryService = FormEngines.getDefaultFormEngine().getFormRepositoryService();
+    public void initialize() {
+        cmmnTaskService = cmmnEngineConfiguration.getCmmnTaskService();
+        cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
+
+        formRepositoryService = FormEngines.getDefaultFormEngine().getFormRepositoryService();
         formRepositoryService.createDeployment().
             addClasspathResource("org/flowable/cmmn/test/simple.form").
             deploy();
@@ -60,7 +73,6 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
 
     @After
     public void cleanDeployments() {
-        FormRepositoryService formRepositoryService = FormEngines.getDefaultFormEngine().getFormRepositoryService();
         formRepositoryService.createDeploymentQuery().list().forEach(
             formDeployment -> formRepositoryService.deleteDeployment(formDeployment.getId())
         );
@@ -114,7 +126,6 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
             caseDefinitionKey("oneTaskCaseWithForm").
             start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caze.getId()).singleResult();
-        FormRepositoryService formRepositoryService = FormEngines.getDefaultFormEngine().getFormRepositoryService();
         FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
         assertThat(SideEffectTaskListener.getSideEffect(), is(1));
         SideEffectTaskListener.reset();
@@ -139,7 +150,6 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
             caseDefinitionKey("oneTaskCaseWithForm").
             start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caze.getId()).singleResult();
-        FormRepositoryService formRepositoryService = FormEngines.getDefaultFormEngine().getFormRepositoryService();
         FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
         assertThat(SideEffectTaskListener.getSideEffect(), is(1));
         SideEffectTaskListener.reset();
