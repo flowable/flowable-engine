@@ -20,7 +20,7 @@ import org.flowable.form.api.FormInfo;
 /**
  * @author martin.grofcik
  */
-public class ThrowExceptionFormFiledValidator implements FormFieldValidator {
+public class ThrowExceptionFormFieldValidator implements FormFieldValidator {
 
     @Override
     public void validateFormFieldsOnSubmit(FormInfo formInfo, String taskId, Map<String, Object> variables) {

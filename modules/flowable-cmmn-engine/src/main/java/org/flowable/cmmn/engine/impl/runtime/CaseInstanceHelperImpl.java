@@ -239,10 +239,10 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
                     }
 
                     if (formInfo != null) {
-                        FormFieldValidator formFieldValidator = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getFormFieldValidator();
-                        formFieldValidator.validateFormFieldsOnSubmit(formInfo, null, startFormVariables);
                         Map<String, Object> formVariables = formService.getVariablesFromFormSubmission(formInfo,
                             startFormVariables, caseInstanceBuilder.getOutcome());
+                        FormFieldValidator formFieldValidator = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getFormFieldValidator();
+                        formFieldValidator.validateFormFieldsOnSubmit(formInfo, null, startFormVariables);
 
                         if (startFormVariables != null) {
 	                        for (String variableName : startFormVariables.keySet()) {

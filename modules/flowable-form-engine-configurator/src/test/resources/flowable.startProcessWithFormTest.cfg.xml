@@ -44,7 +44,7 @@
         <property name="enableProcessDefinitionInfoCache" value="true" />
 
         <property name="formFieldValidator">
-            <bean class="org.flowable.form.engine.test.ThrowExceptionFormFiledValidator"/>
+            <bean class="org.flowable.form.engine.test.ThrowExceptionFormFieldValidator"/>
         </property>
 
         <property name="configurators">

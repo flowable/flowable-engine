@@ -69,9 +69,6 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         FormInfo formInfo = formRepositoryService.getFormModelById(formDefinitionId);
 
         if (formInfo != null) {
-            FormFieldValidator formFieldValidator = CommandContextUtil.getProcessEngineConfiguration(commandContext).getFormFieldValidator();
-            formFieldValidator.validateFormFieldsOnSubmit(formInfo, task.getId(), variables);
-
             // Extract raw variables and complete the task
             Map<String, Object> formVariables = formService.getVariablesFromFormSubmission(formInfo, variables, outcome);
 
@@ -82,6 +79,9 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
                 formService.saveFormInstanceWithScopeId(formVariables, formInfo, task.getId(), task.getScopeId(), task.getScopeType(), 
                                 task.getScopeDefinitionId(), task.getTenantId());
             }
+
+            FormFieldValidator formFieldValidator = CommandContextUtil.getProcessEngineConfiguration(commandContext).getFormFieldValidator();
+            formFieldValidator.validateFormFieldsOnSubmit(formInfo, task.getId(), variables);
 
             FormFieldHandler formFieldHandler = CommandContextUtil.getProcessEngineConfiguration(commandContext).getFormFieldHandler();
             formFieldHandler.handleFormFieldsOnSubmit(formInfo, task.getId(), task.getProcessInstanceId(), null, null, variables, task.getTenantId());
