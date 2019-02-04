@@ -90,6 +90,8 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     protected String nameLikeIgnoreCase;
     protected String deploymentId;
     protected List<String> deploymentIds;
+    protected String callbackId;
+    protected String callbackType;
     
     protected List<ExecutionQueryImpl> orQueryObjects = new ArrayList<>();
     protected ExecutionQueryImpl currentOrQueryObject;
@@ -1080,11 +1082,4 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         this.startedBy = startedBy;
     }
 
-    public String getCallbackId() {
-        return null;
-    }
-
-    public String getCallbackType() {
-        return null;
-    }
 }
