@@ -19,7 +19,6 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.form.api.FormFieldHandler;
-import org.flowable.form.api.FormFieldValidator;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
@@ -80,10 +79,8 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
                                 task.getScopeDefinitionId(), task.getTenantId());
             }
 
-            FormFieldValidator formFieldValidator = CommandContextUtil.getProcessEngineConfiguration(commandContext).getFormFieldValidator();
-            formFieldValidator.validateFormFieldsOnSubmit(formInfo, task.getId(), variables);
-
             FormFieldHandler formFieldHandler = CommandContextUtil.getProcessEngineConfiguration(commandContext).getFormFieldHandler();
+            formFieldHandler.validateFormFieldsOnSubmit(formInfo, task.getId(), variables);
             formFieldHandler.handleFormFieldsOnSubmit(formInfo, task.getId(), task.getProcessInstanceId(), null, null, variables, task.getTenantId());
 
             TaskHelper.completeTask(task, formVariables, transientVariables, localScope, commandContext);

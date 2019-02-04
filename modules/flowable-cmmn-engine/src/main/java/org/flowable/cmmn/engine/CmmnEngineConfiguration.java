@@ -60,7 +60,6 @@ import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.el.CmmnExpressionManager;
 import org.flowable.cmmn.engine.impl.form.DefaultFormFieldHandler;
-import org.flowable.cmmn.engine.impl.form.DefaultFormFieldValidator;
 import org.flowable.cmmn.engine.impl.function.IsStageCompletableExpressionFunction;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryTaskManager;
@@ -223,7 +222,6 @@ import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
 import org.flowable.entitylink.service.impl.db.EntityLinkDbSchemaManager;
 import org.flowable.form.api.FormFieldHandler;
-import org.flowable.form.api.FormFieldValidator;
 import org.flowable.identitylink.service.IdentityLinkEventHandler;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
@@ -685,7 +683,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected List<HistoryJsonTransformer> customHistoryJsonTransformers;
 
     protected FormFieldHandler formFieldHandler;
-    protected FormFieldValidator formFieldValidator;
 
     protected BusinessCalendarManager businessCalendarManager;
 
@@ -780,7 +777,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initHistoryManager();
         initDynamicStateManager();
         initCaseInstanceCallbacks();
-        initFormFieldValidator();
         initFormFieldHandler();
         initClock();
         initIdentityLinkServiceConfiguration();
@@ -1256,12 +1252,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void initFormFieldHandler() {
         if (this.formFieldHandler == null) {
             this.formFieldHandler = new DefaultFormFieldHandler();
-        }
-    }
-
-    public void initFormFieldValidator() {
-        if (this.formFieldValidator == null) {
-            this.formFieldValidator = new DefaultFormFieldValidator();
         }
     }
 
@@ -3269,15 +3259,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setFormFieldHandler(FormFieldHandler formFieldHandler) {
         this.formFieldHandler = formFieldHandler;
-        return this;
-    }
-
-    public FormFieldValidator getFormFieldValidator() {
-        return formFieldValidator;
-    }
-
-    public CmmnEngineConfiguration setFormFieldValidator(FormFieldValidator formFieldValidator) {
-        this.formFieldValidator = formFieldValidator;
         return this;
     }
 

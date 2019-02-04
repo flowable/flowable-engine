@@ -14,14 +14,14 @@ package org.flowable.cmmn.test.validate;
 
 import java.util.Map;
 
-import org.flowable.form.api.FormFieldValidator;
+import org.flowable.engine.impl.formhandler.DefaultFormFieldHandler;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.engine.FlowableFormValidationException;
 
 /**
  * @author martin.grofcik
  */
-public class ThrowExceptionFormFieldValidator implements FormFieldValidator {
+public class ThrowExceptionFormFieldValidator extends DefaultFormFieldHandler {
 
     @Override
     public void validateFormFieldsOnSubmit(FormInfo formInfo, String taskId, Map<String, Object> variables) {

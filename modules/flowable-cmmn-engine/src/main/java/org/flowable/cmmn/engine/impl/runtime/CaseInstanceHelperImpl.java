@@ -41,7 +41,6 @@ import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallba
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.form.api.FormFieldHandler;
-import org.flowable.form.api.FormFieldValidator;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
@@ -241,8 +240,6 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
                     if (formInfo != null) {
                         Map<String, Object> formVariables = formService.getVariablesFromFormSubmission(formInfo,
                             startFormVariables, caseInstanceBuilder.getOutcome());
-                        FormFieldValidator formFieldValidator = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getFormFieldValidator();
-                        formFieldValidator.validateFormFieldsOnSubmit(formInfo, null, startFormVariables);
 
                         if (startFormVariables != null) {
 	                        for (String variableName : startFormVariables.keySet()) {
@@ -252,7 +249,9 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
 
                         formService.createFormInstanceWithScopeId(formVariables, formInfo, null, caseInstanceEntity.getId(),
                             ScopeTypes.CMMN, caseInstanceEntity.getCaseDefinitionId(), caseInstanceEntity.getTenantId());
+
                         FormFieldHandler formFieldHandler = CommandContextUtil.getCmmnEngineConfiguration().getFormFieldHandler();
+                        formFieldHandler.validateFormFieldsOnSubmit(formInfo, null, formVariables);
                         formFieldHandler.handleFormFieldsOnSubmit(formInfo, null, null,
                             caseInstanceEntity.getId(), ScopeTypes.CMMN, formVariables, caseInstanceEntity.getTenantId());
                     }

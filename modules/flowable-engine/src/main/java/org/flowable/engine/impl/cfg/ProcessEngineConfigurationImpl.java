@@ -197,7 +197,6 @@ import org.flowable.engine.impl.event.SignalEventHandler;
 import org.flowable.engine.impl.event.logger.EventLogger;
 import org.flowable.engine.impl.form.BooleanFormType;
 import org.flowable.engine.impl.form.DateFormType;
-import org.flowable.engine.impl.form.DefaultFormFieldValidator;
 import org.flowable.engine.impl.form.DoubleFormType;
 import org.flowable.engine.impl.form.FormEngine;
 import org.flowable.engine.impl.form.FormHandlerHelper;
@@ -205,7 +204,7 @@ import org.flowable.engine.impl.form.FormTypes;
 import org.flowable.engine.impl.form.JuelFormEngine;
 import org.flowable.engine.impl.form.LongFormType;
 import org.flowable.engine.impl.form.StringFormType;
-import org.flowable.engine.impl.form.DefaultFormFieldHandler;
+import org.flowable.engine.impl.formhandler.DefaultFormFieldHandler;
 import org.flowable.engine.impl.history.DefaultHistoryManager;
 import org.flowable.engine.impl.history.DefaultHistoryTaskManager;
 import org.flowable.engine.impl.history.DefaultHistoryVariableManager;
@@ -331,7 +330,6 @@ import org.flowable.engine.parse.BpmnParseHandler;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
 import org.flowable.entitylink.service.impl.db.EntityLinkDbSchemaManager;
 import org.flowable.form.api.FormFieldHandler;
-import org.flowable.form.api.FormFieldValidator;
 import org.flowable.identitylink.service.IdentityLinkEventHandler;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
@@ -825,7 +823,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected FailedJobCommandFactory failedJobCommandFactory;
     
     protected FormFieldHandler formFieldHandler;
-    protected FormFieldValidator formFieldValidator;
 
     /**
      * Set this to true if you want to have extra checks on the BPMN xml that is parsed. See http://www.jorambarrez.be/blog/2013/02/19/uploading-a-funny-xml -can-bring-down-your-server/
@@ -993,7 +990,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initEventDispatcher();
         initProcessValidator();
         initFormFieldHandler();
-        initFormFieldValidator();
         initDatabaseEventLogging();
         initFlowable5CompatibilityHandler();
         initVariableServiceConfiguration();
@@ -2368,12 +2364,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
     
-    public void initFormFieldValidator() {
-        if (this.formFieldValidator == null) {
-            this.formFieldValidator = new DefaultFormFieldValidator();
-        }
-    }
-
     public void initShortHandExpressionFunctions() {
         if (shortHandExpressionFunctions == null) {
             shortHandExpressionFunctions = new ArrayList<>();
@@ -3453,15 +3443,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setFormFieldHandler(FormFieldHandler formFieldHandler) {
         this.formFieldHandler = formFieldHandler;
-        return this;
-    }
-
-    public FormFieldValidator getFormFieldValidator() {
-        return formFieldValidator;
-    }
-
-    public ProcessEngineConfigurationImpl setFormFieldValidator(FormFieldValidator formFieldValidator) {
-        this.formFieldValidator = formFieldValidator;
         return this;
     }
 

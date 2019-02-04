@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.form;
+package org.flowable.engine.impl.formhandler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -114,4 +114,8 @@ public class DefaultFormFieldHandler implements FormFieldHandler {
         }
     }
 
+    @Override
+    public void validateFormFieldsOnSubmit(FormInfo formInfo, String taskId, Map<String, Object> variables) {
+        // do not validate form fields on submit by default
+    }
 }
