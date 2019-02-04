@@ -63,10 +63,12 @@ public class DefaultCmmnDynamicStateManager extends AbstractCmmnDynamicStateMana
     }
 
     @Override
-    protected Map<String, List<PlanItemInstance>> resolveStagePlanItemInstances(String caseInstanceId, CommandContext commandContext) {
+    protected Map<String, List<PlanItemInstance>> resolveActiveStagePlanItemInstances(String caseInstanceId, CommandContext commandContext) {
         PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext);
         PlanItemInstanceQueryImpl planItemInstanceQuery = new PlanItemInstanceQueryImpl(commandContext);
-        planItemInstanceQuery.caseInstanceId(caseInstanceId).onlyStages();
+        planItemInstanceQuery.caseInstanceId(caseInstanceId)
+            .onlyStages()
+            .planItemInstanceStateActive();
         List<PlanItemInstance> planItemInstances = planItemInstanceEntityManager.findByCriteria(planItemInstanceQuery);
 
         Map<String, List<PlanItemInstance>> stagesByPlanItemDefinitionId = planItemInstances.stream()
