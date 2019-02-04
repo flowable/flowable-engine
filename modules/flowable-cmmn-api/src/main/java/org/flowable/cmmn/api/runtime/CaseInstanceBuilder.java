@@ -83,6 +83,14 @@ public interface CaseInstanceBuilder {
      */
     CaseInstanceBuilder fallbackToDefaultTenant();
 
+    /**
+     * Start case instance with form flag
+     *
+     * @param flag to indicate whether start case instance with form
+     * @return modified case instance builder
+     */
+    CaseInstanceBuilder startWithForm(boolean flag);
+
     CaseInstance start();
 
     CaseInstance startAsync();
@@ -117,4 +125,5 @@ public interface CaseInstanceBuilder {
 
     boolean isFallbackToDefaultTenant();
 
+    boolean isStartWithForm();
 }

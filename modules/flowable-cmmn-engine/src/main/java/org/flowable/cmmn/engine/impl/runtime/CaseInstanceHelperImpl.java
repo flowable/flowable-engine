@@ -216,8 +216,8 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
             }
         }
 
-        Map<String, Object> startFormVariables = caseInstanceBuilder.getStartFormVariables();
-        if (startFormVariables != null || caseInstanceBuilder.getOutcome() != null) {
+        if (caseInstanceBuilder.isStartWithForm() || caseInstanceBuilder.getOutcome() != null) {
+            Map<String, Object> startFormVariables = caseInstanceBuilder.getStartFormVariables();
 
             FormService formService = CommandContextUtil.getFormService(commandContext);
 

@@ -18,11 +18,11 @@ import static org.junit.Assert.fail;
 
 import java.util.Collections;
 
+import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.ProcessEngine;
@@ -69,6 +69,9 @@ public class CaseWithFormTest {
         formRepositoryService.createDeployment().
             addClasspathResource("org/flowable/cmmn/test/simple.form").
             deploy();
+        cmmnEngineConfiguration.getCmmnRepositoryService().createDeployment().
+            addClasspathResource("org/flowable/cmmn/test/oneTasksCaseWithForm.cmmn").
+            deploy();
     }
 
     @After
@@ -76,14 +79,13 @@ public class CaseWithFormTest {
         formRepositoryService.createDeploymentQuery().list().forEach(
             formDeployment -> formRepositoryService.deleteDeployment(formDeployment.getId())
         );
+        CmmnRepositoryService cmmnRepositoryService = cmmnEngineConfiguration.getCmmnRepositoryService();
+        cmmnRepositoryService.createDeploymentQuery().list().forEach(
+            cmmnDeployment -> cmmnRepositoryService.deleteDeployment(cmmnDeployment.getId(), true)
+        );
     }
 
     @Test
-    @CmmnDeployment(
-        resources = {
-            "org/flowable/cmmn/test/oneTasksCaseWithForm.cmmn"
-        }
-    )
     public void startCaseWithForm() {
         try {
             cmmnRuntimeService.createCaseInstanceBuilder().
@@ -98,11 +100,6 @@ public class CaseWithFormTest {
     }
 
     @Test
-    @CmmnDeployment(
-        resources = {
-            "org/flowable/cmmn/test/oneTasksCaseWithForm.cmmn"
-        }
-    )
     public void startCaseWithFormWithoutVariables() {
         try {
             cmmnRuntimeService.createCaseInstanceBuilder().
@@ -116,11 +113,34 @@ public class CaseWithFormTest {
     }
 
     @Test
-    @CmmnDeployment(
-        resources = {
-            "org/flowable/cmmn/test/oneTasksCaseWithForm.cmmn"
+    public void startCaseWithFormWithoutVariablesWithFlag() {
+        try {
+            cmmnRuntimeService.createCaseInstanceBuilder().
+                caseDefinitionKey("oneTaskCaseWithForm").
+                startWithForm(true).
+                start();
+            fail("Validation exception expected");
+        } catch (FlowableFormValidationException e) {
+            assertThat("Validation failed by default", is(e.getMessage()));
         }
-    )
+        assertThat(SideEffectTaskListener.getSideEffect(), is(0));
+    }
+
+    @Test
+    public void startCaseWithFormWithFlagAsync() {
+        try {
+            cmmnRuntimeService.createCaseInstanceBuilder().
+                caseDefinitionKey("oneTaskCaseWithForm").
+                startWithForm(true).
+                startAsync();
+            fail("Validation exception expected");
+        } catch (FlowableFormValidationException e) {
+            assertThat("Validation failed by default", is(e.getMessage()));
+        }
+        assertThat(SideEffectTaskListener.getSideEffect(), is(0));
+    }
+
+    @Test
     public void completeCaseTaskWithForm() {
         CaseInstance caze = cmmnRuntimeService.createCaseInstanceBuilder().
             caseDefinitionKey("oneTaskCaseWithForm").
@@ -140,11 +160,6 @@ public class CaseWithFormTest {
     }
 
     @Test
-    @CmmnDeployment(
-        resources = {
-            "org/flowable/cmmn/test/oneTasksCaseWithForm.cmmn"
-        }
-    )
     public void completeCaseTaskWithFormWithoutVariables() {
         CaseInstance caze = cmmnRuntimeService.createCaseInstanceBuilder().
             caseDefinitionKey("oneTaskCaseWithForm").

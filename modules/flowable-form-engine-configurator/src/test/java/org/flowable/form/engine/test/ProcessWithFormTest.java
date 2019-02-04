@@ -22,7 +22,6 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.ConfigurationResource;
-import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.FlowableTest;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormRepositoryService;
@@ -30,6 +29,7 @@ import org.flowable.form.engine.FormEngines;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -40,7 +40,10 @@ import org.junit.jupiter.api.Test;
 public class ProcessWithFormTest {
 
     @AfterEach
-    public void resetSideEffect() {
+    public void resetSideEffect(RepositoryService repositoryService) {
+        repositoryService.createDeploymentQuery().list().forEach(
+            deployment -> repositoryService.deleteDeployment(deployment.getId(), true)
+        );
         FormRepositoryService formRepositoryService = FormEngines.getDefaultFormEngine().getFormRepositoryService();
         formRepositoryService.createDeploymentQuery().list().
             forEach(
@@ -49,13 +52,15 @@ public class ProcessWithFormTest {
         SideEffectExecutionListener.reset();
     }
 
+    @BeforeEach
+    public void deployModels(RepositoryService repositoryService) {
+        repositoryService.createDeployment().
+            addClasspathResource("org/flowable/form/engine/test/deployment/simple.form").
+            addClasspathResource("org/flowable/form/engine/test/deployment/oneTaskWithFormKeySideEffectProcess.bpmn20.xml").
+            deploy();
+    }
+
     @Test
-    @Deployment(
-        resources = {
-            "org/flowable/form/engine/test/deployment/simple.form",
-            "org/flowable/form/engine/test/deployment/oneTaskWithFormKeySideEffectProcess.bpmn20.xml"
-        }
-    )
     public void throwExceptionValidationOnStartProcess(RuntimeService runtimeService, RepositoryService repositoryService) {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskWithFormSideEffectProcess")
             .singleResult();
@@ -68,12 +73,6 @@ public class ProcessWithFormTest {
     }
 
     @Test
-    @Deployment(
-        resources = {
-            "org/flowable/form/engine/test/deployment/simple.form",
-            "org/flowable/form/engine/test/deployment/oneTaskWithFormKeySideEffectProcess.bpmn20.xml"
-        }
-    )
     public void throwExceptionValidationOnStartProcessWithoutVariables(RuntimeService runtimeService, RepositoryService repositoryService) {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskWithFormSideEffectProcess")
             .singleResult();
@@ -86,12 +85,6 @@ public class ProcessWithFormTest {
     }
 
     @Test
-    @Deployment(
-        resources = {
-            "org/flowable/form/engine/test/deployment/simple.form",
-            "org/flowable/form/engine/test/deployment/oneTaskWithFormKeySideEffectProcess.bpmn20.xml"
-        }
-    )
     public void throwExceptionValidationOnCompleteTask(RuntimeService runtimeService, TaskService taskService) {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskWithFormSideEffectProcess");
         Assertions.assertEquals(1, SideEffectExecutionListener.getSideEffect());
@@ -107,4 +100,5 @@ public class ProcessWithFormTest {
 
         Assertions.assertEquals(0, SideEffectExecutionListener.getSideEffect());
     }
+
 }
