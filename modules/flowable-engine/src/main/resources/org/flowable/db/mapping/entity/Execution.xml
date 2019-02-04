@@ -784,6 +784,12 @@
         	and (RES.SUSPENSION_STATE_ = 2)
         </if>
       </if>
+      <if test="callbackId != null">
+            and CALLBACK_ID_ = #{callbackId}
+      </if>
+      <if test="callbackType != null">
+           and CALLBACK_TYPE_ = #{callbackType}
+      </if>
       <if test="tenantId != null">
         and RES.TENANT_ID_ = #{tenantId}
       </if>
@@ -992,6 +998,12 @@
             <if test="orQueryObject.suspensionState.stateCode == 2">
               or (RES.SUSPENSION_STATE_ = 2)
             </if>
+          </if>
+          <if test="orQueryObject.callbackId != null">
+              or CALLBACK_ID_ = #{orQueryObject.callbackId}
+          </if>
+          <if test="orQueryObject.callbackType != null">
+              or CALLBACK_TYPE_ = #{orQueryObject.callbackType}
           </if>
           <if test="orQueryObject.tenantId != null">
             or RES.TENANT_ID_ = #{orQueryObject.tenantId}
