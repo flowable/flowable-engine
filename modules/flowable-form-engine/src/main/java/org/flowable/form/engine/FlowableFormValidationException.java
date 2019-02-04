@@ -13,14 +13,14 @@
 
 package org.flowable.form.engine;
 
-import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 
 /**
  * An exception indicating that a validation of a form field value resulted in an error.
  * 
  * @author Tijs Rademakers
  */
-public class FlowableFormValidationException extends FlowableException {
+public class FlowableFormValidationException extends FlowableIllegalArgumentException {
 
     private static final long serialVersionUID = 1L;
 

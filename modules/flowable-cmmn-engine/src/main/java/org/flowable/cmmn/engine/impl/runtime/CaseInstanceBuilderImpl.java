@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.runtime;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -172,6 +173,9 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
 
     @Override
     public CaseInstance startWithForm() {
+        if (this.startFormVariables == null) {
+            this.startFormVariables = Collections.emptyMap();
+        }
         return cmmnRuntimeService.startCaseInstance(this);
     }
 

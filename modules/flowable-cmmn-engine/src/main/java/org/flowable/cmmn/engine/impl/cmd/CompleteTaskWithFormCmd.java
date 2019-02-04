@@ -20,6 +20,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.form.api.FormFieldHandler;
+import org.flowable.form.api.FormFieldValidator;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
@@ -80,6 +81,9 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
                 formService.saveFormInstanceWithScopeId(formVariables, formInfo, task.getId(), task.getScopeId(), task.getScopeType(), 
                                 task.getScopeDefinitionId(), task.getTenantId());
             }
+
+            FormFieldValidator formFieldValidator = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getFormFieldValidator();
+            formFieldValidator.validateFormFieldsOnSubmit(formInfo, task.getId(), variables);
 
             FormFieldHandler formFieldHandler = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getFormFieldHandler();
             formFieldHandler.handleFormFieldsOnSubmit(formInfo, task.getId(), null, task.getScopeId(), 

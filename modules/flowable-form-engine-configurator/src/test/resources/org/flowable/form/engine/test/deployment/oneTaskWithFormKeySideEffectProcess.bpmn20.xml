@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="oneTaskWithFormSideEffectProcess" name="The One Task Process">
+    <documentation>This is a process for testing purposes</documentation>
+  
+    <startEvent id="theStart" flowable:formKey="form1" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
+    <userTask id="theTask" name="my task" flowable:formKey="form1" flowable:assignee="myAssignee" flowable:owner="myOwner"
+    	flowable:priority="60" flowable:category="myCategory" flowable:dueDate="2021-01-01" >
+      <extensionElements>
+        <flowable:executionListener event="start" class="org.flowable.form.engine.test.SideEffectExecutionListener"></flowable:executionListener>
+        <flowable:executionListener event="end" class="org.flowable.form.engine.test.SideEffectExecutionListener"></flowable:executionListener>
+      </extensionElements>
+    </userTask>
+
+    <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>
