@@ -1,4 +1,4 @@
-FROM flowable/java8_server:8.181
+FROM adoptopenjdk/openjdk8:alpine-slim
 ADD wait-for-something.sh .
 
 RUN addgroup tomcat && adduser -s /bin/false -G tomcat -h /opt/tomcat -D tomcat
