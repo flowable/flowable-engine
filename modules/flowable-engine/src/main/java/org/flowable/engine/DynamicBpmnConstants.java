@@ -17,6 +17,8 @@ public interface DynamicBpmnConstants {
     String BPMN_NODE = "bpmn";
     String LOCALIZATION_NODE = "localization";
 
+    String GLOBAL_PROCESS_DEFINITION_PROPERTIES = "_flowableGlobalProcessDefinitionProperties";
+    String ENABLE_SKIP_EXPRESSION = "enableSkipExpression";
     String TASK_SKIP_EXPRESSION = "taskSkipExpression";
 
     String SERVICE_TASK_CLASS_NAME = "serviceTaskClassName";
