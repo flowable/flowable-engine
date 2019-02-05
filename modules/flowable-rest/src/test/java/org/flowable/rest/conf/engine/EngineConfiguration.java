@@ -93,7 +93,6 @@ public class EngineConfiguration {
         processEngineConfiguration.setHistoryLevel(HistoryLevel.FULL);
         processEngineConfiguration.setEnableEntityLinks(true);
         processEngineConfiguration.addConfigurator(formEngineConfigurator());
-        processEngineConfiguration.setEnableHistoricTaskLogging(true);
         return processEngineConfiguration;
     }
     
