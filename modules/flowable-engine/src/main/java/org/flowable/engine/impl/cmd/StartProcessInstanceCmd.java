@@ -136,9 +136,11 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
 
                     if (formInfo != null) {
                         formVariables = formService.getVariablesFromFormSubmission(formInfo, startFormVariables, outcome);
-                        processEngineConfiguration.getFormFieldHandler().validateFormFieldsOnSubmit(
-                            formInfo, null, startFormVariables
-                        );
+                        if (processEngineConfiguration.isFormFieldValidationEnabled()) {
+                            processEngineConfiguration.getFormFieldHandler().validateFormFieldsOnSubmit(
+                                formInfo, null, formVariables
+                            );
+                        }
                         if (formVariables != null) {
                             if (variables == null) {
                                 variables = new HashMap<>();

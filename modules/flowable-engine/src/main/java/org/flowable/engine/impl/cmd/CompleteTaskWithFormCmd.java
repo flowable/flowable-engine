@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.form.api.FormFieldHandler;
@@ -79,8 +80,11 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
                                 task.getScopeDefinitionId(), task.getTenantId());
             }
 
-            FormFieldHandler formFieldHandler = CommandContextUtil.getProcessEngineConfiguration(commandContext).getFormFieldHandler();
-            formFieldHandler.validateFormFieldsOnSubmit(formInfo, task.getId(), variables);
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+            FormFieldHandler formFieldHandler = processEngineConfiguration.getFormFieldHandler();
+            if (processEngineConfiguration.isFormFieldValidationEnabled()) {
+                formFieldHandler.validateFormFieldsOnSubmit(formInfo, task.getId(), variables);
+            }
             formFieldHandler.handleFormFieldsOnSubmit(formInfo, task.getId(), task.getProcessInstanceId(), null, null, variables, task.getTenantId());
 
             TaskHelper.completeTask(task, formVariables, transientVariables, localScope, commandContext);
