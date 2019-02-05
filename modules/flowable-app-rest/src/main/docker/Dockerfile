@@ -1,4 +1,4 @@
-FROM flowable/java8_server:8.181
+FROM adoptopenjdk/openjdk8:alpine-slim
 ARG WAR_FILE
 ADD ${WAR_FILE} app.war
 ADD wait-for-something.sh .
