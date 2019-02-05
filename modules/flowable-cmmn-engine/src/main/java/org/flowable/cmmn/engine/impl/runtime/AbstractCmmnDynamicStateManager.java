@@ -185,7 +185,7 @@ public abstract class AbstractCmmnDynamicStateManager {
 
     protected void doMovePlanItemState(CaseInstanceChangeState caseInstanceChangeState, CommandContext commandContext) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-        Map<String, List<PlanItemInstance>> currentStages = resolveStagePlanItemInstances(caseInstanceChangeState.getCaseInstanceId(), commandContext);
+        Map<String, List<PlanItemInstance>> currentStages = resolveActiveStagePlanItemInstances(caseInstanceChangeState.getCaseInstanceId(), commandContext);
         caseInstanceChangeState.setCurrentStageInstances(currentStages);
         
         // Set the case variables first so they are available during the change state logic
@@ -349,7 +349,7 @@ public abstract class AbstractCmmnDynamicStateManager {
         }
     }
 
-    protected abstract Map<String, List<PlanItemInstance>> resolveStagePlanItemInstances(String caseInstanceId, CommandContext commandContext);
+    protected abstract Map<String, List<PlanItemInstance>> resolveActiveStagePlanItemInstances(String caseInstanceId, CommandContext commandContext);
 
     protected abstract boolean isDirectPlanItemDefinitionMigration(PlanItemDefinition currentPlanItemDefinition, PlanItemDefinition newPlanItemDefinition);
 

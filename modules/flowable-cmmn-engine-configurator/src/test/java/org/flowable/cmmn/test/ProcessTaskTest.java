@@ -30,6 +30,7 @@ import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
+import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
@@ -231,17 +232,35 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         assertNotNull(planItemInstances.get(0).getReferenceId());
         assertEquals(CallbackTypes.PLAN_ITEM_CHILD_PROCESS, planItemInstances.get(0).getReferenceType());
         assertEquals(0, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
-        
+
         ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().singleResult();
         assertNotNull(processInstance);
-        assertNotNull(processInstance.getCallbackId());
-        assertNotNull(processInstance.getCallbackType());
-        
+
+        PlanItemInstance processTaskPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK).singleResult();
+        assertEquals(processTaskPlanItemInstance.getId(), processInstance.getCallbackId());
+        assertEquals(CallbackTypes.PLAN_ITEM_CHILD_PROCESS, processInstance.getCallbackType());
+
+        assertEquals(processInstance.getId(), processEngine.getRuntimeService().createProcessInstanceQuery()
+            .processInstanceCallbackId(processInstance.getCallbackId()).singleResult().getId());
+        assertEquals(processInstance.getId(), processEngine.getRuntimeService().createProcessInstanceQuery()
+            .processInstanceCallbackType(CallbackTypes.PLAN_ITEM_CHILD_PROCESS).singleResult().getId());
+        assertEquals(processInstance.getId(), processEngine.getRuntimeService().createProcessInstanceQuery()
+            .processInstanceCallbackId(processTaskPlanItemInstance.getId())
+            .processInstanceCallbackType(CallbackTypes.PLAN_ITEM_CHILD_PROCESS).singleResult().getId());
+
         if (processEngine.getProcessEngineConfiguration().getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricProcessInstance historicProcessInstance = processEngine.getHistoryService().createHistoricProcessInstanceQuery()
                     .processInstanceId(processInstance.getId()).singleResult();
             assertEquals(processInstance.getCallbackId(), historicProcessInstance.getCallbackId());
             assertEquals(processInstance.getCallbackType(), historicProcessInstance.getCallbackType());
+
+            assertEquals(processInstance.getId(), processEngine.getHistoryService().createHistoricProcessInstanceQuery()
+                .processInstanceCallbackId(processInstance.getCallbackId()).singleResult().getId());
+            assertEquals(processInstance.getId(), processEngine.getHistoryService().createHistoricProcessInstanceQuery()
+                .processInstanceCallbackType(CallbackTypes.PLAN_ITEM_CHILD_PROCESS).singleResult().getId());
+            assertEquals(processInstance.getId(), processEngine.getHistoryService().createHistoricProcessInstanceQuery()
+                .processInstanceCallbackId(processTaskPlanItemInstance.getId())
+                .processInstanceCallbackType(CallbackTypes.PLAN_ITEM_CHILD_PROCESS).singleResult().getId());
         }
         
         // Completing task will trigger completion of process task plan item
@@ -436,6 +455,46 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     }
     
+    @Test
+    @CmmnDeployment
+    public void testProcessTaskWithInclusiveGateway() {
+        Deployment deployment = processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/processWithInclusiveGateway.bpmn20.xml").deploy();
+        try {
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+            assertEquals(0, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
+            assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
+
+            List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemDefinitionId("theTask")
+                    .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                    .list();
+            assertEquals(1, planItemInstances.size());
+            cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
+            assertEquals("No process instance started", 1L, processEngineRuntimeService.createProcessInstanceQuery().count());
+            
+            assertEquals(2, processEngineTaskService.createTaskQuery().count());
+            
+            List<Task> tasks = processEngineTaskService.createTaskQuery().list();
+            processEngine.getTaskService().complete(tasks.get(0).getId());
+            processEngine.getTaskService().complete(tasks.get(1).getId());
+            
+            assertEquals(0, processEngineTaskService.createTaskQuery().count());
+            assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
+            
+            planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemDefinitionId("theTask2")
+                    .list();
+            assertEquals(1, planItemInstances.size());
+            assertEquals("Task Two", planItemInstances.get(0).getName());
+            assertEquals(PlanItemInstanceState.ENABLED, planItemInstances.get(0).getState());
+            
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+    
     protected CaseInstance startCaseInstanceWithOneTaskProcess() {
         return startCaseInstanceWithOneTaskProcess(null);
     }
@@ -595,7 +654,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment(resources = {
-        "org/flowable/cmmn/test/ProcesTaskTest.testParentStageTerminatedBeforeProcessStarted.cmmn",
+        "org/flowable/cmmn/test/ProcessTaskTest.testParentStageTerminatedBeforeProcessStarted.cmmn",
         "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml"
     })
     public void testParentStageTerminatedBeforeProcessStarted() {
