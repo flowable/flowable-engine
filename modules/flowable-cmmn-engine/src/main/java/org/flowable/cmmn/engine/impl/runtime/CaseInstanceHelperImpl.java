@@ -238,17 +238,22 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
                     }
 
                     if (formInfo != null) {
-                        Map<String, Object> formVariables = formService.getVariablesFromFormSubmission(formInfo,
+                        // Extract the caseVariables from the form submission variables and pass then to the case
+                        Map<String, Object> caseVariables = formService.getVariablesFromFormSubmission(formInfo,
                             startFormVariables, caseInstanceBuilder.getOutcome());
-                        for (String variableName : startFormVariables.keySet()) {
-                            caseInstanceEntity.setVariable(variableName, startFormVariables.get(variableName));
+                        if (caseVariables != null) {
+	                        for (String variableName : caseVariables.keySet()) {
+	                            caseInstanceEntity.setVariable(variableName, caseVariables.get(variableName));
+	                        }
                         }
 
-                        formService.createFormInstanceWithScopeId(formVariables, formInfo, null, caseInstanceEntity.getId(),
+                        // The caseVariables are the variables that should be used when starting the case
+                        // the actual variables should instead be used when creating the form instances
+                        formService.createFormInstanceWithScopeId(startFormVariables, formInfo, null, caseInstanceEntity.getId(),
                             ScopeTypes.CMMN, caseInstanceEntity.getCaseDefinitionId(), caseInstanceEntity.getTenantId());
                         FormFieldHandler formFieldHandler = CommandContextUtil.getCmmnEngineConfiguration().getFormFieldHandler();
                         formFieldHandler.handleFormFieldsOnSubmit(formInfo, null, null,
-                            caseInstanceEntity.getId(), ScopeTypes.CMMN, formVariables, caseInstanceEntity.getTenantId());
+                            caseInstanceEntity.getId(), ScopeTypes.CMMN, caseVariables, caseInstanceEntity.getTenantId());
                     }
 
                 } else {

@@ -69,20 +69,22 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
 
         if (formInfo != null) {
             // Extract raw variables and complete the task
-            Map<String, Object> formVariables = formService.getVariablesFromFormSubmission(formInfo, variables, outcome);
+            Map<String, Object> taskVariables = formService.getVariablesFromFormSubmission(formInfo, variables, outcome);
 
+            // The taskVariables are the variables that should be used when completing the task
+            // the actual variables should instead be used when saving the form instances
             if (task.getProcessInstanceId() != null) {
-                formService.saveFormInstance(formVariables, formInfo, task.getId(), task.getProcessInstanceId(), 
+                formService.saveFormInstance(variables, formInfo, task.getId(), task.getProcessInstanceId(),
                                 task.getProcessDefinitionId(), task.getTenantId());
             } else {
-                formService.saveFormInstanceWithScopeId(formVariables, formInfo, task.getId(), task.getScopeId(), task.getScopeType(), 
+                formService.saveFormInstanceWithScopeId(variables, formInfo, task.getId(), task.getScopeId(), task.getScopeType(),
                                 task.getScopeDefinitionId(), task.getTenantId());
             }
 
             FormFieldHandler formFieldHandler = CommandContextUtil.getProcessEngineConfiguration(commandContext).getFormFieldHandler();
-            formFieldHandler.handleFormFieldsOnSubmit(formInfo, task.getId(), task.getProcessInstanceId(), null, null, variables, task.getTenantId());
+            formFieldHandler.handleFormFieldsOnSubmit(formInfo, task.getId(), task.getProcessInstanceId(), null, null, taskVariables, task.getTenantId());
 
-            TaskHelper.completeTask(task, formVariables, transientVariables, localScope, commandContext);
+            TaskHelper.completeTask(task, taskVariables, transientVariables, localScope, commandContext);
 
         } else {
             TaskHelper.completeTask(task, variables, transientVariables, localScope, commandContext);

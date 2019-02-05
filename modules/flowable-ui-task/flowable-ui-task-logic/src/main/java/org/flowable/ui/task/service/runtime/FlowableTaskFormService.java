@@ -91,7 +91,7 @@ public class FlowableTaskFormService {
         checkCurrentUserCanModifyTask(task);
             
         FormInfo formInfo = formRepositoryService.getFormModelById(saveFormRepresentation.getFormId());
-        Map<String, Object> formVariables = formService.getVariablesFromFormSubmission(formInfo, saveFormRepresentation.getValues(), null);
+        Map<String, Object> formVariables = saveFormRepresentation.getValues();
         
         if (task.getProcessInstanceId() != null) {
             formService.saveFormInstanceByFormDefinitionId(formVariables, saveFormRepresentation.getFormId(), taskId, 
