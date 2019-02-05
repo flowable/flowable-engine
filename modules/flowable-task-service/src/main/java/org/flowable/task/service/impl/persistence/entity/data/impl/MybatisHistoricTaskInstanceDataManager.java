@@ -115,9 +115,4 @@ public class MybatisHistoricTaskInstanceDataManager extends AbstractDataManager<
         return (Long) getDbSqlSession().selectOne("selectHistoricTaskInstanceCountByNativeQuery", parameterMap);
     }
 
-    @Override
-    public void delete(String id) {
-        super.delete(id);
-    }
-
 }
