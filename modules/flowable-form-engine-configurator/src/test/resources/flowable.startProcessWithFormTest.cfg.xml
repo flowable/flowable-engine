@@ -46,6 +46,7 @@
         <property name="formFieldHandler">
             <bean class="org.flowable.form.engine.test.ThrowExceptionFormFieldValidator"/>
         </property>
+        <property name="formFieldValidationEnabled" value="true"/>
 
         <property name="configurators">
             <list>

@@ -134,6 +134,7 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
 
     @Override
     public CaseInstanceBuilder startFormVariables(Map<String, Object> formVariables) {
+        this.startWithForm = true;
         this.startFormVariables = formVariables;
         return this;
     }

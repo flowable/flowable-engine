@@ -229,17 +229,21 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
                 if (formRepositoryService != null) {
 
                     FormInfo formInfo = null;
+                    CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
                     if (caseInstanceEntity.getTenantId() == null || CmmnEngineConfiguration.NO_TENANT_ID.equals(caseInstanceEntity.getTenantId())) {
                         formInfo = formRepositoryService.getFormModelByKey(planModel.getFormKey());
                     } else {
-                        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-                        formInfo = formRepositoryService.getFormModelByKey(planModel.getFormKey(), caseInstanceEntity.getTenantId(), 
+                        formInfo = formRepositoryService.getFormModelByKey(planModel.getFormKey(), caseInstanceEntity.getTenantId(),
                                         cmmnEngineConfiguration.isFallbackToDefaultTenant());
                     }
 
                     if (formInfo != null) {
                         Map<String, Object> formVariables = formService.getVariablesFromFormSubmission(formInfo,
                             startFormVariables, caseInstanceBuilder.getOutcome());
+                        FormFieldHandler formFieldHandler = CommandContextUtil.getCmmnEngineConfiguration().getFormFieldHandler();
+                        if (isFormFieldValidationEnabled(cmmnEngineConfiguration)) {
+                            formFieldHandler.validateFormFieldsOnSubmit(formInfo, null, formVariables);
+                        }
 
                         if (startFormVariables != null) {
 	                        for (String variableName : startFormVariables.keySet()) {
@@ -249,9 +253,6 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
 
                         formService.createFormInstanceWithScopeId(formVariables, formInfo, null, caseInstanceEntity.getId(),
                             ScopeTypes.CMMN, caseInstanceEntity.getCaseDefinitionId(), caseInstanceEntity.getTenantId());
-
-                        FormFieldHandler formFieldHandler = CommandContextUtil.getCmmnEngineConfiguration().getFormFieldHandler();
-                        formFieldHandler.validateFormFieldsOnSubmit(formInfo, null, formVariables);
                         formFieldHandler.handleFormFieldsOnSubmit(formInfo, null, null,
                             caseInstanceEntity.getId(), ScopeTypes.CMMN, formVariables, caseInstanceEntity.getTenantId());
                     }
@@ -262,6 +263,10 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
             }
         }
 
+    }
+
+    protected boolean isFormFieldValidationEnabled(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        return cmmnEngineConfiguration.isFormFieldValidationEnabled();
     }
 
     protected CaseInstanceEntity createCaseInstanceEntityFromDefinition(CommandContext commandContext, CaseDefinition caseDefinition) {

@@ -44,6 +44,9 @@
         <property name="formFieldHandler">
             <bean class="org.flowable.cmmn.test.validate.ThrowExceptionFormFieldValidator"/>
         </property>
+        
+        <property name="formFieldValidationEnabled" value="true"/>
+        <property name="enableHistoricTaskLogging" value="true"/>
     </bean>
     
     <bean id="processAsyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">

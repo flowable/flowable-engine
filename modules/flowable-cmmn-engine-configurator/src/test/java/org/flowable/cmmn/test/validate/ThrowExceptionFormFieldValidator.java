@@ -25,6 +25,8 @@ public class ThrowExceptionFormFieldValidator extends DefaultFormFieldHandler {
 
     @Override
     public void validateFormFieldsOnSubmit(FormInfo formInfo, String taskId, Map<String, Object> variables) {
-        throw new FlowableFormValidationException("Validation failed by default");
+        if (variables == null || !variables.containsKey("doNotThrowException")) {
+            throw new FlowableFormValidationException("Validation failed by default");
+        }
     }
 }

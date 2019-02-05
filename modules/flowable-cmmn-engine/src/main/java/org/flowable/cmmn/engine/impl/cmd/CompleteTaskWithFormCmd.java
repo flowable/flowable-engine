@@ -12,17 +12,22 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
+import static org.flowable.cmmn.engine.impl.task.TaskHelper.logUserTaskCompleted;
+
 import java.util.Map;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
+import org.flowable.task.service.delegate.TaskListener;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
@@ -81,8 +86,11 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
                                 task.getScopeDefinitionId(), task.getTenantId());
             }
 
-            FormFieldHandler formFieldHandler = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getFormFieldHandler();
-            formFieldHandler.validateFormFieldsOnSubmit(formInfo, task.getId(), variables);
+            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+            FormFieldHandler formFieldHandler = cmmnEngineConfiguration.getFormFieldHandler();
+            if (cmmnEngineConfiguration.isFormFieldValidationEnabled()) {
+                formFieldHandler.validateFormFieldsOnSubmit(formInfo, task.getId(), variables);
+            }
             formFieldHandler.handleFormFieldsOnSubmit(formInfo, task.getId(), null, task.getScopeId(),
                             task.getScopeType(), variables, task.getTenantId());
 
@@ -117,7 +125,12 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
                 task.setTransientVariables(transientVariables);
             }
         }
-        
+
+        logUserTaskCompleted(task);
+
+        CommandContextUtil.getInternalTaskAssignmentManager(commandContext).addUserIdentityLinkToParent(task, Authentication.getAuthenticatedUserId());
+        CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_COMPLETE);
+
         CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(planItemInstanceEntity);
     }
 

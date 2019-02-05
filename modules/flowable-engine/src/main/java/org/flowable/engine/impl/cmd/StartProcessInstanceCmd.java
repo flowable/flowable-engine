@@ -145,6 +145,11 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
                             }
                             variables.putAll(formVariables);
                         }
+                        if (processEngineConfiguration.isFormFieldValidationEnabled()) {
+                            processEngineConfiguration.getFormFieldHandler().validateFormFieldsOnSubmit(
+                                formInfo, null, formVariables
+                            );
+                        }
                     }
                 }
             }

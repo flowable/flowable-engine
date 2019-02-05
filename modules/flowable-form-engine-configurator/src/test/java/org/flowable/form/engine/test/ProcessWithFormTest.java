@@ -12,13 +12,16 @@
  */
 package org.flowable.form.engine.test;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collections;
 
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.ConfigurationResource;
@@ -73,6 +76,21 @@ public class ProcessWithFormTest {
     }
 
     @Test
+    public void startProcessWithFormWithoutValidationOnConfiguration(ProcessEngineConfiguration processEngineConfiguration, RuntimeService runtimeService, RepositoryService repositoryService) {
+        ((ProcessEngineConfigurationImpl) processEngineConfiguration).setFormFieldValidationEnabled(false);
+        try {
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskWithFormSideEffectProcess")
+                .singleResult();
+            ProcessInstance processInstance = runtimeService
+                .startProcessInstanceWithForm(processDefinition.getId(), "COMPLETE", Collections.singletonMap("name", "nameValue"), "test");
+            assertNotNull(processInstance);
+            Assertions.assertEquals(1, SideEffectExecutionListener.getSideEffect());
+        } finally {
+            ((ProcessEngineConfigurationImpl) processEngineConfiguration).setFormFieldValidationEnabled(true);
+        }
+    }
+
+    @Test
     public void throwExceptionValidationOnStartProcessWithoutVariables(RuntimeService runtimeService, RepositoryService repositoryService) {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskWithFormSideEffectProcess")
             .singleResult();
@@ -99,6 +117,27 @@ public class ProcessWithFormTest {
         );
 
         Assertions.assertEquals(0, SideEffectExecutionListener.getSideEffect());
+    }
+
+    @Test
+    public void completeTaskWithoutValidationOnConfiguration(ProcessEngineConfiguration processEngineConfiguration, RuntimeService runtimeService, TaskService taskService) {
+        ((ProcessEngineConfigurationImpl) processEngineConfiguration).setFormFieldValidationEnabled(false);
+        try {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskWithFormSideEffectProcess");
+            Assertions.assertEquals(1, SideEffectExecutionListener.getSideEffect());
+            SideEffectExecutionListener.reset();
+
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+            FormRepositoryService formRepositoryService = FormEngines.getDefaultFormEngine().getFormRepositoryService();
+            FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
+
+            taskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", Collections.emptyMap());
+
+            Assertions.assertEquals(1, SideEffectExecutionListener.getSideEffect());
+        } finally {
+            ((ProcessEngineConfigurationImpl) processEngineConfiguration).setFormFieldValidationEnabled(true);
+        }
     }
 
 }
