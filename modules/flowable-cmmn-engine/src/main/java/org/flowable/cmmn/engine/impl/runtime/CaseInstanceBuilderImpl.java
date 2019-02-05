@@ -164,12 +164,6 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     }
 
     @Override
-    public CaseInstanceBuilder startWithForm(boolean flag) {
-        this.startWithForm = flag;
-        return this;
-    }
-
-    @Override
     public CaseInstance start() {
         return cmmnRuntimeService.startCaseInstance(this);
     }

@@ -198,34 +198,6 @@ public class CaseWithFormTest {
     }
 
     @Test
-    public void startCaseWithFormWithoutVariablesWithFlag() {
-        try {
-            cmmnRuntimeService.createCaseInstanceBuilder().
-                caseDefinitionKey("oneTaskCaseWithForm").
-                startWithForm(true).
-                start();
-            fail("Validation exception expected");
-        } catch (FlowableFormValidationException e) {
-            assertThat("Validation failed by default", is(e.getMessage()));
-        }
-        assertThat(SideEffectTaskListener.getSideEffect(), is(0));
-    }
-
-    @Test
-    public void startCaseWithFormWithFlagAsync() {
-        try {
-            cmmnRuntimeService.createCaseInstanceBuilder().
-                caseDefinitionKey("oneTaskCaseWithForm").
-                startWithForm(true).
-                startAsync();
-            fail("Validation exception expected");
-        } catch (FlowableFormValidationException e) {
-            assertThat("Validation failed by default", is(e.getMessage()));
-        }
-        assertThat(SideEffectTaskListener.getSideEffect(), is(0));
-    }
-
-    @Test
     public void completeCaseTaskWithFormWithValidationDisabledOnConfigLevel() {
         cmmnEngineConfiguration.setFormFieldValidationEnabled(false);
         try {
