@@ -142,6 +142,16 @@
       "popular" : true
     } ]
   }, {
+    "name" : "formfieldvalidationpackage",
+    "properties" : [ {
+      "id" : "formfieldvalidation",
+      "type" : "String",
+      "title" : "Validate form fields",
+      "value" : "true",
+      "description" : "Validate form fields on the form submission. (allowed values are 'true', 'false' or expression)",
+      "popular" : true
+    } ]
+  }, {
     "name" : "duedatedefinitionpackage",
     "properties" : [ {
       "id" : "duedatedefinition",
@@ -902,6 +912,7 @@
       "namepackage",
       "documentationpackage",
       "formkeydefinitionpackage",
+      "formfieldvalidationpackage",
       "formreferencepackage",
       "autocompletepackage"
      ],
@@ -968,6 +979,7 @@
       "usertaskassignmentpackage",
       "formkeydefinitionpackage",
       "formreferencepackage",
+      "formfieldvalidationpackage",
       "duedatedefinitionpackage",
       "prioritydefinitionpackage",
       "tasklistenerspackage",

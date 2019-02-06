@@ -208,6 +208,9 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         if (StringUtils.isNotEmpty(planModelStage.getFormKey())) {
             planModelPropertiesNode.put(PROPERTY_FORMKEY, planModelStage.getFormKey());
         }
+        if (StringUtils.isNotEmpty(planModelStage.getValidateFormFields())) {
+            planModelPropertiesNode.put(PROPERTY_FORM_FIELD_VALIDATION, planModelStage.getValidateFormFields());
+        }
         planModelNode.set(EDITOR_SHAPE_PROPERTIES, planModelPropertiesNode);
 
         planModelNode.putArray(EDITOR_OUTGOING);

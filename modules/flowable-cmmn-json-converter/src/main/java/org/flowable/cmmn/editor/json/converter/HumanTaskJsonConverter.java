@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.editor.json.converter.util.CollectionUtils;
 import org.flowable.cmmn.editor.json.converter.util.ListenerConverterUtil;
@@ -259,6 +260,7 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
 
         task.setPriority(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_USERTASK_PRIORITY, elementNode));
         task.setFormKey(CmmnJsonConverterUtil.getPropertyFormKey(elementNode, formMap));
+        task.setValidateFormFields(CmmnJsonConverterUtil.getPropertyValueAsString(CmmnStencilConstants.PROPERTY_FORM_FIELD_VALIDATION, elementNode));
 
         task.setDueDate(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_USERTASK_DUEDATE, elementNode));
         task.setCategory(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_USERTASK_CATEGORY, elementNode));

@@ -136,7 +136,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
 
                     if (formInfo != null) {
                         formVariables = formService.getVariablesFromFormSubmission(formInfo, startFormVariables, outcome);
-                        if (processEngineConfiguration.isFormFieldValidationEnabled()) {
+                        if (isFormFieldValidationEnabled(processEngineConfiguration, startEvent)) {
                             processEngineConfiguration.getFormFieldHandler().validateFormFieldsOnSubmit(
                                 formInfo, null, formVariables
                             );
@@ -164,6 +164,10 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
         }
 
         return processInstance;
+    }
+
+    protected boolean isFormFieldValidationEnabled(ProcessEngineConfigurationImpl processEngineConfiguration, StartEvent startEvent) {
+        return processEngineConfiguration.isFormFieldValidationEnabled();
     }
 
     protected ProcessInstance startProcessInstance(ProcessDefinition processDefinition) {

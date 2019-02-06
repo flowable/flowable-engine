@@ -62,6 +62,7 @@ public interface CmmnStencilConstants {
 
     String PROPERTY_FORMKEY = "formkeydefinition";
     String PROPERTY_FORM_REFERENCE = "formreference";
+    String PROPERTY_FORM_FIELD_VALIDATION = "formfieldvalidation";
 
     String PROPERTY_IS_BLOCKING = "isblocking";
     String PROPERTY_IS_BLOCKING_EXPRESSION = "isblockingexpression";

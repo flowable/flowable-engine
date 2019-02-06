@@ -23,6 +23,7 @@ public class StartEvent extends Event {
     protected String initiator;
     protected String formKey;
     protected boolean isInterrupting = true;
+    protected String validateFormFields;
     protected List<FormProperty> formProperties = new ArrayList<>();
 
     public String getInitiator() {
@@ -57,6 +58,14 @@ public class StartEvent extends Event {
         this.formProperties = formProperties;
     }
 
+    public String getValidateFormFields() {
+        return validateFormFields;
+    }
+
+    public void setValidateFormFields(String validateFormFields) {
+        this.validateFormFields = validateFormFields;
+    }
+
     @Override
     public StartEvent clone() {
         StartEvent clone = new StartEvent();
@@ -69,6 +78,7 @@ public class StartEvent extends Event {
         setInitiator(otherEvent.getInitiator());
         setFormKey(otherEvent.getFormKey());
         setInterrupting(otherEvent.isInterrupting);
+        setValidateFormFields(otherEvent.validateFormFields);
 
         formProperties = new ArrayList<>();
         if (otherEvent.getFormProperties() != null && !otherEvent.getFormProperties().isEmpty()) {
