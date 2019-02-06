@@ -503,8 +503,8 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_STAGE_INSTANCE_ID, planItemInstanceEntity.getStageInstanceId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_IS_STAGE, planItemInstanceEntity.isStage());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ELEMENT_ID, planItemInstanceEntity.getElementId());
-        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_PLAN_DEFINITION_ID, planItemInstanceEntity.getPlanItemDefinitionId());
-        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_PLAN_DEFINITION_TYPE, planItemInstanceEntity.getPlanItemDefinitionType());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_PLAN_ITEM_DEFINITION_ID, planItemInstanceEntity.getPlanItemDefinitionId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_PLAN_ITEM_DEFINITION_TYPE, planItemInstanceEntity.getPlanItemDefinitionType());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_START_USER_ID, planItemInstanceEntity.getStartUserId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CREATE_TIME, planItemInstanceEntity.getCreateTime());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REFERENCE_ID, planItemInstanceEntity.getReferenceId());
