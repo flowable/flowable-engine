@@ -28,6 +28,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityMana
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
+import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.IdentityLinkUtil;
 import org.flowable.cmmn.model.Case;
@@ -241,7 +242,7 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
                         Map<String, Object> formVariables = formService.getVariablesFromFormSubmission(formInfo,
                             startFormVariables, caseInstanceBuilder.getOutcome());
                         FormFieldHandler formFieldHandler = CommandContextUtil.getCmmnEngineConfiguration().getFormFieldHandler();
-                        if (isFormFieldValidationEnabled(cmmnEngineConfiguration)) {
+                        if (isFormFieldValidationEnabled(cmmnEngineConfiguration, planModel)) {
                             formFieldHandler.validateFormFieldsOnSubmit(formInfo, null, formVariables);
                         }
 
@@ -265,8 +266,13 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
 
     }
 
-    protected boolean isFormFieldValidationEnabled(CmmnEngineConfiguration cmmnEngineConfiguration) {
-        return cmmnEngineConfiguration.isFormFieldValidationEnabled();
+    protected boolean isFormFieldValidationEnabled(CmmnEngineConfiguration cmmnEngineConfiguration, Stage stage) {
+        if (cmmnEngineConfiguration.isFormFieldValidationEnabled()) {
+            return TaskHelper.isFormFieldValidationEnabled(null, // case instance does not exist yet
+                cmmnEngineConfiguration,  stage.getValidateFormFields()
+            );
+        }
+        return false;
     }
 
     protected CaseInstanceEntity createCaseInstanceEntityFromDefinition(CommandContext commandContext, CaseDefinition caseDefinition) {

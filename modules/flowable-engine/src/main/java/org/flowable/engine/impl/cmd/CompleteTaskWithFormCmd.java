@@ -99,10 +99,12 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
 
     protected boolean isFormFieldValidationEnabled(TaskEntity task, ProcessEngineConfigurationImpl processEngineConfiguration, String processDefinitionId,
         String taskDefinitionKey) {
-        UserTask userTask = (UserTask) processEngineConfiguration.getRepositoryService().getBpmnModel(processDefinitionId).getFlowElement(taskDefinitionKey);
-        String formFieldValidationExpression = userTask.getValidateFormFields();
-
-        return TaskHelper.isFormFieldValidationEnabled(task, processEngineConfiguration, formFieldValidationExpression);
+        if (processEngineConfiguration.isFormFieldValidationEnabled()) {
+            UserTask userTask = (UserTask) processEngineConfiguration.getRepositoryService().getBpmnModel(processDefinitionId).getFlowElement(taskDefinitionKey);
+            String formFieldValidationExpression = userTask.getValidateFormFields();
+            return TaskHelper.isFormFieldValidationEnabled(task, processEngineConfiguration, formFieldValidationExpression);
+        }
+        return false;
     }
 
     @Override

@@ -168,8 +168,11 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
     }
 
     protected boolean isFormFieldValidationEnabled(ProcessEngineConfigurationImpl processEngineConfiguration, StartEvent startEvent) {
-        return TaskHelper.isFormFieldValidationEnabled(null // process instance does not exist yet
-            , processEngineConfiguration, startEvent.getValidateFormFields());
+        if (processEngineConfiguration.isFormFieldValidationEnabled()) {
+            return TaskHelper.isFormFieldValidationEnabled(null // process instance does not exist yet
+                , processEngineConfiguration, startEvent.getValidateFormFields());
+        }
+        return false;
     }
 
     protected ProcessInstance startProcessInstance(ProcessDefinition processDefinition) {

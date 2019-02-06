@@ -18,7 +18,9 @@ import java.util.Map;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.HumanTask;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.identity.Authentication;
@@ -88,7 +90,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
 
             CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
             FormFieldHandler formFieldHandler = cmmnEngineConfiguration.getFormFieldHandler();
-            if (cmmnEngineConfiguration.isFormFieldValidationEnabled()) {
+            if (isFormFieldValidationEnabled(cmmnEngineConfiguration, task)) {
                 formFieldHandler.validateFormFieldsOnSubmit(formInfo, task.getId(), variables);
             }
             formFieldHandler.handleFormFieldsOnSubmit(formInfo, task.getId(), null, task.getScopeId(),
@@ -102,7 +104,19 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         
         return null;
     }
-    
+
+    protected boolean isFormFieldValidationEnabled(CmmnEngineConfiguration cmmnEngineConfiguration, TaskEntity task) {
+        if (cmmnEngineConfiguration.isFormFieldValidationEnabled()) {
+            HumanTask humanTask = (HumanTask) cmmnEngineConfiguration.getCmmnRepositoryService().
+                getCmmnModel(task.getScopeDefinitionId()).
+                findPlanItemDefinition(task.getTaskDefinitionKey());
+            String formFieldValidationExpression = humanTask.getValidateFormFields();
+
+            return TaskHelper.isFormFieldValidationEnabled(task, cmmnEngineConfiguration, formFieldValidationExpression);
+        }
+        return false;
+    }
+
     protected void completeTask(CommandContext commandContext, TaskEntity task, Map<String, Object> taskVariables) {
         String planItemInstanceId = task.getSubScopeId();
         PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findById(planItemInstanceId);

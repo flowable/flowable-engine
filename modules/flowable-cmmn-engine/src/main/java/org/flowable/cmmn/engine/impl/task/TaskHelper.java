@@ -16,9 +16,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -192,6 +196,43 @@ public class TaskHelper {
             taskLogEntryBuilder.type(HistoricTaskLogEntryType.USER_TASK_COMPLETED.name());
             taskServiceConfiguration.getInternalHistoryTaskManager().recordHistoryUserTaskLog(taskLogEntryBuilder);
         }
+    }
+
+    public static boolean isFormFieldValidationEnabled(VariableContainer variableContainer,
+        CmmnEngineConfiguration cmmnEngineConfiguration, String formFieldValidationExpression) {
+        if (StringUtils.isNotEmpty(formFieldValidationExpression)) {
+            Boolean formFieldValidation = getBoolean(formFieldValidationExpression);
+            if (formFieldValidation != null)
+                return formFieldValidation;
+
+            if (variableContainer != null) {
+                ExpressionManager expressionManager = cmmnEngineConfiguration.getExpressionManager();
+                Boolean formFieldValidationValue = getBoolean(
+                    expressionManager.createExpression(formFieldValidationExpression).getValue(variableContainer)
+                );
+                if (formFieldValidationValue == null) {
+                    throw new FlowableException("Unable to resolve formFieldValidationExpression to boolean value");
+                }
+                return formFieldValidationValue;
+            }
+            throw new FlowableException("Unable to resolve formFieldValidationExpression without variable container");
+        }
+        return true;
+    }
+
+    protected static Boolean getBoolean(Object booleanObject) {
+        if (booleanObject instanceof Boolean) {
+            return (Boolean) booleanObject;
+        }
+        if (booleanObject instanceof String) {
+            if ("true".equalsIgnoreCase((String) booleanObject)) {
+                return Boolean.TRUE;
+            }
+            if ("false".equalsIgnoreCase((String) booleanObject)) {
+                return Boolean.FALSE;
+            }
+        }
+        return null;
     }
 
 }
