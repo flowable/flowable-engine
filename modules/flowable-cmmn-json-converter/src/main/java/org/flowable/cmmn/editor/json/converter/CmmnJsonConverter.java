@@ -343,6 +343,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
             planModelStage.setAutoCompleteCondition(autocompleteCondition);
         }
         planModelStage.setFormKey(CmmnJsonConverterUtil.getPropertyFormKey(planModelShape, formKeyMap));
+        planModelStage.setValidateFormFields(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_FORM_FIELD_VALIDATION, planModelShape));
         planModelStage.setPlanModel(true);
 
         caseModel.setPlanModel(planModelStage);
