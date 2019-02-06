@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.test.async;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
@@ -240,7 +241,7 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         assertEquals(caseInstance.getId(), historicTaskInstance.getScopeId());
         assertEquals(caseInstance.getCaseDefinitionId(), historicTaskInstance.getScopeDefinitionId());
         assertEquals(ScopeTypes.CMMN, historicTaskInstance.getScopeType());
-        assertNotNull(historicTaskInstance.getStartTime());
+        assertNotNull(historicTaskInstance.getCreateTime());
         
         // Update
         cmmnTaskService.setAssignee(historicTaskInstance.getId(), "janeDoe");
@@ -255,6 +256,13 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertEquals(99, historicTaskInstance.getPriority());
         assertNull(historicTaskInstance.getEndTime());
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+            .orderByName().asc()
+            .list();
+        assertThat(planItemInstances).extracting(PlanItemInstance::getName).containsExactly("The Task");
+        assertThat(planItemInstances).extracting(PlanItemInstance::getCreateTime).isNotNull();
         
         // Complete
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
@@ -264,6 +272,12 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         waitForAsyncHistoryExecutorToProcessAllJobs();
         historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertNotNull(historicTaskInstance.getEndTime());
+
+        List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+            .planItemInstanceDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+            .list();
+        assertThat(historicPlanItemInstances).extracting(HistoricPlanItemInstance::getName).containsExactly("The Task");
+        assertThat(historicPlanItemInstances).extracting(HistoricPlanItemInstance::getCreateTime).isNotNull();
     }
     
     @Test
