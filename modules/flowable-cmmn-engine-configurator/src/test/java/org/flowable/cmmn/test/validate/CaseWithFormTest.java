@@ -49,6 +49,30 @@ import org.junit.runner.RunWith;
  */
 @RunWith(CmmnTestRunner.class)
 public class CaseWithFormTest {
+
+    public static final String ONE_TASK_CASE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+        + "<definitions xmlns=\"http://www.omg.org/spec/CMMN/20151109/MODEL\"\n"
+        + "             xmlns:flowable=\"http://flowable.org/cmmn\"\n"
+        + "\n"
+        + "             targetNamespace=\"http://flowable.org/cmmn\">\n"
+        + "\n"
+        + "\n"
+        + "    <case id=\"oneTaskCaseWithForm\">\n"
+        + "        <casePlanModel id=\"myPlanModel\" name=\"My CasePlanModel\" flowable:formKey=\"form1\" flowable:formFieldValidation=\"CASE_VALIDATE_VALUE\">\n"
+        + "\n"
+        + "            <planItem id=\"planItem1\" name=\"Task One\" definitionRef=\"theTask\" />\n"
+        + "\n"
+        + "            <humanTask id=\"theTask\" name=\"The Task\" flowable:formKey=\"form1\" flowable:formFieldValidation=\"TASK_VALIDATE_VALUE\">\n"
+        + "                <extensionElements>\n"
+        + "                    <flowable:taskListener event=\"create\" class=\"org.flowable.cmmn.test.validate.SideEffectTaskListener\"></flowable:taskListener>\n"
+        + "                    <flowable:taskListener event=\"complete\" class=\"org.flowable.cmmn.test.validate.SideEffectTaskListener\"></flowable:taskListener>\n"
+        + "                </extensionElements>\n"
+        + "            </humanTask>\n"
+        + "\n"
+        + "        </casePlanModel>\n"
+        + "    </case>\n"
+        + "</definitions>\n";
+
     protected static CmmnEngineConfiguration cmmnEngineConfiguration;
     protected static ProcessEngine processEngine;
 
@@ -79,7 +103,10 @@ public class CaseWithFormTest {
         cmmnHistoryService = cmmnEngineConfiguration.getCmmnHistoryService();
 
         cmmnEngineConfiguration.getCmmnRepositoryService().createDeployment().
-            addClasspathResource("org/flowable/cmmn/test/oneTasksCaseWithForm.cmmn").
+            addString("org/flowable/cmmn/test/oneTasksCaseWithForm.cmmn", ONE_TASK_CASE.
+                replace("CASE_VALIDATE_VALUE", "true").
+                replace("TASK_VALIDATE_VALUE", "true")
+            ).
             deploy();
         SideEffectTaskListener.reset();
     }
@@ -237,6 +264,145 @@ public class CaseWithFormTest {
 
     @Test
     public void completeCaseTaskWithFormWithoutVariables() {
+        CaseInstance caze = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCaseWithForm").
+            start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caze.getId()).singleResult();
+        FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
+        assertThat(SideEffectTaskListener.getSideEffect(), is(1));
+        SideEffectTaskListener.reset();
+
+        try {
+            cmmnTaskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", null);
+            fail("Validation exception expected");
+        } catch (FlowableFormValidationException e) {
+            assertThat("Validation failed by default", is(e.getMessage()));
+        }
+        assertThat(SideEffectTaskListener.getSideEffect(), is(0));
+    }
+
+    @Test
+    public void completeTaskWithoutValidationOnModelLevel() {
+        cmmnEngineConfiguration.getCmmnRepositoryService().createDeployment().
+            addString("org/flowable/cmmn/test/oneTasksCaseWithForm.cmmn", ONE_TASK_CASE.
+                replace("CASE_VALIDATE_VALUE", "false").
+                replace("TASK_VALIDATE_VALUE", "false")
+            ).
+            deploy();
+        CaseInstance caze = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCaseWithForm").
+            start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caze.getId()).singleResult();
+        FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
+        assertThat(SideEffectTaskListener.getSideEffect(), is(1));
+        SideEffectTaskListener.reset();
+
+        cmmnTaskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", null);
+        assertThat(SideEffectTaskListener.getSideEffect(), is(1));
+    }
+
+    @Test
+    public void completeTaskWithoutValidationOnModelLevelExpression() {
+        cmmnEngineConfiguration.getCmmnRepositoryService().createDeployment().
+            addString("org/flowable/cmmn/test/oneTasksCaseWithForm.cmmn", ONE_TASK_CASE.
+                replace("CASE_VALIDATE_VALUE", "true").
+                replace("TASK_VALIDATE_VALUE", "${allowValidation}")
+            ).
+            deploy();
+
+        try {
+            cmmnRuntimeService.createCaseInstanceBuilder().
+                caseDefinitionKey("oneTaskCaseWithForm").
+                startFormVariables(Collections.singletonMap("allowValidation", true)).
+                startWithForm();
+            fail("Validation exception expected");
+        } catch (FlowableFormValidationException e) {
+            assertThat("Validation failed by default", is(e.getMessage()));
+        }
+        assertThat(SideEffectTaskListener.getSideEffect(), is(0));
+
+        CaseInstance caze = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCaseWithForm").
+            variables(Collections.singletonMap("allowValidation", true)).
+            start();
+        assertThat(SideEffectTaskListener.getSideEffect(), is(1));
+        SideEffectTaskListener.reset();
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caze.getId()).singleResult();
+        FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
+
+        try {
+            cmmnTaskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", null);
+            fail("Validation exception expected");
+        } catch (FlowableFormValidationException e) {
+            assertThat("Validation failed by default", is(e.getMessage()));
+        }
+        assertThat(SideEffectTaskListener.getSideEffect(), is(0));
+
+
+    }
+
+    @Test
+    public void completeTaskWithoutValidationOnModelLevelBadExpression() {
+        cmmnEngineConfiguration.getCmmnRepositoryService().createDeployment().
+            addString("org/flowable/cmmn/test/oneTasksCaseWithForm.cmmn", ONE_TASK_CASE.
+                replace("CASE_VALIDATE_VALUE", "true").
+                replace("TASK_VALIDATE_VALUE", "${BAD_EXPRESSION}")
+            ).
+            deploy();
+
+        CaseInstance caze = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCaseWithForm").
+            start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caze.getId()).singleResult();
+        FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
+        assertThat(SideEffectTaskListener.getSideEffect(), is(1));
+        SideEffectTaskListener.reset();
+
+        try {
+            cmmnTaskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", null);
+            fail("Validation exception expected");
+        } catch (RuntimeException e) {
+            assertThat("Unknown property used in expression: ${BAD_EXPRESSION}", is(e.getMessage()));
+        }
+        assertThat(SideEffectTaskListener.getSideEffect(), is(0));
+    }
+
+    @Test
+    public void completeTaskWithValidationOnModelLevelStringExpression() {
+        cmmnEngineConfiguration.getCmmnRepositoryService().createDeployment().
+            addString("org/flowable/cmmn/test/oneTasksCaseWithForm.cmmn", ONE_TASK_CASE.
+                replace("CASE_VALIDATE_VALUE", "true").
+                replace("TASK_VALIDATE_VALUE", "${true}")
+            ).
+            deploy();
+
+        CaseInstance caze = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCaseWithForm").
+            start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caze.getId()).singleResult();
+        FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
+        assertThat(SideEffectTaskListener.getSideEffect(), is(1));
+        SideEffectTaskListener.reset();
+
+        try {
+            cmmnTaskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", null);
+            fail("Validation exception expected");
+        } catch (FlowableFormValidationException e) {
+            assertThat("Validation failed by default", is(e.getMessage()));
+        }
+        assertThat(SideEffectTaskListener.getSideEffect(), is(0));
+    }
+
+    @Test
+    public void completeTaskWithoutValidationOnMissingModelLevel() {
+        cmmnEngineConfiguration.getCmmnRepositoryService().createDeployment().
+            addString("org/flowable/cmmn/test/oneTasksCaseWithForm.cmmn", ONE_TASK_CASE.
+                replace("flowable:formFieldValidation=\"CASE_VALIDATE_VALUE\"", "").
+                replace("flowable:formFieldValidation=\"TASK_VALIDATE_VALUE\"", "")
+            ).
+            deploy();
+
         CaseInstance caze = cmmnRuntimeService.createCaseInstanceBuilder().
             caseDefinitionKey("oneTaskCaseWithForm").
             start();

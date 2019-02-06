@@ -163,7 +163,7 @@ public class ProcessWithFormTest {
             FormRepositoryService formRepositoryService = FormEngines.getDefaultFormEngine().getFormRepositoryService();
             FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
 
-            taskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", Collections.emptyMap());
+            taskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", Collections.singletonMap("initiator", "someInitiator"));
 
             assertEquals(1, SideEffectExecutionListener.getSideEffect());
         } finally {
@@ -277,7 +277,7 @@ public class ProcessWithFormTest {
     }
 
     @Test
-    public void completeTaskWithoutValidationOnModelLevelStringExpression(ProcessEngineConfiguration processEngineConfiguration, RuntimeService runtimeService,
+    public void completeTaskWithValidationOnModelLevelStringExpression(ProcessEngineConfiguration processEngineConfiguration, RuntimeService runtimeService,
         TaskService taskService, RepositoryService repositoryService) {
 
         Deployment deployment = repositoryService.createDeployment().
@@ -285,6 +285,39 @@ public class ProcessWithFormTest {
                 ONE_TASK_PROCESS.
                     replace("START_EVENT_VALIDATION", "true").
                     replace("USER_TASK_VALIDATION", "${true}")
+            ).
+            deploy();
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
+            "oneTaskWithFormSideEffectProcess",
+            Collections.emptyMap()
+        );
+        SideEffectExecutionListener.reset();
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        FormRepositoryService formRepositoryService = FormEngines.getDefaultFormEngine().getFormRepositoryService();
+        FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
+
+        assertEquals(
+            "validation failed",
+            assertThrows(
+            RuntimeException.class,
+            () -> taskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", Collections.singletonMap("initiator", "someInitiator"))
+        ).getMessage()
+        );
+
+        assertEquals(0, SideEffectExecutionListener.getSideEffect());
+    }
+
+    @Test
+    public void completeTaskWithValidationOnMissingModelLevel(ProcessEngineConfiguration processEngineConfiguration, RuntimeService runtimeService,
+        TaskService taskService, RepositoryService repositoryService) {
+
+        Deployment deployment = repositoryService.createDeployment().
+            addString("oneTaskWithFormKeySideEffectProcess.bpmn20.xml",
+                ONE_TASK_PROCESS.
+                    replace("flowable:formFieldValidation=\"START_EVENT_VALIDATION\"", "").
+                    replace("flowable:formFieldValidation=\"USER_TASK_VALIDATION\"", "")
             ).
             deploy();
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
