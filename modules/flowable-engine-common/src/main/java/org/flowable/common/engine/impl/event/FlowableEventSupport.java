@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
@@ -115,7 +114,7 @@ public class FlowableEventSupport {
             listener.onEvent(event);
         } catch (Throwable t) {
             if (listener.isFailOnException()) {
-                throw new FlowableException("Exception while executing event-listener", t);
+                throw t;
             } else {
                 // Ignore the exception and continue notifying remaining listeners. The listener
                 // explicitly states that the exception should not bubble up
