@@ -12,12 +12,14 @@
  */
 package org.flowable.cmmn.test.async;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
@@ -82,10 +84,14 @@ public class AsyncTaskTest extends FlowableCmmnTestCase {
         waitForJobExecutorToProcessAllJobs();
         
         List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
-        assertEquals(3, tasks.size());
-        assertEquals("B", tasks.get(0).getName());
-        assertEquals("C", tasks.get(1).getName());
-        assertEquals("D", tasks.get(2).getName());
+        assertThat(tasks).extracting(Task::getName).containsExactly("B", "C", "D");
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+            .orderByName().asc()
+            .list();
+        assertThat(planItemInstances).extracting(PlanItemInstance::getName).containsExactly("B", "C", "D");
+        assertThat(planItemInstances).extracting(PlanItemInstance::getCreateTime).isNotNull();
     }
     
     @Test
