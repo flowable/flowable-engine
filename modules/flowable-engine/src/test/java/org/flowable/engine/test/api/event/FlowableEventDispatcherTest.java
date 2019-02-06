@@ -12,7 +12,9 @@
  */
 package org.flowable.engine.test.api.event;
 
-import org.flowable.common.engine.api.FlowableException;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
@@ -229,17 +231,12 @@ public class FlowableEventDispatcherTest extends PluggableFlowableTestCase {
         dispatcher.addEventListener(listener);
         dispatcher.addEventListener(secondListener);
 
-        try {
-            dispatcher.dispatchEvent(event);
-            fail("Exception expected");
-        } catch (Throwable t) {
-            assertTrue(t instanceof FlowableException);
-            assertTrue(t.getCause() instanceof RuntimeException);
-            assertEquals("Test exception", t.getCause().getMessage());
+        assertThatThrownBy(() -> dispatcher.dispatchEvent(event))
+            .isExactlyInstanceOf(RuntimeException.class)
+            .hasMessage("Test exception");
 
-            // Second listener should NOT have been called
-            assertEquals(0, secondListener.getEventsReceived().size());
-        }
+        // Second listener should NOT have been called
+        assertThat(secondListener.getEventsReceived()).isEmpty();
     }
 
     /**
