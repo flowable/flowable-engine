@@ -46,6 +46,7 @@ import org.flowable.rest.service.api.history.HistoricActivityInstanceQueryReques
 import org.flowable.rest.service.api.history.HistoricDetailQueryRequest;
 import org.flowable.rest.service.api.history.HistoricProcessInstanceQueryRequest;
 import org.flowable.rest.service.api.history.HistoricTaskInstanceQueryRequest;
+import org.flowable.rest.service.api.history.HistoricTaskLogEntryQueryRequest;
 import org.flowable.rest.service.api.history.HistoricVariableInstanceQueryRequest;
 import org.flowable.rest.service.api.identity.GroupRequest;
 import org.flowable.rest.service.api.identity.UserRequest;
@@ -64,6 +65,7 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
+import org.flowable.task.api.history.HistoricTaskLogEntryQuery;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
 
@@ -164,7 +166,9 @@ public interface BpmnRestApiInterceptor {
     void accessHistoryVariableInfoById(HistoricVariableInstance historicVariableInstance);
     
     void accessHistoryVariableInfoWithQuery(HistoricVariableInstanceQuery historicVariableInstanceQuery, HistoricVariableInstanceQueryRequest request);
-    
+
+    void accessHistoricTaskLogWithQuery(HistoricTaskLogEntryQuery historicTaskLogEntryQuery, HistoricTaskLogEntryQueryRequest request);
+
     void accessGroupInfoById(Group group);
     
     void accessGroupInfoWithQuery(GroupQuery groupQuery);

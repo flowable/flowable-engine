@@ -17,7 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.util.CollectionUtil;
+import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.junit.jupiter.api.Test;
@@ -54,6 +56,60 @@ public class ConditionalSequenceFlowTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
 
         assertEquals("task left", task.getName());
+    }
+    
+    @Test
+    @Deployment
+    public void testSkipExpressionWithDefinitionInfoEnabled() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("testSkipExpression").singleResult();
+        ObjectNode infoNode = dynamicBpmnService.enableSkipExpression();
+        dynamicBpmnService.saveProcessDefinitionInfo(processDefinition.getId(), infoNode);
+        
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("input", "left");
+        variables.put("skipLeft", false);
+        variables.put("skipRight", true);
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("testSkipExpression", variables);
+
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+
+        assertEquals("task right", task.getName());
+        
+        dynamicBpmnService.removeEnableSkipExpression(infoNode);
+        dynamicBpmnService.saveProcessDefinitionInfo(processDefinition.getId(), infoNode);
+        infoNode = dynamicBpmnService.getProcessDefinitionInfo(processDefinition.getId());
+        assertTrue(infoNode.get("bpmn").has(DynamicBpmnConstants.GLOBAL_PROCESS_DEFINITION_PROPERTIES));
+        assertFalse(infoNode.get("bpmn").get(DynamicBpmnConstants.GLOBAL_PROCESS_DEFINITION_PROPERTIES).has(DynamicBpmnConstants.ENABLE_SKIP_EXPRESSION));
+        
+        variables = new HashMap<>();
+        variables.put("input", "left");
+        variables.put("skipLeft", false);
+        variables.put("skipRight", true);
+        pi = runtimeService.startProcessInstanceByKey("testSkipExpression", variables);
+
+        task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+
+        assertEquals("task left", task.getName());
+        
+        dynamicBpmnService.enableSkipExpression(infoNode);
+        dynamicBpmnService.changeSkipExpression("flow1", "${skipOtherLeftVar}", infoNode);
+        dynamicBpmnService.changeSkipExpression("flow2", "${skipOtherRightVar}", infoNode);
+        dynamicBpmnService.saveProcessDefinitionInfo(processDefinition.getId(), infoNode);
+        infoNode = dynamicBpmnService.getProcessDefinitionInfo(processDefinition.getId());
+        assertTrue(infoNode.get("bpmn").has(DynamicBpmnConstants.GLOBAL_PROCESS_DEFINITION_PROPERTIES));
+        assertTrue(infoNode.get("bpmn").get(DynamicBpmnConstants.GLOBAL_PROCESS_DEFINITION_PROPERTIES).has(DynamicBpmnConstants.ENABLE_SKIP_EXPRESSION));
+        assertEquals("${skipOtherLeftVar}", infoNode.get("bpmn").get("flow1").get(DynamicBpmnConstants.TASK_SKIP_EXPRESSION).asText());
+        assertEquals("${skipOtherRightVar}", infoNode.get("bpmn").get("flow2").get(DynamicBpmnConstants.TASK_SKIP_EXPRESSION).asText());
+        
+        variables = new HashMap<>();
+        variables.put("input", "left");
+        variables.put("skipOtherLeftVar", false);
+        variables.put("skipOtherRightVar", true);
+        pi = runtimeService.startProcessInstanceByKey("testSkipExpression", variables);
+
+        task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+
+        assertEquals("task right", task.getName());
     }
 
     @Test
