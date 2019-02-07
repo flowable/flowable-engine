@@ -10,16 +10,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.flowable.rest.conf;
 
-import org.flowable.rest.conf.engine.EngineConfiguration;
+import org.flowable.rest.conf.engine.EngineConfigurationWithTaskLogging;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Configuration
 @ComponentScan(basePackages = { "org.flowable.rest.conf.common" })
-@Import(EngineConfiguration.class)
-public class ApplicationConfiguration {
+@Import(EngineConfigurationWithTaskLogging.class)
+public class ApplicationWithTaskLogging {
 
 }

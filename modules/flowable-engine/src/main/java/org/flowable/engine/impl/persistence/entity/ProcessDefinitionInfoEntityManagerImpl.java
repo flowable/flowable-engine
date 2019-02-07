@@ -65,8 +65,9 @@ public class ProcessDefinitionInfoEntityManagerImpl extends
 
             if (processDefinitionInfo.getInfoJsonId() == null) {
                 processDefinitionInfo.setInfoJsonId(ref.getId());
-                updateProcessDefinitionInfo(processDefinitionInfo);
             }
+            
+            updateProcessDefinitionInfo(processDefinitionInfo);
         }
     }
 

@@ -117,8 +117,8 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_OWNER = "owner";
     String FIELD_PARENT_ID = "parentId";
     String FIELD_PARENT_TASK_ID = "parentTaskId";
-    String FIELD_PLAN_DEFINITION_ID = "planDefinitionId";
-    String FIELD_PLAN_DEFINITION_TYPE = "planDefinitionType";
+    String FIELD_PLAN_ITEM_DEFINITION_ID = "planItemDefinitionId";
+    String FIELD_PLAN_ITEM_DEFINITION_TYPE = "planItemDefinitionType";
     String FIELD_PLAN_ITEM_INSTANCE_ID = "planItemInstanceId";
     String FIELD_PRIORITY = "priority";
     String FIELD_REFERENCE_ID = "referenceId";

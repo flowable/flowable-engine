@@ -3,7 +3,7 @@
     "name": "My first form",
     "fields": [
         {
-            "id": "input1",
+            "id": "doNotThrowException",
             "name": "Input1",
             "type": "text",
             "required": false,

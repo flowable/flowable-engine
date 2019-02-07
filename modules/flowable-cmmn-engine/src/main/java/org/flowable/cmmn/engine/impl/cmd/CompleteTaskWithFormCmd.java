@@ -77,26 +77,28 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
 
         if (formInfo != null) {
             // Extract raw variables and complete the task
-            Map<String, Object> formVariables = formService.getVariablesFromFormSubmission(formInfo, variables, outcome);
+            Map<String, Object> taskVariables = formService.getVariablesFromFormSubmission(formInfo, variables, outcome);
 
-            if (task.getProcessInstanceId() != null) {
-                formService.saveFormInstance(formVariables, formInfo, task.getId(), task.getProcessInstanceId(), 
+            // The taskVariables are the variables that should be used when completing the task
+            // the actual variables should instead be used when saving the form instances
+            if (task.getProcessInstanceId() != null && variables != null) {
+                formService.saveFormInstance(variables, formInfo, task.getId(), task.getProcessInstanceId(),
                                 task.getProcessDefinitionId(), task.getTenantId());
                 
-            } else if (task.getScopeId() != null) {
-                formService.saveFormInstanceWithScopeId(formVariables, formInfo, task.getId(), task.getScopeId(), task.getScopeType(), 
+            } else if (task.getScopeId() != null && variables != null) {
+                formService.saveFormInstanceWithScopeId(variables, formInfo, task.getId(), task.getScopeId(), task.getScopeType(),
                                 task.getScopeDefinitionId(), task.getTenantId());
             }
 
             CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
             FormFieldHandler formFieldHandler = cmmnEngineConfiguration.getFormFieldHandler();
             if (isFormFieldValidationEnabled(cmmnEngineConfiguration, task)) {
-                formFieldHandler.validateFormFieldsOnSubmit(formInfo, task.getId(), variables);
+                formFieldHandler.validateFormFieldsOnSubmit(formInfo, task.getId(), taskVariables);
             }
             formFieldHandler.handleFormFieldsOnSubmit(formInfo, task.getId(), null, task.getScopeId(),
-                            task.getScopeType(), variables, task.getTenantId());
+                            task.getScopeType(), taskVariables, task.getTenantId());
 
-            completeTask(commandContext, task, formVariables);
+            completeTask(commandContext, task, taskVariables);
 
         } else {
             completeTask(commandContext, task, variables);

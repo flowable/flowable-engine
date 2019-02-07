@@ -10,16 +10,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.rest.conf;
 
-import org.flowable.rest.conf.engine.EngineConfiguration;
-import org.springframework.context.annotation.ComponentScan;
+package org.flowable.rest.conf.engine;
+
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
 @Configuration
-@ComponentScan(basePackages = { "org.flowable.rest.conf.common" })
-@Import(EngineConfiguration.class)
-public class ApplicationConfiguration {
+public class EngineConfigurationWithTaskLogging extends EngineConfiguration {
 
+    @Override
+    public ProcessEngineConfigurationImpl processEngineConfiguration() {
+        ProcessEngineConfigurationImpl configuration = super.processEngineConfiguration();
+        configuration.setEnableHistoricTaskLogging(true);
+        return configuration;
+    }
 }
