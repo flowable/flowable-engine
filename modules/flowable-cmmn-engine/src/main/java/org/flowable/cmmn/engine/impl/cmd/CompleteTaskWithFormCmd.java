@@ -81,11 +81,11 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
 
             // The taskVariables are the variables that should be used when completing the task
             // the actual variables should instead be used when saving the form instances
-            if (task.getProcessInstanceId() != null) {
+            if (task.getProcessInstanceId() != null && variables != null) {
                 formService.saveFormInstance(variables, formInfo, task.getId(), task.getProcessInstanceId(),
                                 task.getProcessDefinitionId(), task.getTenantId());
                 
-            } else if (task.getScopeId() != null) {
+            } else if (task.getScopeId() != null && variables != null) {
                 formService.saveFormInstanceWithScopeId(variables, formInfo, task.getId(), task.getScopeId(), task.getScopeType(),
                                 task.getScopeDefinitionId(), task.getTenantId());
             }
