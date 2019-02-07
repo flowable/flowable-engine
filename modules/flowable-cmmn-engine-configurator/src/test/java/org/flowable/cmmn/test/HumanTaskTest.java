@@ -15,51 +15,26 @@ package org.flowable.cmmn.test;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import org.flowable.cmmn.api.CmmnRuntimeService;
-import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.task.api.Task;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * @author martin.grofcik
  */
-@RunWith(CmmnTestRunner.class)
-public class HumanTaskTest {
+public class HumanTaskTest extends AbstractProcessEngineIntegrationTest {
 
-    protected static ProcessEngine processEngine;
-    protected static CmmnEngineConfiguration cmmnEngineConfiguration;
-
-    protected CmmnRuntimeService cmmnRuntimeService;
-    protected CmmnTaskService cmmnTaskService;
     protected FormRepositoryService formRepositoryService;
-
-    @BeforeClass
-    public static void bootProcessEngine() {
-        if (processEngine == null) {
-            processEngine = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("flowable-process-cmmn-form.cfg.xml").buildProcessEngine();
-            cmmnEngineConfiguration = (CmmnEngineConfiguration) processEngine.getProcessEngineConfiguration()
-                .getEngineConfigurations().get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
-            CmmnTestRunner.setCmmnEngineConfiguration(cmmnEngineConfiguration);
-        }
-    }
 
     @Before
     public void setup() {
-        this.cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
-        this.cmmnTaskService = cmmnEngineConfiguration.getCmmnTaskService();
+        super.setupServices();
         FormEngineConfiguration formEngineConfiguration = (FormEngineConfiguration) processEngine.getProcessEngineConfiguration()
             .getEngineConfigurations().get(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
         this.formRepositoryService = formEngineConfiguration.getFormRepositoryService();
