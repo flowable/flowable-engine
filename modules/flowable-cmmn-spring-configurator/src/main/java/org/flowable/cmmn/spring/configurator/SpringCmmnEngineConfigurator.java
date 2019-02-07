@@ -57,8 +57,10 @@ public class SpringCmmnEngineConfigurator extends CmmnEngineConfigurator {
         }
 
         ((SpringCmmnEngineConfiguration) cmmnEngineConfiguration).setTransactionManager(springEngineConfiguration.getTransactionManager());
-        cmmnEngineConfiguration.setExpressionManager(new SpringCmmnExpressionManager(
-                        springEngineConfiguration.getApplicationContext(), springEngineConfiguration.getBeans()));
+        if (cmmnEngineConfiguration.getExpressionManager() == null) {
+            cmmnEngineConfiguration.setExpressionManager(new SpringCmmnExpressionManager(
+                springEngineConfiguration.getApplicationContext(), springEngineConfiguration.getBeans()));
+        }
 
         initCmmnEngine();
 
