@@ -124,7 +124,7 @@ public abstract class AbstractSaveFormInstanceCmd implements Command<FormInstanc
                 continue;
             }
 
-            if (variables.containsKey(fieldId)) {
+            if (variables != null && variables.containsKey(fieldId)) {
                 Object variableValue = variables.get(fieldId);
                 if (variableValue == null) {
                     valuesNode.putNull(fieldId);
@@ -154,7 +154,7 @@ public abstract class AbstractSaveFormInstanceCmd implements Command<FormInstanc
             outcomeVariable = "form_" + formModel.getKey() + "_outcome";
         }
 
-        if (variables.containsKey(outcomeVariable) && variables.get(outcomeVariable) != null) {
+        if (variables != null && variables.containsKey(outcomeVariable) && variables.get(outcomeVariable) != null) {
             submittedFormValuesJson.put("flowable_form_outcome", variables.get(outcomeVariable).toString());
         }
 
