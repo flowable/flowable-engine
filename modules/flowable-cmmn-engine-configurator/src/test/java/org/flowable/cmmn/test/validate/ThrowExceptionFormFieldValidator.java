@@ -13,6 +13,7 @@
 package org.flowable.cmmn.test.validate;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.flowable.engine.impl.formhandler.DefaultFormFieldHandler;
 import org.flowable.form.api.FormInfo;
@@ -23,10 +24,20 @@ import org.flowable.form.engine.FlowableFormValidationException;
  */
 public class ThrowExceptionFormFieldValidator extends DefaultFormFieldHandler {
 
+    protected static AtomicBoolean activate = new AtomicBoolean(false);
+
     @Override
     public void validateFormFieldsOnSubmit(FormInfo formInfo, String taskId, Map<String, Object> variables) {
-        if (variables == null || !variables.containsKey("doNotThrowException")) {
+        if (activate.get() && (variables == null || !variables.containsKey("doNotThrowException"))) {
             throw new FlowableFormValidationException("Validation failed by default");
         }
+    }
+
+    public static void activate() {
+        activate.set(true);
+    }
+
+    public static void deactivate() {
+        activate.set(false);
     }
 }

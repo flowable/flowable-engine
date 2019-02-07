@@ -202,8 +202,9 @@ public class TaskHelper {
         CmmnEngineConfiguration cmmnEngineConfiguration, String formFieldValidationExpression) {
         if (StringUtils.isNotEmpty(formFieldValidationExpression)) {
             Boolean formFieldValidation = getBoolean(formFieldValidationExpression);
-            if (formFieldValidation != null)
+            if (formFieldValidation != null) {
                 return formFieldValidation;
+            }
 
             if (variableContainer != null) {
                 ExpressionManager expressionManager = cmmnEngineConfiguration.getExpressionManager();

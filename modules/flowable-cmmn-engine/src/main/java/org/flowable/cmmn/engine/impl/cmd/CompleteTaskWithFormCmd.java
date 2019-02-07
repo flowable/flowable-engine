@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.HumanTask;
@@ -109,8 +110,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
 
     protected boolean isFormFieldValidationEnabled(CmmnEngineConfiguration cmmnEngineConfiguration, TaskEntity task) {
         if (cmmnEngineConfiguration.isFormFieldValidationEnabled()) {
-            HumanTask humanTask = (HumanTask) cmmnEngineConfiguration.getCmmnRepositoryService().
-                getCmmnModel(task.getScopeDefinitionId()).
+            HumanTask humanTask = (HumanTask) CaseDefinitionUtil.getCmmnModel(task.getScopeDefinitionId()).
                 findPlanItemDefinition(task.getTaskDefinitionKey());
             String formFieldValidationExpression = humanTask.getValidateFormFields();
 

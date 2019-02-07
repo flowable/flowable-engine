@@ -41,6 +41,13 @@
         <property name="asyncFailedJobWaitTime" value="1" />
         
         <property name="enableEntityLinks" value="true" />
+
+        <property name="formFieldValidationEnabled" value="true"/>
+        <property name="enableHistoricTaskLogging" value="true"/>
+        <property name="formFieldHandler">
+            <bean class="org.flowable.cmmn.test.validate.ThrowExceptionFormFieldValidator"/>
+        </property>
+
     </bean>
     
     <bean id="processAsyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">

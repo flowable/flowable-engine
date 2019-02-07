@@ -21,16 +21,9 @@ import static org.junit.Assert.fail;
 import java.util.Collections;
 import java.util.Date;
 
-import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
-import org.flowable.cmmn.api.CmmnRuntimeService;
-import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
-import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.cmmn.test.AbstractProcessEngineIntegrationTest;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.engine.FlowableFormValidationException;
@@ -40,15 +33,12 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * @author martin.grofcik
  */
-@RunWith(CmmnTestRunner.class)
-public class CaseWithFormTest {
+public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
 
     public static final String ONE_TASK_CASE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
         + "<definitions xmlns=\"http://www.omg.org/spec/CMMN/20151109/MODEL\"\n"
@@ -73,23 +63,7 @@ public class CaseWithFormTest {
         + "    </case>\n"
         + "</definitions>\n";
 
-    protected static CmmnEngineConfiguration cmmnEngineConfiguration;
-    protected static ProcessEngine processEngine;
-
-    protected CmmnRuntimeService cmmnRuntimeService;
-    protected CmmnTaskService cmmnTaskService;
     protected FormRepositoryService formRepositoryService;
-    protected CmmnHistoryService cmmnHistoryService;
-
-    @BeforeClass
-    public static void bootProcessEngine() {
-        if (processEngine == null) {
-            processEngine = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("flowable.process-cmmn-form.cfg.xml").buildProcessEngine();
-            cmmnEngineConfiguration = (CmmnEngineConfiguration) processEngine.getProcessEngineConfiguration()
-                .getEngineConfigurations().get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
-            CmmnTestRunner.setCmmnEngineConfiguration(cmmnEngineConfiguration);
-        }
-    }
 
     @Before
     public void initialize() {
@@ -109,10 +83,12 @@ public class CaseWithFormTest {
             ).
             deploy();
         SideEffectTaskListener.reset();
+        ThrowExceptionFormFieldValidator.activate();
     }
 
     @After
     public void cleanDeployments() {
+        ThrowExceptionFormFieldValidator.deactivate();
         formRepositoryService.createDeploymentQuery().list().forEach(
             formDeployment -> formRepositoryService.deleteDeployment(formDeployment.getId())
         );
