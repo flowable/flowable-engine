@@ -272,7 +272,7 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
     protected boolean isFormFieldValidationEnabled(CmmnEngineConfiguration cmmnEngineConfiguration, Stage stage) {
         if (cmmnEngineConfiguration.isFormFieldValidationEnabled()) {
             return TaskHelper.isFormFieldValidationEnabled(null, // case instance does not exist yet
-                cmmnEngineConfiguration,  stage.getValidateFormFields()
+                cmmnEngineConfiguration, stage.getValidateFormFields()
             );
         }
         return false;
