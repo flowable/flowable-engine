@@ -912,8 +912,8 @@
       "namepackage",
       "documentationpackage",
       "formkeydefinitionpackage",
-      "formfieldvalidationpackage",
       "formreferencepackage",
+      "formfieldvalidationpackage",
       "autocompletepackage"
      ],
     "hiddenPropertyPackages" : [ ],
