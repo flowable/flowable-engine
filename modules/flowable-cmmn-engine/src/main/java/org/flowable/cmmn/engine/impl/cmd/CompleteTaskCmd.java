@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
+import static org.flowable.cmmn.engine.impl.task.TaskHelper.logUserTaskCompleted;
+
 import java.util.Map;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -86,19 +88,6 @@ public class CompleteTaskCmd implements Command<Void> {
         }
         
         return null;
-    }
-
-    protected void logUserTaskCompleted(TaskEntity taskEntity) {
-        TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
-        if (taskServiceConfiguration.isEnableHistoricTaskLogging()) {
-            BaseHistoricTaskLogEntryBuilderImpl taskLogEntryBuilder = new BaseHistoricTaskLogEntryBuilderImpl(taskEntity);
-            ObjectNode data = taskServiceConfiguration.getObjectMapper().createObjectNode();
-            taskLogEntryBuilder.timeStamp(taskServiceConfiguration.getClock().getCurrentTime());
-            taskLogEntryBuilder.userId(Authentication.getAuthenticatedUserId());
-            taskLogEntryBuilder.data(data.toString());
-            taskLogEntryBuilder.type(HistoricTaskLogEntryType.USER_TASK_COMPLETED.name());
-            taskServiceConfiguration.getInternalHistoryTaskManager().recordHistoryUserTaskLog(taskLogEntryBuilder);
-        }
     }
 
 }

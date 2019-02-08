@@ -26,6 +26,7 @@
                 "name":"My plan model",
                 "documentation":"My plan model documentation",
                 "formkeydefinition": "formKeyDefinition",
+                "formfieldvalidation": "validateFormFields",
                 "formreference": {
                     "id": "f49c62c2-dfdf-11e7-82bb-d0bf9c184429",
                     "name": "casePlanForm",

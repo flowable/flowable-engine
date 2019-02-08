@@ -17,16 +17,20 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.identitylink.api.IdentityLinkType;
@@ -453,6 +457,44 @@ public class TaskHelper {
         if (taskServiceConfiguration.isEnableHistoricTaskLogging()) {
             CommandContextUtil.getHistoricTaskService().deleteHistoricTaskLogEntriesForTaskId(taskId);
         }
+    }
+
+    public static boolean isFormFieldValidationEnabled(VariableContainer variableContainer,
+        ProcessEngineConfigurationImpl processEngineConfiguration, String formFieldValidationExpression) {
+        if (StringUtils.isNotEmpty(formFieldValidationExpression)) {
+            Boolean formFieldValidation = getBoolean(formFieldValidationExpression);
+            if (formFieldValidation != null) {
+                return formFieldValidation;
+            }
+
+            if (variableContainer != null) {
+                ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
+                Boolean formFieldValidationValue = getBoolean(
+                    expressionManager.createExpression(formFieldValidationExpression).getValue(variableContainer)
+                );
+                if (formFieldValidationValue == null) {
+                    throw new FlowableException("Unable to resolve formFieldValidationExpression to boolean value");
+                }
+                return formFieldValidationValue;
+            }
+            throw new FlowableException("Unable to resolve formFieldValidationExpression without variable container");
+        }
+        return true;
+    }
+
+    protected static Boolean getBoolean(Object booleanObject) {
+        if (booleanObject instanceof Boolean) {
+            return (Boolean) booleanObject;
+        }
+        if (booleanObject instanceof String) {
+            if ("true".equalsIgnoreCase((String) booleanObject)) {
+                return Boolean.TRUE;
+            }
+            if ("false".equalsIgnoreCase((String) booleanObject)) {
+                return Boolean.FALSE;
+            }
+        }
+        return null;
     }
 
     protected static void fireAssignmentEvents(TaskEntity taskEntity) {

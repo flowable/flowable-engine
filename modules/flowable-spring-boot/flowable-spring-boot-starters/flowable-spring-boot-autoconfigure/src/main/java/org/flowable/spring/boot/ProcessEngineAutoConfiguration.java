@@ -193,6 +193,8 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         conf.setAnnotationFontName(flowableProperties.getAnnotationFontName());
         conf.setLabelFontName(flowableProperties.getLabelFontName());
 
+        conf.setFormFieldValidationEnabled(flowableProperties.isFormFieldValidationEnabled());
+
         IdGenerator idGenerator = getIfAvailable(processIdGenerator, globalIdGenerator);
         if (idGenerator == null) {
             idGenerator = new StrongUuidGenerator();

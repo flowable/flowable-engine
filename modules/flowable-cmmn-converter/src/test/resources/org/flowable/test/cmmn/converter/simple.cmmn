@@ -9,7 +9,7 @@
     targetNamespace="http://flowable.org/cmmn">
 
     <case id="myCase" flowable:initiatorVariableName="test" flowable:candidateStarterUsers="test,test2" flowable:candidateStarterGroups="group,group2">
-        <casePlanModel id="myPlanModel" name="My CasePlanModel" flowable:formKey="formKey">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel" flowable:formKey="formKey" flowable:formFieldValidation="validateFormFieldsValue">
 
             <planItem id="planItemTaskA" definitionRef="taskA" />
             <planItem id="planItemMileStoneOne" definitionRef="mileStoneOne">

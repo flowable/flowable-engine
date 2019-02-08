@@ -35,6 +35,7 @@ import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
+import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.form.api.FormFieldHandler;
@@ -138,6 +139,11 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
                         // The processVariables are the variables that should be used when starting the process
                         // the actual variables should instead be used when saving the form instances
                         processVariables = formService.getVariablesFromFormSubmission(formInfo, startFormVariables, outcome);
+                        if (isFormFieldValidationEnabled(processEngineConfiguration, startEvent)) {
+                            processEngineConfiguration.getFormFieldHandler().validateFormFieldsOnSubmit(
+                                formInfo, null, processVariables
+                            );
+                        }
                         if (processVariables != null) {
                             if (variables == null) {
                                 variables = new HashMap<>();
@@ -161,6 +167,14 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
         }
 
         return processInstance;
+    }
+
+    protected boolean isFormFieldValidationEnabled(ProcessEngineConfigurationImpl processEngineConfiguration, StartEvent startEvent) {
+        if (processEngineConfiguration.isFormFieldValidationEnabled()) {
+            return TaskHelper.isFormFieldValidationEnabled(null // process instance does not exist yet
+                , processEngineConfiguration, startEvent.getValidateFormFields());
+        }
+        return false;
     }
 
     protected ProcessInstance startProcessInstance(ProcessDefinition processDefinition) {

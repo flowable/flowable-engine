@@ -71,6 +71,7 @@ public class SimpleCmmnXmlConverterTest extends AbstractConverterTest {
         assertEquals("myPlanModel", planModel.getId());
         assertEquals("My CasePlanModel", planModel.getName());
         assertEquals("formKey", planModel.getFormKey());
+        assertEquals("validateFormFieldsValue", planModel.getValidateFormFields());
 
         // Sentries
         assertEquals(3, planModel.getSentries().size());
