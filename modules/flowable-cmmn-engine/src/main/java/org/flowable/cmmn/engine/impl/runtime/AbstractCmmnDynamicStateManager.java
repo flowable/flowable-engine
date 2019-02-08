@@ -128,6 +128,7 @@ public abstract class AbstractCmmnDynamicStateManager {
         List<PlanItemInstanceEntity> resultPlanItemInstances = planItemInstances.stream()
             .filter(e -> e.getPlanItemDefinitionId() != null)
             .filter(e -> e.getPlanItemDefinitionId().equals(planItemDefinitionId))
+            .filter(e -> PlanItemInstanceState.ACTIVE.equals(e.getState()) || PlanItemInstanceState.AVAILABLE.equals(e.getState()) || PlanItemInstanceState.ENABLED.equals(e.getState()))
             .filter(e -> e.getEndedTime() == null)
             .collect(Collectors.toList());
 
@@ -220,26 +221,8 @@ public abstract class AbstractCmmnDynamicStateManager {
             Set<String> planItemInstanceIdsNotToDelete = new HashSet<>();
             for (PlanItemInstanceEntity planItemInstance : planItemInstancesToMove) {
                 planItemInstanceIdsNotToDelete.add(planItemInstance.getId());
-
-                Date currentTime = cmmnEngineConfiguration.getClock().getCurrentTime();
-                planItemInstance.setEndedTime(currentTime);
-                planItemInstance.setTerminatedTime(currentTime);
-                planItemInstance.setState(PlanItemInstanceState.TERMINATED);
                 
-                if (planItemInstance.getPlanItem().getPlanItemDefinition() instanceof HumanTask) {
-                    TaskService taskService = CommandContextUtil.getTaskService(commandContext);
-                    List<TaskEntity> taskEntities = taskService.findTasksBySubScopeIdScopeType(planItemInstance.getId(), ScopeTypes.CMMN);
-                    if (taskEntities == null || taskEntities.isEmpty()) {
-                        throw new FlowableException("No task entity found for plan item instance " + planItemInstance.getId());
-                    }
-
-                    // Should be only one
-                    for (TaskEntity taskEntity : taskEntities) {
-                        if (!taskEntity.isDeleted()) {
-                            TaskHelper.deleteTask(taskEntity, "Change plan item state", false, false);
-                        }
-                    }
-                }
+                terminatePlanItemInstance(planItemInstance, commandContext, cmmnEngineConfiguration);
                 
                 // Delete the parent plan item instances for each current plan item instance when the move to plan item definition id has the same stage scope
                 PlanItemInstanceEntity continueParentPlanItemInstance = deleteParentPlanItemInstances(planItemInstance.getStageInstanceId(), moveToPlanItemMoveEntries, planItemInstanceIdsNotToDelete, commandContext);
@@ -643,6 +626,47 @@ public abstract class AbstractCmmnDynamicStateManager {
         CommandContextUtil.getAgenda().planStartPlanItemInstanceOperation(newPlanItemInstance, null);
 
         return newPlanItemInstance;
+    }
+    
+    protected void terminatePlanItemInstance(PlanItemInstanceEntity planItemInstance, CommandContext commandContext, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        Date currentTime = cmmnEngineConfiguration.getClock().getCurrentTime();
+        planItemInstance.setEndedTime(currentTime);
+        planItemInstance.setTerminatedTime(currentTime);
+        planItemInstance.setState(PlanItemInstanceState.TERMINATED);
+        
+        PlanItemDefinition planItemDefinition = planItemInstance.getPlanItem().getPlanItemDefinition();
+        if (planItemDefinition instanceof HumanTask) {
+            TaskService taskService = CommandContextUtil.getTaskService(commandContext);
+            List<TaskEntity> taskEntities = taskService.findTasksBySubScopeIdScopeType(planItemInstance.getId(), ScopeTypes.CMMN);
+            if (taskEntities == null || taskEntities.isEmpty()) {
+                throw new FlowableException("No task entity found for plan item instance " + planItemInstance.getId());
+            }
+
+            // Should be only one
+            for (TaskEntity taskEntity : taskEntities) {
+                if (!taskEntity.isDeleted()) {
+                    TaskHelper.deleteTask(taskEntity, "Change plan item state", false, false);
+                }
+            }
+            
+        } else if (planItemDefinition instanceof Stage) {
+            deleteChildPlanItemInstances(planItemInstance, commandContext, cmmnEngineConfiguration);
+        
+        } else if (planItemDefinition instanceof ProcessTask) {
+            if (planItemInstance.getReferenceId() != null) {
+                cmmnEngineConfiguration.getProcessInstanceService().deleteProcessInstance(planItemInstance.getReferenceId());
+            }
+        }
+    }
+    
+    protected void deleteChildPlanItemInstances(PlanItemInstanceEntity planItemInstance, CommandContext commandContext, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        List<PlanItemInstanceEntity> childPlanItemInstances = planItemInstance.getChildPlanItemInstances();
+        if (childPlanItemInstances != null) {
+            for (PlanItemInstanceEntity childPlanItemInstance : childPlanItemInstances) {
+                deleteChildPlanItemInstances(childPlanItemInstance, commandContext, cmmnEngineConfiguration);
+                terminatePlanItemInstance(childPlanItemInstance, commandContext, cmmnEngineConfiguration);
+            }
+        }
     }
 
     protected void handleHumanTaskNewAssignee(PlanItemInstanceEntity taskPlanItemInstance, String newAssigneeId, CommandContext commandContext) {
