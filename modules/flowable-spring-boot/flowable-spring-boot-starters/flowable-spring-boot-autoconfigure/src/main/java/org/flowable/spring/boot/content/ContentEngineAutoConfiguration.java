@@ -75,8 +75,10 @@ public class ContentEngineAutoConfiguration extends AbstractEngineAutoConfigurat
         configureEngine(configuration, dataSource);
 
         FlowableContentProperties.Storage storage = contentProperties.getStorage();
-        configuration.setContentRootFolder(storage.getRootFolder());
-        configuration.setCreateContentRootFolder(storage.getCreateRoot());
+        configuration.setContentStorageType(storage.getType());
+        FlowableContentProperties.Storage.File file = storage.getFile();
+        configuration.setContentRootFolder(file.getRootFolder());
+        configuration.setCreateContentRootFolder(file.getCreateRoot());
 
         return configuration;
     }

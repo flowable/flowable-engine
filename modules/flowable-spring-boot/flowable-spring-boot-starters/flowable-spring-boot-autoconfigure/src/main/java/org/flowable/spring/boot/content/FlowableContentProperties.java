@@ -63,29 +63,58 @@ public class FlowableContentProperties {
     public static class Storage {
 
         /**
-         * Root folder location where content files will be stored, for example, task attachments or form file uploads.
+         * Type of content storage engine
          */
-        private String rootFolder;
-
+        private String type = "file";
+ 
         /**
-         * If the root folder doesn't exist, should it be created?
+         * The storage properties for the file system content configuration.
          */
-        private boolean createRoot = true;
+        @NestedConfigurationProperty
+        private final File file = new File();
 
-        public String getRootFolder() {
-            return rootFolder;
+        public String getType() {
+            return type;
         }
 
-        public void setRootFolder(String rootFolder) {
-            this.rootFolder = rootFolder;
+        public void setType(String type) {
+            this.type = type;
         }
-
-        public boolean getCreateRoot() {
-            return createRoot;
+        
+        public File getFile() {
+            return file;
         }
+        
+        /**
+         * The file storage configuration for the content engine.
+         */
+        public static class File {
 
-        public void setCreateRoot(Boolean createRoot) {
-            this.createRoot = createRoot;
+            /**
+             * Root folder location where content files will be stored, for example, task attachments or form file uploads.
+             */
+            private String rootFolder;
+
+            /**
+             * If the root folder doesn't exist, should it be created?
+             */
+            private boolean createRoot = true;
+
+            public String getRootFolder() {
+                return rootFolder;
+            }
+
+            public void setRootFolder(String rootFolder) {
+                this.rootFolder = rootFolder;
+            }
+
+            public boolean getCreateRoot() {
+                return createRoot;
+            }
+
+            public void setCreateRoot(Boolean createRoot) {
+                this.createRoot = createRoot;
+            }
         }
     }
 }
