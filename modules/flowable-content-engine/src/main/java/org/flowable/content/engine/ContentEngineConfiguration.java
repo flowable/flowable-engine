@@ -42,13 +42,13 @@ import org.flowable.content.engine.impl.cfg.StandaloneInMemContentEngineConfigur
 import org.flowable.content.engine.impl.cmd.SchemaOperationsContentEngineBuild;
 import org.flowable.content.engine.impl.db.ContentDbSchemaManager;
 import org.flowable.content.engine.impl.db.EntityDependencyOrder;
-import org.flowable.content.engine.impl.fs.SimpleFileSystemContentStorage;
 import org.flowable.content.engine.impl.persistence.entity.ContentItemEntityManager;
 import org.flowable.content.engine.impl.persistence.entity.ContentItemEntityManagerImpl;
 import org.flowable.content.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.content.engine.impl.persistence.entity.TableDataManagerImpl;
 import org.flowable.content.engine.impl.persistence.entity.data.ContentItemDataManager;
 import org.flowable.content.engine.impl.persistence.entity.data.impl.MybatisContentItemDataManager;
+import org.flowable.content.engine.impl.storage.fs.SimpleFileSystemContentStorage;
 
 public class ContentEngineConfiguration extends AbstractEngineConfiguration implements ContentEngineConfigurationApi {
 
@@ -71,6 +71,10 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
     // ADDITIONAL SERVICES /////////////////////////////////////////////
 
     protected ContentStorage contentStorage;
+    protected String contentStorageType = SimpleFileSystemContentStorage.STORE_NAME;
+    
+    // Used when the ContentStorage
+    
     protected String contentRootFolder;
     protected boolean createContentRootFolder = true;
 
@@ -180,20 +184,25 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
 
     public void initContentStorage() {
         if (contentStorage == null) {
-            if (contentRootFolder == null) {
-                contentRootFolder = System.getProperty("user.home") + File.separator + "content";
+          
+            if (contentStorageType.equals(SimpleFileSystemContentStorage.STORE_NAME)) {
+                if (contentRootFolder == null) {
+                    contentRootFolder = System.getProperty("user.home") + File.separator + "content";
+                }
+    
+                File contentRootFile = new File(contentRootFolder);
+                if (createContentRootFolder && !contentRootFile.exists()) {
+                    contentRootFile.mkdirs();
+                }
+    
+                if (contentRootFile != null && contentRootFile.exists()) {
+                    logger.info("Content file system root : {}", contentRootFile.getAbsolutePath());
+                }
+    
+                contentStorage = new SimpleFileSystemContentStorage(contentRootFile);
+            } else {
+                throw new RuntimeException("Unknown content storage type '" + contentStorageType + "'");
             }
-
-            File contentRootFile = new File(contentRootFolder);
-            if (createContentRootFolder && !contentRootFile.exists()) {
-                contentRootFile.mkdirs();
-            }
-
-            if (contentRootFile != null && contentRootFile.exists()) {
-                logger.info("Content file system root : {}", contentRootFile.getAbsolutePath());
-            }
-
-            contentStorage = new SimpleFileSystemContentStorage(contentRootFile);
         }
     }
 
@@ -450,6 +459,15 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
         return this;
     }
 
+    public String getContentStorageType() {
+        return contentStorageType;
+    }
+  
+    public ContentEngineConfiguration setContentStorageType(String contentStorageType) {
+        this.contentStorageType = contentStorageType;
+        return this;
+    }
+    
     public String getContentRootFolder() {
         return contentRootFolder;
     }
