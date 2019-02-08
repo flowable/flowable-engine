@@ -208,6 +208,9 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         if (StringUtils.isNotEmpty(planModelStage.getFormKey())) {
             planModelPropertiesNode.put(PROPERTY_FORMKEY, planModelStage.getFormKey());
         }
+        if (StringUtils.isNotEmpty(planModelStage.getValidateFormFields())) {
+            planModelPropertiesNode.put(PROPERTY_FORM_FIELD_VALIDATION, planModelStage.getValidateFormFields());
+        }
         planModelNode.set(EDITOR_SHAPE_PROPERTIES, planModelPropertiesNode);
 
         planModelNode.putArray(EDITOR_OUTGOING);
@@ -340,6 +343,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
             planModelStage.setAutoCompleteCondition(autocompleteCondition);
         }
         planModelStage.setFormKey(CmmnJsonConverterUtil.getPropertyFormKey(planModelShape, formKeyMap));
+        planModelStage.setValidateFormFields(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_FORM_FIELD_VALIDATION, planModelShape));
         planModelStage.setPlanModel(true);
 
         caseModel.setPlanModel(planModelStage);

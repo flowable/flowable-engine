@@ -178,6 +178,7 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
             }
         }
 
+        setPropertyValue(PROPERTY_FORM_FIELD_VALIDATION, userTask.getValidateFormFields(), propertiesNode);
         setPropertyValue(PROPERTY_USERTASK_DUEDATE, userTask.getDueDate(), propertiesNode);
         setPropertyValue(PROPERTY_USERTASK_CATEGORY, userTask.getCategory(), propertiesNode);
 
@@ -220,6 +221,7 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
             }
         }
 
+        task.setValidateFormFields(getPropertyValueAsString(PROPERTY_FORM_FIELD_VALIDATION, elementNode));
         task.setDueDate(getPropertyValueAsString(PROPERTY_USERTASK_DUEDATE, elementNode));
         task.setCategory(getPropertyValueAsString(PROPERTY_USERTASK_CATEGORY, elementNode));
 

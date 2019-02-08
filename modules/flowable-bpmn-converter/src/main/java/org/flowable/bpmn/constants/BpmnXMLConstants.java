@@ -163,6 +163,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_EVENT_START_INITIATOR = "initiator";
     public static final String ATTRIBUTE_EVENT_START_INTERRUPTING = "isInterrupting";
     public static final String ATTRIBUTE_FORM_FORMKEY = "formKey";
+    public static final String ATTRIBUTE_FORM_FIELD_VALIDATION = "formFieldValidation";
 
     public static final String ELEMENT_MULTIINSTANCE = "multiInstanceLoopCharacteristics";
     public static final String ELEMENT_MULTIINSTANCE_CARDINALITY = "loopCardinality";

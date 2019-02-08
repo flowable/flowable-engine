@@ -9,7 +9,7 @@
     targetNamespace="http://flowable.org/cmmn">
 
     <case id="myCase">
-        <casePlanModel id="myPlanModel" name="My CasePlanModel" flowable:formKey="formKey">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel" flowable:formKey="formKey" flowable:formFieldValidation="formFieldValidationValue">
 
             <planItem id="planItemTaskA" definitionRef="taskA">
                 <extensionElements>

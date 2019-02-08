@@ -94,6 +94,7 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
         userTask.setBusinessCalendarName(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_BUSINESS_CALENDAR_NAME, xtr));
         userTask.setCategory(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_CATEGORY, xtr));
         userTask.setFormKey(formKey);
+        userTask.setValidateFormFields(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_FORM_FIELD_VALIDATION, xtr));
         userTask.setAssignee(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_ASSIGNEE, xtr));
         userTask.setOwner(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_OWNER, xtr));
         userTask.setPriority(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_PRIORITY, xtr));
@@ -135,6 +136,7 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
         writeQualifiedAttribute(ATTRIBUTE_TASK_USER_BUSINESS_CALENDAR_NAME, userTask.getBusinessCalendarName(), xtw);
         writeQualifiedAttribute(ATTRIBUTE_TASK_USER_CATEGORY, userTask.getCategory(), xtw);
         writeQualifiedAttribute(ATTRIBUTE_FORM_FORMKEY, userTask.getFormKey(), xtw);
+        writeQualifiedAttribute(ATTRIBUTE_FORM_FIELD_VALIDATION, userTask.getValidateFormFields(), xtw);
         if (userTask.getPriority() != null) {
             writeQualifiedAttribute(ATTRIBUTE_TASK_USER_PRIORITY, userTask.getPriority(), xtw);
         }

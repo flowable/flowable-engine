@@ -683,6 +683,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected List<HistoryJsonTransformer> customHistoryJsonTransformers;
 
     protected FormFieldHandler formFieldHandler;
+    protected boolean isFormFieldValidationEnabled;
 
     protected BusinessCalendarManager businessCalendarManager;
 
@@ -3259,6 +3260,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setFormFieldHandler(FormFieldHandler formFieldHandler) {
         this.formFieldHandler = formFieldHandler;
+        return this;
+    }
+
+    public boolean isFormFieldValidationEnabled() {
+        return this.isFormFieldValidationEnabled;
+    }
+
+    public CmmnEngineConfiguration setFormFieldValidationEnabled(boolean flag) {
+        this.isFormFieldValidationEnabled = flag;
         return this;
     }
 

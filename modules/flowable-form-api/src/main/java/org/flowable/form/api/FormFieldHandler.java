@@ -26,4 +26,13 @@ public interface FormFieldHandler {
     
     void enrichFormFields(FormInfo formInfo);
 
+    /**
+     * Apply validation restrictions on the submitted variables
+     *
+     * @param formInfo form description
+     * @param taskId submission related taskId. TaskId can be null in the case when submission is related to case/process instance start
+     * @param variables submitted variables
+     */
+    void validateFormFieldsOnSubmit(FormInfo formInfo, String taskId, Map<String, Object> variables);
+
 }

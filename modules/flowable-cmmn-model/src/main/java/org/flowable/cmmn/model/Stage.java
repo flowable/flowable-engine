@@ -27,6 +27,7 @@ public class Stage extends PlanFragment implements HasExitCriteria {
     protected boolean autoComplete; 
     protected String autoCompleteCondition;
     protected String formKey; // For the start form of the plan model. Null otherwise
+    protected String validateFormFields;
     protected Integer displayOrder;
     protected boolean includeInStageOverview;
     protected Map<String, PlanItemDefinition> planItemDefinitionMap = new LinkedHashMap<>();
@@ -134,6 +135,14 @@ public class Stage extends PlanFragment implements HasExitCriteria {
 
     public void setFormKey(String formKey) {
         this.formKey = formKey;
+    }
+
+    public String getValidateFormFields() {
+        return validateFormFields;
+    }
+
+    public void setValidateFormFields(String validateFormFields) {
+        this.validateFormFields = validateFormFields;
     }
 
     @Override

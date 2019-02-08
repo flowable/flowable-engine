@@ -794,6 +794,11 @@ This are the Task UI App specific properties.
 |rest.task-app.enabled
 |true
 |Enables the REST API (this is not the REST api used by the UI, but an api that's available over basic auth authentication).
+
+|flowable.form-field-validation-enabled
+|
+|false
+|Enable form field validation after form submission on the engine side.
 |===============
 
 

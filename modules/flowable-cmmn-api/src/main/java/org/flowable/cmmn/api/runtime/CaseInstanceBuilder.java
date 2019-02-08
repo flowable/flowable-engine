@@ -117,4 +117,5 @@ public interface CaseInstanceBuilder {
 
     boolean isFallbackToDefaultTenant();
 
+    boolean isStartWithForm();
 }
