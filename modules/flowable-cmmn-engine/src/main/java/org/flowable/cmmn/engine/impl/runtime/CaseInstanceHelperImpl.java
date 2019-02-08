@@ -28,6 +28,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityMana
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
+import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.IdentityLinkUtil;
 import org.flowable.cmmn.model.Case;
@@ -216,8 +217,8 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
             }
         }
 
-        Map<String, Object> startFormVariables = caseInstanceBuilder.getStartFormVariables();
-        if (startFormVariables != null || caseInstanceBuilder.getOutcome() != null) {
+        if (caseInstanceBuilder.isStartWithForm() || caseInstanceBuilder.getOutcome() != null) {
+            Map<String, Object> startFormVariables = caseInstanceBuilder.getStartFormVariables();
 
             FormService formService = CommandContextUtil.getFormService(commandContext);
 
@@ -229,11 +230,11 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
                 if (formRepositoryService != null) {
 
                     FormInfo formInfo = null;
+                    CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
                     if (caseInstanceEntity.getTenantId() == null || CmmnEngineConfiguration.NO_TENANT_ID.equals(caseInstanceEntity.getTenantId())) {
                         formInfo = formRepositoryService.getFormModelByKey(planModel.getFormKey());
                     } else {
-                        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-                        formInfo = formRepositoryService.getFormModelByKey(planModel.getFormKey(), caseInstanceEntity.getTenantId(), 
+                        formInfo = formRepositoryService.getFormModelByKey(planModel.getFormKey(), caseInstanceEntity.getTenantId(),
                                         cmmnEngineConfiguration.isFallbackToDefaultTenant());
                     }
 
@@ -241,6 +242,11 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
                         // Extract the caseVariables from the form submission variables and pass then to the case
                         Map<String, Object> caseVariables = formService.getVariablesFromFormSubmission(formInfo,
                             startFormVariables, caseInstanceBuilder.getOutcome());
+                        FormFieldHandler formFieldHandler = CommandContextUtil.getCmmnEngineConfiguration().getFormFieldHandler();
+                        if (isFormFieldValidationEnabled(cmmnEngineConfiguration, planModel)) {
+                            formFieldHandler.validateFormFieldsOnSubmit(formInfo, null, caseVariables);
+                        }
+
                         if (caseVariables != null) {
 	                        for (String variableName : caseVariables.keySet()) {
 	                            caseInstanceEntity.setVariable(variableName, caseVariables.get(variableName));
@@ -251,7 +257,6 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
                         // the actual variables should instead be used when creating the form instances
                         formService.createFormInstanceWithScopeId(startFormVariables, formInfo, null, caseInstanceEntity.getId(),
                             ScopeTypes.CMMN, caseInstanceEntity.getCaseDefinitionId(), caseInstanceEntity.getTenantId());
-                        FormFieldHandler formFieldHandler = CommandContextUtil.getCmmnEngineConfiguration().getFormFieldHandler();
                         formFieldHandler.handleFormFieldsOnSubmit(formInfo, null, null,
                             caseInstanceEntity.getId(), ScopeTypes.CMMN, caseVariables, caseInstanceEntity.getTenantId());
                     }
@@ -262,6 +267,15 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
             }
         }
 
+    }
+
+    protected boolean isFormFieldValidationEnabled(CmmnEngineConfiguration cmmnEngineConfiguration, Stage stage) {
+        if (cmmnEngineConfiguration.isFormFieldValidationEnabled()) {
+            return TaskHelper.isFormFieldValidationEnabled(null, // case instance does not exist yet
+                cmmnEngineConfiguration, stage.getValidateFormFields()
+            );
+        }
+        return false;
     }
 
     protected CaseInstanceEntity createCaseInstanceEntityFromDefinition(CommandContext commandContext, CaseDefinition caseDefinition) {

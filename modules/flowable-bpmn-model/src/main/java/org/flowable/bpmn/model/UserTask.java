@@ -37,6 +37,7 @@ public class UserTask extends Task {
     protected List<FormProperty> formProperties = new ArrayList<>();
     protected List<FlowableListener> taskListeners = new ArrayList<>();
     protected String skipExpression;
+    protected String validateFormFields;
 
     protected Map<String, Set<String>> customUserIdentityLinks = new HashMap<>();
     protected Map<String, Set<String>> customGroupIdentityLinks = new HashMap<>();
@@ -197,6 +198,14 @@ public class UserTask extends Task {
         this.skipExpression = skipExpression;
     }
 
+    public String getValidateFormFields() {
+        return validateFormFields;
+    }
+
+    public void setValidateFormFields(String validateFormFields) {
+        this.validateFormFields = validateFormFields;
+    }
+
     @Override
     public UserTask clone() {
         UserTask clone = new UserTask();
@@ -214,6 +223,7 @@ public class UserTask extends Task {
         setCategory(otherElement.getCategory());
         setExtensionId(otherElement.getExtensionId());
         setSkipExpression(otherElement.getSkipExpression());
+        setValidateFormFields(otherElement.getValidateFormFields());
 
         setCandidateGroups(new ArrayList<>(otherElement.getCandidateGroups()));
         setCandidateUsers(new ArrayList<>(otherElement.getCandidateUsers()));

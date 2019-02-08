@@ -154,6 +154,7 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_CANDIDATE_GROUPS = "candidateGroups";
     String ATTRIBUTE_PRIORITY = "priority";
     String ATTRIBUTE_FORM_KEY = "formKey";
+    String ATTRIBUTE_FORM_FIELD_VALIDATION = "formFieldValidation";
     String ATTRIBUTE_DUE_DATE = "dueDate";
     String ATTRIBUTE_CATEGORY = "category";
 

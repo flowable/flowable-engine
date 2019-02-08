@@ -24,6 +24,7 @@ public class HumanTask extends Task {
     protected String owner;
     protected String priority;
     protected String formKey;
+    protected String validateFormFields;
     protected String dueDate;
     protected String category;
     protected List<String> candidateUsers = new ArrayList<>();
@@ -60,6 +61,14 @@ public class HumanTask extends Task {
 
     public void setFormKey(String formKey) {
         this.formKey = formKey;
+    }
+
+    public String getValidateFormFields() {
+        return validateFormFields;
+    }
+
+    public void setValidateFormFields(String validateFormFields) {
+        this.validateFormFields = validateFormFields;
     }
 
     public String getDueDate() {
@@ -114,6 +123,7 @@ public class HumanTask extends Task {
         setAssignee(otherElement.getAssignee());
         setOwner(otherElement.getOwner());
         setFormKey(otherElement.getFormKey());
+        setValidateFormFields(otherElement.getValidateFormFields());
         setDueDate(otherElement.getDueDate());
         setPriority(otherElement.getPriority());
         setCategory(otherElement.getCategory());

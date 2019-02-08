@@ -144,6 +144,8 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
 
         configuration.setEnableSafeCmmnXml(cmmnProperties.isEnableSafeXml());
 
+        configuration.setFormFieldValidationEnabled(flowableProperties.isFormFieldValidationEnabled());
+
         return configuration;
     }
 

@@ -96,6 +96,8 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
             }
         }
 
+        setPropertyValue(PROPERTY_FORM_FIELD_VALIDATION, startEvent.getValidateFormFields(), propertiesNode);
+
         if (startEvent.getSubProcess() instanceof EventSubProcess && !startEvent.isInterrupting()) {
             propertiesNode.put(PROPERTY_INTERRUPTING, false);
         } else {
@@ -123,6 +125,10 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
                         startEvent.setFormKey(formMap.get(formReferenceNode.get("id").asText()));
                     }
                 }
+            }
+            String validateFormFields = getPropertyValueAsString(PROPERTY_FORM_FIELD_VALIDATION, elementNode);
+            if (StringUtils.isNotEmpty(validateFormFields)) {
+                startEvent.setValidateFormFields(validateFormFields);
             }
             convertJsonToFormProperties(elementNode, startEvent);
 

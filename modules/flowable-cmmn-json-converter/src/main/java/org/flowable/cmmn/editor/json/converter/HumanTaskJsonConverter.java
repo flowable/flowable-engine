@@ -259,6 +259,7 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
 
         task.setPriority(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_USERTASK_PRIORITY, elementNode));
         task.setFormKey(CmmnJsonConverterUtil.getPropertyFormKey(elementNode, formMap));
+        task.setValidateFormFields(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_FORM_FIELD_VALIDATION, elementNode));
 
         task.setDueDate(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_USERTASK_DUEDATE, elementNode));
         task.setCategory(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_USERTASK_CATEGORY, elementNode));

@@ -114,4 +114,9 @@ public class DefaultFormFieldHandler implements FormFieldHandler {
         }
     }
 
+    @Override
+    public void validateFormFieldsOnSubmit(FormInfo formInfo, String taskId, Map<String, Object> variables) {
+        // do not validate form fields by default
+    }
+
 }
