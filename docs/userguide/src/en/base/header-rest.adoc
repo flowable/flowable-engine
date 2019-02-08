@@ -148,8 +148,18 @@ Paging and order parameters can be added as query-string in the URL (for example
 |order|asc|Sorting order which can be 'asc' or 'desc'.
 |start|0|Parameter to allow for paging of the result. By default the result will start at 0.
 |size|10|Parameter to allow for paging of the result. By default the size will be 10.
-
 |===============
+
+[NOTE]
+====
+Bear in mind that the start parameter is used as the offset of the query. For example, to get tasks in three pages of three items each (9 items), we would use:
+
+----
+GET /runtime/tasks?start=0&size=3
+GET /runtime/tasks?start=3&size=3
+GET /runtime/tasks?start=6&size=3
+----
+====
 
 [[restQueryVariable]]
 
