@@ -48,6 +48,8 @@ import org.flowable.content.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.content.engine.impl.persistence.entity.TableDataManagerImpl;
 import org.flowable.content.engine.impl.persistence.entity.data.ContentItemDataManager;
 import org.flowable.content.engine.impl.persistence.entity.data.impl.MybatisContentItemDataManager;
+import org.flowable.content.engine.impl.storage.db.SimpleDatabaseContentStorage;
+import org.flowable.content.engine.impl.storage.db.entity.StorageItemEntityManager;
 import org.flowable.content.engine.impl.storage.fs.SimpleFileSystemContentStorage;
 
 public class ContentEngineConfiguration extends AbstractEngineConfiguration implements ContentEngineConfigurationApi {
@@ -80,6 +82,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
 
     // ENTITY MANAGERS /////////////////////////////////////////////////
     protected ContentItemEntityManager contentItemEntityManager;
+    protected StorageItemEntityManager storageEntityManager;
     protected TableDataManager tableDataManager;
 
     public static ContentEngineConfiguration createContentEngineConfigurationFromResourceDefault() {
@@ -196,6 +199,8 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
                 }
     
                 contentStorage = new SimpleFileSystemContentStorage(contentRootFile);
+            } else if (contentStorageType.equals(SimpleDatabaseContentStorage.STORE_NAME)) {
+                contentStorage = new SimpleDatabaseContentStorage(this);
             } else {
                 throw new RuntimeException("Unknown content storage type '" + contentStorageType + "'");
             }

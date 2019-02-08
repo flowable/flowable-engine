@@ -10,5 +10,6 @@
     <mapper resource="org/flowable/content/db/mapping/common.xml" />
     <mapper resource="org/flowable/content/db/mapping/entity/ContentItem.xml" />
     <mapper resource="org/flowable/content/db/mapping/entity/TableData.xml" />
+    <mapper resource="org/flowable/content/db/mapping/entity/StorageItem.xml" />    
   </mappers>
 </configuration>
