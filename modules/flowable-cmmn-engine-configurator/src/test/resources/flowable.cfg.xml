@@ -17,6 +17,7 @@
         <property name="asyncFailedJobWaitTime" value="1" />
         
         <property name="enableEntityLinks" value="true" />
+        <property name="enableProcessDefinitionInfoCache" value="true" />
         
         <property name="configurators">
             <list>

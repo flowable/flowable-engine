@@ -18,6 +18,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Collections;
@@ -41,6 +42,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkType;
@@ -51,6 +53,8 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskLogEntry;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -453,6 +457,24 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
         assertEquals("Hello World", cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVariable"));
 
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testProcessTaskWithSkipExpressions() {
+        Deployment deployment = processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/processWithSkipExpressions.bpmn20.xml").deploy();
+
+        ProcessDefinition processDefinition = processEngineRepositoryService.createProcessDefinitionQuery().processDefinitionKey("testSkipExpressionProcess").singleResult();
+        ObjectNode infoNode = processEngineDynamicBpmnService.enableSkipExpression();
+
+        // skip test user task
+        processEngineDynamicBpmnService.changeSkipExpression("sequenceflow2", "${true}", infoNode);
+        processEngineDynamicBpmnService.saveProcessDefinitionInfo(processDefinition.getId(), infoNode);
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("skipExpressionCaseTest").start();
+
+        assertTrue(processEngineTaskService.createTaskQuery().list().isEmpty());
+        assertTrue(processEngineRuntimeService.createProcessInstanceQuery().list().isEmpty());
     }
     
     @Test
