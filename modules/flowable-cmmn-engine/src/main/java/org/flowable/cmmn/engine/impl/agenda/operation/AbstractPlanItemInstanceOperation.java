@@ -226,7 +226,7 @@ public abstract class AbstractPlanItemInstanceOperation extends CmmnOperation {
     }
 
     protected boolean isPlanItemRepeatableOnComplete(PlanItem planItem) {
-        return  planItem != null
+        return planItem != null
                 && planItem.getEntryCriteria().isEmpty()
                 && planItem.getItemControl() != null
                 && planItem.getItemControl().getRepetitionRule() != null;
