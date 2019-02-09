@@ -24,12 +24,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
+import org.flowable.cmmn.engine.impl.listener.PlanItemLifeCycleListenerUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
@@ -39,6 +41,7 @@ import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.runtime.MovePlanItemInstanceEntityContainer.PlanItemMoveEntry;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.HumanTask;
@@ -48,6 +51,7 @@ import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -623,6 +627,13 @@ public abstract class AbstractCmmnDynamicStateManager {
                                             caseInstance.getTenantId(), true);
         }
         
+        // Special care needed in case the plan item instance is repeating
+        if (!newPlanItemInstance.getPlanItem().getEntryCriteria().isEmpty() && hasRepetitionRule(newPlanItemInstance)) {
+            if (evaluateRepetitionRule(newPlanItemInstance, commandContext)) {
+                createPlanItemInstanceDuplicateForRepetition(newPlanItemInstance, commandContext);
+            }
+        }
+        
         CommandContextUtil.getAgenda().planStartPlanItemInstanceOperation(newPlanItemInstance, null);
 
         return newPlanItemInstance;
@@ -675,6 +686,78 @@ public abstract class AbstractCmmnDynamicStateManager {
         TaskHelper.changeTaskAssignee(task, newAssigneeId);
     }
 
+    protected boolean hasRepetitionRule(PlanItemInstanceEntity planItemInstanceEntity) {
+        if (planItemInstanceEntity != null && planItemInstanceEntity.getPlanItem() != null) {
+            return planItemInstanceEntity.getPlanItem().getItemControl() != null && 
+                            planItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule() != null;
+        }
+        return false;
+    }
+    
+    protected boolean evaluateRepetitionRule(PlanItemInstanceEntity planItemInstanceEntity, CommandContext commandContext) {
+        if (hasRepetitionRule(planItemInstanceEntity)) {
+            String repetitionCondition = planItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule().getCondition();
+            return evaluateRepetitionRule(planItemInstanceEntity, repetitionCondition, commandContext);
+        }
+        return false;
+    }
+
+    protected boolean evaluateRepetitionRule(VariableContainer variableContainer, String repetitionCondition, CommandContext commandContext) {
+        if (StringUtils.isNotEmpty(repetitionCondition)) {
+            return ExpressionUtil.evaluateBooleanExpression(commandContext, variableContainer, repetitionCondition);
+        } else {
+            return true; // no condition set, but a repetition rule defined is assumed to be defaulting to true
+        }
+    }
+    
+    protected PlanItemInstanceEntity createPlanItemInstanceDuplicateForRepetition(PlanItemInstanceEntity planItemInstanceEntity, CommandContext commandContext) {
+        PlanItemInstanceEntity childPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false);
+
+        String oldState = childPlanItemInstanceEntity.getState();
+        String newState = PlanItemInstanceState.WAITING_FOR_REPETITION;
+        childPlanItemInstanceEntity.setState(newState);
+        PlanItemLifeCycleListenerUtil.callLifecycleListeners(commandContext, planItemInstanceEntity, oldState, newState);
+
+        // createPlanItemInstance operations will also sync planItemInstance history
+        CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceForRepetitionOperation(childPlanItemInstanceEntity);
+        return childPlanItemInstanceEntity;
+    }
+    
+    protected PlanItemInstanceEntity copyAndInsertPlanItemInstance(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntityToCopy, boolean addToParent) {
+        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).createChildPlanItemInstance(
+                planItemInstanceEntityToCopy.getPlanItem(),
+                planItemInstanceEntityToCopy.getCaseDefinitionId(),
+                planItemInstanceEntityToCopy.getCaseInstanceId(),
+                planItemInstanceEntityToCopy.getStageInstanceId(),
+                planItemInstanceEntityToCopy.getTenantId(),
+                addToParent);
+
+        if (hasRepetitionRule(planItemInstanceEntityToCopy)) {
+            int counter = getRepetitionCounter(planItemInstanceEntityToCopy);
+            setRepetitionCounter(planItemInstanceEntity, counter);
+        }
+
+        return planItemInstanceEntity;
+    }
+    
+    protected int getRepetitionCounter(PlanItemInstanceEntity repeatingPlanItemInstanceEntity) {
+        Integer counter = (Integer) repeatingPlanItemInstanceEntity.getVariableLocal(getCounterVariable(repeatingPlanItemInstanceEntity));
+        if (counter == null) {
+            return 0;
+        } else {
+            return counter.intValue();
+        }
+    }
+    
+    protected void setRepetitionCounter(PlanItemInstanceEntity repeatingPlanItemInstanceEntity, int counterValue) {
+        repeatingPlanItemInstanceEntity.setVariableLocal(getCounterVariable(repeatingPlanItemInstanceEntity), counterValue);
+    }
+
+    protected String getCounterVariable(PlanItemInstanceEntity repeatingPlanItemInstanceEntity) {
+        String repetitionCounterVariableName = repeatingPlanItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule().getRepetitionCounterVariableName();
+        return repetitionCounterVariableName;
+    }
+    
     protected boolean isExpression(String variableName) {
         return variableName.startsWith("${") || variableName.startsWith("#{");
     }
