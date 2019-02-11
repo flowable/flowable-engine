@@ -176,9 +176,11 @@ public class JsonNodeELResolver extends ELResolver {
             if (resultNode != null && resultNode.isValueNode()) {
                 if (resultNode.isBoolean()) {
                     result = resultNode.asBoolean();
+                } else if (resultNode.isShort() || resultNode.isInt()) {
+                    result = resultNode.asInt();
                 } else if (resultNode.isLong()) {
                     result = resultNode.asLong();
-                } else if (resultNode.isBigDecimal() || resultNode.isDouble()) {
+                } else if (resultNode.isBigDecimal() || resultNode.isDouble() || resultNode.isFloat()) {
                     result = resultNode.asDouble();
                 } else if (resultNode.isTextual()) {
                     result = resultNode.asText();
