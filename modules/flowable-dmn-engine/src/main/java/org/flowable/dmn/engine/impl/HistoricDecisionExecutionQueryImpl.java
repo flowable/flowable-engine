@@ -39,6 +39,8 @@ public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistori
     protected String executionId;
     protected String activityId;
     protected String scopeType;
+    protected String processInstanceIdWithChildren;
+    protected String caseInstanceIdWithChildren;
     protected Boolean failed;
     protected String tenantId;
     protected String tenantIdLike;
@@ -127,6 +129,18 @@ public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistori
             throw new FlowableIllegalArgumentException("scopeType is null");
         }
         this.scopeType = scopeType;
+        return this;
+    }
+    
+    @Override
+    public DmnHistoricDecisionExecutionQuery processInstanceIdWithChildren(String processInstanceId) {
+        this.processInstanceIdWithChildren = processInstanceId;
+        return this;
+    }
+
+    @Override
+    public DmnHistoricDecisionExecutionQuery caseInstanceIdWithChildren(String caseInstanceId) {
+        this.caseInstanceIdWithChildren = caseInstanceId;
         return this;
     }
     
@@ -237,6 +251,14 @@ public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistori
         return scopeType;
     }
     
+    public String getProcessInstanceIdWithChildren() {
+        return processInstanceIdWithChildren;
+    }
+
+    public String getCaseInstanceIdWithChildren() {
+        return caseInstanceIdWithChildren;
+    }
+
     public Boolean getFailed() {
         return failed;
     }
