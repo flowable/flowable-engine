@@ -14,6 +14,8 @@ package org.flowable.form.api;
 
 import java.util.Map;
 
+import org.flowable.common.engine.api.variable.VariableContainer;
+
 /**
  * Defines a form field handler.
  * 
@@ -30,9 +32,9 @@ public interface FormFieldHandler {
      * Apply validation restrictions on the submitted variables
      *
      * @param formInfo form description
-     * @param taskId submission related taskId. TaskId can be null in the case when submission is related to case/process instance start
+     * @param variableContainer variableContainer to be able to get initial variable values
      * @param variables submitted variables
      */
-    void validateFormFieldsOnSubmit(FormInfo formInfo, String taskId, Map<String, Object> variables);
+    void validateFormFieldsOnSubmit(FormInfo formInfo, VariableContainer variableContainer, Map<String, Object> variables);
 
 }

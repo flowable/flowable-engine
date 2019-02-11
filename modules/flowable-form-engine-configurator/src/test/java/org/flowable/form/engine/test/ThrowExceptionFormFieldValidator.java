@@ -14,6 +14,7 @@ package org.flowable.form.engine.test;
 
 import java.util.Map;
 
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.engine.impl.formhandler.DefaultFormFieldHandler;
 import org.flowable.form.api.FormInfo;
 
@@ -23,7 +24,7 @@ import org.flowable.form.api.FormInfo;
 public class ThrowExceptionFormFieldValidator extends DefaultFormFieldHandler{
 
     @Override
-    public void validateFormFieldsOnSubmit(FormInfo formInfo, String taskId, Map<String, Object> variables) {
+    public void validateFormFieldsOnSubmit(FormInfo formInfo, VariableContainer variableContainer, Map<String, Object> variables) {
         throw new RuntimeException("validation failed");
     }
 }
