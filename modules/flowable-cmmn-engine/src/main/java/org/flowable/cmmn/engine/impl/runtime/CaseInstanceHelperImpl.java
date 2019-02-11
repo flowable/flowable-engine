@@ -302,7 +302,7 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         Case caseModel = cmmnModel.getCaseById(caseDefinition.getKey());
 
         if (caseModel.getInitiatorVariableName() != null) {
-            caseInstanceEntity.setVariable(caseModel.getInitiatorVariableName(), Authentication.getAuthenticatedUserId());
+            caseInstanceEntity.setVariable(caseModel.getInitiatorVariableName(), authenticatedUserId);
         }
 
         return caseInstanceEntity;

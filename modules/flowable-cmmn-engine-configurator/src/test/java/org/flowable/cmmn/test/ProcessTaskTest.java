@@ -42,6 +42,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -1032,4 +1033,36 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
         }
     }
+
+    @Test
+    @CmmnDeployment
+    public void testPassChildTaskVariables() {
+        assertEquals(processEngineRuntimeService.createProcessInstanceQuery().count(), 0);
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("startChildProcess").start();
+        PlanItemInstance processPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .planItemInstanceStateEnabled()
+            .singleResult();
+
+        cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(processPlanItemInstance.getId())
+            .variable("caseVar", "caseValue")
+            .childTaskVariable("processVar1", "processValue")
+            .childTaskVariables(CollectionUtil.map("processVar2", 123, "processVar3", 456))
+            .start();
+
+        Map<String, Object> variables = cmmnRuntimeService.getVariables(caseInstance.getId());
+        assertEquals(1, variables.size());
+        assertEquals("caseValue", variables.get("caseVar"));
+
+        ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceQuery()
+            .processInstanceCallbackId(processPlanItemInstance.getId())
+            .singleResult();
+        Map<String, Object> processInstanceVariables = processEngineRuntimeService.getVariables(processInstance.getId());
+        assertEquals(3, processInstanceVariables.size());
+        assertEquals("processValue", processInstanceVariables.get("processVar1"));
+        assertEquals(123, processInstanceVariables.get("processVar2"));
+        assertEquals(456, processInstanceVariables.get("processVar3"));
+    }
+
 }

@@ -19,6 +19,7 @@ import java.util.Map;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceTransitionBuilder;
 import org.flowable.cmmn.api.runtime.GenericEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
@@ -34,6 +35,8 @@ import org.flowable.identitylink.api.IdentityLink;
 public interface CmmnRuntimeService {
 
     CaseInstanceBuilder createCaseInstanceBuilder();
+
+    PlanItemInstanceTransitionBuilder createPlanItemInstanceTransitionBuilder(String planItemInstanceId);
     
     void triggerPlanItemInstance(String planItemInstanceId);
     
@@ -86,7 +89,7 @@ public interface CmmnRuntimeService {
     
     void removeLocalVariable(String planItemInstanceId, String variableName);
     
-    void removeLocalVariables(String caseInstanceId, Collection<String> variableNames);
+    void removeLocalVariables(String planItemInstanceId, Collection<String> variableNames);
 
     /**
      * Set or change the name of the case instance.
