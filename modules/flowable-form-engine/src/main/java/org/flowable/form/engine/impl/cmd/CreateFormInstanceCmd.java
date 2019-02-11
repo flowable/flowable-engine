@@ -26,28 +26,28 @@ public class CreateFormInstanceCmd extends AbstractSaveFormInstanceCmd implement
 
     private static final long serialVersionUID = 1L;
 
-    public CreateFormInstanceCmd(FormInfo formInfo, Map<String, Object> variables, String taskId, String processInstanceId, 
-                    String processDefinitionId, String tenantId) {
+    public CreateFormInstanceCmd(FormInfo formInfo, Map<String, Object> variables, String taskId, String processInstanceId,
+        String processDefinitionId, String tenantId, String outcome) {
         
-        super(formInfo, variables, taskId, processInstanceId, processDefinitionId, tenantId);
+        super(formInfo, variables, taskId, processInstanceId, processDefinitionId, tenantId, outcome);
     }
     
-    public CreateFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String processInstanceId, 
-                    String processDefinitionId, String tenantId) {
+    public CreateFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String processInstanceId,
+        String processDefinitionId, String tenantId, String outcome) {
         
-        super(formModelId, variables, taskId, processInstanceId, processDefinitionId, tenantId);
+        super(formModelId, variables, taskId, processInstanceId, processDefinitionId, tenantId, outcome);
     }
     
-    public CreateFormInstanceCmd(FormInfo formInfo, Map<String, Object> variables, String taskId, String scopeId, 
-                    String scopeType, String scopeDefinitionId, String tenantId) {
+    public CreateFormInstanceCmd(FormInfo formInfo, Map<String, Object> variables, String taskId, String scopeId,
+        String scopeType, String scopeDefinitionId, String tenantId, String outcome) {
         
-        super(formInfo, variables, taskId, scopeId, scopeType, scopeDefinitionId, tenantId);
+        super(formInfo, variables, taskId, scopeId, scopeType, scopeDefinitionId, tenantId, outcome);
     }
     
-    public CreateFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String scopeId, 
-                    String scopeType, String scopeDefinitionId, String tenantId) {
+    public CreateFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String scopeId,
+        String scopeType, String scopeDefinitionId, String tenantId, String outcome) {
         
-        super(formModelId, variables, taskId, scopeId, scopeType, scopeDefinitionId, tenantId);
+        super(formModelId, variables, taskId, scopeId, scopeType, scopeDefinitionId, tenantId, outcome);
     }
 
     @Override

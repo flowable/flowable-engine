@@ -71,6 +71,12 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         FormInfo formInfo = formRepositoryService.getFormModelById(formDefinitionId);
 
         if (formInfo != null) {
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+            FormFieldHandler formFieldHandler = processEngineConfiguration.getFormFieldHandler();
+            if (isFormFieldValidationEnabled(task, processEngineConfiguration, task.getProcessDefinitionId(), task.getTaskDefinitionKey())) {
+                formFieldHandler.validateFormFieldsOnSubmit(formInfo, task, variables);
+            }
+
             // Extract raw variables and complete the task
             Map<String, Object> taskVariables = formService.getVariablesFromFormSubmission(formInfo, variables, outcome);
 
@@ -78,17 +84,12 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
             // the actual variables should instead be used when saving the form instances
             if (task.getProcessInstanceId() != null) {
                 formService.saveFormInstance(variables, formInfo, task.getId(), task.getProcessInstanceId(),
-                                task.getProcessDefinitionId(), task.getTenantId());
+                                task.getProcessDefinitionId(), task.getTenantId(), outcome);
             } else {
                 formService.saveFormInstanceWithScopeId(variables, formInfo, task.getId(), task.getScopeId(), task.getScopeType(),
-                                task.getScopeDefinitionId(), task.getTenantId());
+                                task.getScopeDefinitionId(), task.getTenantId(), outcome);
             }
 
-            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-            FormFieldHandler formFieldHandler = processEngineConfiguration.getFormFieldHandler();
-            if (isFormFieldValidationEnabled(task, processEngineConfiguration, task.getProcessDefinitionId(), task.getTaskDefinitionKey())) {
-                formFieldHandler.validateFormFieldsOnSubmit(formInfo, task.getId(), taskVariables);
-            }
             formFieldHandler.handleFormFieldsOnSubmit(formInfo, task.getId(), task.getProcessInstanceId(), null, null, taskVariables, task.getTenantId());
 
             TaskHelper.completeTask(task, taskVariables, transientVariables, localScope, commandContext);

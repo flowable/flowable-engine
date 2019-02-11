@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
+import java.util.Map;
+
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -33,7 +35,13 @@ public class CompleteStagePlanItemInstanceCmd extends AbstractNeedsPlanItemInsta
         super(planItemInstanceId);
         this.force = force;
     }
-    
+
+    public CompleteStagePlanItemInstanceCmd(String planItemInstanceId, Map<String, Object> variables,
+            Map<String, Object> localVariables, Map<String, Object> transientVariables, boolean force) {
+        super(planItemInstanceId, variables, localVariables, transientVariables);
+        this.force = force;
+    }
+
     @Override
     protected void internalExecute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         if (!PlanItemDefinitionType.STAGE.equals(planItemInstanceEntity.getPlanItemDefinitionType())) {
