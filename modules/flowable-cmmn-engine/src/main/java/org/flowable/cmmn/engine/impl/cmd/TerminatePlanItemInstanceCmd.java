@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
+import java.util.Map;
+
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -24,7 +26,12 @@ public class TerminatePlanItemInstanceCmd extends AbstractNeedsPlanItemInstanceC
     public TerminatePlanItemInstanceCmd(String planItemInstanceId) {
         super(planItemInstanceId);
     }
-    
+
+    public TerminatePlanItemInstanceCmd(String planItemInstanceId, Map<String, Object> variables, Map<String, Object> localVariables,
+        Map<String, Object> transientVariables) {
+        super(planItemInstanceId, variables, localVariables, transientVariables);
+    }
+
     @Override
     protected void internalExecute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity);

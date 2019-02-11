@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+  <case id="startChildProcess" name="startChildProcess" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="casePlanModel" flowable:formFieldValidation="true" flowable:includeInStageOverview="false">
+      <planItem id="planItem1" name="The Process" definitionRef="sid-79E49928-2FEF-44C8-A9A8-696A58252282">
+        <itemControl>
+          <manualActivationRule></manualActivationRule>
+        </itemControl>
+      </planItem>
+      <processTask id="sid-79E49928-2FEF-44C8-A9A8-696A58252282" name="The Process" flowable:fallbackToDefaultTenant="false">
+        <processRefExpression><![CDATA[oneTask]]></processRefExpression>
+      </processTask>
+    </casePlanModel>
+  </case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="CMMNDiagram_startChildProcess">
+      <cmmndi:CMMNShape id="CMMNShape_casePlanModel" cmmnElementRef="casePlanModel">
+        <dc:Bounds height="714.0" width="718.0" x="40.0" y="40.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+        <dc:Bounds height="80.0" width="100.0" x="247.0" y="225.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</definitions>
