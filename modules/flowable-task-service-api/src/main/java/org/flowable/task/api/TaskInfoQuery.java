@@ -245,12 +245,12 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
     T scopeDefinitionId(String scopeDefinitionId);
     
     /**
-     * Select all tasks for the given process id and its children.
+     * Select all tasks for the given process instance id and its children.
      */
     T processInstanceIdWithChildren(String processInstanceId);
     
     /**
-     * Select all tasks for the given process id and its children.
+     * Select all tasks for the given case instance id and its children.
      */
     T caseInstanceIdWithChildren(String caseInstanceId);
 
