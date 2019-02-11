@@ -1052,7 +1052,8 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             .start();
 
         Map<String, Object> variables = cmmnRuntimeService.getVariables(caseInstance.getId());
-        assertEquals(1, variables.size());
+        // also includes initiator variable
+        assertEquals(2, variables.size());
         assertEquals("caseValue", variables.get("caseVar"));
 
         ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceQuery()
