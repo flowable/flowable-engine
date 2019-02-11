@@ -12,6 +12,8 @@
  */
 package org.flowable.form.engine.test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -40,9 +42,13 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         Map<String, Object> valuesMap = new HashMap<>();
         valuesMap.put("input1", "test");
         Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formInfo, valuesMap, "default");
-        assertEquals("test", formValues.get("input1"));
+        assertThat(formValues)
+            .containsOnly(
+                entry("input1", "test"),
+                entry("form_form1_outcome", "default")
+            );
 
-        FormInstance formInstance = formService.createFormInstance(formValues, formInfo, null, null, null, null);
+        FormInstance formInstance = formService.createFormInstance(formValues, formInfo, null, null, null, null, "default");
         assertEquals(formInfo.getId(), formInstance.getFormDefinitionId());
         JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
         assertEquals("test", formNode.get("values").get("input1").asText());
@@ -70,9 +76,13 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         Map<String, Object> valuesMap = new HashMap<>();
         valuesMap.put("input1", "test");
         Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formInfo, valuesMap, "default");
-        assertEquals("test", formValues.get("input1"));
+        assertThat(formValues)
+            .containsOnly(
+                entry("input1", "test"),
+                entry("form_form1_outcome", "default")
+            );
 
-        FormInstance formInstance = formService.createFormInstance(formValues, formInfo, "aTaskId", null, null, "flowable");
+        FormInstance formInstance = formService.createFormInstance(valuesMap, formInfo, "aTaskId", null, null, "flowable", "default");
         assertEquals(formInfo.getId(), formInstance.getFormDefinitionId());
         JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
         assertEquals("test", formNode.get("values").get("input1").asText());
@@ -104,8 +114,13 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         valuesMap.put("input1", "test");
         Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formInfo, valuesMap, "default");
         assertEquals("test", formValues.get("input1"));
+        assertThat(formValues)
+            .containsOnly(
+                entry("input1", "test"),
+                entry("form_form1_outcome", "default")
+            );
 
-        FormInstance formInstance = formService.createFormInstance(formValues, formInfo, "aTaskId", null, null, "flowable");
+        FormInstance formInstance = formService.createFormInstance(formValues, formInfo, "aTaskId", null, null, "flowable", "default");
         assertEquals(formInfo.getId(), formInstance.getFormDefinitionId());
         JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
         assertEquals("test", formNode.get("values").get("input1").asText());
@@ -140,9 +155,13 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
             Map<String, Object> valuesMap = new HashMap<>();
             valuesMap.put("input1", "test");
             Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formInfo, valuesMap, "default");
-            assertEquals("test", formValues.get("input1"));
+            assertThat(formValues)
+                .containsOnly(
+                    entry("input1", "test"),
+                    entry("form_form1_outcome", "default")
+                );
     
-            FormInstance formInstance = formService.createFormInstance(formValues, formInfo, "aTaskId", null, null, "flowable");
+            FormInstance formInstance = formService.createFormInstance(formValues, formInfo, "aTaskId", null, null, "flowable", "default");
             assertEquals(formInfo.getId(), formInstance.getFormDefinitionId());
             JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
             assertEquals("test", formNode.get("values").get("input1").asText());
@@ -180,11 +199,15 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         valuesMap.put("date1", "2016-01-01");
         valuesMap.put("date2", "2017-01-01");
         Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formInfo, valuesMap, "date");
-        assertEquals("test", formValues.get("input1"));
-        assertEquals(new LocalDate(2016, 1, 1), formValues.get("date1"));
-        assertEquals(new LocalDate(2017, 1, 1), formValues.get("date2"));
+        assertThat(formValues)
+            .containsOnly(
+                entry("input1", "test"),
+                entry("date1", new LocalDate(2016, 1, 1)),
+                entry("date2", new LocalDate(2017, 1, 1)),
+                entry("form_dateform_outcome", "date")
+            );
 
-        FormInstance formInstance = formService.createFormInstance(formValues, formInfo, null, null, null, null);
+        FormInstance formInstance = formService.createFormInstance(formValues, formInfo, null, null, null, null, "date");
         assertEquals(formInfo.getId(), formInstance.getFormDefinitionId());
         JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
         JsonNode valuesNode = formNode.get("values");
@@ -209,8 +232,13 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         Map<String, Object> valuesMap = new HashMap<>();
         valuesMap.put("input1", "test");
         Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formInfo, valuesMap, "default");
+        assertThat(formValues)
+            .containsOnly(
+                entry("input1", "test"),
+                entry("form_form1_outcome", "default")
+            );
 
-        FormInstance formInstance = formService.saveFormInstance(formValues, formInfo, taskId, "someId", "testDefId", null);
+        FormInstance formInstance = formService.saveFormInstance(formValues, formInfo, taskId, "someId", "testDefId", null, "default");
         assertEquals(formInfo.getId(), formInstance.getFormDefinitionId());
         JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
         assertEquals("test", formNode.get("values").get("input1").asText());
@@ -227,8 +255,13 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         valuesMap = new HashMap<>();
         valuesMap.put("input1", "updatedValue");
         formValues = formService.getVariablesFromFormSubmission(formInfo, valuesMap, "updatedOutcome");
+        assertThat(formValues)
+            .containsOnly(
+                entry("input1", "updatedValue"),
+                entry("form_form1_outcome", "updatedOutcome")
+            );
 
-        formInstance = formService.saveFormInstance(formValues, formInfo, taskId, "someId", "testDefId", null);
+        formInstance = formService.saveFormInstance(formValues, formInfo, taskId, "someId", "testDefId", null, "updatedOutcome");
         assertEquals(formInfo.getId(), formInstance.getFormDefinitionId());
         formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
         assertEquals("updatedValue", formNode.get("values").get("input1").asText());
@@ -260,12 +293,16 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         variables.put("plainLink", "http://notmylink.com");
         variables.put("page", "downloads.html");
         Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formInfo, variables, "default");
-        // Should be null as this is not an input element
-        assertEquals("http://notmylink.com", formValues.get("plainLink"));
-        assertNull(formValues.get("expressionLink"));
+        // Should be not contain expressionLink as this is not an input element
+        assertThat(formValues)
+            .containsOnly(
+                entry("plainLink", "http://notmylink.com"),
+                entry("form_hyperlink_outcome", "default")
+            )
+            .doesNotContainKeys("expressionLink");
 
         // test setting hyperlink from variable
-        FormInstance formInstance = formService.createFormInstanceWithScopeId(formValues, formInfo, "123456", "someId", "cmmn", "testDefId", null);
+        FormInstance formInstance = formService.createFormInstanceWithScopeId(formValues, formInfo, "123456", "someId", "cmmn", "testDefId", null, "default");
         assertEquals(formInfo.getId(), formInstance.getFormDefinitionId());
         JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
         assertEquals("http://notmylink.com", formNode.get("values").get("plainLink").asText());

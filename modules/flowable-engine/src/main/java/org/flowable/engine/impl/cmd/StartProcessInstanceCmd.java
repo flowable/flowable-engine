@@ -161,7 +161,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
         if (formInfo != null) {
             FormService formService = CommandContextUtil.getFormService(commandContext);
             formService.createFormInstance(startFormVariables, formInfo, null, processInstance.getId(),
-                            processInstance.getProcessDefinitionId(), processInstance.getTenantId());
+                            processInstance.getProcessDefinitionId(), processInstance.getTenantId(), outcome);
             FormFieldHandler formFieldHandler = processEngineConfiguration.getFormFieldHandler();
             formFieldHandler.handleFormFieldsOnSubmit(formInfo, null, processInstance.getId(), null, null, variables, processInstance.getTenantId());
         }

@@ -43,17 +43,23 @@ public interface FormService {
      * @param values
      *            json node with the values of the
      */
-    FormInstance createFormInstance(Map<String, Object> variables, FormInfo formInfo, String taskId, String processInstanceId, String processDefinitionId, String tenantId);
+    FormInstance createFormInstance(Map<String, Object> variables, FormInfo formInfo, String taskId, String processInstanceId, String processDefinitionId,
+        String tenantId, String outcome);
 
-    FormInstance saveFormInstance(Map<String, Object> variables, FormInfo formInfo, String taskId, String processInstanceId, String processDefinitionId, String tenantId);
+    FormInstance saveFormInstance(Map<String, Object> variables, FormInfo formInfo, String taskId, String processInstanceId, String processDefinitionId,
+        String tenantId, String outcome);
 
-    FormInstance saveFormInstanceByFormDefinitionId(Map<String, Object> variables, String formDefinitionId, String taskId, String processInstanceId, String processDefinitionId, String tenantId);
+    FormInstance saveFormInstanceByFormDefinitionId(Map<String, Object> variables, String formDefinitionId, String taskId, String processInstanceId,
+        String processDefinitionId, String tenantId, String outcome);
     
-    FormInstance createFormInstanceWithScopeId(Map<String, Object> variables, FormInfo formInfo, String taskId, String scopeId, String scopeType, String scopeDefinitionId, String tenantId);
+    FormInstance createFormInstanceWithScopeId(Map<String, Object> variables, FormInfo formInfo, String taskId, String scopeId, String scopeType,
+        String scopeDefinitionId, String tenantId, String outcome);
 
-    FormInstance saveFormInstanceWithScopeId(Map<String, Object> variables, FormInfo formInfo, String taskId, String scopeId, String scopeType, String scopeDefinitionId, String tenantId);
+    FormInstance saveFormInstanceWithScopeId(Map<String, Object> variables, FormInfo formInfo, String taskId, String scopeId, String scopeType,
+        String scopeDefinitionId, String tenantId, String outcome);
 
-    FormInstance saveFormInstanceWithScopeId(Map<String, Object> variables, String formDefinitionId, String taskId, String scopeId, String scopeType, String scopeDefinitionId, String tenantId);
+    FormInstance saveFormInstanceWithScopeId(Map<String, Object> variables, String formDefinitionId, String taskId, String scopeId, String scopeType,
+        String scopeDefinitionId, String tenantId, String outcome);
 
     FormInfo getFormModelWithVariablesById(String formDefinitionId, String taskId, Map<String, Object> variables);
 
