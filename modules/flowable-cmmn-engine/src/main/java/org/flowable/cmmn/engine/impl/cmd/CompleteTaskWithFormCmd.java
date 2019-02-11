@@ -77,6 +77,12 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         FormInfo formInfo = formRepositoryService.getFormModelById(formDefinitionId);
 
         if (formInfo != null) {
+            // validate input at first
+            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+            FormFieldHandler formFieldHandler = cmmnEngineConfiguration.getFormFieldHandler();
+            if (isFormFieldValidationEnabled(cmmnEngineConfiguration, task)) {
+                formFieldHandler.validateFormFieldsOnSubmit(formInfo, task, variables);
+            }
             // Extract raw variables and complete the task
             Map<String, Object> taskVariables = formService.getVariablesFromFormSubmission(formInfo, variables, outcome);
 
@@ -91,11 +97,6 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
                                 task.getScopeDefinitionId(), task.getTenantId());
             }
 
-            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-            FormFieldHandler formFieldHandler = cmmnEngineConfiguration.getFormFieldHandler();
-            if (isFormFieldValidationEnabled(cmmnEngineConfiguration, task)) {
-                formFieldHandler.validateFormFieldsOnSubmit(formInfo, task.getId(), taskVariables);
-            }
             formFieldHandler.handleFormFieldsOnSubmit(formInfo, task.getId(), null, task.getScopeId(),
                             task.getScopeType(), taskVariables, task.getTenantId());
 

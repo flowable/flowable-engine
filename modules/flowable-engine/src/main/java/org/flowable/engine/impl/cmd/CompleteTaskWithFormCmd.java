@@ -71,6 +71,12 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         FormInfo formInfo = formRepositoryService.getFormModelById(formDefinitionId);
 
         if (formInfo != null) {
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+            FormFieldHandler formFieldHandler = processEngineConfiguration.getFormFieldHandler();
+            if (isFormFieldValidationEnabled(task, processEngineConfiguration, task.getProcessDefinitionId(), task.getTaskDefinitionKey())) {
+                formFieldHandler.validateFormFieldsOnSubmit(formInfo, task, variables);
+            }
+
             // Extract raw variables and complete the task
             Map<String, Object> taskVariables = formService.getVariablesFromFormSubmission(formInfo, variables, outcome);
 
@@ -84,11 +90,6 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
                                 task.getScopeDefinitionId(), task.getTenantId());
             }
 
-            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-            FormFieldHandler formFieldHandler = processEngineConfiguration.getFormFieldHandler();
-            if (isFormFieldValidationEnabled(task, processEngineConfiguration, task.getProcessDefinitionId(), task.getTaskDefinitionKey())) {
-                formFieldHandler.validateFormFieldsOnSubmit(formInfo, task.getId(), taskVariables);
-            }
             formFieldHandler.handleFormFieldsOnSubmit(formInfo, task.getId(), task.getProcessInstanceId(), null, null, taskVariables, task.getTenantId());
 
             TaskHelper.completeTask(task, taskVariables, transientVariables, localScope, commandContext);
