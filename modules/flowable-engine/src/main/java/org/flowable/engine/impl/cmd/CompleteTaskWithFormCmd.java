@@ -84,10 +84,10 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
             // the actual variables should instead be used when saving the form instances
             if (task.getProcessInstanceId() != null) {
                 formService.saveFormInstance(variables, formInfo, task.getId(), task.getProcessInstanceId(),
-                                task.getProcessDefinitionId(), task.getTenantId());
+                                task.getProcessDefinitionId(), task.getTenantId(), outcome);
             } else {
                 formService.saveFormInstanceWithScopeId(variables, formInfo, task.getId(), task.getScopeId(), task.getScopeType(),
-                                task.getScopeDefinitionId(), task.getTenantId());
+                                task.getScopeDefinitionId(), task.getTenantId(), outcome);
             }
 
             formFieldHandler.handleFormFieldsOnSubmit(formInfo, task.getId(), task.getProcessInstanceId(), null, null, taskVariables, task.getTenantId());

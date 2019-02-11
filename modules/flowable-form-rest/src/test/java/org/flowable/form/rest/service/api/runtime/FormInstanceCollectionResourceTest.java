@@ -36,6 +36,7 @@ public class FormInstanceCollectionResourceTest extends BaseSpringRestTestCase {
 
         Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formInfo, valuesMap, "default");
         assertEquals("test", formValues.get("user"));
+        assertEquals("default", formValues.get("form_form1_outcome"));
 
         FormRequest formRequest = new FormRequest();
         formRequest.setFormDefinitionKey(formInfo.getKey());
