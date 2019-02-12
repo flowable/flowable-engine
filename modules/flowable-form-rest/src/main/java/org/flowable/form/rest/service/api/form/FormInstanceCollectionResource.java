@@ -55,7 +55,7 @@ public class FormInstanceCollectionResource extends BaseFormInstanceResource {
             @ApiImplicitParam(name = "processDefinitionIdLike", dataType = "string", value = "Only return form instances with a process definition id like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "scopeId", dataType = "string", value = "Only return form instances with the given scope id.", paramType = "query"),
             @ApiImplicitParam(name = "scopeType", dataType = "string", value = "Only return form instances with a scope type like the given value.", paramType = "query"),
-            @ApiImplicitParam(name = "scopeId", dataType = "string", value = "Only return form instances with the given scope definition id.", paramType = "query"),
+            @ApiImplicitParam(name = "scopeDefinitionId", dataType = "string", value = "Only return form instances with the given scope definition id.", paramType = "query"),
             @ApiImplicitParam(name = "submittedBy", dataType = "string", value = "Only return form instances submitted by the given value.", paramType = "query"),
             @ApiImplicitParam(name = "submittedByLike", dataType = "string", value = "Only return form instances submitted by like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return form instances with the given tenantId.", paramType = "query"),
