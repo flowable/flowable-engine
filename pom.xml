@@ -37,7 +37,7 @@
         <checkstyle.suppressions.location>/checkstyle/flowable-suppressions.xml</checkstyle.suppressions.location>
 
         <!-- JVM params for test execution -->
-		<argLine>-Duser.language=en</argLine>
+		<argLine>-Xmx3g -Duser.language=en</argLine>
 
 		<!-- OSGi bundles properties -->
 		<flowable.artifact />
@@ -1682,7 +1682,7 @@
                 <jdk>[9,)</jdk>
             </activation>
             <properties>
-                <argLine>--add-modules java.xml.bind</argLine>
+                <argLine>-Xmx3g --add-modules java.xml.bind</argLine>
             </properties>
         </profile>
 	</profiles>
