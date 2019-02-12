@@ -387,6 +387,19 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
     }
 
     @Test
+    public void testSetTaskStartTime() {
+        Task task = startOneTaskprocess();
+
+        finishOneTaskProcess(task);
+
+        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
+        HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
+        assertNotNull(historicTaskInstance.getStartTime());
+        assertNotNull(historicTaskInstance.getEndTime());
+        assertEquals(task.getCreateTime(), historicTaskInstance.getStartTime());
+    }
+
+    @Test
     public void testSetTaskParentId() {
         Task parentTask1 = taskService.newTask();
         parentTask1.setName("Parent task 1");
