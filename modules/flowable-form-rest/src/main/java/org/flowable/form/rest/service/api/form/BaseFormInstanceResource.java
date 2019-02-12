@@ -51,6 +51,9 @@ public class BaseFormInstanceResource {
 
         FormInstanceQuery query = formService.createFormInstanceQuery();
 
+        if (queryRequest.getId() != null) {
+            query.id(queryRequest.getId());
+        }
         if (queryRequest.getFormDefinitionId() != null) {
             query.formDefinitionId(queryRequest.getFormDefinitionId());
         }
