@@ -183,6 +183,12 @@
     <build>
         <plugins>
             <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>${argLine} -Xmx3g</argLine>
+                </configuration>
+            </plugin>
+            <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
@@ -500,16 +506,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        
-        <profile>
-            <id>java8</id>
-            <activation>
-                <jdk>1.8</jdk>
-            </activation>
-            <properties>
-                <argLine>-Xmx3g</argLine>
-            </properties>
         </profile>
     </profiles>
 
