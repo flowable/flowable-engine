@@ -276,6 +276,7 @@
                         <exclude>${exclude.tests2}</exclude>
                     </excludes>
                     <runOrder>alphabetical</runOrder>
+                    <argLine>${argLine} -Xmx3g</argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -1557,18 +1558,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-
-        <profile>
-            <id>java8</id>
-            <activation>
-                <jdk>1.8</jdk>
-            </activation>
-            <properties>
-                <!-- increase max heap to fix: SurefireBooterForkException: There was an error in the forked process
-                    [ERROR] GC overhead limit exceeded -->
-                <argLine>-Xmx3g</argLine>
-            </properties>
         </profile>
     </profiles>
 
