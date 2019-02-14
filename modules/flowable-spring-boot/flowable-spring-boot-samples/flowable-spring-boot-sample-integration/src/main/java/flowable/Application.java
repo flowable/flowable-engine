@@ -13,7 +13,6 @@
 package flowable;
 
 import java.util.Collections;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.flowable.engine.ProcessEngine;
@@ -28,6 +27,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.handler.GenericHandler;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
 
 @SpringBootApplication
@@ -71,7 +71,7 @@ public class Application {
                 .from(inboundGateway)
                 .handle(new GenericHandler<DelegateExecution>() {
                     @Override
-                    public Object handle(DelegateExecution execution, Map<String, Object> headers) {
+                    public Object handle(DelegateExecution execution, MessageHeaders headers) {
                         return MessageBuilder.withPayload(execution)
                                 .setHeader("projectId", "2143243")
                                 .setHeader("orderId", "246")

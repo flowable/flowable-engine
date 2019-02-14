@@ -13,13 +13,13 @@ matrix:
     dist: xenial
   - jdk: openjdk11
     dist: xenial
+  - jdk: openjdk12
   - jdk: openjdk-ea
     branches:
       only:
       - master
     if: TRAVIS_PULL_REQUEST != false
   allow_failures:
-  - jdk: openjdk11
   - jdk: openjdk-ea
   - name: "Flowable 5 tests"
 
