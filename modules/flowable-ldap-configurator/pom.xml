@@ -72,25 +72,16 @@
 			<artifactId>spring-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- Apache DS (LDAP Server) -->
+
+
+		<!-- UnboundID LDAP Server -->
 		<dependency>
-			<groupId>org.apache.directory.server</groupId>
-			<artifactId>apacheds-core</artifactId>
-			<version>1.5.5</version>
+			<groupId>com.unboundid</groupId>
+			<artifactId>unboundid-ldapsdk</artifactId>
+			<version>4.0.9</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.directory.server</groupId>
-			<artifactId>apacheds-protocol-ldap</artifactId>
-			<version>1.5.5</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.directory.shared</groupId>
-			<artifactId>shared-ldap</artifactId>
-			<version>0.9.17</version>
-			<scope>test</scope>
-		</dependency>
+
 		<!-- Logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -197,16 +188,6 @@
 				</plugins>
 			</build>
 		</profile>
-        <profile>
-            <id>java11+</id>
-            <activation>
-                <jdk>[11,)</jdk>
-            </activation>
-            <properties>
-                <!-- Apache DS does not support Java 11 yet -->
-                <maven.test.skip>true</maven.test.skip>
-            </properties>
-        </profile>
 	</profiles>
 
 	<build>

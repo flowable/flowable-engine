@@ -11,7 +11,13 @@
                            http://www.springframework.org/schema/security   http://www.springframework.org/schema/security/spring-security.xsd">
 
     <!-- Embedded ldap test server -->
-    <security:ldap-server ldif="classpath:users.ldif" root="o=flowable" manager-dn="uid=admin, ou=users" manager-password="admin" />
+    <bean id="inMemoryLdapDirectoryServer" class="org.flowable.test.ldap.InMemoryDirectoryServerFactoryBean">
+        <property name="baseDn" value="o=flowable"/>
+        <property name="user" value="uid=admin, ou=users" />
+        <property name="password" value="admin" />
+        <property name="port" value="33389" />
+        <property name="ldif" value="classpath:users.ldif" />
+    </bean>
 
     <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
         <property name="driverClass" value="org.h2.Driver" />
