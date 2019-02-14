@@ -91,7 +91,7 @@ public class CmmnEngineAutoConfigurationTest {
                 .getBean(CustomUserEngineConfigurerConfiguration.class)
                 .satisfies(configuration -> {
                     assertThat(configuration.getInvokedConfigurations())
-                        .containsExactly(
+                        .containsExactlyInAnyOrder(
                             SpringCmmnEngineConfiguration.class,
                             SpringIdmEngineConfiguration.class
                         );
@@ -127,7 +127,7 @@ public class CmmnEngineAutoConfigurationTest {
                 .getBean(CustomUserEngineConfigurerConfiguration.class)
                 .satisfies(configuration -> {
                     assertThat(configuration.getInvokedConfigurations())
-                        .containsExactly(
+                        .containsExactlyInAnyOrder(
                             SpringCmmnEngineConfiguration.class,
                             SpringIdmEngineConfiguration.class,
                             SpringProcessEngineConfiguration.class
@@ -166,7 +166,7 @@ public class CmmnEngineAutoConfigurationTest {
                 .getBean(CustomUserEngineConfigurerConfiguration.class)
                 .satisfies(configuration -> {
                     assertThat(configuration.getInvokedConfigurations())
-                        .containsExactly(
+                        .containsExactlyInAnyOrder(
                             SpringProcessEngineConfiguration.class,
                             SpringCmmnEngineConfiguration.class,
                             SpringIdmEngineConfiguration.class,
