@@ -8,9 +8,6 @@ matrix:
     install: true
     script:
       cd scripts && ./run-flowable5-tests.sh
-  - jdk: oraclejdk9
-  - jdk: openjdk10
-    dist: xenial
   - jdk: openjdk11
     dist: xenial
   - jdk: openjdk12
