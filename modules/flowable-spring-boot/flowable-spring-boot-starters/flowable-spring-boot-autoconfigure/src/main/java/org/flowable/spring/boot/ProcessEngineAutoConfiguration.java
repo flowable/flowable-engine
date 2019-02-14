@@ -68,11 +68,9 @@ import org.springframework.transaction.PlatformTransactionManager;
     FlowableAppProperties.class,
     FlowableIdmProperties.class
 })
-@AutoConfigureAfter(value = {
+@AutoConfigureAfter({
     FlowableJpaAutoConfiguration.class,
     AppEngineAutoConfiguration.class,
-}, name = {
-    "org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration"
 })
 @AutoConfigureBefore({
     AppEngineServicesAutoConfiguration.class,

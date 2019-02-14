@@ -12,27 +12,36 @@
  */
 package org.flowable.test.ldap;
 
+import javax.annotation.Resource;
+
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.unboundid.ldap.listener.InMemoryDirectoryServer;
+import org.springframework.security.ldap.server.ApacheDSContainer;
 
 /**
+ * Parts of this class come from http://www.kimchy.org/before_after_testcase_with_junit/
+ * 
  * @author Joram Barrez
  */
 @Tag("ldap")
 public class LDAPTestCase extends SpringFlowableTestCase {
 
+    @Resource(name = "org.springframework.security.apacheDirectoryServerContainer")
+    private ApacheDSContainer apacheDSContainer;
+
+    protected LDAPTestCase() {
+        super();
+    }
 
     @AfterAll
-    static void closeInMemoryDirectoryServer(@Autowired InMemoryDirectoryServer inMemoryDirectoryServer) {
+    static void closeDsContainer(@Autowired ApacheDSContainer apacheDSContainer) {
         // Need to do this 'manually', or otherwise the ldap server won't be
         // shut down properly
         // on the QA machine, failing the next tests
-        if (inMemoryDirectoryServer != null) {
-            inMemoryDirectoryServer.shutDown(true);
+        if (apacheDSContainer != null) {
+            apacheDSContainer.stop();
         }
     }
 
