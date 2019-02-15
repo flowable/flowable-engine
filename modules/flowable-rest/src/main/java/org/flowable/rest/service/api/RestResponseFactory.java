@@ -1129,7 +1129,8 @@ public class RestResponseFactory {
         response.setId(user.getId());
         response.setEmail(user.getEmail());
         response.setUrl(urlBuilder.buildUrl(RestUrls.URL_USER, user.getId()));
-
+        response.setTenantId(user.getTenantId());
+        
         if (incudePassword) {
             response.setPassword(user.getPassword());
         }
