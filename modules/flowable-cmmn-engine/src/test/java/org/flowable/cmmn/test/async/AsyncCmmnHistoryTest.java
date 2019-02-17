@@ -396,12 +396,12 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         Task taskB = cmmnTaskService.createTaskQuery().taskName("B").singleResult();
         cmmnTaskService.complete(taskB.getId());
 
-        assertEquals(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("C").singleResult().getEntryCriterionId(), "entryA2");
+        assertEquals("entryA2", cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("C").singleResult().getEntryCriterionId());
 
         waitForAsyncHistoryExecutorToProcessAllJobs();
 
         HistoricPlanItemInstance planItemInstanceC = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceName("C").singleResult();
-        assertEquals(planItemInstanceC.getEntryCriterionId(), "entryA2");
+        assertEquals("entryA2", planItemInstanceC.getEntryCriterionId());
         assertNull(planItemInstanceC.getExitCriterionId());
 
         // Completing  will set the exit criterion
@@ -410,8 +410,8 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
 
         waitForAsyncHistoryExecutorToProcessAllJobs();
         planItemInstanceC = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceName("C").singleResult();
-        assertEquals(planItemInstanceC.getEntryCriterionId(), "entryA2");
-        assertEquals(planItemInstanceC.getExitCriterionId(), "stop");
+        assertEquals("entryA2", planItemInstanceC.getEntryCriterionId());
+        assertEquals("stop", planItemInstanceC.getExitCriterionId());
     }
 
     @Test
