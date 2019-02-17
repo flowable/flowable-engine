@@ -32,16 +32,16 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
 
         String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
 
-        assertEquals(new Long(10), tableCount.get(tablePrefix + "ACT_GE_PROPERTY"));
-        assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_GE_BYTEARRAY"));
-        assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_RE_DEPLOYMENT"));
-        assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_RU_EXECUTION"));
-        assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_ID_GROUP"));
-        assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_ID_MEMBERSHIP"));
-        assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_ID_USER"));
-        assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_RE_PROCDEF"));
-        assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_RU_TASK"));
-        assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_RU_IDENTITYLINK"));
+        assertEquals(Long.valueOf(10), tableCount.get(tablePrefix + "ACT_GE_PROPERTY"));
+        assertEquals(Long.valueOf(0), tableCount.get(tablePrefix + "ACT_GE_BYTEARRAY"));
+        assertEquals(Long.valueOf(0), tableCount.get(tablePrefix + "ACT_RE_DEPLOYMENT"));
+        assertEquals(Long.valueOf(0), tableCount.get(tablePrefix + "ACT_RU_EXECUTION"));
+        assertEquals(Long.valueOf(0), tableCount.get(tablePrefix + "ACT_ID_GROUP"));
+        assertEquals(Long.valueOf(0), tableCount.get(tablePrefix + "ACT_ID_MEMBERSHIP"));
+        assertEquals(Long.valueOf(0), tableCount.get(tablePrefix + "ACT_ID_USER"));
+        assertEquals(Long.valueOf(0), tableCount.get(tablePrefix + "ACT_RE_PROCDEF"));
+        assertEquals(Long.valueOf(0), tableCount.get(tablePrefix + "ACT_RU_TASK"));
+        assertEquals(Long.valueOf(0), tableCount.get(tablePrefix + "ACT_RU_IDENTITYLINK"));
     }
 
     public void testGetTableMetaData() {
