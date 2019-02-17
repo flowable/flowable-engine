@@ -15,6 +15,7 @@ package org.flowable.dmn.engine.impl.repository;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 import org.flowable.common.engine.api.FlowableException;
@@ -117,12 +118,8 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
     @Override
     public DmnDeploymentBuilder addDmnModel(String resourceName, DmnDefinition dmnDefinition) {
         DmnXMLConverter dmnXMLConverter = new DmnXMLConverter();
-        try {
-            String dmn20Xml = new String(dmnXMLConverter.convertToXML(dmnDefinition), "UTF-8");
-            addString(resourceName, dmn20Xml);
-        } catch (UnsupportedEncodingException e) {
-            throw new FlowableException("Error while transforming DMN model to xml: not UTF-8 encoded", e);
-        }
+        String dmn20Xml = new String(dmnXMLConverter.convertToXML(dmnDefinition), StandardCharsets.UTF_8);
+        addString(resourceName, dmn20Xml);
         return this;
     }
 

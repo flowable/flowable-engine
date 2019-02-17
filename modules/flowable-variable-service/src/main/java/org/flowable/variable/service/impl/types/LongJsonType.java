@@ -12,6 +12,8 @@
  */
 package org.flowable.variable.service.impl.types;
 
+import java.nio.charset.StandardCharsets;
+
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.variable.api.types.ValueFields;
 
@@ -57,7 +59,7 @@ public class LongJsonType extends SerializableType {
         }
         JsonNode valueNode = (JsonNode) value;
         try {
-            return valueNode.toString().getBytes("utf-8");
+            return valueNode.toString().getBytes(StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new FlowableException("Error getting bytes from json variable", e);
         }

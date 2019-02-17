@@ -13,6 +13,7 @@
 
 package org.flowable.engine.test.api.repository;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.flowable.engine.impl.persistence.entity.ModelEntity;
@@ -41,7 +42,7 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         repositoryService.saveModel(model);
         modelOneId = model.getId();
 
-        repositoryService.addModelEditorSource(modelOneId, "bytes".getBytes("utf-8"));
+        repositoryService.addModelEditorSource(modelOneId, "bytes".getBytes(StandardCharsets.UTF_8));
 
     }
 
@@ -75,7 +76,7 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         ModelQuery query = repositoryService.createModelQuery().modelName("my model");
         Model model = query.singleResult();
         assertNotNull(model);
-        assertEquals("bytes", new String(repositoryService.getModelEditorSource(model.getId()), "utf-8"));
+        assertEquals("bytes", new String(repositoryService.getModelEditorSource(model.getId()), StandardCharsets.UTF_8));
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());
     }
@@ -93,7 +94,7 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         ModelQuery query = repositoryService.createModelQuery().modelNameLike("%model%");
         Model model = query.singleResult();
         assertNotNull(model);
-        assertEquals("bytes", new String(repositoryService.getModelEditorSource(model.getId()), "utf-8"));
+        assertEquals("bytes", new String(repositoryService.getModelEditorSource(model.getId()), StandardCharsets.UTF_8));
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());
     }
