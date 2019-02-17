@@ -1037,7 +1037,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
     @Test
     @CmmnDeployment
     public void testPassChildTaskVariables() {
-        assertEquals(processEngineRuntimeService.createProcessInstanceQuery().count(), 0);
+        assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("startChildProcess").start();
         PlanItemInstance processPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
