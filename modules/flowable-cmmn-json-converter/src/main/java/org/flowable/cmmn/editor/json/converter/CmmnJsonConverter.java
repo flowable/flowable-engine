@@ -481,7 +481,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
             }
 
             if (!associationMap.containsKey(criterion.getId())) {
-                associationMap.put(criterion.getId(), new ArrayList<Association>());
+                associationMap.put(criterion.getId(), new ArrayList<>());
             }
             associationMap.get(criterion.getId()).add(association);
         }

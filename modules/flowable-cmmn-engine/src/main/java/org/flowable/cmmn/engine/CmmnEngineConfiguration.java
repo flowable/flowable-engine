@@ -2217,7 +2217,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             planItemInstanceLifecycleListeners = new HashMap<>();
         }
         planItemInstanceLifecycleListeners
-            .computeIfAbsent(planItemDefinitionType, key -> new ArrayList<PlanItemInstanceLifecycleListener>())
+            .computeIfAbsent(planItemDefinitionType, key -> new ArrayList<>())
             .add(planItemInstanceLifeCycleListener);
     }
 

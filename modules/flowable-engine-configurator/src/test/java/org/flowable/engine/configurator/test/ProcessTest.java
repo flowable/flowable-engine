@@ -110,7 +110,7 @@ public class ProcessTest extends FlowableAppTestCase {
             FormDefinition formDefinition = formEngineConfiguration.getFormRepositoryService().createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
             assertNotNull(formDefinition);
             
-            Map<String, Object> variables = new HashMap<String, Object>();
+            Map<String, Object> variables = new HashMap<>();
             variables.put("input1", "test");
             taskService.completeTaskWithForm(task.getId(), formDefinition.getId(), null, variables);
             
