@@ -1136,7 +1136,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         return graphicInfo;
     }
 
-    class FlowWithContainer {
+    static class FlowWithContainer {
         protected SequenceFlow sequenceFlow;
         protected FlowElementsContainer flowContainer;
 
