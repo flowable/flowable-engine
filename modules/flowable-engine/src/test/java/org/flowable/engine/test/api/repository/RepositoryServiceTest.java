@@ -17,6 +17,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipInputStream;
@@ -267,7 +268,7 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
     public void testNewModelWithSource() throws Exception {
         Model model = repositoryService.newModel();
         model.setName("Test model");
-        byte[] testSource = "modelsource".getBytes("utf-8");
+        byte[] testSource = "modelsource".getBytes(StandardCharsets.UTF_8);
         repositoryService.saveModel(model);
 
         assertNotNull(model.getId());
@@ -278,7 +279,7 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         assertEquals("Test model", model.getName());
 
         byte[] editorSourceBytes = repositoryService.getModelEditorSource(model.getId());
-        assertEquals("modelsource", new String(editorSourceBytes, "utf-8"));
+        assertEquals("modelsource", new String(editorSourceBytes, StandardCharsets.UTF_8));
 
         repositoryService.deleteModel(model.getId());
     }
@@ -304,8 +305,8 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         repositoryService.saveModel(model);
 
         assertNotNull(model.getId());
-        repositoryService.addModelEditorSource(model.getId(), "new".getBytes("utf-8"));
-        repositoryService.addModelEditorSourceExtra(model.getId(), "new".getBytes("utf-8"));
+        repositoryService.addModelEditorSource(model.getId(), "new".getBytes(StandardCharsets.UTF_8));
+        repositoryService.addModelEditorSourceExtra(model.getId(), "new".getBytes(StandardCharsets.UTF_8));
 
         model = repositoryService.getModel(model.getId());
 
@@ -314,8 +315,8 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         assertEquals("test", model.getMetaInfo());
         assertNotNull(model.getCreateTime());
         assertEquals(Integer.valueOf(2), model.getVersion());
-        assertEquals("new", new String(repositoryService.getModelEditorSource(model.getId()), "utf-8"));
-        assertEquals("new", new String(repositoryService.getModelEditorSourceExtra(model.getId()), "utf-8"));
+        assertEquals("new", new String(repositoryService.getModelEditorSource(model.getId()), StandardCharsets.UTF_8));
+        assertEquals("new", new String(repositoryService.getModelEditorSourceExtra(model.getId()), StandardCharsets.UTF_8));
 
         repositoryService.deleteModel(model.getId());
     }

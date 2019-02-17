@@ -19,6 +19,7 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 
@@ -123,7 +124,7 @@ public class ParsedDeploymentTest extends PluggableFlowableTestCase {
     private ResourceEntity buildResource(String name, String text) throws UnsupportedEncodingException {
         ResourceEntityImpl result = new ResourceEntityImpl();
         result.setName(name);
-        result.setBytes(text.getBytes("UTF8"));
+        result.setBytes(text.getBytes(StandardCharsets.UTF_8));
 
         return result;
     }
