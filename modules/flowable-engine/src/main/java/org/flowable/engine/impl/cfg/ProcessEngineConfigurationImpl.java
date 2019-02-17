@@ -2395,10 +2395,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (this.flowableFunctionDelegates == null) {
             this.flowableFunctionDelegates = new ArrayList<>();
             this.flowableFunctionDelegates.add(new FlowableDateFunctionDelegate());
-            
-            for (FlowableShortHandExpressionFunction expressionFunction : shortHandExpressionFunctions) {
-                flowableFunctionDelegates.add(expressionFunction);
-            }
+            flowableFunctionDelegates.addAll(shortHandExpressionFunctions);
         }
 
         if (this.customFlowableFunctionDelegates != null) {
@@ -2409,11 +2406,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initExpressionEnhancers() {
         if (expressionEnhancers == null) {
             expressionEnhancers = new ArrayList<>();
-            
-            for (FlowableShortHandExpressionFunction expressionFunction : shortHandExpressionFunctions) {
-                expressionEnhancers.add(expressionFunction);
-            }
-            
+            expressionEnhancers.addAll(shortHandExpressionFunctions);
         }
         
         if (customExpressionEnhancers != null) {

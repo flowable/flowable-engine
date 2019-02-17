@@ -895,10 +895,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void initFunctionDelegates() {
         if (flowableFunctionDelegates == null) {
             flowableFunctionDelegates = new ArrayList<>();
-            
-            for (FlowableShortHandExpressionFunction expressionFunction : shortHandExpressionFunctions) {
-                flowableFunctionDelegates.add(expressionFunction);
-            }
+            flowableFunctionDelegates.addAll(shortHandExpressionFunctions);
         }
         
         if (customFlowableFunctionDelegates != null) {
@@ -909,11 +906,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void initExpressionEnhancers() {
         if (expressionEnhancers == null) {
             expressionEnhancers = new ArrayList<>();
-            
-            for (FlowableShortHandExpressionFunction expressionFunction : shortHandExpressionFunctions) {
-                expressionEnhancers.add(expressionFunction);
-            }
-            
+            expressionEnhancers.addAll(shortHandExpressionFunctions);
         }
         
         if (customExpressionEnhancers != null) {
