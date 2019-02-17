@@ -331,7 +331,7 @@ public class CronExpression implements Serializable, Cloneable {
 
         Date timeAfter = getTimeAfter(testDateCal.getTime());
 
-        return ((timeAfter != null) && timeAfter.equals(originalDate));
+        return (originalDate.equals(timeAfter));
     }
 
     /**
