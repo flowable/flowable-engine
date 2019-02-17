@@ -18,6 +18,7 @@ public abstract class AbstractBpmnEngineVariableScopeEntity extends VariableScop
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public String getIdPrefix() {
         return BpmnEngineEntityConstants.BPMN_ENGINE_ID_PREFIX;
     }

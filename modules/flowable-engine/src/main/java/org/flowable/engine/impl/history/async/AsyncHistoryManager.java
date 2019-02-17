@@ -698,6 +698,7 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
         }
     }
     
+    @Override
     public void recordHistoricUserTaskLogEntry(HistoricTaskLogEntryBuilder taskLogEntryBuilder) {
         if (processEngineConfiguration.isEnableHistoricTaskLogging()) {
             Map<String, String> data = new HashMap<>();

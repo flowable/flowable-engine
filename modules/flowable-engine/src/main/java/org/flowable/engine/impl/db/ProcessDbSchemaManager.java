@@ -30,6 +30,7 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
     
     protected static final Pattern CLEAN_VERSION_REGEX = Pattern.compile("\\d\\.\\d*");
     
+    @Override
     public void schemaCheckVersion() {
         try {
             String dbVersion = getDbVersion();
