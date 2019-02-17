@@ -191,7 +191,7 @@ public class ProcessInstanceMigrationDocumentConverter {
         return null;
     }
 
-    public static abstract class BaseActivityMigrationMappingConverter<T extends ActivityMigrationMapping> {
+    public abstract static class BaseActivityMigrationMappingConverter<T extends ActivityMigrationMapping> {
 
         public ObjectNode convertToJson(T mapping, ObjectMapper objectMapper) {
             ObjectNode mappingNode = convertMappingInfoToJson(mapping, objectMapper);
