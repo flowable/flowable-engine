@@ -14,8 +14,10 @@
 package org.flowable.idm.engine.test.api.identity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -191,7 +193,7 @@ public class IdentityServiceTest extends PluggableFlowableIdmTestCase {
 
         // Fetch and update the user
         user = idmIdentityService.createUserQuery().userId("johndoe").singleResult();
-        assertTrue(Arrays.equals("niceface".getBytes(), picture.getBytes()), "byte arrays differ");
+        assertArrayEquals("niceface".getBytes(), picture.getBytes(), "byte arrays differ");
         assertEquals("image/string", picture.getMimeType());
 
         // interface definition states that setting picture to null should delete it
@@ -465,7 +467,7 @@ public class IdentityServiceTest extends PluggableFlowableIdmTestCase {
         user.setFirstName("John Doe");
         idmIdentityService.saveUser(user);
         User johndoe = idmIdentityService.createUserQuery().userId("johndoe").list().get(0);
-        assertFalse(johndoe.getPassword().equals("xxx"));
+        assertNotEquals("xxx", johndoe.getPassword());
         assertEquals("John Doe", johndoe.getFirstName());
         assertTrue(idmIdentityService.checkPassword("johndoe", "xxx"));
 

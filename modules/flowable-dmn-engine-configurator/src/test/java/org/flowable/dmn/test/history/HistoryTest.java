@@ -14,6 +14,7 @@ package org.flowable.dmn.test.history;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -52,7 +53,7 @@ public class HistoryTest extends AbstractFlowableDmnEngineConfiguratorTest {
             DmnHistoricDecisionExecution decisionExecution = dmnHistoryService.createHistoricDecisionExecutionQuery().processInstanceIdWithChildren(processInstance.getId()).singleResult();
             assertEquals("decision1", decisionExecution.getDecisionKey());
             String subProcessInstanceId = decisionExecution.getInstanceId();
-            assertFalse(subProcessInstanceId.equals(processInstance.getId()));
+            assertNotEquals(subProcessInstanceId, processInstance.getId());
             
             decisionExecution = dmnHistoryService.createHistoricDecisionExecutionQuery().instanceId(processInstance.getId()).singleResult();
             assertNull(decisionExecution);

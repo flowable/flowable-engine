@@ -13,6 +13,7 @@
 package org.flowable.camel.cdi.std;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
 import java.util.Collections;
@@ -89,7 +90,7 @@ public class CdiSimpleProcessTest extends StdCamelCdiFlowableTestCase {
         String instanceId = (String) exchange.getProperty("PROCESS_ID_PROPERTY");
 
         ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().processInstanceId(instanceId).singleResult();
-        assertEquals(false,processInstance.isEnded());
+        assertFalse(processInstance.isEnded());
 
         tpl.sendBodyAndProperty("direct:receive", null, FlowableProducer.PROCESS_ID_PROPERTY, instanceId);
 
