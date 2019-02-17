@@ -61,7 +61,7 @@ public class GetFormModelWithVariablesCmd implements Command<FormInfo>, Serializ
 
     private static final long serialVersionUID = 1L;
     
-    protected static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-M-d");
+    protected static final String DATE_FORMAT_PATTERN = "yyyy-M-d";
 
     protected String formDefinitionKey;
     protected String parentDeploymentId;
@@ -189,11 +189,11 @@ public class GetFormModelWithVariablesCmd implements Command<FormInfo>, Serializ
                     if (variableValue != null) {
                         if (variableValue instanceof LocalDate) {
                             LocalDate dateVariable = (LocalDate) variableValue;
-                            field.setValue(dateVariable.toString("yyyy-M-d"));
+                            field.setValue(dateVariable.toString(DATE_FORMAT_PATTERN));
                             
                         } else if (variableValue instanceof Date) {
                             Date dateVariable = (Date) variableValue;
-                            field.setValue(DATE_FORMAT.format(dateVariable));
+                            field.setValue(new SimpleDateFormat(DATE_FORMAT_PATTERN).format(dateVariable));
                             
                         } else {
                             field.setValue(variableValue);

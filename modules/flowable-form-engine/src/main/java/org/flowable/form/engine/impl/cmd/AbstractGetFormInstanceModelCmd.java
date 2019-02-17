@@ -65,7 +65,7 @@ public class AbstractGetFormInstanceModelCmd implements Command<FormInstanceInfo
 
     private static final long serialVersionUID = 1L;
     
-    protected static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("d-M-yyyy");
+    protected static final String DATE_FORMAT_PATTERN = "d-M-yyyy";
 
     protected String formInstanceId;
     protected String formDefinitionKey;
@@ -215,9 +215,9 @@ public class AbstractGetFormInstanceModelCmd implements Command<FormInstanceInfo
                     if (variableValue != null) {
                         
                         if (variableValue instanceof LocalDate) {
-                            field.setValue(((LocalDate) variableValue).toString("d-M-yyyy"));
+                            field.setValue(((LocalDate) variableValue).toString(DATE_FORMAT_PATTERN));
                         } else if (variableValue instanceof Date) {
-                            field.setValue(DATE_FORMAT.format((Date) variableValue));
+                            field.setValue(new SimpleDateFormat(DATE_FORMAT_PATTERN).format((Date) variableValue));
                         } else {
                             field.setValue(variableValue);
                         }
