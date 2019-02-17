@@ -85,9 +85,7 @@ public class DefaultAutoDeploymentStrategy extends AbstractAutoDeploymentStrateg
                         resourceName = resource.toString();
                     }
                 }
-                LOGGER.warn("Exception while autodeploying app definition for resource " + resourceName + ". "
-                    + "This exception can be ignored if the root cause indicates a unique constraint violation, "
-                    + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", e);
+                LOGGER.warn("Exception while autodeploying app definition for resource {}. This exception can be ignored if the root cause indicates a unique constraint violation, which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", resourceName, e);
             }
         }
     }

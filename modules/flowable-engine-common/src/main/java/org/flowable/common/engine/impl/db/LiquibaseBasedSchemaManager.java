@@ -182,7 +182,7 @@ public abstract class LiquibaseBasedSchemaManager implements SchemaManager {
                     try {
                         database.close();
                     } catch (DatabaseException e) {
-                        logger.warn("Error closing database for " + context, e);
+                        logger.warn("Error closing database for {}", context, e);
                     }
                 }
             }
