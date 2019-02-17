@@ -58,12 +58,11 @@ public class DecisionTaskJsonConverterTest extends AbstractConverterTest {
     }
 
     protected void assertThatFieldExtension(DecisionTask decisionTask, String fieldName, Object fieldValue) {
-        assertTrue(decisionTask.getFieldExtensions().stream().
-            filter(field -> field.getFieldName().equals(fieldName)).
-            findFirst().
-            orElseThrow(AssertionError::new).
-            getStringValue().equals(fieldValue)
-        );
+        assertEquals(decisionTask.getFieldExtensions().stream().
+                filter(field -> field.getFieldName().equals(fieldName)).
+                findFirst().
+                orElseThrow(AssertionError::new).
+                getStringValue(), fieldValue);
     }
 
 }

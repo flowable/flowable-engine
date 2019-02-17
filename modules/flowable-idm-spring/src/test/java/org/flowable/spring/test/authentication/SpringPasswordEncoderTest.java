@@ -15,6 +15,7 @@ package org.flowable.spring.test.authentication;
 import static junit.framework.TestCase.assertTrue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.PasswordEncoder;
@@ -79,7 +80,7 @@ public class SpringPasswordEncoderTest {
         User johndoe = autoWiredIdmIdentityService.createUserQuery().userId("johndoe").list().get(0);
         LOGGER.info("Hash Password = {}", johndoe.getPassword());
 
-        assertFalse("xxx".equals(johndoe.getPassword()));
+        assertNotEquals("xxx", johndoe.getPassword());
         assertTrue(autoWiredIdmIdentityService.checkPassword("johndoe", "xxx"));
         assertFalse(autoWiredIdmIdentityService.checkPassword("johndoe", "invalid pwd"));
 

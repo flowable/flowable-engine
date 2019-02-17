@@ -55,11 +55,10 @@ public class DecisionTaskConverterTest extends AbstractConverterTest {
     }
 
     protected void assertThatFieldExtension(ServiceTask serviceTask, String fieldName, Object fieldValue) {
-        assertTrue(serviceTask.getFieldExtensions().stream().
-            filter(field -> field.getFieldName().equals(fieldName)).
-            findFirst().
-            orElseThrow(AssertionError::new).
-            getStringValue().equals(fieldValue)
-        );
+        assertEquals(serviceTask.getFieldExtensions().stream().
+                filter(field -> field.getFieldName().equals(fieldName)).
+                findFirst().
+                orElseThrow(AssertionError::new).
+                getStringValue(), fieldValue);
     }
 }
