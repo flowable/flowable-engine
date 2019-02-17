@@ -25,7 +25,7 @@ public enum HistoryLevel {
 
     NONE("none"), ACTIVITY("activity"), AUDIT("audit"), FULL("full");
 
-    private String key;
+    private final String key;
 
     private HistoryLevel(String key) {
         this.key = key;
