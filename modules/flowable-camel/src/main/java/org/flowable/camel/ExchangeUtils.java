@@ -106,12 +106,7 @@ public class ExchangeUtils {
             }
         }
 
-        Object camelBody = null;
-        if (exchange.hasOut()) {
-            camelBody = exchange.getOut().getBody();
-        } else {
-            camelBody = exchange.getIn().getBody();
-        }
+        Object camelBody = exchange.getMessage().getBody();
 
         if (camelBody instanceof Map<?, ?>) {
             Map<?, ?> camelBodyMap = (Map<?, ?>) camelBody;

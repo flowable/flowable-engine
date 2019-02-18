@@ -16,8 +16,8 @@ import java.util.Map;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
-import org.apache.camel.impl.DefaultComponent;
-import org.apache.camel.util.IntrospectionSupport;
+import org.apache.camel.support.DefaultComponent;
+import org.apache.camel.util.PropertiesHelper;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
@@ -74,7 +74,7 @@ public class FlowableComponent extends DefaultComponent {
         ae.setCopyVariablesToBodyAsMap(this.copyVariablesToBodyAsMap);
         ae.setCopyCamelBodyToBody(this.copyCamelBodyToBody);
 
-        Map<String, Object> returnVars = IntrospectionSupport.extractProperties(parameters, "var.return.");
+        Map<String, Object> returnVars = PropertiesHelper.extractProperties(parameters, "var.return.");
         if (returnVars != null && returnVars.size() > 0) {
             ae.getReturnVarMap().putAll(returnVars);
         }

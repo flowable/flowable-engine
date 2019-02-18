@@ -79,7 +79,7 @@ public class CdiCustomNonDefaultNamedContextTest extends NamedCamelCdiFlowableTe
     public void tearDown() throws Exception {
         List<Route> routes = camelContext.getRoutes();
         for (Route r : routes) {
-            camelContext.stopRoute(r.getId());
+            camelContext.getRouteController().stopRoute(r.getId());
             camelContext.removeRoute(r.getId());
         }
     }

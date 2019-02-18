@@ -20,7 +20,7 @@
 		<jackson.version>2.10.2</jackson.version>
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
 		<mule.version>3.8.0</mule.version>
-        <camel.version>2.25.0</camel.version>
+        <camel.version>3.0.0</camel.version>
 		<cxf.version>3.3.5</cxf.version>
 		<slf4j.version>1.7.30</slf4j.version>
 		<spring.boot.version>2.2.5.RELEASE</spring.boot.version>
@@ -1032,7 +1032,27 @@
 			</dependency>
 			<dependency>
 				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-direct</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-seda</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-log</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
 				<artifactId>camel-mvel</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-mock</artifactId>
 				<version>${camel.version}</version>
 			</dependency>
 			<dependency>
