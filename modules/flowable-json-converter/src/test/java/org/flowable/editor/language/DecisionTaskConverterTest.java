@@ -12,11 +12,14 @@
  */
 package org.flowable.editor.language;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ServiceTask;
 import org.junit.Test;
@@ -49,16 +52,12 @@ public class DecisionTaskConverterTest extends AbstractConverterTest {
         assertEquals("decisiontask", serviceTask.getId());
         assertEquals("decision task", serviceTask.getName());
 
-        assertThatFieldExtension(serviceTask, "fallbackToDefaultTenant", "true");
-        assertThatFieldExtension(serviceTask, "decisionTaskThrowErrorOnNoHits", "true");
-
-    }
-
-    protected void assertThatFieldExtension(ServiceTask serviceTask, String fieldName, Object fieldValue) {
-        assertEquals(serviceTask.getFieldExtensions().stream().
-                filter(field -> field.getFieldName().equals(fieldName)).
-                findFirst().
-                orElseThrow(AssertionError::new).
-                getStringValue(), fieldValue);
+        assertThat(serviceTask.getFieldExtensions())
+            .extracting(FieldExtension::getFieldName, FieldExtension::getStringValue)
+            .as("fieldName, stringValue")
+            .contains(
+                tuple("fallbackToDefaultTenant", "true"),
+                tuple("decisionTaskThrowErrorOnNoHits", "true")
+            );
     }
 }
