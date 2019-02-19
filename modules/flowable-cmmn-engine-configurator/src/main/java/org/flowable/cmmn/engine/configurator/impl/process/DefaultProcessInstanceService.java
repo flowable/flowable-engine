@@ -22,10 +22,12 @@ import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.cmmn.model.IOParameter;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.TriggerCaseTaskCmd;
 import org.flowable.engine.impl.persistence.entity.BpmnEngineEntityConstants;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 
@@ -128,8 +130,22 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
     }
 
     @Override
+    public Object getVariable(String executionId, String variableName) {
+        return processEngineConfiguration.getRuntimeService().getVariable(executionId, variableName);
+    }
+
+    @Override
     public Map<String, Object> getVariables(String executionId){
        return processEngineConfiguration.getRuntimeService().getVariables(executionId);
+    }
+
+    @Override
+    public Object resolveExpression(String executionId, String expressionString) {
+        Expression expression = processEngineConfiguration.getExpressionManager().createExpression(expressionString);
+        return processEngineConfiguration.getCommandExecutor().execute(commandContext -> {
+            ExecutionEntity executionEntity = CommandContextUtil.getExecutionEntityManager(commandContext).findById(executionId);
+            return expression.getValue(executionEntity);
+        });
     }
 
 }
