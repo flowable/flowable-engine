@@ -461,6 +461,57 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         assertEquals("Hello World", cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVariable"));
 
     }
+
+    @Test
+    @CmmnDeployment
+    public void testIOParameterCombinations() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testProcessTaskParameterExpressions")
+            .variable("caseVariableA", "variable A from the case instance")
+            .variable("caseVariableName1", "aCaseString1")
+            .variable("caseVariableName2", "aCaseString2")
+            .start();
+
+        PlanItemInstance processTaskPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK)
+            .singleResult();
+        String processInstanceId = processTaskPlanItemInstance.getReferenceId();
+        ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        Assertions.assertThat(processInstance).isNotNull();
+
+        // In parameters
+        Assertions.assertThat(processEngineRuntimeService.getVariable(processInstanceId, "caseVariableA")).isNull();
+        Assertions.assertThat(processEngineRuntimeService.getVariable(processInstanceId, "caseVariableName1")).isNull();
+        Assertions.assertThat(processEngineRuntimeService.getVariable(processInstanceId, "caseVariableName2")).isNull();
+
+        Assertions.assertThat(processEngineRuntimeService.getVariable(processInstanceId, "processVariableA")).isEqualTo("variable A from the case instance");
+        Assertions.assertThat(processEngineRuntimeService.getVariable(processInstanceId, "aCaseString1")).isEqualTo("variable A from the case instance");
+        Assertions.assertThat(processEngineRuntimeService.getVariable(processInstanceId, "processVariableB")).isEqualTo(2L);
+        Assertions.assertThat(processEngineRuntimeService.getVariable(processInstanceId, "aCaseString2")).isEqualTo(4L);
+
+        // Out parameters
+        Task task = processEngineTaskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("processVariableC", "hello");
+        variables.put("processVariableD", 123);
+        variables.put("processVariableName1", "processString1");
+        variables.put("processVariableName2", "processString2");
+        processEngineTaskService.complete(task.getId(), variables);
+
+        Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processVariableC")).isNull();;
+        Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processVariableD")).isNull();;
+        Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processVariableName1")).isNull();;
+        Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processVariableName2")).isNull();;
+
+        Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "caseVariableC")).isEqualTo("hello");
+        Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processString1")).isEqualTo("hello");
+        Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "caseVariableD")).isEqualTo(124L);
+        Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processString2")).isEqualTo(6L);
+
+        Assertions.assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).hasSize(3 + 4); // 3 from start, 4 from out mapping
+        Assertions.assertThat(processEngineHistoryService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId).list()).hasSize(4 + 4); // 4 from in mapping, 4 from task complete
+    }
     
     @Test
     @CmmnDeployment
