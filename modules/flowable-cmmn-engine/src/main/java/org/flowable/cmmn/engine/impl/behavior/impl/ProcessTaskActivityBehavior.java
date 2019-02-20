@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
@@ -36,8 +37,6 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import liquibase.util.StringUtils;
 
 /**
  * @author Joram Barrez
@@ -206,9 +205,7 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
                 variableName = outParameter.getTarget();
 
             } else if (StringUtils.isNotEmpty(outParameter.getTargetExpression())) {
-                Expression expression = cmmnEngineConfiguration.getExpressionManager().createExpression(outParameter.getTargetExpression());
-
-                Object variableNameValue = expression.getValue(planItemInstance);
+                Object variableNameValue = processInstanceService.resolveExpression(planItemInstance.getReferenceId(), outParameter.getTargetExpression());
                 if (variableNameValue != null) {
                     variableName = variableNameValue.toString();
                 } else {
