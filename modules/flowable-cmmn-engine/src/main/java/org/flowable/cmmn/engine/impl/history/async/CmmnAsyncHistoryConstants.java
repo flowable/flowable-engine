@@ -142,6 +142,8 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_TASK_DEFINITION_ID = "taskDefinitionId";
     String FIELD_TASK_DEFINITION_KEY = "taskDefinitionKey";
     String FIELD_TERMINATED_TIME = "terminatedTime";
+    String FIELD_CALLBACK_ID = "callbackId";
+    String FIELD_CALLBACK_TYPE = "callbackType";
     String FIELD_TENANT_ID = "tenantId";
     String FIELD_USER_ID = "userId";
     String FIELD_VARIABLE_BYTES_VALUE = "variableBytesValue";
