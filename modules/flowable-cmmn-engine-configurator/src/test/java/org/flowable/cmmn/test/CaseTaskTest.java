@@ -30,6 +30,7 @@ import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.Test;
 
 /**
@@ -176,6 +177,49 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
 
             processEngine.getTaskService().complete(processTasks.get(0).getId());
             assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
+
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+    
+    @Test
+    @CmmnDeployment(resources = {"org/flowable/cmmn/test/oneProcessTask.cmmn", "org/flowable/cmmn/test/oneServiceTask.cmmn"})
+    public void testCaseHierarchyResolvement() {
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+            .addClasspathResource("org/flowable/cmmn/test/oneCaseTaskProcess.bpmn20.xml")
+            .deploy();
+
+        try {
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneProcessTaskCase").start();
+            assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+            HistoricVariableInstance variableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery()
+                            .variableName("linkCount")
+                            .singleResult();
+            assertEquals(2, variableInstance.getValue());
+
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+    
+    @Test
+    @CmmnDeployment(resources = {"org/flowable/cmmn/test/oneProcessTask.cmmn", "org/flowable/cmmn/test/oneServiceTask.cmmn"})
+    public void testCaseHierarchyResolvementWithUserTask() {
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+            .addClasspathResource("org/flowable/cmmn/test/userTaskAndCaseTaskProcess.bpmn20.xml")
+            .deploy();
+
+        try {
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneProcessTaskCase").start();
+            Task task = processEngineTaskService.createTaskQuery().taskDefinitionKey("userTask").singleResult();
+            processEngineTaskService.complete(task.getId());
+            
+            assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+            HistoricVariableInstance variableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery()
+                            .variableName("linkCount")
+                            .singleResult();
+            assertEquals(2, variableInstance.getValue());
 
         } finally {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);

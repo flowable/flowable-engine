@@ -61,23 +61,13 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
     @Override
     public CaseInstanceEntity startCaseInstance(CaseInstanceBuilder caseInstanceBuilder) {
         CommandContext commandContext = CommandContextUtil.getCommandContext();
-
-        return startCaseInstance(
-            commandContext,
-            getCaseDefinition(caseInstanceBuilder, commandContext),
-            caseInstanceBuilder
-        );
+        return startCaseInstance(commandContext, getCaseDefinition(caseInstanceBuilder, commandContext), caseInstanceBuilder);
     }
 
     @Override
     public CaseInstanceEntity startCaseInstanceAsync(CaseInstanceBuilder caseInstanceBuilder) {
         CommandContext commandContext = CommandContextUtil.getCommandContext();
-
-        return startCaseInstanceAsync(
-            commandContext,
-            getCaseDefinition(caseInstanceBuilder, commandContext),
-            caseInstanceBuilder
-        );
+        return startCaseInstanceAsync(commandContext, getCaseDefinition(caseInstanceBuilder, commandContext), caseInstanceBuilder);
     }
 
     protected CaseDefinition getCaseDefinition(CaseInstanceBuilder caseInstanceBuilder, CommandContext commandContext) {
@@ -167,7 +157,7 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
     protected CaseInstanceEntity initializeCaseInstanceEntity(CommandContext commandContext, CaseDefinition caseDefinition, 
                     CaseInstanceBuilder caseInstanceBuilder) {
         
-        CaseInstanceEntity caseInstanceEntity = createCaseInstanceEntityFromDefinition(commandContext, caseDefinition);
+        CaseInstanceEntity caseInstanceEntity = createCaseInstanceEntityFromDefinition(commandContext, caseDefinition, caseInstanceBuilder);
 
         applyCaseInstanceBuilder(caseInstanceBuilder, caseInstanceEntity, caseDefinition, commandContext);
 
@@ -279,9 +269,16 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         return false;
     }
 
-    protected CaseInstanceEntity createCaseInstanceEntityFromDefinition(CommandContext commandContext, CaseDefinition caseDefinition) {
+    protected CaseInstanceEntity createCaseInstanceEntityFromDefinition(CommandContext commandContext, 
+                    CaseDefinition caseDefinition, CaseInstanceBuilder caseInstanceBuilder) {
+        
         CaseInstanceEntityManager caseInstanceEntityManager = CommandContextUtil.getCaseInstanceEntityManager(commandContext);
         CaseInstanceEntity caseInstanceEntity = caseInstanceEntityManager.create();
+        
+        if (caseInstanceBuilder.getPredefinedCaseInstanceId() != null) {
+            caseInstanceEntity.setId(caseInstanceBuilder.getPredefinedCaseInstanceId());
+        }
+        
         caseInstanceEntity.setCaseDefinitionId(caseDefinition.getId());
         caseInstanceEntity.setStartTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
         caseInstanceEntity.setState(CaseInstanceState.ACTIVE);

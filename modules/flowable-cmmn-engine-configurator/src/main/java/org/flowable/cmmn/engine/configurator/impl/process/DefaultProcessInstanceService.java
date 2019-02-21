@@ -98,7 +98,7 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
     
     @Override
     public List<IOParameter> getOutputParametersOfCaseTask(String executionId) {
-        ExecutionEntity execution = (ExecutionEntity) processEngineConfiguration.getRuntimeService().createExecutionQuery().executionId(executionId).singleResult();
+        ExecutionEntity execution = (ExecutionEntity) processEngineConfiguration.getExecutionEntityManager().findById(executionId);
         if (execution == null) {
             throw new FlowableException("No execution could be found for id " + executionId);
         }

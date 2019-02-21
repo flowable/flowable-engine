@@ -18,6 +18,7 @@ import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.persistence.entity.CmmnEngineEntityConstants;
 import org.flowable.engine.impl.cmmn.CaseInstanceService;
 
 /**
@@ -31,13 +32,25 @@ public class DefaultCaseInstanceService implements CaseInstanceService {
         this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
     
+    @Override
+    public String generateNewCaseInstanceId() {
+        if (cmmnEngineConfiguration.isUsePrefixId()) {
+            return CmmnEngineEntityConstants.CMMN_ENGINE_ID_PREFIX + cmmnEngineConfiguration.getIdGenerator().getNextId();
+        } else {
+            return cmmnEngineConfiguration.getIdGenerator().getNextId();
+        }
+    }
 
     @Override
-    public String startCaseInstanceByKey(String caseDefinitionKey, String caseInstanceName, String businessKey, String executionId, 
+    public String startCaseInstanceByKey(String caseDefinitionKey, String predefinedCaseInstanceId, String caseInstanceName, String businessKey, String executionId, 
                     String tenantId, boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap) {
         
         CaseInstanceBuilder caseInstanceBuilder = cmmnEngineConfiguration.getCmmnRuntimeService().createCaseInstanceBuilder();
         caseInstanceBuilder.caseDefinitionKey(caseDefinitionKey);
+        
+        if (predefinedCaseInstanceId != null) {
+            caseInstanceBuilder.predefinedCaseInstanceId(predefinedCaseInstanceId);
+        }
         
         if (tenantId != null) {
             caseInstanceBuilder.tenantId(tenantId);
