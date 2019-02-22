@@ -279,7 +279,6 @@
                         <exclude>${exclude.tests}</exclude>
                         <exclude>${exclude.tests2}</exclude>
                     </excludes>
-                    <runOrder>alphabetical</runOrder>
                     <argLine>${argLine} -Xmx3g</argLine>
                 </configuration>
             </plugin>
@@ -785,13 +784,11 @@
                         <configuration>
                             <excludes>
                                 <exclude>**/*TestCase.java</exclude>
-
                                 <!-- Disabling tests that run exclusively 
                                     using standalone config -->
                                 <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
                             </excludes>
-                            <runOrder>alphabetical</runOrder>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -860,13 +857,11 @@
                         <configuration>
                             <excludes>
                                 <exclude>**/*TestCase.java</exclude>
-
                                 <!-- Disabling tests that run exclusively 
                                     using standalone config -->
                                 <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
                             </excludes>
-                            <runOrder>alphabetical</runOrder>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -922,7 +917,6 @@
                                 <exclude>org/flowable/standalone/**</exclude>
                                 <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
-                            <runOrder>alphabetical</runOrder>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -1113,7 +1107,6 @@
                                 <exclude>org/flowable/standalone/**</exclude>
                                 <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
-                            <runOrder>alphabetical</runOrder>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -1175,7 +1168,6 @@
                                 <exclude>**/ProcessInstanceLogQueryTest.java</exclude>
                                 <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
-                            <runOrder>alphabetical</runOrder>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -1221,7 +1213,6 @@
                                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
                             </excludes>
-                            <runOrder>alphabetical</runOrder>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -1244,7 +1235,6 @@
                                 <include>**/JdbcMetaDataTest.java</include>
                             </includes>
                             <excludes />
-                            <runOrder>alphabetical</runOrder>
                         </configuration>
                     </plugin>
                     <plugin>
