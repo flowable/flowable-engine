@@ -2494,6 +2494,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return Collections.emptyList();
     }
     
+    @Override
     public ProcessEngineConfigurationImpl addConfigurator(EngineConfigurator configurator) {
         super.addConfigurator(configurator);
         return this;

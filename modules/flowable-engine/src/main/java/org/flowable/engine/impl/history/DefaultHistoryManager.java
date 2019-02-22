@@ -558,6 +558,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
     }
     
+    @Override
     public void recordHistoricUserTaskLogEntry(HistoricTaskLogEntryBuilder taskLogEntryBuilder) {
         CommandContextUtil.getHistoricTaskService().createHistoricTaskLogEntry(taskLogEntryBuilder);
     }

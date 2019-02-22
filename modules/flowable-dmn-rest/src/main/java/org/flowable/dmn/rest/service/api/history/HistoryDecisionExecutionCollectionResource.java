@@ -121,7 +121,7 @@ public class HistoryDecisionExecutionCollectionResource {
             historicDecisionExecutionQuery.caseInstanceIdWithChildren(allRequestParams.get("caseInstanceIdWithChildren"));
         }
         if (allRequestParams.containsKey("failed")) {
-            historicDecisionExecutionQuery.failed(new Boolean(allRequestParams.get("failed")));
+            historicDecisionExecutionQuery.failed(Boolean.valueOf(allRequestParams.get("failed")));
         }
         if (allRequestParams.containsKey("tenantId")) {
             historicDecisionExecutionQuery.tenantId(allRequestParams.get("tenantId"));

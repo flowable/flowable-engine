@@ -520,6 +520,7 @@ public class DefaultJobManager implements JobManager {
         jobEntity.setExclusive(exclusive);
     }
 
+    @Override
     public JobEntity createExecutableJobFromOtherJob(AbstractRuntimeJobEntity job) {
         JobEntity executableJob = jobServiceConfiguration.getJobEntityManager().create();
         copyJobInfo(executableJob, job);
@@ -535,24 +536,28 @@ public class DefaultJobManager implements JobManager {
         return executableJob;
     }
 
+    @Override
     public TimerJobEntity createTimerJobFromOtherJob(AbstractRuntimeJobEntity otherJob) {
         TimerJobEntity timerJob = jobServiceConfiguration.getTimerJobEntityManager().create();
         copyJobInfo(timerJob, otherJob);
         return timerJob;
     }
 
+    @Override
     public SuspendedJobEntity createSuspendedJobFromOtherJob(AbstractRuntimeJobEntity otherJob) {
         SuspendedJobEntity suspendedJob = jobServiceConfiguration.getSuspendedJobEntityManager().create();
         copyJobInfo(suspendedJob, otherJob);
         return suspendedJob;
     }
 
+    @Override
     public DeadLetterJobEntity createDeadLetterJobFromOtherJob(AbstractRuntimeJobEntity otherJob) {
         DeadLetterJobEntity deadLetterJob = jobServiceConfiguration.getDeadLetterJobEntityManager().create();
         copyJobInfo(deadLetterJob, otherJob);
         return deadLetterJob;
     }
 
+    @Override
     public AbstractRuntimeJobEntity copyJobInfo(AbstractRuntimeJobEntity copyToJob, AbstractRuntimeJobEntity copyFromJob) {
         copyToJob.setDuedate(copyFromJob.getDuedate());
         copyToJob.setEndDate(copyFromJob.getEndDate());

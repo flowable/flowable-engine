@@ -83,7 +83,7 @@ public class DurationBusinessCalendar extends BusinessCalendarImpl {
     // }
     //
     // String quantityText = singleUnitQuantity.substring(0, spaceIndex);
-    // Integer quantity = new Integer(quantityText);
+    // Integer quantity = Integer.valueOf(quantityText);
     //
     // String unitText = singleUnitQuantity
     // .substring(spaceIndex+1)

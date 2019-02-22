@@ -253,15 +253,15 @@ public class DecisionExecutionAuditContainer {
                 if (entry.getValue() == null) {
                     // do nothing
                 } else if (entry.getValue() instanceof Long) {
-                    newValue = new Long(((Long) entry.getValue()).longValue());
+                    newValue = Long.valueOf(((Long) entry.getValue()).longValue());
                 } else if (entry.getValue() instanceof Double) {
-                    newValue = new Double(((Double) entry.getValue()).doubleValue());
+                    newValue = Double.valueOf(((Double) entry.getValue()).doubleValue());
                 } else if (entry.getValue() instanceof Integer) {
-                    newValue = new Integer(((Integer) entry.getValue()).intValue());
+                    newValue = Integer.valueOf(((Integer) entry.getValue()).intValue());
                 } else if (entry.getValue() instanceof Date) {
                     newValue = new Date(((Date) entry.getValue()).getTime());
                 } else if (entry.getValue() instanceof Boolean) {
-                    newValue = new Boolean(((Boolean) entry.getValue()).booleanValue());
+                    newValue = Boolean.valueOf(((Boolean) entry.getValue()).booleanValue());
                 } else {
                     newValue = new String(entry.getValue().toString());
                 }

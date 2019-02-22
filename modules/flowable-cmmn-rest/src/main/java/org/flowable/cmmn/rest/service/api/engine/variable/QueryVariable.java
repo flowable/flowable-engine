@@ -71,7 +71,7 @@ public class QueryVariable {
         EQUALS("equals"), NOT_EQUALS("notEquals"), EQUALS_IGNORE_CASE("equalsIgnoreCase"), NOT_EQUALS_IGNORE_CASE("notEqualsIgnoreCase"), LIKE("like"), LIKE_IGNORE_CASE("likeIgnoreCase"), GREATER_THAN("greaterThan"), GREATER_THAN_OR_EQUALS(
                 "greaterThanOrEquals"), LESS_THAN("lessThan"), LESS_THAN_OR_EQUALS("lessThanOrEquals");
 
-        private String friendlyName;
+        private final String friendlyName;
 
         private QueryVariableOperation(String friendlyName) {
             this.friendlyName = friendlyName;

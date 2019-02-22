@@ -88,6 +88,7 @@ public abstract class ServiceSqlScriptBasedDbSchemaManager extends AbstractSqlSc
         return feedback;
     }
     
+    @Override
     public void schemaCheckVersion() {
         String dbVersion = getSchemaVersion();
         if (!FlowableVersions.CURRENT_VERSION.equals(dbVersion)) {
