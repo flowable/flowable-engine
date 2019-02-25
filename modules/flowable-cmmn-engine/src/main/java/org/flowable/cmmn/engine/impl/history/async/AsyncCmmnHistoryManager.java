@@ -16,8 +16,6 @@ import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonU
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.putIfNotNull;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -41,6 +39,8 @@ import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * @author Joram Barrez
  */
@@ -59,7 +59,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
     @Override
     public void recordCaseInstanceStart(CaseInstanceEntity caseInstanceEntity) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-            Map<String, String> data = new HashMap<>();
+            ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonCaseInstanceFields(caseInstanceEntity, data);
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_CASE_INSTANCE_START, data, caseInstanceEntity.getTenantId());
         }
@@ -68,7 +68,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
     @Override
     public void recordCaseInstanceEnd(CaseInstanceEntity caseInstanceEntity, String state) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-            Map<String, String> data = new HashMap<>();
+            ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonCaseInstanceFields(caseInstanceEntity, data);
             
             Date endTime = cmmnEngineConfiguration.getClock().getCurrentTime();
@@ -85,7 +85,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
     @Override
     public void recordUpdateCaseInstanceName(CaseInstanceEntity caseInstanceEntity, String name) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-            Map<String, String> data = new HashMap<>();
+            ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, caseInstanceEntity.getId());
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_NAME, caseInstanceEntity.getName());
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REVISION, caseInstanceEntity.getRevision());
@@ -94,7 +94,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
         }
     }
     
-    protected void addCommonCaseInstanceFields(CaseInstanceEntity caseInstanceEntity, Map<String, String> data) {
+    protected void addCommonCaseInstanceFields(CaseInstanceEntity caseInstanceEntity, ObjectNode data) {
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, caseInstanceEntity.getId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REVISION, caseInstanceEntity.getRevision());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_NAME, caseInstanceEntity.getName());
@@ -118,7 +118,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
     public void recordHistoricCaseInstanceDeleted(String caseInstanceId) {
         // Can only be done after the case instance has been fully ended (see DeleteHistoricCaseInstanceCmd)
         if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
-            Map<String, String> data = new HashMap<>();
+            ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, caseInstanceId);
             
             HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
@@ -147,7 +147,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
         }
     }
 
-    protected void addCaseDefinitionFields(Map<String, String> data, CaseDefinition caseDefinition) {
+    protected void addCaseDefinitionFields(ObjectNode data, CaseDefinition caseDefinition) {
         if (caseDefinition != null) {
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CASE_DEFINITION_ID, caseDefinition.getId());
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CASE_DEFINITION_CATEGORY, caseDefinition.getCategory());
@@ -162,7 +162,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
     @Override
     public void recordMilestoneReached(MilestoneInstanceEntity milestoneInstanceEntity) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-            Map<String, String> data = new HashMap<>();
+            ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, milestoneInstanceEntity.getId());
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REVISION, milestoneInstanceEntity.getRevision());
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_NAME, milestoneInstanceEntity.getName());
@@ -185,7 +185,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
         if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE 
                 && (identityLink.getScopeId() != null || identityLink.getTaskId() != null)) {
             
-            Map<String, String> data = new HashMap<>();
+            ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonIdentityLinkFields(identityLink, data);
             
             CaseDefinition caseDefinition = getCaseDefinition(identityLink);
@@ -202,7 +202,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
     public void recordIdentityLinkDeleted(IdentityLinkEntity identityLink) {
         if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
             
-            Map<String, String> data = new HashMap<>();
+            ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonIdentityLinkFields(identityLink, data);
             
             CaseDefinition caseDefinition = getCaseDefinition(identityLink);
@@ -215,7 +215,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
         }
     }
     
-    protected void addCommonIdentityLinkFields(IdentityLinkEntity identityLink, Map<String, String> data) {
+    protected void addCommonIdentityLinkFields(IdentityLinkEntity identityLink, ObjectNode data) {
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, identityLink.getId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_GROUP_ID, identityLink.getGroupId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SCOPE_DEFINITION_ID, identityLink.getScopeDefinitionId());
@@ -250,7 +250,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
     public void recordEntityLinkCreated(EntityLinkEntity entityLink) {
         if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE && entityLink.getScopeId() != null) {
             
-            Map<String, String> data = new HashMap<>();
+            ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonEntityLinkFields(entityLink, data);
             
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_ENTITY_LINK_CREATED, data, null);
@@ -261,14 +261,14 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
     public void recordEntityLinkDeleted(EntityLinkEntity entityLink) {
         if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
             
-            Map<String, String> data = new HashMap<>();
+            ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonEntityLinkFields(entityLink, data);
             
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_ENTITY_LINK_DELETED, data, null);
         }
     }
     
-    protected void addCommonEntityLinkFields(EntityLinkEntity entityLink, Map<String, String> data) {
+    protected void addCommonEntityLinkFields(EntityLinkEntity entityLink, ObjectNode data) {
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, entityLink.getId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ENTITY_LINK_TYPE, entityLink.getLinkType());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CREATE_TIME, entityLink.getLinkType());
@@ -284,7 +284,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
     @Override
     public void recordVariableCreate(VariableInstanceEntity variable) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            Map<String, String> data = new HashMap<>();
+            ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CREATE_TIME, cmmnEngineConfiguration.getClock().getCurrentTime());
             addCommonVariableFields(variable, data);
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_VARIABLE_CREATED, data);
@@ -294,7 +294,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
     @Override
     public void recordVariableUpdate(VariableInstanceEntity variable) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) { 
-            Map<String, String> data = new HashMap<>();
+            ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonVariableFields(variable, data);
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_VARIABLE_UPDATED, data);
         }
@@ -303,13 +303,13 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
     @Override
     public void recordVariableRemoved(VariableInstanceEntity variable) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            Map<String, String> data = new HashMap<>();
+            ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonVariableFields(variable, data);
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_VARIABLE_REMOVED, data);
         }
     }
     
-    protected void addCommonVariableFields(VariableInstanceEntity variable, Map<String, String> data) {
+    protected void addCommonVariableFields(VariableInstanceEntity variable, ObjectNode data) {
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, variable.getId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_TASK_ID, variable.getTaskId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REVISION, variable.getRevision());
@@ -346,7 +346,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
     @Override
     public void recordTaskCreated(TaskEntity task) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            Map<String, String> data = new HashMap<>();
+            ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonTaskFields(task, data);
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_TASK_CREATED, data, task.getTenantId());
         }
@@ -355,7 +355,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
     @Override
     public void recordTaskInfoChange(TaskEntity task) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            Map<String, String> data = new HashMap<>();
+            ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonTaskFields(task, data);
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_TASK_UPDATED, data, task.getTenantId());
         }
@@ -364,7 +364,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
     @Override
     public void recordTaskEnd(TaskEntity task, String deleteReason) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            Map<String, String> data = new HashMap<>();
+            ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonTaskFields(task, data);
             
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_DELETE_REASON, deleteReason);
@@ -374,7 +374,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
         }
     }
     
-    protected void addCommonTaskFields(TaskEntity task, Map<String, String> data) {
+    protected void addCommonTaskFields(TaskEntity task, ObjectNode data) {
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, task.getId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REVISION, task.getRevision());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_NAME, task.getName());
@@ -408,7 +408,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
     @Override
     public void recordPlanItemInstanceCreated(PlanItemInstanceEntity planItemInstanceEntity) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-            Map<String, String> data = new HashMap<>();
+            ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonPlanItemInstanceFields(planItemInstanceEntity, data);
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_CREATED, data, planItemInstanceEntity.getTenantId());
         }
@@ -471,7 +471,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
     @Override
     public void recordHistoricUserTaskLogEntry(HistoricTaskLogEntryBuilder taskLogEntryBuilder) {
         if (cmmnEngineConfiguration.getTaskServiceConfiguration().isEnableHistoricTaskLogging()) {
-            Map<String, String> data = new HashMap<>();
+            ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LOG_ENTRY_DATA, taskLogEntryBuilder.getData());
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SCOPE_ID, taskLogEntryBuilder.getScopeId());
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SCOPE_TYPE, taskLogEntryBuilder.getScopeType());
@@ -490,14 +490,14 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
     @Override
     public void deleteHistoricUserTaskLogEntry(long logNumber) {
         if (cmmnEngineConfiguration.getTaskServiceConfiguration().isEnableHistoricTaskLogging()) {
-            Map<String, String> data = new HashMap<>();
+            ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LOG_ENTRY_LOGNUMBER, logNumber);
 
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_HISTORIC_USER_TASK_LOG_DELETE, data);
         }
     }
 
-    protected void addCommonPlanItemInstanceFields(PlanItemInstanceEntity planItemInstanceEntity, Map<String, String> data) {
+    protected void addCommonPlanItemInstanceFields(PlanItemInstanceEntity planItemInstanceEntity, ObjectNode data) {
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, planItemInstanceEntity.getId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REVISION, planItemInstanceEntity.getRevision());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_NAME, planItemInstanceEntity.getName());
@@ -524,7 +524,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
     
     protected void updatePlanItemInstanceTimeStamp(PlanItemInstanceEntity planItemInstanceEntity, Date time, String type, String...fields) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-            Map<String, String> data = new HashMap<>();
+            ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonPlanItemInstanceFields(planItemInstanceEntity, data);
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_UPDATE_TIME, time);
             for (String field : fields) {
