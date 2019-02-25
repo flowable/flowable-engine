@@ -27,6 +27,8 @@ import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.util.CommandContextUtil;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 public class AsyncHistorySession implements Session {
     
     public static final String TIMESTAMP = "__timeStamp"; // Two underscores to avoid clashes with other fields
@@ -71,12 +73,12 @@ public class AsyncHistorySession implements Session {
         this.commandContextCloseListener = new AsyncHistorySessionCommandContextCloseListener(this, asyncHistoryListener); 
     }
     
-    public void addHistoricData(String type, Map<String, String> data) {
+    public void addHistoricData(String type, ObjectNode data) {
         JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration();
         addHistoricData(jobServiceConfiguration, type, data, null);
     }
 
-    public void addHistoricData(String type, Map<String, String> data, String tenantId) {
+    public void addHistoricData(String type, ObjectNode data, String tenantId) {
         
         // Different engines can call each other and all generate historical data.
         // To make sure the context of where the data is coming from (and thus being able to process it in the right context),
@@ -86,11 +88,11 @@ public class AsyncHistorySession implements Session {
         addHistoricData(jobServiceConfiguration, type, data, tenantId);
     }
     
-    public void addHistoricData(JobServiceConfiguration jobServiceConfiguration, String type, Map<String, String> data) {
+    public void addHistoricData(JobServiceConfiguration jobServiceConfiguration, String type, ObjectNode data) {
         addHistoricData(jobServiceConfiguration, type, data, null);
     }
 
-    public void addHistoricData(JobServiceConfiguration jobServiceConfiguration, String type, Map<String, String> data, String tenantId) {
+    public void addHistoricData(JobServiceConfiguration jobServiceConfiguration, String type, ObjectNode data, String tenantId) {
         data.put(TIMESTAMP, AsyncHistoryDateUtil.formatDate(CommandContextUtil.getJobServiceConfiguration(commandContext).getClock().getCurrentTime()));
         
         if (sessionData == null) {
@@ -158,15 +160,15 @@ public class AsyncHistorySession implements Session {
      */
     public static class AsyncHistorySessionData { 
         
-        protected Map<String, List<Map<String, String>>> jobData = new LinkedHashMap<>(); // A map of {type, list of map-data (the historical event)}. Linked because insertion order is important
+        protected Map<String, List<ObjectNode>> jobData = new LinkedHashMap<>(); // A map of {type, list of map-data (the historical event)}. Linked because insertion order is important
         
-        public Map<String, List<Map<String, String>>> getJobData() {
+        public Map<String, List<ObjectNode>> getJobData() {
             return jobData;
         }
-        public void setJobData(Map<String, List<Map<String, String>>> jobData) {
+        public void setJobData(Map<String, List<ObjectNode>> jobData) {
             this.jobData = jobData;
         }
-        public void addJobData(String type, Map<String, String> data) {
+        public void addJobData(String type, ObjectNode data) {
             if (!jobData.containsKey(type)) {
                 jobData.put(type, new ArrayList<>(1));
             }
