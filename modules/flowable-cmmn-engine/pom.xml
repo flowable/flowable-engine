@@ -153,6 +153,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-dmn-api</artifactId>
         </dependency>
