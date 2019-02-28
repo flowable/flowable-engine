@@ -131,7 +131,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordSubProcessInstanceStart(executionEntity, subProcessInstance);
 
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
-        if (eventDispatcher.isEnabled()) {
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
                     FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_CREATED, subProcessInstance));
         }
@@ -191,7 +191,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
             subProcessInstance.setName(processInstanceName);
         }
 
-        if (eventDispatcher.isEnabled()) {
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, subProcessInstance));
         }
         
@@ -206,7 +206,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
 
         CommandContextUtil.getAgenda().planContinueProcessOperation(subProcessInitialExecution);
 
-        if (eventDispatcher.isEnabled()) {
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(subProcessInitialExecution, variables, false));
         }
     }

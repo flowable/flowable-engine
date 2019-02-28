@@ -149,7 +149,7 @@ public class DeploymentEntityManagerImpl extends AbstractEntityManager<Deploymen
         List<TimerJobEntity> timerStartJobs = timerJobService.findJobsByTypeAndProcessDefinitionId(TimerStartEventJobHandler.TYPE, processDefinition.getId());
         if (timerStartJobs != null && timerStartJobs.size() > 0) {
             for (TimerJobEntity timerStartJob : timerStartJobs) {
-                if (getEventDispatcher().isEnabled()) {
+                if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
                     getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timerStartJob, null, null, processDefinition.getId()));
                 }
 

@@ -58,7 +58,7 @@ public class GroupEntityManagerImpl extends AbstractEntityManager<GroupEntity> i
         if (group != null) {
 
             getMembershipEntityManager().deleteMembershipByGroupId(groupId);
-            if (getEventDispatcher().isEnabled()) {
+            if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
                 getEventDispatcher().dispatchEvent(FlowableIdmEventBuilder.createMembershipEvent(FlowableIdmEventType.MEMBERSHIPS_DELETED, groupId, null));
             }
 

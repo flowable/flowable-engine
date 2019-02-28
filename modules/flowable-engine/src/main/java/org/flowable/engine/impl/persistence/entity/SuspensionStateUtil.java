@@ -14,9 +14,11 @@ package org.flowable.engine.impl.persistence.entity;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.task.api.history.HistoricTaskLogEntryType;
@@ -76,14 +78,19 @@ public class SuspensionStateUtil {
     }
 
     protected static void dispatchStateChangeEvent(Object entity, SuspensionState state) {
-        if (Context.getCommandContext() != null && CommandContextUtil.getEventDispatcher().isEnabled()) {
+        CommandContext commandContext = Context.getCommandContext();
+        FlowableEventDispatcher eventDispatcher = null;
+        if (commandContext != null) {
+            eventDispatcher = CommandContextUtil.getEventDispatcher();
+        }
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             FlowableEngineEventType eventType = null;
             if (state == SuspensionState.ACTIVE) {
                 eventType = FlowableEngineEventType.ENTITY_ACTIVATED;
             } else {
                 eventType = FlowableEngineEventType.ENTITY_SUSPENDED;
             }
-            CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(eventType, entity));
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(eventType, entity));
         }
     }
 
