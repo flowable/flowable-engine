@@ -49,7 +49,7 @@ public class CommentEntityManagerImpl extends AbstractEntityManager<CommentEntit
         insert(commentEntity, false);
 
         Comment comment = (Comment) commentEntity;
-        if (getEventDispatcher().isEnabled()) {
+        if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
             // Forced to fetch the process-instance to associate the right
             // process definition
             String processDefinitionId = null;
@@ -73,7 +73,7 @@ public class CommentEntityManagerImpl extends AbstractEntityManager<CommentEntit
 
         CommentEntity updatedCommentEntity = update(commentEntity, false);
 
-        if (getEventDispatcher().isEnabled()) {
+        if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
             // Forced to fetch the process-instance to associate the right
             // process definition
             String processDefinitionId = null;
@@ -162,7 +162,7 @@ public class CommentEntityManagerImpl extends AbstractEntityManager<CommentEntit
         delete(commentEntity, false);
 
         Comment comment = (Comment) commentEntity;
-        if (getEventDispatcher().isEnabled()) {
+        if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
             // Forced to fetch the process-instance to associate the right
             // process definition
             String processDefinitionId = null;

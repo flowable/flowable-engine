@@ -24,6 +24,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
@@ -231,8 +232,9 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_CREATE);
 
             // All properties set, now firing 'create' events
-            if (CommandContextUtil.getTaskServiceConfiguration(commandContext).getEventDispatcher().isEnabled()) {
-                CommandContextUtil.getTaskServiceConfiguration(commandContext).getEventDispatcher().dispatchEvent(
+            FlowableEventDispatcher eventDispatcher = CommandContextUtil.getTaskServiceConfiguration(commandContext).getEventDispatcher();
+            if (eventDispatcher != null  && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(
                         FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
             }
             

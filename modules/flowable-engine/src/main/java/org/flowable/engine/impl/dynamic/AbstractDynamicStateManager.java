@@ -604,7 +604,7 @@ public abstract class AbstractDynamicStateManager {
                         CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(newChildExecution);
 
                         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
-                        if (eventDispatcher.isEnabled()) {
+                        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
                             eventDispatcher.dispatchEvent(
                                 FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, newFlowElement.getId(), newFlowElement.getName(), newChildExecution.getId(),
                                     newChildExecution.getProcessInstanceId(), newChildExecution.getProcessDefinitionId(), newFlowElement));
@@ -690,7 +690,7 @@ public abstract class AbstractDynamicStateManager {
         subProcessExecution.setScope(true);
 
         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
-        if (eventDispatcher.isEnabled()) {
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(
                 FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, subProcess.getId(), subProcess.getName(), subProcessExecution.getId(),
                     subProcessExecution.getProcessInstanceId(), subProcessExecution.getProcessDefinitionId(), subProcess));
@@ -780,7 +780,7 @@ public abstract class AbstractDynamicStateManager {
         CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordSubProcessInstanceStart(parentExecution, subProcessInstance);
 
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
-        if (eventDispatcher.isEnabled()) {
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_CREATED, subProcessInstance));
         }
 
@@ -813,7 +813,7 @@ public abstract class AbstractDynamicStateManager {
             subProcessInstance.setVariables(variables);
         }
 
-        if (eventDispatcher.isEnabled()) {
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, subProcessInstance));
         }
 

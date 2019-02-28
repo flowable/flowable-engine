@@ -48,8 +48,8 @@ public class StartProcessInstanceAsyncCmd extends StartProcessInstanceCmd {
 
         processInstanceHelper.processAvailableEventSubProcesses(processInstance, process, commandContext);
 
-        if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
+        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(execution, variables, false));
         }
 

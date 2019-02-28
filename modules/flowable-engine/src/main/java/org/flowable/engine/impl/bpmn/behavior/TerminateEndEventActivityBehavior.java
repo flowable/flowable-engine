@@ -21,6 +21,7 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -171,8 +172,12 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
 
             // Fire event
             ProcessEngineConfigurationImpl config = CommandContextUtil.getProcessEngineConfiguration();
-            if (config != null && config.getEventDispatcher().isEnabled()) {
-                config.getEventDispatcher().dispatchEvent(
+            FlowableEventDispatcher eventDispatcher = null;
+            if (config != null) {
+                eventDispatcher = config.getEventDispatcher();
+            }
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(
                         FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance));
             }
         }
@@ -219,8 +224,9 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
         Process process = ProcessDefinitionUtil.getProcess(execution.getProcessDefinitionId());
         CommandContextUtil.getProcessEngineConfiguration().getListenerNotificationHelper()
             .executeExecutionListeners(process, execution, ExecutionListener.EVENTNAME_END);
-        
-        if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+
+        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             if ((execution.isProcessInstanceType() && execution.getSuperExecutionId() == null) ||
                     (execution.getParentId() == null && execution.getSuperExecutionId() != null)) {
 
@@ -234,7 +240,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
                 }
                 
                 if (fireEvent) {
-                    CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher()
+                    eventDispatcher
                         .dispatchEvent(FlowableEventBuilder.createTerminateEvent(execution, terminateEndEvent));
                 }
                 

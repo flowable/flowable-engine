@@ -196,7 +196,7 @@ public class DeploymentManager {
         for (ProcessDefinition processDefinition : processDefinitions) {
 
             // Since all process definitions are deleted by a single query, we should dispatch the events in this loop
-            if (eventDispatcher.isEnabled()) {
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
                 eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, processDefinition));
             }
         }
@@ -205,7 +205,7 @@ public class DeploymentManager {
         deploymentEntityManager.deleteDeployment(deploymentId, cascade);
 
         // Since we use a delete by query, delete-events are not automatically dispatched
-        if (eventDispatcher.isEnabled()) {
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, deployment));
         }
 

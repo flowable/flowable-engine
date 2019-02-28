@@ -42,7 +42,7 @@ public class CountingEntityUtil {
         }
         
         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher(commandContext);
-        if (fireDeleteEvent && eventDispatcher.isEnabled()) {
+        if (fireDeleteEvent && eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, variableInstance));
     
             eventDispatcher.dispatchEvent(EventUtil.createVariableDeleteEvent(variableInstance));
