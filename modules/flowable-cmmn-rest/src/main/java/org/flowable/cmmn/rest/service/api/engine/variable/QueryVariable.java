@@ -17,6 +17,8 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * @author Frederik Heremans
  */
@@ -36,6 +38,7 @@ public class QueryVariable {
         this.name = name;
     }
 
+    @ApiModelProperty(hidden = true)
     public QueryVariableOperation getVariableOperation() {
         if (operation == null) {
             return null;
@@ -43,6 +46,7 @@ public class QueryVariable {
         return QueryVariableOperation.forFriendlyName(operation);
     }
 
+    @ApiModelProperty(allowableValues = "equals, notEquals, equalsIgnoreCase, notEqualsIgnoreCase, like, likeIgnoreCase, greaterThan, greaterThanOrEquals, lessThan, lessThanOrEquals")
     public void setOperation(String operation) {
         this.operation = operation;
     }
