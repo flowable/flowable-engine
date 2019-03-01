@@ -6,6 +6,10 @@
 
     <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
 
+        <!-- cockroachdb specific -->
+        <property name="bulkInsertEnabled" value="false" />
+        <property name="databaseType" value="cockroachdb" />
+
         <property name="jdbcUrl" value="jdbc:postgresql://127.0.0.1:26257/flowable?sslmode=disable" />
         <property name="jdbcDriver" value="org.postgresql.Driver" />
         <property name="jdbcUsername" value="flowable" />
@@ -45,9 +49,6 @@
         <property name="enableProcessDefinitionHistoryLevel" value="true" />
         <property name="enableProcessDefinitionInfoCache" value="true" />
         <property name="enableHistoricTaskLogging" value="true"/>
-
-        <!-- cockroachdb specific -->
-        <property name="bulkInsertEnabled" value="false" />
 
     </bean>
 
