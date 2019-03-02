@@ -1,1 +1,1 @@
-drop table if exists act_ru_variable cascade;
+drop table if exists ${databaseSchema}act_ru_variable cascade;

@@ -1,4 +1,4 @@
-create table ACT_RU_JOB (
+CREATE TABLE ${databaseSchema}ACT_RU_JOB (
     ID_ varchar(64) NOT NULL,
     REV_ integer,
     TYPE_ varchar(255) NOT NULL,
@@ -25,7 +25,7 @@ create table ACT_RU_JOB (
     primary key (ID_)
 );
 
-create table ACT_RU_TIMER_JOB (
+CREATE TABLE ${databaseSchema}ACT_RU_TIMER_JOB (
     ID_ varchar(64) NOT NULL,
     REV_ integer,
     TYPE_ varchar(255) NOT NULL,
@@ -52,7 +52,7 @@ create table ACT_RU_TIMER_JOB (
     primary key (ID_)
 );
 
-create table ACT_RU_SUSPENDED_JOB (
+CREATE TABLE ${databaseSchema}ACT_RU_SUSPENDED_JOB (
     ID_ varchar(64) NOT NULL,
     REV_ integer,
     TYPE_ varchar(255) NOT NULL,
@@ -77,7 +77,7 @@ create table ACT_RU_SUSPENDED_JOB (
     primary key (ID_)
 );
 
-create table ACT_RU_DEADLETTER_JOB (
+CREATE TABLE ${databaseSchema}ACT_RU_DEADLETTER_JOB (
     ID_ varchar(64) NOT NULL,
     REV_ integer,
     TYPE_ varchar(255) NOT NULL,
@@ -101,7 +101,7 @@ create table ACT_RU_DEADLETTER_JOB (
     primary key (ID_)
 );
 
-create table ACT_RU_HISTORY_JOB (
+CREATE TABLE ${databaseSchema}ACT_RU_HISTORY_JOB (
     ID_ varchar(64) NOT NULL,
     REV_ integer,
     LOCK_EXP_TIME_ timestamp,
@@ -119,72 +119,72 @@ create table ACT_RU_HISTORY_JOB (
     primary key (ID_)
 );
 
-create index ACT_IDX_JOB_EXCEPTION_STACK_ID on ACT_RU_JOB(EXCEPTION_STACK_ID_);
-create index ACT_IDX_JOB_CUSTOM_VALUES_ID on ACT_RU_JOB(CUSTOM_VALUES_ID_);
+create index ACT_IDX_JOB_EXCEPTION_STACK_ID on ${databaseSchema}ACT_RU_JOB(EXCEPTION_STACK_ID_);
+create index ACT_IDX_JOB_CUSTOM_VALUES_ID on ${databaseSchema}ACT_RU_JOB(CUSTOM_VALUES_ID_);
 
-create index ACT_IDX_TIMER_JOB_EXCEPTION_STACK_ID on ACT_RU_TIMER_JOB(EXCEPTION_STACK_ID_);
-create index ACT_IDX_TIMER_JOB_CUSTOM_VALUES_ID on ACT_RU_TIMER_JOB(CUSTOM_VALUES_ID_);
+create index ACT_IDX_TIMER_JOB_EXCEPTION_STACK_ID on ${databaseSchema}ACT_RU_TIMER_JOB(EXCEPTION_STACK_ID_);
+create index ACT_IDX_TIMER_JOB_CUSTOM_VALUES_ID on ${databaseSchema}ACT_RU_TIMER_JOB(CUSTOM_VALUES_ID_);
 
-create index ACT_IDX_SUSPENDED_JOB_EXCEPTION_STACK_ID on ACT_RU_SUSPENDED_JOB(EXCEPTION_STACK_ID_);
-create index ACT_IDX_SUSPENDED_JOB_CUSTOM_VALUES_ID on ACT_RU_SUSPENDED_JOB(CUSTOM_VALUES_ID_);
+create index ACT_IDX_SUSPENDED_JOB_EXCEPTION_STACK_ID on ${databaseSchema}ACT_RU_SUSPENDED_JOB(EXCEPTION_STACK_ID_);
+create index ACT_IDX_SUSPENDED_JOB_CUSTOM_VALUES_ID on ${databaseSchema}ACT_RU_SUSPENDED_JOB(CUSTOM_VALUES_ID_);
 
-create index ACT_IDX_DEADLETTER_JOB_EXCEPTION_STACK_ID on ACT_RU_DEADLETTER_JOB(EXCEPTION_STACK_ID_);
-create index ACT_IDX_DEADLETTER_JOB_CUSTOM_VALUES_ID on ACT_RU_DEADLETTER_JOB(CUSTOM_VALUES_ID_);
+create index ACT_IDX_DEADLETTER_JOB_EXCEPTION_STACK_ID on ${databaseSchema}ACT_RU_DEADLETTER_JOB(EXCEPTION_STACK_ID_);
+create index ACT_IDX_DEADLETTER_JOB_CUSTOM_VALUES_ID on ${databaseSchema}ACT_RU_DEADLETTER_JOB(CUSTOM_VALUES_ID_);
 
-alter table ACT_RU_JOB
+alter table ${databaseSchema}ACT_RU_JOB
     add constraint ACT_FK_JOB_EXCEPTION
     foreign key (EXCEPTION_STACK_ID_)
-    references ACT_GE_BYTEARRAY (ID_);
+    references ${databaseSchema}ACT_GE_BYTEARRAY (ID_);
 
-alter table ACT_RU_JOB
+alter table ${databaseSchema}ACT_RU_JOB
     add constraint ACT_FK_JOB_CUSTOM_VALUES
     foreign key (CUSTOM_VALUES_ID_)
-    references ACT_GE_BYTEARRAY (ID_);
+    references ${databaseSchema}ACT_GE_BYTEARRAY (ID_);
 
-alter table ACT_RU_TIMER_JOB
+alter table ${databaseSchema}ACT_RU_TIMER_JOB
     add constraint ACT_FK_TIMER_JOB_EXCEPTION
     foreign key (EXCEPTION_STACK_ID_)
-    references ACT_GE_BYTEARRAY (ID_);
+    references ${databaseSchema}ACT_GE_BYTEARRAY (ID_);
 
-alter table ACT_RU_TIMER_JOB
+alter table ${databaseSchema}ACT_RU_TIMER_JOB
     add constraint ACT_FK_TIMER_JOB_CUSTOM_VALUES
     foreign key (CUSTOM_VALUES_ID_)
-    references ACT_GE_BYTEARRAY (ID_);
+    references ${databaseSchema}ACT_GE_BYTEARRAY (ID_);
 
-alter table ACT_RU_SUSPENDED_JOB
+alter table ${databaseSchema}ACT_RU_SUSPENDED_JOB
     add constraint ACT_FK_SUSPENDED_JOB_EXCEPTION
     foreign key (EXCEPTION_STACK_ID_)
-    references ACT_GE_BYTEARRAY (ID_);
+    references ${databaseSchema}ACT_GE_BYTEARRAY (ID_);
 
-alter table ACT_RU_SUSPENDED_JOB
+alter table ${databaseSchema}ACT_RU_SUSPENDED_JOB
     add constraint ACT_FK_SUSPENDED_JOB_CUSTOM_VALUES
     foreign key (CUSTOM_VALUES_ID_)
-    references ACT_GE_BYTEARRAY (ID_);
+    references ${databaseSchema}ACT_GE_BYTEARRAY (ID_);
 
-alter table ACT_RU_DEADLETTER_JOB
+alter table ${databaseSchema}ACT_RU_DEADLETTER_JOB
     add constraint ACT_FK_DEADLETTER_JOB_EXCEPTION
     foreign key (EXCEPTION_STACK_ID_)
-    references ACT_GE_BYTEARRAY (ID_);
+    references ${databaseSchema}ACT_GE_BYTEARRAY (ID_);
 
-alter table ACT_RU_DEADLETTER_JOB
+alter table ${databaseSchema}ACT_RU_DEADLETTER_JOB
     add constraint ACT_FK_DEADLETTER_JOB_CUSTOM_VALUES
     foreign key (CUSTOM_VALUES_ID_)
-    references ACT_GE_BYTEARRAY (ID_);
+    references ${databaseSchema}ACT_GE_BYTEARRAY (ID_);
 
-create index ACT_IDX_JOB_SCOPE on ACT_RU_JOB(SCOPE_ID_, SCOPE_TYPE_);
-create index ACT_IDX_JOB_SUB_SCOPE on ACT_RU_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
-create index ACT_IDX_JOB_SCOPE_DEF on ACT_RU_JOB(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
+create index ACT_IDX_JOB_SCOPE on ${databaseSchema}ACT_RU_JOB(SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_JOB_SUB_SCOPE on ${databaseSchema}ACT_RU_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_JOB_SCOPE_DEF on ${databaseSchema}ACT_RU_JOB(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
-create index ACT_IDX_TJOB_SCOPE on ACT_RU_TIMER_JOB(SCOPE_ID_, SCOPE_TYPE_);
-create index ACT_IDX_TJOB_SUB_SCOPE on ACT_RU_TIMER_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
-create index ACT_IDX_TJOB_SCOPE_DEF on ACT_RU_TIMER_JOB(SCOPE_DEFINITION_ID_, SCOPE_TYPE_); 
+create index ACT_IDX_TJOB_SCOPE on ${databaseSchema}ACT_RU_TIMER_JOB(SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_TJOB_SUB_SCOPE on ${databaseSchema}ACT_RU_TIMER_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_TJOB_SCOPE_DEF on ${databaseSchema}ACT_RU_TIMER_JOB(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
-create index ACT_IDX_SJOB_SCOPE on ACT_RU_SUSPENDED_JOB(SCOPE_ID_, SCOPE_TYPE_);
-create index ACT_IDX_SJOB_SUB_SCOPE on ACT_RU_SUSPENDED_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
-create index ACT_IDX_SJOB_SCOPE_DEF on ACT_RU_SUSPENDED_JOB(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);   
+create index ACT_IDX_SJOB_SCOPE on ${databaseSchema}ACT_RU_SUSPENDED_JOB(SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_SJOB_SUB_SCOPE on ${databaseSchema}ACT_RU_SUSPENDED_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_SJOB_SCOPE_DEF on ${databaseSchema}ACT_RU_SUSPENDED_JOB(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
-create index ACT_IDX_DJOB_SCOPE on ACT_RU_DEADLETTER_JOB(SCOPE_ID_, SCOPE_TYPE_);
-create index ACT_IDX_DJOB_SUB_SCOPE on ACT_RU_DEADLETTER_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
-create index ACT_IDX_DJOB_SCOPE_DEF on ACT_RU_DEADLETTER_JOB(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
+create index ACT_IDX_DJOB_SCOPE on ${databaseSchema}ACT_RU_DEADLETTER_JOB(SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_DJOB_SUB_SCOPE on ${databaseSchema}ACT_RU_DEADLETTER_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_DJOB_SCOPE_DEF on ${databaseSchema}ACT_RU_DEADLETTER_JOB(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
-insert into ACT_GE_PROPERTY values ('job.schema.version', '6.5.0.0', 1);
+insert into ${databaseSchema}ACT_GE_PROPERTY values ('job.schema.version', '6.5.0.0', 1);

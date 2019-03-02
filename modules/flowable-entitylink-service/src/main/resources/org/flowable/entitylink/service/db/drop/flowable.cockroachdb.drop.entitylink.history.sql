@@ -1,1 +1,1 @@
-drop table if exists act_hi_entitylink cascade;
+drop table if exists ${databaseSchema}act_hi_entitylink cascade;

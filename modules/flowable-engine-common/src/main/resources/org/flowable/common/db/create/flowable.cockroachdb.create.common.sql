@@ -1,11 +1,11 @@
-create table ACT_GE_PROPERTY (
+CREATE TABLE ${databaseSchema}ACT_GE_PROPERTY (
     NAME_ varchar(64),
     VALUE_ varchar(300),
     REV_ integer,
     primary key (NAME_)
 );
 
-create table ACT_GE_BYTEARRAY (
+CREATE TABLE ${databaseSchema}ACT_GE_BYTEARRAY (
     ID_ varchar(64),
     REV_ integer,
     NAME_ varchar(255),
@@ -15,8 +15,8 @@ create table ACT_GE_BYTEARRAY (
     primary key (ID_)
 );
 
-insert into ACT_GE_PROPERTY
+insert into ${databaseSchema}ACT_GE_PROPERTY
 values ('common.schema.version', '6.5.0.0', 1);
 
-insert into ACT_GE_PROPERTY
+insert into ${databaseSchema}ACT_GE_PROPERTY
 values ('next.dbid', '1', 1);

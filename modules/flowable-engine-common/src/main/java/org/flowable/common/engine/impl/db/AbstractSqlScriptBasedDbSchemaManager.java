@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -246,7 +247,7 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
             Connection connection = dbSqlSession.getSqlSession().getConnection();
             Exception exception = null;
             byte[] bytes = IoUtil.readInputStream(inputStream, resourceName);
-            String ddlStatements = new String(bytes);
+            String ddlStatements = new String(bytes, StandardCharsets.UTF_8);
 
             // Special DDL handling for certain databases
             try {
@@ -306,7 +307,11 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
 
                         Statement jdbcStatement = connection.createStatement();
                         try {
-                            // no logging needed as the connection will log it
+
+                            if (sqlStatement.contains("${databaseSchema}")) {
+                                sqlStatement = sqlStatement.replace("${databaseSchema}", dbSqlSession.getDbSqlSessionFactory().getDatabaseSchema() + ".");
+                            }
+
                             logger.debug("SQL: {}", sqlStatement);
                             jdbcStatement.execute(sqlStatement);
                             jdbcStatement.close();

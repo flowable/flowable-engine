@@ -1,4 +1,4 @@
-create table ACT_HI_VARINST (
+create table ${databaseSchema}ACT_HI_VARINST (
     ID_ varchar(64) not null,
     REV_ integer default 1,
     PROC_INST_ID_ varchar(64),
@@ -19,6 +19,6 @@ create table ACT_HI_VARINST (
     primary key (ID_)
 );
 
-create index ACT_IDX_HI_PROCVAR_NAME_TYPE on ACT_HI_VARINST(NAME_, VAR_TYPE_);
-create index ACT_IDX_HI_VAR_SCOPE_ID_TYPE on ACT_HI_VARINST(SCOPE_ID_, SCOPE_TYPE_);
-create index ACT_IDX_HI_VAR_SUB_ID_TYPE on ACT_HI_VARINST(SUB_SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_HI_PROCVAR_NAME_TYPE on ${databaseSchema}ACT_HI_VARINST(NAME_, VAR_TYPE_);
+create index ACT_IDX_HI_VAR_SCOPE_ID_TYPE on ${databaseSchema}ACT_HI_VARINST(SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_HI_VAR_SUB_ID_TYPE on ${databaseSchema}ACT_HI_VARINST(SUB_SCOPE_ID_, SCOPE_TYPE_);
