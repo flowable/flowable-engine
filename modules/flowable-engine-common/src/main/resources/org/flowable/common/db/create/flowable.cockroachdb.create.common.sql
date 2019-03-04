@@ -20,3 +20,5 @@ values ('common.schema.version', '6.5.0.0', 1);
 
 insert into ${databaseSchema}ACT_GE_PROPERTY
 values ('next.dbid', '1', 1);
+
+-- force-commit

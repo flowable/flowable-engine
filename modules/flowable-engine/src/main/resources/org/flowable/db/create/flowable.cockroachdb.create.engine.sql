@@ -103,8 +103,11 @@ CREATE TABLE ${databaseSchema}ACT_RU_EVENT_SUBSCR (
     primary key (ID_)
 );
 
+-- Cockroachdb specific
+create sequence ${databaseSchema}act_evt_log_nr__seq MINVALUE 1 MAXVALUE 9223372036854775807 INCREMENT 1 START 1;
+
 CREATE TABLE ${databaseSchema}ACT_EVT_LOG (
-    LOG_NR_ SERIAL PRIMARY KEY,
+    LOG_NR_ INT NOT NULL DEFAULT nextval('${databaseSchema}act_evt_log_nr__seq':::STRING),
     TYPE_ varchar(64),
     PROC_DEF_ID_ varchar(64),
     PROC_INST_ID_ varchar(64),
@@ -160,6 +163,39 @@ create index ACT_IDX_RU_ACTI_PROC_ACT on ${databaseSchema}ACT_RU_ACTINST(PROC_IN
 create index ACT_IDX_RU_ACTI_EXEC on ${databaseSchema}ACT_RU_ACTINST(EXECUTION_ID_);
 create index ACT_IDX_RU_ACTI_EXEC_ACT on ${databaseSchema}ACT_RU_ACTINST(EXECUTION_ID_, ACT_ID_);
 
+create index ACT_IDX_EXE_PROCINST on ${databaseSchema}ACT_RU_EXECUTION(PROC_INST_ID_);
+create index ACT_IDX_EXE_PARENT on ${databaseSchema}ACT_RU_EXECUTION(PARENT_ID_);
+create index ACT_IDX_EXE_SUPER on ${databaseSchema}ACT_RU_EXECUTION(SUPER_EXEC_);
+create index ACT_IDX_EXE_PROCDEF on ${databaseSchema}ACT_RU_EXECUTION(PROC_DEF_ID_);
+create index ACT_IDX_TSKASS_TASK on ${databaseSchema}ACT_RU_IDENTITYLINK(TASK_ID_);
+create index ACT_IDX_ATHRZ_PROCEDEF on ${databaseSchema}ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
+create index ACT_IDX_IDL_PROCINST on ${databaseSchema}ACT_RU_IDENTITYLINK(PROC_INST_ID_);
+create index ACT_IDX_TASK_EXEC on ${databaseSchema}ACT_RU_TASK(EXECUTION_ID_);
+create index ACT_IDX_TASK_PROCINST on ${databaseSchema}ACT_RU_TASK(PROC_INST_ID_);
+create index ACT_IDX_TASK_PROCDEF on ${databaseSchema}ACT_RU_TASK(PROC_DEF_ID_);
+create index ACT_IDX_VAR_EXE on ${databaseSchema}ACT_RU_VARIABLE(EXECUTION_ID_);
+create index ACT_IDX_VAR_PROCINST on ${databaseSchema}ACT_RU_VARIABLE(PROC_INST_ID_);
+create index ACT_IDX_JOB_EXECUTION_ID on ${databaseSchema}ACT_RU_JOB(EXECUTION_ID_);
+create index ACT_IDX_JOB_PROCESS_INSTANCE_ID on ${databaseSchema}ACT_RU_JOB(PROCESS_INSTANCE_ID_);
+create index ACT_IDX_JOB_PROC_DEF_ID on ${databaseSchema}ACT_RU_JOB(PROC_DEF_ID_);
+create index ACT_IDX_TIMER_JOB_EXECUTION_ID on ${databaseSchema}ACT_RU_TIMER_JOB(EXECUTION_ID_);
+create index ACT_IDX_TIMER_JOB_PROCESS_INSTANCE_ID on ${databaseSchema}ACT_RU_TIMER_JOB(PROCESS_INSTANCE_ID_);
+create index ACT_IDX_TIMER_JOB_PROC_DEF_ID on ${databaseSchema}ACT_RU_TIMER_JOB(PROC_DEF_ID_);
+create index ACT_IDX_SUSPENDED_JOB_EXECUTION_ID on ${databaseSchema}ACT_RU_SUSPENDED_JOB(EXECUTION_ID_);
+create index ACT_IDX_SUSPENDED_JOB_PROCESS_INSTANCE_ID on ${databaseSchema}ACT_RU_SUSPENDED_JOB(PROCESS_INSTANCE_ID_);
+create index ACT_IDX_SUSPENDED_JOB_PROC_DEF_ID on ${databaseSchema}ACT_RU_SUSPENDED_JOB(PROC_DEF_ID_);
+create index ACT_IDX_DEADLETTER_JOB_EXECUTION_ID on ${databaseSchema}ACT_RU_DEADLETTER_JOB(EXECUTION_ID_);
+create index ACT_IDX_DEADLETTER_JOB_PROCESS_INSTANCE_ID on ${databaseSchema}ACT_RU_DEADLETTER_JOB(PROCESS_INSTANCE_ID_);
+create index ACT_IDX_DEADLETTER_JOB_PROC_DEF_ID on ${databaseSchema}ACT_RU_DEADLETTER_JOB(PROC_DEF_ID_);
+create index ACT_IDX_EVENT_SUBSCR on ${databaseSchema}ACT_RU_EVENT_SUBSCR(EXECUTION_ID_);
+create index ACT_IDX_MODEL_SOURCE on ${databaseSchema}ACT_RE_MODEL(EDITOR_SOURCE_VALUE_ID_);
+create index ACT_IDX_MODEL_SOURCE_EXTRA on ${databaseSchema}ACT_RE_MODEL(EDITOR_SOURCE_EXTRA_VALUE_ID_);
+create index ACT_IDX_MODEL_DEPLOYMENT on ${databaseSchema}ACT_RE_MODEL(DEPLOYMENT_ID_);
+create index ACT_IDX_PROCDEF_INFO_JSON on ${databaseSchema}ACT_PROCDEF_INFO(INFO_JSON_ID_);
+create index ACT_IDX_PROCDEF_INFO_PROC on ${databaseSchema}ACT_PROCDEF_INFO(PROC_DEF_ID_);
+
+-- force-commit
+
 alter table ${databaseSchema}ACT_GE_BYTEARRAY
     add constraint ACT_FK_BYTEARR_DEPL
     foreign key (DEPLOYMENT_ID_) 
@@ -168,184 +204,153 @@ alter table ${databaseSchema}ACT_GE_BYTEARRAY
 alter table ${databaseSchema}ACT_RE_PROCDEF
     add constraint ACT_UNIQ_PROCDEF
     unique (KEY_,VERSION_, DERIVED_VERSION_, TENANT_ID_);
-    
-create index ACT_IDX_EXE_PROCINST on ${databaseSchema}ACT_RU_EXECUTION(PROC_INST_ID_);
+
 --alter table ACT_RU_EXECUTION
 --    add constraint ACT_FK_EXE_PROCINST
 --    foreign key (PROC_INST_ID_)
 --    references ACT_RU_EXECUTION (ID_);
 
-create index ACT_IDX_EXE_PARENT on ${databaseSchema}ACT_RU_EXECUTION(PARENT_ID_);
 alter table ${databaseSchema}ACT_RU_EXECUTION
     add constraint ACT_FK_EXE_PARENT
     foreign key (PARENT_ID_) 
     references ${databaseSchema}ACT_RU_EXECUTION (ID_);
     
-create index ACT_IDX_EXE_SUPER on ${databaseSchema}ACT_RU_EXECUTION(SUPER_EXEC_);
+
 alter table ${databaseSchema}ACT_RU_EXECUTION
     add constraint ACT_FK_EXE_SUPER
     foreign key (SUPER_EXEC_) 
     references ${databaseSchema}ACT_RU_EXECUTION (ID_);
-    
 
-create index ACT_IDX_EXE_PROCDEF on ${databaseSchema}ACT_RU_EXECUTION(PROC_DEF_ID_);
 alter table ${databaseSchema}ACT_RU_EXECUTION
     add constraint ACT_FK_EXE_PROCDEF 
     foreign key (PROC_DEF_ID_) 
     references ${databaseSchema}ACT_RE_PROCDEF (ID_);
     
-
-create index ACT_IDX_TSKASS_TASK on ${databaseSchema}ACT_RU_IDENTITYLINK(TASK_ID_);
 alter table ${databaseSchema}ACT_RU_IDENTITYLINK
     add constraint ACT_FK_TSKASS_TASK
     foreign key (TASK_ID_) 
     references ${databaseSchema}ACT_RU_TASK (ID_);
     
-create index ACT_IDX_ATHRZ_PROCEDEF on ${databaseSchema}ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
 alter table ${databaseSchema}ACT_RU_IDENTITYLINK
     add constraint ACT_FK_ATHRZ_PROCEDEF
     foreign key (PROC_DEF_ID_) 
     references ${databaseSchema}ACT_RE_PROCDEF (ID_);
     
-create index ACT_IDX_IDL_PROCINST on ${databaseSchema}ACT_RU_IDENTITYLINK(PROC_INST_ID_);
 alter table ${databaseSchema}ACT_RU_IDENTITYLINK
     add constraint ACT_FK_IDL_PROCINST
     foreign key (PROC_INST_ID_) 
     references ${databaseSchema}ACT_RU_EXECUTION (ID_);
     
-create index ACT_IDX_TASK_EXEC on ${databaseSchema}ACT_RU_TASK(EXECUTION_ID_);
 alter table ${databaseSchema}ACT_RU_TASK
     add constraint ACT_FK_TASK_EXE
     foreign key (EXECUTION_ID_)
     references ${databaseSchema}ACT_RU_EXECUTION (ID_);
     
-create index ACT_IDX_TASK_PROCINST on ${databaseSchema}ACT_RU_TASK(PROC_INST_ID_);
 alter table ${databaseSchema}ACT_RU_TASK
     add constraint ACT_FK_TASK_PROCINST
     foreign key (PROC_INST_ID_)
     references ${databaseSchema}ACT_RU_EXECUTION (ID_);
     
-create index ACT_IDX_TASK_PROCDEF on ${databaseSchema}ACT_RU_TASK(PROC_DEF_ID_);
 alter table ${databaseSchema}ACT_RU_TASK
   add constraint ACT_FK_TASK_PROCDEF
   foreign key (PROC_DEF_ID_)
   references ${databaseSchema}ACT_RE_PROCDEF (ID_);
   
-create index ACT_IDX_VAR_EXE on ${databaseSchema}ACT_RU_VARIABLE(EXECUTION_ID_);
 alter table ${databaseSchema}ACT_RU_VARIABLE
     add constraint ACT_FK_VAR_EXE
     foreign key (EXECUTION_ID_) 
     references ${databaseSchema}ACT_RU_EXECUTION (ID_);
 
-create index ACT_IDX_VAR_PROCINST on ${databaseSchema}ACT_RU_VARIABLE(PROC_INST_ID_);
 alter table ${databaseSchema}ACT_RU_VARIABLE
     add constraint ACT_FK_VAR_PROCINST
     foreign key (PROC_INST_ID_)
     references ${databaseSchema}ACT_RU_EXECUTION(ID_);
 
-create index ACT_IDX_JOB_EXECUTION_ID on ${databaseSchema}ACT_RU_JOB(EXECUTION_ID_);
 alter table ${databaseSchema}ACT_RU_JOB
     add constraint ACT_FK_JOB_EXECUTION 
     foreign key (EXECUTION_ID_) 
     references ${databaseSchema}ACT_RU_EXECUTION (ID_);
 
-create index ACT_IDX_JOB_PROCESS_INSTANCE_ID on ${databaseSchema}ACT_RU_JOB(PROCESS_INSTANCE_ID_);
 alter table ${databaseSchema}ACT_RU_JOB
     add constraint ACT_FK_JOB_PROCESS_INSTANCE 
     foreign key (PROCESS_INSTANCE_ID_) 
     references ${databaseSchema}ACT_RU_EXECUTION (ID_);
 
-create index ACT_IDX_JOB_PROC_DEF_ID on ${databaseSchema}ACT_RU_JOB(PROC_DEF_ID_);
 alter table ${databaseSchema}ACT_RU_JOB
     add constraint ACT_FK_JOB_PROC_DEF
     foreign key (PROC_DEF_ID_) 
     references ${databaseSchema}ACT_RE_PROCDEF (ID_);
 
-create index ACT_IDX_TIMER_JOB_EXECUTION_ID on ${databaseSchema}ACT_RU_TIMER_JOB(EXECUTION_ID_);
 alter table ${databaseSchema}ACT_RU_TIMER_JOB
     add constraint ACT_FK_TIMER_JOB_EXECUTION 
     foreign key (EXECUTION_ID_) 
     references ${databaseSchema}ACT_RU_EXECUTION (ID_);
 
-create index ACT_IDX_TIMER_JOB_PROCESS_INSTANCE_ID on ${databaseSchema}ACT_RU_TIMER_JOB(PROCESS_INSTANCE_ID_);
 alter table ${databaseSchema}ACT_RU_TIMER_JOB
     add constraint ACT_FK_TIMER_JOB_PROCESS_INSTANCE 
     foreign key (PROCESS_INSTANCE_ID_) 
     references ${databaseSchema}ACT_RU_EXECUTION (ID_);
 
-create index ACT_IDX_TIMER_JOB_PROC_DEF_ID on ${databaseSchema}ACT_RU_TIMER_JOB(PROC_DEF_ID_);
 alter table ${databaseSchema}ACT_RU_TIMER_JOB
     add constraint ACT_FK_TIMER_JOB_PROC_DEF
     foreign key (PROC_DEF_ID_) 
     references ${databaseSchema}ACT_RE_PROCDEF (ID_);
 
-create index ACT_IDX_SUSPENDED_JOB_EXECUTION_ID on ${databaseSchema}ACT_RU_SUSPENDED_JOB(EXECUTION_ID_);
 alter table ${databaseSchema}ACT_RU_SUSPENDED_JOB
     add constraint ACT_FK_SUSPENDED_JOB_EXECUTION 
     foreign key (EXECUTION_ID_) 
     references ${databaseSchema}ACT_RU_EXECUTION (ID_);
     
-create index ACT_IDX_SUSPENDED_JOB_PROCESS_INSTANCE_ID on ${databaseSchema}ACT_RU_SUSPENDED_JOB(PROCESS_INSTANCE_ID_);
 alter table ${databaseSchema}ACT_RU_SUSPENDED_JOB
     add constraint ACT_FK_SUSPENDED_JOB_PROCESS_INSTANCE 
     foreign key (PROCESS_INSTANCE_ID_) 
     references ${databaseSchema}ACT_RU_EXECUTION (ID_);
 
-create index ACT_IDX_SUSPENDED_JOB_PROC_DEF_ID on ${databaseSchema}ACT_RU_SUSPENDED_JOB(PROC_DEF_ID_);
 alter table ${databaseSchema}ACT_RU_SUSPENDED_JOB
     add constraint ACT_FK_SUSPENDED_JOB_PROC_DEF
     foreign key (PROC_DEF_ID_) 
     references ${databaseSchema}ACT_RE_PROCDEF (ID_);
 
-create index ACT_IDX_DEADLETTER_JOB_EXECUTION_ID on ${databaseSchema}ACT_RU_DEADLETTER_JOB(EXECUTION_ID_);
 alter table ${databaseSchema}ACT_RU_DEADLETTER_JOB
     add constraint ACT_FK_DEADLETTER_JOB_EXECUTION 
     foreign key (EXECUTION_ID_) 
     references ${databaseSchema}ACT_RU_EXECUTION (ID_);
  
-create index ACT_IDX_DEADLETTER_JOB_PROCESS_INSTANCE_ID on ${databaseSchema}ACT_RU_DEADLETTER_JOB(PROCESS_INSTANCE_ID_);
 alter table ${databaseSchema}ACT_RU_DEADLETTER_JOB
     add constraint ACT_FK_DEADLETTER_JOB_PROCESS_INSTANCE 
     foreign key (PROCESS_INSTANCE_ID_) 
     references ${databaseSchema}ACT_RU_EXECUTION (ID_);
     
-create index ACT_IDX_DEADLETTER_JOB_PROC_DEF_ID on ${databaseSchema}ACT_RU_DEADLETTER_JOB(PROC_DEF_ID_);
 alter table ${databaseSchema}ACT_RU_DEADLETTER_JOB
     add constraint ACT_FK_DEADLETTER_JOB_PROC_DEF
     foreign key (PROC_DEF_ID_) 
     references ${databaseSchema}ACT_RE_PROCDEF (ID_);
     
-create index ACT_IDX_EVENT_SUBSCR on ${databaseSchema}ACT_RU_EVENT_SUBSCR(EXECUTION_ID_);
 alter table ${databaseSchema}ACT_RU_EVENT_SUBSCR
     add constraint ACT_FK_EVENT_EXEC
     foreign key (EXECUTION_ID_)
     references ${databaseSchema}ACT_RU_EXECUTION(ID_);
 
-create index ACT_IDX_MODEL_SOURCE on ${databaseSchema}ACT_RE_MODEL(EDITOR_SOURCE_VALUE_ID_);
 alter table ${databaseSchema}ACT_RE_MODEL
     add constraint ACT_FK_MODEL_SOURCE 
     foreign key (EDITOR_SOURCE_VALUE_ID_) 
     references ${databaseSchema}ACT_GE_BYTEARRAY (ID_);
 
-create index ACT_IDX_MODEL_SOURCE_EXTRA on ${databaseSchema}ACT_RE_MODEL(EDITOR_SOURCE_EXTRA_VALUE_ID_);
 alter table ${databaseSchema}ACT_RE_MODEL
     add constraint ACT_FK_MODEL_SOURCE_EXTRA 
     foreign key (EDITOR_SOURCE_EXTRA_VALUE_ID_) 
     references ${databaseSchema}ACT_GE_BYTEARRAY (ID_);
     
-create index ACT_IDX_MODEL_DEPLOYMENT on ${databaseSchema}ACT_RE_MODEL(DEPLOYMENT_ID_);
 alter table ${databaseSchema}ACT_RE_MODEL
     add constraint ACT_FK_MODEL_DEPLOYMENT 
     foreign key (DEPLOYMENT_ID_) 
     references ${databaseSchema}ACT_RE_DEPLOYMENT (ID_);
 
-create index ACT_IDX_PROCDEF_INFO_JSON on ${databaseSchema}ACT_PROCDEF_INFO(INFO_JSON_ID_);
 alter table ${databaseSchema}ACT_PROCDEF_INFO
     add constraint ACT_FK_INFO_JSON_BA 
     foreign key (INFO_JSON_ID_) 
     references ${databaseSchema}ACT_GE_BYTEARRAY (ID_);
 
-create index ACT_IDX_PROCDEF_INFO_PROC on ${databaseSchema}ACT_PROCDEF_INFO(PROC_DEF_ID_);
 alter table ${databaseSchema}ACT_PROCDEF_INFO
     add constraint ACT_FK_INFO_PROCDEF 
     foreign key (PROC_DEF_ID_) 
@@ -360,3 +365,5 @@ values ('schema.version', '6.5.0.0', 1);
 
 insert into ${databaseSchema}ACT_GE_PROPERTY
 values ('schema.history', 'create(6.5.0.0)', 1);
+
+--force-commit

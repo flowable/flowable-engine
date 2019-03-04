@@ -37,3 +37,5 @@ create index ACT_IDX_TASK_SUB_SCOPE on ${databaseSchema}ACT_RU_TASK(SUB_SCOPE_ID
 create index ACT_IDX_TASK_SCOPE_DEF on ${databaseSchema}ACT_RU_TASK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
 insert into ${databaseSchema}ACT_GE_PROPERTY values ('task.schema.version', '6.5.0.0', 1);
+
+-- force-commit

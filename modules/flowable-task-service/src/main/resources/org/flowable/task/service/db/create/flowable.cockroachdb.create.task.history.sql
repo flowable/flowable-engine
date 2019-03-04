@@ -49,3 +49,5 @@ CREATE TABLE ${databaseSchema}ACT_HI_TSK_LOG (
 create index ACT_IDX_HI_TASK_SCOPE on ${databaseSchema}ACT_HI_TASKINST(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_HI_TASK_SUB_SCOPE on ${databaseSchema}ACT_HI_TASKINST(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_HI_TASK_SCOPE_DEF on ${databaseSchema}ACT_HI_TASKINST(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
+
+-- force-commit

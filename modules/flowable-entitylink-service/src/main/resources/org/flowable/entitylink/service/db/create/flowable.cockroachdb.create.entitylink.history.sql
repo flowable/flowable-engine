@@ -14,3 +14,5 @@ create table ${databaseSchema}ACT_HI_ENTITYLINK (
 
 create index ACT_IDX_HI_ENT_LNK_SCOPE on ${databaseSchema}ACT_HI_ENTITYLINK(SCOPE_ID_, SCOPE_TYPE_, LINK_TYPE_);
 create index ACT_IDX_HI_ENT_LNK_SCOPE_DEF on ${databaseSchema}ACT_HI_ENTITYLINK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_, LINK_TYPE_);
+
+-- force-commit

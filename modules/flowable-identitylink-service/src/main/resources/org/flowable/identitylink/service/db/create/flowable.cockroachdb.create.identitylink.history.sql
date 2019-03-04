@@ -15,3 +15,5 @@ CREATE TABLE ${databaseSchema}ACT_HI_IDENTITYLINK (
 create index ACT_IDX_HI_IDENT_LNK_USER on ${databaseSchema}ACT_HI_IDENTITYLINK(USER_ID_);
 create index ACT_IDX_HI_IDENT_LNK_SCOPE on ${databaseSchema}ACT_HI_IDENTITYLINK(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_HI_IDENT_LNK_SCOPE_DEF on ${databaseSchema}ACT_HI_IDENTITYLINK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
+
+-- force-commit

@@ -274,7 +274,12 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
                     logger.debug(line.substring(2));
 
                 } else if (line.startsWith("-- ")) {
-                    logger.debug(line.substring(3));
+
+                    if ("-- force-commit".equals(line)) {
+                        connection.commit();
+                    } else {
+                        logger.debug(line.substring(3));
+                    }
 
                 } else if (line.startsWith("execute java ")) {
                     String upgradestepClassName = line.substring(13).trim();

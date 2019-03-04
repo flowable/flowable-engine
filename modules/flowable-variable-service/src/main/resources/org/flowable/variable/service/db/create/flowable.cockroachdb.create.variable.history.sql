@@ -22,3 +22,5 @@ create table ${databaseSchema}ACT_HI_VARINST (
 create index ACT_IDX_HI_PROCVAR_NAME_TYPE on ${databaseSchema}ACT_HI_VARINST(NAME_, VAR_TYPE_);
 create index ACT_IDX_HI_VAR_SCOPE_ID_TYPE on ${databaseSchema}ACT_HI_VARINST(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_HI_VAR_SUB_ID_TYPE on ${databaseSchema}ACT_HI_VARINST(SUB_SCOPE_ID_, SCOPE_TYPE_);
+
+-- force-commit

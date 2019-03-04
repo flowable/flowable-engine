@@ -9,6 +9,8 @@
         <!-- cockroachdb specific -->
         <property name="bulkInsertEnabled" value="false" />
         <property name="databaseType" value="cockroachdb" />
+        <property name="databaseSchema" value="flowable" />
+        <property name="databaseTablePrefix" value="flowable." />
 
         <property name="jdbcUrl" value="jdbc:postgresql://127.0.0.1:26257/flowable?sslmode=disable" />
         <property name="jdbcDriver" value="org.postgresql.Driver" />

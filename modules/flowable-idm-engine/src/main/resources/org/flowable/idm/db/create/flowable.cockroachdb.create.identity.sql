@@ -82,26 +82,30 @@ create table ${databaseSchema}ACT_ID_PRIV_MAPPING (
 );
 
 create index ACT_IDX_MEMB_GROUP on ${databaseSchema}ACT_ID_MEMBERSHIP(GROUP_ID_);
+create index ACT_IDX_MEMB_USER on ${databaseSchema}ACT_ID_MEMBERSHIP(USER_ID_);
+create index ACT_IDX_PRIV_MAPPING on ${databaseSchema}ACT_ID_PRIV_MAPPING(PRIV_ID_);
+create index ACT_IDX_PRIV_USER on ${databaseSchema}ACT_ID_PRIV_MAPPING(USER_ID_);
+create index ACT_IDX_PRIV_GROUP on ${databaseSchema}ACT_ID_PRIV_MAPPING(GROUP_ID_);
+
+-- force-commit
+
 alter table ${databaseSchema}ACT_ID_MEMBERSHIP
     add constraint ACT_FK_MEMB_GROUP
     foreign key (GROUP_ID_)
     references ${databaseSchema}ACT_ID_GROUP (ID_);
 
-create index ACT_IDX_MEMB_USER on ${databaseSchema}ACT_ID_MEMBERSHIP(USER_ID_);
 alter table ${databaseSchema}ACT_ID_MEMBERSHIP
     add constraint ACT_FK_MEMB_USER
     foreign key (USER_ID_)
     references ${databaseSchema}ACT_ID_USER (ID_);
 
-create index ACT_IDX_PRIV_MAPPING on ${databaseSchema}ACT_ID_PRIV_MAPPING(PRIV_ID_);
 alter table ${databaseSchema}ACT_ID_PRIV_MAPPING
     add constraint ACT_FK_PRIV_MAPPING
     foreign key (PRIV_ID_)
     references ${databaseSchema}ACT_ID_PRIV (ID_);
 
-create index ACT_IDX_PRIV_USER on ${databaseSchema}ACT_ID_PRIV_MAPPING(USER_ID_);
-create index ACT_IDX_PRIV_GROUP on ${databaseSchema}ACT_ID_PRIV_MAPPING(GROUP_ID_);
-
 alter table ${databaseSchema}ACT_ID_PRIV
     add constraint ACT_UNIQ_PRIV_NAME
     unique (NAME_);
+
+-- force-commit

@@ -7,3 +7,5 @@ drop table if exists ${databaseSchema}act_id_user cascade;
 drop table if exists ${databaseSchema}act_id_token cascade;
 drop table if exists ${databaseSchema}act_id_priv cascade;
 drop table if exists ${databaseSchema}act_id_priv_mapping cascade;
+
+-- force-commit

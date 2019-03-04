@@ -19,3 +19,5 @@ create index ACT_IDX_IDENT_LNK_SCOPE on ${databaseSchema}ACT_RU_IDENTITYLINK(SCO
 create index ACT_IDX_IDENT_LNK_SCOPE_DEF on ${databaseSchema}ACT_RU_IDENTITYLINK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
 insert into ${databaseSchema}ACT_GE_PROPERTY values ('identitylink.schema.version', '6.5.0.0', 1);
+
+-- force-commit

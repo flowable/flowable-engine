@@ -104,3 +104,5 @@ create index ACT_IDX_HI_ACT_INST_EXEC on ${databaseSchema}ACT_HI_ACTINST(EXECUTI
 create index ACT_IDX_HI_IDENT_LNK_TASK on ${databaseSchema}ACT_HI_IDENTITYLINK(TASK_ID_);
 create index ACT_IDX_HI_IDENT_LNK_PROCINST on ${databaseSchema}ACT_HI_IDENTITYLINK(PROC_INST_ID_);
 create index ACT_IDX_HI_TASK_INST_PROCINST on ${databaseSchema}ACT_HI_TASKINST(PROC_INST_ID_);
+
+-- force-commit
