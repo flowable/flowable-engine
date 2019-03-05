@@ -23,10 +23,16 @@ public class GetTableNameCmd implements Command<String>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Class<?> entityClass;
+    protected Class<?> entityClass;
+    protected boolean withPrefix = true;
 
     public GetTableNameCmd(Class<?> entityClass) {
         this.entityClass = entityClass;
+    }
+
+    public GetTableNameCmd(Class<?> entityClass, boolean withPrefix) {
+        this.entityClass = entityClass;
+        this.withPrefix = withPrefix;
     }
 
     @Override
@@ -34,7 +40,7 @@ public class GetTableNameCmd implements Command<String>, Serializable {
         if (entityClass == null) {
             throw new FlowableIllegalArgumentException("entityClass is null");
         }
-        return CommandContextUtil.getTableDataManager(commandContext).getTableName(entityClass, true);
+        return CommandContextUtil.getTableDataManager(commandContext).getTableName(entityClass, withPrefix);
     }
 
 }

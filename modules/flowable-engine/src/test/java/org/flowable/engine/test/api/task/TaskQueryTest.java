@@ -3105,20 +3105,21 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
     @Test
     public void testNativeQueryPaging() {
-        assertEquals("ACT_RU_TASK", managementService.getTableName(org.flowable.task.api.Task.class));
-        assertEquals("ACT_RU_TASK", managementService.getTableName(TaskEntity.class));
+        assertEquals("ACT_RU_TASK", managementService.getTableName(org.flowable.task.api.Task.class, false));
+        assertEquals("ACT_RU_TASK", managementService.getTableName(TaskEntity.class, false));
         assertEquals(5, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(org.flowable.task.api.Task.class)).listPage(0, 5).size());
         assertEquals(2, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(org.flowable.task.api.Task.class)).listPage(10, 12).size());
     }
 
     @Test
     public void testNativeQuery() {
-        assertEquals("ACT_RU_TASK", managementService.getTableName(org.flowable.task.api.Task.class));
-        assertEquals("ACT_RU_TASK", managementService.getTableName(TaskEntity.class));
+        assertEquals("ACT_RU_TASK", managementService.getTableName(org.flowable.task.api.Task.class, false));
+        assertEquals("ACT_RU_TASK", managementService.getTableName(TaskEntity.class, false));
         assertEquals(12, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(org.flowable.task.api.Task.class)).list().size());
         assertEquals(12, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(org.flowable.task.api.Task.class)).count());
 
-        assertEquals(144, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM ACT_RU_TASK T1, ACT_RU_TASK T2").count());
+        assertEquals(144, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM "
+            + managementService.getTableName(Task.class) + " T1, " + managementService.getTableName(Task.class) + " T2").count());
 
         // join task and variable instances
         assertEquals(
@@ -3132,14 +3133,14 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertEquals("gonzoTask", tasks.get(0).getName());
 
         // select with distinct
-        assertEquals(12, taskService.createNativeTaskQuery().sql("SELECT DISTINCT T1.* FROM ACT_RU_TASK T1").list().size());
+        assertEquals(12, taskService.createNativeTaskQuery().sql("SELECT DISTINCT T1.* FROM " + managementService.getTableName(Task.class) + " T1").list().size());
 
         assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(org.flowable.task.api.Task.class) + " T WHERE T.NAME_ = 'gonzoTask'").count());
         assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(org.flowable.task.api.Task.class) + " T WHERE T.NAME_ = 'gonzoTask'").list().size());
 
         // use parameters
-        assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(org.flowable.task.api.Task.class) + " T WHERE T.NAME_ = #{taskName}").parameter("taskName", "gonzoTask")
-                .count());
+        assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(org.flowable.task.api.Task.class)
+            + " T WHERE T.NAME_ = #{taskName}").parameter("taskName", "gonzoTask").count());
     }
 
     @Test

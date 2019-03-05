@@ -582,8 +582,8 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
 
-            assertEquals("ACT_HI_VARINST", managementService.getTableName(HistoricVariableInstance.class));
-            assertEquals("ACT_HI_VARINST", managementService.getTableName(HistoricVariableInstanceEntity.class));
+            assertEquals("ACT_HI_VARINST", managementService.getTableName(HistoricVariableInstance.class, false));
+            assertEquals("ACT_HI_VARINST", managementService.getTableName(HistoricVariableInstanceEntity.class, false));
 
             String tableName = managementService.getTableName(HistoricVariableInstance.class);
             String baseQuerySql = "SELECT * FROM " + tableName;
@@ -616,8 +616,8 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = "org/flowable/engine/test/history/HistoricVariableInstanceTest.testSimple.bpmn20.xml")
     public void testNativeHistoricDetailQuery() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
-            assertEquals("ACT_HI_DETAIL", managementService.getTableName(HistoricDetail.class));
-            assertEquals("ACT_HI_DETAIL", managementService.getTableName(HistoricVariableUpdate.class));
+            assertEquals("ACT_HI_DETAIL", managementService.getTableName(HistoricDetail.class, false));
+            assertEquals("ACT_HI_DETAIL", managementService.getTableName(HistoricVariableUpdate.class, false));
 
             String tableName = managementService.getTableName(HistoricDetail.class);
             String baseQuerySql = "SELECT * FROM " + tableName;

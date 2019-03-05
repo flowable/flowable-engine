@@ -57,6 +57,7 @@ import org.flowable.common.engine.impl.db.MybatisTypeAliasConfigurator;
 import org.flowable.common.engine.impl.db.MybatisTypeHandlerConfigurator;
 import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.event.EventDispatchAction;
+import org.flowable.common.engine.impl.interceptor.CockroachDbRetryInterceptor;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContextFactory;
@@ -500,6 +501,11 @@ public abstract class AbstractEngineConfiguration {
         if (defaultCommandInterceptors == null) {
             List<CommandInterceptor> interceptors = new ArrayList<>();
             interceptors.add(new LogInterceptor());
+
+            // This probably won't work in environments such as Spring if the transaction is externally managed
+            if ("cockroachdb".equals(databaseType)) {
+                interceptors.add(new CockroachDbRetryInterceptor());
+            }
 
             CommandInterceptor transactionInterceptor = createTransactionInterceptor();
             if (transactionInterceptor != null) {

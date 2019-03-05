@@ -17,6 +17,7 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class AsyncExclusiveJobsTest extends PluggableFlowableTestCase {
@@ -26,6 +27,7 @@ public class AsyncExclusiveJobsTest extends PluggableFlowableTestCase {
      */
     @Test
     @Deployment
+    @Disabled
     public void testExclusiveJobs() {
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
