@@ -228,7 +228,7 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
     protected void writeAdditionalChildElements(BaseElement element, BpmnModel model, XMLStreamWriter xtw) throws Exception {
     }
 
-    public class HumanPerformerParser extends BaseChildElementParser {
+    public static class HumanPerformerParser extends BaseChildElementParser {
 
         @Override
         public String getElementName() {
@@ -247,7 +247,7 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
         }
     }
 
-    public class PotentialOwnerParser extends BaseChildElementParser {
+    public static class PotentialOwnerParser extends BaseChildElementParser {
 
         @Override
         public String getElementName() {
@@ -301,7 +301,7 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
         }
     }
 
-    public class CustomIdentityLinkParser extends BaseChildElementParser {
+    public static class CustomIdentityLinkParser extends BaseChildElementParser {
 
         @Override
         public String getElementName() {

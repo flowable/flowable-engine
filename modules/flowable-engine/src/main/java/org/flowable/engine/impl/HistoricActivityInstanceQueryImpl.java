@@ -193,6 +193,7 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQuery tenantIdIn(List<String> tenantIds) {
         this.tenantIds = tenantIds;
         return this;

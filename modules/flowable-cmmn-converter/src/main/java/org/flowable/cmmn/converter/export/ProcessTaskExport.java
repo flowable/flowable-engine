@@ -93,6 +93,9 @@ public class ProcessTaskExport extends AbstractPlanItemDefinitionExport<ProcessT
             if (StringUtils.isNotEmpty(ioParameter.getTarget())) {
                 xtw.writeAttribute(ATTRIBUTE_IOPARAMETER_TARGET, ioParameter.getTarget());
             }
+            if (StringUtils.isNotEmpty(ioParameter.getTargetExpression())) {
+                xtw.writeAttribute(ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION, ioParameter.getTargetExpression());
+            }
 
             xtw.writeEndElement();
         }

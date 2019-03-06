@@ -232,11 +232,13 @@ public class HistoryJobEntityImpl extends AbstractJobServiceEntity implements Hi
     public void setLockExpirationTime(Date claimedUntil) {
         this.lockExpirationTime = claimedUntil;
     }
-    
+
+    @Override
     public String getScopeType() {
         return scopeType;
     }
 
+    @Override
     public void setScopeType(String scopeType) {
         this.scopeType = scopeType;
     }

@@ -24,7 +24,7 @@
 		<mule.version>3.8.0</mule.version>
         <camel.version>2.23.0</camel.version>
 		<cxf.version>3.3.0</cxf.version>
-		<slf4j.version>1.7.25</slf4j.version>
+		<slf4j.version>1.7.26</slf4j.version>
 		<spring.boot.version>2.1.3.RELEASE</spring.boot.version>
 
 		<junit.version>4.12</junit.version>
@@ -118,7 +118,7 @@
 			<dependency>
 			    <groupId>commons-codec</groupId>
 			    <artifactId>commons-codec</artifactId>
-			    <version>1.11</version>
+			    <version>1.12</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
@@ -181,12 +181,12 @@
 			<dependency>
 				<groupId>io.swagger</groupId>
 				<artifactId>swagger-annotations</artifactId>
-				<version>1.5.21</version>
+				<version>1.5.22</version>
 			</dependency>
 			<dependency>
 				<groupId>io.swagger</groupId>
 				<artifactId>swagger-models</artifactId>
-				<version>1.5.21</version>
+				<version>1.5.22</version>
 			</dependency>
 			<dependency>
 				<groupId>org.junit</groupId>
@@ -730,7 +730,7 @@
             <dependency>
                 <groupId>com.zaxxer</groupId>
                 <artifactId>HikariCP</artifactId>
-                <version>2.7.9</version>
+                <version>3.3.1</version>
             </dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>

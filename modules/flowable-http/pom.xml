@@ -41,7 +41,6 @@
                         <propertyName>http.workingDirectory</propertyName>
                         <buildDirectory>${project.build.directory}</buildDirectory>
                     </systemPropertyVariables>
-                    <runOrder>alphabetical</runOrder>
                 </configuration>
             </plugin>
             <plugin>

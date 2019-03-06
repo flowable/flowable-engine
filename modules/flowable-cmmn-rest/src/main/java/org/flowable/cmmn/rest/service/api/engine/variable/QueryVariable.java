@@ -17,6 +17,8 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * @author Frederik Heremans
  */
@@ -36,6 +38,7 @@ public class QueryVariable {
         this.name = name;
     }
 
+    @ApiModelProperty(hidden = true)
     public QueryVariableOperation getVariableOperation() {
         if (operation == null) {
             return null;
@@ -43,6 +46,7 @@ public class QueryVariable {
         return QueryVariableOperation.forFriendlyName(operation);
     }
 
+    @ApiModelProperty(allowableValues = "equals, notEquals, equalsIgnoreCase, notEqualsIgnoreCase, like, likeIgnoreCase, greaterThan, greaterThanOrEquals, lessThan, lessThanOrEquals")
     public void setOperation(String operation) {
         this.operation = operation;
     }
@@ -71,7 +75,7 @@ public class QueryVariable {
         EQUALS("equals"), NOT_EQUALS("notEquals"), EQUALS_IGNORE_CASE("equalsIgnoreCase"), NOT_EQUALS_IGNORE_CASE("notEqualsIgnoreCase"), LIKE("like"), LIKE_IGNORE_CASE("likeIgnoreCase"), GREATER_THAN("greaterThan"), GREATER_THAN_OR_EQUALS(
                 "greaterThanOrEquals"), LESS_THAN("lessThan"), LESS_THAN_OR_EQUALS("lessThanOrEquals");
 
-        private String friendlyName;
+        private final String friendlyName;
 
         private QueryVariableOperation(String friendlyName) {
             this.friendlyName = friendlyName;

@@ -89,7 +89,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertEquals(processInstance.getProcessDefinitionId(), historicProcessInstance.getProcessDefinitionId());
         assertEquals(noon, historicProcessInstance.getStartTime());
         assertEquals(twentyFiveSecsAfterNoon, historicProcessInstance.getEndTime());
-        assertEquals(new Long(25 * 1000), historicProcessInstance.getDurationInMillis());
+        assertEquals(Long.valueOf(25 * 1000), historicProcessInstance.getDurationInMillis());
 
         assertEquals(0, historyService.createHistoricProcessInstanceQuery().unfinished().count());
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());

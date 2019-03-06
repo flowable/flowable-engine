@@ -16,6 +16,7 @@ import org.flowable.common.engine.impl.persistence.entity.AbstractEntityNoRevisi
 
 public abstract class AbstractIdentityLinkServiceNoRevisionEntity extends AbstractEntityNoRevision {
 
+    @Override
     public String getIdPrefix() {
         return IdentityLinkServiceEntityConstants.IDENTITY_LINK_SERVICE_ID_PREFIX;
     }

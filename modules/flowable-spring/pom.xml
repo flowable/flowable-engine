@@ -348,7 +348,6 @@
                                 <exclude>**/JobExecutorTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-427 -->
                                 <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-485 -->
                             </excludes>
-                            <runOrder>alphabetical</runOrder>
                         </configuration>
                     </plugin>
                 </plugins>

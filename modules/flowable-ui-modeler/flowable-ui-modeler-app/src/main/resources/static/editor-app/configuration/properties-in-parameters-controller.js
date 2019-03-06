@@ -48,11 +48,13 @@ angular.module('flowableModeler').controller('FlowableInParametersPopupCtrl',
         var sourcePromise = $translate('PROPERTY.PARAMETER.SOURCE');
         var sourceExpressionPromise = $translate('PROPERTY.PARAMETER.SOURCEEXPRESSION');
         var targetPromise = $translate('PROPERTY.PARAMETER.TARGET');
+        var targetExpressionPromise = $translate('PROPERTY.PARAMETER.TARGETEXPRESSION');
 
-        $q.all([sourcePromise, sourceExpressionPromise, targetPromise]).then(function (results) {
+        $q.all([sourcePromise, sourceExpressionPromise, targetPromise, targetExpressionPromise]).then(function (results) {
             $scope.labels.sourceLabel = results[0];
             $scope.labels.sourceExpressionLabel = results[1];
             $scope.labels.targetLabel = results[2];
+            $scope.labels.targetExpressionLabel = results[3];
             $scope.translationsRetrieved = true;
 
             // Config for grid
@@ -66,9 +68,11 @@ angular.module('flowableModeler').controller('FlowableInParametersPopupCtrl',
                 enableHorizontalScrollbar: 0,
                 enableColumnMenus: false,
                 enableSorting: false,
-                columnDefs: [{field: 'source', displayName: $scope.labels.sourceLabel},
+                columnDefs: [
+                    {field: 'source', displayName: $scope.labels.sourceLabel},
                     {field: 'sourceExpression', displayName: $scope.labels.sourceExpressionLabel},
-                    {field: 'target', displayName: $scope.labels.targetLabel}]
+                    {field: 'target', displayName: $scope.labels.targetLabel},
+                    {field: 'targetExpression', displayName: $scope.labels.targetExpressionLabel}]
             };
 
             $scope.gridOptions.onRegisterApi = function (gridApi) {
@@ -85,7 +89,8 @@ angular.module('flowableModeler').controller('FlowableInParametersPopupCtrl',
             var newParameter = {
                 source: '',
                 sourceExpression: '',
-                target: ''
+                target: '',
+                targetExpression: ''
             };
 
             $scope.parameters.push(newParameter);

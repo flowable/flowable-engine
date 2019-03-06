@@ -69,7 +69,7 @@ public class MybatisHistoricActivityInstanceDataManager extends AbstractProcessD
     public List<HistoricActivityInstanceEntity> findUnfinishedHistoricActivityInstancesByProcessInstanceId(final String processInstanceId) {
         Map<String, Object> params = new HashMap<>();
         params.put("processInstanceId", processInstanceId);
-        return getList("selectUnfinishedHistoricActivityInstanceExecutionIdAndActivityId", params, unfinishedHistoricActivityInstanceMatcher, true);
+        return getList("selectUnfinishedHistoricActivityInstanceByProcessInstanceId", params, unfinishedHistoricActivityInstanceMatcher, true);
     }
 
     @Override

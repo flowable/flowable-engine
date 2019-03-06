@@ -101,8 +101,8 @@ public class TaskHelper {
 
         logUserTaskCompleted(taskEntity);
 
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
-        if (eventDispatcher.isEnabled()) {
+        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             if (variables != null) {
                 eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityWithVariablesEvent(
                         FlowableEngineEventType.TASK_COMPLETED, taskEntity, variables, localScope));
@@ -178,9 +178,10 @@ public class TaskHelper {
             countingExecutionEntity.setTaskCount(countingExecutionEntity.getTaskCount() + 1);
         }
 
-        if (fireCreateEvent && CommandContextUtil.getEventDispatcher().isEnabled()) {
+        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
+        if (fireCreateEvent && eventDispatcher != null && eventDispatcher.isEnabled()) {
             if (taskEntity.getAssignee() != null) {
-                CommandContextUtil.getEventDispatcher().dispatchEvent(
+                eventDispatcher.dispatchEvent(
                         FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, taskEntity));
             }
         }
@@ -255,7 +256,7 @@ public class TaskHelper {
         if (!task.isDeleted()) {
             
             CommandContext commandContext = CommandContextUtil.getCommandContext();
-            FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
+            FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher(commandContext);
             fireEvents = fireEvents && eventDispatcher != null && eventDispatcher.isEnabled();
 
             if (fireTaskListener) {
@@ -360,8 +361,7 @@ public class TaskHelper {
         }
     }
 
-    protected static void fireTaskDeletedEvent(TaskEntity task, CommandContext commandContext,
-            FlowableEventDispatcher eventDispatcher) {
+    protected static void fireTaskDeletedEvent(TaskEntity task, CommandContext commandContext, FlowableEventDispatcher eventDispatcher) {
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             CommandContextUtil.getEventDispatcher(commandContext).dispatchEvent(
                 FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, task));
@@ -397,11 +397,12 @@ public class TaskHelper {
         List<TaskEntity> tasks = CommandContextUtil.getTaskService().findTasksByProcessInstanceId(processInstanceId);
 
         for (TaskEntity task : tasks) {
-            if (CommandContextUtil.getEventDispatcher().isEnabled() && !task.isCanceled()) {
+            FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
+            if (eventDispatcher != null && eventDispatcher.isEnabled() && !task.isCanceled()) {
                 task.setCanceled(true);
 
                 ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(task.getExecutionId());
-                CommandContextUtil.getEventDispatcher()
+                eventDispatcher
                         .dispatchEvent(org.flowable.engine.delegate.event.impl.FlowableEventBuilder
                                 .createActivityCancelledEvent(execution.getActivityId(), task.getName(),
                                         task.getExecutionId(), task.getProcessInstanceId(),
@@ -500,8 +501,9 @@ public class TaskHelper {
     protected static void fireAssignmentEvents(TaskEntity taskEntity) {
         CommandContextUtil.getProcessEngineConfiguration().getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_ASSIGNMENT);
 
-        if (CommandContextUtil.getEventDispatcher().isEnabled()) {
-            CommandContextUtil.getEventDispatcher().dispatchEvent(
+        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(
                     FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, taskEntity));
         }
     }

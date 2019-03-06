@@ -89,7 +89,20 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
 
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceNameLikeIgnoreCase("taskName%").count(), is(2L));
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceNameLikeIgnoreCase("%TASK3").count(), is(1L));
+    }
 
+    public void getCaseInstanceByCaseDefinitionKeyIncludingVariables() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
+                caseDefinitionKey("oneTaskCase").
+                start();
+
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionKey("oneTaskCase").includeCaseVariables().count(), is(1L));
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionKey("oneTaskCase").includeCaseVariables().list().get(0).getId(), is(caseInstance.getId()));
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionKey("oneTaskCase").includeCaseVariables().singleResult().getId(), is(caseInstance.getId()));
+
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().or().caseDefinitionKey("oneTaskCase").caseInstanceId("Undefined").endOr().includeCaseVariables().count(), is(1L));
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().or().caseDefinitionKey("oneTaskCase").caseInstanceId("Undefined").endOr().includeCaseVariables().list().get(0).getId(), is(caseInstance.getId()));
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().or().caseDefinitionKey("oneTaskCase").caseInstanceId("Undefined").endOr().includeCaseVariables().singleResult().getId(), is(caseInstance.getId()));
     }
 
     @Test

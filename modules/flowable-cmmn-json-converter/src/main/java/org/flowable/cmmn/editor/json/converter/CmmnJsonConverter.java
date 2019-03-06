@@ -19,8 +19,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -69,8 +68,8 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
     protected static Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap = new HashMap<>();
 
     public static final String MODELER_NAMESPACE = "http://flowable.org/modeler";
-    protected static final DateFormat defaultFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-    protected static final DateFormat entFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+    protected static final DateTimeFormatter defaultFormat = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    protected static final DateTimeFormatter entFormat = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
 
     static {
 

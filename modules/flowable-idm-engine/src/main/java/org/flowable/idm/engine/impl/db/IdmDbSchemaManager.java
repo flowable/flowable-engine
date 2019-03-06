@@ -69,6 +69,7 @@ public class IdmDbSchemaManager extends ServiceSqlScriptBasedDbSchemaManager {
        return isTablePresent("ACT_ID_GROUP");
    }
    
+   @Override
    public void schemaCheckVersion() {
        try {
            String dbVersion = getSchemaVersion();

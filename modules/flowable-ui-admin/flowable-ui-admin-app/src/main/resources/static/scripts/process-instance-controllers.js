@@ -563,7 +563,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
     }]);
 
 flowableAdminApp.controller('DeleteProcessModalInstanceCtrl',
-    ['$rootScope', '$scope', '$modalInstance', '$http', 'process', function ($rootScope, $scope, $modalInstance, $http, process, action) {
+    ['$rootScope', '$scope', '$modalInstance', '$http', 'process', 'action', function ($rootScope, $scope, $modalInstance, $http, process, action) {
 
         $scope.process = process;
         $scope.action = action;

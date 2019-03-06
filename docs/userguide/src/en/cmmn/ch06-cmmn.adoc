@@ -718,6 +718,22 @@ A process task is visualized as a rounded rectangle with an arrow icon in the to
 
 image::images/cmmn.processtask.png[align="center"]
 
+A process task can be configured to have in- and out parameters, which take the form of _source/sourceExpression_ and _target/targetExpression_.
+
+The in parameters are resolved within context of the case instance.
+
+* The _source_ value will be the case instance variable which value will be mapped to a process variable
+* Alternatively, the _sourceExpression_ allows to create an arbitrary value, where the expression is resolved against the case instance.
+* The _target_ will be the name of the process variable to which the source value is mapped.
+* Alternatively, the _targetExpression_ will resolve to a *string* value that is used as variable name in the process instance. The expression is resolved within case instance context.
+
+The out parameters are resolved within context of the process instance.
+
+* The _source_ value will be the process instance variable which value will be mapped to a case variable
+* Alternatively, the _sourceExpression_ allows to create an arbitrary value, where the expression is resolved against the process instance.
+* The _target_ will be the name of the case variable to which the source value is mapped.
+* Alternatively, the _targetExpression_ will resolve to a *string* value that is used as variable name in the case instance. The expression is resolved within process instance context.
+
 ==== Criteria
 
 ===== Entry criterion (entry sentry)

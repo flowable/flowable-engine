@@ -1352,6 +1352,14 @@ public abstract class AbstractEngineConfiguration {
         return customSessionFactories;
     }
 
+    public AbstractEngineConfiguration addCustomSessionFactory(SessionFactory sessionFactory) {
+        if (customSessionFactories == null) {
+            customSessionFactories = new ArrayList<>();
+        }
+        customSessionFactories.add(sessionFactory);
+        return this;
+    }
+
     public AbstractEngineConfiguration setCustomSessionFactories(List<SessionFactory> customSessionFactories) {
         this.customSessionFactories = customSessionFactories;
         return this;

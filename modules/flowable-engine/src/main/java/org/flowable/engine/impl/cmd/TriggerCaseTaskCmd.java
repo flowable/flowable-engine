@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
@@ -50,7 +49,7 @@ public class TriggerCaseTaskCmd implements Command<Void>, Serializable {
     @Override
     public Void execute(CommandContext commandContext) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-        ExecutionEntity execution = (ExecutionEntity) processEngineConfiguration.getRuntimeService().createExecutionQuery().executionId(executionId).singleResult();
+        ExecutionEntity execution = (ExecutionEntity) processEngineConfiguration.getExecutionEntityManager().findById(executionId);
         if (execution == null) {
             throw new FlowableException("No execution could be found for id " + executionId);
         }
