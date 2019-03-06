@@ -319,6 +319,9 @@
                   #{caseInstanceId}
                 </foreach>
             </if>
+            <if test="caseInstanceName != null">
+	            and lower(RES.NAME_) LIKE lower(#{caseInstanceName}${wildcardEscapeClause})
+            </if>
             <if test="caseDefinitionId != null">
                 and RES.CASE_DEF_ID_ = #{caseDefinitionId}
             </if>

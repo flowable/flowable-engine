@@ -267,6 +267,14 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
      *            cannot be null. The string can include the wildcard character '%' to express like-strategy: starts with (string%), ends with (%string) or contains (%string%).
      */
     HistoricCaseInstanceQuery variableValueLikeIgnoreCase(String name, String value);
+
+    /**
+     * Only select historic case instances with the given name like (case insensitive).
+     *
+     * @param caseInstanceName
+     *          cannot be null. The string can include the wildcard character '%' to express like-strategy: starts with (string%), ends with (%string) or contains (%string%).
+     */
+    HistoricCaseInstanceQuery caseInstanceNameLikeIgnoreCase(String caseInstanceName);
     
     /**
      * Only select case instances which have a variable with the given name.
@@ -285,6 +293,7 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
     HistoricCaseInstanceQuery variableNotExists(String name);
     
     HistoricCaseInstanceQuery orderByCaseInstanceId();
+    HistoricCaseInstanceQuery orderByCaseInstanceName();
     HistoricCaseInstanceQuery orderByCaseDefinitionKey();
     HistoricCaseInstanceQuery orderByCaseDefinitionId();
     HistoricCaseInstanceQuery orderByStartTime();

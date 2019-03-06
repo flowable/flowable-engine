@@ -42,6 +42,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String caseDefinitionCategory;
     protected Integer caseDefinitionVersion;
     protected String caseInstanceId;
+    protected String caseInstanceName;
     protected Set<String> caseInstanceIds;
     protected String businessKey;
     protected String caseInstanceParentId;
@@ -163,7 +164,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         }
         return this;
     }
-    
+
     @Override
     public HistoricCaseInstanceQueryImpl caseInstanceIds(Set<String> caseInstanceIds) {
         if (caseInstanceIds == null) {
@@ -387,6 +388,12 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     }
 
     @Override
+    public HistoricCaseInstanceQueryImpl orderByCaseInstanceName() {
+        this.orderProperty = HistoricCaseInstanceQueryProperty.CASE_INSTANCE_NAME;
+        return this;
+    }
+
+    @Override
     public HistoricCaseInstanceQueryImpl orderByCaseDefinitionId() {
         this.orderProperty = HistoricCaseInstanceQueryProperty.CASE_DEFINITION_ID;
         return this;
@@ -562,6 +569,17 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     }
 
     @Override
+    public HistoricCaseInstanceQueryImpl caseInstanceNameLikeIgnoreCase(String caseInstanceName) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseInstanceName = caseInstanceName;
+        } else {
+            this.caseInstanceName = caseInstanceName;
+        }
+        return this;
+    }
+
+
+    @Override
     public HistoricCaseInstanceQuery variableValueGreaterThan(String name, Object value) {
         if (inOrStatement) {
             currentOrQueryObject.variableValueGreaterThan(name, value, false);
@@ -661,6 +679,10 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public String getCaseInstanceId() {
         return caseInstanceId;
+    }
+
+    public String getCaseInstanceName() {
+        return caseInstanceName;
     }
 
     public String getBusinessKey() {
