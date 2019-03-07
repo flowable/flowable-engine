@@ -77,7 +77,7 @@ public class JuelFormEngine implements FormEngine {
         try {
             formTemplateString = new String(resourceBytes, encoding);
         } catch (UnsupportedEncodingException e) {
-            throw new FlowableException("Unsupported encoding of :" + encoding, e);
+            throw new FlowableException("Unsupported encoding of: " + encoding, e);
         }
         return formTemplateString;
     }
