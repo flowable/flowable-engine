@@ -42,7 +42,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String caseDefinitionCategory;
     protected Integer caseDefinitionVersion;
     protected String caseInstanceId;
-    protected String caseInstanceName;
+    protected String caseInstanceNameLikeIgnoreCase;
     protected Set<String> caseInstanceIds;
     protected String businessKey;
     protected String caseInstanceParentId;
@@ -571,9 +571,9 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     @Override
     public HistoricCaseInstanceQueryImpl caseInstanceNameLikeIgnoreCase(String caseInstanceName) {
         if (inOrStatement) {
-            this.currentOrQueryObject.caseInstanceName = caseInstanceName;
+            this.currentOrQueryObject.caseInstanceNameLikeIgnoreCase = caseInstanceName;
         } else {
-            this.caseInstanceName = caseInstanceName;
+            this.caseInstanceNameLikeIgnoreCase = caseInstanceName;
         }
         return this;
     }
@@ -681,8 +681,8 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return caseInstanceId;
     }
 
-    public String getCaseInstanceName() {
-        return caseInstanceName;
+    public String getCaseInstanceNameLikeIgnoreCase() {
+        return caseInstanceNameLikeIgnoreCase;
     }
 
     public String getBusinessKey() {
