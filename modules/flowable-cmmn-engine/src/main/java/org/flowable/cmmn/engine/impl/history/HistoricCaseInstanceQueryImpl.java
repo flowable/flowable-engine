@@ -569,11 +569,11 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     }
 
     @Override
-    public HistoricCaseInstanceQueryImpl caseInstanceNameLikeIgnoreCase(String caseInstanceName) {
+    public HistoricCaseInstanceQueryImpl caseInstanceNameLikeIgnoreCase(String nameLikeIgnoreCase) {
         if (inOrStatement) {
-            this.currentOrQueryObject.caseInstanceNameLikeIgnoreCase = caseInstanceName;
+            this.currentOrQueryObject.caseInstanceNameLikeIgnoreCase = nameLikeIgnoreCase;
         } else {
-            this.caseInstanceNameLikeIgnoreCase = caseInstanceName;
+            this.caseInstanceNameLikeIgnoreCase = nameLikeIgnoreCase;
         }
         return this;
     }
