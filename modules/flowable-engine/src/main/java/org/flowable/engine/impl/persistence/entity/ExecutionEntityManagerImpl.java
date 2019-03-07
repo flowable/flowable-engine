@@ -231,7 +231,8 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
 
     @Override
     public ExecutionEntity createProcessInstanceExecution(ProcessDefinition processDefinition, String predefinedProcessInstanceId, 
-                    String businessKey, String tenantId, String initiatorVariableName, String startActivityId) {
+                    String businessKey, String processInstanceName, String callbackId, String callbackType,
+                    String tenantId, String initiatorVariableName, String startActivityId) {
 
         ExecutionEntity processInstanceExecution = executionDataManager.create();
 
@@ -249,6 +250,16 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         processInstanceExecution.setProcessDefinitionVersion(processDefinition.getVersion());
         processInstanceExecution.setDeploymentId(processDefinition.getDeploymentId());
         processInstanceExecution.setBusinessKey(businessKey);
+        processInstanceExecution.setName(processInstanceName);
+        
+        // Callbacks
+        if (callbackId != null) {
+            processInstanceExecution.setCallbackId(callbackId);
+        }
+        if (callbackType != null) {
+            processInstanceExecution.setCallbackType(callbackType);
+        }   
+        
         processInstanceExecution.setScope(true); // process instance is always a scope for all child executions
 
         // Inherit tenant id (if any)
