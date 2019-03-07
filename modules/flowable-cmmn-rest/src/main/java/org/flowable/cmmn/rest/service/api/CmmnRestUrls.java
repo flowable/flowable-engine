@@ -364,7 +364,7 @@ public final class CmmnRestUrls {
      */
     public static final String[] URL_HISTORIC_CASE_INSTANCE_VARIABLE_DATA = { SEGMENT_HISTORY_RESOURCES, SEGMENT_HISTORIC_CASE_INSTANCE_RESOURCE, "{0}", SEGMENT_VARIABLES, "{1}",
             SEGMENT_VARIABLE_DATA };
-
+    
     /**
      * URL template for a single historic task instance: <i>history/historic-task-instances/{0:taskId}</i>
      */

@@ -30,7 +30,7 @@ public class LoggingExecutionTreeCommandInvoker extends CommandInvoker {
             AbstractOperation operation = (AbstractOperation) runnable;
 
             if (operation.getExecution() != null) {
-                LOGGER.info("Execution tree while executing operation {} :", operation.getClass());
+                LOGGER.info("Execution tree while executing operation {}:", operation.getClass());
                 LOGGER.info("{}", System.lineSeparator() + ExecutionTreeUtil.buildExecutionTree(operation.getExecution()));
             }
 
