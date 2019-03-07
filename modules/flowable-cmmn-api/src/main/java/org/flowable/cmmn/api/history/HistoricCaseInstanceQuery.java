@@ -271,10 +271,10 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
     /**
      * Only select case instances that have a name like (case insensitive) the given name.
      *
-     * @param caseInstanceName
+     * @param nameLikeIgnoreCase
      *          cannot be null. The string can include the wildcard character '%' to express like-strategy: starts with (string%), ends with (%string) or contains (%string%).
      */
-    HistoricCaseInstanceQuery caseInstanceNameLikeIgnoreCase(String caseInstanceName);
+    HistoricCaseInstanceQuery caseInstanceNameLikeIgnoreCase(String nameLikeIgnoreCase);
     
     /**
      * Only select case instances which have a variable with the given name.
