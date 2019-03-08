@@ -334,6 +334,28 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment
+    public void timerExitStageOnCompletedTasks() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("timerExitStageOnCompletedTasks").start();
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery()
+                .caseInstanceId(caseInstance.getId())
+                .orderByTaskName().asc()
+                .list();
+        assertEquals(1, tasks.size());
+
+        // Should have a TimerJob
+        assertEquals(1L, cmmnManagementService.createTimerJobQuery().count());
+
+        for(Task task : tasks) {
+            cmmnTaskService.complete(task.getId());
+        }
+
+        // TimerJob should be deleted after all tasks have completed in the stage
+        assertEquals(0L, cmmnManagementService.createTimerJobQuery().count());
+    }
+
+    @Test
+    @CmmnDeployment
     public void testTimerWithAvailableCondition() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTimerExpression").start();
 
