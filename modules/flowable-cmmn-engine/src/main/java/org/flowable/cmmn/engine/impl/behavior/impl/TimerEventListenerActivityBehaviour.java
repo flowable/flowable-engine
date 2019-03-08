@@ -55,16 +55,16 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
     public TimerEventListenerActivityBehaviour(TimerEventListener timerEventListener) {
         this.timerEventListener = timerEventListener;
     }
-    
+
     @Override
     public void onStateTransition(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition) {
-        if (PlanItemTransition.CREATE.equals(transition) && StringUtils.isEmpty(timerEventListener.getAvailableConditionExpression())) {
+        if ((PlanItemTransition.CREATE.equals(transition) && StringUtils.isEmpty(timerEventListener.getAvailableConditionExpression()))
+                || PlanItemTransition.INITIATE.equals(transition)) {
             handleCreateTransition(commandContext, (PlanItemInstanceEntity) planItemInstance);
 
-        } else if (PlanItemTransition.INITIATE.equals(transition)) {
-            handleCreateTransition(commandContext, (PlanItemInstanceEntity) planItemInstance);
-
-        } else if (PlanItemTransition.DISMISS.equals(transition) || PlanItemTransition.TERMINATE.equals(transition)) {
+        } else if (PlanItemTransition.DISMISS.equals(transition)
+                || PlanItemTransition.TERMINATE.equals(transition)
+                || PlanItemTransition.EXIT.equals(transition)) {
             removeTimerJob(commandContext, (PlanItemInstanceEntity) planItemInstance);
 
         }
