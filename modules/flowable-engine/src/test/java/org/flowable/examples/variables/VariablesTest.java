@@ -1767,7 +1767,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskAssigneeProcess");
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
-        Map<String, String> variables = new HashMap<>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("testProperty", "434");
 
         formService.submitTaskFormData(task.getId(), variables);

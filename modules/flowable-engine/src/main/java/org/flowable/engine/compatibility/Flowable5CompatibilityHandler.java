@@ -138,7 +138,7 @@ public interface Flowable5CompatibilityHandler {
 
     Object getRenderedStartForm(String processDefinitionId, String formEngineName);
 
-    ProcessInstance submitStartFormData(String processDefinitionId, String businessKey, Map<String, String> properties);
+    ProcessInstance submitStartFormData(String processDefinitionId, String businessKey, Map<String, Object> properties);
     
     TaskFormData getTaskFormData(String taskId);
 

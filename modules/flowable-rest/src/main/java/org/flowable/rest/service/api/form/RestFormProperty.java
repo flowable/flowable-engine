@@ -25,7 +25,7 @@ public class RestFormProperty {
     protected String id;
     protected String name;
     protected String type;
-    protected String value;
+    protected Object value;
     protected boolean readable;
     protected boolean writable;
     protected boolean required;
@@ -59,11 +59,11 @@ public class RestFormProperty {
         this.type = type;
     }
 
-    public String getValue() {
+    public Object getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(Object value) {
         this.value = value;
     }
 

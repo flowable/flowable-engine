@@ -31,5 +31,5 @@ public interface FormHandler extends Serializable {
 
     void parseConfiguration(List<FormProperty> formProperties, String formKey, DeploymentEntity deployment, ProcessDefinition processDefinition);
 
-    void submitFormProperties(Map<String, String> properties, ExecutionEntity execution);
+    void submitFormProperties(Map<String, Object> properties, ExecutionEntity execution);
 }

@@ -466,7 +466,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
 
         processEngineConfiguration.getClock().setCurrentTime(startedDate);
 
-        Map<String, String> formProperties = new HashMap<>();
+        Map<String, Object> formProperties = new HashMap<>();
         formProperties.put("formProp1", "Activiti rocks");
         formProperties.put("formProp2", "12345");
 
@@ -605,7 +605,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
     @Test
     @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
     public void testHistoricFormPropertiesQuery() throws Exception {
-        Map<String, String> formProperties = new HashMap<>();
+        Map<String, Object> formProperties = new HashMap<>();
         formProperties.put("stringVar", "activiti rocks!");
         formProperties.put("longVar", "12345");
 
@@ -669,7 +669,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
     public void testHistoricFormPropertySorting() throws Exception {
 
-        Map<String, String> formProperties = new HashMap<>();
+        Map<String, Object> formProperties = new HashMap<>();
         formProperties.put("stringVar", "activiti rocks!");
         formProperties.put("longVar", "12345");
 
@@ -697,7 +697,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
     @Deployment
     public void testHistoricDetailQueryMixed() throws Exception {
 
-        Map<String, String> formProperties = new HashMap<>();
+        Map<String, Object> formProperties = new HashMap<>();
         formProperties.put("formProp1", "activiti rocks!");
         formProperties.put("formProp2", "12345");
 
@@ -899,7 +899,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertNotNull(processInstance);
 
         // Submit form on task
-        Map<String, String> data = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
         data.put("formProp1", "Property value");
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();

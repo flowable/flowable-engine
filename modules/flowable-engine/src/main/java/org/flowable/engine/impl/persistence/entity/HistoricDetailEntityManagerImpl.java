@@ -45,14 +45,14 @@ public class HistoricDetailEntityManagerImpl extends AbstractEntityManager<Histo
 
     @Override
     public HistoricFormPropertyEntity insertHistoricFormPropertyEntity(ExecutionEntity execution,
-            String propertyId, String propertyValue, String taskId) {
+            String propertyId, Object propertyValue, String taskId) {
 
         HistoricFormPropertyEntity historicFormPropertyEntity = historicDetailDataManager.createHistoricFormProperty();
         historicFormPropertyEntity.setProcessInstanceId(execution.getProcessInstanceId());
         historicFormPropertyEntity.setExecutionId(execution.getId());
         historicFormPropertyEntity.setTaskId(taskId);
         historicFormPropertyEntity.setPropertyId(propertyId);
-        historicFormPropertyEntity.setPropertyValue(propertyValue);
+        historicFormPropertyEntity.setPropertyValue(String.valueOf(propertyValue));
         historicFormPropertyEntity.setTime(getClock().getCurrentTime());
 
         ActivityInstanceEntity activityInstance = getActivityInstanceEntityManager().findUnfinishedActivityInstance(execution);

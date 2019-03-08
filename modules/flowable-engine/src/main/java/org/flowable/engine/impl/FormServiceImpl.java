@@ -66,17 +66,17 @@ public class FormServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
     }
 
     @Override
-    public ProcessInstance submitStartFormData(String processDefinitionId, Map<String, String> properties) {
+    public ProcessInstance submitStartFormData(String processDefinitionId, Map<String, Object> properties) {
         return commandExecutor.execute(new SubmitStartFormCmd(processDefinitionId, null, properties));
     }
 
     @Override
-    public ProcessInstance submitStartFormData(String processDefinitionId, String businessKey, Map<String, String> properties) {
+    public ProcessInstance submitStartFormData(String processDefinitionId, String businessKey, Map<String, Object> properties) {
         return commandExecutor.execute(new SubmitStartFormCmd(processDefinitionId, businessKey, properties));
     }
 
     @Override
-    public void submitTaskFormData(String taskId, Map<String, String> properties) {
+    public void submitTaskFormData(String taskId, Map<String, Object> properties) {
         commandExecutor.execute(new SubmitTaskFormCmd(taskId, properties, true));
     }
 
@@ -91,7 +91,7 @@ public class FormServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
     }
 
     @Override
-    public void saveFormData(String taskId, Map<String, String> properties) {
+    public void saveFormData(String taskId, Map<String, Object> properties) {
         commandExecutor.execute(new SubmitTaskFormCmd(taskId, properties, false));
     }
 }

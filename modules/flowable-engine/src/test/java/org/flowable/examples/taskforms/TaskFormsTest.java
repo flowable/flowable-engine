@@ -57,7 +57,7 @@ public class TaskFormsTest extends PluggableFlowableTestCase {
         assertEquals("org/flowable/examples/taskforms/request.form", formService.getStartFormData(processDefinitionId).getFormKey());
 
         // Define variables that would be filled in through the form
-        Map<String, String> formProperties = new HashMap<>();
+        Map<String, Object> formProperties = new HashMap<>();
         formProperties.put("employeeName", "kermit");
         formProperties.put("numberOfDays", "4");
         formProperties.put("vacationMotivation", "I'm tired");

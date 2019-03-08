@@ -75,7 +75,7 @@ public class FormPropertyHandler implements Serializable {
         return formProperty;
     }
 
-    public void submitFormProperty(ExecutionEntity execution, Map<String, String> properties) {
+    public void submitFormProperty(ExecutionEntity execution, Map<String, Object> properties) {
         if (!isWritable && properties.containsKey(id)) {
             throw new FlowableException("form property '" + id + "' is not writable");
         }
@@ -87,9 +87,9 @@ public class FormPropertyHandler implements Serializable {
         Object modelValue = null;
         if (properties.containsKey(id)) {
             propertyExists = true;
-            final String propertyValue = properties.remove(id);
-            if (type != null) {
-                modelValue = type.convertFormValueToModelValue(propertyValue);
+            final Object propertyValue = properties.remove(id);
+            if (type != null && propertyValue != null ) {
+                modelValue = type.convertFormValueToModelValue(propertyValue.toString());
             } else {
                 modelValue = propertyValue;
             }

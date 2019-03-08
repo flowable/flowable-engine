@@ -639,7 +639,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             assertEquals(2, historyService.createNativeHistoricDetailQuery().sql(sqlWithConditions).parameter("name", "var%").list().size());
 
             org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-            Map<String, String> formDatas = new HashMap<>();
+            Map<String, Object> formDatas = new HashMap<>();
             formDatas.put("field1", "field value 1");
             formDatas.put("field2", "field value 2");
             formService.submitTaskFormData(task.getId(), formDatas);

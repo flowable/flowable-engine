@@ -232,7 +232,7 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
             historyMap.put(historicVariableInstance.getVariableName(), historicVariableInstance);
         }
 
-        assertEquals("123", historyMap.get("room").getValue());
+        assertEquals(123, historyMap.get("room").getValue());
         assertEquals(processInstanceId, historyMap.get("room").getProcessInstanceId());
 
         processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variableMap);
@@ -261,7 +261,7 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
             historyMap.put(historicVariableInstance.getVariableName(), historicVariableInstance);
         }
 
-        assertEquals("123", historyMap.get("room").getValue());
+        assertEquals(123, historyMap.get("room").getValue());
         assertEquals(processInstanceId, historyMap.get("room").getProcessInstanceId());
         assertEquals("up", historyMap.get("direction").getValue());
 

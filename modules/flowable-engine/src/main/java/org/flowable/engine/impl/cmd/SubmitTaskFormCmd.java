@@ -13,6 +13,7 @@
 
 package org.flowable.engine.impl.cmd;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -34,10 +35,10 @@ public class SubmitTaskFormCmd extends NeedsActiveTaskCmd<Void> {
     private static final long serialVersionUID = 1L;
 
     protected String taskId;
-    protected Map<String, String> properties;
+    protected Map<String, Object> properties;
     protected boolean completeTask;
 
-    public SubmitTaskFormCmd(String taskId, Map<String, String> properties, boolean completeTask) {
+    public SubmitTaskFormCmd(String taskId, Map<String, Object> properties, boolean completeTask) {
         super(taskId);
         this.taskId = taskId;
         this.properties = properties;
@@ -50,8 +51,11 @@ public class SubmitTaskFormCmd extends NeedsActiveTaskCmd<Void> {
         // Backwards compatibility
         if (task.getProcessDefinitionId() != null) {
             if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
+                Map<String, String> backwardCompatMap = new HashMap<>();
+                properties.keySet().forEach((key) -> backwardCompatMap.put(key, String.valueOf(properties.get(key))));
+
                 Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
-                compatibilityHandler.submitTaskFormData(taskId, properties, completeTask);
+                compatibilityHandler.submitTaskFormData(taskId, backwardCompatMap, completeTask);
                 return null;
             }
         }
