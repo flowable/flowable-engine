@@ -71,7 +71,7 @@ public abstract class DmnEngines {
             }
             for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext();) {
                 URL resource = iterator.next();
-                LOGGER.info("Initializing dmn engine using configuration '{}'", resource.toString());
+                LOGGER.info("Initializing dmn engine using configuration '{}'", resource);
                 initDmnEngineFromResource(resource);
             }
 
@@ -83,7 +83,7 @@ public abstract class DmnEngines {
 
             while (resources.hasMoreElements()) {
                 URL resource = resources.nextElement();
-                LOGGER.info("Initializing dmn engine using Spring configuration '{}'", resource.toString());
+                LOGGER.info("Initializing dmn engine using Spring configuration '{}'", resource);
                 initDmnEngineFromSpringResource(resource);
             }
 
@@ -105,7 +105,7 @@ public abstract class DmnEngines {
             dmnEngineInfosByResourceUrl.put(resource.toString(), dmnEngineInfo);
 
         } catch (Exception e) {
-            throw new FlowableException("couldn't initialize dmn engine from spring configuration resource " + resource.toString() + ": " + e.getMessage(), e);
+            throw new FlowableException("couldn't initialize dmn engine from spring configuration resource " + resource + ": " + e.getMessage(), e);
         }
     }
 
