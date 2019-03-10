@@ -608,19 +608,17 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
             String groupStarterValue = BpmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_PROCESS_POTENTIALSTARTERGROUP, modelNode);
 
             if (StringUtils.isNotEmpty(userStarterValue)) {
-                List<String> userStarters = new ArrayList<>();
                 String userStartArray[] = userStarterValue.split(",");
 
-                userStarters.addAll(Arrays.asList(userStartArray));
+                List<String> userStarters = new ArrayList<>(Arrays.asList(userStartArray));
 
                 process.setCandidateStarterUsers(userStarters);
             }
 
             if (StringUtils.isNotEmpty(groupStarterValue)) {
-                List<String> groupStarters = new ArrayList<>();
                 String groupStarterArray[] = groupStarterValue.split(",");
 
-                groupStarters.addAll(Arrays.asList(groupStarterArray));
+                List<String> groupStarters = new ArrayList<>(Arrays.asList(groupStarterArray));
 
                 process.setCandidateStarterGroups(groupStarters);
             }

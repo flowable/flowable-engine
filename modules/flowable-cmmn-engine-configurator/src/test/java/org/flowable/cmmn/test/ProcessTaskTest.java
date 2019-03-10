@@ -499,10 +499,10 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         variables.put("processVariableName2", "processString2");
         processEngineTaskService.complete(task.getId(), variables);
 
-        Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processVariableC")).isNull();;
-        Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processVariableD")).isNull();;
-        Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processVariableName1")).isNull();;
-        Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processVariableName2")).isNull();;
+        Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processVariableC")).isNull();
+        Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processVariableD")).isNull();
+        Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processVariableName1")).isNull();
+        Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processVariableName2")).isNull();
 
         Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "caseVariableC")).isEqualTo("hello");
         Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processString1")).isEqualTo("hello");

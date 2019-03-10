@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -212,7 +213,7 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
         assertEquals("mammals", groups.get(2).getId());
         assertEquals("muppets", groups.get(3).getId());
         
-        groups = idmIdentityService.createGroupQuery().groupMembers(Arrays.asList("fozzie")).orderByGroupId().asc().list();
+        groups = idmIdentityService.createGroupQuery().groupMembers(Collections.singletonList("fozzie")).orderByGroupId().asc().list();
         assertEquals(2, groups.size());
         assertEquals("mammals", groups.get(0).getId());
         assertEquals("muppets", groups.get(1).getId());
@@ -225,7 +226,7 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
     
     @Test
     public void testQueryByInvalidGroupMember() {
-        GroupQuery query = idmIdentityService.createGroupQuery().groupMembers(Arrays.asList("invalid"));
+        GroupQuery query = idmIdentityService.createGroupQuery().groupMembers(Collections.singletonList("invalid"));
         verifyQueryResults(query, 0);
 
         try {

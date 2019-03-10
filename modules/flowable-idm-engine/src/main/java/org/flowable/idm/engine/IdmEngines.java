@@ -72,7 +72,7 @@ public abstract class IdmEngines {
             }
             for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext(); ) {
                 URL resource = iterator.next();
-                LOGGER.info("Initializing idm engine using configuration '{}'", resource.toString());
+                LOGGER.info("Initializing idm engine using configuration '{}'", resource);
                 initIdmEngineFromResource(resource);
             }
 
@@ -84,7 +84,7 @@ public abstract class IdmEngines {
 
             while (resources.hasMoreElements()) {
                 URL resource = resources.nextElement();
-                LOGGER.info("Initializing idm engine using Spring configuration '{}'", resource.toString());
+                LOGGER.info("Initializing idm engine using Spring configuration '{}'", resource);
                 initIdmEngineFromSpringResource(resource);
             }
 
@@ -106,7 +106,7 @@ public abstract class IdmEngines {
             idmEngineInfosByResourceUrl.put(resource.toString(), idmEngineInfo);
 
         } catch (Exception e) {
-            throw new FlowableException("couldn't initialize idm engine from spring configuration resource " + resource.toString() + ": " + e.getMessage(), e);
+            throw new FlowableException("couldn't initialize idm engine from spring configuration resource " + resource + ": " + e.getMessage(), e);
         }
     }
 

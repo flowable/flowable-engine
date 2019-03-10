@@ -48,7 +48,7 @@ public class SignalEventSubscriptionEntity extends EventSubscriptionEntity {
 
     public boolean isProcessInstanceScoped() {
         String scope = extractScopeFormConfiguration();
-        return (scope != null) && (Signal.SCOPE_PROCESS_INSTANCE.equals(scope));
+        return Signal.SCOPE_PROCESS_INSTANCE.equals(scope);
     }
 
     public boolean isGlobalScoped() {

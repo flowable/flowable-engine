@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -44,7 +45,7 @@ public class StartTimerEventRepeatWithoutEndTest extends PluggableFlowableTestCa
     class StartEventListener extends AbstractFlowableEngineEventListener {
 
         public StartEventListener() {
-            super(new HashSet<>(Arrays.asList(FlowableEngineEventType.TIMER_FIRED)));
+            super(new HashSet<>(Collections.singletonList(FlowableEngineEventType.TIMER_FIRED)));
         }
 
         @Override

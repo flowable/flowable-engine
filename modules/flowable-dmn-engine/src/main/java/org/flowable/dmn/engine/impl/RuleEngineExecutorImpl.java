@@ -296,7 +296,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
                 executionContext.getAuditContainer().addDecisionResultType(outputVariableId, outputVariableType);
 
                 if (executionVariable != null) {
-                    LOGGER.debug("Created conclusion result: {} of type: {} with value {}", outputVariableId, resultValue.getClass(), resultValue.toString());
+                    LOGGER.debug("Created conclusion result: {} of type: {} with value {}", outputVariableId, resultValue.getClass(), resultValue);
                 } else {
                     LOGGER.warn("Could not create conclusion result");
                 }

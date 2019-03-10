@@ -341,7 +341,7 @@ public class HttpActivityExecutor {
         try (BufferedReader reader = new BufferedReader(new StringReader(headers))) {
             String line = reader.readLine();
             while (line != null) {
-                int colonIndex = line.indexOf(":");
+                int colonIndex = line.indexOf(':');
                 if (colonIndex > 0) {
                     String headerName = line.substring(0, colonIndex);
                     if (line.length() > colonIndex + 2) {

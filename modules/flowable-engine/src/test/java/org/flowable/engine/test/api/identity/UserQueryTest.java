@@ -17,6 +17,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -300,14 +301,14 @@ public class UserQueryTest extends PluggableFlowableTestCase {
         assertEquals("gonzo", users.get(1).getId());
         assertEquals("kermit", users.get(2).getId());
         
-        users = identityService.createUserQuery().memberOfGroups(Arrays.asList("frogs")).list();
+        users = identityService.createUserQuery().memberOfGroups(Collections.singletonList("frogs")).list();
         assertEquals(1, users.size());
         assertEquals("kermit", users.get(0).getId());
     }
     
     @Test
     public void testQueryByInvalidMemberOfGroups() {
-        UserQuery query = identityService.createUserQuery().memberOfGroups(Arrays.asList("invalid"));
+        UserQuery query = identityService.createUserQuery().memberOfGroups(Collections.singletonList("invalid"));
         verifyQueryResults(query, 0);
 
         try {

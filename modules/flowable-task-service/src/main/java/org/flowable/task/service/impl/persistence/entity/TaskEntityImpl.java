@@ -635,8 +635,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     }
     
     protected List<IdentityLink> convertToIdentityLinks(List<IdentityLinkEntity> identityLinks) {
-        List<IdentityLink> identityLinkObjects = new ArrayList<>();
-        identityLinkObjects.addAll(identityLinks);
+        List<IdentityLink> identityLinkObjects = new ArrayList<>(identityLinks);
         return identityLinkObjects;
     }
     

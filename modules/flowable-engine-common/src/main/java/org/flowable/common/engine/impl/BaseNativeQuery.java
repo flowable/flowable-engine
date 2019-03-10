@@ -48,8 +48,7 @@ public abstract class BaseNativeQuery<T extends NativeQuery<?, ?>, U> implements
     }
     
     protected Map<String, Object> generateParameterMap() {
-        Map<String, Object> parameterMap = new HashMap<>();
-        parameterMap.putAll(parameters);
+        Map<String, Object> parameterMap = new HashMap<>(parameters);
         parameterMap.put("sql", sqlStatement);
         parameterMap.put("resultType", resultType.toString());
         parameterMap.put("firstResult", firstResult);

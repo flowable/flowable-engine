@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.http.HttpStatus;
@@ -89,7 +90,7 @@ public class HistoricTaskLogCollectionResourceTest extends BaseSpringRestTestCas
         expectSequence(list1, asList(task1.getId(), task1.getId(), task2.getId()), asList("USER_TASK_CREATED", "USER_TASK_COMPLETED", "USER_TASK_CREATED"));
 
         JsonNode list2 = queryTaskLogEntries("?processInstanceId=" + encode(processInstance2.getId()) + "&sort=logNumber&order=asc");
-        expectSequence(list2, asList(task3.getId()), asList("USER_TASK_CREATED"));
+        expectSequence(list2, Collections.singletonList(task3.getId()), Collections.singletonList("USER_TASK_CREATED"));
     }
 
     @Test
@@ -116,8 +117,8 @@ public class HistoricTaskLogCollectionResourceTest extends BaseSpringRestTestCas
 
         JsonNode listAfter = queryTaskLogEntries("?taskId=" + encode(task1.getId()) + "&sort=logNumber&order=asc&from=" + dateFormat.format(startTime.getTime()));
         expectSequence(listAfter,
-            asList(task1.getId()),
-            asList("USER_TASK_OWNER_CHANGED"));
+                Collections.singletonList(task1.getId()),
+                Collections.singletonList("USER_TASK_OWNER_CHANGED"));
 
         startTime.add(Calendar.DAY_OF_YEAR, -1);
         JsonNode listBefore = queryTaskLogEntries("?taskId=" + encode(task1.getId()) + "&sort=logNumber&order=asc&to=" + dateFormat.format(startTime.getTime()));

@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -163,13 +164,13 @@ public class PrivilegesTest extends PluggableFlowableIdmTestCase {
     
     @Test
     public void testQueryByGroupIds() {
-        List<Privilege> privileges = idmIdentityService.createPrivilegeQuery().groupIds(Arrays.asList("admins")).list();
+        List<Privilege> privileges = idmIdentityService.createPrivilegeQuery().groupIds(Collections.singletonList("admins")).list();
         assertEquals(2, privileges.size());
         
         privileges = idmIdentityService.createPrivilegeQuery().groupIds(Arrays.asList("admins", "engineering")).list();
         assertEquals(2, privileges.size());
         
-        privileges = idmIdentityService.createPrivilegeQuery().groupIds(Arrays.asList("engineering")).list();
+        privileges = idmIdentityService.createPrivilegeQuery().groupIds(Collections.singletonList("engineering")).list();
         assertEquals(1, privileges.size());
         
         privileges = idmIdentityService.createPrivilegeQuery().groupIds(Arrays.asList("admins", "engineering")).listPage(0, 1);
@@ -181,7 +182,7 @@ public class PrivilegesTest extends PluggableFlowableIdmTestCase {
     
     @Test
     public void testQueryByInvalidGroupIds() {
-        assertEquals(0, idmIdentityService.createPrivilegeQuery().groupIds(Arrays.asList("does not exist")).list().size());
+        assertEquals(0, idmIdentityService.createPrivilegeQuery().groupIds(Collections.singletonList("does not exist")).list().size());
     }
 
     @Test

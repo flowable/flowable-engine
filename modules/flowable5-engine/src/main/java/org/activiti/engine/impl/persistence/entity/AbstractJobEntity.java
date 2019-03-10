@@ -13,13 +13,11 @@
 package org.activiti.engine.impl.persistence.entity;
 
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.db.BulkDeleteable;
 import org.activiti.engine.impl.db.HasRevision;
 import org.activiti.engine.impl.db.PersistentObject;

@@ -18,6 +18,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -364,7 +365,7 @@ public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
                 .variable("myVar", new ArrayList<>())
                 .start();
         assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
-        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar",  Arrays.asList("a"));
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", Collections.singletonList("a"));
         assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
         cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar",  Arrays.asList("a", "b", "c", "d", "e", "f", "g"));
         assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
@@ -467,7 +468,7 @@ public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
                 .variable("myVar", new ArrayList<>())
                 .start();
         assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
-        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar",  Arrays.asList("c"));
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", Collections.singletonList("c"));
         assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
         cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar",  Arrays.asList("a", "b", "c", "d", "e", "f", "g"));
         assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());

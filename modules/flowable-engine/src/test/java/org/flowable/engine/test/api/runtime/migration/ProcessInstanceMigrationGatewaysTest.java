@@ -1040,7 +1040,7 @@ public class ProcessInstanceMigrationGatewaysTest extends AbstractProcessInstanc
 
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procInclusiveGtw.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("gwFork")));
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Collections.singletonList("gwFork")));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
@@ -1106,7 +1106,7 @@ public class ProcessInstanceMigrationGatewaysTest extends AbstractProcessInstanc
         try {
             ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
                 .migrateToProcessDefinition(procInclusiveGtw.getId())
-                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("gwFork")).withLocalVariableForAllActivities("myConditionVar", 10));
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Collections.singletonList("gwFork")).withLocalVariableForAllActivities("myConditionVar", 10));
 
             ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
             assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
@@ -1139,7 +1139,7 @@ public class ProcessInstanceMigrationGatewaysTest extends AbstractProcessInstanc
 
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procInclusiveGtw.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("gwFork")));
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Collections.singletonList("gwFork")));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
@@ -1205,7 +1205,7 @@ public class ProcessInstanceMigrationGatewaysTest extends AbstractProcessInstanc
 
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procInclusiveGtw.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("gwFork")).withLocalVariableForAllActivities("myConditionVar", 11));
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Collections.singletonList("gwFork")).withLocalVariableForAllActivities("myConditionVar", 11));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
@@ -1272,7 +1272,7 @@ public class ProcessInstanceMigrationGatewaysTest extends AbstractProcessInstanc
 
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procInclusiveGtw.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("gwFork")))
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Collections.singletonList("gwFork")))
             .withProcessInstanceVariable("myConditionVar", 11);
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
@@ -1339,7 +1339,7 @@ public class ProcessInstanceMigrationGatewaysTest extends AbstractProcessInstanc
 
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procInclusiveGtw.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("taskLess")));
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Collections.singletonList("taskLess")));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
@@ -1618,7 +1618,7 @@ public class ProcessInstanceMigrationGatewaysTest extends AbstractProcessInstanc
 
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procInclusiveGtw.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("gwFork")));
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Collections.singletonList("gwFork")));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
@@ -1685,7 +1685,7 @@ public class ProcessInstanceMigrationGatewaysTest extends AbstractProcessInstanc
 
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procInclusiveGtw.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Arrays.asList("taskLess")));
+            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", Collections.singletonList("taskLess")));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
