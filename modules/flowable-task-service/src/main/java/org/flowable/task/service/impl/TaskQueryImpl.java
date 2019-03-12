@@ -859,10 +859,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     @Override
     public TaskQuery taskFormKey(String formKey) {
-        if (formKey == null){
+        if (formKey == null) {
             throw new FlowableIllegalArgumentException("Task formKey is null");
         }
-        if(orActive){
+        if (orActive) {
             currentOrQueryObject.formKey = formKey;
         } else {
             this.formKey = formKey;

@@ -1255,11 +1255,11 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     @Override
     public HistoricTaskInstanceQuery taskFormKey(String formKey) {
-        if(formKey == null){
+        if (formKey == null) {
             throw new FlowableIllegalArgumentException("Task formKey is null");
         }
 
-        if(inOrStatement){
+        if (inOrStatement) {
             currentOrQueryObject.formKey = formKey;
         } else {
             this.formKey = formKey;
