@@ -34,6 +34,7 @@ import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.junit.jupiter.api.AfterEach;
@@ -487,6 +488,69 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             fail();
         } catch (FlowableIllegalArgumentException e) {
 
+        }
+    }
+
+    @Test
+    public void testQueryByFormKey() {
+        Task task = taskService.newTask();
+        task.setFormKey("testFormKey");
+        taskService.saveTask(task);
+        taskIds.add(task.getId());
+
+        List<Task> tasks = taskService.createTaskQuery().taskFormKey("testFormKey").list();
+
+        assertEquals(1, tasks.size());
+        assertEquals("testFormKey", tasks.get(0).getFormKey());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                .taskFormKey("testFormKey")
+                .list();
+            assertEquals(1, historicTasks.size());
+            assertEquals("testFormKey", historicTasks.get(0).getFormKey());
+        }
+    }
+
+    @Test
+    public void testQueryByFormKeyOr() {
+        Task task = taskService.newTask();
+        task.setFormKey("testFormKey");
+        taskService.saveTask(task);
+        taskIds.add(task.getId());
+
+        List<Task> tasks = taskService.createTaskQuery().or().taskId("invalid").taskFormKey("testFormKey").list();
+
+        assertEquals(1, tasks.size());
+        assertEquals("testFormKey", tasks.get(0).getFormKey());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery().or()
+                .taskFormKey("testFormKey")
+                .list();
+            assertEquals(1, historicTasks.size());
+            assertEquals("testFormKey", historicTasks.get(0).getFormKey());
+        }
+    }
+
+    @Test
+    public void testQueryWithFormKey() {
+        Task task = taskService.newTask();
+        task.setFormKey("testFormKey");
+        taskService.saveTask(task);
+        taskIds.add(task.getId());
+
+        List<Task> tasks = taskService.createTaskQuery().taskWithFormKey().list();
+
+        assertEquals(1, tasks.size());
+        assertEquals("testFormKey", tasks.get(0).getFormKey());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                .taskWithFormKey()
+                .list();
+            assertEquals(1, historicTasks.size());
+            assertEquals("testFormKey", historicTasks.get(0).getFormKey());
         }
     }
 

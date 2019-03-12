@@ -812,6 +812,9 @@
       <if test="withFormKey">
         and RES.FORM_KEY_ IS NOT NULL
       </if>
+      <if test="formKey != null">
+        and RES.FORM_KEY_ = #{formKey}
+      </if>
       <if test="tenantId != null">
         and RES.TENANT_ID_ = #{tenantId}
       </if>
@@ -1187,6 +1190,9 @@
           </if>
           <if test="orQueryObject.withFormKey">
             or RES.FORM_KEY_ IS NOT NULL
+          </if>
+          <if test="orQueryObject.formKey != null">
+            or RES.FORM_KEY_ = #{orQueryObject.formKey}
           </if>
           <if test="orQueryObject.tenantId != null">
             or RES.TENANT_ID_ = #{orQueryObject.tenantId}

@@ -810,6 +810,9 @@
       <if test="withFormKey">
         and RES.FORM_KEY_ IS NOT NULL
       </if>
+        <if test="formKey != null">
+            and RES.FORM_KEY_ = #{formKey}
+        </if>
       <if test="excludeSubtasks">
         and RES.PARENT_TASK_ID_ IS NULL
       </if>
@@ -1214,6 +1217,9 @@
             </if>
             <if test="orQueryObject.withFormKey">
               or RES.FORM_KEY_ IS NOT NULL
+            </if>
+            <if test="orQueryObject.formKey != null">
+                or RES.FORM_KEY_ = #{orQueryObject.formKey}
             </if>
             <if test="orQueryObject.excludeSubtasks">
               or RES.PARENT_TASK_ID_ IS NULL
