@@ -290,8 +290,6 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         task.setName("Test name");
         task.setDescription("Test description");
         cmmnTaskService.saveTask(task);
-        Date dueDate = new Date();
-        cmmnTaskService.setDueDate(task.getId(), dueDate);
 
         waitForAsyncHistoryExecutorToProcessAllJobs();
 
@@ -300,6 +298,15 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         assertThat(historicTaskInstance).isNotNull();
         assertThat(historicTaskInstance.getName()).isEqualTo("Test name");
         assertThat(historicTaskInstance.getDescription()).isEqualTo("Test description");
+        assertThat(historicTaskInstance.getDueDate()).isNull();
+
+        // Set due date
+        Date dueDate = new Date();
+        cmmnTaskService.setDueDate(task.getId(), dueDate);
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+
+        historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(historicTaskInstance.getDueDate()).isEqualTo(dueDate);
 
         // Update name and description to null
