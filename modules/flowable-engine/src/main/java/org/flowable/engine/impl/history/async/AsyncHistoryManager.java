@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -525,17 +524,6 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
     /* Helper methods */
 
     protected ObjectNode getActivityStart(String executionId, String activityId, boolean removeFromAsyncHistorySession) {
-        return getActivityStart(objectNode -> activityId.equals(getStringFromJson(objectNode, HistoryJsonConstants.ACTIVITY_ID))
-                        && executionId.equals(getStringFromJson(objectNode, HistoryJsonConstants.EXECUTION_ID)),
-                removeFromAsyncHistorySession);
-    }
-
-    protected ObjectNode getActivityStart(String runtimeActivityInstanceId, boolean removeFromAsyncHistorySession) {
-        return getActivityStart(objectNode -> runtimeActivityInstanceId.equals(getStringFromJson(objectNode,
-                HistoryJsonConstants.RUNTIME_ACTIVITY_INSTANCE_ID)), removeFromAsyncHistorySession);
-    }
-
-    private ObjectNode getActivityStart(Predicate<ObjectNode> isActivityStartData, boolean removeFromAsyncHistorySession) {
         Map<JobServiceConfiguration, AsyncHistorySessionData> sessionData = getAsyncHistorySession().getSessionData();
         if (sessionData != null) {
             AsyncHistorySessionData asyncHistorySessionData = sessionData.get(getJobServiceConfiguration());
@@ -546,7 +534,33 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
                     Iterator<ObjectNode> activityStartDataIterator = activityStartDataList.iterator();
                     while (activityStartDataIterator.hasNext()) {
                         ObjectNode activityStartData = activityStartDataIterator.next();
-                        if (isActivityStartData.test(activityStartData)) {
+                        if (activityId.equals(getStringFromJson(activityStartData, HistoryJsonConstants.ACTIVITY_ID))
+                                && executionId.equals(getStringFromJson(activityStartData, HistoryJsonConstants.EXECUTION_ID))) {
+                            if (removeFromAsyncHistorySession) {
+                                activityStartDataIterator.remove();
+                            }
+                            return activityStartData;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    protected ObjectNode getActivityStart(String runtimeActivityInstanceId, boolean removeFromAsyncHistorySession) {
+        Map<JobServiceConfiguration, AsyncHistorySessionData> sessionData = getAsyncHistorySession().getSessionData();
+        if (sessionData != null) {
+            AsyncHistorySessionData asyncHistorySessionData = sessionData.get(getJobServiceConfiguration());
+            if (asyncHistorySessionData != null) {
+                Map<String, List<ObjectNode>> jobData = asyncHistorySessionData.getJobData();
+                if (jobData != null && jobData.containsKey(HistoryJsonConstants.TYPE_ACTIVITY_START)) {
+                    List<ObjectNode> activityStartDataList = jobData.get(HistoryJsonConstants.TYPE_ACTIVITY_START);
+                    Iterator<ObjectNode> activityStartDataIterator = activityStartDataList.iterator();
+                    while (activityStartDataIterator.hasNext()) {
+                        ObjectNode activityStartData = activityStartDataIterator.next();
+                        if (runtimeActivityInstanceId.equals(getStringFromJson(activityStartData,
+                                HistoryJsonConstants.RUNTIME_ACTIVITY_INSTANCE_ID))) {
                             if (removeFromAsyncHistorySession) {
                                 activityStartDataIterator.remove();
                             }
