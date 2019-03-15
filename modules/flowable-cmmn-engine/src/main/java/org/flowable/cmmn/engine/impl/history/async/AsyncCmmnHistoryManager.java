@@ -58,12 +58,11 @@ public class AsyncCmmnHistoryManager extends AbstractAsyncCmmnHistoryManager {
     }
 
     @Override
-    public void recordCaseInstanceEnd(CaseInstanceEntity caseInstanceEntity, String state) {
+    public void recordCaseInstanceEnd(CaseInstanceEntity caseInstanceEntity, String state, Date endTime) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonCaseInstanceFields(caseInstanceEntity, data);
             
-            Date endTime = cmmnEngineConfiguration.getClock().getCurrentTime();
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_END_TIME, endTime);
             
             if (caseInstanceEntity.getStartTime() != null) {
@@ -172,20 +171,20 @@ public class AsyncCmmnHistoryManager extends AbstractAsyncCmmnHistoryManager {
     }
     
     @Override
-    public void recordVariableCreate(VariableInstanceEntity variable) {
+    public void recordVariableCreate(VariableInstanceEntity variable, Date createTime) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
-            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CREATE_TIME, cmmnEngineConfiguration.getClock().getCurrentTime());
-            addCommonVariableFields(variable, data);
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CREATE_TIME, createTime);
+            addCommonVariableFields(variable, data, createTime);
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_VARIABLE_CREATED, data);
         }
     }
 
     @Override
-    public void recordVariableUpdate(VariableInstanceEntity variable) {
+    public void recordVariableUpdate(VariableInstanceEntity variable, Date updateTime) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) { 
             ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
-            addCommonVariableFields(variable, data);
+            addCommonVariableFields(variable, data, updateTime);
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_VARIABLE_UPDATED, data);
         }
     }
@@ -194,7 +193,8 @@ public class AsyncCmmnHistoryManager extends AbstractAsyncCmmnHistoryManager {
     public void recordVariableRemoved(VariableInstanceEntity variable) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
-            addCommonVariableFields(variable, data);
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, variable.getId());
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REVISION, variable.getRevision());
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_VARIABLE_REMOVED, data);
         }
     }
@@ -209,22 +209,24 @@ public class AsyncCmmnHistoryManager extends AbstractAsyncCmmnHistoryManager {
     }
 
     @Override
-    public void recordTaskInfoChange(TaskEntity task) {
+    public void recordTaskInfoChange(TaskEntity task, Date changeTime) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonTaskFields(task, data);
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_UPDATE_TIME, changeTime);
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_TASK_UPDATED, data, task.getTenantId());
         }
     }
     
     @Override
-    public void recordTaskEnd(TaskEntity task, String deleteReason) {
+    public void recordTaskEnd(TaskEntity task, String deleteReason, Date endTime) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonTaskFields(task, data);
             
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_DELETE_REASON, deleteReason);
-            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_END_TIME, cmmnEngineConfiguration.getClock().getCurrentTime());
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_END_TIME, endTime);
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_UPDATE_TIME, endTime);
             
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_TASK_REMOVED, data, task.getTenantId());
         }

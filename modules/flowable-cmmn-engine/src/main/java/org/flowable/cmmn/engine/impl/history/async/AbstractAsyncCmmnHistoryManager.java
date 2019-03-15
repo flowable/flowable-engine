@@ -196,7 +196,7 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
         }
     }
 
-    protected void addCommonVariableFields(VariableInstanceEntity variable, ObjectNode data) {
+    protected void addCommonVariableFields(VariableInstanceEntity variable, ObjectNode data, Date time) {
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, variable.getId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_TASK_ID, variable.getTaskId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REVISION, variable.getRevision());
@@ -212,7 +212,6 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_PLAN_ITEM_INSTANCE_ID, variable.getSubScopeId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SCOPE_TYPE, variable.getScopeType());
 
-        Date time = cmmnEngineConfiguration.getClock().getCurrentTime();
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_UPDATE_TIME, time);
 
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_VARIABLE_TYPE, variable.getType().getTypeName());

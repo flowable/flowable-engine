@@ -33,7 +33,8 @@ public class SetTaskPriorityCmd extends NeedsActiveTaskCmd<Void> {
     @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
         task.setPriority(priority);
-        CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskInfoChange(task);
+        CommandContextUtil.getCmmnHistoryManager(commandContext)
+            .recordTaskInfoChange(task, commandContext.getCurrentEngineConfiguration().getClock().getCurrentTime());
         CommandContextUtil.getTaskService().updateTask(task, true);
         return null;
     }

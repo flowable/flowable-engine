@@ -12,6 +12,8 @@
  */
 package org.flowable.variable.service.history;
 
+import java.util.Date;
+
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 public interface InternalHistoryVariableManager {
@@ -19,16 +21,16 @@ public interface InternalHistoryVariableManager {
     /**
      * Record a variable has been created, if audit history is enabled.
      */
-    void recordVariableCreate(VariableInstanceEntity variable);
+    void recordVariableCreate(VariableInstanceEntity variable, Date createTime);
 
     /**
      * Record a variable has been updated, if audit history is enabled.
      */
-    void recordVariableUpdate(VariableInstanceEntity variable);
+    void recordVariableUpdate(VariableInstanceEntity variable, Date updateTime);
 
     /**
      * Record a variable has been deleted, if audit history is enabled.
      */
-    void recordVariableRemoved(VariableInstanceEntity variable);
+    void recordVariableRemoved(VariableInstanceEntity variable, Date removeTime);
 
 }

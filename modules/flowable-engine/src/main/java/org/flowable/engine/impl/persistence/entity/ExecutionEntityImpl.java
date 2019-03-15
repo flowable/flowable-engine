@@ -27,6 +27,7 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -721,12 +722,13 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         
         CountingEntityUtil.handleInsertVariableInstanceEntityCount(variableInstance);
         
+        Clock clock = CommandContextUtil.getProcessEngineConfiguration().getClock();
         // Record historic variable
-        CommandContextUtil.getHistoryManager().recordVariableCreate(variableInstance);
+        CommandContextUtil.getHistoryManager().recordVariableCreate(variableInstance, clock.getCurrentTime());
 
         // Record historic detail
         CommandContextUtil.getHistoryManager().recordHistoricDetailVariableCreate(variableInstance, sourceExecution, true,
-            getRelatedActivityInstanceId(sourceExecution));
+            getRelatedActivityInstanceId(sourceExecution), clock.getCurrentTime());
 
         return variableInstance;
     }
@@ -749,10 +751,11 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     protected void updateVariableInstance(VariableInstanceEntity variableInstance, Object value, ExecutionEntity sourceExecution) {
         super.updateVariableInstance(variableInstance, value);
 
+        Clock clock = CommandContextUtil.getProcessEngineConfiguration().getClock();
         CommandContextUtil.getHistoryManager().recordHistoricDetailVariableCreate(variableInstance, sourceExecution, true,
-            getRelatedActivityInstanceId(sourceExecution));
+            getRelatedActivityInstanceId(sourceExecution), clock.getCurrentTime());
 
-        CommandContextUtil.getHistoryManager().recordVariableUpdate(variableInstance);
+        CommandContextUtil.getHistoryManager().recordVariableUpdate(variableInstance, clock.getCurrentTime());
     }
 
     @Override
@@ -761,12 +764,13 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         
         CountingEntityUtil.handleDeleteVariableInstanceEntityCount(variableInstance, true);
         
+        Clock clock = CommandContextUtil.getProcessEngineConfiguration().getClock();
         // Record historic variable deletion
         CommandContextUtil.getHistoryManager().recordVariableRemoved(variableInstance);
 
         // Record historic detail
         CommandContextUtil.getHistoryManager().recordHistoricDetailVariableCreate(variableInstance, this, true,
-            getRelatedActivityInstanceId(this));
+            getRelatedActivityInstanceId(this), clock.getCurrentTime());
     }
     
     @Override
