@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.history;
 
 import java.util.Collection;
+import java.util.Date;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
@@ -43,9 +44,9 @@ public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
     }
 
     @Override
-    public void recordCaseInstanceEnd(CaseInstanceEntity caseInstanceEntity, String state) {
+    public void recordCaseInstanceEnd(CaseInstanceEntity caseInstanceEntity, String state, Date endTime) {
         for (CmmnHistoryManager historyManager : historyManagers) {
-            historyManager.recordCaseInstanceEnd(caseInstanceEntity, state);
+            historyManager.recordCaseInstanceEnd(caseInstanceEntity, state, endTime);
         }
     }
 
@@ -99,16 +100,16 @@ public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
     }
 
     @Override
-    public void recordVariableCreate(VariableInstanceEntity variable) {
+    public void recordVariableCreate(VariableInstanceEntity variable, Date createTime) {
         for (CmmnHistoryManager historyManager : historyManagers) {
-            historyManager.recordVariableCreate(variable);
+            historyManager.recordVariableCreate(variable, createTime);
         }
     }
 
     @Override
-    public void recordVariableUpdate(VariableInstanceEntity variable) {
+    public void recordVariableUpdate(VariableInstanceEntity variable, Date updateTime) {
         for (CmmnHistoryManager historyManager : historyManagers) {
-            historyManager.recordVariableUpdate(variable);
+            historyManager.recordVariableUpdate(variable, updateTime);
         }
     }
 
@@ -127,16 +128,16 @@ public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
     }
 
     @Override
-    public void recordTaskEnd(TaskEntity task, String deleteReason) {
+    public void recordTaskEnd(TaskEntity task, String deleteReason, Date endTime) {
         for (CmmnHistoryManager historyManager : historyManagers) {
-            historyManager.recordTaskEnd(task, deleteReason);
+            historyManager.recordTaskEnd(task, deleteReason, endTime);
         }
     }
 
     @Override
-    public void recordTaskInfoChange(TaskEntity taskEntity) {
+    public void recordTaskInfoChange(TaskEntity taskEntity, Date changeTime) {
         for (CmmnHistoryManager historyManager : historyManagers) {
-            historyManager.recordTaskInfoChange(taskEntity);
+            historyManager.recordTaskInfoChange(taskEntity, changeTime);
         }
     }
 

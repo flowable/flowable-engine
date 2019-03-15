@@ -12,6 +12,7 @@
  */
 package org.flowable.variable.service.impl.persistence.entity;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -24,9 +25,9 @@ import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
  */
 public interface HistoricVariableInstanceEntityManager extends EntityManager<HistoricVariableInstanceEntity> {
 
-    HistoricVariableInstanceEntity createAndInsert(VariableInstanceEntity variableInstance);
+    HistoricVariableInstanceEntity createAndInsert(VariableInstanceEntity variableInstance, Date createTime);
 
-    void copyVariableValue(HistoricVariableInstanceEntity historicVariableInstance, VariableInstanceEntity variableInstance);
+    void copyVariableValue(HistoricVariableInstanceEntity historicVariableInstance, VariableInstanceEntity variableInstance, Date updateTime);
 
     List<HistoricVariableInstance> findHistoricVariableInstancesByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery);
 

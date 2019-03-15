@@ -13,6 +13,7 @@
 package org.flowable.engine.impl.history;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
 
 import org.flowable.bpmn.model.FlowElement;
@@ -83,9 +84,9 @@ public class CompositeHistoryManager implements HistoryManager {
     }
 
     @Override
-    public void recordProcessInstanceEnd(ExecutionEntity processInstance, String deleteReason, String activityId) {
+    public void recordProcessInstanceEnd(ExecutionEntity processInstance, String deleteReason, String activityId, Date endTime) {
         for (HistoryManager historyManager : historyManagers) {
-            historyManager.recordProcessInstanceEnd(processInstance, deleteReason, activityId);
+            historyManager.recordProcessInstanceEnd(processInstance, deleteReason, activityId, endTime);
         }
     }
 
@@ -132,9 +133,9 @@ public class CompositeHistoryManager implements HistoryManager {
     }
 
     @Override
-    public void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason) {
+    public void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason, Date endTime) {
         for (HistoryManager historyManager : historyManagers) {
-            historyManager.recordActivityEnd(executionEntity, deleteReason);
+            historyManager.recordActivityEnd(executionEntity, deleteReason, endTime);
         }
     }
 
@@ -165,38 +166,38 @@ public class CompositeHistoryManager implements HistoryManager {
     }
 
     @Override
-    public void recordTaskEnd(TaskEntity task, ExecutionEntity execution, String deleteReason) {
+    public void recordTaskEnd(TaskEntity task, ExecutionEntity execution, String deleteReason, Date endTime) {
         for (HistoryManager historyManager : historyManagers) {
-            historyManager.recordTaskEnd(task, execution, deleteReason);
+            historyManager.recordTaskEnd(task, execution, deleteReason, endTime);
         }
     }
 
     @Override
-    public void recordTaskInfoChange(TaskEntity taskEntity, String activityInstanceId) {
+    public void recordTaskInfoChange(TaskEntity taskEntity, String activityInstanceId, Date changeTime) {
         for (HistoryManager historyManager : historyManagers) {
-            historyManager.recordTaskInfoChange(taskEntity, activityInstanceId);
+            historyManager.recordTaskInfoChange(taskEntity, activityInstanceId, changeTime);
         }
     }
 
     @Override
-    public void recordVariableCreate(VariableInstanceEntity variable) {
+    public void recordVariableCreate(VariableInstanceEntity variable, Date createTime) {
         for (HistoryManager historyManager : historyManagers) {
-            historyManager.recordVariableCreate(variable);
+            historyManager.recordVariableCreate(variable, createTime);
         }
     }
 
     @Override
     public void recordHistoricDetailVariableCreate(VariableInstanceEntity variable, ExecutionEntity sourceActivityExecution, boolean useActivityId,
-        String activityInstanceId) {
+        String activityInstanceId, Date createTime) {
         for (HistoryManager historyManager : historyManagers) {
-            historyManager.recordHistoricDetailVariableCreate(variable, sourceActivityExecution, useActivityId, activityInstanceId);
+            historyManager.recordHistoricDetailVariableCreate(variable, sourceActivityExecution, useActivityId, activityInstanceId, createTime);
         }
     }
 
     @Override
-    public void recordVariableUpdate(VariableInstanceEntity variable) {
+    public void recordVariableUpdate(VariableInstanceEntity variable, Date updateTime) {
         for (HistoryManager historyManager : historyManagers) {
-            historyManager.recordVariableUpdate(variable);
+            historyManager.recordVariableUpdate(variable, updateTime);
         }
     }
 
@@ -265,9 +266,9 @@ public class CompositeHistoryManager implements HistoryManager {
     }
 
     @Override
-    public void recordFormPropertiesSubmitted(ExecutionEntity processInstance, Map<String, String> properties, String taskId) {
+    public void recordFormPropertiesSubmitted(ExecutionEntity processInstance, Map<String, String> properties, String taskId, Date createTime) {
         for (HistoryManager historyManager : historyManagers) {
-            historyManager.recordFormPropertiesSubmitted(processInstance, properties, taskId);
+            historyManager.recordFormPropertiesSubmitted(processInstance, properties, taskId, createTime);
         }
     }
 
@@ -314,9 +315,9 @@ public class CompositeHistoryManager implements HistoryManager {
     }
 
     @Override
-    public void updateActivity(ExecutionEntity executionEntity, String oldActivityId, FlowElement newFlowElement, TaskEntity task) {
+    public void updateActivity(ExecutionEntity executionEntity, String oldActivityId, FlowElement newFlowElement, TaskEntity task, Date updateTime) {
         for (HistoryManager historyManager : historyManagers) {
-            historyManager.updateActivity(executionEntity, oldActivityId, newFlowElement, task);
+            historyManager.updateActivity(executionEntity, oldActivityId, newFlowElement, task, updateTime);
         }
     }
 

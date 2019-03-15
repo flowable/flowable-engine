@@ -13,6 +13,7 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +46,7 @@ public class HistoricDetailEntityManagerImpl extends AbstractEntityManager<Histo
 
     @Override
     public HistoricFormPropertyEntity insertHistoricFormPropertyEntity(ExecutionEntity execution,
-            String propertyId, String propertyValue, String taskId) {
+        String propertyId, String propertyValue, String taskId, Date createTime) {
 
         HistoricFormPropertyEntity historicFormPropertyEntity = historicDetailDataManager.createHistoricFormProperty();
         historicFormPropertyEntity.setProcessInstanceId(execution.getProcessInstanceId());
@@ -53,7 +54,7 @@ public class HistoricDetailEntityManagerImpl extends AbstractEntityManager<Histo
         historicFormPropertyEntity.setTaskId(taskId);
         historicFormPropertyEntity.setPropertyId(propertyId);
         historicFormPropertyEntity.setPropertyValue(propertyValue);
-        historicFormPropertyEntity.setTime(getClock().getCurrentTime());
+        historicFormPropertyEntity.setTime(createTime);
 
         ActivityInstanceEntity activityInstance = getActivityInstanceEntityManager().findUnfinishedActivityInstance(execution);
         String activityInstanceId;
@@ -69,12 +70,13 @@ public class HistoricDetailEntityManagerImpl extends AbstractEntityManager<Histo
     }
 
     @Override
-    public HistoricDetailVariableInstanceUpdateEntity copyAndInsertHistoricDetailVariableInstanceUpdateEntity(VariableInstanceEntity variableInstance) {
+    public HistoricDetailVariableInstanceUpdateEntity copyAndInsertHistoricDetailVariableInstanceUpdateEntity(VariableInstanceEntity variableInstance,
+        Date createTime) {
         HistoricDetailVariableInstanceUpdateEntity historicVariableUpdate = historicDetailDataManager.createHistoricDetailVariableInstanceUpdate();
         historicVariableUpdate.setProcessInstanceId(variableInstance.getProcessInstanceId());
         historicVariableUpdate.setExecutionId(variableInstance.getExecutionId());
         historicVariableUpdate.setTaskId(variableInstance.getTaskId());
-        historicVariableUpdate.setTime(getClock().getCurrentTime());
+        historicVariableUpdate.setTime(createTime);
         historicVariableUpdate.setRevision(variableInstance.getRevision());
         historicVariableUpdate.setName(variableInstance.getName());
         historicVariableUpdate.setVariableType(variableInstance.getType());

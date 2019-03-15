@@ -67,7 +67,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
             
             String originalAssignee = originalTaskEntity.getAssignee();
             
-            CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskInfoChange(task);
+            CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskInfoChange(task, cmmnEngineConfiguration.getClock().getCurrentTime());
             CommandContextUtil.getTaskService().updateTask(task, true);
             
             if (!StringUtils.equals(originalAssignee, task.getAssignee())) {

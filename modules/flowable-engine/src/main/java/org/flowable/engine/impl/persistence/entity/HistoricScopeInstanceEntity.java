@@ -23,7 +23,12 @@ import org.flowable.common.engine.impl.persistence.entity.Entity;
  */
 public interface HistoricScopeInstanceEntity extends Entity {
 
-    void markEnded(String deleteReason);
+    @Deprecated
+    default void markEnded(String deleteReason) {
+        markEnded(deleteReason, null);
+    }
+
+    void markEnded(String deleteReason, Date endTime);
 
     String getProcessInstanceId();
 

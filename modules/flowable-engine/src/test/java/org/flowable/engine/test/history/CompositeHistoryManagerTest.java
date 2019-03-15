@@ -18,7 +18,10 @@ import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -135,10 +138,11 @@ class CompositeHistoryManagerTest {
     @Test
     void recordProcessInstanceEnd() {
         ExecutionEntity instance = new ExecutionEntityImpl();
-        compositeHistoryManager.recordProcessInstanceEnd(instance, "reason", "activity-id");
+        Date endTime = Date.from(Instant.now().plusSeconds(1));
+        compositeHistoryManager.recordProcessInstanceEnd(instance, "reason", "activity-id", endTime);
 
-        verify(historyManager1).recordProcessInstanceEnd(same(instance), eq("reason"), eq("activity-id"));
-        verify(historyManager2).recordProcessInstanceEnd(same(instance), eq("reason"), eq("activity-id"));
+        verify(historyManager1).recordProcessInstanceEnd(same(instance), eq("reason"), eq("activity-id"), eq(endTime));
+        verify(historyManager2).recordProcessInstanceEnd(same(instance), eq("reason"), eq("activity-id"), eq(endTime));
     }
 
     @Test
@@ -196,10 +200,11 @@ class CompositeHistoryManagerTest {
     @Test
     void recordActivityEndWithExecutionEntity() {
         ExecutionEntity instance = new ExecutionEntityImpl();
-        compositeHistoryManager.recordActivityEnd(instance, "reason");
+        Date endTime = Date.from(Instant.now().minusSeconds(1));
+        compositeHistoryManager.recordActivityEnd(instance, "reason", endTime);
 
-        verify(historyManager1).recordActivityEnd(same(instance), eq("reason"));
-        verify(historyManager2).recordActivityEnd(same(instance), eq("reason"));
+        verify(historyManager1).recordActivityEnd(same(instance), eq("reason"), eq(endTime));
+        verify(historyManager2).recordActivityEnd(same(instance), eq("reason"), eq(endTime));
     }
 
     @Test
@@ -241,47 +246,52 @@ class CompositeHistoryManagerTest {
     void recordTaskEnd() {
         TaskEntity task = new TaskEntityImpl();
         ExecutionEntity instance = new ExecutionEntityImpl();
-        compositeHistoryManager.recordTaskEnd(task, instance, "test");
+        Date endTime = Date.from(Instant.now().plus(1, ChronoUnit.MILLIS));
+        compositeHistoryManager.recordTaskEnd(task, instance, "test", endTime);
 
-        verify(historyManager1).recordTaskEnd(same(task), same(instance), eq("test"));
-        verify(historyManager2).recordTaskEnd(same(task), same(instance), eq("test"));
+        verify(historyManager1).recordTaskEnd(same(task), same(instance), eq("test"), eq(endTime));
+        verify(historyManager2).recordTaskEnd(same(task), same(instance), eq("test"), eq(endTime));
     }
 
     @Test
     void recordTaskInfoChange() {
         TaskEntity task = new TaskEntityImpl();
-        compositeHistoryManager.recordTaskInfoChange(task, "activity");
+        Date changeTime = Date.from(Instant.now().plusSeconds(3));
+        compositeHistoryManager.recordTaskInfoChange(task, "activity", changeTime);
 
-        verify(historyManager1).recordTaskInfoChange(same(task), eq("activity"));
-        verify(historyManager2).recordTaskInfoChange(same(task), eq("activity"));
+        verify(historyManager1).recordTaskInfoChange(same(task), eq("activity"), eq(changeTime));
+        verify(historyManager2).recordTaskInfoChange(same(task), eq("activity"), eq(changeTime));
     }
 
     @Test
     void recordVariableCreate() {
         VariableInstanceEntity variable = new VariableInstanceEntityImpl();
-        compositeHistoryManager.recordVariableCreate(variable);
+        Date createTime = Date.from(Instant.now().minusSeconds(30));
+        compositeHistoryManager.recordVariableCreate(variable, createTime);
 
-        verify(historyManager1).recordVariableCreate(same(variable));
-        verify(historyManager2).recordVariableCreate(same(variable));
+        verify(historyManager1).recordVariableCreate(same(variable), eq(createTime));
+        verify(historyManager2).recordVariableCreate(same(variable), eq(createTime));
     }
 
     @Test
     void recordHistoricDetailVariableCreate() {
         VariableInstanceEntity variable = new VariableInstanceEntityImpl();
         ExecutionEntity execution = new ExecutionEntityImpl();
-        compositeHistoryManager.recordHistoricDetailVariableCreate(variable, execution, true, "id");
+        Date createTime = Date.from(Instant.now().plusSeconds(10));
+        compositeHistoryManager.recordHistoricDetailVariableCreate(variable, execution, true, "id", createTime);
 
-        verify(historyManager1).recordHistoricDetailVariableCreate(same(variable), same(execution), eq(true), eq("id"));
-        verify(historyManager2).recordHistoricDetailVariableCreate(same(variable), same(execution), eq(true), eq("id"));
+        verify(historyManager1).recordHistoricDetailVariableCreate(same(variable), same(execution), eq(true), eq("id"), eq(createTime));
+        verify(historyManager2).recordHistoricDetailVariableCreate(same(variable), same(execution), eq(true), eq("id"), eq(createTime));
     }
 
     @Test
     void recordVariableUpdate() {
         VariableInstanceEntity variable = new VariableInstanceEntityImpl();
-        compositeHistoryManager.recordVariableUpdate(variable);
+        Date updateTime = Date.from(Instant.now().minusSeconds(4));
+        compositeHistoryManager.recordVariableUpdate(variable, updateTime);
 
-        verify(historyManager1).recordVariableUpdate(same(variable));
-        verify(historyManager2).recordVariableUpdate(same(variable));
+        verify(historyManager1).recordVariableUpdate(same(variable), eq(updateTime));
+        verify(historyManager2).recordVariableUpdate(same(variable), eq(updateTime));
     }
 
     @Test
@@ -371,10 +381,11 @@ class CompositeHistoryManagerTest {
         ExecutionEntity processInstance = new ExecutionEntityImpl();
         Map<String, String> properties = new HashMap<>();
         properties.put("key", "value");
-        compositeHistoryManager.recordFormPropertiesSubmitted(processInstance, properties, "task-1");
+        Date createTime = Date.from(Instant.now().plusSeconds(3));
+        compositeHistoryManager.recordFormPropertiesSubmitted(processInstance, properties, "task-1", createTime);
 
-        verify(historyManager1).recordFormPropertiesSubmitted(same(processInstance), eq(properties), eq("task-1"));
-        verify(historyManager2).recordFormPropertiesSubmitted(same(processInstance), eq(properties), eq("task-1"));
+        verify(historyManager1).recordFormPropertiesSubmitted(same(processInstance), eq(properties), eq("task-1"), eq(createTime));
+        verify(historyManager2).recordFormPropertiesSubmitted(same(processInstance), eq(properties), eq("task-1"), eq(createTime));
     }
 
     @Test
@@ -437,10 +448,11 @@ class CompositeHistoryManagerTest {
         ExecutionEntity execution = new ExecutionEntityImpl();
         FlowElement flowElement = new SequenceFlow();
         TaskEntity task = new TaskEntityImpl();
-        compositeHistoryManager.updateActivity(execution, "old-id", flowElement, task);
+        Date updateTime = Date.from(Instant.now().plusSeconds(9));
+        compositeHistoryManager.updateActivity(execution, "old-id", flowElement, task, updateTime);
 
-        verify(historyManager1).updateActivity(same(execution), eq("old-id"), same(flowElement), same(task));
-        verify(historyManager2).updateActivity(same(execution), eq("old-id"), same(flowElement), same(task));
+        verify(historyManager1).updateActivity(same(execution), eq("old-id"), same(flowElement), same(task), eq(updateTime));
+        verify(historyManager2).updateActivity(same(execution), eq("old-id"), same(flowElement), same(task), eq(updateTime));
     }
 
     @Test

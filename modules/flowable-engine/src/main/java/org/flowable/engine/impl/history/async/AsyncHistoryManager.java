@@ -60,13 +60,13 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
     }
 
     @Override
-    public void recordProcessInstanceEnd(ExecutionEntity processInstance, String deleteReason, String activityId) {
+    public void recordProcessInstanceEnd(ExecutionEntity processInstance, String deleteReason, String activityId, Date endTime) {
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processInstance.getProcessDefinitionId())) {
             ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonProcessInstanceFields(processInstance, data);
             
             putIfNotNull(data, HistoryJsonConstants.DELETE_REASON, deleteReason);
-            putIfNotNull(data, HistoryJsonConstants.END_TIME, getClock().getCurrentTime());
+            putIfNotNull(data, HistoryJsonConstants.END_TIME, endTime);
             putIfNotNull(data, HistoryJsonConstants.ACTIVITY_ID, activityId);
             
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_PROCESS_INSTANCE_END, data);
@@ -121,7 +121,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
     }
 
     @Override
-    public void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason) {
+    public void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason, Date endTime) {
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, executionEntity.getProcessDefinitionId())) {
             String activityId = getActivityIdForExecution(executionEntity);
             if (StringUtils.isNotEmpty(activityId)) {
@@ -142,7 +142,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
                 }
 
                 putIfNotNull(data, HistoryJsonConstants.DELETE_REASON, deleteReason);
-                putIfNotNull(data, HistoryJsonConstants.END_TIME, getClock().getCurrentTime());
+                putIfNotNull(data, HistoryJsonConstants.END_TIME, endTime);
 
                 ObjectNode correspondingActivityStartData = getActivityStart(executionEntity.getId(), activityId, true);
                 if (correspondingActivityStartData == null) {
@@ -205,7 +205,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
     }
 
     @Override
-    public void recordTaskEnd(TaskEntity task, ExecutionEntity execution, String deleteReason) {
+    public void recordTaskEnd(TaskEntity task, ExecutionEntity execution, String deleteReason, Date endTime) {
         String processDefinitionId = null;
         if (execution != null) {
             processDefinitionId = execution.getProcessDefinitionId();
@@ -217,7 +217,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
             addCommonTaskFields(task, execution, data);
             
             putIfNotNull(data, HistoryJsonConstants.DELETE_REASON, deleteReason);
-            putIfNotNull(data, HistoryJsonConstants.END_TIME, getClock().getCurrentTime());
+            putIfNotNull(data, HistoryJsonConstants.END_TIME, endTime);
 
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_TASK_ENDED, data);
         }
@@ -225,7 +225,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
     
     @SuppressWarnings("unchecked")
     @Override
-    public void recordTaskInfoChange(TaskEntity taskEntity, String runtimeActivityInstanceId) {
+    public void recordTaskInfoChange(TaskEntity taskEntity, String runtimeActivityInstanceId, Date changeTime) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, taskEntity.getProcessDefinitionId())) {
             ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonTaskFields(taskEntity, null, data);
@@ -237,17 +237,17 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
         if ((originalPersistentState == null && taskEntity.getAssignee() != null) || 
                 (originalPersistentState != null && !Objects.equals(originalPersistentState.get("assignee"), taskEntity.getAssignee()))) {
             
-            handleTaskAssigneeChange(taskEntity, runtimeActivityInstanceId);
+            handleTaskAssigneeChange(taskEntity, runtimeActivityInstanceId, changeTime);
         }
         
         if ((originalPersistentState == null && taskEntity.getOwner() != null) ||
                 (originalPersistentState != null && !Objects.equals(originalPersistentState.get("owner"), taskEntity.getOwner()))) {
             
-            handleTaskOwnerChange(taskEntity, runtimeActivityInstanceId);
+            handleTaskOwnerChange(taskEntity, runtimeActivityInstanceId, changeTime);
         }
     }
     
-    protected void handleTaskAssigneeChange(TaskEntity taskEntity, String activityInstanceId) {
+    protected void handleTaskAssigneeChange(TaskEntity taskEntity, String activityInstanceId, Date changeTime) {
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, taskEntity.getProcessDefinitionId())) {
             ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
             putIfNotNull(data, HistoryJsonConstants.ASSIGNEE, taskEntity.getAssignee());
@@ -273,18 +273,18 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
 
             if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, taskEntity.getProcessDefinitionId())) {
                 putIfNotNull(data, HistoryJsonConstants.ID, taskEntity.getId());
-                putIfNotNull(data, HistoryJsonConstants.CREATE_TIME, getClock().getCurrentTime());
+                putIfNotNull(data, HistoryJsonConstants.CREATE_TIME, changeTime);
                 getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_TASK_ASSIGNEE_CHANGED, data);
             }
         }
     }
     
-    protected void handleTaskOwnerChange(TaskEntity taskEntity, String activityInstanceId) {
+    protected void handleTaskOwnerChange(TaskEntity taskEntity, String activityInstanceId, Date changeTime) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, taskEntity.getProcessDefinitionId())) {
             ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
             putIfNotNull(data, HistoryJsonConstants.ID, taskEntity.getId());
             putIfNotNull(data, HistoryJsonConstants.OWNER, taskEntity.getOwner());
-            putIfNotNull(data, HistoryJsonConstants.CREATE_TIME, getClock().getCurrentTime());
+            putIfNotNull(data, HistoryJsonConstants.CREATE_TIME, changeTime);
             putIfNotNull(data, HistoryJsonConstants.RUNTIME_ACTIVITY_INSTANCE_ID, activityInstanceId);
 
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_TASK_OWNER_CHANGED, data);
@@ -292,7 +292,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
     }
 
     @Override
-    public void recordVariableCreate(VariableInstanceEntity variable) {
+    public void recordVariableCreate(VariableInstanceEntity variable, Date createTime) {
         String processDefinitionId = null;
         if (enableProcessDefinitionHistoryLevel && variable.getProcessInstanceId() != null) {
             ExecutionEntity processInstanceExecution = CommandContextUtil.getExecutionEntityManager().findById(variable.getProcessInstanceId());
@@ -303,8 +303,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
             ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonVariableFields(variable, data);
             
-            Date time = getClock().getCurrentTime();
-            putIfNotNull(data, HistoryJsonConstants.CREATE_TIME, time);
+            putIfNotNull(data, HistoryJsonConstants.CREATE_TIME, createTime);
             
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_VARIABLE_CREATED, data);
         }
@@ -312,7 +311,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
 
     @Override
     public void recordHistoricDetailVariableCreate(VariableInstanceEntity variable, ExecutionEntity sourceActivityExecution, boolean useActivityId,
-        String activityInstanceId) {
+        String activityInstanceId, Date createTime) {
 
         String processDefinitionId = getProcessDefinitionId(variable, sourceActivityExecution);
         
@@ -324,8 +323,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
                 putIfNotNull(data, HistoryJsonConstants.IS_MULTI_INSTANCE_ROOT_EXECUTION, true);
             }
            
-            Date time = getClock().getCurrentTime();
-            putIfNotNull(data, HistoryJsonConstants.CREATE_TIME, time);
+            putIfNotNull(data, HistoryJsonConstants.CREATE_TIME, createTime);
 
             putIfNotNull(data, HistoryJsonConstants.RUNTIME_ACTIVITY_INSTANCE_ID, activityInstanceId);
             if (useActivityId && sourceActivityExecution != null) {
@@ -341,7 +339,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
     }
 
     @Override
-    public void recordVariableUpdate(VariableInstanceEntity variable) {
+    public void recordVariableUpdate(VariableInstanceEntity variable, Date updateTime) {
         String processDefinitionId = null;
         if (enableProcessDefinitionHistoryLevel && variable.getProcessInstanceId() != null) {
             ExecutionEntity processInstanceExecution = CommandContextUtil.getExecutionEntityManager().findById(variable.getProcessInstanceId());
@@ -352,8 +350,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
             ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonVariableFields(variable, data);
             
-            Date time = getClock().getCurrentTime();
-            putIfNotNull(data, HistoryJsonConstants.LAST_UPDATED_TIME, time);
+            putIfNotNull(data, HistoryJsonConstants.LAST_UPDATED_TIME, updateTime);
             
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_VARIABLE_UPDATED, data);
         }
@@ -377,7 +374,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
     }
 
     @Override
-    public void recordFormPropertiesSubmitted(ExecutionEntity execution, Map<String, String> properties, String taskId) {
+    public void recordFormPropertiesSubmitted(ExecutionEntity execution, Map<String, String> properties, String taskId, Date createTime) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, execution.getProcessDefinitionId())) {
             ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
             addProcessDefinitionFields(data, execution.getProcessDefinitionId());
@@ -388,8 +385,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
             String activityId = getActivityIdForExecution(execution);
             putIfNotNull(data, HistoryJsonConstants.ACTIVITY_ID, activityId);
             
-            Date currentTime = getClock().getCurrentTime();
-            putIfNotNull(data, HistoryJsonConstants.CREATE_TIME, currentTime);
+            putIfNotNull(data, HistoryJsonConstants.CREATE_TIME, createTime);
             
             int counter = 1;
             for (String propertyId : properties.keySet()) {
