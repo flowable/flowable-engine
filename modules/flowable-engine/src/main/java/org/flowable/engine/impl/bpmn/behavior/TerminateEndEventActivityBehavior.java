@@ -25,6 +25,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
@@ -80,7 +81,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
         deleteExecutionEntities(executionEntityManager, rootExecutionEntity, execution, deleteReason);
         endAllHistoricActivities(rootExecutionEntity.getId(), deleteReason);
         CommandContextUtil.getHistoryManager(commandContext).recordProcessInstanceEnd(rootExecutionEntity,
-                deleteReason, execution.getCurrentActivityId());
+                deleteReason, execution.getCurrentActivityId(), commandContext.getCurrentEngineConfiguration().getClock().getCurrentTime());
     }
 
     protected void defaultTerminateEndEventBehaviour(ExecutionEntity execution, CommandContext commandContext,
@@ -98,7 +99,8 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
         if (scopeExecutionEntity.isProcessInstanceType() && scopeExecutionEntity.getSuperExecutionId() == null) {
             endAllHistoricActivities(scopeExecutionEntity.getId(), deleteReason);
             deleteExecutionEntities(executionEntityManager, scopeExecutionEntity, execution, deleteReason);
-            CommandContextUtil.getHistoryManager(commandContext).recordProcessInstanceEnd(scopeExecutionEntity, deleteReason, execution.getCurrentActivityId());
+            CommandContextUtil.getHistoryManager(commandContext).recordProcessInstanceEnd(scopeExecutionEntity, deleteReason, execution.getCurrentActivityId(),
+                commandContext.getCurrentEngineConfiguration().getClock().getCurrentTime());
 
         } else if (scopeExecutionEntity.getCurrentFlowElement() != null
                 && scopeExecutionEntity.getCurrentFlowElement() instanceof SubProcess) { // SubProcess
@@ -167,8 +169,9 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
         List<HistoricActivityInstanceEntity> historicActivityInstances = CommandContextUtil.getHistoricActivityInstanceEntityManager()
                 .findUnfinishedHistoricActivityInstancesByProcessInstanceId(processInstanceId);
 
+        Clock clock = CommandContextUtil.getProcessEngineConfiguration().getClock();
         for (HistoricActivityInstanceEntity historicActivityInstance : historicActivityInstances) {
-            historicActivityInstance.markEnded(deleteReason);
+            historicActivityInstance.markEnded(deleteReason, clock.getCurrentTime());
 
             // Fire event
             ProcessEngineConfigurationImpl config = CommandContextUtil.getProcessEngineConfiguration();

@@ -13,6 +13,8 @@
 
 package org.flowable.engine.impl.history;
 
+import java.util.Date;
+
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -31,8 +33,8 @@ public class DefaultHistoryTaskManager implements InternalHistoryTaskManager {
 
 
     @Override
-    public void recordTaskInfoChange(TaskEntity taskEntity) {
-        getActivityInstanceEntityManager().recordTaskInfoChange(taskEntity);
+    public void recordTaskInfoChange(TaskEntity taskEntity, Date changeTime) {
+        getActivityInstanceEntityManager().recordTaskInfoChange(taskEntity, changeTime);
     }
 
     @Override

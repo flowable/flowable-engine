@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.history;
 
+import java.util.Date;
+
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
@@ -29,8 +31,8 @@ public class CmmnHistoryTaskManager implements InternalHistoryTaskManager {
     }
 
     @Override
-    public void recordTaskInfoChange(TaskEntity taskEntity) {
-        CommandContextUtil.getCmmnHistoryManager().recordTaskInfoChange(taskEntity);
+    public void recordTaskInfoChange(TaskEntity taskEntity, Date changeTime) {
+        CommandContextUtil.getCmmnHistoryManager().recordTaskInfoChange(taskEntity, changeTime);
     }
 
     @Override

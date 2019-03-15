@@ -22,6 +22,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -126,9 +127,10 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
 
         // and change possible existing tasks (as the process definition id is stored there too)
         List<TaskEntity> tasks = CommandContextUtil.getTaskService(commandContext).findTasksByExecutionId(execution.getId());
+        Clock clock = commandContext.getCurrentEngineConfiguration().getClock();
         for (TaskEntity taskEntity : tasks) {
             taskEntity.setProcessDefinitionId(newProcessDefinition.getId());
-            CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordTaskInfoChange(taskEntity);
+            CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordTaskInfoChange(taskEntity, clock.getCurrentTime());
         }
     }
 

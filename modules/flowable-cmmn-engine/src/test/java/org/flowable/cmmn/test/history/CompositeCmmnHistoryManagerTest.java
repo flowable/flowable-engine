@@ -16,7 +16,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.verify;
 
+import java.time.Instant;
 import java.util.Arrays;
+import java.util.Date;
 
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.history.CompositeCmmnHistoryManager;
@@ -73,10 +75,11 @@ class CompositeCmmnHistoryManagerTest {
     @Test
     void recordCaseInstanceEnd() {
         CaseInstanceEntity caseInstance = new CaseInstanceEntityImpl();
-        compositeHistoryManager.recordCaseInstanceEnd(caseInstance, "state");
+        Date endTime = Date.from(Instant.now().minusSeconds(2));
+        compositeHistoryManager.recordCaseInstanceEnd(caseInstance, "state", endTime);
 
-        verify(historyManager1).recordCaseInstanceEnd(same(caseInstance), eq("state"));
-        verify(historyManager2).recordCaseInstanceEnd(same(caseInstance), eq("state"));
+        verify(historyManager1).recordCaseInstanceEnd(same(caseInstance), eq("state"), eq(endTime));
+        verify(historyManager2).recordCaseInstanceEnd(same(caseInstance), eq("state"), eq(endTime));
     }
 
     @Test
@@ -144,19 +147,21 @@ class CompositeCmmnHistoryManagerTest {
     @Test
     void recordVariableCreate() {
         VariableInstanceEntity variable = new VariableInstanceEntityImpl();
-        compositeHistoryManager.recordVariableCreate(variable);
+        Date createTime = Date.from(Instant.now().minusSeconds(5));
+        compositeHistoryManager.recordVariableCreate(variable, createTime);
 
-        verify(historyManager1).recordVariableCreate(same(variable));
-        verify(historyManager2).recordVariableCreate(same(variable));
+        verify(historyManager1).recordVariableCreate(same(variable), eq(createTime));
+        verify(historyManager2).recordVariableCreate(same(variable), eq(createTime));
     }
 
     @Test
     void recordVariableUpdate() {
         VariableInstanceEntity variable = new VariableInstanceEntityImpl();
-        compositeHistoryManager.recordVariableUpdate(variable);
+        Date updateTime = Date.from(Instant.now().plusSeconds(40));
+        compositeHistoryManager.recordVariableUpdate(variable, updateTime);
 
-        verify(historyManager1).recordVariableUpdate(same(variable));
-        verify(historyManager2).recordVariableUpdate(same(variable));
+        verify(historyManager1).recordVariableUpdate(same(variable), eq(updateTime));
+        verify(historyManager2).recordVariableUpdate(same(variable), eq(updateTime));
     }
 
     @Test
@@ -180,19 +185,21 @@ class CompositeCmmnHistoryManagerTest {
     @Test
     void recordTaskEnd() {
         TaskEntity task = new TaskEntityImpl();
-        compositeHistoryManager.recordTaskEnd(task, "delete reason");
+        Date endTime = Date.from(Instant.now().plusSeconds(3));
+        compositeHistoryManager.recordTaskEnd(task, "delete reason", endTime);
 
-        verify(historyManager1).recordTaskEnd(same(task), eq("delete reason"));
-        verify(historyManager2).recordTaskEnd(same(task), eq("delete reason"));
+        verify(historyManager1).recordTaskEnd(same(task), eq("delete reason"), eq(endTime));
+        verify(historyManager2).recordTaskEnd(same(task), eq("delete reason"), eq(endTime));
     }
 
     @Test
     void recordTaskInfoChange() {
         TaskEntity task = new TaskEntityImpl();
-        compositeHistoryManager.recordTaskInfoChange(task);
+        Date changeTime = Date.from(Instant.now().minusSeconds(8));
+        compositeHistoryManager.recordTaskInfoChange(task, changeTime);
 
-        verify(historyManager1).recordTaskInfoChange(same(task));
-        verify(historyManager2).recordTaskInfoChange(same(task));
+        verify(historyManager1).recordTaskInfoChange(same(task), eq(changeTime));
+        verify(historyManager2).recordTaskInfoChange(same(task), eq(changeTime));
     }
 
     @Test

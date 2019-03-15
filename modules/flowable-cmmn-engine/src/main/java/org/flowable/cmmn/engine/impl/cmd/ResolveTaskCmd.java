@@ -52,7 +52,8 @@ public class ResolveTaskCmd extends NeedsActiveTaskCmd<Void> {
 
         task.setDelegationState(DelegationState.RESOLVED);
         TaskHelper.changeTaskAssignee(task, task.getOwner());
-        CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskInfoChange(task);
+        CommandContextUtil.getCmmnHistoryManager(commandContext)
+            .recordTaskInfoChange(task, commandContext.getCurrentEngineConfiguration().getClock().getCurrentTime());
 
         return null;
     }

@@ -57,7 +57,8 @@ public class SubmitTaskFormCmd extends NeedsActiveTaskCmd<Void> {
         }
 
         ExecutionEntity executionEntity = CommandContextUtil.getExecutionEntityManager().findById(task.getExecutionId());
-        CommandContextUtil.getHistoryManager(commandContext).recordFormPropertiesSubmitted(executionEntity, properties, taskId);
+        CommandContextUtil.getHistoryManager(commandContext)
+            .recordFormPropertiesSubmitted(executionEntity, properties, taskId, commandContext.getCurrentEngineConfiguration().getClock().getCurrentTime());
 
         FormHandlerHelper formHandlerHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getFormHandlerHelper();
         TaskFormHandler taskFormHandler = formHandlerHelper.getTaskFormHandlder(task);

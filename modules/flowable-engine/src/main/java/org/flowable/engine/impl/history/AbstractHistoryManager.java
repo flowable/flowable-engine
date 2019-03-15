@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.history;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -244,7 +245,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
     }
 
     @Override
-    public void updateActivity(ExecutionEntity childExecution, String oldActivityId, FlowElement newFlowElement, TaskEntity task) {
+    public void updateActivity(ExecutionEntity childExecution, String oldActivityId, FlowElement newFlowElement, TaskEntity task, Date updateTime) {
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager = CommandContextUtil.getHistoricActivityInstanceEntityManager();
             List<HistoricActivityInstanceEntity> historicActivityInstances = historicActivityInstanceEntityManager.findHistoricActivityInstancesByExecutionAndActivityId(childExecution.getId(), oldActivityId);
@@ -257,7 +258,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
 
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
             HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
-            historicTaskService.recordTaskInfoChange(task);
+            historicTaskService.recordTaskInfoChange(task, updateTime);
         }
 
     }

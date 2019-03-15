@@ -39,7 +39,8 @@ public class DelegateTaskCmd extends NeedsActiveTaskCmd<Object> {
             task.setOwner(task.getAssignee());
         }
         TaskHelper.changeTaskAssignee(task, userId);
-        CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskInfoChange(task);
+        CommandContextUtil.getCmmnHistoryManager(commandContext)
+            .recordTaskInfoChange(task, commandContext.getCurrentEngineConfiguration().getClock().getCurrentTime());
         return null;
     }
 
