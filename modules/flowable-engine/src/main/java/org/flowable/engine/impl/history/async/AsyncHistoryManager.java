@@ -167,7 +167,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
                 putIfNotNull(data, HistoryJsonConstants.END_TIME, activityInstance.getEndTime());
                 putIfNotNull(data, HistoryJsonConstants.START_TIME, activityInstance.getStartTime());
 
-                ObjectNode correspondingActivityStartData = getActivityStart(activityInstance.getExecutionId(), activityInstance.getActivityId(), true);
+                ObjectNode correspondingActivityStartData = getActivityStart(activityInstance.getId(), true);
                 if (correspondingActivityStartData == null) {
                     getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_ACTIVITY_END, data);
                 } else {
@@ -547,7 +547,32 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
         }
         return null;
     }
-    
+
+    protected ObjectNode getActivityStart(String runtimeActivityInstanceId, boolean removeFromAsyncHistorySession) {
+        Map<JobServiceConfiguration, AsyncHistorySessionData> sessionData = getAsyncHistorySession().getSessionData();
+        if (sessionData != null) {
+            AsyncHistorySessionData asyncHistorySessionData = sessionData.get(getJobServiceConfiguration());
+            if (asyncHistorySessionData != null) {
+                Map<String, List<ObjectNode>> jobData = asyncHistorySessionData.getJobData();
+                if (jobData != null && jobData.containsKey(HistoryJsonConstants.TYPE_ACTIVITY_START)) {
+                    List<ObjectNode> activityStartDataList = jobData.get(HistoryJsonConstants.TYPE_ACTIVITY_START);
+                    Iterator<ObjectNode> activityStartDataIterator = activityStartDataList.iterator();
+                    while (activityStartDataIterator.hasNext()) {
+                        ObjectNode activityStartData = activityStartDataIterator.next();
+                        if (runtimeActivityInstanceId.equals(getStringFromJson(activityStartData,
+                                HistoryJsonConstants.RUNTIME_ACTIVITY_INSTANCE_ID))) {
+                            if (removeFromAsyncHistorySession) {
+                                activityStartDataIterator.remove();
+                            }
+                            return activityStartData;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     protected JobServiceConfiguration getJobServiceConfiguration() {
         return getProcessEngineConfiguration().getJobServiceConfiguration();
     }
