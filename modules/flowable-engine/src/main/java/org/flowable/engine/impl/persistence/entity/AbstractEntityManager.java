@@ -109,7 +109,7 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
 
     protected void fireEntityDeletedEvent(Entity entity) {
         FlowableEventDispatcher eventDispatcher = getEventDispatcher();
-        if (eventDispatcher != null && eventDispatcher != null && eventDispatcher.isEnabled()) {
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, entity));
         }
     }
