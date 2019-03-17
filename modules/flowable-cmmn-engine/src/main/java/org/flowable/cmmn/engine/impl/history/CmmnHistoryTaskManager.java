@@ -34,6 +34,11 @@ public class CmmnHistoryTaskManager implements InternalHistoryTaskManager {
     }
 
     @Override
+    public void recordTaskCreated(TaskEntity taskEntity) {
+        cmmnHistoryManager.recordTaskCreated(taskEntity);
+    }
+
+    @Override
     public void recordHistoryUserTaskLog(HistoricTaskLogEntryBuilder taskLogEntryBuilder) {
         CommandContextUtil.getCmmnHistoryManager().recordHistoricUserTaskLogEntry(taskLogEntryBuilder);
     }

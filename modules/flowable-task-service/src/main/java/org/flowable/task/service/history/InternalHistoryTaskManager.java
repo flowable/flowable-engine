@@ -23,6 +23,11 @@ public interface InternalHistoryTaskManager {
     void recordTaskInfoChange(TaskEntity taskEntity);
 
     /**
+     * Record task created.
+     */
+    void recordTaskCreated(TaskEntity taskEntity);
+
+    /**
      * Record historyUserTaskLogEntry
      */
     void recordHistoryUserTaskLog(HistoricTaskLogEntryBuilder taskLogEntryBuilder);

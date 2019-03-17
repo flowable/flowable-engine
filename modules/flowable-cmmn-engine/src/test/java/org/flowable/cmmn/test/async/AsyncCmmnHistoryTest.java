@@ -132,6 +132,19 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         waitForAsyncHistoryExecutorToProcessAllJobs();
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().count());
     }
+
+    @Test
+    public void testCreateTaskHistory() {
+        Task task = cmmnTaskService.createTaskBuilder().id("task1").create();
+        assertNull(cmmnHistoryService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult());
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+
+        assertNotNull(cmmnHistoryService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult());
+        assertEquals("task1", task.getId());
+
+        cmmnTaskService.deleteTask(task.getId(), true);
+    }
     
     @Test
     @CmmnDeployment

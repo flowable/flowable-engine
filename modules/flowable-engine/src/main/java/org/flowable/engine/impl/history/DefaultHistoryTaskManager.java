@@ -28,9 +28,16 @@ public class DefaultHistoryTaskManager implements InternalHistoryTaskManager {
         this.processEngineConfiguration = processEngineConfiguration;
     }
 
+
+
     @Override
     public void recordTaskInfoChange(TaskEntity taskEntity) {
         getActivityInstanceEntityManager().recordTaskInfoChange(taskEntity);
+    }
+
+    @Override
+    public void recordTaskCreated(TaskEntity taskEntity) {
+        CommandContextUtil.getHistoryManager().recordTaskCreated(taskEntity, null);
     }
 
     @Override

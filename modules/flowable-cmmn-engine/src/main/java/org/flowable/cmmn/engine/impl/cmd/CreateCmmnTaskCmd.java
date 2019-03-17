@@ -44,6 +44,7 @@ public class CreateCmmnTaskCmd implements Command<Task> {
                 countingParentTaskEntity.setSubTaskCount(countingParentTaskEntity.getSubTaskCount() + 1);
             }
         }
+
         return task;
     }
 }
