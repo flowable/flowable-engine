@@ -280,6 +280,11 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
     T taskWithFormKey();
 
     /**
+     * Only select tasks with the given formKey.
+     */
+    T taskFormKey(String formKey);
+
+    /**
      * Only select tasks with the given taskDefinitionKey. The task definition key is the id of the userTask: &lt;userTask id="xxx" .../&gt;
      **/
     T taskDefinitionKey(String key);
