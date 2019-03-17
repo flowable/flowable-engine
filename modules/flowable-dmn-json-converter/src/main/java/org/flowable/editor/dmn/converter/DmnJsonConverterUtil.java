@@ -335,7 +335,7 @@ public class DmnJsonConverterUtil {
     public static boolean isCollectionOperator(String operator) {
         return "IN".equals(operator) || "NOT IN".equals(operator) || "ANY".equals(operator) || "NOT ANY".equals(operator) ||
             "IS IN".equals(operator) || "IS NOT IN".equals(operator) ||
-            "ALL OF".equals(operator) || "NONE OF".equals(operator) || "NOT ALL OF".equals(operator) || "ALL OF".equals(operator);
+            "NONE OF".equals(operator) || "NOT ALL OF".equals(operator) || "ALL OF".equals(operator);
     }
 
     protected static String getDMNContainsExpressionMethod(String containsOperator) {

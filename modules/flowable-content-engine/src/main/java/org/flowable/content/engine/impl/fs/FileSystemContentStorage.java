@@ -194,7 +194,7 @@ public class FileSystemContentStorage implements ContentStorage {
 
         if (shouldExist != file.exists()) {
             if (shouldExist) {
-                throw new ContentNotFoundException("Content with id: " + id + " was not found (path: " + file.toString() + ")");
+                throw new ContentNotFoundException("Content with id: " + id + " was not found (path: " + file + ")");
             } else {
                 throw new ContentNotFoundException("Content with id: " + id + " already exists.");
             }

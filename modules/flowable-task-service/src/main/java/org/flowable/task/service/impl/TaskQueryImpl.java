@@ -90,6 +90,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected Date createTimeAfter;
     protected String category;
     protected boolean withFormKey;
+    protected String formKey;
     protected String taskDefinitionId;
     protected String key;
     protected String keyLike;
@@ -852,6 +853,19 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             currentOrQueryObject.withFormKey = true;
         } else {
             this.withFormKey = true;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery taskFormKey(String formKey) {
+        if (formKey == null) {
+            throw new FlowableIllegalArgumentException("Task formKey is null");
+        }
+        if (orActive) {
+            currentOrQueryObject.formKey = formKey;
+        } else {
+            this.formKey = formKey;
         }
         return this;
     }
@@ -1850,6 +1864,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public boolean isWithFormKey() {
         return withFormKey;
+    }
+
+    public String getFormKey() {
+        return formKey;
     }
 
     public String getProcessDefinitionKeyLike() {
