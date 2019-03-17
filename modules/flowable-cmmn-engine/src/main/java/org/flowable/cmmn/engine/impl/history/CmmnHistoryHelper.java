@@ -12,7 +12,6 @@
  */
 package org.flowable.cmmn.engine.impl.history;
 
-import static org.flowable.entitylink.service.impl.util.CommandContextUtil.getHistoricEntityLinkEntityManager;
 import static org.flowable.variable.service.impl.util.CommandContextUtil.getHistoricVariableInstanceEntityManager;
 
 import java.util.List;
