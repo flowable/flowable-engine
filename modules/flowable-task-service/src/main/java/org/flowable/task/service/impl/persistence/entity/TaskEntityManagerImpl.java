@@ -104,9 +104,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
                     FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, taskEntity));
         }
 
-        if (taskServiceConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            taskServiceConfiguration.getHistoricTaskService().recordTaskCreated(taskEntity);
-        }
+        taskServiceConfiguration.getInternalHistoryTaskManager().recordTaskCreated(taskEntity);
 
         return enrichedTaskEntity;
     }

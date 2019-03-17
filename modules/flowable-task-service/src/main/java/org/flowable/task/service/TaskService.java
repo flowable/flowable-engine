@@ -51,7 +51,7 @@ public interface TaskService {
     
     TaskEntity createTask();
     
-    Task createTask(TaskBuilder taskBuilder);
+    TaskEntity createTask(TaskBuilder taskBuilder);
     
     void insertTask(TaskEntity taskEntity, boolean fireCreateEvent);
     
