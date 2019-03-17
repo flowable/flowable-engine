@@ -71,7 +71,7 @@ public abstract class AppEngines {
             }
             for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext();) {
                 URL resource = iterator.next();
-                LOGGER.info("Initializing app engine using configuration '{}'", resource.toString());
+                LOGGER.info("Initializing app engine using configuration '{}'", resource);
                 initAppEngineFromResource(resource);
             }
 
@@ -83,7 +83,7 @@ public abstract class AppEngines {
 
             while (resources.hasMoreElements()) {
                 URL resource = resources.nextElement();
-                LOGGER.info("Initializing app engine using Spring configuration '{}'", resource.toString());
+                LOGGER.info("Initializing app engine using Spring configuration '{}'", resource);
                 initAppEngineFromSpringResource(resource);
             }
 
@@ -105,7 +105,7 @@ public abstract class AppEngines {
             appEngineInfosByResourceUrl.put(resource.toString(), appEngineInfo);
 
         } catch (Exception e) {
-            throw new FlowableException("couldn't initialize app engine from spring configuration resource " + resource.toString() + ": " + e.getMessage(), e);
+            throw new FlowableException("couldn't initialize app engine from spring configuration resource " + resource + ": " + e.getMessage(), e);
         }
     }
 

@@ -90,7 +90,7 @@ public abstract class ProcessEngines {
             }
             for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext();) {
                 URL resource = iterator.next();
-                LOGGER.info("Initializing process engine using configuration '{}'", resource.toString());
+                LOGGER.info("Initializing process engine using configuration '{}'", resource);
                 initProcessEngineFromResource(resource);
             }
 
@@ -101,7 +101,7 @@ public abstract class ProcessEngines {
             }
             while (resources.hasMoreElements()) {
                 URL resource = resources.nextElement();
-                LOGGER.info("Initializing process engine using Spring configuration '{}'", resource.toString());
+                LOGGER.info("Initializing process engine using Spring configuration '{}'", resource);
                 initProcessEngineFromSpringResource(resource);
             }
 
@@ -123,7 +123,7 @@ public abstract class ProcessEngines {
             processEngineInfosByResourceUrl.put(resource.toString(), processEngineInfo);
 
         } catch (Exception e) {
-            throw new FlowableException("couldn't initialize process engine from spring configuration resource " + resource.toString() + ": " + e.getMessage(), e);
+            throw new FlowableException("couldn't initialize process engine from spring configuration resource " + resource + ": " + e.getMessage(), e);
         }
     }
 
