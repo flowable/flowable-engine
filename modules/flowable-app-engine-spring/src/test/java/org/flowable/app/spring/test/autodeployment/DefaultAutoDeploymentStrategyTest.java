@@ -22,6 +22,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.flowable.app.spring.autodeployment.DefaultAutoDeploymentStrategy;
@@ -55,7 +56,7 @@ public class DefaultAutoDeploymentStrategyTest extends AbstractAutoDeploymentStr
     }
 
     @Test
-    public void testDeployResources() {
+    public void testDeployResources() throws IOException {
         final Resource[] resources = new Resource[] { resourceMock1, resourceMock2, resourceMock3 };
         classUnderTest.deployResources(resources, repositoryServiceMock);
 
@@ -66,10 +67,11 @@ public class DefaultAutoDeploymentStrategyTest extends AbstractAutoDeploymentStr
         verify(deploymentBuilderMock, times(1)).addInputStream(eq(resourceName1), isA(InputStream.class));
         verify(deploymentBuilderMock, times(1)).addInputStream(eq(resourceName2), isA(InputStream.class));
         verify(deploymentBuilderMock, times(3)).deploy();
+        verify(inputStreamMock, times(3)).close();
     }
 
     @Test
-    public void testDeployResourcesNoResources() {
+    public void testDeployResourcesNoResources() throws IOException {
         final Resource[] resources = new Resource[] {};
         classUnderTest.deployResources(resources, repositoryServiceMock);
 
@@ -77,6 +79,7 @@ public class DefaultAutoDeploymentStrategyTest extends AbstractAutoDeploymentStr
         verify(deploymentBuilderMock, never()).addInputStream(isA(String.class), isA(InputStream.class));
         verify(deploymentBuilderMock, never()).addInputStream(eq(resourceName2), isA(InputStream.class));
         verify(deploymentBuilderMock, never()).deploy();
+        verify(inputStreamMock, never()).close();
     }
 
 }

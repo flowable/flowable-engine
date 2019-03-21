@@ -13,6 +13,7 @@
 
 package org.flowable.spring.configurator;
 
+import java.io.InputStream;
 import java.util.zip.ZipInputStream;
 
 import org.flowable.engine.RepositoryService;
@@ -51,10 +52,12 @@ public class DefaultAutoDeploymentStrategy extends AbstractAutoDeploymentStrateg
 
             for (final Resource resource : resources) {
                 final String resourceName = determineResourceName(resource);
-                if (resourceName.endsWith(".bar") || resourceName.endsWith(".zip") || resourceName.endsWith(".jar")) {
-                    deploymentBuilder.addZipInputStream(new ZipInputStream(resource.getInputStream()));
-                } else {
-                    deploymentBuilder.addInputStream(resourceName, resource.getInputStream());
+                try(InputStream resourceInputStream = resource.getInputStream()) {
+                    if (resourceName.endsWith(".bar") || resourceName.endsWith(".zip") || resourceName.endsWith(".jar")) {
+                        deploymentBuilder.addZipInputStream(new ZipInputStream(resourceInputStream));
+                    } else {
+                        deploymentBuilder.addInputStream(resourceName, resourceInputStream);
+                    }
                 }
 
             }

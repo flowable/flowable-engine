@@ -70,7 +70,7 @@ public class AbstractAutoDeploymentStrategyTest {
     protected File fileMock5;
 
     @Mock
-    private InputStream inputStreamMock;
+    protected InputStream inputStreamMock;
 
     @Mock
     private Deployment deploymentMock;

@@ -58,7 +58,7 @@ public class AbstractAutoDeploymentStrategyTest {
     protected File fileMock3;
 
     @Mock
-    private InputStream inputStreamMock;
+    protected InputStream inputStreamMock;
 
     @Mock
     private AppDeployment deploymentMock;

@@ -14,6 +14,7 @@
 package org.flowable.app.spring.autodeployment;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.zip.ZipInputStream;
 
 import org.flowable.app.api.AppRepositoryService;
@@ -62,11 +63,11 @@ public class DefaultAutoDeploymentStrategy extends AbstractAutoDeploymentStrateg
 
                 final AppDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(resourceName);
 
-                try {
+                try(InputStream resourceInputStream = resource.getInputStream()) {
                     if (resourceName.endsWith(".bar") || resourceName.endsWith(".zip")) {
-                        deploymentBuilder.addZipInputStream(new ZipInputStream(resource.getInputStream()));
+                        deploymentBuilder.addZipInputStream(new ZipInputStream(resourceInputStream));
                     } else {
-                        deploymentBuilder.addInputStream(resourceName, resource.getInputStream());
+                        deploymentBuilder.addInputStream(resourceName, resourceInputStream);
                     }
 
                 } catch (IOException e) {

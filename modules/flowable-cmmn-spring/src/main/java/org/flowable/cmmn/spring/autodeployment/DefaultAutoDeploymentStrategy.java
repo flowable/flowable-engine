@@ -19,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
+import java.io.InputStream;
+
 /**
  * Default implementation of {@link AutoDeploymentStrategy} that groups all {@link Resource}s into a single deployment.
  * This implementation is equivalent to the previously used implementation.
@@ -48,7 +50,9 @@ public class DefaultAutoDeploymentStrategy extends AbstractAutoDeploymentStrateg
             final CmmnDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentNameHint);
 
             for (final Resource resource : resources) {
-                deploymentBuilder.addInputStream(determineResourceName(resource), resource.getInputStream());
+                try(InputStream resourceInputStream = resource.getInputStream()) {
+                    deploymentBuilder.addInputStream(determineResourceName(resource), resourceInputStream);
+                }
             }
 
             deploymentBuilder.deploy();

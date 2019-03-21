@@ -59,7 +59,7 @@ public class DefaultAutoDeploymentStrategyTest extends AbstractAutoDeploymentStr
     }
 
     @Test
-    public void testDeployResources() {
+    public void testDeployResources() throws IOException {
         final Resource[] resources = new Resource[] { resourceMock1, resourceMock2, resourceMock3, resourceMock4, resourceMock5 };
         classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
 
@@ -70,10 +70,11 @@ public class DefaultAutoDeploymentStrategyTest extends AbstractAutoDeploymentStr
         verify(deploymentBuilderMock, times(1)).addInputStream(eq(resourceName2), isA(InputStream.class));
         verify(deploymentBuilderMock, times(3)).addZipInputStream(isA(ZipInputStream.class));
         verify(deploymentBuilderMock, times(1)).deploy();
+        verify(inputStreamMock, times(5)).close();
     }
 
     @Test
-    public void testDeployResourcesNoResources() {
+    public void testDeployResourcesNoResources() throws IOException {
         final Resource[] resources = new Resource[] {};
         classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
 
@@ -84,6 +85,7 @@ public class DefaultAutoDeploymentStrategyTest extends AbstractAutoDeploymentStr
         verify(deploymentBuilderMock, never()).addInputStream(eq(resourceName2), isA(InputStream.class));
         verify(deploymentBuilderMock, never()).addZipInputStream(isA(ZipInputStream.class));
         verify(deploymentBuilderMock, times(1)).deploy();
+        verify(inputStreamMock, never()).close();
     }
 
     @Test(expected = ActivitiException.class)

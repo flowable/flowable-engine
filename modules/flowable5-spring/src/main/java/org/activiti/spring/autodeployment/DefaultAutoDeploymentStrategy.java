@@ -14,6 +14,7 @@
 package org.activiti.spring.autodeployment;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.zip.ZipInputStream;
 
 import org.activiti.engine.ActivitiException;
@@ -48,11 +49,11 @@ public class DefaultAutoDeploymentStrategy extends AbstractAutoDeploymentStrateg
         for (final Resource resource : resources) {
             final String resourceName = determineResourceName(resource);
 
-            try {
+            try(InputStream resourceInputStream = resource.getInputStream()) {
                 if (resourceName.endsWith(".bar") || resourceName.endsWith(".zip") || resourceName.endsWith(".jar")) {
-                    deploymentBuilder.addZipInputStream(new ZipInputStream(resource.getInputStream()));
+                    deploymentBuilder.addZipInputStream(new ZipInputStream(resourceInputStream));
                 } else {
-                    deploymentBuilder.addInputStream(resourceName, resource.getInputStream());
+                    deploymentBuilder.addInputStream(resourceName, resourceInputStream);
                 }
             } catch (IOException e) {
                 throw new ActivitiException("couldn't auto deploy resource '" + resource + "': " + e.getMessage(), e);
