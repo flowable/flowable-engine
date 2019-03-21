@@ -13,6 +13,8 @@
 package org.flowable.cmmn.test.async;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
@@ -36,12 +38,15 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.entitylink.api.EntityLinkType;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
+import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -292,6 +297,38 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
             .list();
         assertThat(historicPlanItemInstances).extracting(HistoricPlanItemInstance::getName).containsExactly("The Task");
         assertThat(historicPlanItemInstances).extracting(HistoricPlanItemInstance::getCreateTime).isNotNull();
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testHumanTaskWithCandidateUsersAndGroups() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+        assertThat(cmmnTaskService.getIdentityLinksForTask(task.getId()))
+            .extracting(IdentityLink::getType, IdentityLink::getUserId, IdentityLink::getGroupId)
+            .containsExactlyInAnyOrder(
+                tuple("assignee", "johnDoe", null),
+                tuple("candidate", "user1", null),
+                tuple("candidate", null, "group1"),
+                tuple("candidate", null, "group2")
+            );
+
+        assertThatThrownBy(() -> cmmnHistoryService.getHistoricIdentityLinksForTask(task.getId()))
+            .isInstanceOf(FlowableObjectNotFoundException.class)
+            .hasMessageContaining("No historic task exists");
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+
+        assertThat(cmmnHistoryService.getHistoricIdentityLinksForTask(task.getId()))
+            .extracting(HistoricIdentityLink::getType, HistoricIdentityLink::getUserId, HistoricIdentityLink::getGroupId)
+            .containsExactlyInAnyOrder(
+                tuple("assignee", "johnDoe", null),
+                tuple("candidate", "user1", null),
+                tuple("candidate", null, "group1"),
+                tuple("candidate", null, "group2")
+            );
     }
 
     @Test

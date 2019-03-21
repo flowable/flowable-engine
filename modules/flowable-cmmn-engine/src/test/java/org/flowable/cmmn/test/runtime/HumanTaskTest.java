@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.test.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -32,7 +34,9 @@ import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkType;
 import org.flowable.entitylink.api.HierarchyType;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
+import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.Test;
@@ -71,6 +75,12 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
         assertNull(entityLink.getReferenceScopeDefinitionId());
         assertEquals(HierarchyType.ROOT, entityLink.getHierarchyType());
 
+        assertThat(cmmnTaskService.getIdentityLinksForTask(task1Id))
+            .extracting(IdentityLink::getType, IdentityLink::getUserId, IdentityLink::getGroupId)
+            .containsExactlyInAnyOrder(
+                tuple("assignee", "JohnDoe", null)
+            );
+
         cmmnTaskService.complete(task.getId());
 
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
@@ -83,6 +93,14 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
 
         task = cmmnTaskService.createTaskQuery().taskCandidateUser("test2").caseInstanceId(caseInstance.getId()).singleResult();
         assertEquals("Task 2", task.getName());
+
+        assertThat(cmmnTaskService.getIdentityLinksForTask(task2Id))
+            .extracting(IdentityLink::getType, IdentityLink::getUserId, IdentityLink::getGroupId)
+            .containsExactlyInAnyOrder(
+                tuple("candidate", "test", null),
+                tuple("candidate", "test2", null),
+                tuple("candidate", null, "test")
+            );
 
         cmmnTaskService.complete(task.getId());
 
@@ -119,6 +137,20 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
             
             assertTrue(hasTask1);
             assertTrue(hasTask2);
+
+            assertThat(cmmnHistoryService.getHistoricIdentityLinksForTask(task1Id))
+                .extracting(HistoricIdentityLink::getType, HistoricIdentityLink::getUserId, HistoricIdentityLink::getGroupId)
+                .containsExactlyInAnyOrder(
+                    tuple("assignee", "JohnDoe", null)
+                );
+
+            assertThat(cmmnHistoryService.getHistoricIdentityLinksForTask(task2Id))
+                .extracting(HistoricIdentityLink::getType, HistoricIdentityLink::getUserId, HistoricIdentityLink::getGroupId)
+                .containsExactlyInAnyOrder(
+                    tuple("candidate", "test", null),
+                    tuple("candidate", "test2", null),
+                    tuple("candidate", null, "test")
+                );
         }
 
         Authentication.setAuthenticatedUserId(null);
