@@ -32,15 +32,26 @@ public interface CmmnAsyncHistoryConstants {
     String TYPE_ENTITY_LINK_CREATED = "cmmn-entity-link-created";
     String TYPE_ENTITY_LINK_DELETED = "cmmn-entity-link-deleted";
     String TYPE_MILESTONE_REACHED = "cmmn-milestone-reached";
+    String TYPE_PLAN_ITEM_INSTANCE_FULL = "cmmn-plan-item-instance-full";
+    @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_AVAILABLE = "cmmn-plan-item-instance-available";
+    @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_COMPLETED = "cmmn-plan-item-instance-completed";
+    @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_CREATED = "cmmn-plan-item-instance-created";
+    @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_DISABLED = "cmmn-plan-item-instance-disabled";
+    @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_ENABLED = "cmmn-plan-item-instance-enabled";
+    @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_EXIT = "cmmn-plan-item-instance-exit";
+    @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_OCCURRED = "cmmn-plan-item-instance-occurred";
+    @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_SUSPENDED = "cmmn-plan-item-instance-suspended";
+    @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_STARTED = "cmmn-plan-item-instance-started";
+    @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_TERMINATED = "cmmn-plan-item-instance-terminated";
     String TYPE_TASK_CREATED = "cmmn-task-created";
     String TYPE_TASK_REMOVED = "cmmn-task-removed";
@@ -59,16 +70,7 @@ public interface CmmnAsyncHistoryConstants {
             TYPE_IDENTITY_LINK_CREATED,
             TYPE_IDENTITY_LINK_DELETED,
             TYPE_MILESTONE_REACHED,
-            TYPE_PLAN_ITEM_INSTANCE_CREATED,
-            TYPE_PLAN_ITEM_INSTANCE_AVAILABLE,
-            TYPE_PLAN_ITEM_INSTANCE_COMPLETED,
-            TYPE_PLAN_ITEM_INSTANCE_DISABLED,
-            TYPE_PLAN_ITEM_INSTANCE_ENABLED,
-            TYPE_PLAN_ITEM_INSTANCE_EXIT,
-            TYPE_PLAN_ITEM_INSTANCE_OCCURRED,
-            TYPE_PLAN_ITEM_INSTANCE_SUSPENDED,
-            TYPE_PLAN_ITEM_INSTANCE_STARTED,
-            TYPE_PLAN_ITEM_INSTANCE_TERMINATED,
+            TYPE_PLAN_ITEM_INSTANCE_FULL,
             TYPE_TASK_CREATED,
             TYPE_TASK_REMOVED,
             TYPE_TASK_UPDATED,
