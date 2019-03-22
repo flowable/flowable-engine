@@ -1,4 +1,4 @@
-CREATE TABLE ${databaseSchema}ACT_HI_TASKINST (
+CREATE TABLE ACT_HI_TASKINST (
     ID_ varchar(64) not null,
     REV_ integer default 1,
     PROC_DEF_ID_ varchar(64),
@@ -29,7 +29,7 @@ CREATE TABLE ${databaseSchema}ACT_HI_TASKINST (
     primary key (ID_)
 );
 
-CREATE TABLE ${databaseSchema}ACT_HI_TSK_LOG (
+CREATE TABLE ACT_HI_TSK_LOG (
     ID_ SERIAL PRIMARY KEY,
     TYPE_ varchar(64),
     TASK_ID_ varchar(64) not null,
@@ -46,8 +46,8 @@ CREATE TABLE ${databaseSchema}ACT_HI_TSK_LOG (
     TENANT_ID_ varchar(255) default ''
 );
 
-create index ACT_IDX_HI_TASK_SCOPE on ${databaseSchema}ACT_HI_TASKINST(SCOPE_ID_, SCOPE_TYPE_);
-create index ACT_IDX_HI_TASK_SUB_SCOPE on ${databaseSchema}ACT_HI_TASKINST(SUB_SCOPE_ID_, SCOPE_TYPE_);
-create index ACT_IDX_HI_TASK_SCOPE_DEF on ${databaseSchema}ACT_HI_TASKINST(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
+create index ACT_IDX_HI_TASK_SCOPE on ACT_HI_TASKINST(SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_HI_TASK_SUB_SCOPE on ACT_HI_TASKINST(SUB_SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_HI_TASK_SCOPE_DEF on ACT_HI_TASKINST(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
 -- force-commit

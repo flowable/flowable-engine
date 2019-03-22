@@ -1,4 +1,4 @@
-create table ${databaseSchema}ACT_RU_TASK (
+create table ACT_RU_TASK (
     ID_ varchar(64),
     REV_ integer,
     EXECUTION_ID_ varchar(64),
@@ -31,11 +31,11 @@ create table ${databaseSchema}ACT_RU_TASK (
     primary key (ID_)
 );
 
-create index ACT_IDX_TASK_CREATE on ${databaseSchema}ACT_RU_TASK(CREATE_TIME_);
-create index ACT_IDX_TASK_SCOPE on ${databaseSchema}ACT_RU_TASK(SCOPE_ID_, SCOPE_TYPE_);
-create index ACT_IDX_TASK_SUB_SCOPE on ${databaseSchema}ACT_RU_TASK(SUB_SCOPE_ID_, SCOPE_TYPE_);
-create index ACT_IDX_TASK_SCOPE_DEF on ${databaseSchema}ACT_RU_TASK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
+create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
+create index ACT_IDX_TASK_SCOPE on ACT_RU_TASK(SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_TASK_SUB_SCOPE on ACT_RU_TASK(SUB_SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_TASK_SCOPE_DEF on ACT_RU_TASK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
-insert into ${databaseSchema}ACT_GE_PROPERTY values ('task.schema.version', '6.5.0.0', 1);
+insert into ACT_GE_PROPERTY values ('task.schema.version', '6.5.0.0', 1);
 
 -- force-commit

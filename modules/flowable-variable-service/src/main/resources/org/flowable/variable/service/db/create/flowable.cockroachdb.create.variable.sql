@@ -1,4 +1,4 @@
-create table ${databaseSchema}ACT_RU_VARIABLE (
+create table ACT_RU_VARIABLE (
     ID_ varchar(64) not null,
     REV_ integer,
     TYPE_ varchar(255) not null,
@@ -17,17 +17,17 @@ create table ${databaseSchema}ACT_RU_VARIABLE (
     primary key (ID_)
 );
 
-create index ACT_IDX_RU_VAR_SCOPE_ID_TYPE on ${databaseSchema}ACT_RU_VARIABLE(SCOPE_ID_, SCOPE_TYPE_);
-create index ACT_IDX_RU_VAR_SUB_ID_TYPE on ${databaseSchema}ACT_RU_VARIABLE(SUB_SCOPE_ID_, SCOPE_TYPE_);
-create index ACT_IDX_VAR_BYTEARRAY on ${databaseSchema}ACT_RU_VARIABLE(BYTEARRAY_ID_);
+create index ACT_IDX_RU_VAR_SCOPE_ID_TYPE on ACT_RU_VARIABLE(SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_RU_VAR_SUB_ID_TYPE on ACT_RU_VARIABLE(SUB_SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_VAR_BYTEARRAY on ACT_RU_VARIABLE(BYTEARRAY_ID_);
 
 -- force-commit
 
-alter table ${databaseSchema}ACT_RU_VARIABLE
+alter table ACT_RU_VARIABLE
     add constraint ACT_FK_VAR_BYTEARRAY 
     foreign key (BYTEARRAY_ID_) 
-    references ${databaseSchema}ACT_GE_BYTEARRAY (ID_);
+    references ACT_GE_BYTEARRAY (ID_);
 
-insert into ${databaseSchema}ACT_GE_PROPERTY values ('variable.schema.version', '6.5.0.0', 1);
+insert into ACT_GE_PROPERTY values ('variable.schema.version', '6.5.0.0', 1);
 
 -- force-commit

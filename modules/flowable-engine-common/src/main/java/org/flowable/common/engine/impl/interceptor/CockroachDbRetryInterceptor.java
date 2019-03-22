@@ -12,8 +12,6 @@
  */
 package org.flowable.common.engine.impl.interceptor;
 
-import java.sql.SQLException;
-
 import org.flowable.common.engine.api.FlowableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,9 +47,7 @@ public class CockroachDbRetryInterceptor extends AbstractCommandInterceptor {
                 return next.execute(config, command);
 
             } catch (Exception e) {
-                if (e instanceof SQLException) {
-                    LOGGER.info("Caught optimistic locking exception: {}", e.getMessage(), e);
-                }
+                LOGGER.debug("Exception caught. Retrying.", e);
             }
 
             failedAttempts++;

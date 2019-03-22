@@ -18,11 +18,13 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.management.TablePage;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
+@Disabled
 public class TablePageQueryTest extends PluggableFlowableTestCase {
 
     @Test

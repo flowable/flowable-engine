@@ -26,8 +26,8 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.job.api.Job;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 
 /**
  * These are the first tests ever written for Flowable 6. Keeping them here for nostalgic reasons.
@@ -121,7 +121,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
      */
     @Test
     @org.flowable.engine.test.Deployment
-    @Disabled
+    @EnabledIfSystemProperty(named = "db", matches = "crdb")
     public void testLongServiceTaskLoop() {
         int maxCount = 3210; // You can make this as big as you want (as long as it still fits within transaction timeouts).
                              // Go on, try it!

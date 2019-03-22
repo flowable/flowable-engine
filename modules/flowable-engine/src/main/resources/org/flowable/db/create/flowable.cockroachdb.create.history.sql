@@ -1,4 +1,4 @@
-CREATE TABLE ${databaseSchema}ACT_HI_PROCINST (
+CREATE TABLE ACT_HI_PROCINST (
     ID_ varchar(64) not null,
     REV_ integer default 1,
     PROC_INST_ID_ varchar(64) not null,
@@ -20,7 +20,7 @@ CREATE TABLE ${databaseSchema}ACT_HI_PROCINST (
     unique (PROC_INST_ID_)
 );
 
-CREATE TABLE ${databaseSchema}ACT_HI_ACTINST (
+CREATE TABLE ACT_HI_ACTINST (
     ID_ varchar(64) not null,
     REV_ integer default 1,
     PROC_DEF_ID_ varchar(64) not null,
@@ -40,7 +40,7 @@ CREATE TABLE ${databaseSchema}ACT_HI_ACTINST (
     primary key (ID_)
 );
 
-CREATE TABLE ${databaseSchema}ACT_HI_DETAIL (
+CREATE TABLE ACT_HI_DETAIL (
     ID_ varchar(64) not null,
     TYPE_ varchar(255) not null,
     PROC_INST_ID_ varchar(64),
@@ -59,7 +59,7 @@ CREATE TABLE ${databaseSchema}ACT_HI_DETAIL (
     primary key (ID_)
 );
 
-CREATE TABLE ${databaseSchema}ACT_HI_COMMENT (
+CREATE TABLE ACT_HI_COMMENT (
     ID_ varchar(64) not null,
     TYPE_ varchar(255),
     TIME_ timestamp not null,
@@ -72,7 +72,7 @@ CREATE TABLE ${databaseSchema}ACT_HI_COMMENT (
     primary key (ID_)
 );
 
-CREATE TABLE ${databaseSchema}ACT_HI_ATTACHMENT (
+CREATE TABLE ACT_HI_ATTACHMENT (
     ID_ varchar(64) not null,
     REV_ integer,
     USER_ID_ varchar(255),
@@ -87,22 +87,22 @@ CREATE TABLE ${databaseSchema}ACT_HI_ATTACHMENT (
     primary key (ID_)
 );
 
-create index ACT_IDX_HI_PRO_INST_END on ${databaseSchema}ACT_HI_PROCINST(END_TIME_);
-create index ACT_IDX_HI_PRO_I_BUSKEY on ${databaseSchema}ACT_HI_PROCINST(BUSINESS_KEY_);
-create index ACT_IDX_HI_ACT_INST_START on ${databaseSchema}ACT_HI_ACTINST(START_TIME_);
-create index ACT_IDX_HI_ACT_INST_END on ${databaseSchema}ACT_HI_ACTINST(END_TIME_);
-create index ACT_IDX_HI_DETAIL_PROC_INST on ${databaseSchema}ACT_HI_DETAIL(PROC_INST_ID_);
-create index ACT_IDX_HI_DETAIL_ACT_INST on ${databaseSchema}ACT_HI_DETAIL(ACT_INST_ID_);
-create index ACT_IDX_HI_DETAIL_TIME on ${databaseSchema}ACT_HI_DETAIL(TIME_);
-create index ACT_IDX_HI_DETAIL_NAME on ${databaseSchema}ACT_HI_DETAIL(NAME_);
-create index ACT_IDX_HI_DETAIL_TASK_ID on ${databaseSchema}ACT_HI_DETAIL(TASK_ID_);
-create index ACT_IDX_HI_PROCVAR_PROC_INST on ${databaseSchema}ACT_HI_VARINST(PROC_INST_ID_);
-create index ACT_IDX_HI_PROCVAR_TASK_ID on ${databaseSchema}ACT_HI_VARINST(TASK_ID_);
-create index ACT_IDX_HI_PROCVAR_EXE on ${databaseSchema}ACT_HI_VARINST(EXECUTION_ID_);
-create index ACT_IDX_HI_ACT_INST_PROCINST on ${databaseSchema}ACT_HI_ACTINST(PROC_INST_ID_, ACT_ID_);
-create index ACT_IDX_HI_ACT_INST_EXEC on ${databaseSchema}ACT_HI_ACTINST(EXECUTION_ID_, ACT_ID_);
-create index ACT_IDX_HI_IDENT_LNK_TASK on ${databaseSchema}ACT_HI_IDENTITYLINK(TASK_ID_);
-create index ACT_IDX_HI_IDENT_LNK_PROCINST on ${databaseSchema}ACT_HI_IDENTITYLINK(PROC_INST_ID_);
-create index ACT_IDX_HI_TASK_INST_PROCINST on ${databaseSchema}ACT_HI_TASKINST(PROC_INST_ID_);
+create index ACT_IDX_HI_PRO_INST_END on ACT_HI_PROCINST(END_TIME_);
+create index ACT_IDX_HI_PRO_I_BUSKEY on ACT_HI_PROCINST(BUSINESS_KEY_);
+create index ACT_IDX_HI_ACT_INST_START on ACT_HI_ACTINST(START_TIME_);
+create index ACT_IDX_HI_ACT_INST_END on ACT_HI_ACTINST(END_TIME_);
+create index ACT_IDX_HI_DETAIL_PROC_INST on ACT_HI_DETAIL(PROC_INST_ID_);
+create index ACT_IDX_HI_DETAIL_ACT_INST on ACT_HI_DETAIL(ACT_INST_ID_);
+create index ACT_IDX_HI_DETAIL_TIME on ACT_HI_DETAIL(TIME_);
+create index ACT_IDX_HI_DETAIL_NAME on ACT_HI_DETAIL(NAME_);
+create index ACT_IDX_HI_DETAIL_TASK_ID on ACT_HI_DETAIL(TASK_ID_);
+create index ACT_IDX_HI_PROCVAR_PROC_INST on ACT_HI_VARINST(PROC_INST_ID_);
+create index ACT_IDX_HI_PROCVAR_TASK_ID on ACT_HI_VARINST(TASK_ID_);
+create index ACT_IDX_HI_PROCVAR_EXE on ACT_HI_VARINST(EXECUTION_ID_);
+create index ACT_IDX_HI_ACT_INST_PROCINST on ACT_HI_ACTINST(PROC_INST_ID_, ACT_ID_);
+create index ACT_IDX_HI_ACT_INST_EXEC on ACT_HI_ACTINST(EXECUTION_ID_, ACT_ID_);
+create index ACT_IDX_HI_IDENT_LNK_TASK on ACT_HI_IDENTITYLINK(TASK_ID_);
+create index ACT_IDX_HI_IDENT_LNK_PROCINST on ACT_HI_IDENTITYLINK(PROC_INST_ID_);
+create index ACT_IDX_HI_TASK_INST_PROCINST on ACT_HI_TASKINST(PROC_INST_ID_);
 
 -- force-commit
