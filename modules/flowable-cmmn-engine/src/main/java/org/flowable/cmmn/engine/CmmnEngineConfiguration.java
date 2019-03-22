@@ -84,6 +84,7 @@ import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInst
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceDisabledHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceEnabledHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceExitHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceFullHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceOccurredHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceStartedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceSuspendedHistoryJsonTransformer;
@@ -1508,6 +1509,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         historyJsonTransformers.add(new TaskUpdatedHistoryJsonTransformer());
         historyJsonTransformers.add(new TaskEndedHistoryJsonTransformer());
         
+        historyJsonTransformers.add(new PlanItemInstanceFullHistoryJsonTransformer());
         historyJsonTransformers.add(new PlanItemInstanceAvailableHistoryJsonTransformer());
         historyJsonTransformers.add(new PlanItemInstanceCompletedHistoryJsonTransformer());
         historyJsonTransformers.add(new PlanItemInstanceCreatedHistoryJsonTransformer());

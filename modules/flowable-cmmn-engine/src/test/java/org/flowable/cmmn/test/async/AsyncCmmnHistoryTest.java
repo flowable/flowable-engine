@@ -26,6 +26,9 @@ import java.time.temporal.ChronoField;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
@@ -50,7 +53,6 @@ import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
-import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskLogEntry;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
@@ -60,6 +62,7 @@ import org.junit.Test;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCase {
     
@@ -662,4 +665,246 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         assertEquals(1, entityLinksByScopeIdAndType.size());
         assertEquals("root", entityLinksByScopeIdAndType.get(0).getHierarchyType());
     }
+
+    @Test
+    @CmmnDeployment
+    public void testPlanItemInstancesStateChangesWithFixedTime() {
+        Date fixTime = Date.from(Instant.now());
+        cmmnEngineConfiguration.getClock().setCurrentTime(fixTime);
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("allStates")
+            .start();
+
+        List<PlanItemInstance> runtimePlanItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(runtimePlanItemInstances)
+            .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
+            .as("planItemDefinitionId, state")
+            .containsExactlyInAnyOrder(
+                tuple("eventListenerAvailable", PlanItemInstanceState.AVAILABLE),
+                tuple("eventListenerUnavailable", PlanItemInstanceState.UNAVAILABLE),
+                tuple("serviceTaskAvailableEnabled", PlanItemInstanceState.ENABLED),
+                tuple("serviceTaskAvailableAsyncActive", PlanItemInstanceState.ASYNC_ACTIVE)
+            );
+
+        Map<String, PlanItemInstance> runtimePlanItemInstancesByDefinitionId = runtimePlanItemInstances.stream()
+            .collect(Collectors.toMap(PlanItemInstance::getPlanItemDefinitionId, Function.identity()));
+
+        PlanItemInstance eventListenerAvailable = runtimePlanItemInstancesByDefinitionId.get("eventListenerAvailable");
+
+        assertThat(eventListenerAvailable).extracting(
+            PlanItemInstance::getCompletedTime,
+            PlanItemInstance::getEndedTime,
+            PlanItemInstance::getOccurredTime,
+            PlanItemInstance::getTerminatedTime,
+            PlanItemInstance::getExitTime,
+            PlanItemInstance::getLastEnabledTime,
+            PlanItemInstance::getLastDisabledTime,
+            PlanItemInstance::getLastStartedTime,
+            PlanItemInstance::getLastSuspendedTime
+        ).containsOnlyNulls();
+
+        assertThat(eventListenerAvailable).extracting(
+            PlanItemInstance::getCreateTime,
+            PlanItemInstance::getLastAvailableTime
+        ).containsOnly(fixTime);
+
+        PlanItemInstance eventListenerUnavailable = runtimePlanItemInstancesByDefinitionId.get("eventListenerUnavailable");
+
+        assertThat(eventListenerUnavailable).extracting(
+            PlanItemInstance::getCompletedTime,
+            PlanItemInstance::getEndedTime,
+            PlanItemInstance::getOccurredTime,
+            PlanItemInstance::getTerminatedTime,
+            PlanItemInstance::getExitTime,
+            PlanItemInstance::getLastEnabledTime,
+            PlanItemInstance::getLastAvailableTime,
+            PlanItemInstance::getLastDisabledTime,
+            PlanItemInstance::getLastStartedTime,
+            PlanItemInstance::getLastSuspendedTime
+        ).containsOnlyNulls();
+
+        assertThat(eventListenerUnavailable).extracting(
+            PlanItemInstance::getCreateTime
+        ).isEqualTo(fixTime);
+
+        PlanItemInstance serviceTaskAvailableEnabled = runtimePlanItemInstancesByDefinitionId.get("serviceTaskAvailableEnabled");
+
+        assertThat(serviceTaskAvailableEnabled).extracting(
+            PlanItemInstance::getCompletedTime,
+            PlanItemInstance::getEndedTime,
+            PlanItemInstance::getOccurredTime,
+            PlanItemInstance::getTerminatedTime,
+            PlanItemInstance::getExitTime,
+            PlanItemInstance::getLastDisabledTime,
+            PlanItemInstance::getLastStartedTime,
+            PlanItemInstance::getLastSuspendedTime
+        ).containsOnlyNulls();
+
+        assertThat(serviceTaskAvailableEnabled).extracting(
+            PlanItemInstance::getCreateTime,
+            PlanItemInstance::getLastEnabledTime,
+            PlanItemInstance::getLastAvailableTime
+        ).containsOnly(fixTime);
+
+        PlanItemInstance serviceTaskAvailableAsyncActive = runtimePlanItemInstancesByDefinitionId.get("serviceTaskAvailableAsyncActive");
+
+        assertThat(serviceTaskAvailableAsyncActive).extracting(
+            PlanItemInstance::getCompletedTime,
+            PlanItemInstance::getEndedTime,
+            PlanItemInstance::getOccurredTime,
+            PlanItemInstance::getTerminatedTime,
+            PlanItemInstance::getExitTime,
+            PlanItemInstance::getLastEnabledTime,
+            PlanItemInstance::getLastDisabledTime,
+            PlanItemInstance::getLastSuspendedTime
+        ).containsOnlyNulls();
+
+        assertThat(serviceTaskAvailableAsyncActive).extracting(
+            PlanItemInstance::getCreateTime,
+            PlanItemInstance::getLastAvailableTime,
+            PlanItemInstance::getLastStartedTime
+        ).containsOnly(fixTime);
+
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).list())
+            .extracting(HistoricPlanItemInstance::getPlanItemDefinitionId, HistoricPlanItemInstance::getState)
+            .isEmpty();
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+
+        List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+            .planItemInstanceCaseInstanceId(caseInstance.getId())
+            .list();
+
+        assertThat(historicPlanItemInstances)
+            .extracting(HistoricPlanItemInstance::getPlanItemDefinitionId, HistoricPlanItemInstance::getState)
+            .containsExactlyInAnyOrder(
+                tuple("serviceTaskAvailableActiveCompleted", PlanItemInstanceState.COMPLETED),
+                tuple("stageAvailableActiveTerminated", PlanItemInstanceState.TERMINATED),
+                tuple("humanTaskAvailableActiveTerminatedAndWaitingForRepetition", PlanItemInstanceState.TERMINATED),
+                tuple("eventListenerAvailable", PlanItemInstanceState.AVAILABLE),
+                tuple("eventListenerUnavailable", PlanItemInstanceState.UNAVAILABLE),
+                tuple("serviceTaskAvailableEnabled", PlanItemInstanceState.ENABLED),
+                tuple("serviceTaskAvailableAsyncActive", PlanItemInstanceState.ASYNC_ACTIVE)
+            );
+
+        Map<String, HistoricPlanItemInstance> historicPlanItemInstancesByDefinitionId = historicPlanItemInstances.stream()
+            .collect(Collectors.toMap(HistoricPlanItemInstance::getPlanItemDefinitionId, Function.identity()));
+
+        HistoricPlanItemInstance historicEventListenerAvailable = historicPlanItemInstancesByDefinitionId.get("eventListenerAvailable");
+
+        assertThat(historicEventListenerAvailable).extracting(
+            HistoricPlanItemInstance::getCompletedTime,
+            HistoricPlanItemInstance::getEndedTime,
+            HistoricPlanItemInstance::getOccurredTime,
+            HistoricPlanItemInstance::getTerminatedTime,
+            HistoricPlanItemInstance::getExitTime,
+            HistoricPlanItemInstance::getLastEnabledTime,
+            HistoricPlanItemInstance::getLastDisabledTime,
+            HistoricPlanItemInstance::getLastStartedTime,
+            HistoricPlanItemInstance::getLastSuspendedTime
+        ).containsOnlyNulls();
+
+        assertThat(historicEventListenerAvailable).extracting(
+            HistoricPlanItemInstance::getCreateTime,
+            HistoricPlanItemInstance::getLastAvailableTime
+        ).containsOnly(fixTime);
+
+        HistoricPlanItemInstance historicEventListenerUnavailable = historicPlanItemInstancesByDefinitionId.get("eventListenerUnavailable");
+
+        assertThat(historicEventListenerUnavailable).extracting(
+            HistoricPlanItemInstance::getCompletedTime,
+            HistoricPlanItemInstance::getEndedTime,
+            HistoricPlanItemInstance::getOccurredTime,
+            HistoricPlanItemInstance::getTerminatedTime,
+            HistoricPlanItemInstance::getExitTime,
+            HistoricPlanItemInstance::getLastEnabledTime,
+            HistoricPlanItemInstance::getLastAvailableTime,
+            HistoricPlanItemInstance::getLastDisabledTime,
+            HistoricPlanItemInstance::getLastStartedTime,
+            HistoricPlanItemInstance::getLastSuspendedTime
+        ).containsOnlyNulls();
+
+        assertThat(historicEventListenerUnavailable).extracting(
+            HistoricPlanItemInstance::getCreateTime
+        ).isEqualTo(fixTime);
+
+        HistoricPlanItemInstance historicServiceTaskAvailableEnabled = historicPlanItemInstancesByDefinitionId.get("serviceTaskAvailableEnabled");
+
+        assertThat(historicServiceTaskAvailableEnabled).extracting(
+            HistoricPlanItemInstance::getCompletedTime,
+            HistoricPlanItemInstance::getEndedTime,
+            HistoricPlanItemInstance::getOccurredTime,
+            HistoricPlanItemInstance::getTerminatedTime,
+            HistoricPlanItemInstance::getExitTime,
+            HistoricPlanItemInstance::getLastDisabledTime,
+            HistoricPlanItemInstance::getLastStartedTime,
+            HistoricPlanItemInstance::getLastSuspendedTime
+        ).containsOnlyNulls();
+
+        assertThat(historicServiceTaskAvailableEnabled).extracting(
+            HistoricPlanItemInstance::getCreateTime,
+            HistoricPlanItemInstance::getLastEnabledTime,
+            HistoricPlanItemInstance::getLastAvailableTime
+        ).containsOnly(fixTime);
+
+        HistoricPlanItemInstance historicServiceTaskAvailableActiveCompleted = historicPlanItemInstancesByDefinitionId.get("serviceTaskAvailableActiveCompleted");
+
+        assertThat(historicServiceTaskAvailableActiveCompleted).extracting(
+            HistoricPlanItemInstance::getOccurredTime,
+            HistoricPlanItemInstance::getTerminatedTime,
+            HistoricPlanItemInstance::getExitTime,
+            HistoricPlanItemInstance::getLastEnabledTime,
+            HistoricPlanItemInstance::getLastDisabledTime,
+            HistoricPlanItemInstance::getLastSuspendedTime
+        ).containsOnlyNulls();
+
+        assertThat(historicServiceTaskAvailableActiveCompleted).extracting(
+            HistoricPlanItemInstance::getCreateTime,
+            HistoricPlanItemInstance::getCompletedTime,
+            HistoricPlanItemInstance::getEndedTime,
+            HistoricPlanItemInstance::getLastAvailableTime,
+            HistoricPlanItemInstance::getLastStartedTime
+        ).containsOnly(fixTime);
+
+        HistoricPlanItemInstance historicStageAvailableActiveTerminated = historicPlanItemInstancesByDefinitionId.get("stageAvailableActiveTerminated");
+
+        assertThat(historicStageAvailableActiveTerminated).extracting(
+            HistoricPlanItemInstance::getCompletedTime,
+            HistoricPlanItemInstance::getOccurredTime,
+            HistoricPlanItemInstance::getTerminatedTime,
+            HistoricPlanItemInstance::getLastEnabledTime,
+            HistoricPlanItemInstance::getLastDisabledTime,
+            HistoricPlanItemInstance::getLastSuspendedTime
+        ).containsOnlyNulls();
+
+        assertThat(historicStageAvailableActiveTerminated).extracting(
+            HistoricPlanItemInstance::getCreateTime,
+            HistoricPlanItemInstance::getEndedTime,
+            HistoricPlanItemInstance::getExitTime,
+            HistoricPlanItemInstance::getLastAvailableTime,
+            HistoricPlanItemInstance::getLastStartedTime
+        ).containsOnly(fixTime);
+
+        HistoricPlanItemInstance historicHumanTaskAvailableActiveTerminatedAndWaitingForRepetition = historicPlanItemInstancesByDefinitionId
+            .get("humanTaskAvailableActiveTerminatedAndWaitingForRepetition");
+
+        assertThat(historicHumanTaskAvailableActiveTerminatedAndWaitingForRepetition).extracting(
+            HistoricPlanItemInstance::getCompletedTime,
+            HistoricPlanItemInstance::getOccurredTime,
+            HistoricPlanItemInstance::getTerminatedTime,
+            HistoricPlanItemInstance::getLastEnabledTime,
+            HistoricPlanItemInstance::getLastDisabledTime,
+            HistoricPlanItemInstance::getLastSuspendedTime
+        ).containsOnlyNulls();
+
+        assertThat(historicHumanTaskAvailableActiveTerminatedAndWaitingForRepetition).extracting(
+            HistoricPlanItemInstance::getCreateTime,
+            HistoricPlanItemInstance::getEndedTime,
+            HistoricPlanItemInstance::getExitTime,
+            HistoricPlanItemInstance::getLastAvailableTime,
+            HistoricPlanItemInstance::getLastStartedTime
+        ).containsOnly(fixTime);
+    }
+
 }

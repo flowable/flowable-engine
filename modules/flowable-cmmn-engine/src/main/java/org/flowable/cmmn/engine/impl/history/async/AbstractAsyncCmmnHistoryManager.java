@@ -176,6 +176,17 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_EXIT_CRITERION_ID, planItemInstanceEntity.getExitCriterionId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_TENANT_ID, planItemInstanceEntity.getTenantId());
 
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_AVAILABLE_TIME, planItemInstanceEntity.getLastAvailableTime());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_ENABLED_TIME, planItemInstanceEntity.getLastEnabledTime());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_DISABLED_TIME, planItemInstanceEntity.getLastDisabledTime());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_STARTED_TIME, planItemInstanceEntity.getLastStartedTime());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_SUSPENDED_TIME, planItemInstanceEntity.getLastSuspendedTime());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_COMPLETED_TIME, planItemInstanceEntity.getCompletedTime());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_OCCURRED_TIME, planItemInstanceEntity.getOccurredTime());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_TERMINATED_TIME, planItemInstanceEntity.getTerminatedTime());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_EXIT_TIME, planItemInstanceEntity.getExitTime());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_END_TIME, planItemInstanceEntity.getEndedTime());
+
         if (planItemInstanceEntity.getCaseDefinitionId() != null) {
             addCaseDefinitionFields(data, CaseDefinitionUtil.getCaseDefinition(planItemInstanceEntity.getCaseDefinitionId()));
         }

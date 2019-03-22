@@ -28,6 +28,7 @@ import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonU
 /**
  * @author Joram Barrez
  */
+@Deprecated
 public class PlanItemInstanceStartedHistoryJsonTransformer extends AbstractNeedsHistoricPlanItemInstanceHistoryJsonTransformer {
     
     @Override
