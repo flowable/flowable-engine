@@ -248,6 +248,12 @@ public abstract class AbstractCmmnDynamicStateManager {
                 } else {
                     agenda.planStartPlanItemInstanceOperation(newPlanItemInstance, null);
                 }
+                
+                if (!newPlanItemInstance.getPlanItem().getEntryCriteria().isEmpty() && hasRepetitionRule(newPlanItemInstance)) {
+                    if (evaluateRepetitionRule(newPlanItemInstance, commandContext)) {
+                        createPlanItemInstanceDuplicateForRepetition(newPlanItemInstance, commandContext);
+                    }
+                }
             }
             
             agenda.planEvaluateCriteriaOperation(caseInstance.getId());
@@ -277,6 +283,12 @@ public abstract class AbstractCmmnDynamicStateManager {
                 agenda.planStartPlanItemInstanceOperation(newPlanItemInstance, null, caseInstanceChangeState.getChildInstanceTaskVariables().get(planItemDefinitionId));
             } else {
                 agenda.planStartPlanItemInstanceOperation(newPlanItemInstance, null);
+            }
+            
+            if (!newPlanItemInstance.getPlanItem().getEntryCriteria().isEmpty() && hasRepetitionRule(newPlanItemInstance)) {
+                if (evaluateRepetitionRule(newPlanItemInstance, commandContext)) {
+                    createPlanItemInstanceDuplicateForRepetition(newPlanItemInstance, commandContext);
+                }
             }
             
             agenda.planEvaluateCriteriaOperation(caseInstance.getId());
