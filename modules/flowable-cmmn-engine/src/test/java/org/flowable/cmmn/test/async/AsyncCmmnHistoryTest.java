@@ -21,6 +21,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.time.Instant;
+import java.time.temporal.ChronoField;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -330,6 +332,66 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
             );
     }
 
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/async/AsyncCmmnHistoryTest.testHumanTask.cmmn")
+    public void testHumanTaskWithNameDueDateAndDescription() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+        task.setName("Test name");
+        task.setDescription("Test description");
+        cmmnTaskService.saveTask(task);
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+
+        // Create
+        HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(historicTaskInstance).isNotNull();
+        assertThat(historicTaskInstance.getName()).isEqualTo("Test name");
+        assertThat(historicTaskInstance.getDescription()).isEqualTo("Test description");
+        assertThat(historicTaskInstance.getDueDate()).isNull();
+
+        // Set due date
+        Date dueDate = Date.from(Instant.now().with(ChronoField.MILLI_OF_SECOND, 0));
+        cmmnTaskService.setDueDate(task.getId(), dueDate);
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+
+        historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(historicTaskInstance.getDueDate()).isEqualTo(dueDate);
+
+        // Update name and description to null
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        task.setName(null);
+        task.setDescription(null);
+        cmmnTaskService.saveTask(task);
+
+        // Before the history jobs it has the old data
+        historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(historicTaskInstance.getName()).isEqualTo("Test name");
+        assertThat(historicTaskInstance.getDescription()).isEqualTo("Test description");
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+
+        // After the history jobs it has the new data
+        historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(historicTaskInstance.getName()).isNull();
+        assertThat(historicTaskInstance.getDescription()).isNull();
+
+        // Update dueDate to null
+        cmmnTaskService.setDueDate(task.getId(), null);
+
+        // Before the history jobs it has the old data
+        historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(historicTaskInstance.getDueDate()).isEqualTo(dueDate);
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+
+        // After the history jobs it has the new data
+        historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(historicTaskInstance.getDueDate()).isNull();
+    }
+    
     @Test
     @CmmnDeployment
     public void testPlanItemInstances() {
