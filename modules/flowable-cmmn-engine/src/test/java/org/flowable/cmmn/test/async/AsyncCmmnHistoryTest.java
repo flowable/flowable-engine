@@ -21,6 +21,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.time.Instant;
+import java.time.temporal.ChronoField;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -351,7 +353,7 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         assertThat(historicTaskInstance.getDueDate()).isNull();
 
         // Set due date
-        Date dueDate = new Date();
+        Date dueDate = Date.from(Instant.now().with(ChronoField.MILLI_OF_SECOND, 0));
         cmmnTaskService.setDueDate(task.getId(), dueDate);
 
         waitForAsyncHistoryExecutorToProcessAllJobs();

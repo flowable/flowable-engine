@@ -184,7 +184,8 @@ public class DbSqlSession implements Session {
         if (parameterToUse == null) {
             parameterToUse = new ListQueryParameterObject();
         }
-        return selectListWithRawParameter(statement, parameter, false);
+        parameterToUse.setDatabaseType(dbSqlSessionFactory.getDatabaseType());
+        return selectListWithRawParameter(statement, parameterToUse, false);
     }
 
     @SuppressWarnings("rawtypes")

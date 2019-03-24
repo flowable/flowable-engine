@@ -492,6 +492,28 @@
         </profile>
 
         <profile>
+            <id>mssql</id>
+            <activation>
+                <property>
+                    <name>databasemssql</name>
+                    <value>mssql</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>net.sourceforge.jtds</groupId>
+                    <artifactId>jtds</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>com.microsoft.sqlserver</groupId>
+                    <artifactId>mssql-jdbc</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
             <id>distro</id>
             <build>
                 <plugins>

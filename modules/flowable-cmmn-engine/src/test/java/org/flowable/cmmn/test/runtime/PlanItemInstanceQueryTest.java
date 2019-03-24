@@ -386,7 +386,7 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
 
     @Test
     public void testLastDisabledBeforeAndAfter() {
-        Date now = new Date();
+        Date now = setClockFixedToCurrentTime();
         setClockTo(now);
         startInstances(3);
 
