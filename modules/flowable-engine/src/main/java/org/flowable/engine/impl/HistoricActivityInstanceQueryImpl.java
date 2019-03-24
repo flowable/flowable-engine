@@ -67,13 +67,11 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext).findHistoricActivityInstanceCountByQueryCriteria(this);
     }
 
     @Override
     public List<HistoricActivityInstance> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext).findHistoricActivityInstancesByQueryCriteria(this);
     }
 

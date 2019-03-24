@@ -198,19 +198,12 @@ public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistori
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getHistoricDecisionExecutionEntityManager().findHistoricDecisionExecutionCountByQueryCriteria(this);
     }
 
     @Override
     public List<DmnHistoricDecisionExecution> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getHistoricDecisionExecutionEntityManager().findHistoricDecisionExecutionsByQueryCriteria(this);
-    }
-
-    @Override
-    public void checkQueryOk() {
-        super.checkQueryOk();
     }
 
     // getters ////////////////////////////////////////////

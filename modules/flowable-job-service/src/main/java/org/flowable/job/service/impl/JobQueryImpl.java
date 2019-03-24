@@ -310,13 +310,11 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getJobEntityManager(commandContext).findJobCountByQueryCriteria(this);
     }
 
     @Override
     public List<Job> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getJobEntityManager(commandContext).findJobsByQueryCriteria(this);
     }
 

@@ -290,19 +290,12 @@ public class FormDefinitionQueryImpl extends AbstractQuery<FormDefinitionQuery, 
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getFormDefinitionEntityManager(commandContext).findFormDefinitionCountByQueryCriteria(this);
     }
 
     @Override
     public List<FormDefinition> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getFormDefinitionEntityManager(commandContext).findFormDefinitionsByQueryCriteria(this);
-    }
-
-    @Override
-    public void checkQueryOk() {
-        super.checkQueryOk();
     }
 
     // getters ////////////////////////////////////////////

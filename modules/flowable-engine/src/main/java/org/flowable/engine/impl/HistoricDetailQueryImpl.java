@@ -109,13 +109,11 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getHistoricDetailEntityManager(commandContext).findHistoricDetailCountByQueryCriteria(this);
     }
 
     @Override
     public List<HistoricDetail> executeList(CommandContext commandContext) {
-        checkQueryOk();
         List<HistoricDetail> historicDetails = CommandContextUtil.getHistoricDetailEntityManager(commandContext).findHistoricDetailsByQueryCriteria(this);
 
         HistoricDetailVariableInstanceUpdateEntity varUpdate = null;

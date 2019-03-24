@@ -143,13 +143,11 @@ public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements 
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getGroupEntityManager(commandContext).findGroupCountByQueryCriteria(this);
     }
 
     @Override
     public List<Group> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getGroupEntityManager(commandContext).findGroupByQueryCriteria(this);
     }
 

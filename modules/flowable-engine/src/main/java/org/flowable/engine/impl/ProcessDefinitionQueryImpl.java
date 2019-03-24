@@ -361,19 +361,12 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getProcessDefinitionEntityManager(commandContext).findProcessDefinitionCountByQueryCriteria(this);
     }
 
     @Override
     public List<ProcessDefinition> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getProcessDefinitionEntityManager(commandContext).findProcessDefinitionsByQueryCriteria(this);
-    }
-
-    @Override
-    public void checkQueryOk() {
-        super.checkQueryOk();
     }
 
     // getters ////////////////////////////////////////////

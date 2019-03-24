@@ -333,13 +333,11 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getSuspendedJobEntityManager(commandContext).findJobCountByQueryCriteria(this);
     }
 
     @Override
     public List<Job> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getSuspendedJobEntityManager(commandContext).findJobsByQueryCriteria(this);
     }
 

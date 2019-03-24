@@ -231,13 +231,11 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getModelEntityManager(commandContext).findModelCountByQueryCriteria(this);
     }
 
     @Override
     public List<Model> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getModelEntityManager(commandContext).findModelsByQueryCriteria(this);
     }
 
