@@ -15,6 +15,7 @@ package org.flowable.task.service.impl;
 import java.util.Date;
 import java.util.List;
 
+import org.flowable.common.engine.impl.AbstractQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.task.api.history.HistoricTaskLogEntry;
