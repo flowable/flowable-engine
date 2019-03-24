@@ -15,6 +15,7 @@ package org.flowable.task.service.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.AbstractNativeQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.task.api.NativeTaskQuery;
