@@ -294,13 +294,11 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getTimerJobEntityManager(commandContext).findJobCountByQueryCriteria(this);
     }
 
     @Override
     public List<Job> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getTimerJobEntityManager(commandContext).findJobsByQueryCriteria(this);
     }
 

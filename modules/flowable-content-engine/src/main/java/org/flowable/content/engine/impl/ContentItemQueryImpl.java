@@ -323,13 +323,11 @@ public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, Conten
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getContentItemEntityManager().findContentItemCountByQueryCriteria(this);
     }
 
     @Override
     public List<ContentItem> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getContentItemEntityManager().findContentItemsByQueryCriteria(this);
     }
 

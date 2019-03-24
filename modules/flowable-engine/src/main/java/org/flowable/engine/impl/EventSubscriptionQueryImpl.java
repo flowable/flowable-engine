@@ -176,13 +176,11 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getEventSubscriptionEntityManager(commandContext).findEventSubscriptionCountByQueryCriteria(this);
     }
 
     @Override
     public List<EventSubscription> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getEventSubscriptionEntityManager(commandContext).findEventSubscriptionsByQueryCriteria(this);
     }
 

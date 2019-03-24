@@ -1617,7 +1617,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     @Override
     public List<Task> executeList(CommandContext commandContext) {
         ensureVariablesInitialized();
-        checkQueryOk();
         List<Task> tasks = null;
         TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration(commandContext);
         if (taskServiceConfiguration.getTaskQueryInterceptor() != null) {
@@ -1646,7 +1645,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     @Override
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
-        checkQueryOk();
         
         TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration(commandContext);
         if (taskServiceConfiguration.getTaskQueryInterceptor() != null) {

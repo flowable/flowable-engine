@@ -177,13 +177,11 @@ public class AppDeploymentQueryImpl extends AbstractQuery<AppDeploymentQuery, Ap
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getAppDeploymentEntityManager(commandContext).findDeploymentCountByQueryCriteria(this);
     }
 
     @Override
     public List<AppDeployment> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getAppDeploymentEntityManager(commandContext).findDeploymentsByQueryCriteria(this);
     }
 

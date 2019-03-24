@@ -727,7 +727,6 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         ensureVariablesInitialized();
         
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
@@ -740,7 +739,6 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
     @Override
     public List<ProcessInstance> executeList(CommandContext commandContext) {
-        checkQueryOk();
         ensureVariablesInitialized();
         List<ProcessInstance> processInstances = null;
         

@@ -186,13 +186,11 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getDeploymentEntityManager(commandContext).findDeploymentCountByQueryCriteria(this);
     }
 
     @Override
     public List<FormDeployment> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getDeploymentEntityManager(commandContext).findDeploymentsByQueryCriteria(this);
     }
 

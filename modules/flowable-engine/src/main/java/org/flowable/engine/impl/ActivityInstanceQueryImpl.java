@@ -58,13 +58,11 @@ public class ActivityInstanceQueryImpl extends AbstractQuery<ActivityInstanceQue
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getActivityInstanceEntityManager(commandContext).findActivityInstanceCountByQueryCriteria(this);
     }
 
     @Override
     public List<ActivityInstance> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getActivityInstanceEntityManager(commandContext).findActivityInstancesByQueryCriteria(this);
     }
 

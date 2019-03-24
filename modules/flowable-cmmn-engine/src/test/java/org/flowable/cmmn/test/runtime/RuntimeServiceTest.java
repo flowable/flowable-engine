@@ -21,7 +21,9 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.time.Instant;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -564,51 +566,57 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
         variablesB.put("numberVar", 10);
         variablesB.put("floatVar", 10.1);
 
+        Instant now = setClockFixedToCurrentTime().toInstant();
         cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
                 .name("A")
                 .variables(variablesA)
                 .start();
+        setClockTo(Date.from(now.plusSeconds(1)));
         cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
                 .name("B")
                 .variables(variablesB)
                 .start();
+        setClockTo(Date.from(now.plusSeconds(2)));
         cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
                 .name("C")
                 .start();
 
-        List<CaseInstance> caseInstancesWithVariables = cmmnRuntimeService.createCaseInstanceQuery().includeCaseVariables().orderByStartTime().list();
+        List<CaseInstance> caseInstancesWithVariables = cmmnRuntimeService.createCaseInstanceQuery().includeCaseVariables().orderByStartTime().asc().list();
         assertThat(caseInstancesWithVariables.size(), is(3));
         assertThat(caseInstancesWithVariables.get(0).getCaseVariables(), is(variablesA));
         assertThat(caseInstancesWithVariables.get(1).getCaseVariables(), is(variablesB));
         assertThat(caseInstancesWithVariables.get(2).getCaseVariables(), is(Collections.EMPTY_MAP));
 
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().includeCaseVariables().orderByStartTime().count(), is(3L));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().includeCaseVariables().orderByStartTime().asc().count(), is(3L));
 
-        List<HistoricCaseInstance> historicCaseInstancesWithVariables = cmmnHistoryService.createHistoricCaseInstanceQuery().includeCaseVariables().orderByStartTime().list();
+        List<HistoricCaseInstance> historicCaseInstancesWithVariables = cmmnHistoryService.createHistoricCaseInstanceQuery().includeCaseVariables().orderByStartTime().asc().list();
         assertThat(historicCaseInstancesWithVariables.size(), is(3));
         assertThat(historicCaseInstancesWithVariables.get(0).getCaseVariables(), is(variablesA));
         assertThat(historicCaseInstancesWithVariables.get(1).getCaseVariables(), is(variablesB));
         assertThat(historicCaseInstancesWithVariables.get(2).getCaseVariables(), is(Collections.EMPTY_MAP));
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().includeCaseVariables().orderByStartTime().count(), is(3L));
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().includeCaseVariables().orderByStartTime().asc().count(), is(3L));
     }
 
     @Test
     @CmmnDeployment(resources = {"org/flowable/cmmn/test/runtime/RuntimeServiceTest.testStartSimplePassthroughCaseWithBlockingTask.cmmn"})
     public void testIncludeSameVariableListQueryWithBlockingTask() {
+        Instant now = setClockFixedToCurrentTime().toInstant();
         cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
                 .name("A")
                 .variables(VARIABLES)
                 .start();
+        setClockTo(Date.from(now.plusSeconds(1)));
         cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
                 .name("B")
                 .variables(VARIABLES)
                 .start();
+        setClockTo(Date.from(now.plusSeconds(2)));
         cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
                 .variables(VARIABLES)
@@ -616,8 +624,8 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
                 .start();
 
         assertNonEmptyQueryIncludeVariables(3, VARIABLES,
-                cmmnRuntimeService.createCaseInstanceQuery().orderByStartTime(),
-                cmmnHistoryService.createHistoricCaseInstanceQuery().orderByStartTime()
+                cmmnRuntimeService.createCaseInstanceQuery().orderByStartTime().asc(),
+                cmmnHistoryService.createHistoricCaseInstanceQuery().orderByStartTime().asc()
         );
     }
 
@@ -626,28 +634,28 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
     public void includeVariablesWithPaginationQueries() {
         createCaseInstances();
 
-        testIncludeVariablesWithPagination(cmmnRuntimeService.createCaseInstanceQuery().includeCaseVariables().orderByStartTime());
-        testIncludeVariablesWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals("var", "test").includeCaseVariables().orderByStartTime());
-        testIncludeVariablesWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueEqualsIgnoreCase("var", "TEST").includeCaseVariables().orderByStartTime());
-        testIncludeVariablesWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueNotEquals("var", "test2").includeCaseVariables().orderByStartTime());
-        testIncludeVariablesWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueNotEqualsIgnoreCase("var", "TEST2").includeCaseVariables().orderByStartTime());
-        testIncludeVariablesWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueLike("var", "te%").includeCaseVariables().orderByStartTime());
-        testIncludeVariablesWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueLikeIgnoreCase("var", "TE%").includeCaseVariables().orderByStartTime());
-        testIncludeVariablesWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueGreaterThan("numberVar", 5).includeCaseVariables().orderByStartTime());
-        testIncludeVariablesWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueGreaterThanOrEqual("numberVar", 10).includeCaseVariables().orderByStartTime());
-        testIncludeVariablesWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueLessThan("numberVar", 20).includeCaseVariables().orderByStartTime());
-        testIncludeVariablesWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueLessThanOrEqual("numberVar", 10).includeCaseVariables().orderByStartTime());
+        testIncludeVariablesWithPagination(cmmnRuntimeService.createCaseInstanceQuery().includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals("var", "test").includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueEqualsIgnoreCase("var", "TEST").includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueNotEquals("var", "test2").includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueNotEqualsIgnoreCase("var", "TEST2").includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueLike("var", "te%").includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueLikeIgnoreCase("var", "TE%").includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueGreaterThan("numberVar", 5).includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueGreaterThanOrEqual("numberVar", 10).includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueLessThan("numberVar", 20).includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueLessThanOrEqual("numberVar", 10).includeCaseVariables().orderByStartTime().asc());
 
-        testIncludeVariablesWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().includeCaseVariables().orderByStartTime());
-        testIncludeVariablesWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueEquals("var", "test").includeCaseVariables().orderByStartTime());
-        testIncludeVariablesWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueEqualsIgnoreCase("var", "TEST").includeCaseVariables().orderByStartTime());
-        testIncludeVariablesWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueNotEquals("var", "test2").includeCaseVariables().orderByStartTime());
-        testIncludeVariablesWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLike("var", "te%").includeCaseVariables().orderByStartTime());
-        testIncludeVariablesWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLikeIgnoreCase("var", "TE%").includeCaseVariables().orderByStartTime());
-        testIncludeVariablesWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueGreaterThan("numberVar", 5).includeCaseVariables().orderByStartTime());
-        testIncludeVariablesWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueGreaterThanOrEqual("numberVar", 10).includeCaseVariables().orderByStartTime());
-        testIncludeVariablesWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLessThan("numberVar", 20).includeCaseVariables().orderByStartTime());
-        testIncludeVariablesWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLessThanOrEqual("numberVar", 10).includeCaseVariables().orderByStartTime());
+        testIncludeVariablesWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueEquals("var", "test").includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueEqualsIgnoreCase("var", "TEST").includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueNotEquals("var", "test2").includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLike("var", "te%").includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLikeIgnoreCase("var", "TE%").includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueGreaterThan("numberVar", 5).includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueGreaterThanOrEqual("numberVar", 10).includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLessThan("numberVar", 20).includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLessThanOrEqual("numberVar", 10).includeCaseVariables().orderByStartTime().asc());
     }
 
     @Test
@@ -655,39 +663,42 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
     public void includeVariablesWithEmptyPaginationQueries() {
         createCaseInstances();
 
-        testIncludeVariablesOnEmptyQueryWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals("var", "test2").includeCaseVariables().orderByStartTime());
-        testIncludeVariablesOnEmptyQueryWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueEqualsIgnoreCase("var", "TEST2").includeCaseVariables().orderByStartTime());
-        testIncludeVariablesOnEmptyQueryWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueNotEquals("var", "test").includeCaseVariables().orderByStartTime());
-        testIncludeVariablesOnEmptyQueryWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueNotEqualsIgnoreCase("var", "TEST").includeCaseVariables().orderByStartTime());
-        testIncludeVariablesOnEmptyQueryWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueLike("var", "te2%").includeCaseVariables().orderByStartTime());
-        testIncludeVariablesOnEmptyQueryWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueLikeIgnoreCase("var", "TE2%").includeCaseVariables().orderByStartTime());
-        testIncludeVariablesOnEmptyQueryWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueGreaterThan("numberVar", 11).includeCaseVariables().orderByStartTime());
-        testIncludeVariablesOnEmptyQueryWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueGreaterThanOrEqual("numberVar", 11).includeCaseVariables().orderByStartTime());
-        testIncludeVariablesOnEmptyQueryWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueLessThan("numberVar", 5).includeCaseVariables().orderByStartTime());
-        testIncludeVariablesOnEmptyQueryWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueLessThanOrEqual("numberVar", 9).includeCaseVariables().orderByStartTime());
+        testIncludeVariablesOnEmptyQueryWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals("var", "test2").includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesOnEmptyQueryWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueEqualsIgnoreCase("var", "TEST2").includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesOnEmptyQueryWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueNotEquals("var", "test").includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesOnEmptyQueryWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueNotEqualsIgnoreCase("var", "TEST").includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesOnEmptyQueryWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueLike("var", "te2%").includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesOnEmptyQueryWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueLikeIgnoreCase("var", "TE2%").includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesOnEmptyQueryWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueGreaterThan("numberVar", 11).includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesOnEmptyQueryWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueGreaterThanOrEqual("numberVar", 11).includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesOnEmptyQueryWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueLessThan("numberVar", 5).includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesOnEmptyQueryWithPagination(cmmnRuntimeService.createCaseInstanceQuery().variableValueLessThanOrEqual("numberVar", 9).includeCaseVariables().orderByStartTime().asc());
 
-        testIncludeVariablesOnEmptyQueryWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueEquals("var", "test2").includeCaseVariables().orderByStartTime());
-        testIncludeVariablesOnEmptyQueryWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueEqualsIgnoreCase("var", "TEST2").includeCaseVariables().orderByStartTime());
-        testIncludeVariablesOnEmptyQueryWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueNotEquals("var", "test").includeCaseVariables().orderByStartTime());
-        testIncludeVariablesOnEmptyQueryWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLike("var", "te2%").includeCaseVariables().orderByStartTime());
-        testIncludeVariablesOnEmptyQueryWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLikeIgnoreCase("var", "TE2%").includeCaseVariables().orderByStartTime());
-        testIncludeVariablesOnEmptyQueryWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueGreaterThan("numberVar", 11).includeCaseVariables().orderByStartTime());
-        testIncludeVariablesOnEmptyQueryWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueGreaterThanOrEqual("numberVar", 11).includeCaseVariables().orderByStartTime());
-        testIncludeVariablesOnEmptyQueryWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLessThan("numberVar", 5).includeCaseVariables().orderByStartTime());
-        testIncludeVariablesOnEmptyQueryWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLessThanOrEqual("numberVar", 9).includeCaseVariables().orderByStartTime());
+        testIncludeVariablesOnEmptyQueryWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueEquals("var", "test2").includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesOnEmptyQueryWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueEqualsIgnoreCase("var", "TEST2").includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesOnEmptyQueryWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueNotEquals("var", "test").includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesOnEmptyQueryWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLike("var", "te2%").includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesOnEmptyQueryWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLikeIgnoreCase("var", "TE2%").includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesOnEmptyQueryWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueGreaterThan("numberVar", 11).includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesOnEmptyQueryWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueGreaterThanOrEqual("numberVar", 11).includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesOnEmptyQueryWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLessThan("numberVar", 5).includeCaseVariables().orderByStartTime().asc());
+        testIncludeVariablesOnEmptyQueryWithPagination(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLessThanOrEqual("numberVar", 9).includeCaseVariables().orderByStartTime().asc());
     }
 
     private void createCaseInstances() {
         Map<String, Object> variablesWithCounter = new HashMap<>(VARIABLES);
 
+        Instant now = Instant.now();
         for (int i = 0; i < 100; i++) {
             variablesWithCounter.put("counter", i);
+            setClockTo(Date.from(now.plusSeconds(i)));
             cmmnRuntimeService.createCaseInstanceBuilder()
                     .caseDefinitionKey("myCase")
                     .name("A" + i)
                     .variables(variablesWithCounter)
                     .start();
         }
+        setClockTo(null);
     }
 
     private void testIncludeVariablesWithPagination(CaseInstanceQuery caseInstanceQuery) {

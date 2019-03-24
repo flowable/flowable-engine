@@ -207,13 +207,11 @@ public class CmmnDeploymentQueryImpl extends AbstractQuery<CmmnDeploymentQuery, 
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getCmmnDeploymentEntityManager(commandContext).findDeploymentCountByQueryCriteria(this);
     }
 
     @Override
     public List<CmmnDeployment> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getCmmnDeploymentEntityManager(commandContext).findDeploymentsByQueryCriteria(this);
     }
 
