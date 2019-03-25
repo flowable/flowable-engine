@@ -291,19 +291,12 @@ public class DecisionTableQueryImpl extends AbstractQuery<DmnDecisionTableQuery,
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getDecisionTableEntityManager(commandContext).findDecisionTableCountByQueryCriteria(this);
     }
 
     @Override
     public List<DmnDecisionTable> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getDecisionTableEntityManager(commandContext).findDecisionTablesByQueryCriteria(this);
-    }
-
-    @Override
-    public void checkQueryOk() {
-        super.checkQueryOk();
     }
 
     // getters ////////////////////////////////////////////

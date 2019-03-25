@@ -295,19 +295,12 @@ public class AppDefinitionQueryImpl extends AbstractQuery<AppDefinitionQuery, Ap
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getAppDefinitionEntityManager(commandContext).findAppDefinitionCountByQueryCriteria(this);
     }
 
     @Override
     public List<AppDefinition> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getAppDefinitionEntityManager(commandContext).findAppDefinitionsByQueryCriteria(this);
-    }
-
-    @Override
-    public void checkQueryOk() {
-        super.checkQueryOk();
     }
 
     // getters ////////////////////////////////////////////

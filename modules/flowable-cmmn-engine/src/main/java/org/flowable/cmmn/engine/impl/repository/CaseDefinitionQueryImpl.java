@@ -312,19 +312,12 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getCaseDefinitionEntityManager(commandContext).findCaseDefinitionCountByQueryCriteria(this);
     }
 
     @Override
     public List<CaseDefinition> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getCaseDefinitionEntityManager(commandContext).findCaseDefinitionsByQueryCriteria(this);
-    }
-
-    @Override
-    public void checkQueryOk() {
-        super.checkQueryOk();
     }
 
     // getters ////////////////////////////////////////////

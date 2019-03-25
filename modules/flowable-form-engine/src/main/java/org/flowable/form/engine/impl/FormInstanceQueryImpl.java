@@ -221,13 +221,11 @@ public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, Form
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getFormInstanceEntityManager(commandContext).findFormInstanceCountByQueryCriteria(this);
     }
 
     @Override
     public List<FormInstance> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getFormInstanceEntityManager(commandContext).findFormInstancesByQueryCriteria(this);
     }
 

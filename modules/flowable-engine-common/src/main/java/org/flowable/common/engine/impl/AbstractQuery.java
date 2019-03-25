@@ -103,6 +103,8 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
         if (commandExecutor != null) {
             return (U) commandExecutor.execute(this);
         }
+        // The execute has a checkQueryOk() call as well, so no need to do the call earlier
+        checkQueryOk();
         return executeSingleResult(Context.getCommandContext());
     }
 
@@ -113,6 +115,8 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
         if (commandExecutor != null) {
             return (List<U>) commandExecutor.execute(this);
         }
+        // The execute has a checkQueryOk() call as well, so no need to do the call earlier
+        checkQueryOk();
         return executeList(Context.getCommandContext());
     }
 
@@ -125,6 +129,8 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
         if (commandExecutor != null) {
             return (List<U>) commandExecutor.execute(this);
         }
+        // The execute has a checkQueryOk() call as well, so no need to do the call earlier
+        checkQueryOk();
         return executeList(Context.getCommandContext());
     }
 
@@ -134,11 +140,14 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
         if (commandExecutor != null) {
             return (Long) commandExecutor.execute(this);
         }
+        // The execute has a checkQueryOk() call as well, so no need to do the call earlier
+        checkQueryOk();
         return executeCount(Context.getCommandContext());
     }
 
     @Override
     public Object execute(CommandContext commandContext) {
+        checkQueryOk();
         if (resultType == ResultType.LIST) {
             return executeList(commandContext);
         } else if (resultType == ResultType.SINGLE_RESULT) {

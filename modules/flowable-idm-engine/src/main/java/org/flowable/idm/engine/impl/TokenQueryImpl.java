@@ -199,13 +199,11 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getTokenEntityManager(commandContext).findTokenCountByQueryCriteria(this);
     }
 
     @Override
     public List<Token> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getTokenEntityManager(commandContext).findTokenByQueryCriteria(this);
     }
 
