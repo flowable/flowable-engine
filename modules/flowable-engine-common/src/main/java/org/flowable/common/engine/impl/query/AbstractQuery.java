@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.impl;
+package org.flowable.common.engine.impl.query;
 
 import java.io.Serializable;
 import java.util.List;
@@ -19,6 +19,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.Query;
 import org.flowable.common.engine.api.query.QueryProperty;
+import org.flowable.common.engine.impl.Direction;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.ListQueryParameterObject;
 import org.flowable.common.engine.impl.interceptor.Command;
