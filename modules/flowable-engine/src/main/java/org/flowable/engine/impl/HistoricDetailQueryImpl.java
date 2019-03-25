@@ -15,7 +15,7 @@ package org.flowable.engine.impl;
 
 import java.util.List;
 
-import org.flowable.common.engine.impl.AbstractQuery;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.history.HistoricDetail;

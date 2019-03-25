@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.impl;
+package org.flowable.common.engine.impl.query;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -73,13 +73,6 @@ public abstract class BaseNativeQuery<T extends NativeQuery<?, ?>, U> implements
             lastRow = firstResult + maxResults + 1;
         }
         parameterMap.put("lastRow", lastRow);
-        return parameterMap;
-    }
-
-    protected Map<String, Object> __generateParameterMap() {
-        HashMap<String, Object> parameterMap = new HashMap<>();
-        parameterMap.put("sql", sqlStatement);
-        parameterMap.putAll(parameters);
         return parameterMap;
     }
 
