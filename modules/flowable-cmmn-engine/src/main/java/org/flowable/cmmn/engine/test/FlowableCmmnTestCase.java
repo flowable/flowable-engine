@@ -18,6 +18,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Instant;
+import java.time.temporal.ChronoField;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -119,7 +121,8 @@ public abstract class FlowableCmmnTestCase {
     }
     
     protected Date setClockFixedToCurrentTime() {
-        Date date = new Date();
+        // SQL Server rounds the milliseconds, on order to be stable we set them to 0
+        Date date = Date.from(Instant.now().with(ChronoField.MILLI_OF_SECOND, 0));
         cmmnEngineConfiguration.getClock().setCurrentTime(date);
         return date;
     }

@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.test.runtime;
 
+import static org.assertj.core.api.Assertions.tuple;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
@@ -21,7 +23,9 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.time.Instant;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +53,7 @@ import org.junit.Test;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class RuntimeServiceTest extends FlowableCmmnTestCase {
 
@@ -846,6 +851,104 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
 
         assertEquals(1, cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Task A").planItemInstanceWithoutTenantId().count());
         assertEquals(1, cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Task A").planItemInstanceWithoutTenantId().list().size());
+    }
+
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/test/runtime/RuntimeServiceTest.testStartSimplePassthroughCaseWithBlockingTask.cmmn" })
+    public void testCaseInstanceQueryWithOrderByStartTime() {
+        Instant now = Instant.now();
+        setClockTo(Date.from(now));
+
+        CaseInstance case1 = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("myCase")
+            .businessKey("firstCase")
+            .start();
+
+        setClockTo(Date.from(now.plusSeconds(10)));
+
+        CaseInstance case2 = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("myCase")
+            .businessKey("secondCase")
+            .start();
+
+        setClockTo(Date.from(now.plusSeconds(40)));
+
+        CaseInstance case3 = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("myCase")
+            .businessKey("thirdCase")
+            .start();
+
+        setClockTo(Date.from(now.plusSeconds(70)));
+
+        CaseInstance case4 = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("myCase")
+            .businessKey("fourthCase")
+            .start();
+
+        setClockTo(Date.from(now.plusSeconds(100)));
+
+        CaseInstance case5 = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("myCase")
+            .businessKey("fifthCase")
+            .start();
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().orderByStartTime().asc().list())
+            .extracting(CaseInstance::getId, CaseInstance::getBusinessKey)
+            .containsExactly(
+                tuple(case1.getId(), "firstCase"),
+                tuple(case2.getId(), "secondCase"),
+                tuple(case3.getId(), "thirdCase"),
+                tuple(case4.getId(), "fourthCase"),
+                tuple(case5.getId(), "fifthCase")
+            );
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().orderByStartTime().asc().listPage(0, 3))
+            .extracting(CaseInstance::getId, CaseInstance::getBusinessKey)
+            .containsExactly(
+                tuple(case1.getId(), "firstCase"),
+                tuple(case2.getId(), "secondCase"),
+                tuple(case3.getId(), "thirdCase")
+            );
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().orderByStartTime().asc().listPage(3, 10))
+            .extracting(CaseInstance::getId, CaseInstance::getBusinessKey)
+            .containsExactly(
+                tuple(case4.getId(), "fourthCase"),
+                tuple(case5.getId(), "fifthCase")
+            );
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().orderByStartTime().asc().listPage(10, 20))
+            .extracting(CaseInstance::getId, CaseInstance::getBusinessKey)
+            .isEmpty();
+
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().orderByStartTime().asc().list())
+            .extracting(HistoricCaseInstance::getId, HistoricCaseInstance::getBusinessKey)
+            .containsExactly(
+                tuple(case1.getId(), "firstCase"),
+                tuple(case2.getId(), "secondCase"),
+                tuple(case3.getId(), "thirdCase"),
+                tuple(case4.getId(), "fourthCase"),
+                tuple(case5.getId(), "fifthCase")
+            );
+
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().orderByStartTime().asc().listPage(0, 3))
+            .extracting(HistoricCaseInstance::getId, HistoricCaseInstance::getBusinessKey)
+            .containsExactly(
+                tuple(case1.getId(), "firstCase"),
+                tuple(case2.getId(), "secondCase"),
+                tuple(case3.getId(), "thirdCase")
+            );
+
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().orderByStartTime().asc().listPage(3, 10))
+            .extracting(HistoricCaseInstance::getId, HistoricCaseInstance::getBusinessKey)
+            .containsExactly(
+                tuple(case4.getId(), "fourthCase"),
+                tuple(case5.getId(), "fifthCase")
+            );
+
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().orderByStartTime().asc().listPage(10, 20))
+            .extracting(HistoricCaseInstance::getId, HistoricCaseInstance::getBusinessKey)
+            .isEmpty();
     }
 
 }
