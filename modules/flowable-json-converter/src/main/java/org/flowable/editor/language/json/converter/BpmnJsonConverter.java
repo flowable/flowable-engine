@@ -787,8 +787,8 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                     }else if (eventDef instanceof ErrorEventDefinition) {
                         ErrorEventDefinition errorEventDef = (ErrorEventDefinition) eventDef;
                         if (StringUtils.isNotEmpty(errorEventDef.getErrorCode())) {
-                            if (bpmnModel.getErrors().get(errorEventDef.getErrorCode())==null) {
-                                bpmnModel.addError(errorEventDef.getId(),errorEventDef.getErrorCode());
+                            if (bpmnModel.getErrors().get(errorEventDef.getErrorCode()) == null) {
+                                bpmnModel.addError(errorEventDef.getId(), errorEventDef.getErrorCode());
                             }
                         }
                     }

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Iterator;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BooleanDataObject;
@@ -132,13 +132,9 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
     }
 
     public static void convertErrorsToJson(Map<String, String> errorMap, ObjectNode propertiesNode) {
-        String propertyName = "errordefinitions";
-
         ArrayNode errorsNode = objectMapper.createArrayNode();
 
-        Iterator<Map.Entry<String, String>> errorMapiterator = errorMap.entrySet().iterator();
-        while (errorMapiterator.hasNext()){
-            Map.Entry<String, String> errorEntry = errorMapiterator.next();
+        for (Map.Entry<String, String> errorEntry : errorMap.entrySet()) {
             String errorId = errorEntry.getKey();
             String errorCode = errorEntry.getValue();
             ObjectNode propertyItemNode = objectMapper.createObjectNode();
@@ -147,7 +143,7 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
             errorsNode.add(propertyItemNode);
         }
 
-        propertiesNode.set(propertyName, errorsNode);
+        propertiesNode.set(PROPERTY_ERROR_DEFINITIONS, errorsNode);
     }
 
     public static void convertListenersToJson(List<FlowableListener> listeners, boolean isExecutionListener, ObjectNode propertiesNode) {
