@@ -12,25 +12,23 @@
  */
 package org.flowable.bpmn.converter.export;
 
-import org.flowable.bpmn.constants.BpmnXMLConstants;
-import org.flowable.bpmn.model.BpmnModel;
+import java.util.Map;
 
 import javax.xml.stream.XMLStreamWriter;
-import java.util.Iterator;
-import java.util.Map;
+
+import org.flowable.bpmn.constants.BpmnXMLConstants;
+import org.flowable.bpmn.model.BpmnModel;
 
 /**
  * @author Zheng Ji
  */
 public class ErrorDefinitionExport implements BpmnXMLConstants {
-    public static void writeError(BpmnModel model, XMLStreamWriter xtw) throws Exception {
-        Map<String, String> errors = model.getErrors();
 
-        Iterator<Map.Entry<String, String>> entryIterator = errors.entrySet().iterator();
-        while (entryIterator.hasNext()) {
-            Map.Entry<String, String> entry = entryIterator.next();
-            String errorId = entry.getKey();
-            String errorCode = entry.getValue();
+    public static void writeErrors(BpmnModel model, XMLStreamWriter xtw) throws Exception {
+        Map<String, String> errors = model.getErrors();
+        for (Map.Entry<String, String> errorEntry : errors.entrySet()) {
+            String errorId = errorEntry.getKey();
+            String errorCode = errorEntry.getValue();
             xtw.writeStartElement(ELEMENT_ERROR);
             xtw.writeAttribute(ATTRIBUTE_ID, errorId);
             xtw.writeAttribute(ATTRIBUTE_ERROR_CODE, errorCode);

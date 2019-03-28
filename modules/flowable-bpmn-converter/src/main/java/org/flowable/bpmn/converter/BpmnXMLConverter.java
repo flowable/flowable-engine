@@ -506,7 +506,8 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
             CollaborationExport.writePools(model, xtw);
             DataStoreExport.writeDataStores(model, xtw);
             SignalAndMessageDefinitionExport.writeSignalsAndMessages(model, xtw);
-            ErrorDefinitionExport.writeError(model,xtw);
+            ErrorDefinitionExport.writeErrors(model,xtw);
+
             for (Process process : model.getProcesses()) {
 
                 if (process.getFlowElements().isEmpty() && process.getLanes().isEmpty()) {

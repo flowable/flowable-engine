@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
-  <error id="shareniu-a" errorCode="shareniu-a"></error>
-  <error id="shareniu-b" errorCode="shareniu-b"></error>
-  <process id="test_errorcode" name="test_errorcode" isExecutable="true">
-    <documentation>test_errorcode</documentation>
-    <startEvent id="sid-DC9C1AEF-C999-40B9-BAC5-6532CC6D7F89" isInterrupting="true">
-      <errorEventDefinition errorRef="shareniu-b"></errorEventDefinition>
+  <error id="myerror1" errorCode="shareniu-a"/>
+  <error id="myerror2" errorCode="shareniu-b"/>
+  <process id="process" name="process" isExecutable="true">
+    <startEvent id="startErrorEvent" isInterrupting="true">
+      <errorEventDefinition errorRef="myerror1"/>
     </startEvent>
-    <userTask id="sid-58FAD9C6-DC70-4D28-9994-317CFC77969E"></userTask>
-    <sequenceFlow id="sid-955FBEA1-E4A3-4A73-9506-3B1E69EFB3AA" sourceRef="sid-DC9C1AEF-C999-40B9-BAC5-6532CC6D7F89" targetRef="sid-58FAD9C6-DC70-4D28-9994-317CFC77969E"></sequenceFlow>
-    <endEvent id="sid-06B9C63D-E14C-4DCA-8CC7-F6DA6CA4A8B2"></endEvent>
-    <sequenceFlow id="sid-3C8E5527-9DC5-44A4-83E7-3776F681C9BE" sourceRef="sid-58FAD9C6-DC70-4D28-9994-317CFC77969E" targetRef="sid-06B9C63D-E14C-4DCA-8CC7-F6DA6CA4A8B2"></sequenceFlow>
+    <userTask id="userTask"/>
+    <sequenceFlow id="startErrorEvent-userTask" sourceRef="startErrorEvent" targetRef="userTask"/>
+    <endEvent id="endErrorEvent">
+      <errorEventDefinition errorRef="myerror2"/>
+    </endEvent>
+    <sequenceFlow id="userTask-endErrorEvent" sourceRef="userTask" targetRef="endErrorEvent"/>
+    <boundaryEvent id="errorBoundaryEvent" attachedToRef="userTask">
+      <errorEventDefinition errorRef="myerror2"/>
+    </boundaryEvent>
+    <endEvent id="noneEndEvent"/>
+    <sequenceFlow id="errorBoundaryEvent-noneEndEvent" sourceRef="errorBoundaryEvent" targetRef="noneEndEvent"/>
   </process>
 </definitions>

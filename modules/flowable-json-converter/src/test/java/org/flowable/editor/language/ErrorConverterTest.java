@@ -16,16 +16,16 @@ import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
+import java.util.List;
+
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EndEvent;
+import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.FlowElement;
-import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
 import org.junit.Test;
-
-import java.util.List;
 
 /**
  * @author Zheng Ji
