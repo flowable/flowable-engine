@@ -16,7 +16,9 @@ import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
+import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ErrorEventDefinition;
@@ -49,13 +51,14 @@ public class ErrorConverterTest extends AbstractConverterTest {
     }
 
     private void validateModel(BpmnModel model) {
-        FlowElement flowElement = model.getMainProcess().getFlowElement("sid-CF7571C4-F093-45C5-ADD6-8F357ACF584C");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof StartEvent);
+        // error start event
+        FlowElement startFlowElement = model.getMainProcess().getFlowElement("startErrorEvent");
+        assertNotNull(startFlowElement);
+        assertTrue(startFlowElement instanceof StartEvent);
 
-        StartEvent startEvent= (StartEvent) flowElement;
+        StartEvent startEvent = (StartEvent) startFlowElement;
         List<EventDefinition> eventDefinitions = startEvent.getEventDefinitions();
-        assertEquals(1,eventDefinitions.size());
+        assertEquals(1, eventDefinitions.size());
 
         EventDefinition eventDefinition = eventDefinitions.get(0);
         assertTrue(eventDefinition instanceof ErrorEventDefinition);
@@ -64,6 +67,34 @@ public class ErrorConverterTest extends AbstractConverterTest {
         String errorCode = errorEventDefinition.getErrorCode();
         assertEquals("myerror1",errorCode);
 
+        // error end event
+        FlowElement endFlowElement = model.getMainProcess().getFlowElement("endErrorEvent");
+        assertNotNull(endFlowElement);
+        assertTrue(endFlowElement instanceof EndEvent);
 
+        EndEvent endEvent = (EndEvent) endFlowElement;
+        List<EventDefinition> endEventDefinitions = endEvent.getEventDefinitions();
+        assertEquals(1, endEventDefinitions.size());
+        EventDefinition endEventDefinition = endEventDefinitions.get(0);
+        assertTrue(endEventDefinition instanceof ErrorEventDefinition);
+
+        ErrorEventDefinition errorEndEventDefinition = (ErrorEventDefinition) endEventDefinition;
+        String endErrorCode = errorEndEventDefinition.getErrorCode();
+        assertEquals("myerror2", endErrorCode);
+
+        // error boundary event
+        FlowElement boundaryFlowElement = model.getMainProcess().getFlowElement("errorBoundaryEvent");
+        assertNotNull(boundaryFlowElement);
+        assertTrue(boundaryFlowElement instanceof BoundaryEvent);
+
+        BoundaryEvent boundaryEvent = (BoundaryEvent) boundaryFlowElement;
+        List<EventDefinition> boundaryEventDefinitions = boundaryEvent.getEventDefinitions();
+        assertEquals(1, boundaryEventDefinitions.size());
+        EventDefinition boundaryEventDefinition = boundaryEventDefinitions.get(0);
+        assertTrue(boundaryEventDefinition instanceof ErrorEventDefinition);
+
+        ErrorEventDefinition errorBoundaryEventDefinition = (ErrorEventDefinition) endEventDefinition;
+        String boundaryErrorCode = errorBoundaryEventDefinition.getErrorCode();
+        assertEquals("myerror2", boundaryErrorCode);
     }
 }

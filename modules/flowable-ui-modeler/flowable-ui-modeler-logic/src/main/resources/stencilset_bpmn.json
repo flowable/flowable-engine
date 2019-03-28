@@ -1170,9 +1170,9 @@
       "properties" : [ {
         "id" : "errordefinitions",
         "type" : "multiplecomplex",
-        "title" : "error definitions",
+        "title" : "Error definitions",
         "value" : "",
-        "description" : "error definitions",
+        "description" : "Error definitions",
         "popular" : true
       } ]
     }, {
