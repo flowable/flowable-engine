@@ -272,7 +272,7 @@
 
         <dependency>
         	<groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-jsr223</artifactId>
+            <artifactId>groovy-all</artifactId>
        </dependency>
 
 	</dependencies>
