@@ -865,7 +865,7 @@
         <choose>
             <when test="queryVar.operator.equals('EXISTS')">
               and EXISTS (
-                select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVar.name}
+                select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVar.name}
                 <if test="!queryVar.local">
                     and RES.PROC_INST_ID_ = PROC_INST_ID_ and TASK_ID_ is null
                 </if>
@@ -876,7 +876,7 @@
             </when>
             <when test="queryVar.operator.equals('NOT_EXISTS')">
               and NOT EXISTS (
-                select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVar.name}
+                select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVar.name}
                 <if test="!queryVar.local">
                     and RES.PROC_INST_ID_ = PROC_INST_ID_ and TASK_ID_ is null
                 </if>
@@ -1248,7 +1248,7 @@
               <choose>
                 <when test="queryVar.operator.equals('EXISTS')">
                     and EXISTS (
-                        select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVar.name}
+                        select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVar.name}
                     <if test="!queryVar.local">
                         and RES.PROC_INST_ID_ = PROC_INST_ID_ and TASK_ID_ is null
                     </if>
@@ -1259,7 +1259,7 @@
                 </when>
                 <when test="queryVar.operator.equals('NOT_EXISTS')">
                     and NOT EXISTS (
-                        select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVar.name}
+                        select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVar.name}
                     <if test="!queryVar.local">
                         and RES.PROC_INST_ID_ = PROC_INST_ID_ and TASK_ID_ is null
                     </if>

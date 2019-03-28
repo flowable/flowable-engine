@@ -669,6 +669,17 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
     }
 
     @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/history/HistoricTaskAndVariablesQueryTest.testCandidate.bpmn20.xml" })
+    public void testQueryVariableExistsForCompletedTasks() {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            taskService.createTaskQuery().list().forEach(
+                task -> taskService.complete(task.getId())
+            );
+            testQueryVariableExists();
+        }
+    }
+
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml" })
     public void testWithoutDueDateQuery() throws Exception {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
