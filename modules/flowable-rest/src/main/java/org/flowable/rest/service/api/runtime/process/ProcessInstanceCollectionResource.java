@@ -51,7 +51,7 @@ import io.swagger.annotations.Authorization;
 /**
  * Modified the "createProcessInstance" method to conditionally call a "createProcessInstanceResponse" method with a different signature, which will conditionally return the process variables that
  * exist when the process instance either enters its first wait state or completes. In this case, the different method is always called with a flag of true, which means that it will always return
- * those variables. If variables are not to be returned, the original method is called, which doesn't return the variables.
+ * those variables. If variables are not to be returned, the original method is called, which does not return the variables.
  * 
  * @author Frederik Heremans
  * @author Ryan Johnston (@rjfsu)
@@ -85,7 +85,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
             @ApiImplicitParam(name = "suspended", dataType = "boolean", value = "If true, only return process instance which are suspended. If false, only return process instances which are not suspended (active).", paramType = "query"),
             @ApiImplicitParam(name = "superProcessInstanceId", dataType = "string", value = "Only return process instances which have the given super process-instance id (for processes that have a call-activities).", paramType = "query"),
             @ApiImplicitParam(name = "subProcessInstanceId", dataType = "string", value = "Only return process instances which have the given sub process-instance id (for processes started as a call-activity).", paramType = "query"),
-            @ApiImplicitParam(name = "excludeSubprocesses", dataType = "boolean", value = "Return only process instances which aren’t sub processes.", paramType = "query"),
+            @ApiImplicitParam(name = "excludeSubprocesses", dataType = "boolean", value = "Return only process instances which are not sub processes.", paramType = "query"),
             @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "Indication to include process variables in the result.", paramType = "query"),
             @ApiImplicitParam(name = "callbackId", dataType = "string", value = "Only return process instances with the given callbackId.", paramType = "query"),
             @ApiImplicitParam(name = "callbackType", dataType = "string", value = "Only return process instances with the given callbackType.", paramType = "query"),
@@ -233,26 +233,39 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
                 throw new FlowableIllegalArgumentException("TenantId can only be used with either processDefinitionKey or message.");
             }
         }
-
+        
         Map<String, Object> startVariables = null;
-        if (request.getVariables() != null) {
-            startVariables = new HashMap<>();
-            for (RestVariable variable : request.getVariables()) {
-                if (variable.getName() == null) {
-                    throw new FlowableIllegalArgumentException("Variable name is required.");
-                }
-                startVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
-            }
-        }
-
         Map<String, Object> transientVariables = null;
-        if (request.getTransientVariables() != null) {
-            transientVariables = new HashMap<>();
-            for (RestVariable variable : request.getTransientVariables()) {
+        Map<String, Object> startFormVariables = null;
+        if (request.getStartFormVariables() != null) {
+            startFormVariables = new HashMap<>();
+            for (RestVariable variable : request.getStartFormVariables()) {
                 if (variable.getName() == null) {
                     throw new FlowableIllegalArgumentException("Variable name is required.");
                 }
-                transientVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
+                startFormVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
+            }
+            
+        } else {
+            
+            if (request.getVariables() != null) {
+                startVariables = new HashMap<>();
+                for (RestVariable variable : request.getVariables()) {
+                    if (variable.getName() == null) {
+                        throw new FlowableIllegalArgumentException("Variable name is required.");
+                    }
+                    startVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
+                }
+            }
+    
+            if (request.getTransientVariables() != null) {
+                transientVariables = new HashMap<>();
+                for (RestVariable variable : request.getTransientVariables()) {
+                    if (variable.getName() == null) {
+                        throw new FlowableIllegalArgumentException("Variable name is required.");
+                    }
+                    transientVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
+                }
             }
         }
 
@@ -282,11 +295,17 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
             if (request.getOverrideDefinitionTenantId() != null && request.getOverrideDefinitionTenantId().length() > 0) {
                 processInstanceBuilder.overrideProcessDefinitionTenantId(request.getOverrideDefinitionTenantId());
             }
+            if (startFormVariables != null) {
+                processInstanceBuilder.startFormVariables(startFormVariables);
+            }
             if (startVariables != null) {
                 processInstanceBuilder.variables(startVariables);
             }
             if (transientVariables != null) {
                 processInstanceBuilder.transientVariables(transientVariables);
+            }
+            if (request.getOutcome() != null) {
+                processInstanceBuilder.outcome(request.getOutcome());
             }
             
             if (restApiInterceptor != null) {
@@ -321,8 +340,8 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
             
             return processInstanceResponse;
 
-        } catch (FlowableObjectNotFoundException aonfe) {
-            throw new FlowableIllegalArgumentException(aonfe.getMessage(), aonfe);
+        } catch (FlowableObjectNotFoundException e) {
+            throw new FlowableIllegalArgumentException(e.getMessage(), e);
         }
     }
 }

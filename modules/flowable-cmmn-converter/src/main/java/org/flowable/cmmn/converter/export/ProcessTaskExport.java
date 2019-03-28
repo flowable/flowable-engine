@@ -38,8 +38,8 @@ public class ProcessTaskExport extends AbstractPlanItemDefinitionExport<ProcessT
         super.writePlanItemDefinitionSpecificAttributes(processTask, xtw);
         TaskExport.writeCommonTaskAttributes(processTask, xtw);
         // fallback to default tenant
-        if (processTask.isFallbackToDefaultTenant()) {
-            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT, String.valueOf(processTask.isFallbackToDefaultTenant()));
+        if (processTask.getFallbackToDefaultTenant() != null) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT, String.valueOf(processTask.getFallbackToDefaultTenant()));
         }
     }
     
@@ -92,6 +92,9 @@ public class ProcessTaskExport extends AbstractPlanItemDefinitionExport<ProcessT
             }
             if (StringUtils.isNotEmpty(ioParameter.getTarget())) {
                 xtw.writeAttribute(ATTRIBUTE_IOPARAMETER_TARGET, ioParameter.getTarget());
+            }
+            if (StringUtils.isNotEmpty(ioParameter.getTargetExpression())) {
+                xtw.writeAttribute(ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION, ioParameter.getTargetExpression());
             }
 
             xtw.writeEndElement();

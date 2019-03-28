@@ -99,6 +99,7 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
             if (task.isExclusive()) {
                 propertiesNode.put(PROPERTY_IS_EXCLUSIVE, task.isExclusive());
             }
+            
         } else if (planItemDefinition instanceof Stage) {
             Stage stage = (Stage) planItemDefinition;
             if (stage.isAutoComplete()) {
@@ -119,11 +120,13 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
         ArrayNode outgoingArrayNode = objectMapper.createArrayNode();
 
         if (CollectionUtils.isNotEmpty(planItem.getEntryCriteria())) {
-            convertCriteria(planItem.getEntryCriteria(), model, processor, shapesArrayNode, outgoingArrayNode, subProcessX, subProcessY);
+            convertCriteria(planItem.getEntryCriteria(), planItemDefinition, planItemNode, model, processor, shapesArrayNode, 
+                            outgoingArrayNode, subProcessX, subProcessY);
         }
 
         if (CollectionUtils.isNotEmpty(planItem.getExitCriteria())) {
-            convertCriteria(planItem.getExitCriteria(), model, processor, shapesArrayNode, outgoingArrayNode, subProcessX, subProcessY);
+            convertCriteria(planItem.getExitCriteria(), planItemDefinition, planItemNode, model, processor, shapesArrayNode, 
+                            outgoingArrayNode, subProcessX, subProcessY);
         }
         
         if (CollectionUtils.isNotEmpty(planItem.getOutgoingAssociations())) {
@@ -311,14 +314,30 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
 
     protected abstract String getStencilId(BaseElement baseElement);
 
-    protected void convertCriteria(List<Criterion> criteria, CmmnModel model, ActivityProcessor processor, ArrayNode shapesArrayNode, ArrayNode outgoingArrayNode, double subProcessX, double subProcessY) {
+    protected void convertCriteria(List<Criterion> criteria, PlanItemDefinition criterionParentDefinition, ObjectNode criterionParentPlanItemNode, CmmnModel model, ActivityProcessor processor, 
+                    ArrayNode shapesArrayNode, ArrayNode outgoingArrayNode, double subProcessX, double subProcessY) {
+        
         for (Criterion criterion : criteria) {
             GraphicInfo criterionGraphicInfo = model.getGraphicInfo(criterion.getId());
             ObjectNode criterionNode = CmmnJsonConverterUtil.createChildShape(criterion.getId(), criterion.isEntryCriterion() ? STENCIL_ENTRY_CRITERION : STENCIL_EXIT_CRITERION,
                     criterionGraphicInfo.getX() - subProcessX + criterionGraphicInfo.getWidth(), criterionGraphicInfo.getY() - subProcessY + criterionGraphicInfo.getHeight(),
                     criterionGraphicInfo.getX() - subProcessX, criterionGraphicInfo.getY() - subProcessY);
 
-            shapesArrayNode.add(criterionNode);
+            Stage attachedToStage = null;
+            if (criterion.isExitCriterion() && criterionParentDefinition instanceof Stage) {
+                Stage criterionStage = (Stage) criterionParentDefinition;
+                if (!criterionStage.isPlanModel()) {
+                    attachedToStage = criterionStage;
+                }
+            }
+            
+            if (attachedToStage != null) {
+                ArrayNode planItemChildShapes = (ArrayNode) criterionParentPlanItemNode.get(EDITOR_CHILD_SHAPES);
+                planItemChildShapes.add(criterionNode);
+            } else {
+                shapesArrayNode.add(criterionNode);
+            }
+            
             ObjectNode criterionPropertiesNode = objectMapper.createObjectNode();
             criterionPropertiesNode.put(PROPERTY_OVERRIDE_ID, criterion.getId());
             new CriterionJsonConverter().convertElementToJson(criterionNode, criterionPropertiesNode, processor, criterion, model);
@@ -333,7 +352,9 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
                 criterionNode.set("outgoing", criterionOutgoingArrayNode);
             }
 
-            outgoingArrayNode.add(CmmnJsonConverterUtil.createResourceNode(criterion.getId()));
+            if (attachedToStage == null) {
+                outgoingArrayNode.add(CmmnJsonConverterUtil.createResourceNode(criterion.getId()));
+            }
         }
     }
 

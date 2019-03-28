@@ -125,6 +125,40 @@ public class DynamicBpmnServiceImpl extends CommonEngineServiceImpl<ProcessEngin
     }
 
     @Override
+    public ObjectNode changeSkipExpression(String id, String skipExpression) {
+        ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
+        changeSkipExpression(id, skipExpression, infoNode);
+        return infoNode;
+    }
+
+    @Override
+    public void changeSkipExpression(String id, String skipExpression, ObjectNode infoNode) {
+        setElementProperty(id, TASK_SKIP_EXPRESSION, skipExpression, infoNode);
+    }
+
+    @Override
+    public void removeSkipExpression(String id, ObjectNode infoNode) {
+        removeElementProperty(id, TASK_SKIP_EXPRESSION, infoNode);
+    }
+
+    @Override
+    public ObjectNode enableSkipExpression() {
+        ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
+        enableSkipExpression(infoNode);
+        return infoNode;
+    }
+
+    @Override
+    public void enableSkipExpression(ObjectNode infoNode) {
+        setElementProperty(GLOBAL_PROCESS_DEFINITION_PROPERTIES, ENABLE_SKIP_EXPRESSION, "true", infoNode);
+    }
+
+    @Override
+    public void removeEnableSkipExpression(ObjectNode infoNode) {
+        removeElementProperty(GLOBAL_PROCESS_DEFINITION_PROPERTIES, ENABLE_SKIP_EXPRESSION, infoNode);
+    }
+
+    @Override
     public ObjectNode changeUserTaskName(String id, String name) {
         ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
         changeUserTaskName(id, name, infoNode);
@@ -442,6 +476,16 @@ public class DynamicBpmnServiceImpl extends CommonEngineServiceImpl<ProcessEngin
         }
 
         ((ObjectNode) bpmnNode.get(id)).set(propertyName, propertyValue);
+    }
+    
+    protected void removeElementProperty(String id, String propertyName, ObjectNode infoNode) {
+        ObjectNode bpmnNode = createOrGetBpmnNode(infoNode);
+        if (bpmnNode.has(id)) {
+            ObjectNode activityNode = (ObjectNode) bpmnNode.get(id);
+            if (activityNode.has(propertyName)) {
+                activityNode.remove(propertyName);
+            }
+        }
     }
 
     protected ObjectNode createOrGetBpmnNode(ObjectNode infoNode) {

@@ -51,6 +51,9 @@ public class BaseFormInstanceResource {
 
         FormInstanceQuery query = formService.createFormInstanceQuery();
 
+        if (queryRequest.getId() != null) {
+            query.id(queryRequest.getId());
+        }
         if (queryRequest.getFormDefinitionId() != null) {
             query.formDefinitionId(queryRequest.getFormDefinitionId());
         }
@@ -91,13 +94,13 @@ public class BaseFormInstanceResource {
             query.submittedByLike(queryRequest.getSubmittedByLike());
         }
         if (queryRequest.getTenantId() != null) {
-            query.deploymentTenantId(queryRequest.getTenantId());
+            query.tenantId(queryRequest.getTenantId());
         }
         if (queryRequest.getTenantIdLike() != null) {
-            query.deploymentTenantIdLike(queryRequest.getTenantIdLike());
+            query.tenantIdLike(queryRequest.getTenantIdLike());
         }
         if (Boolean.TRUE.equals(queryRequest.isWithoutTenantId())) {
-            query.deploymentWithoutTenantId();
+            query.withoutTenantId();
         }
         
         if (restApiInterceptor != null) {

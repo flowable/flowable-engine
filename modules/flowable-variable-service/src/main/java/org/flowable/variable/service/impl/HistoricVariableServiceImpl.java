@@ -12,6 +12,7 @@
  */
 package org.flowable.variable.service.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import org.flowable.common.engine.impl.context.Context;
@@ -55,12 +56,12 @@ public class HistoricVariableServiceImpl extends CommonServiceImpl<VariableServi
     }
     
     @Override
-    public HistoricVariableInstanceEntity createAndInsert(VariableInstanceEntity variable) {
-        return getHistoricVariableInstanceEntityManager().createAndInsert(variable);
+    public HistoricVariableInstanceEntity createAndInsert(VariableInstanceEntity variable, Date createTime) {
+        return getHistoricVariableInstanceEntityManager().createAndInsert(variable, createTime);
     }
     
     @Override
-    public void recordVariableUpdate(VariableInstanceEntity variableInstanceEntity) {
+    public void recordVariableUpdate(VariableInstanceEntity variableInstanceEntity, Date updateTime) {
         HistoricVariableInstanceEntity historicVariable = getEntityCache().findInCache(HistoricVariableInstanceEntity.class, variableInstanceEntity.getId());
         HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager = getHistoricVariableInstanceEntityManager();
         if (historicVariable == null) {
@@ -68,9 +69,9 @@ public class HistoricVariableServiceImpl extends CommonServiceImpl<VariableServi
         }
 
         if (historicVariable != null) {
-            historicVariableInstanceEntityManager.copyVariableValue(historicVariable, variableInstanceEntity);
+            historicVariableInstanceEntityManager.copyVariableValue(historicVariable, variableInstanceEntity, updateTime);
         } else {
-            historicVariableInstanceEntityManager.createAndInsert(variableInstanceEntity);
+            historicVariableInstanceEntityManager.createAndInsert(variableInstanceEntity, updateTime);
         }
     }
     

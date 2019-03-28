@@ -60,8 +60,7 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
 
         // Cleanup
         for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
-            taskService.deleteTask(task.getId());
-            historyService.deleteHistoricTaskInstance(task.getId());
+            taskService.deleteTask(task.getId(), true);
         }
 
     }
@@ -101,8 +100,7 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
 
         // Cleanup
         for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
-            taskService.deleteTask(task.getId());
-            historyService.deleteHistoricTaskInstance(task.getId());
+            taskService.deleteTask(task.getId(), true);
         }
 
     }

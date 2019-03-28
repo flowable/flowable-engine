@@ -18,8 +18,15 @@ import java.util.Map;
  * @author Tijs Rademakers
  */
 public interface CaseInstanceService {
+    
+    /**
+     * @return A new id that will be used when starting a case instance.
+     *         This is for example needed to set the bidrectional relation
+     *         when a process instance starts a case instance through a case task.
+     */
+    String generateNewCaseInstanceId();
 
-    String startCaseInstanceByKey(String caseDefinitionKey, String caseInstanceName, String businessKey, 
+    String startCaseInstanceByKey(String caseDefinitionKey, String predefinedCaseInstanceId, String caseInstanceName, String businessKey, 
                     String executionId, String tenantId, boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap);
 
     void deleteCaseInstance(String caseInstanceId);

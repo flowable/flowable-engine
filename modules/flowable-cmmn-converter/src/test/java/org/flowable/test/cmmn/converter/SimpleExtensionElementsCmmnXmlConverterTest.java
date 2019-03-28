@@ -61,6 +61,7 @@ public class SimpleExtensionElementsCmmnXmlConverterTest extends AbstractConvert
         assertEquals("myPlanModel", planModel.getId());
         assertEquals("My CasePlanModel", planModel.getName());
         assertEquals("formKey", planModel.getFormKey());
+        assertEquals("formFieldValidationValue", planModel.getValidateFormFields());
 
         Task task = (Task) planModel.findPlanItemDefinitionInStageOrUpwards("taskA");
         assertEquals(1, task.getExtensionElements().size());

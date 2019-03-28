@@ -95,6 +95,8 @@ public class CmmnEngineImpl implements CmmnEngine {
         if (asyncHistoryExecutor != null && asyncHistoryExecutor.isActive()) {
             asyncHistoryExecutor.shutdown();
         }
+        cmmnEngineConfiguration.close();
+
     }
     
     @Override

@@ -28,10 +28,14 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.flowable.form.api.FormDefinition;
+import org.flowable.form.api.FormDeployment;
+import org.flowable.form.api.FormInstance;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -382,6 +386,74 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
             // Cleanup deployment in tenant
             if (tenantDeployment != null) {
                 repositoryService.deleteDeployment(tenantDeployment.getId(), true);
+            }
+        }
+    }
+    
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/oneHumanTaskCaseWithStartForm.cmmn",
+                    "org/flowable/cmmn/rest/service/api/runtime/simple.form"})
+    public void testStartCaseWithForm() throws Exception {
+        CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneHumanTaskCase").singleResult();
+        try {
+            FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
+            assertNotNull(formDefinition);
+            
+            FormInstance formInstance = formEngineFormService.createFormInstanceQuery().formDefinitionId(formDefinition.getId()).singleResult();
+            assertNull(formInstance);
+            
+            String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION_START_FORM, caseDefinition.getId());
+            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+            JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+            closeResponse(response);
+            assertEquals(formDefinition.getId(), responseNode.get("id").asText());
+            assertEquals(formDefinition.getKey(), responseNode.get("key").asText());
+            assertEquals(formDefinition.getName(), responseNode.get("name").asText());
+            assertEquals(2, responseNode.get("fields").size());
+            
+            ArrayNode formVariablesNode = objectMapper.createArrayNode();
+            
+            // String variable
+            ObjectNode stringVarNode = formVariablesNode.addObject();
+            stringVarNode.put("name", "user");
+            stringVarNode.put("value", "simple string value");
+            stringVarNode.put("type", "string");
+
+            ObjectNode integerVarNode = formVariablesNode.addObject();
+            integerVarNode.put("name", "number");
+            integerVarNode.put("value", 1234);
+            integerVarNode.put("type", "integer");
+    
+            ObjectNode requestNode = objectMapper.createObjectNode();
+            
+            // Start using case definition key
+            requestNode.put("caseDefinitionKey", "oneHumanTaskCase");
+            requestNode.set("startFormVariables", formVariablesNode);
+    
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION));
+            httpPost.setEntity(new StringEntity(requestNode.toString()));
+            response = executeRequest(httpPost, HttpStatus.SC_CREATED);
+    
+            CaseInstance caseInstance = runtimeService.createCaseInstanceQuery().singleResult();
+            assertNotNull(caseInstance);
+    
+            assertEquals("simple string value", runtimeService.getVariable(caseInstance.getId(), "user"));
+            assertEquals(1234, runtimeService.getVariable(caseInstance.getId(), "number"));
+            
+            formInstance = formEngineFormService.createFormInstanceQuery().formDefinitionId(formDefinition.getId()).singleResult();
+            assertNotNull(formInstance);
+            byte[] valuesBytes = formEngineFormService.getFormInstanceValues(formInstance.getId());
+            assertNotNull(valuesBytes);
+            JsonNode instanceNode = objectMapper.readTree(valuesBytes);
+            JsonNode valuesNode = instanceNode.get("values");
+            assertEquals("simple string value", valuesNode.get("user").asText());
+            assertEquals(1234, valuesNode.get("number").asInt());
+            
+        } finally {
+            formEngineFormService.deleteFormInstancesByScopeDefinition(caseDefinition.getId());
+            
+            List<FormDeployment> formDeployments = formRepositoryService.createDeploymentQuery().list();
+            for (FormDeployment formDeployment : formDeployments) {
+                formRepositoryService.deleteDeployment(formDeployment.getId());
             }
         }
     }

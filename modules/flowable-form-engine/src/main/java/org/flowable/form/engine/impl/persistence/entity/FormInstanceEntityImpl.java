@@ -144,6 +144,9 @@ public class FormInstanceEntityImpl extends AbstractFormEngineNoRevisionEntity i
 
     @Override
     public String getFormValuesId() {
+        if (formValuesId == null && resourceRef != null) {
+            formValuesId = resourceRef.getId();
+        }
         return formValuesId;
     }
 
@@ -186,7 +189,7 @@ public class FormInstanceEntityImpl extends AbstractFormEngineNoRevisionEntity i
 
     @Override
     public String toString() {
-        return "SubmittedFormEntity[" + id + "]";
+        return "FormInstanceEntity[" + id + "]";
     }
 
 }

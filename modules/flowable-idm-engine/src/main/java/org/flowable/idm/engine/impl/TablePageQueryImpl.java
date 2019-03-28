@@ -16,7 +16,7 @@ import java.io.Serializable;
 
 import org.flowable.common.engine.api.management.TablePage;
 import org.flowable.common.engine.api.management.TablePageQuery;
-import org.flowable.common.engine.impl.AbstractQuery;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;

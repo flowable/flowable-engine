@@ -12,10 +12,15 @@
  */
 package org.flowable.cmmn.converter.export;
 
+import javax.xml.stream.XMLStreamWriter;
+
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.model.GenericEventListener;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class GenericEventListenerExport extends AbstractPlanItemDefinitionExport<GenericEventListener> {
 
@@ -28,4 +33,16 @@ public class GenericEventListenerExport extends AbstractPlanItemDefinitionExport
     protected String getPlanItemDefinitionXmlElementValue(GenericEventListener planItemDefinition) {
         return ELEMENT_GENERIC_EVENT_LISTENER;
     }
+
+    @Override
+    protected void writePlanItemDefinitionSpecificAttributes(GenericEventListener genericEventListener, XMLStreamWriter xtw) throws Exception {
+        super.writePlanItemDefinitionSpecificAttributes(genericEventListener, xtw);
+
+        if (StringUtils.isNotEmpty(genericEventListener.getAvailableConditionExpression())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE,
+                CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_AVAILABLE_CONDITION,
+                genericEventListener.getAvailableConditionExpression());
+        }
+    }
+
 }

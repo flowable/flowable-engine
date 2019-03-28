@@ -115,9 +115,12 @@ public class ProcessEngineImpl implements ProcessEngine {
             closeRunnable.run();
         }
 
+        processEngineConfiguration.close();
+
         if (processEngineConfiguration.getProcessEngineLifecycleListener() != null) {
             processEngineConfiguration.getProcessEngineLifecycleListener().onProcessEngineClosed(this);
         }
+
 
         processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CLOSED));
     }

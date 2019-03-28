@@ -185,7 +185,7 @@
         P.ITEM_DEFINITION_TYPE_ as PI_ITEM_DEFINITION_TYPE_,
         P.NAME_ as PI_NAME_,
         P.STATE_ as PI_STATE_,
-        P.CREATE_TIME_ as PI_CREATE_TIME_TIME_,
+        P.CREATE_TIME_ as PI_CREATE_TIME_,
         P.LAST_AVAILABLE_TIME_ as PI_LAST_AVAILABLE_TIME_,
         P.LAST_ENABLED_TIME_ as PI_LAST_ENABLED_TIME_,
         P.LAST_DISABLED_TIME_ as PI_LAST_DISABLED_TIME_,
@@ -324,7 +324,7 @@
         from ${prefix}ACT_CMMN_RU_CASE_INST RES
         inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
         <if test="includeCaseVariables">
-            left outer join ${prefix}ACT_RU_VARIABLE VAR ON RES.ID_ = VAR.SCOPE_ID_ and VAR.TASK_ID_ is null and
+            left outer join ${prefix}ACT_RU_VARIABLE VAR ON RES.ID_ = VAR.SCOPE_ID_ and
             VAR.SCOPE_TYPE_= 'cmmn' and VAR.SUB_SCOPE_ID_ is null
         </if>
         <include refid="commonSelectCaseInstancesByQueryCriteriaSql"/>

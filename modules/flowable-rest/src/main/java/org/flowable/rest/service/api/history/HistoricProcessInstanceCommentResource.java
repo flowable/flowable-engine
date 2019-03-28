@@ -56,7 +56,7 @@ public class HistoricProcessInstanceCommentResource extends HistoricProcessInsta
     @ApiOperation(value = "Get a comment on a historic process instance", tags = { "History Process" }, notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the historic process instance and comment were found and the comment is returned."),
-            @ApiResponse(code = 404, message = "Indicates the requested historic process instance was not found or the historic process instance doesn’t have a comment with the given ID.") })
+            @ApiResponse(code = 404, message = "Indicates the requested historic process instance was not found or the historic process instance does not have a comment with the given ID.") })
     @GetMapping(value = "/history/historic-process-instances/{processInstanceId}/comments/{commentId}", produces = "application/json")
     public CommentResponse getComment(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "commentId") @PathVariable("commentId") String commentId, HttpServletRequest request) {
 
@@ -64,7 +64,7 @@ public class HistoricProcessInstanceCommentResource extends HistoricProcessInsta
 
         Comment comment = taskService.getComment(commentId);
         if (comment == null || comment.getProcessInstanceId() == null || !comment.getProcessInstanceId().equals(instance.getId())) {
-            throw new FlowableObjectNotFoundException("Process instance '" + instance.getId() + "' doesn't have a comment with id '" + commentId + "'.", Comment.class);
+            throw new FlowableObjectNotFoundException("Process instance '" + instance.getId() + "' does not have a comment with id '" + commentId + "'.", Comment.class);
         }
 
         return restResponseFactory.createRestComment(comment);
@@ -73,7 +73,7 @@ public class HistoricProcessInstanceCommentResource extends HistoricProcessInsta
     @ApiOperation(value = "Delete a comment on a historic process instance", tags = { "History Process" }, notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the historic process instance and comment were found and the comment is deleted. Response body is left empty intentionally."),
-            @ApiResponse(code = 404, message = "Indicates the requested historic process instance was not found or the historic process instance doesn’t have a comment with the given ID.") })
+            @ApiResponse(code = 404, message = "Indicates the requested historic process instance was not found or the historic process instance does not have a comment with the given ID.") })
     @DeleteMapping(value = "/history/historic-process-instances/{processInstanceId}/comments/{commentId}")
     public void deleteComment(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "commentId") @PathVariable("commentId") String commentId, HttpServletRequest request,
             HttpServletResponse response) {
@@ -82,7 +82,7 @@ public class HistoricProcessInstanceCommentResource extends HistoricProcessInsta
 
         Comment comment = taskService.getComment(commentId);
         if (comment == null || comment.getProcessInstanceId() == null || !comment.getProcessInstanceId().equals(instance.getId())) {
-            throw new FlowableObjectNotFoundException("Process instance '" + instance.getId() + "' doesn't have a comment with id '" + commentId + "'.", Comment.class);
+            throw new FlowableObjectNotFoundException("Process instance '" + instance.getId() + "' does not have a comment with id '" + commentId + "'.", Comment.class);
         }
 
         taskService.deleteComment(commentId);

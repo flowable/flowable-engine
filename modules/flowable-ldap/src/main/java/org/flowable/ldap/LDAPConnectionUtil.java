@@ -53,8 +53,8 @@ public class LDAPConnectionUtil {
         try {
             context = new InitialDirContext(properties);
         } catch (NamingException e) {
-            LOGGER.warn("Could not create InitialDirContext for LDAP connection : {}", e.getMessage());
-            throw new FlowableException("Could not create InitialDirContext for LDAP connection : " + e.getMessage(), e);
+            LOGGER.warn("Could not create InitialDirContext for LDAP connection: {}", e.getMessage());
+            throw new FlowableException("Could not create InitialDirContext for LDAP connection: " + e.getMessage(), e);
         }
         return context;
     }

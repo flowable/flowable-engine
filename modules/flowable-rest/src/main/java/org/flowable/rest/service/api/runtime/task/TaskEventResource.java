@@ -53,7 +53,7 @@ public class TaskEventResource extends TaskBaseResource {
 
         Event event = taskService.getEvent(eventId);
         if (event == null || !task.getId().equals(event.getTaskId())) {
-            throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' doesn't have an event with id '" + eventId + "'.", Event.class);
+            throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' does not have an event with id '" + eventId + "'.", Event.class);
         }
 
         return restResponseFactory.createEventResponse(event);
@@ -72,7 +72,7 @@ public class TaskEventResource extends TaskBaseResource {
 
         Event event = taskService.getEvent(eventId);
         if (event == null || event.getTaskId() == null || !event.getTaskId().equals(task.getId())) {
-            throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' doesn't have an event with id '" + event + "'.", Event.class);
+            throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' does not have an event with id '" + event + "'.", Event.class);
         }
 
         taskService.deleteComment(eventId);

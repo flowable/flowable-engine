@@ -59,9 +59,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
         setLoopVariable(multiInstanceRootExecution, NUMBER_OF_ACTIVE_INSTANCES, 1);
         logLoopDetails(multiInstanceRootExecution, "initialized", 0, 0, 1, nrOfInstances);
 
-        if (nrOfInstances > 0) {
-            executeOriginalBehavior(execution, (ExecutionEntity) multiInstanceRootExecution, 0);
-        }
+        executeOriginalBehavior(execution, (ExecutionEntity) multiInstanceRootExecution, 0);
 
         return nrOfInstances;
     }

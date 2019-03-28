@@ -203,7 +203,7 @@ public class BaseExecutionVariableResource {
         }
 
         if (!isNew && !hasVariable) {
-            throw new FlowableObjectNotFoundException("Execution '" + execution.getId() + "' doesn't have a variable with name: '" + name + "'.", null);
+            throw new FlowableObjectNotFoundException("Execution '" + execution.getId() + "' does not have a variable with name: '" + name + "'.", null);
         }
 
         if (scope == RestVariableScope.LOCAL) {
@@ -272,7 +272,7 @@ public class BaseExecutionVariableResource {
         }
 
         if (!variableFound) {
-            throw new FlowableObjectNotFoundException("Execution '" + execution.getId() + "' doesn't have a variable with name: '" + variableName + "'.", VariableInstanceEntity.class);
+            throw new FlowableObjectNotFoundException("Execution '" + execution.getId() + "' does not have a variable with name: '" + variableName + "'.", VariableInstanceEntity.class);
         } else {
             return constructRestVariable(variableName, value, variableScope, execution.getId(), includeBinary);
         }
@@ -284,7 +284,7 @@ public class BaseExecutionVariableResource {
     }
 
     /**
-     * Get valid execution from request. Throws exception if execution doesn't exist or if execution id is not provided.
+     * Get valid execution from request. Throws exception if execution does not exist or if execution id is not provided.
      */
     protected Execution getExecutionFromRequest(String executionId) {
         Execution execution = runtimeService.createExecutionQuery().executionId(executionId).singleResult();

@@ -71,9 +71,13 @@ public class PlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager
         PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
         if (planItemDefinition != null) {
             planItemInstanceEntity.setPlanItemDefinitionId(planItemDefinition.getId());
-            planItemInstanceEntity.setPlanItemDefinitionType(planItemDefinition.getClass().getSimpleName().toLowerCase());
+
+            String planItemDefinitionType = planItemDefinition.getClass().getSimpleName().toLowerCase();
+            planItemInstanceEntity.setPlanItemDefinitionType(planItemDefinitionType);
+            planItemInstanceEntity.setStage(PlanItemDefinitionType.STAGE.equals(planItemDefinitionType));
+        } else {
+            planItemInstanceEntity.setStage(false);
         }
-        planItemInstanceEntity.setStage(false);
         planItemInstanceEntity.setStageInstanceId(stagePlanItemInstanceId);
         planItemInstanceEntity.setTenantId(tenantId);
        
@@ -125,6 +129,11 @@ public class PlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager
     @Override
     public List<PlanItemInstance> findByCriteria(PlanItemInstanceQuery planItemInstanceQuery) {
         return planItemInstanceDataManager.findByCriteria((PlanItemInstanceQueryImpl) planItemInstanceQuery);
+    }
+    
+    @Override
+    public List<PlanItemInstanceEntity> findByCaseInstanceId(String caseInstanceId) {
+        return planItemInstanceDataManager.findByCaseInstanceId(caseInstanceId);
     }
 
     @Override

@@ -142,6 +142,16 @@
       "popular" : true
     } ]
   }, {
+    "name" : "formfieldvalidationpackage",
+    "properties" : [ {
+      "id" : "formfieldvalidation",
+      "type" : "String",
+      "title" : "Validate form fields",
+      "value" : "true",
+      "description" : "Validate form fields on the form submission. (allowed values are 'true', 'false' or expression)",
+      "popular" : true
+    } ]
+  }, {
     "name" : "duedatedefinitionpackage",
     "properties" : [ {
       "id" : "duedatedefinition",
@@ -863,7 +873,18 @@
       "description" : "The type of the transition event",
       "popular" : true
     } ]
-  } ],
+  }, {
+      "name" : "availableconditionpackage",
+      "properties" : [ {
+        "id" : "availablecondition",
+        "type" : "String",
+        "title" : "Available condition",
+        "value" : "",
+        "description" : "An optional condition expression on an event listener to indicate to determine when it becomes available.",
+        "popular" : true
+      }]
+    }
+  ],
   "stencils" : [ {
     "type" : "node",
     "id" : "CMMNDiagram",
@@ -892,6 +913,7 @@
       "documentationpackage",
       "formkeydefinitionpackage",
       "formreferencepackage",
+      "formfieldvalidationpackage",
       "autocompletepackage"
      ],
     "hiddenPropertyPackages" : [ ],
@@ -957,6 +979,7 @@
       "usertaskassignmentpackage",
       "formkeydefinitionpackage",
       "formreferencepackage",
+      "formfieldvalidationpackage",
       "duedatedefinitionpackage",
       "prioritydefinitionpackage",
       "tasklistenerspackage",
@@ -1178,7 +1201,8 @@
         "completionneutralrulepackage",
         "requiredrulepackage",
         "repetitionrulepackage",
-        "planitemlifecyclelistenerspackage"],
+        "planitemlifecyclelistenerspackage",
+        "availableconditionpackage"],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
     }, {
@@ -1197,7 +1221,8 @@
         "timerstarttriggerpackage",
         "completionneutralrulepackage",
         "requiredrulepackage",
-        "planitemlifecyclelistenerspackage"],
+        "planitemlifecyclelistenerspackage",
+        "availableconditionpackage"],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
     }, {
@@ -1215,7 +1240,8 @@
         "completionneutralrulepackage",
         "requiredrulepackage",
         "repetitionrulepackage",
-        "planitemlifecyclelistenerspackage"],
+        "planitemlifecyclelistenerspackage",
+        "availableconditionpackage"],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {

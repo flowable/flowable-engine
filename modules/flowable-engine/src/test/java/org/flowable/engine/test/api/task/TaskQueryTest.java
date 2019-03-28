@@ -34,6 +34,7 @@ import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.junit.jupiter.api.AfterEach;
@@ -491,6 +492,69 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    public void testQueryByFormKey() {
+        Task task = taskService.newTask();
+        task.setFormKey("testFormKey");
+        taskService.saveTask(task);
+        taskIds.add(task.getId());
+
+        List<Task> tasks = taskService.createTaskQuery().taskFormKey("testFormKey").list();
+
+        assertEquals(1, tasks.size());
+        assertEquals("testFormKey", tasks.get(0).getFormKey());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                .taskFormKey("testFormKey")
+                .list();
+            assertEquals(1, historicTasks.size());
+            assertEquals("testFormKey", historicTasks.get(0).getFormKey());
+        }
+    }
+
+    @Test
+    public void testQueryByFormKeyOr() {
+        Task task = taskService.newTask();
+        task.setFormKey("testFormKey");
+        taskService.saveTask(task);
+        taskIds.add(task.getId());
+
+        List<Task> tasks = taskService.createTaskQuery().or().taskId("invalid").taskFormKey("testFormKey").list();
+
+        assertEquals(1, tasks.size());
+        assertEquals("testFormKey", tasks.get(0).getFormKey());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery().or()
+                .taskFormKey("testFormKey")
+                .list();
+            assertEquals(1, historicTasks.size());
+            assertEquals("testFormKey", historicTasks.get(0).getFormKey());
+        }
+    }
+
+    @Test
+    public void testQueryWithFormKey() {
+        Task task = taskService.newTask();
+        task.setFormKey("testFormKey");
+        taskService.saveTask(task);
+        taskIds.add(task.getId());
+
+        List<Task> tasks = taskService.createTaskQuery().taskWithFormKey().list();
+
+        assertEquals(1, tasks.size());
+        assertEquals("testFormKey", tasks.get(0).getFormKey());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                .taskWithFormKey()
+                .list();
+            assertEquals(1, historicTasks.size());
+            assertEquals("testFormKey", historicTasks.get(0).getFormKey());
+        }
+    }
+
+    @Test
     public void testQueryByPriority() {
         TaskQuery query = taskService.createTaskQuery().taskPriority(10);
         assertEquals(2, query.list().size());
@@ -750,10 +814,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         List<org.flowable.task.api.Task> allTasks = taskService.createTaskQuery().list();
         for (org.flowable.task.api.Task task : allTasks) {
             if (task.getExecutionId() == null) {
-                taskService.deleteTask(task.getId());
-                if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                    historyService.deleteHistoricTaskInstance(task.getId());
-                }
+                taskService.deleteTask(task.getId(), true);
             }
         }
     }
@@ -1447,10 +1508,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertEquals(12, tasks.size());
 
         org.flowable.task.api.Task assigneeToKermit = taskService.createTaskQuery().taskName("assigneeToKermit").singleResult();
-        taskService.deleteTask(assigneeToKermit.getId());
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            historyService.deleteHistoricTaskInstance(assigneeToKermit.getId());
-        }
+        taskService.deleteTask(assigneeToKermit.getId(), true);
     }
 
     @Test
@@ -1489,10 +1547,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertEquals(12, tasks.size());
 
         org.flowable.task.api.Task assigneeToKermit = taskService.createTaskQuery().or().taskId("invalid").taskName("assigneeToKermit").singleResult();
-        taskService.deleteTask(assigneeToKermit.getId());
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            historyService.deleteHistoricTaskInstance(assigneeToKermit.getId());
-        }
+        taskService.deleteTask(assigneeToKermit.getId(), true);
     }
     
     @Test
@@ -3458,6 +3513,25 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                 .endOr()
                 .list()
                 .size());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" },
+        tenantId = "testTenant"
+    )
+    public void testIncludeTaskLocalAndProcessInstanceVariableHasTenant() {
+        for (int i = 0; i < 10; i++) {
+            runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", Collections.singletonMap("simpleVar", "simpleVarValue"), "testTenant");
+        }
+
+        List<Task> tasks = taskService.createTaskQuery().processDefinitionKey("oneTaskProcess").
+            includeProcessVariables().includeTaskLocalVariables()
+            .list();
+
+        assertEquals(10, tasks.size());
+        for (Task task : tasks) {
+            assertEquals("testTenant", task.getTenantId());
+        }
     }
 
     @Test

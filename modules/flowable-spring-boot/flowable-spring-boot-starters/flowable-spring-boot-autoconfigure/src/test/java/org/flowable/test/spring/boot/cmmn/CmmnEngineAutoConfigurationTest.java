@@ -91,7 +91,7 @@ public class CmmnEngineAutoConfigurationTest {
                 .getBean(CustomUserEngineConfigurerConfiguration.class)
                 .satisfies(configuration -> {
                     assertThat(configuration.getInvokedConfigurations())
-                        .containsExactly(
+                        .containsExactlyInAnyOrder(
                             SpringCmmnEngineConfiguration.class,
                             SpringIdmEngineConfiguration.class
                         );
@@ -127,7 +127,7 @@ public class CmmnEngineAutoConfigurationTest {
                 .getBean(CustomUserEngineConfigurerConfiguration.class)
                 .satisfies(configuration -> {
                     assertThat(configuration.getInvokedConfigurations())
-                        .containsExactly(
+                        .containsExactlyInAnyOrder(
                             SpringCmmnEngineConfiguration.class,
                             SpringIdmEngineConfiguration.class,
                             SpringProcessEngineConfiguration.class
@@ -166,7 +166,7 @@ public class CmmnEngineAutoConfigurationTest {
                 .getBean(CustomUserEngineConfigurerConfiguration.class)
                 .satisfies(configuration -> {
                     assertThat(configuration.getInvokedConfigurations())
-                        .containsExactly(
+                        .containsExactlyInAnyOrder(
                             SpringProcessEngineConfiguration.class,
                             SpringCmmnEngineConfiguration.class,
                             SpringIdmEngineConfiguration.class,
@@ -224,9 +224,9 @@ public class CmmnEngineAutoConfigurationTest {
         
         List<CmmnDeployment> deployments = repositoryService.createDeploymentQuery().list();
 
-        assertThat(deployments).hasSize(2)
+        assertThat(deployments).hasSize(3)
             .extracting(CmmnDeployment::getName)
-            .contains("SpringBootAutoDeployment", "simple.bar");
+            .contains("SpringBootAutoDeployment", "simple.bar", "processTask.bar");
         
         AppRepositoryService appRepositoryService = context.getBean(AppRepositoryService.class);
         List<AppDefinition> appDefinitions = appRepositoryService.createAppDefinitionQuery().list();
@@ -242,9 +242,9 @@ public class CmmnEngineAutoConfigurationTest {
         assertThat(appDefinition.getVersion()).isOne();
         
         List<AppDeployment> appDeployments = appRepositoryService.createDeploymentQuery().list();
-        assertThat(appDeployments).hasSize(2)
+        assertThat(appDeployments).hasSize(3)
             .extracting(AppDeployment::getName)
-            .contains("simple.bar", "vacationRequest.zip");
+            .contains("simple.bar", "vacationRequest.zip", "processTask.bar");
     }
 
     private static CmmnEngineConfigurationApi cmmnEngine(ProcessEngine processEngine) {

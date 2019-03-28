@@ -13,14 +13,15 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.task;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-import io.swagger.annotations.ApiModelProperty;
-
 import java.util.List;
 
 import org.flowable.cmmn.rest.service.api.RestActionRequest;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
+
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * @author Frederik Heremans
@@ -32,9 +33,11 @@ public class TaskActionRequest extends RestActionRequest {
     public static final String ACTION_DELEGATE = "delegate";
     public static final String ACTION_RESOLVE = "resolve";
 
-    private String assignee;
-    private List<RestVariable> variables;
-    private List<RestVariable> transientVariables;
+    protected String assignee;
+    protected String formDefinitionId;
+    protected String outcome;
+    protected List<RestVariable> variables;
+    protected List<RestVariable> transientVariables;
 
     public void setAssignee(String assignee) {
         this.assignee = assignee;
@@ -43,6 +46,24 @@ public class TaskActionRequest extends RestActionRequest {
     @ApiModelProperty(value = "If action is claim or delegate, you can use this parameter to set the assignee associated ", example = "userWhoClaims/userToDelegateTo")
     public String getAssignee() {
         return assignee;
+    }
+    
+    @ApiModelProperty(value = "Required when completing a task with a form", example = "12345")
+    public String getFormDefinitionId() {
+        return formDefinitionId;
+    }
+
+    public void setFormDefinitionId(String formDefinitionId) {
+        this.formDefinitionId = formDefinitionId;
+    }
+
+    @ApiModelProperty(value = "Optional outcome value when completing a task with a form", example = "accepted/rejected")
+    public String getOutcome() {
+        return outcome;
+    }
+
+    public void setOutcome(String outcome) {
+        this.outcome = outcome;
     }
 
     public void setVariables(List<RestVariable> variables) {

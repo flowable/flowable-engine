@@ -76,12 +76,8 @@ public class TaskSubTaskCollectionResourceTest extends BaseSpringRestTestCase {
         assertTrue(foundSubtask1);
         assertTrue(foundSubtask2);
 
-        taskService.deleteTask(parentTask.getId());
-        taskService.deleteTask(subTask.getId());
-        taskService.deleteTask(subTask2.getId());
-
-        historyService.deleteHistoricTaskInstance(parentTask.getId());
-        historyService.deleteHistoricTaskInstance(subTask.getId());
-        historyService.deleteHistoricTaskInstance(subTask2.getId());
+        taskService.deleteTask(parentTask.getId(), true);
+        taskService.deleteTask(subTask.getId(), true);
+        taskService.deleteTask(subTask2.getId(), true);
     }
 }

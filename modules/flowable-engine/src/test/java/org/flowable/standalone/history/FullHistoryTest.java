@@ -33,6 +33,7 @@ import org.flowable.engine.history.HistoricFormProperty;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricVariableUpdate;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -808,6 +809,11 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         historicTaskVariableUpdates = historyService.createHistoricDetailQuery().taskId(taskId).variableUpdates().orderByVariableName().asc().list();
 
         assertEquals(0, historicTaskVariableUpdates.size());
+
+        managementService.executeCommand(commandContext -> {
+            CommandContextUtil.getHistoricTaskService(commandContext).deleteHistoricTaskLogEntriesForTaskId(taskId);
+            return null;
+        });
     }
 
     // ACT-592
@@ -839,7 +845,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         taskService.complete(task.getId());
 
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
-        assertEquals(3, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(5, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count());
         assertEquals(4, historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count());
         assertEquals(4, historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count());
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count());

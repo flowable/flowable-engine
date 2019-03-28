@@ -52,6 +52,6 @@ public class CaseTaskJsonConverterTest extends AbstractConverterTest {
         CaseTask caseTask = (CaseTask) planItemDefinition;
         assertEquals("sid-E06221FA-0225-4EF8-A1E8-8DC177326B77", caseTask.getId());
         assertEquals("caseTaskName", caseTask.getName());
-        assertTrue(caseTask.isFallbackToDefaultTenant());
+        assertTrue(caseTask.getFallbackToDefaultTenant());
     }
 }

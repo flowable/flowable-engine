@@ -18,6 +18,7 @@ public abstract class AbstractCmmnEngineVariableScopeEntity extends VariableScop
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public String getIdPrefix() {
         return CmmnEngineEntityConstants.CMMN_ENGINE_ID_PREFIX;
     }

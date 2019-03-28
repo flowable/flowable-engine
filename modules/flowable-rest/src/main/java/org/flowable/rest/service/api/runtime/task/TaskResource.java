@@ -19,11 +19,18 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableForbiddenException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.form.api.FormInfo;
+import org.flowable.form.model.SimpleFormModel;
+import org.flowable.rest.service.api.FormHandlerRestApiInterceptor;
+import org.flowable.rest.service.api.FormModelResponse;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.task.api.Task;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,6 +57,9 @@ import io.swagger.annotations.Authorization;
 @RestController
 @Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
 public class TaskResource extends TaskBaseResource {
+    
+    @Autowired(required=false)
+    protected FormHandlerRestApiInterceptor formHandlerRestApiInterceptor;
 
     @ApiOperation(value = "Get a task", tags = { "Tasks" })
     @ApiResponses(value = {
@@ -80,17 +90,20 @@ public class TaskResource extends TaskBaseResource {
         // Populate the task properties based on the request
         populateTaskFromRequest(task, taskRequest);
 
+        if (restApiInterceptor != null) {
+            restApiInterceptor.updateTask(task, taskRequest);
+        }
+
         // Save the task and fetch again, it's possible that an
         // assignment-listener has updated
-        // fields after it was saved so we can't use the in-memory task
+        // fields after it was saved so we can not use the in-memory task
         taskService.saveTask(task);
         task = taskService.createTaskQuery().taskId(task.getId()).singleResult();
 
         return restResponseFactory.createTaskResponse(task);
     }
 
-    @ApiOperation(value = "Tasks actions", tags = { "Tasks" },
-            notes = "")
+    @ApiOperation(value = "Tasks actions", tags = { "Tasks" }, notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the action was executed."),
             @ApiResponse(code = 400, message = "When the body contains an invalid value or when the assignee is missing when the action requires it."),
@@ -143,8 +156,14 @@ public class TaskResource extends TaskBaseResource {
 
         Task taskToDelete = getTaskFromRequest(taskId);
         if (taskToDelete.getExecutionId() != null) {
-            // Can't delete a task that is part of a process instance
-            throw new FlowableForbiddenException("Cannot delete a task that is part of a process-instance.");
+            // Can not delete a task that is part of a process instance
+            throw new FlowableForbiddenException("Cannot delete a task that is part of a process instance.");
+        } else if (taskToDelete.getScopeId() != null && ScopeTypes.CMMN.equals(taskToDelete.getScopeType())) {
+            throw new FlowableForbiddenException("Cannot delete a task that is part of a case instance.");
+        }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteTask(taskToDelete);
         }
 
         if (cascadeHistory != null) {
@@ -156,6 +175,27 @@ public class TaskResource extends TaskBaseResource {
             taskService.deleteTask(taskToDelete.getId(), deleteReason);
         }
         response.setStatus(HttpStatus.NO_CONTENT.value());
+    }
+    
+    @ApiOperation(value = "Get a task form", tags = { "Tasks" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates request was successful and the task form is returned"),
+            @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
+    })
+    @GetMapping(value = "/runtime/tasks/{taskId}/form", produces = "application/json")
+    public String getTaskForm(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
+        Task task = getTaskFromRequest(taskId);
+        if (StringUtils.isEmpty(task.getFormKey())) {
+            throw new FlowableIllegalArgumentException("Task has no form defined");
+        }
+        
+        FormInfo formInfo = taskService.getTaskFormModel(task.getId());
+        if (formHandlerRestApiInterceptor != null) {
+            return formHandlerRestApiInterceptor.convertTaskFormInfo(formInfo, task);
+        } else {
+            SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();
+            return restResponseFactory.getFormModelString(new FormModelResponse(formInfo, formModel));
+        }
     }
 
     protected void completeTask(Task task, TaskActionRequest actionRequest) {
@@ -186,7 +226,13 @@ public class TaskResource extends TaskBaseResource {
             }
         }
 
-        taskService.complete(task.getId(), variablesToSet, transientVariablesToSet);
+        if (actionRequest.getFormDefinitionId() != null) {
+            taskService.completeTaskWithForm(task.getId(), actionRequest.getFormDefinitionId(), actionRequest.getOutcome(), 
+                            variablesToSet, transientVariablesToSet);
+            
+        } else {
+            taskService.complete(task.getId(), variablesToSet, transientVariablesToSet);
+        }
     }
 
     protected void resolveTask(Task task, TaskActionRequest actionRequest) {

@@ -55,7 +55,7 @@ public class FormInstanceCollectionResource extends BaseFormInstanceResource {
             @ApiImplicitParam(name = "processDefinitionIdLike", dataType = "string", value = "Only return form instances with a process definition id like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "scopeId", dataType = "string", value = "Only return form instances with the given scope id.", paramType = "query"),
             @ApiImplicitParam(name = "scopeType", dataType = "string", value = "Only return form instances with a scope type like the given value.", paramType = "query"),
-            @ApiImplicitParam(name = "scopeId", dataType = "string", value = "Only return form instances with the given scope definition id.", paramType = "query"),
+            @ApiImplicitParam(name = "scopeDefinitionId", dataType = "string", value = "Only return form instances with the given scope definition id.", paramType = "query"),
             @ApiImplicitParam(name = "submittedBy", dataType = "string", value = "Only return form instances submitted by the given value.", paramType = "query"),
             @ApiImplicitParam(name = "submittedByLike", dataType = "string", value = "Only return form instances submitted by like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return form instances with the given tenantId.", paramType = "query"),
@@ -143,20 +143,27 @@ public class FormInstanceCollectionResource extends BaseFormInstanceResource {
         if (restApiInterceptor != null) {
             restApiInterceptor.storeFormInstance(formRequest);
         }
+        
+        boolean fallbackToDefaultTenant = false;
+        if (formRequest.getFallbackToDefaultTenant() != null) {
+            fallbackToDefaultTenant = formRequest.getFallbackToDefaultTenant();
+        }
 
         if (formRequest.getFormDefinitionKey() != null) {
             formModel = formService.getFormModelWithVariablesByKey(
                     formRequest.getFormDefinitionKey(),
                     formRequest.getTaskId(),
                     formRequest.getVariables(),
-                    formRequest.getTenantId());
+                    formRequest.getTenantId(),
+                    fallbackToDefaultTenant);
             
         } else if (formRequest.getFormDefinitionId() != null) {
             formModel = formService.getFormModelWithVariablesById(
                     formRequest.getFormDefinitionId(),
                     formRequest.getTaskId(),
                     formRequest.getVariables(),
-                    formRequest.getTenantId());
+                    formRequest.getTenantId(),
+                    fallbackToDefaultTenant);
             
         } else {
             throw new FlowableIllegalArgumentException("Either form definition key or form definition id must be provided in the request");
@@ -168,11 +175,11 @@ public class FormInstanceCollectionResource extends BaseFormInstanceResource {
 
         if (formRequest.getScopeId() != null) {
             formService.createFormInstanceWithScopeId(formRequest.getVariables(), formModel, formRequest.getTaskId(),
-                            formRequest.getScopeId(), formRequest.getScopeType(), formRequest.getScopeDefinitionId());
+                            formRequest.getScopeId(), formRequest.getScopeType(), formRequest.getScopeDefinitionId(), formRequest.getTenantId(), null);
             
         } else {
             formService.createFormInstance(formRequest.getVariables(), formModel, formRequest.getTaskId(),
-                            formRequest.getProcessInstanceId(), formRequest.getProcessDefinitionId());
+                            formRequest.getProcessInstanceId(), formRequest.getProcessDefinitionId(), formRequest.getTenantId(), null);
         }
     }
 }

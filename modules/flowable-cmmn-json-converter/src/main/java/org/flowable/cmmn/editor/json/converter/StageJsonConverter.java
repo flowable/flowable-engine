@@ -91,6 +91,7 @@ public class StageJsonConverter extends BaseCmmnJsonConverter implements FormAwa
                     BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
         
         Stage stage = new Stage();
+        stage.setId(CmmnJsonConverterUtil.getElementId(elementNode));
         
         stage.setAutoComplete(CmmnJsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_IS_AUTOCOMPLETE, elementNode));
         String autoCompleteCondition = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_AUTOCOMPLETE_CONDITION, elementNode);

@@ -15,6 +15,7 @@ package org.flowable.app.rest;
 import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.app.api.repository.AppDefinitionQuery;
 import org.flowable.app.api.repository.AppDeployment;
+import org.flowable.app.api.repository.AppDeploymentBuilder;
 import org.flowable.app.api.repository.AppDeploymentQuery;
 
 public interface AppRestApiInterceptor {
@@ -28,6 +29,8 @@ public interface AppRestApiInterceptor {
     void accessDeploymentsWithQuery(AppDeploymentQuery deploymentQuery);
     
     void executeNewDeploymentForTenantId(String tenantId);
+
+    void enhanceDeployment(AppDeploymentBuilder deploymentBuilder);
     
     void deleteDeployment(AppDeployment deployment);
     

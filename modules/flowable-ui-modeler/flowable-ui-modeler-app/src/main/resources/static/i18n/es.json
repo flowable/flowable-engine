@@ -720,6 +720,8 @@
     "PROPERTY.PARAMETER.SOURCEEXPRESSION.PLACEHOLDER" : "Expresion de fuente",
     "PROPERTY.PARAMETER.TARGET" : "Objetivo",
     "PROPERTY.PARAMETER.TARGET.PLACEHOLDER" : "Introduce un objetivo",
+    "PROPERTY.PARAMETER.TARGETEXPRESSION" : "Expresion de objetivo",
+    "PROPERTY.PARAMETER.TARGETEXPRESSION.PLACEHOLDER" : "Introduce un expresion de objetivo",
     "PROPERTY.PARAMETER.EMPTY" : "No hay parametro seleccionado",
 
     "PROPERTY.SUBPROCESSREFERENCE.EMPTY" : "No hay referencia seleccionada",

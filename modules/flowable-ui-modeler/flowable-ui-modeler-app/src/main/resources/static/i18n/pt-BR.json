@@ -679,6 +679,8 @@
   "PROPERTY.PARAMETER.SOURCEEXPRESSION.PLACEHOLDER":"Insira uma expressão de origem",
   "PROPERTY.PARAMETER.TARGET":"Destino",
   "PROPERTY.PARAMETER.TARGET.PLACEHOLDER":"Insira um destino",
+  "PROPERTY.PARAMETER.TARGETEXPRESSION" : "Expressão de destino",
+  "PROPERTY.PARAMETER.TARGETEXPRESSION.PLACEHOLDER" : "Insira uma expressão de destino",
   "PROPERTY.PARAMETER.EMPTY":"Nenhum parâmetro selecionado",
   "PROPERTY.SUBPROCESSREFERENCE.EMPTY":"Nenhuma referência selecionada",
   "PROPERTY.SUBPROCESSREFERENCE.TITLE":"Referência de subprocesso recolhida",

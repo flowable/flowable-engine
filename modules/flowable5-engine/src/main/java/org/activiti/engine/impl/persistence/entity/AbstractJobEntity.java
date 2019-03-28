@@ -13,12 +13,11 @@
 package org.activiti.engine.impl.persistence.entity;
 
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.db.BulkDeleteable;
 import org.activiti.engine.impl.db.HasRevision;
 import org.activiti.engine.impl.db.PersistentObject;
@@ -83,11 +82,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         if (bytes == null) {
             return null;
         }
-        try {
-            return new String(bytes, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new ActivitiException("UTF-8 is not a supported encoding", e);
-        }
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 
     public void setExceptionStacktrace(String exception) {
@@ -100,11 +95,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         if (bytes == null) {
             return null;
         }
-        try {
-            return new String(bytes, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new ActivitiException("UTF-8 is not a supported encoding", e);
-        }
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 
     public void setCustomValues(String customValues) {
@@ -115,11 +106,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         if (str == null) {
             return null;
         }
-        try {
-            return str.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new ActivitiException("UTF-8 is not a supported encoding", e);
-        }
+        return str.getBytes(StandardCharsets.UTF_8);
     }
 
     @Override

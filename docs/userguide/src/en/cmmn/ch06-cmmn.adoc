@@ -603,7 +603,7 @@ image::images/cmmn.scripttask.png[align="center"]
             </string>
         </flowable:field>
     </extensionElements>
-</taks>
+</task>
 ----
 
 *Note*: The value of the *scriptFormat* attribute must be a name that is compatible with the link:$$http://jcp.org/en/jsr/detail?id=223$$[JSR-223] (scripting for the Java platform). By default, JavaScript is included in every JDK and as such doesn't need any additional JAR files. If you want to use another (JSR-223 compatible) scripting engine, it is sufficient to add the corresponding JAR to the classpath and use the appropriate name. For example, the Flowable unit tests often use Groovy because the syntax is similar to that of Java.
@@ -660,7 +660,7 @@ The following names are reserved and *cannot be used* as variable names: *out, o
 
 [source,xml,linenums]
 ----
-<task name="Script Task" flowable:type="script" flowable:scriptFormat="groovy" lowable:resultVariable="myVar">
+<task name="Script Task" flowable:type="script" flowable:scriptFormat="groovy" flowable:resultVariable="myVar">
     <flowable:field name="script">
         <string>#{echo}</string>
     </flowable:field>
@@ -717,6 +717,22 @@ Properties:
 A process task is visualized as a rounded rectangle with an arrow icon in the top left corner:
 
 image::images/cmmn.processtask.png[align="center"]
+
+A process task can be configured to have in- and out parameters, which take the form of _source/sourceExpression_ and _target/targetExpression_.
+
+The in parameters are resolved within context of the case instance.
+
+* The _source_ value will be the case instance variable which value will be mapped to a process variable
+* Alternatively, the _sourceExpression_ allows to create an arbitrary value, where the expression is resolved against the case instance.
+* The _target_ will be the name of the process variable to which the source value is mapped.
+* Alternatively, the _targetExpression_ will resolve to a *string* value that is used as variable name in the process instance. The expression is resolved within case instance context.
+
+The out parameters are resolved within context of the process instance.
+
+* The _source_ value will be the process instance variable which value will be mapped to a case variable
+* Alternatively, the _sourceExpression_ allows to create an arbitrary value, where the expression is resolved against the process instance.
+* The _target_ will be the name of the case variable to which the source value is mapped.
+* Alternatively, the _targetExpression_ will resolve to a *string* value that is used as variable name in the case instance. The expression is resolved within process instance context.
 
 ==== Criteria
 
@@ -790,6 +806,25 @@ User event listeners can be queried using the _org.flowable.cmmn.api.runtime.Use
 
 A user event listener can be completed by calling the _cmmnRuntimeService.completeUserEventListenerInstance(id)_ method.
 
+===== Generic Event Listener
+
+A generic event listener is used to typically model a programmatic interaction (e.g. a external system that calls out to change something in a case instance).
+
+image::images/cmmn.generic-event-listener.png[align="center"]
+
+The API to retrieve and complete these event listeners is on the _CmmnRuntimeService_:
+
+[source,java,linenums]
+----
+GenericEventListenerInstanceQuery createGenericEventListenerInstanceQuery();
+void completeGenericEventListenerInstance(String genericEventListenerInstanceId);
+----
+
+Similar to _user event listeners_, this API is a wrapper on top of the _PlanItemInstance_ queries and operations. This means that the data can also be retrieved through the regular _PlanItemInstanceQuery_
+
+Note that generic event listeners are not part of the CMMN specification, but are a Flowable-specific addition.
+
+
 ===== Automatic removal of event listeners
 
 The engine will automatically detect when event listeners (user or timer) are not useful anymore.
@@ -819,6 +854,24 @@ image::images/cmmn.user-event-listener-removal-4.png[align="center"]
 
 Here, human task _C_ is not yet created when a case instance is started for this case definition. The user event listener will not be removed as long that _C_ has a parent stage that is in a non-terminal state, as this means that the event could still be listened to in the future.
 
+===== Available condition
+
+All types of event listeners can be configured to have a *available condition*: an expressions that will guard the available state of the event listener. To explain the use case, take the following case definition:
+
+image::images/cmmn.create-condition.png[align="center"]
+
+When the case instance is started, Stage 1 (as it has no entry criteria) will be moving immediately from _available_ to _active_. Similar story for human task A. Human task B will move from _available_ to _enabled_ as it's manually activated.
+
+Normally, also the event listener would become _available_. The life cycle of event listeners is simpler than that of plan items such as human tasks: an event listener stays in the _available_ state until the event happens. There's no _active_ state like for other plan items.
+This means that a user could trigger it after start and the stage would be exited.
+
+In some use case however, the event listener shouldn't be _available_ for the user to interact with (or a timer shouldn't start, when using a timer event listener) unless a certain condition is true.
+
+In the example above, we want to only create it when the stage doesn't have any active children (or required) anymore. Setting the *availableCondition* to *${cmmn:isStageCompletable()}* will allow the event listener to be created which makes it move immediately to _available_. Concretely in this model, when human task A is completed Stage 1 becomes _completable_ (as human task B is manually activated and non-required). This makes the _availbleCondition_ of the event listener _true_ and the event listener is now available for a user to decide to exit the stage.
+
+Note: this is a Flowable specific addition to the CMMN specification. Without this addition, the event listener would have to be nested within a substage which is protected with entry criteria that listens to the completion of task A.
+
+Note: if this were an autocompletable stage, the engine would complete the stage automatically when A completes.
 
 ==== Item control: Repetition Rule
 

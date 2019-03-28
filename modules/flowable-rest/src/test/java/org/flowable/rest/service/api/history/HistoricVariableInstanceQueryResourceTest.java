@@ -13,6 +13,9 @@
 
 package org.flowable.rest.service.api.history;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -32,8 +35,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import static org.junit.Assert.*;
 
 /**
  * Test for REST-operation related to the historic variable instance query resource.
@@ -153,7 +154,7 @@ public class HistoricVariableInstanceQueryResourceTest extends BaseSpringRestTes
                 if (variableName.equals(name)) {
                     variableFound = true;
                     if (variableValue instanceof Boolean) {
-                        assertTrue("Variable value is not equal", variableNode.get("value").asBoolean() == (Boolean) variableValue);
+                        assertEquals("Variable value is not equal", variableNode.get("value").asBoolean(), (boolean) (Boolean) variableValue);
                     } else if (variableValue instanceof Integer) {
                         assertEquals("Variable value is not equal", variableNode.get("value").asInt(), (int) (Integer) variableValue);
                     } else {

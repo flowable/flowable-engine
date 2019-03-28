@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -191,7 +190,7 @@ public class ChangeStateForCallActivityTest extends PluggableFlowableTestCase {
     public void testSetCurrentActivityInSubProcessInstanceWithCalledElementExpression() {
 
         //Deploy second version of the process definition
-        ProcessDefinition procDefCallActivity = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml");
+        deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml");
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("calledElementExpression");
 
@@ -246,7 +245,7 @@ public class ChangeStateForCallActivityTest extends PluggableFlowableTestCase {
     public void testSetCurrentActivityInSubProcessInstanceSpecificVersion() {
 
         //Deploy second version of the process definition
-        ProcessDefinition procDefCallActivityV1 = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskProcessV2.bpmn20.xml");
+        deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskProcessV2.bpmn20.xml");
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksParentProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();

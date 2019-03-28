@@ -34,10 +34,14 @@ public abstract class HistoricScopeInstanceEntityImpl extends AbstractBpmnEngine
     protected String deleteReason;
 
     @Override
-    public void markEnded(String deleteReason) {
+    public void markEnded(String deleteReason, Date endTime) {
         if (this.endTime == null) {
             this.deleteReason = deleteReason;
-            this.endTime = CommandContextUtil.getProcessEngineConfiguration().getClock().getCurrentTime();
+            if (endTime != null) {
+                this.endTime = endTime;
+            } else {
+                this.endTime = CommandContextUtil.getProcessEngineConfiguration().getClock().getCurrentTime();
+            }
             if (endTime != null && startTime != null) {
                 this.durationInMillis = endTime.getTime() - startTime.getTime();
             }

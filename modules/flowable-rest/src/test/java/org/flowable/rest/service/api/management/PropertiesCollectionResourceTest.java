@@ -12,6 +12,9 @@
  */
 package org.flowable.rest.service.api.management;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.Iterator;
 import java.util.Map;
 
@@ -23,8 +26,6 @@ import org.flowable.rest.service.api.RestUrls;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
-import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to the Job collection and a single job resource.

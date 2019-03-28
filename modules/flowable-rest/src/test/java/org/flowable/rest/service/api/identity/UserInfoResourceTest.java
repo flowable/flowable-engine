@@ -13,6 +13,11 @@
 
 package org.flowable.rest.service.api.identity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
@@ -27,8 +32,6 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Frederik Heremans
@@ -129,7 +132,7 @@ public class UserInfoResourceTest extends BaseSpringRestTestCase {
     }
 
     /**
-     * Test getting the info for a user who doesn't have that info set
+     * Test getting the info for a user who does not have that info set
      */
     @Test
     public void testGetInfoForUserWithoutInfo() throws Exception {
@@ -237,7 +240,7 @@ public class UserInfoResourceTest extends BaseSpringRestTestCase {
     }
 
     /**
-     * Test deleting the info for a user who doesn't have that info set
+     * Test deleting the info for a user who does not have that info set
      */
     @Test
     public void testUpdateUnexistingInfo() throws Exception {
@@ -275,7 +278,7 @@ public class UserInfoResourceTest extends BaseSpringRestTestCase {
     }
 
     /**
-     * Test deleting the info for a user who doesn't have that info set
+     * Test deleting the info for a user who does not have that info set
      */
     @Test
     public void testDeleteInfoForUserWithoutInfo() throws Exception {

@@ -160,6 +160,7 @@ public interface StencilConstants {
     final String PROPERTY_FIELD_STRING = "string";
 
     final String PROPERTY_FORMKEY = "formkeydefinition";
+    final String PROPERTY_FORM_FIELD_VALIDATION = "formfieldvalidation";
 
     final String PROPERTY_USERTASK_ASSIGNMENT = "usertaskassignment";
     final String PROPERTY_USERTASK_PRIORITY = "prioritydefinition";

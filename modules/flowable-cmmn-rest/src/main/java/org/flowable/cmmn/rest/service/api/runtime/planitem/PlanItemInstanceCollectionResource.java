@@ -49,7 +49,7 @@ public class PlanItemInstanceCollectionResource extends PlanItemInstanceBaseReso
             @ApiImplicitParam(name = "stageInstanceId", dataType = "string", value = "Only return plan item instances which are part of the given stage instance.", paramType = "query"),
             @ApiImplicitParam(name = "planItemDefinitionId", dataType = "string", value = "Only return plan item instances which have the given plan item definition id.", paramType = "query"),
             @ApiImplicitParam(name = "planItemDefinitionType", dataType = "string", value = "Only return plan item instances which have the given plan item definition type.", paramType = "query"),
-            @ApiImplicitParam(name = "planItemDefinitionTypes", dataType = "string", value = "Only return plan item instances which have any of the given plan item definition types. Comma-seperated string e.g. humantask, stage", paramType = "query"),
+            @ApiImplicitParam(name = "planItemDefinitionTypes", dataType = "string", value = "Only return plan item instances which have any of the given plan item definition types. Comma-separated string e.g. humantask, stage", paramType = "query"),
             @ApiImplicitParam(name = "state", dataType = "string", value = "Only return plan item instances which have the given state.", paramType = "query"),
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return plan item instances which have the given name.", paramType = "query"),
             @ApiImplicitParam(name = "elementId", dataType = "string", value = "Only return plan item instances which have the given element id.", paramType = "query"),
@@ -60,7 +60,7 @@ public class PlanItemInstanceCollectionResource extends PlanItemInstanceBaseReso
             @ApiImplicitParam(name = "startUserId", dataType = "string", value = "Only return plan item instances which are started by the given user id.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return process instances with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns process instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
-            @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "processInstanceId ,processDefinitionId,processDefinitionKey ,tenantId", paramType = "query"),
+            @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "processInstanceId,processDefinitionId,processDefinitionKey ,tenantId", paramType = "query"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the executions are returned"),

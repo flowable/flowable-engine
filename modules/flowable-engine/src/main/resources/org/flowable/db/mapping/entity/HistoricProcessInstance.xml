@@ -402,7 +402,7 @@
     from ${prefix}ACT_HI_PROCINST RES
     left outer join ${prefix}ACT_RE_PROCDEF DEF on RES.PROC_DEF_ID_ = DEF.ID_
     <if test="includeProcessVariables">
-      left outer join ${prefix}ACT_HI_VARINST VAR ON RES.PROC_INST_ID_ = VAR.EXECUTION_ID_ and VAR.TASK_ID_ is null
+      left outer join ${prefix}ACT_HI_VARINST VAR ON RES.PROC_INST_ID_ = VAR.EXECUTION_ID_
     </if>
     <include refid="commonSelectHistoricProcessInstancesByQueryCriteriaSql"/>
   </sql>
@@ -524,6 +524,12 @@
       </if>
       <if test="excludeSubprocesses">
         and RES.SUPER_PROCESS_INSTANCE_ID_ is null
+      </if>
+      <if test="callbackId != null">
+        and CALLBACK_ID_ = #{callbackId}
+      </if>
+      <if test="callbackType != null">
+        and CALLBACK_TYPE_ = #{callbackType}
       </if>
       <if test="tenantId != null">
         and RES.TENANT_ID_ = #{tenantId}
@@ -713,6 +719,12 @@
           </if>
           <if test="orQueryObject.excludeSubprocesses">
             or RES.SUPER_PROCESS_INSTANCE_ID_ is null
+          </if>
+          <if test="orQueryObject.callbackId != null">
+            or CALLBACK_ID_ = #{orQueryObject.callbackId}
+          </if>
+          <if test="orQueryObject.callbackType != null">
+            or CALLBACK_TYPE_ = #{orQueryObject.callbackType}
           </if>
           <if test="orQueryObject.tenantId != null">
             or RES.TENANT_ID_ = #{orQueryObject.tenantId}

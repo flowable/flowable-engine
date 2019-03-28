@@ -15,6 +15,7 @@ package org.flowable.dmn.xml;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
@@ -27,16 +28,16 @@ public abstract class AbstractConverterTest {
     protected DmnDefinition readXMLFile() throws Exception {
         InputStream xmlStream = this.getClass().getClassLoader().getResourceAsStream(getResource());
         XMLInputFactory xif = XMLInputFactory.newInstance();
-        InputStreamReader in = new InputStreamReader(xmlStream, "UTF-8");
+        InputStreamReader in = new InputStreamReader(xmlStream, StandardCharsets.UTF_8);
         XMLStreamReader xtr = xif.createXMLStreamReader(in);
         return new DmnXMLConverter().convertToDmnModel(xtr);
     }
 
     protected DmnDefinition exportAndReadXMLFile(DmnDefinition definition) throws Exception {
         byte[] xml = new DmnXMLConverter().convertToXML(definition);
-        System.out.println("xml " + new String(xml, "UTF-8"));
+        System.out.println("xml " + new String(xml, StandardCharsets.UTF_8));
         XMLInputFactory xif = XMLInputFactory.newInstance();
-        InputStreamReader in = new InputStreamReader(new ByteArrayInputStream(xml), "UTF-8");
+        InputStreamReader in = new InputStreamReader(new ByteArrayInputStream(xml), StandardCharsets.UTF_8);
         XMLStreamReader xtr = xif.createXMLStreamReader(in);
         return new DmnXMLConverter().convertToDmnModel(xtr);
     }

@@ -204,8 +204,12 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
         return new ArrayList<>(result);
     }
 
-    @SuppressWarnings("unchecked")
     protected List<EntityImpl> getListFromCache(CachedEntityMatcher<EntityImpl> entityMatcher, Object parameter) {
+        return getListFromCache(entityMatcher, parameter, false);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected List<EntityImpl> getListFromCache(CachedEntityMatcher<EntityImpl> entityMatcher, Object parameter, boolean includeDeletedEntities) {
         Collection<CachedEntity> cachedObjects = getEntityCache().findInCacheAsCachedObjects(getManagedEntityClass());
 
         DbSqlSession dbSqlSession = getDbSqlSession();
@@ -214,7 +218,8 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
         if (cachedObjects != null && entityMatcher != null) {
             for (CachedEntity cachedObject : cachedObjects) {
                 EntityImpl cachedEntity = (EntityImpl) cachedObject.getEntity();
-                if (entityMatcher.isRetained(null, cachedObjects, cachedEntity, parameter) && !dbSqlSession.isEntityToBeDeleted(cachedEntity)) {
+                if (entityMatcher.isRetained(null, cachedObjects, cachedEntity, parameter)
+                        && (includeDeletedEntities || !dbSqlSession.isEntityToBeDeleted(cachedEntity))) {
                     result.add(cachedEntity);
                 }
             }

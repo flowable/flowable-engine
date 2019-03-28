@@ -18,6 +18,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
@@ -276,7 +277,7 @@ public class CmmnHttpTaskTest {
         assertEquals("text/plain", headerMap.get("Content-Type"));
         assertEquals("623b94fc-14b8-4ee6-aed7-b16b9321e29f", headerMap.get("X-Request-ID"));
         assertEquals("localhost:7000", headerMap.get("Host"));
-        assertEquals(null, headerMap.get("Test"));
+        assertNull(headerMap.get("Test"));
     }
 
     @Test
@@ -315,7 +316,7 @@ public class CmmnHttpTaskTest {
         assertEquals("text/plain", headerMap.get("Content-Type"));
         assertEquals("623b94fc-14b8-4ee6-aed7-b16b9321e29f", headerMap.get("X-Request-ID"));
         assertEquals("localhost:7000", headerMap.get("Host"));
-        assertEquals(null, headerMap.get("Test"));
+        assertNull(headerMap.get("Test"));
     }
 
     protected CaseInstance createCaseInstance() {

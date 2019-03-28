@@ -285,7 +285,6 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(executions).extracting(Execution::getActivityId).containsExactly("userTask1Id");
         assertThat(executions).extracting("processDefinitionId").containsOnly(procSimpleOneTask.getId());
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        Map<String, Object> variables = taskService.getVariables(task.getId());
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSimpleOneTask.getId());
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isNull();

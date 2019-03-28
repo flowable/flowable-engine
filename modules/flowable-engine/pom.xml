@@ -10,7 +10,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>6.4.1-SNAPSHOT</version>
+        <version>6.5.0-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -138,9 +138,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <!-- no official JPA 2.1 Jar was ever published, so we have to use a vendor implementation :( -->
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.1-api</artifactId>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -154,6 +153,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>test</scope>
@@ -161,6 +165,11 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -238,7 +247,10 @@
             org.flowable.engine
         </flowable.artifact>
         <flowable.osgi.export.additional>
-            org.flowable.db.mapping.entity
+            org.flowable.db.create,
+            org.flowable.db.update,
+            org.flowable.db.mapping,
+            org.flowable.db.mapping.entity,
         </flowable.osgi.export.additional>
         <flowable.osgi.import.additional>
             junit*;resolution:=optional,
@@ -272,7 +284,7 @@
                         <exclude>${exclude.tests}</exclude>
                         <exclude>${exclude.tests2}</exclude>
                     </excludes>
-                    <runOrder>alphabetical</runOrder>
+                    <argLine>${argLine} -Xmx3g</argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -568,7 +580,7 @@
                 <exclude.tests>**/ProcessInstanceMigration*Test.java</exclude.tests>
                 <exclude.tests2>**/ChangeState*Test.java</exclude.tests2>
             </properties>
-            <!-- <build>
+            <build>
                 <plugins>
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
@@ -614,7 +626,7 @@
                         </executions>
                     </plugin>
                 </plugins>
-            </build> -->
+            </build>
         </profile>
 
         <profile>
@@ -777,13 +789,11 @@
                         <configuration>
                             <excludes>
                                 <exclude>**/*TestCase.java</exclude>
-
                                 <!-- Disabling tests that run exclusively 
                                     using standalone config -->
                                 <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
                             </excludes>
-                            <runOrder>alphabetical</runOrder>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -852,13 +862,11 @@
                         <configuration>
                             <excludes>
                                 <exclude>**/*TestCase.java</exclude>
-
                                 <!-- Disabling tests that run exclusively 
                                     using standalone config -->
                                 <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
                             </excludes>
-                            <runOrder>alphabetical</runOrder>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -914,7 +922,6 @@
                                 <exclude>org/flowable/standalone/**</exclude>
                                 <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
-                            <runOrder>alphabetical</runOrder>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -1105,7 +1112,6 @@
                                 <exclude>org/flowable/standalone/**</exclude>
                                 <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
-                            <runOrder>alphabetical</runOrder>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -1154,15 +1160,19 @@
                                 <exclude>**/HistoryLevelServiceTest.java</exclude>
                                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                                 <exclude>**/ProcessInstanceLogQueryTest.java</exclude>
+                                <exclude>**/HistoryServiceTaskLogTest.java</exclude>
+                                <exclude>**/HistoryServiceDisableTaskLogTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
                                 <exclude>**/HistoricProcessInstanceQueryVersionTest.java</exclude>
                                 <exclude>**/NonCascadeDeleteTest.java</exclude>
                                 <exclude>**/HistoricProcessInstanceQueryAndWithExceptionTest.java</exclude>
                                 <exclude>**/HistoricJPAVariableTest.java</exclude>
                                 <exclude>**/VerifyDatabaseOperationsTest.java</exclude>
+                                <exclude>**/AsyncHistoryTest.java</exclude>
+                                <exclude>**/AsyncHistoryUpgradeTest.java</exclude>
+                                <exclude>**/ProcessInstanceLogQueryTest.java</exclude>
                                 <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
-                            <runOrder>alphabetical</runOrder>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -1208,7 +1218,6 @@
                                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
                             </excludes>
-                            <runOrder>alphabetical</runOrder>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -1231,7 +1240,6 @@
                                 <include>**/JdbcMetaDataTest.java</include>
                             </includes>
                             <excludes />
-                            <runOrder>alphabetical</runOrder>
                         </configuration>
                     </plugin>
                     <plugin>
@@ -1388,8 +1396,8 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>com.ibm.db2.jcc</groupId>
-                    <artifactId>db2jcc4</artifactId>
+                    <groupId>com.ibm.db2</groupId>
+                    <artifactId>jcc</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -1405,8 +1413,8 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>com.ibm.db2.jcc</groupId>
-                    <artifactId>db2jcc4</artifactId>
+                    <groupId>com.ibm.db2</groupId>
+                    <artifactId>jcc</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -1549,18 +1557,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-
-        <profile>
-            <id>java8</id>
-            <activation>
-                <jdk>1.8</jdk>
-            </activation>
-            <properties>
-                <!-- increase max heap to fix: SurefireBooterForkException: There was an error in the forked process
-                    [ERROR] GC overhead limit exceeded -->
-                <argLine>-Xmx3g</argLine>
-            </properties>
         </profile>
     </profiles>
 

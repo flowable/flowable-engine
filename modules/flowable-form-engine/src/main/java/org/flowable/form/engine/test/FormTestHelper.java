@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormDeploymentBuilder;
@@ -70,6 +71,10 @@ public abstract class FormTestHelper {
 
             for (String resource : resources) {
                 deploymentBuilder.addClasspathResource(resource);
+            }
+            
+            if (StringUtils.isNotEmpty(deploymentAnnotation.tenantId())) {
+                deploymentBuilder.tenantId(deploymentAnnotation.tenantId());
             }
 
             deploymentId = deploymentBuilder.deploy().getId();

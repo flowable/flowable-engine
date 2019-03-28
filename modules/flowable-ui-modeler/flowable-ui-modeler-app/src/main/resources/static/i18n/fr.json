@@ -850,6 +850,8 @@
     "PROPERTY.PARAMETER.SOURCEEXPRESSION.PLACEHOLDER" : "Entrer une expression de source",
     "PROPERTY.PARAMETER.TARGET" : "Cible (Target)",
     "PROPERTY.PARAMETER.TARGET.PLACEHOLDER" : "Entrer une Cible",
+    "PROPERTY.PARAMETER.TARGETEXPRESSION" : "Expression de cible",
+    "PROPERTY.PARAMETER.TARGETEXPRESSION.PLACEHOLDER" : "Entrer une expression de cible",
     "PROPERTY.PARAMETER.EMPTY" : "Aucun paramètre sélectionné",
 
     "PROPERTY.PROCESSREFERENCE.EMPTY" : "Aucune référence sélectionnée",

@@ -214,15 +214,19 @@ public class CommandContextUtil {
     }
     
     public static HistoricTaskService getHistoricTaskService() {
+        return getHistoricTaskService(getCommandContext());
+    }
+
+    public static HistoricTaskService getHistoricTaskService(CommandContext commandContext) {
         HistoricTaskService historicTaskService = null;
-        TaskServiceConfiguration taskServiceConfiguration = getTaskServiceConfiguration();
+        TaskServiceConfiguration taskServiceConfiguration = getTaskServiceConfiguration(commandContext);
         if (taskServiceConfiguration != null) {
             historicTaskService = taskServiceConfiguration.getHistoricTaskService();
         }
-        
+
         return historicTaskService;
     }
-    
+
     // JOB SERVICE
     public static JobServiceConfiguration getJobServiceConfiguration() {
         return getJobServiceConfiguration(getCommandContext());
@@ -346,8 +350,12 @@ public class CommandContextUtil {
     }
     
     public static FormRepositoryService getFormRepositoryService() {
+        return getFormRepositoryService(getCommandContext());
+    }
+    
+    public static FormRepositoryService getFormRepositoryService(CommandContext commandContext) {
         FormRepositoryService formRepositoryService = null;
-        FormEngineConfigurationApi formEngineConfiguration = getFormEngineConfiguration();
+        FormEngineConfigurationApi formEngineConfiguration = getFormEngineConfiguration(commandContext);
         if (formEngineConfiguration != null) {
             formRepositoryService = formEngineConfiguration.getFormRepositoryService();
         }
@@ -356,8 +364,12 @@ public class CommandContextUtil {
     }
     
     public static FormService getFormService() {
+        return getFormService(getCommandContext());
+    }
+    
+    public static FormService getFormService(CommandContext commandContext) {
         FormService formService = null;
-        FormEngineConfigurationApi formEngineConfiguration = getFormEngineConfiguration();
+        FormEngineConfigurationApi formEngineConfiguration = getFormEngineConfiguration(commandContext);
         if (formEngineConfiguration != null) {
             formService = formEngineConfiguration.getFormService();
         }
@@ -366,8 +378,12 @@ public class CommandContextUtil {
     }
     
     public static FormManagementService getFormManagementService() {
+        return getFormManagementService(getCommandContext());
+    }
+    
+    public static FormManagementService getFormManagementService(CommandContext commandContext) {
         FormManagementService formManagementService = null;
-        FormEngineConfigurationApi formEngineConfiguration = getFormEngineConfiguration();
+        FormEngineConfigurationApi formEngineConfiguration = getFormEngineConfiguration(commandContext);
         if (formEngineConfiguration != null) {
             formManagementService = formEngineConfiguration.getFormManagementService();
         }
@@ -386,8 +402,12 @@ public class CommandContextUtil {
     }
     
     public static ContentService getContentService() {
+        return getContentService(getCommandContext());
+    }
+    
+    public static ContentService getContentService(CommandContext commandContext) {
         ContentService contentService = null;
-        ContentEngineConfigurationApi contentEngineConfiguration = getContentEngineConfiguration();
+        ContentEngineConfigurationApi contentEngineConfiguration = getContentEngineConfiguration(commandContext);
         if (contentEngineConfiguration != null) {
             contentService = contentEngineConfiguration.getContentService();
         }

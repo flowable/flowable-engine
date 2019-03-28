@@ -292,7 +292,45 @@ angular.module('flowableApp')
             $scope.closeDiagramPopup = function () {
                 jQuery('.qtip').qtip('destroy', true);
             };
-        }]);
+            
+            $scope.showDiagram = function() {
+                var modalInstance = _internalCreateModal({
+                    template: appResourceRoot + 'views/modal/case-instance-graphical.html',
+                    scope: $scope,
+                    show: true
+                }, $modal, $scope);
+            };
+    }]);
+
+angular.module('flowableApp')
+    .controller('ShowCaseDiagramCtrl', ['$scope', '$timeout', '$q', 'ResourceService', 'appResourceRoot',
+        function ($scope, $timeout, $q, ResourceService, appResourceRoot) {
+
+            $timeout(function () {
+                jQuery("#cmmnModel").attr('data-model-id', $scope.model.caseInstance.id);
+                jQuery("#cmmnModel").attr('data-model-type', 'runtime');
+
+                // in case we want to show a historic model, include additional attribute on the div
+                if ($scope.model.caseInstance.ended) {
+                    jQuery("#cmmnModel").attr('data-history-id', $scope.model.caseInstance.id);
+                }
+
+                var viewerUrl = appResourceRoot + "../display-cmmn/displaymodel.html?version=" + Date.now();
+
+                // If Flowable has been deployed inside an AMD environment Raphael will fail to register
+                // itself globally until displaymodel.js (which depends ona global Raphale variable) is running,
+                // therefore remove AMD's define method until we have loaded in Raphael and displaymodel.js
+                // and assume/hope its not used during.
+                var amdDefine = window.define;
+                window.define = undefined;
+                ResourceService.loadFromHtml(viewerUrl, function () {
+                    // Restore AMD's define method again
+                    window.define = amdDefine;
+                });
+            }, 100);
+        }
+        ]
+    );
 
 angular.module('flowableApp')
     .controller('CancelCaseCtrl', ['$scope', '$http', '$route', 'CaseService', function ($scope, $http, $route, CaseService) {

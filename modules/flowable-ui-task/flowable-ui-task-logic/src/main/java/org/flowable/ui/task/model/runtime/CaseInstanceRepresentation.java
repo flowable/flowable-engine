@@ -44,30 +44,32 @@ public class CaseInstanceRepresentation extends AbstractRepresentation {
     protected String caseDefinitionCategory;
     protected int caseDefinitionVersion;
     protected String caseDefinitionDeploymentId;
+    protected boolean graphicalNotationDefined;
     protected boolean startFormDefined;
 
     protected List<RestVariable> variables = new ArrayList<>();
 
-    public CaseInstanceRepresentation(CaseInstance caseInstance, CaseDefinition caseDefinition, User startedBy) {
-        this(caseInstance, startedBy);
+    public CaseInstanceRepresentation(CaseInstance caseInstance, CaseDefinition caseDefinition, boolean graphicalNotation, User startedBy) {
+        this(caseInstance, graphicalNotation, startedBy);
         mapCaseDefinition(caseDefinition);
     }
 
-    public CaseInstanceRepresentation(CaseInstance caseInstance, User startedBy) {
+    public CaseInstanceRepresentation(CaseInstance caseInstance, boolean graphicalNotation, User startedBy) {
         this.id = caseInstance.getId();
         this.name = caseInstance.getName();
         this.businessKey = caseInstance.getBusinessKey();
         this.caseDefinitionId = caseInstance.getCaseDefinitionId();
         this.tenantId = caseInstance.getTenantId();
+        this.graphicalNotationDefined = graphicalNotation;
         this.startedBy = startedBy != null ? new UserRepresentation(startedBy) : null;
     }
 
-    public CaseInstanceRepresentation(HistoricCaseInstance caseInstance, CaseDefinition caseDefinition, User startedBy) {
-        this(caseInstance, startedBy);
+    public CaseInstanceRepresentation(HistoricCaseInstance caseInstance, CaseDefinition caseDefinition, boolean graphicalNotation, User startedBy) {
+        this(caseInstance, graphicalNotation, startedBy);
         mapCaseDefinition(caseDefinition);
     }
 
-    public CaseInstanceRepresentation(HistoricCaseInstance caseInstance, User startedBy) {
+    public CaseInstanceRepresentation(HistoricCaseInstance caseInstance, boolean graphicalNotation, User startedBy) {
         this.id = caseInstance.getId();
         this.name = caseInstance.getName();
         this.businessKey = caseInstance.getBusinessKey();
@@ -75,6 +77,7 @@ public class CaseInstanceRepresentation extends AbstractRepresentation {
         this.tenantId = caseInstance.getTenantId();
         this.started = caseInstance.getStartTime();
         this.ended = caseInstance.getEndTime();
+        this.graphicalNotationDefined = graphicalNotation;
         this.startedBy = startedBy != null ? new UserRepresentation(startedBy) : null;
     }
 
@@ -215,6 +218,14 @@ public class CaseInstanceRepresentation extends AbstractRepresentation {
 
     public void addVariable(RestVariable variable) {
         variables.add(variable);
+    }
+
+    public boolean isGraphicalNotationDefined() {
+        return graphicalNotationDefined;
+    }
+
+    public void setGraphicalNotationDefined(boolean graphicalNotationDefined) {
+        this.graphicalNotationDefined = graphicalNotationDefined;
     }
 
     public boolean isStartFormDefined() {

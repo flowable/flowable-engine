@@ -131,10 +131,14 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
     }
     
     @Override
-    public void markEnded(String deleteReason) {
+    public void markEnded(String deleteReason, Date endTime) {
         if (this.endTime == null) {
             this.deleteReason = deleteReason;
-            this.endTime = CommandContextUtil.getTaskServiceConfiguration().getClock().getCurrentTime();
+            if (endTime != null) {
+                this.endTime = endTime;
+            } else {
+                this.endTime = CommandContextUtil.getTaskServiceConfiguration().getClock().getCurrentTime();
+            }
             if (endTime != null && createTime != null) {
                 this.durationInMillis = endTime.getTime() - createTime.getTime();
             }

@@ -13,6 +13,10 @@
 
 package org.flowable.rest.service.api.runtime;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -20,6 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -30,6 +37,7 @@ import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.junit.Test;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -621,4 +629,39 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
             }
         }
     }
+
+    @Test
+    @Deployment(resources = "org/flowable/rest/service/api/runtime/TaskQueryResourceTest.testQueryTasks.bpmn20.xml", tenantId = "testTenant")
+    public void testQueryTasksWithTenant() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", "myBusinessKey",
+            Collections.singletonMap("var1", "var1Value"),
+            "testTenant");
+        Task processTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        // Check filter-less to fetch all tasks
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_QUERY);
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("includeProcessVariables", true);
+        requestNode.put("includeTaskLocalVariables", true);
+        assertTenantIdPresent(url, requestNode, "testTenant");
+    }
+
+    protected void assertTenantIdPresent(String url, ObjectNode requestNode, String tenantId) throws IOException {
+        // Do the actual call
+        HttpPost post = new HttpPost(SERVER_URL_PREFIX + url);
+        post.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(post, HttpStatus.SC_OK);
+
+        // Check status and size
+        JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
+        JsonNode dataNode = rootNode.get("data");
+        assertEquals(1, dataNode.size());
+
+        // Check presence of tenantId
+        assertNotNull(dataNode.get(0).get("tenantId"));
+        assertEquals("testTenant", dataNode.get(0).get("tenantId").textValue());
+
+        closeResponse(response);
+    }
+
 }

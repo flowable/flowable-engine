@@ -259,7 +259,7 @@ public static class FetchDataServiceTask implements JavaDelegate {
     String configParam01 = (String) execution.getVariable(configParam01);
     // ...
 
-    RestReponse restResponse = executeRestCall();
+    RestResponse restResponse = executeRestCall();
     execution.setTransientVariable("response", restResponse.getBody());
     execution.setTransientVariable("status", restResponse.getStatus());
   }
@@ -335,7 +335,7 @@ To make working with process variables easier, a set of out-of-the-box functions
 ** For String variables, the passed values are used as substrings that need to be part of the variable
 ** For +java.util.Collection+ variables, all the passed values need to be an element of the collection (regular _contains_ semantics).
 ** For +ArrayNode+ variables: supports checking if the arraynode contains a JsonNode for the types that are supported as variable type
-** When the variable value is null, false is returned in all cases. When the variale value is not null, and the instance type is not one of the types above, false will be returned.
+** When the variable value is null, false is returned in all cases. When the variable value is not null, and the instance type is not one of the types above, false will be returned.
 * *variables:containsAny(varName, value1, value2, ...)* : similar to the _contains_ function, but _true_ will be returned if *any* (and not all) the passed values is contained in the variable.
 * Comparator functions:
 ** *variables:lowerThan(varName, value)* (alias _:lessThan_ or  _:lt_) : shorthand for _${execution.getVariable("varName") != null && execution.getVariable("varName") < value}_
@@ -345,7 +345,7 @@ To make working with process variables easier, a set of out-of-the-box functions
 
 The _variables_ namespace is aliased to _vars_ or _var_. So _variables:get(varName)_ is equivalent to writing _vars:get(varName)_ or _var:get(varName)_. Note that it's not needed to put quotes around the variable name: _var:get(varName)_ is equivalent to _var:get(\'varName')_ or _var:get("varName")_.
  
-Also note that in none of the functions above the _execution_ needs to be passed into the function (as would be needed when not using a function). The engine will inject the appropiate variable scope when invoking the function. This also means that these functions can be used in exactly the same way when writing expression in CMMN case definitions.
+Also note that in none of the functions above the _execution_ needs to be passed into the function (as would be needed when not using a function). The engine will inject the appropriate variable scope when invoking the function. This also means that these functions can be used in exactly the same way when writing expression in CMMN case definitions.
 
 Additionally, it's possible to register custom functions that can be used in expressions. See the +org.flowable.common.engine.api.delegate.FlowableFunctionDelegate+ interface for more information.
 
@@ -381,7 +381,7 @@ Taking all that in account, a JUnit 5 test looks as follows:
 @FlowableTest
 class MyBusinessProcessTest {
 
-  private ProcessEngine procesEngine;
+  private ProcessEngine processEngine;
   private RuntimeService runtimeService;
   private TaskService taskService;
 

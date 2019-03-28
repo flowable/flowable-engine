@@ -30,7 +30,8 @@ import org.flowable.engine.runtime.ProcessInstance;
 public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
 
     ExecutionEntity createProcessInstanceExecution(ProcessDefinition processDefinition, String predefinedProcessInstanceId,
-                    String businessKey, String tenantId, String initiatorVariableName, String startActivityId);
+                    String businessKey, String processInstanceName, String callbackId, String callbackType, String tenantId, 
+                    String initiatorVariableName, String startActivityId);
 
     ExecutionEntity createChildExecution(ExecutionEntity parentExecutionEntity);
 
@@ -97,9 +98,9 @@ public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
     
     void deleteChildExecutions(ExecutionEntity executionEntity, String deleteReason, boolean cancel);
 
-    void deleteExecutionAndRelatedData(ExecutionEntity executionEntity, String deleteReason, boolean cancel, FlowElement cancelActivity);
+    void deleteExecutionAndRelatedData(ExecutionEntity executionEntity, String deleteReason, boolean deleteHistory, boolean cancel, FlowElement cancelActivity);
     
-    void deleteExecutionAndRelatedData(ExecutionEntity executionEntity, String deleteReason);
+    void deleteExecutionAndRelatedData(ExecutionEntity executionEntity, String deleteReason, boolean deleteHistory);
     
     void deleteRelatedDataForExecution(ExecutionEntity executionEntity, String deleteReason);
 

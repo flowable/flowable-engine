@@ -20,6 +20,7 @@ import org.flowable.variable.api.types.VariableType;
  */
 public class StringType implements VariableType {
 
+    public static final String TYPE_NAME = "string";
     private final int maxLength;
 
     public StringType(int maxLength) {
@@ -28,7 +29,7 @@ public class StringType implements VariableType {
 
     @Override
     public String getTypeName() {
-        return "string";
+        return TYPE_NAME;
     }
 
     @Override

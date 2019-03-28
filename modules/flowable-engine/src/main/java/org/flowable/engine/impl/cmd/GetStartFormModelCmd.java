@@ -23,6 +23,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.Deployment;
@@ -48,7 +49,8 @@ public class GetStartFormModelCmd implements Command<FormInfo>, Serializable {
 
     @Override
     public FormInfo execute(CommandContext commandContext) {
-        FormService formService = CommandContextUtil.getFormService();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        FormService formService = CommandContextUtil.getFormService(commandContext);
         if (formService == null) {
             throw new FlowableIllegalArgumentException("Form engine is not initialized");
         }
@@ -61,10 +63,9 @@ public class GetStartFormModelCmd implements Command<FormInfo>, Serializable {
         if (startElement instanceof StartEvent) {
             StartEvent startEvent = (StartEvent) startElement;
             if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
-                
                 Deployment deployment = CommandContextUtil.getDeploymentEntityManager(commandContext).findById(processDefinition.getDeploymentId());
-                formInfo = formService.getFormInstanceModelByKeyAndParentDeploymentId(
-                        startEvent.getFormKey(), deployment.getParentDeploymentId(), null, processInstanceId, null, processDefinition.getTenantId());
+                formInfo = formService.getFormInstanceModelByKeyAndParentDeploymentId(startEvent.getFormKey(), deployment.getParentDeploymentId(), 
+                                null, processInstanceId, null, processDefinition.getTenantId(), processEngineConfiguration.isFallbackToDefaultTenant());
             }
         }
 
@@ -73,7 +74,7 @@ public class GetStartFormModelCmd implements Command<FormInfo>, Serializable {
             throw new FlowableObjectNotFoundException("Form model for process definition " + processDefinitionId + " cannot be found");
         }
 
-        FormFieldHandler formFieldHandler = CommandContextUtil.getProcessEngineConfiguration(commandContext).getFormFieldHandler();
+        FormFieldHandler formFieldHandler = processEngineConfiguration.getFormFieldHandler();
         formFieldHandler.enrichFormFields(formInfo);
 
         return formInfo;

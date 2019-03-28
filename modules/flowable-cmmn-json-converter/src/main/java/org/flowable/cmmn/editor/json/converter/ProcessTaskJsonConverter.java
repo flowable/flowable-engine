@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.editor.json.converter.util.ListenerConverterUtil;
@@ -26,6 +27,7 @@ import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.ProcessTask;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -57,11 +59,25 @@ public class ProcessTaskJsonConverter extends BaseCmmnJsonConverter implements P
     @Override
     protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor,
             BaseElement baseElement, CmmnModel cmmnModel) {
-        // todo implement rest of the properties
+        
         ProcessTask processTask = (ProcessTask) ((PlanItem) baseElement).getPlanItemDefinition();
 
-        propertiesNode.put(PROPERTY_FALLBACK_TO_DEFAULT_TENANT, processTask.isFallbackToDefaultTenant());
+        if (processTask.getFallbackToDefaultTenant() != null) {
+            propertiesNode.put(PROPERTY_FALLBACK_TO_DEFAULT_TENANT, processTask.getFallbackToDefaultTenant());
+        }
+        
         ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, processTask);
+
+        if (processTask.getInParameters() != null && !processTask.getInParameters().isEmpty()) {
+            ObjectNode inParametersNode = propertiesNode.putObject(CmmnStencilConstants.PROPERTY_PROCESS_IN_PARAMETERS);
+            ArrayNode inParametersArray = inParametersNode.putArray("inParameters");
+            readIOParameters(processTask.getInParameters(), inParametersArray);
+        }
+        if (processTask.getOutParameters() != null && !processTask.getOutParameters().isEmpty()) {
+            ObjectNode outParametersNode = propertiesNode.putObject(CmmnStencilConstants.PROPERTY_PROCESS_OUT_PARAMETERS);
+            ArrayNode outParametersArray = outParametersNode.putArray("outParameters");
+            readIOParameters(processTask.getOutParameters(), outParametersArray);
+        }
     }
 
     @Override
@@ -101,17 +117,47 @@ public class ProcessTaskJsonConverter extends BaseCmmnJsonConverter implements P
         return task;
     }
 
-    private List<IOParameter> readIOParameters(JsonNode parametersNode) {
+    protected List<IOParameter> readIOParameters(JsonNode parametersNode) {
         List<IOParameter> ioParameters = new ArrayList<>();
         for (JsonNode paramNode : parametersNode){
             IOParameter ioParameter = new IOParameter();
-            ioParameter.setSource(paramNode.get("source").asText());
-            ioParameter.setSourceExpression(paramNode.get("sourceExpression").asText());
-            ioParameter.setTarget(paramNode.get("target").asText());
-            ioParameter.setTargetExpression(paramNode.get("targetExpression").asText());
+
+            if (paramNode.has("source")) {
+                ioParameter.setSource(paramNode.get("source").asText());
+            }
+            if (paramNode.has("sourceExpression")) {
+                ioParameter.setSourceExpression(paramNode.get("sourceExpression").asText());
+            }
+            if (paramNode.has("target")) {
+                ioParameter.setTarget(paramNode.get("target").asText());
+            }
+            if (paramNode.has("targetExpression")) {
+                ioParameter.setTargetExpression(paramNode.get("targetExpression").asText());
+            }
             ioParameters.add(ioParameter);
         }
         return ioParameters;
+    }
+
+    protected void readIOParameters(List<IOParameter> ioParameters, ArrayNode parametersNode) {
+        for (IOParameter ioParameter : ioParameters) {
+
+            ObjectNode parameterNode = parametersNode.addObject();
+
+            if (StringUtils.isNotEmpty(ioParameter.getSource())) {
+                parameterNode.put("source", ioParameter.getSource());
+            }
+            if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
+                parameterNode.put("sourceExpression", ioParameter.getSourceExpression());
+            }
+            if (StringUtils.isNotEmpty(ioParameter.getTarget())) {
+                parameterNode.put("target", ioParameter.getTarget());
+            }
+            if (StringUtils.isNotEmpty(ioParameter.getTargetExpression())) {
+                parameterNode.put("targetExpression", ioParameter.getTargetExpression());
+            }
+
+        }
     }
 
     @Override

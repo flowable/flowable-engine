@@ -12,11 +12,11 @@
  */
 package org.flowable.engine.impl.history;
 
+import java.util.Date;
 import java.util.Map;
 
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.common.engine.impl.history.HistoryLevel;
-import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -25,6 +25,7 @@ import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
@@ -53,7 +54,7 @@ public interface HistoryManager {
     /**
      * Record a process-instance ended. Updates the historic process instance if activity history is enabled.
      */
-    void recordProcessInstanceEnd(ExecutionEntity processInstance, String deleteReason, String activityId);
+    void recordProcessInstanceEnd(ExecutionEntity processInstance, String deleteReason, String activityId, Date endTime);
 
     /**
      * Record a process-instance started and record start-event if activity history is enabled.
@@ -92,7 +93,7 @@ public interface HistoryManager {
     /**
      * Record activity end in the case when runtime activity instance does not exist.
      */
-    void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason);
+    void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason, Date endTime);
 
     /**
      * Finds the {@link HistoricActivityInstanceEntity} that is active in the given execution.
@@ -112,28 +113,28 @@ public interface HistoryManager {
     /**
      * Record task as ended, if audit history is enabled.
      */
-    void recordTaskEnd(TaskEntity task, ExecutionEntity execution, String deleteReason);
+    void recordTaskEnd(TaskEntity task, ExecutionEntity execution, String deleteReason, Date endTime);
 
     /**
      * Record task name change, if audit history is enabled.
      */
-    void recordTaskInfoChange(TaskEntity taskEntity, String activityInstanceId);
+    void recordTaskInfoChange(TaskEntity taskEntity, String activityInstanceId, Date changeTime);
 
     /**
      * Record a variable has been created, if audit history is enabled.
      */
-    void recordVariableCreate(VariableInstanceEntity variable);
+    void recordVariableCreate(VariableInstanceEntity variable, Date createTime);
 
     /**
      * Record a variable has been created, if audit history is enabled.
      */
     void recordHistoricDetailVariableCreate(VariableInstanceEntity variable, ExecutionEntity sourceActivityExecution, boolean useActivityId,
-        String activityInstanceId);
+        String activityInstanceId, Date createTime);
 
     /**
      * Record a variable has been updated, if audit history is enabled.
      */
-    void recordVariableUpdate(VariableInstanceEntity variable);
+    void recordVariableUpdate(VariableInstanceEntity variable, Date updateTime);
 
     /**
      * Record a variable has been deleted, if audit history is enabled.
@@ -183,7 +184,7 @@ public interface HistoryManager {
     /**
      * Report form properties submitted, if audit history is enabled.
      */
-    void recordFormPropertiesSubmitted(ExecutionEntity processInstance, Map<String, String> properties, String taskId);
+    void recordFormPropertiesSubmitted(ExecutionEntity processInstance, Map<String, String> properties, String taskId, Date createTime);
 
     /**
      * Record the creation of a new {@link IdentityLink}, if audit history is enabled.
@@ -219,8 +220,32 @@ public interface HistoryManager {
      * @param oldActivityId previous activityId
      * @param newFlowElement new flowElement
      * @param task new user task
+     * @param updateTime
      */
-    void updateActivity(ExecutionEntity executionEntity, String oldActivityId, FlowElement newFlowElement, TaskEntity task);
+    void updateActivity(ExecutionEntity executionEntity, String oldActivityId, FlowElement newFlowElement, TaskEntity task, Date updateTime);
 
-    void updateHistoricActivityInstance(ActivityInstanceEntity activityInstance);
+    /**
+     * Update historic activity instance according to changes done in the runtime activity
+     * @param activityInstance
+     */
+    void updateHistoricActivityInstance(ActivityInstance activityInstance);
+
+    /**
+     * Create new historic activity instance from runtime activity instance
+     *
+     * @param activityInstance activity instance template
+     */
+    void createHistoricActivityInstance(ActivityInstance activityInstance);
+
+    /**
+     * Record historic user task log entry
+     * @param taskLogEntryBuilder historic user task log entry description
+     */
+    void recordHistoricUserTaskLogEntry(HistoricTaskLogEntryBuilder taskLogEntryBuilder);
+
+    /**
+     * Delete historic user task log entry
+     * @param logNumber log identifier
+     */
+    void deleteHistoryUserTaskLog(long logNumber);
 }

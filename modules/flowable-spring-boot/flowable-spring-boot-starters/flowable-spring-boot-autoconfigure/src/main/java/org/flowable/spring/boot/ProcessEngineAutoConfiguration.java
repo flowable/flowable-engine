@@ -68,9 +68,11 @@ import org.springframework.transaction.PlatformTransactionManager;
     FlowableAppProperties.class,
     FlowableIdmProperties.class
 })
-@AutoConfigureAfter({
+@AutoConfigureAfter(value = {
     FlowableJpaAutoConfiguration.class,
     AppEngineAutoConfiguration.class,
+}, name = {
+    "org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration"
 })
 @AutoConfigureBefore({
     AppEngineServicesAutoConfiguration.class,
@@ -192,6 +194,8 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         conf.setActivityFontName(flowableProperties.getActivityFontName());
         conf.setAnnotationFontName(flowableProperties.getAnnotationFontName());
         conf.setLabelFontName(flowableProperties.getLabelFontName());
+
+        conf.setFormFieldValidationEnabled(flowableProperties.isFormFieldValidationEnabled());
 
         IdGenerator idGenerator = getIfAvailable(processIdGenerator, globalIdGenerator);
         if (idGenerator == null) {

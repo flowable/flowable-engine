@@ -152,24 +152,36 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
         }
 
         Map<String, Object> startVariables = null;
-        if (request.getVariables() != null) {
-            startVariables = new HashMap<>();
-            for (RestVariable variable : request.getVariables()) {
-                if (variable.getName() == null) {
-                    throw new FlowableIllegalArgumentException("Variable name is required.");
-                }
-                startVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
-            }
-        }
-
         Map<String, Object> transientVariables = null;
-        if (request.getTransientVariables() != null) {
-            transientVariables = new HashMap<>();
-            for (RestVariable variable : request.getTransientVariables()) {
+        Map<String, Object> startFormVariables = null;
+        if (request.getStartFormVariables() != null) {
+            startFormVariables = new HashMap<>();
+            for (RestVariable variable : request.getStartFormVariables()) {
                 if (variable.getName() == null) {
                     throw new FlowableIllegalArgumentException("Variable name is required.");
                 }
-                transientVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
+                startFormVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
+            }
+            
+        } else {
+            if (request.getVariables() != null) {
+                startVariables = new HashMap<>();
+                for (RestVariable variable : request.getVariables()) {
+                    if (variable.getName() == null) {
+                        throw new FlowableIllegalArgumentException("Variable name is required.");
+                    }
+                    startVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
+                }
+            }
+    
+            if (request.getTransientVariables() != null) {
+                transientVariables = new HashMap<>();
+                for (RestVariable variable : request.getTransientVariables()) {
+                    if (variable.getName() == null) {
+                        throw new FlowableIllegalArgumentException("Variable name is required.");
+                    }
+                    transientVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
+                }
             }
         }
 
@@ -195,6 +207,12 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             }
             if (transientVariables != null) {
                 caseInstanceBuilder.transientVariables(transientVariables);
+            }
+            if (startFormVariables != null) {
+                caseInstanceBuilder.startFormVariables(startFormVariables);
+            }
+            if (request.getOutcome() != null) {
+                caseInstanceBuilder.outcome(request.getOutcome());
             }
             
             if (restApiInterceptor != null) {

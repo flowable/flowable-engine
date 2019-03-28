@@ -170,24 +170,15 @@ public class ProcessInstanceHelper {
         }
 
         ExecutionEntity processInstance = CommandContextUtil.getExecutionEntityManager(commandContext)
-                .createProcessInstanceExecution(processDefinition, predefinedProcessInstanceId, businessKey, tenantId, 
-                                initiatorVariableName, initialFlowElement.getId());
-        
-        processInstance.setName(processInstanceName);
-        
-        // Callbacks
-        if (callbackId != null) {
-            processInstance.setCallbackId(callbackId);
-        }
-        if (callbackType != null) {
-            processInstance.setCallbackType(callbackType);
-        }
+                .createProcessInstanceExecution(processDefinition, predefinedProcessInstanceId, businessKey, processInstanceName,
+                                callbackId, callbackType, tenantId, initiatorVariableName, initialFlowElement.getId());
 
         CommandContextUtil.getHistoryManager(commandContext).recordProcessInstanceStart(processInstance);
 
-        boolean eventDispatcherEnabled = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled();
+        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
+        boolean eventDispatcherEnabled = eventDispatcher != null && eventDispatcher.isEnabled();
         if (eventDispatcherEnabled) {
-            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+            eventDispatcher.dispatchEvent(
                     FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_CREATED, processInstance));
         }
 
@@ -207,7 +198,7 @@ public class ProcessInstanceHelper {
         
         // Fire events
         if (eventDispatcherEnabled) {
-            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher()
+            eventDispatcher
                     .dispatchEvent(FlowableEventBuilder.createEntityWithVariablesEvent(FlowableEngineEventType.ENTITY_INITIALIZED, processInstance, variables, false));
         }
 
@@ -237,8 +228,8 @@ public class ProcessInstanceHelper {
         ExecutionEntity execution = processInstance.getExecutions().get(0); // There will always be one child execution created
         CommandContextUtil.getAgenda(commandContext).planContinueProcessOperation(execution);
 
-        if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
+        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(execution, variables, false));
         }
     }
@@ -315,7 +306,8 @@ public class ProcessInstanceHelper {
             }
         }
 
-        if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             for (MessageEventSubscriptionEntity messageEventSubscription : messageEventSubscriptions) {
                 CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
                     .dispatchEvent(FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING, messageEventSubscription.getActivityId(),

@@ -640,7 +640,7 @@
     from ${prefix}ACT_RU_EXECUTION RES
     inner join ${prefix}ACT_RE_PROCDEF P on RES.PROC_DEF_ID_ = P.ID_
     <if test="includeProcessVariables">
-      left outer join ${prefix}ACT_RU_VARIABLE VAR ON RES.PROC_INST_ID_ = VAR.EXECUTION_ID_ and VAR.TASK_ID_ is null
+        left outer join ${prefix}ACT_RU_VARIABLE VAR ON RES.PROC_INST_ID_ = VAR.EXECUTION_ID_
     </if>
     <include refid="commonSelectExecutionsByQueryCriteriaSql"/>
   </sql>
@@ -783,6 +783,12 @@
         <if test="suspensionState.stateCode == 2">
         	and (RES.SUSPENSION_STATE_ = 2)
         </if>
+      </if>
+      <if test="callbackId != null">
+            and CALLBACK_ID_ = #{callbackId}
+      </if>
+      <if test="callbackType != null">
+           and CALLBACK_TYPE_ = #{callbackType}
       </if>
       <if test="tenantId != null">
         and RES.TENANT_ID_ = #{tenantId}
@@ -992,6 +998,12 @@
             <if test="orQueryObject.suspensionState.stateCode == 2">
               or (RES.SUSPENSION_STATE_ = 2)
             </if>
+          </if>
+          <if test="orQueryObject.callbackId != null">
+              or CALLBACK_ID_ = #{orQueryObject.callbackId}
+          </if>
+          <if test="orQueryObject.callbackType != null">
+              or CALLBACK_TYPE_ = #{orQueryObject.callbackType}
           </if>
           <if test="orQueryObject.tenantId != null">
             or RES.TENANT_ID_ = #{orQueryObject.tenantId}

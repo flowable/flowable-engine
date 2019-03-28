@@ -21,9 +21,11 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
@@ -62,7 +64,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
         
         // The current execution always stops here
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
-        executionEntityManager.deleteExecutionAndRelatedData(executionEntity, createDeleteReason(executionEntity.getCurrentActivityId()));
+        executionEntityManager.deleteExecutionAndRelatedData(executionEntity, createDeleteReason(executionEntity.getCurrentActivityId()), false);
         
         if (terminateAll) {
             terminateAllBehaviour(executionEntity, commandContext, executionEntityManager);
@@ -79,7 +81,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
         deleteExecutionEntities(executionEntityManager, rootExecutionEntity, execution, deleteReason);
         endAllHistoricActivities(rootExecutionEntity.getId(), deleteReason);
         CommandContextUtil.getHistoryManager(commandContext).recordProcessInstanceEnd(rootExecutionEntity,
-                deleteReason, execution.getCurrentActivityId());
+                deleteReason, execution.getCurrentActivityId(), commandContext.getCurrentEngineConfiguration().getClock().getCurrentTime());
     }
 
     protected void defaultTerminateEndEventBehaviour(ExecutionEntity execution, CommandContext commandContext,
@@ -97,7 +99,8 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
         if (scopeExecutionEntity.isProcessInstanceType() && scopeExecutionEntity.getSuperExecutionId() == null) {
             endAllHistoricActivities(scopeExecutionEntity.getId(), deleteReason);
             deleteExecutionEntities(executionEntityManager, scopeExecutionEntity, execution, deleteReason);
-            CommandContextUtil.getHistoryManager(commandContext).recordProcessInstanceEnd(scopeExecutionEntity, deleteReason, execution.getCurrentActivityId());
+            CommandContextUtil.getHistoryManager(commandContext).recordProcessInstanceEnd(scopeExecutionEntity, deleteReason, execution.getCurrentActivityId(),
+                commandContext.getCurrentEngineConfiguration().getClock().getCurrentTime());
 
         } else if (scopeExecutionEntity.getCurrentFlowElement() != null
                 && scopeExecutionEntity.getCurrentFlowElement() instanceof SubProcess) { // SubProcess
@@ -166,13 +169,18 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
         List<HistoricActivityInstanceEntity> historicActivityInstances = CommandContextUtil.getHistoricActivityInstanceEntityManager()
                 .findUnfinishedHistoricActivityInstancesByProcessInstanceId(processInstanceId);
 
+        Clock clock = CommandContextUtil.getProcessEngineConfiguration().getClock();
         for (HistoricActivityInstanceEntity historicActivityInstance : historicActivityInstances) {
-            historicActivityInstance.markEnded(deleteReason);
+            historicActivityInstance.markEnded(deleteReason, clock.getCurrentTime());
 
             // Fire event
             ProcessEngineConfigurationImpl config = CommandContextUtil.getProcessEngineConfiguration();
-            if (config != null && config.getEventDispatcher().isEnabled()) {
-                config.getEventDispatcher().dispatchEvent(
+            FlowableEventDispatcher eventDispatcher = null;
+            if (config != null) {
+                eventDispatcher = config.getEventDispatcher();
+            }
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(
                         FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance));
             }
         }
@@ -212,15 +220,16 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
         
         CommandContextUtil.getExecutionEntityManager().deleteChildExecutions(rootExecutionEntity, null, null, deleteReason, true, terminateEndEvent);
         sendProcessInstanceCompletedEvent(rootExecutionEntity, terminateEndEvent);
-        executionEntityManager.deleteExecutionAndRelatedData(rootExecutionEntity, deleteReason);
+        executionEntityManager.deleteExecutionAndRelatedData(rootExecutionEntity, deleteReason, false);
     }
 
     protected void sendProcessInstanceCompletedEvent(ExecutionEntity execution, FlowElement terminateEndEvent) {
         Process process = ProcessDefinitionUtil.getProcess(execution.getProcessDefinitionId());
         CommandContextUtil.getProcessEngineConfiguration().getListenerNotificationHelper()
             .executeExecutionListeners(process, execution, ExecutionListener.EVENTNAME_END);
-        
-        if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+
+        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             if ((execution.isProcessInstanceType() && execution.getSuperExecutionId() == null) ||
                     (execution.getParentId() == null && execution.getSuperExecutionId() != null)) {
 
@@ -234,7 +243,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
                 }
                 
                 if (fireEvent) {
-                    CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher()
+                    eventDispatcher
                         .dispatchEvent(FlowableEventBuilder.createTerminateEvent(execution, terminateEndEvent));
                 }
                 

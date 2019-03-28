@@ -55,6 +55,18 @@ public interface DynamicBpmnService {
     ObjectNode changeScriptTaskScript(String id, String script);
 
     void changeScriptTaskScript(String id, String script, ObjectNode infoNode);
+    
+    ObjectNode changeSkipExpression(String id, String skipExpression);
+
+    void changeSkipExpression(String id, String skipExpression, ObjectNode infoNode);
+    
+    void removeSkipExpression(String id, ObjectNode infoNode);
+    
+    ObjectNode enableSkipExpression();
+    
+    void enableSkipExpression(ObjectNode infoNode);
+    
+    void removeEnableSkipExpression(ObjectNode infoNode);
 
     ObjectNode changeUserTaskName(String id, String name);
 

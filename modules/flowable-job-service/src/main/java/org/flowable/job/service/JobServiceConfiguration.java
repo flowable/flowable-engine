@@ -460,7 +460,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     
     public JobServiceConfiguration addJobHandler(String type, JobHandler jobHandler) {
         if (this.jobHandlers == null) {
-            this.jobHandlers = new HashMap<String, JobHandler>();
+            this.jobHandlers = new HashMap<>();
         }
         this.jobHandlers.put(type, jobHandler);
         return this;

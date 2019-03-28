@@ -112,7 +112,9 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
         if (this.variables == null) {
             this.variables = new HashMap<>();
         }
-        this.variables.putAll(variables);
+        if (variables != null) {
+            this.variables.putAll(variables);
+        }
         return this;
     }
 
@@ -130,7 +132,9 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
         if (this.transientVariables == null) {
             this.transientVariables = new HashMap<>();
         }
-        this.transientVariables.putAll(transientVariables);
+        if (transientVariables != null) {
+            this.transientVariables.putAll(transientVariables);
+        }
         return this;
     }
 
@@ -148,7 +152,9 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
         if (this.startFormVariables == null) {
             this.startFormVariables = new HashMap<>();
         }
-        this.startFormVariables.putAll(startFormVariables);
+        if (startFormVariables != null) {
+            this.startFormVariables.putAll(startFormVariables);
+        }
         return this;
     }
 

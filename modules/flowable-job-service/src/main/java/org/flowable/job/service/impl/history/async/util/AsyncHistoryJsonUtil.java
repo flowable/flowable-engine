@@ -34,13 +34,28 @@ public class AsyncHistoryJsonUtil {
         }
     }
 
+    public static void putIfNotNull(ObjectNode map, String key, String value) {
+        if (value != null) {
+            map.put(key, value);
+        }
+    }
+
     public static void putIfNotNull(Map<String, String> map, String key, int value) {
         map.put(key, Integer.toString(value));
+    }
+    public static void putIfNotNull(ObjectNode map, String key, int value) {
+        map.put(key, value);
     }
     
     public static void putIfNotNull(Map<String, String> map, String key, Double value) {
         if (value != null) {
             map.put(key, Double.toString(value));
+        }
+    }
+
+    public static void putIfNotNull(ObjectNode map, String key, Double value) {
+        if (value != null) {
+            map.put(key, value);
         }
     }
     
@@ -50,7 +65,19 @@ public class AsyncHistoryJsonUtil {
         }
     }
 
+    public static void putIfNotNull(ObjectNode map, String key, Long value) {
+        if (value != null) {
+            map.put(key, value);
+        }
+    }
+
     public static void putIfNotNull(Map<String, String> map, String key, Date value) {
+        if (value != null) {
+            map.put(key, AsyncHistoryDateUtil.formatDate(value));
+        }
+    }
+
+    public static void putIfNotNull(ObjectNode map, String key, Date value) {
         if (value != null) {
             map.put(key, AsyncHistoryDateUtil.formatDate(value));
         }
@@ -59,6 +86,12 @@ public class AsyncHistoryJsonUtil {
     public static void putIfNotNull(Map<String, String> map, String key, Boolean value) {
         if (value != null) {
             map.put(key, Boolean.toString(value));
+        }
+    }
+
+    public static void putIfNotNull(ObjectNode map, String key, Boolean value) {
+        if (value != null) {
+            map.put(key, value);
         }
     }
 

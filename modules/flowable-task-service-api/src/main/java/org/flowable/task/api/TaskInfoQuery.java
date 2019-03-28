@@ -245,12 +245,12 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
     T scopeDefinitionId(String scopeDefinitionId);
     
     /**
-     * Select all tasks for the given process id and its children.
+     * Select all tasks for the given process instance id and its children.
      */
     T processInstanceIdWithChildren(String processInstanceId);
     
     /**
-     * Select all tasks for the given process id and its children.
+     * Select all tasks for the given case instance id and its children.
      */
     T caseInstanceIdWithChildren(String caseInstanceId);
 
@@ -278,6 +278,11 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * Only select tasks with form key.
      */
     T taskWithFormKey();
+
+    /**
+     * Only select tasks with the given formKey.
+     */
+    T taskFormKey(String formKey);
 
     /**
      * Only select tasks with the given taskDefinitionKey. The task definition key is the id of the userTask: &lt;userTask id="xxx" .../&gt;

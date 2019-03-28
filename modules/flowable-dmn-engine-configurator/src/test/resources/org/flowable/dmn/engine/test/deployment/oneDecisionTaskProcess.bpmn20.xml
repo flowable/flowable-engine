@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:flowable="http://flowable.org/bpmn"
   targetNamespace="Examples">
 
   <process id="oneDecisionTaskProcess" name="The One Decision Task Process">
@@ -9,11 +9,11 @@
   
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theDecisionTask" />
-    <serviceTask id="theDecisionTask" activiti:type="dmn">
+    <serviceTask id="theDecisionTask" flowable:type="dmn">
       <extensionElements>
-        <activiti:field name="decisionTableReferenceKey">
-          <activiti:string><![CDATA[decision1]]></activiti:string>
-        </activiti:field>
+        <flowable:field name="decisionTableReferenceKey">
+          <flowable:string><![CDATA[decision1]]></flowable:string>
+        </flowable:field>
       </extensionElements>
     </serviceTask>
     <sequenceFlow id="flow2" sourceRef="theDecisionTask" targetRef="theEnd" />

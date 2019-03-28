@@ -13,6 +13,8 @@
 
 package org.flowable.cmmn.rest.service.api.history;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +29,8 @@ import org.flowable.task.api.Task;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import net.javacrumbs.jsonunit.core.Option;
+
 /**
  * Test for REST-operation related to the historic case instance identity links resource.
  * 
@@ -39,11 +43,6 @@ public class HistoricCaseInstanceIdentityLinkCollectionResourceTest extends Base
      */
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testGetIdentityLinks() throws Exception {
-        HashMap<String, Object> caseVariables = new HashMap<>();
-        caseVariables.put("stringVar", "Azerty");
-        caseVariables.put("intVar", 67890);
-        caseVariables.put("booleanVar", false);
-
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         taskService.complete(task.getId());
@@ -58,39 +57,46 @@ public class HistoricCaseInstanceIdentityLinkCollectionResourceTest extends Base
 
         JsonNode linksArray = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertEquals(3, linksArray.size());
-        Map<String, JsonNode> linksMap = new HashMap<>();
-        for (JsonNode linkNode : linksArray) {
-            linksMap.put(linkNode.get("userId").asText(), linkNode);
-        }
-        JsonNode participantNode = linksMap.get("kermit");
-        assertNotNull(participantNode);
-        assertEquals("participant", participantNode.get("type").asText());
-        assertEquals("kermit", participantNode.get("userId").asText());
-        assertTrue(participantNode.get("groupId").isNull());
-        assertTrue(participantNode.get("taskId").isNull());
-        assertTrue(participantNode.get("taskUrl").isNull());
-        assertEquals(caseInstance.getId(), participantNode.get("caseInstanceId").asText());
-        assertNotNull(participantNode.get("caseInstanceUrl").asText());
-
-        participantNode = linksMap.get("fozzie");
-        assertNotNull(participantNode);
-        assertEquals("participant", participantNode.get("type").asText());
-        assertEquals("fozzie", participantNode.get("userId").asText());
-        assertTrue(participantNode.get("groupId").isNull());
-        assertTrue(participantNode.get("taskId").isNull());
-        assertTrue(participantNode.get("taskUrl").isNull());
-        assertEquals(caseInstance.getId(), participantNode.get("caseInstanceId").asText());
-        assertNotNull(participantNode.get("caseInstanceUrl").asText());
-
-        participantNode = linksMap.get("test");
-        assertNotNull(participantNode);
-        assertEquals("participant", participantNode.get("type").asText());
-        assertEquals("test", participantNode.get("userId").asText());
-        assertTrue(participantNode.get("groupId").isNull());
-        assertTrue(participantNode.get("taskId").isNull());
-        assertTrue(participantNode.get("taskUrl").isNull());
-        assertEquals(caseInstance.getId(), participantNode.get("caseInstanceId").asText());
-        assertNotNull(participantNode.get("caseInstanceUrl").asText());
+        String caseInstanceId = caseInstance.getId();
+        assertThatJson(linksArray)
+            .when(Option.IGNORING_ARRAY_ORDER)
+            .isEqualTo("["
+                + "  {"
+                + "    'type': 'participant',"
+                + "    'userId': 'kermit',"
+                + "    'groupId': null,"
+                + "    'taskId': null,"
+                + "    'taskUrl': null,"
+                + "    'caseInstanceId': '" + caseInstanceId + "',"
+                + "    'caseInstanceUrl': '${json-unit.any-string}'"
+                + "  },"
+                + "  {"
+                + "    'type': 'participant',"
+                + "    'userId': 'fozzie',"
+                + "    'groupId': null,"
+                + "    'taskId': null,"
+                + "    'taskUrl': null,"
+                + "    'caseInstanceId': '" + caseInstanceId + "',"
+                + "    'caseInstanceUrl': '${json-unit.any-string}'"
+                + "  },"
+                + "  {"
+                + "    'type': 'participant',"
+                + "    'userId': 'test',"
+                + "    'groupId': null,"
+                + "    'taskId': null,"
+                + "    'taskUrl': null,"
+                + "    'caseInstanceId': '" + caseInstanceId + "',"
+                + "    'caseInstanceUrl': '${json-unit.any-string}'"
+                + "  },"
+                + "  {"
+                + "    'type': 'participant',"
+                + "    'userId': 'test2',"
+                + "    'groupId': null,"
+                + "    'taskId': null,"
+                + "    'taskUrl': null,"
+                + "    'caseInstanceId': '" + caseInstanceId + "',"
+                + "    'caseInstanceUrl': '${json-unit.any-string}'"
+                + "  }"
+                + "]");
     }
 }

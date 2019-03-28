@@ -696,7 +696,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
     })
     public void testCallActivityAsyncCompleteRealExecutor() {
         runtimeService.startProcessInstanceByKey("testAsyncComplete");
-        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(10000L, 100L);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(20000L, 200L);
         assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     }
 

@@ -3624,7 +3624,7 @@ To create a custom client refer to link:$$http://hc.apache.org/httpcomponents-cl
         </flowable:string>
     </flowable:field>
   </extensionElements>
-</sericeTask>
+</serviceTask>
 ----
 
 [[bpmnHttpTaskConfiguration]]

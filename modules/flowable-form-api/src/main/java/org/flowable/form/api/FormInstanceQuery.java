@@ -118,17 +118,17 @@ public interface FormInstanceQuery extends Query<FormInstanceQuery, FormInstance
     /**
      * Only select submitted forms that have the given tenant id.
      */
-    FormInstanceQuery deploymentTenantId(String tenantId);
+    FormInstanceQuery tenantId(String tenantId);
 
     /**
      * Only select submitted forms with a tenant id like the given one.
      */
-    FormInstanceQuery deploymentTenantIdLike(String tenantIdLike);
+    FormInstanceQuery tenantIdLike(String tenantIdLike);
 
     /**
      * Only select submitted forms that do not have a tenant id.
      */
-    FormInstanceQuery deploymentWithoutTenantId();
+    FormInstanceQuery withoutTenantId();
 
     /**
      * Only select submitted forms that do not have a task id.

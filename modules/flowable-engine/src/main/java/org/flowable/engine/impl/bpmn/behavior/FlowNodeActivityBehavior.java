@@ -61,5 +61,4 @@ public abstract class FlowNodeActivityBehavior implements TriggerableActivityBeh
         elementType = elementType.substring(0, 1).toLowerCase() + elementType.substring(1);
         return elementType;
     }
-
 }

@@ -98,7 +98,7 @@ public class HistoricVariableInstanceCollectionResourceTest extends BaseSpringRe
                 if (variableName.equals(name)) {
                     variableFound = true;
                     if (variableValue instanceof Boolean) {
-                        assertTrue("Variable value is not equal", variableNode.get("value").asBoolean() == (Boolean) variableValue);
+                        assertEquals("Variable value is not equal", variableNode.get("value").asBoolean(), (boolean) (Boolean) variableValue);
                     } else if (variableValue instanceof Integer) {
                         assertEquals("Variable value is not equal", variableNode.get("value").asInt(), (int) (Integer) variableValue);
                     } else {

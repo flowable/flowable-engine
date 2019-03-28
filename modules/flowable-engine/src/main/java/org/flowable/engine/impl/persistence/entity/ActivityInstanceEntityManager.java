@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.persistence.entity;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -75,8 +76,9 @@ public interface ActivityInstanceEntityManager extends EntityManager<ActivityIns
      * Record task information change
      *
      * @param taskEntity task entity which was changed
+     * @param changeTime the time of the change
      */
-    void recordTaskInfoChange(TaskEntity taskEntity);
+    void recordTaskInfoChange(TaskEntity taskEntity, Date changeTime);
 
     /**
      * Synchronize data with the new user task execution
@@ -96,4 +98,10 @@ public interface ActivityInstanceEntityManager extends EntityManager<ActivityIns
      */
     void updateActivityInstancesProcessDefinitionId(String newProcessDefinitionId, String processInstanceId);
 
+    /**
+     * record that sequence flow was taken
+     *
+     * @param execution execution which executed sequence flow
+     */
+    void recordSequenceFlowTaken(ExecutionEntity execution);
 }

@@ -50,9 +50,11 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
         this.processInstanceId = runtimeService.startProcessInstanceByKey("twoTasksProcess", vars).getId();
 
         // Add some comments
-        taskService.addComment(null, processInstanceId, "Hello World");
-        taskService.addComment(null, processInstanceId, "Hello World2");
-        taskService.addComment(null, processInstanceId, "Hello World3");
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            taskService.addComment(null, processInstanceId, "Hello World");
+            taskService.addComment(null, processInstanceId, "Hello World2");
+            taskService.addComment(null, processInstanceId, "Hello World3");
+        }
 
         // Change some variables
         runtimeService.setVariable(processInstanceId, "var1", "new Value");
@@ -132,7 +134,7 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
     public void testIncludeActivities() {
         ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeActivities().singleResult();
         List<HistoricData> events = log.getHistoricData();
-        assertEquals(5, events.size());
+        assertEquals(9, events.size());
 
         for (HistoricData event : events) {
             assertTrue(event instanceof HistoricActivityInstance);
@@ -171,7 +173,7 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
             ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeTasks().includeActivities().includeComments().includeVariables()
                     .includeVariableUpdates().singleResult();
             List<HistoricData> events = log.getHistoricData();
-            assertEquals(15, events.size());
+            assertEquals(19, events.size());
         }
     }
 

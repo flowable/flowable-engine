@@ -13,6 +13,7 @@
 package org.flowable.job.service.impl.asyncexecutor;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -61,9 +62,11 @@ public class DefaultAsyncRunnableExecutionExceptionHandler implements AsyncRunna
 
                 // Dispatch an event, indicating job execution failed in a
                 // try-catch block, to prevent the original exception to be swallowed
-                if (CommandContextUtil.getEventDispatcher().isEnabled()) {
+                FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
+                if (eventDispatcher != null && eventDispatcher.isEnabled()) {
                     try {
-                        CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityExceptionEvent(FlowableEngineEventType.JOB_EXECUTION_FAILURE, job, exception));
+                        eventDispatcher
+                            .dispatchEvent(FlowableJobEventBuilder.createEntityExceptionEvent(FlowableEngineEventType.JOB_EXECUTION_FAILURE, job, exception));
                     } catch (Throwable ignore) {
                         LOGGER.warn("Exception occurred while dispatching job failure event, ignoring.", ignore);
                     }

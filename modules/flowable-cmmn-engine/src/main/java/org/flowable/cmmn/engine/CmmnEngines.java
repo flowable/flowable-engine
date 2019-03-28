@@ -71,7 +71,7 @@ public abstract class CmmnEngines {
             }
             for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext();) {
                 URL resource = iterator.next();
-                LOGGER.info("Initializing cmmn engine using configuration '{}'", resource.toString());
+                LOGGER.info("Initializing cmmn engine using configuration '{}'", resource);
                 initCmmnEngineFromResource(resource);
             }
 
@@ -83,7 +83,7 @@ public abstract class CmmnEngines {
 
             while (resources.hasMoreElements()) {
                 URL resource = resources.nextElement();
-                LOGGER.info("Initializing cmmn engine using Spring configuration '{}'", resource.toString());
+                LOGGER.info("Initializing cmmn engine using Spring configuration '{}'", resource);
                 initCmmnEngineFromSpringResource(resource);
             }
 
@@ -105,7 +105,7 @@ public abstract class CmmnEngines {
             cmmnEngineInfosByResourceUrl.put(resource.toString(), cmmnEngineInfo);
 
         } catch (Exception e) {
-            throw new FlowableException("couldn't initialize cmmn engine from spring configuration resource " + resource.toString() + ": " + e.getMessage(), e);
+            throw new FlowableException("couldn't initialize cmmn engine from spring configuration resource " + resource + ": " + e.getMessage(), e);
         }
     }
 

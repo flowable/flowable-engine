@@ -49,7 +49,11 @@ public class TaskUpdatedHistoryJsonTransformer extends AbstractTaskHistoryJsonTr
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
         HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskEntity(historicalData, commandContext);
 
-        Date lastUpdateTime = getDateFromJson(historicalData, AsyncHistorySession.TIMESTAMP);
+        Date lastUpdateTime = getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_LAST_UPDATE_TIME);
+        if (lastUpdateTime == null) {
+            // this is for backwards compatibility for jobs that don't have the last update time set
+            lastUpdateTime = getDateFromJson(historicalData, AsyncHistorySession.TIMESTAMP);
+        }
         if (historicTaskInstance.getLastUpdateTime() == null || !historicTaskInstance.getLastUpdateTime().after(lastUpdateTime)) {
            copyCommonHistoricTaskInstanceFields(historicalData, historicTaskInstance);
         

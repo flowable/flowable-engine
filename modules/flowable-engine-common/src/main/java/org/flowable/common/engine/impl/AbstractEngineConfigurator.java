@@ -83,7 +83,7 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
     protected abstract List<EngineDeployer> getCustomDeployers();
 
     /**
-     * @return The path to the Mybatis cfg file that's normally used for the engine (so the full cfg, not an individual mapper).
+     * @return The path to the Mybatis cfg file that is normally used for the engine (so the full cfg, not an individual mapper).
      *         Return null in case no custom mappers should be loaded.
      */
     protected abstract String getMybatisCfgPath();
@@ -218,6 +218,7 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
         initSessionFactories(engineConfiguration, targetEngineConfiguration);
         initEventDispatcher(engineConfiguration, targetEngineConfiguration);
         initClock(engineConfiguration, targetEngineConfiguration);
+        initVariableTypes(engineConfiguration, targetEngineConfiguration);
     }
 
     protected void initEngineConfigurations(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
@@ -284,6 +285,12 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
 
     protected void initClock(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
         targetEngineConfiguration.setClock(engineConfiguration.getClock());
+    }
+
+    protected void initVariableTypes(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
+        if (engineConfiguration instanceof HasVariableTypes && targetEngineConfiguration instanceof HasVariableTypes) {
+            ((HasVariableTypes) targetEngineConfiguration).setVariableTypes(((HasVariableTypes) engineConfiguration).getVariableTypes());
+        }
     }
 
     protected abstract List<Class<? extends Entity>> getEntityInsertionOrder();

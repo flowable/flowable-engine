@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.impl.FlowableVersions;
 import org.flowable.spring.boot.actuate.endpoint.ProcessEngineEndpoint;
+import org.flowable.spring.boot.actuate.info.FlowableInfoContributor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,6 +86,14 @@ public class ActuatorApplicationTest {
         assertThat(response.getBody()).containsKeys("flowable");
         Map<String, Object> flowableInfo = (Map<String, Object>) response.getBody().get("flowable");
         assertThat(flowableInfo)
-            .containsExactly(entry("version", FlowableVersions.CURRENT_VERSION));
+            .containsExactly(
+                entry("dbVersion", FlowableVersions.CURRENT_VERSION),
+                entry("version", flowableInfoContributorImplementationVersion())
+            );
+    }
+
+    private String flowableInfoContributorImplementationVersion() {
+        Package pkg = FlowableInfoContributor.class.getPackage();
+        return pkg == null ? null : pkg.getImplementationVersion();
     }
 }

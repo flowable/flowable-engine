@@ -43,6 +43,21 @@ public class FormInstanceEntityManagerImpl extends AbstractEntityManager<FormIns
     public List<FormInstance> findFormInstancesByQueryCriteria(FormInstanceQueryImpl formInstanceQuery) {
         return formInstanceDataManager.findFormInstancesByQueryCriteria(formInstanceQuery);
     }
+    
+    @Override
+    public void deleteFormInstancesByFormDefinitionId(String formDefinitionId) {
+        formInstanceDataManager.deleteFormInstancesByFormDefinitionId(formDefinitionId);
+    }
+    
+    @Override
+    public void deleteFormInstancesByProcessDefinitionId(String processDefinitionId) {
+        formInstanceDataManager.deleteFormInstancesByProcessDefinitionId(processDefinitionId);
+    }
+
+    @Override
+    public void deleteFormInstancesByScopeDefinitionId(String scopeDefinitionId) {
+        formInstanceDataManager.deleteFormInstancesByScopeDefinitionId(scopeDefinitionId);
+    }
 
     @Override
     protected DataManager<FormInstanceEntity> getDataManager() {

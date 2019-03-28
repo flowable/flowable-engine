@@ -64,9 +64,11 @@ import org.springframework.transaction.PlatformTransactionManager;
     FlowableCmmnProperties.class,
     FlowableAppProperties.class
 })
-@AutoConfigureAfter({
+@AutoConfigureAfter(value = {
     AppEngineAutoConfiguration.class,
     ProcessEngineAutoConfiguration.class,
+}, name = {
+    "org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration"
 })
 @AutoConfigureBefore({
     AppEngineServicesAutoConfiguration.class,
@@ -143,6 +145,8 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         configuration.setHistoryLevel(flowableProperties.getHistoryLevel());
 
         configuration.setEnableSafeCmmnXml(cmmnProperties.isEnableSafeXml());
+
+        configuration.setFormFieldValidationEnabled(flowableProperties.isFormFieldValidationEnabled());
 
         return configuration;
     }

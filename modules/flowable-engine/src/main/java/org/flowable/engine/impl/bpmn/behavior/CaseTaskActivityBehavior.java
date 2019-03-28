@@ -32,6 +32,8 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.EntityLinkUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Start a CMMN case with the case service task
@@ -39,6 +41,8 @@ import org.flowable.engine.impl.util.EntityLinkUtil;
  * @author Tijs Rademakers
  */
 public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior implements SubProcessActivityBehavior {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CaseTaskActivityBehavior.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -78,26 +82,45 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
         Map<String, Object> inParameters = new HashMap<>();
 
         // copy process variables
-        for (IOParameter ioParameter : caseServiceTask.getInParameters()) {
+        for (IOParameter inParameter : caseServiceTask.getInParameters()) {
+
             Object value = null;
-            if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
-                Expression expression = expressionManager.createExpression(ioParameter.getSourceExpression().trim());
+            if (StringUtils.isNotEmpty(inParameter.getSourceExpression())) {
+                Expression expression = expressionManager.createExpression(inParameter.getSourceExpression().trim());
                 value = expression.getValue(execution);
 
             } else {
-                value = execution.getVariable(ioParameter.getSource());
+                value = execution.getVariable(inParameter.getSource());
             }
-            inParameters.put(ioParameter.getTarget(), value);
-        }
 
-        String caseInstanceId = processEngineConfiguration.getCaseInstanceService().startCaseInstanceByKey(caseServiceTask.getCaseDefinitionKey(), 
-                        caseInstanceName, businessKey, execution.getId(), execution.getTenantId(), caseServiceTask.isFallbackToDefaultTenant(), inParameters);
+            String variableName = null;
+            if (StringUtils.isNotEmpty(inParameter.getTargetExpression())) {
+                Expression expression = expressionManager.createExpression(inParameter.getTargetExpression());
+                Object variableNameValue = expression.getValue(execution);
+                if (variableNameValue != null) {
+                    variableName = variableNameValue.toString();
+                } else {
+                    LOGGER.warn("In parameter target expression {} did not resolve to a variable name, this is most likely a programmatic error",
+                        inParameter.getTargetExpression());
+                }
+
+            } else if (StringUtils.isNotEmpty(inParameter.getTarget())){
+                variableName = inParameter.getTarget();
+
+            }
+
+            inParameters.put(variableName, value);
+        }
+        
+        String caseInstanceId = caseInstanceService.generateNewCaseInstanceId();
         
         if (processEngineConfiguration.isEnableEntityLinks()) {
             EntityLinkUtil.copyExistingEntityLinks(execution.getProcessInstanceId(), caseInstanceId, ScopeTypes.CMMN);
             EntityLinkUtil.createNewEntityLink(execution.getProcessInstanceId(), caseInstanceId, ScopeTypes.CMMN);
         }
 
+        caseInstanceService.startCaseInstanceByKey(caseServiceTask.getCaseDefinitionKey(), caseInstanceId,
+                        caseInstanceName, businessKey, execution.getId(), execution.getTenantId(), caseServiceTask.isFallbackToDefaultTenant(), inParameters);
     }
     
     @Override

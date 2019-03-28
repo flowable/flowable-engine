@@ -12,6 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.runtime;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
@@ -21,9 +24,6 @@ import org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * @author Dennis Federico
  */
@@ -32,7 +32,9 @@ public class UserEventListenerInstanceQueryImpl implements UserEventListenerInst
     protected PlanItemInstanceQuery innerQuery;
 
     UserEventListenerInstanceQueryImpl(CommandExecutor commandExecutor) {
-        innerQuery = new PlanItemInstanceQueryImpl(commandExecutor).planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER);
+        innerQuery = new PlanItemInstanceQueryImpl(commandExecutor)
+            .planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
+            .planItemInstanceStateAvailable();
     }
 
     @Override
@@ -80,6 +82,12 @@ public class UserEventListenerInstanceQueryImpl implements UserEventListenerInst
     @Override
     public UserEventListenerInstanceQuery stateAvailable() {
         innerQuery.planItemInstanceStateAvailable();
+        return this;
+    }
+
+    @Override
+    public UserEventListenerInstanceQuery stateUnavailable() {
+        innerQuery.planItemInstanceStateUnavailable();
         return this;
     }
 

@@ -22,7 +22,7 @@ public class ProcessTask extends Task {
 
     protected String processRefExpression;
     protected String processRef;
-    protected boolean fallbackToDefaultTenant;
+    protected Boolean fallbackToDefaultTenant;
 
     protected Process process;
 
@@ -69,11 +69,11 @@ public class ProcessTask extends Task {
         this.outParameters = outParameters;
     }
 
-    public void setFallbackToDefaultTenant(boolean fallbackToDefaultTenant) {
+    public void setFallbackToDefaultTenant(Boolean fallbackToDefaultTenant) {
         this.fallbackToDefaultTenant = fallbackToDefaultTenant;
     }
 
-    public boolean isFallbackToDefaultTenant() {
+    public Boolean getFallbackToDefaultTenant() {
         return fallbackToDefaultTenant;
     }
 

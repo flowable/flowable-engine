@@ -39,6 +39,8 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * @author Joram Barrez
  * @author Tom Van Buskirk
@@ -354,9 +356,9 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
         taskService.complete(task.getId());
         assertEquals(0, taskService.createTaskQuery().count());
-
+        
         assertEquals("Found executions: " + runtimeService.createExecutionQuery().list(), 0, runtimeService.createExecutionQuery().count());
-        assertProcessEnded(pi.getId());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).count());
     }
 
     @Test
@@ -543,6 +545,50 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         varMap.put("input", 3);
         processInstance = runtimeService.startProcessInstanceByKey("inclusiveGwSkipExpression", varMap);
         assertTrue(processInstance.isEnded());
+    }
+    
+    @Test
+    @Deployment
+    public void testSkipExpressionWithDefinitionInfo() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("inclusiveGwSkipExpression").singleResult();
+        ObjectNode infoNode = dynamicBpmnService.enableSkipExpression();
+        dynamicBpmnService.saveProcessDefinitionInfo(processDefinition.getId(), infoNode);
+        Map<String, Object> varMap = new HashMap<>();
+        varMap.put("input", 10);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("inclusiveGwSkipExpression", varMap);
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(task);
+        assertEquals("theTask1", task.getTaskDefinitionKey());
+
+        varMap = new HashMap<>();
+        varMap.put("input", 30);
+        processInstance = runtimeService.startProcessInstanceByKey("inclusiveGwSkipExpression", varMap);
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+
+        dynamicBpmnService.removeEnableSkipExpression(infoNode);
+        dynamicBpmnService.saveProcessDefinitionInfo(processDefinition.getId(), infoNode);
+        varMap = new HashMap<>();
+        varMap.put("input", 10);
+        processInstance = runtimeService.startProcessInstanceByKey("inclusiveGwSkipExpression", varMap);
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(task);
+        assertEquals("theTask2", task.getTaskDefinitionKey());
+        
+        dynamicBpmnService.enableSkipExpression(infoNode);
+        dynamicBpmnService.changeSkipExpression("flow2", "${input < 30}", infoNode);
+        dynamicBpmnService.changeSkipExpression("flow3", "${input >= 30}", infoNode);
+        dynamicBpmnService.saveProcessDefinitionInfo(processDefinition.getId(), infoNode);
+        varMap = new HashMap<>();
+        varMap.put("input", 30);
+        processInstance = runtimeService.startProcessInstanceByKey("inclusiveGwSkipExpression", varMap);
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        for (Task taskObject : tasks) {
+            if (!"theTask2".equals(taskObject.getTaskDefinitionKey()) && !"theTask3".equals(taskObject.getTaskDefinitionKey())) {
+                fail("expected theTask2 and theTask3 only");
+            }
+        }
+        assertEquals(2, tasks.size());
     }
 
     @Test
@@ -740,8 +786,8 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
         //Finish the process
         taskService.complete(task.getId());
-
-        assertProcessEnded(processInstance.getId());
+        
+        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
     }
 
     @Test
@@ -864,8 +910,8 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
         //Finish the process
         taskService.complete(task.getId());
-
-        assertProcessEnded(processInstance.getId());
+        
+        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
     }
 
 
@@ -1017,8 +1063,8 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
         //Finish the process
         tasks.forEach(this::completeTask);
-
-        assertProcessEnded(processInstance.getId());
+        
+        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
     }
 
     @Test

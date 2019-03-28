@@ -13,10 +13,12 @@
 
 package org.flowable.engine.impl;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.AbstractQuery;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.history.HistoricActivityInstance;
@@ -25,6 +27,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
+ * @author Zheng Ji
  */
 public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricActivityInstanceQuery, HistoricActivityInstance> implements HistoricActivityInstanceQuery {
 
@@ -36,6 +39,7 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     protected String activityId;
     protected String activityName;
     protected String activityType;
+    protected Set<String> activityTypes;
     protected String assignee;
     protected String tenantId;
     protected String tenantIdLike;
@@ -44,6 +48,11 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     protected boolean unfinished;
     protected String deleteReason;
     protected String deleteReasonLike;
+    protected Date startedBefore;
+    protected Date startedAfter;
+    protected Date finishedBefore;
+    protected Date finishedAfter;
+    protected List<String> tenantIds;
 
     public HistoricActivityInstanceQueryImpl() {
     }
@@ -58,13 +67,11 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext).findHistoricActivityInstanceCountByQueryCriteria(this);
     }
 
     @Override
     public List<HistoricActivityInstance> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext).findHistoricActivityInstancesByQueryCriteria(this);
     }
 
@@ -101,6 +108,32 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     @Override
     public HistoricActivityInstanceQueryImpl activityType(String activityType) {
         this.activityType = activityType;
+        return this;
+    }
+    @Override
+    public HistoricActivityInstanceQueryImpl startedAfter(Date date) {
+        this.startedAfter = date;
+        return this;
+    }
+    @Override
+    public HistoricActivityInstanceQueryImpl startedBefore(Date date) {
+        this.startedBefore = date;
+        return this;
+    }
+    @Override
+    public HistoricActivityInstanceQueryImpl finishedAfter(Date date) {
+        this.finishedAfter = date;
+        return this;
+    }
+    @Override
+    public HistoricActivityInstanceQueryImpl finishedBefore(Date date) {
+        this.finishedBefore = date;
+        return this;
+    }
+
+    @Override
+    public HistoricActivityInstanceQuery activityTypes(Set<String> activityTypes) {
+        this.activityTypes=activityTypes;
         return this;
     }
 
@@ -155,6 +188,12 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
             throw new FlowableIllegalArgumentException("activity tenant id is null");
         }
         this.tenantIdLike = tenantIdLike;
+        return this;
+    }
+
+    @Override
+    public HistoricActivityInstanceQuery tenantIdIn(List<String> tenantIds) {
+        this.tenantIds = tenantIds;
         return this;
     }
 
@@ -274,6 +313,10 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
         return activityType;
     }
 
+    public Set<String> getActivityTypes() {
+        return activityTypes;
+    }
+
     public String getAssignee() {
         return assignee;
     }
@@ -297,5 +340,24 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     public String getDeleteReasonLike() {
         return deleteReasonLike;
     }
-
+    
+    public Date getStartedAfter() {
+        return startedAfter;
+    }
+    
+    public Date getStartedBefore() {
+        return startedBefore;
+    }
+    
+    public Date getFinishedAfter() {
+        return finishedAfter;
+    }
+    
+    public Date getFinishedBefore() {
+        return finishedBefore;
+    }
+    
+    public List<String> getTenantIds() {
+        return tenantIds;
+    }
 }

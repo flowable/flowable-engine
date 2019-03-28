@@ -59,7 +59,7 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
         getDataManager().insert(entity);
 
         FlowableEventDispatcher eventDispatcher = getEventDispatcher();
-        if (fireCreateEvent && eventDispatcher.isEnabled()) {
+        if (fireCreateEvent && eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableIdmEventBuilder.createEntityEvent(FlowableIdmEventType.ENTITY_CREATED, entity));
             eventDispatcher.dispatchEvent(FlowableIdmEventBuilder.createEntityEvent(FlowableIdmEventType.ENTITY_INITIALIZED, entity));
         }
@@ -74,7 +74,7 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
     public EntityImpl update(EntityImpl entity, boolean fireUpdateEvent) {
         EntityImpl updatedEntity = getDataManager().update(entity);
 
-        if (fireUpdateEvent && getEventDispatcher().isEnabled()) {
+        if (fireUpdateEvent && getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
             getEventDispatcher().dispatchEvent(FlowableIdmEventBuilder.createEntityEvent(FlowableIdmEventType.ENTITY_UPDATED, entity));
         }
 
@@ -96,7 +96,7 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
     public void delete(EntityImpl entity, boolean fireDeleteEvent) {
         getDataManager().delete(entity);
 
-        if (fireDeleteEvent && getEventDispatcher().isEnabled()) {
+        if (fireDeleteEvent && getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
             getEventDispatcher().dispatchEvent(FlowableIdmEventBuilder.createEntityEvent(FlowableIdmEventType.ENTITY_DELETED, entity));
         }
     }
