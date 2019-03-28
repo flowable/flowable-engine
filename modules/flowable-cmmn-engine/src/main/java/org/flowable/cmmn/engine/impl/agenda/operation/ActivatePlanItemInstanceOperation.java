@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.model.ManualActivationRule;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemControl;
@@ -61,7 +62,7 @@ public class ActivatePlanItemInstanceOperation extends AbstractPlanItemInstanceO
             ManualActivationRule manualActivationRule = planItemControl.getManualActivationRule();
 
             if (StringUtils.isNotEmpty(manualActivationRule.getCondition())) {
-                return evaluateBooleanExpression(commandContext, planItemInstanceEntity, manualActivationRule.getCondition());
+                return ExpressionUtil.evaluateBooleanExpression(commandContext, planItemInstanceEntity, manualActivationRule.getCondition());
             } else {
                 return true; // Having a manual activation rule without condition, defaults to true.
             }

@@ -50,8 +50,10 @@ import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskLogEntry;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
@@ -105,6 +107,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
         entityToTableNameMap.put(HistoricProcessInstanceEntity.class, "ACT_HI_PROCINST");
         entityToTableNameMap.put(HistoricVariableInstanceEntity.class, "ACT_HI_VARINST");
         entityToTableNameMap.put(HistoricTaskInstanceEntity.class, "ACT_HI_TASKINST");
+        entityToTableNameMap.put(HistoricTaskLogEntryEntity.class, "ACT_HI_TSK_LOG");
         entityToTableNameMap.put(HistoricIdentityLinkEntity.class, "ACT_HI_IDENTITYLINK");
 
         // a couple of stuff goes to the same table
@@ -136,6 +139,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
         apiTypeToTableNameMap.put(HistoricVariableUpdate.class, "ACT_HI_DETAIL");
         apiTypeToTableNameMap.put(HistoricFormProperty.class, "ACT_HI_DETAIL");
         apiTypeToTableNameMap.put(HistoricTaskInstance.class, "ACT_HI_TASKINST");
+        apiTypeToTableNameMap.put(HistoricTaskLogEntry.class, "ACT_HI_TSK_LOG");
         apiTypeToTableNameMap.put(HistoricVariableInstance.class, "ACT_HI_VARINST");
 
         // TODO: Identity skipped for the moment as no SQL injection is provided

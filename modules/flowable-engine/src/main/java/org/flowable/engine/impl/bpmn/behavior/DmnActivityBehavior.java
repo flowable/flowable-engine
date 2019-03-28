@@ -28,6 +28,7 @@ import org.flowable.dmn.api.ExecuteDecisionBuilder;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.DelegateHelper;
+import org.flowable.engine.impl.bpmn.helper.DynamicPropertyUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -76,7 +77,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
 
         if (processEngineConfiguration.isEnableProcessDefinitionInfoCache()) {
             ObjectNode taskElementProperties = BpmnOverrideContext.getBpmnOverrideElementProperties(task.getId(), execution.getProcessDefinitionId());
-            activeDecisionTableKey = getActiveValue(activeDecisionTableKey, DynamicBpmnConstants.DMN_TASK_DECISION_TABLE_KEY, taskElementProperties);
+            activeDecisionTableKey = DynamicPropertyUtil.getActiveValue(activeDecisionTableKey, DynamicBpmnConstants.DMN_TASK_DECISION_TABLE_KEY, taskElementProperties);
         }
 
         String finaldecisionTableKeyValue = null;
@@ -146,15 +147,14 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         leave(execution);
     }
 
-    protected ExecuteDecisionBuilder applyFallbackToDefaultTenant(DelegateExecution execution, ExecuteDecisionBuilder executeDecisionBuilder) {
+    protected void applyFallbackToDefaultTenant(DelegateExecution execution, ExecuteDecisionBuilder executeDecisionBuilder) {
         FieldExtension fallbackfieldExtension = DelegateHelper.getFlowElementField(execution, EXPRESSION_DECISION_TABLE_FALLBACK_TO_DEFAULT_TENANT);
         if (fallbackfieldExtension != null && ((fallbackfieldExtension.getStringValue() != null && fallbackfieldExtension.getStringValue().length() != 0))) {
             String fallbackToDefaultTenant = fallbackfieldExtension.getStringValue();
-            if (Boolean.parseBoolean(fallbackToDefaultTenant)) {
-                return executeDecisionBuilder.fallbackToDefaultTenant();
+            if (StringUtils.isNotEmpty(fallbackToDefaultTenant) && Boolean.parseBoolean(fallbackToDefaultTenant)) {
+                executeDecisionBuilder.fallbackToDefaultTenant();
             }
         }
-        return executeDecisionBuilder;
     }
 
     protected void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper) {

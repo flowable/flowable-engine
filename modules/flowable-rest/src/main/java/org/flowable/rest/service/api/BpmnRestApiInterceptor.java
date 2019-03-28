@@ -19,6 +19,7 @@ import org.flowable.engine.history.HistoricDetailQuery;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.repository.DeploymentQuery;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
@@ -45,6 +46,7 @@ import org.flowable.rest.service.api.history.HistoricActivityInstanceQueryReques
 import org.flowable.rest.service.api.history.HistoricDetailQueryRequest;
 import org.flowable.rest.service.api.history.HistoricProcessInstanceQueryRequest;
 import org.flowable.rest.service.api.history.HistoricTaskInstanceQueryRequest;
+import org.flowable.rest.service.api.history.HistoricTaskLogEntryQueryRequest;
 import org.flowable.rest.service.api.history.HistoricVariableInstanceQueryRequest;
 import org.flowable.rest.service.api.identity.GroupRequest;
 import org.flowable.rest.service.api.identity.UserRequest;
@@ -63,6 +65,7 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
+import org.flowable.task.api.history.HistoricTaskLogEntryQuery;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
 
@@ -74,6 +77,8 @@ public interface BpmnRestApiInterceptor {
     
     void createTask(Task task, TaskRequest request);
     
+    void updateTask(Task task, TaskRequest request);
+
     void deleteTask(Task task);
     
     void executeTaskAction(Task task, TaskActionRequest actionRequest);
@@ -113,6 +118,8 @@ public interface BpmnRestApiInterceptor {
     void accessDeploymentsWithQuery(DeploymentQuery deploymentQuery);
     
     void executeNewDeploymentForTenantId(String tenantId);
+
+    void enhanceDeployment(DeploymentBuilder deploymentBuilder);
     
     void deleteDeployment(Deployment deployment);
     
@@ -159,7 +166,9 @@ public interface BpmnRestApiInterceptor {
     void accessHistoryVariableInfoById(HistoricVariableInstance historicVariableInstance);
     
     void accessHistoryVariableInfoWithQuery(HistoricVariableInstanceQuery historicVariableInstanceQuery, HistoricVariableInstanceQueryRequest request);
-    
+
+    void accessHistoricTaskLogWithQuery(HistoricTaskLogEntryQuery historicTaskLogEntryQuery, HistoricTaskLogEntryQueryRequest request);
+
     void accessGroupInfoById(Group group);
     
     void accessGroupInfoWithQuery(GroupQuery groupQuery);

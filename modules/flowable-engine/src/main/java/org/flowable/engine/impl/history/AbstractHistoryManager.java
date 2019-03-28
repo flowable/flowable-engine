@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.history;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +22,7 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
@@ -34,8 +36,11 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.task.Event;
+import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -240,7 +245,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
     }
 
     @Override
-    public void updateActivity(ExecutionEntity childExecution, String oldActivityId, FlowElement newFlowElement, TaskEntity task) {
+    public void updateActivity(ExecutionEntity childExecution, String oldActivityId, FlowElement newFlowElement, TaskEntity task, Date updateTime) {
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager = CommandContextUtil.getHistoricActivityInstanceEntityManager();
             List<HistoricActivityInstanceEntity> historicActivityInstances = historicActivityInstanceEntityManager.findHistoricActivityInstancesByExecutionAndActivityId(childExecution.getId(), oldActivityId);
@@ -253,7 +258,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
 
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
             HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
-            historicTaskService.recordTaskInfoChange(task);
+            historicTaskService.recordTaskInfoChange(task, updateTime);
         }
 
     }
@@ -372,4 +377,54 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
         this.historyLevel = historyLevel;
     }
 
+    protected String getProcessDefinitionId(VariableInstanceEntity variable, ExecutionEntity sourceActivityExecution) {
+        String processDefinitionId = null;
+        if (sourceActivityExecution != null) {
+            processDefinitionId = sourceActivityExecution.getProcessDefinitionId();
+        } else if (variable.getProcessInstanceId() != null) {
+            ExecutionEntity processInstanceExecution = CommandContextUtil.getExecutionEntityManager().findById(variable.getProcessInstanceId());
+            if (processInstanceExecution != null) {
+                processDefinitionId = processInstanceExecution.getProcessDefinitionId();
+            }
+        } else if (variable.getTaskId() != null) {
+            TaskEntity taskEntity = CommandContextUtil.getTaskService().getTask(variable.getTaskId());
+            if (taskEntity != null) {
+                processDefinitionId = taskEntity.getProcessDefinitionId();
+            }
+        }
+        return processDefinitionId;
+    }
+
+    protected String getProcessDefinitionId(IdentityLinkEntity identityLink) {
+        String processDefinitionId = null;
+        if (identityLink.getProcessInstanceId() != null) {
+            ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(identityLink.getProcessInstanceId());
+            if (execution != null) {
+                processDefinitionId = execution.getProcessDefinitionId();
+            }
+        } else if (identityLink.getTaskId() != null) {
+            TaskEntity task = CommandContextUtil.getTaskService().getTask(identityLink.getTaskId());
+            if (task != null) {
+                processDefinitionId = task.getProcessDefinitionId();
+            }
+        }
+        return processDefinitionId;
+    }
+
+    protected String getProcessDefinitionId(EntityLinkEntity entityLink) {
+        String processDefinitionId = null;
+        if (ScopeTypes.BPMN.equals(entityLink.getScopeType()) && entityLink.getScopeId() != null) {
+            ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(entityLink.getScopeId());
+            if (execution != null) {
+                processDefinitionId = execution.getProcessDefinitionId();
+            }
+
+        } else if (ScopeTypes.TASK.equals(entityLink.getScopeType()) && entityLink.getScopeId() != null) {
+            TaskEntity task = CommandContextUtil.getTaskService().getTask(entityLink.getScopeId());
+            if (task != null) {
+                processDefinitionId = task.getProcessDefinitionId();
+            }
+        }
+        return processDefinitionId;
+    }
 }

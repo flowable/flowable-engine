@@ -84,7 +84,14 @@ public class StateTransition {
 
         addEventListenerTransition(null, PlanItemTransition.CREATE);
 
+        addEventListenerTransition(PlanItemInstanceState.UNAVAILABLE,
+            PlanItemTransition.INITIATE,
+            PlanItemTransition.TERMINATE,
+            PlanItemTransition.EXIT,
+            PlanItemTransition.SUSPEND);
+
         addEventListenerTransition(PlanItemInstanceState.AVAILABLE,
+            PlanItemTransition.DISMISS,
             PlanItemTransition.TERMINATE,
             PlanItemTransition.OCCUR,
             PlanItemTransition.EXIT,
@@ -127,9 +134,6 @@ public class StateTransition {
     }
 
     protected static boolean isEventListenerTransitionPossible(String currentState, String transition) {
-        if (EVENT_LISTENER_TRANSITIONS.get(currentState) == null) {
-            System.out.println("BLIEP" + currentState);
-        }
         return EVENT_LISTENER_TRANSITIONS.get(currentState).contains(transition);
     }
 

@@ -86,6 +86,7 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
                 caseDiagramCanvas.drawUserEventListener(graphicInfo, scaleFactor);
             }
         });
+
         // task
         activityDrawInstructions.put(Task.class, new ActivityDrawInstruction() {
 

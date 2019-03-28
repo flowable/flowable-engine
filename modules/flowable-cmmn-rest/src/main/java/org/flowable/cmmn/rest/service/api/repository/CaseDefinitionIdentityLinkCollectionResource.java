@@ -55,7 +55,7 @@ public class CaseDefinitionIdentityLinkCollectionResource extends BaseCaseDefini
     }
 
     @ApiOperation(value = "Add a candidate starter to a case definition", tags = { "Case Definitions" },
-            notes = "It's possible to add either a user or a group.")
+            notes = "It is possible to add either a user or a group.")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the case definition was found and the identity link was created."),
             @ApiResponse(code = 400, message = "Indicates the body does not contain the correct information."),

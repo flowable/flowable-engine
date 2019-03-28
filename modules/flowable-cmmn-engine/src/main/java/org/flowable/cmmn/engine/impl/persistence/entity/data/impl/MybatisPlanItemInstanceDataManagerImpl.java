@@ -74,13 +74,18 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
         // no need to do anything extra, the findById of the super class will look into the cache
         return super.findById(planItemInstanceId);
     }
+    
+    @Override
+    public List<PlanItemInstanceEntity> findByCaseInstanceId(String caseInstanceId) {
+        return getList("selectPlanItemInstancesByCaseInstanceId", caseInstanceId, planItemInstanceByCaseInstanceIdCachedEntityMatcher, true);
+    }
 
     @Override
     public List<PlanItemInstanceEntity> findByCaseInstanceIdAndPlanItemId(String caseInstanceId, String planitemId) {
         Map<String, Object> params = new HashMap<>();
         params.put("caseInstanceId", caseInstanceId);
         params.put("planItemId", planitemId);
-        return getList("selectPlanItemInstanceByCaseInstanceIdAndPlanItemId", params, planItemInstanceByCaseInstanceIdAndPlanItemIdCachedEntityMatcher);
+        return getList("selectPlanItemInstancesByCaseInstanceIdAndPlanItemId", params, planItemInstanceByCaseInstanceIdAndPlanItemIdCachedEntityMatcher);
     }
 
     @Override

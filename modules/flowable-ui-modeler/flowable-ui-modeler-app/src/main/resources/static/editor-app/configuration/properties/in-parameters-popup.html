@@ -31,14 +31,18 @@
 						   		<input type="text" id="sourceField" class="form-control" ng-model="selectedParameter.source" placeholder="{{'PROPERTY.PARAMETER.SOURCE.PLACEHOLDER' | translate}}" />
 							</div>
 							<div class="form-group">
-						   		<label for="expressionField">{{'PROPERTY.PARAMETER.SOURCEEXPRESSION' | translate}}</label>
-						   		<input type="text" id="expressionField" class="form-control" ng-model="selectedParameter.sourceExpression" placeholder="{{'PROPERTY.PARAMETER.SOURCEEXPRESSION.PLACEHOLDER' | translate}}" />
+						   		<label for="sourceExpressionField">{{'PROPERTY.PARAMETER.SOURCEEXPRESSION' | translate}}</label>
+						   		<input type="text" id="sourceExpressionField" class="form-control" ng-model="selectedParameter.sourceExpression" placeholder="{{'PROPERTY.PARAMETER.SOURCEEXPRESSION.PLACEHOLDER' | translate}}" />
 							</div>
 							<div class="form-group">
-						   		<label for="expressionField">{{'PROPERTY.PARAMETER.TARGET' | translate}}</label>
-						   		<input type="text" id="expressionField" class="form-control" ng-model="selectedParameter.target" placeholder="{{'PROPERTY.PARAMETER.TARGET.PLACEHOLDER' | translate}}" />
+						   		<label for="targetField">{{'PROPERTY.PARAMETER.TARGET' | translate}}</label>
+						   		<input type="text" id="targetField" class="form-control" ng-model="selectedParameter.target" placeholder="{{'PROPERTY.PARAMETER.TARGET.PLACEHOLDER' | translate}}" />
 							</div>
-			                
+							<div class="form-group">
+								<label for="targetExpressionField">{{'PROPERTY.PARAMETER.TARGETEXPRESSION' | translate}}</label>
+								<input type="text" id="targetExpressionField" class="form-control" ng-model="selectedParameter.targetExpression" placeholder="{{'PROPERTY.PARAMETER.TARGETEXPRESSION.PLACEHOLDER' | translate}}" />
+							</div>
+
 			            </div>
 			            <div ng-show="!selectedParameter" class="muted no-property-selected" translate>PROPERTY.PARAMETER.EMPTY</div>
 			        </div>

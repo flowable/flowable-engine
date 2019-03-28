@@ -48,7 +48,8 @@ public class ResourceFlowableExtension extends InternalFlowableExtension {
     public void afterEach(ExtensionContext context) throws Exception {
         super.afterEach(context);
         ProcessEngine processEngine = getProcessEngine(context);
-        ProcessEngines.unregister(processEngine);
+        processEngine.close();
+        processEngine = null;
     }
 
     @Override

@@ -52,6 +52,6 @@ public class ProcessTaskJsonConverterTest extends AbstractConverterTest {
         ProcessTask processTask = (ProcessTask) planItemDefinition;
         assertEquals("sid-5E1BEB30-72F7-463C-A1CB-77F000CA7E0F", processTask.getId());
         assertEquals("processTaskName", processTask.getName());
-        assertTrue(processTask.isFallbackToDefaultTenant());
+        assertTrue(processTask.getFallbackToDefaultTenant());
     }
 }

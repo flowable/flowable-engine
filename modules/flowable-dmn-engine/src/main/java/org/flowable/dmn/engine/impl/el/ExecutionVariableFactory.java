@@ -45,7 +45,7 @@ public class ExecutionVariableFactory {
                 if (expressionResult instanceof Boolean) {
                     executionVariable = expressionResult;
                 } else {
-                    executionVariable = new Boolean(expressionResult.toString());
+                    executionVariable = Boolean.valueOf(expressionResult.toString());
                 }
             } else if (StringUtils.equals("string", type)) {
                 if (expressionResult instanceof String) {

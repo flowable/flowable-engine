@@ -380,7 +380,7 @@ As such, if you have a custom implementation of the 'org.flowable.ldap.LDAPIdent
 |flowable.process-definitions.cache.max
 |-1
 |The maximum amount of process definitions available in the process definition cache.
- Per default it is 1 (all process definitions)
+ Per default it is -1 (all process definitions).
 |===============
 
 .Old properties managed by Spring Boot
@@ -794,6 +794,11 @@ This are the Task UI App specific properties.
 |rest.task-app.enabled
 |true
 |Enables the REST API (this is not the REST api used by the UI, but an api that's available over basic auth authentication).
+
+|flowable.form-field-validation-enabled
+|
+|false
+|Enable form field validation after form submission on the engine side.
 |===============
 
 

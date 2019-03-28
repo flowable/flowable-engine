@@ -239,9 +239,9 @@ public class FormEngineAutoConfigurationTest {
         assertThat(appDefinition.getVersion()).isOne();
         
         List<AppDeployment> appDeployments = appRepositoryService.createDeploymentQuery().list();
-        assertThat(appDeployments).hasSize(2)
+        assertThat(appDeployments).hasSize(3)
             .extracting(AppDeployment::getName)
-            .contains("simple.bar", "vacationRequest.zip");
+            .contains("simple.bar", "vacationRequest.zip", "processTask.bar");
     }
 
     private AnnotationConfigApplicationContext context(Class<?>... clazz) {

@@ -16,6 +16,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
 public abstract class AbstractTaskServiceVariableScopeEntity extends VariableScopeImpl {
 
+    @Override
     public String getIdPrefix() {
         return TaskServiceEntityConstants.TASK_SERVICE_ID_PREFIX;
     }

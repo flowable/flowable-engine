@@ -223,10 +223,10 @@ The following examples show how a case definition is tested in typical Spring-ba
 class MyBusinessCaseTest {
 
   @Autowired
-  private CmmnRepositorySerivce cmmnRepositoryService;
+  private CmmnRepositoryService cmmnRepositoryService;
 
   @Autowired
-  privae CmmnRuntimeSerivce cmmnRuntimeService;
+  private CmmnRuntimeService cmmnRuntimeService;
 
   @Test
   @CmmnDeployment

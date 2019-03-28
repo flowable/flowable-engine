@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.AbstractQuery;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.content.api.ContentItem;
@@ -323,13 +323,11 @@ public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, Conten
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getContentItemEntityManager().findContentItemCountByQueryCriteria(this);
     }
 
     @Override
     public List<ContentItem> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getContentItemEntityManager().findContentItemsByQueryCriteria(this);
     }
 

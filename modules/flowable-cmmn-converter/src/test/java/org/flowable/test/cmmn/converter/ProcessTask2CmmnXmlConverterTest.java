@@ -78,6 +78,7 @@ public class ProcessTask2CmmnXmlConverterTest extends AbstractConverterTest {
         assertEquals("50", humanTask.getPriority());
         assertEquals("2019-01-01", humanTask.getDueDate());
         assertEquals("testCategory", humanTask.getCategory());
+        assertEquals("validateFormFieldsValue", humanTask.getValidateFormFields());
     }
 
 }

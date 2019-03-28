@@ -12,6 +12,11 @@
  */
 package org.flowable.rest.service.api.repository;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Collections;
@@ -33,8 +38,6 @@ import org.flowable.rest.service.api.RestUrls;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
-import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to a single Deployment resource.

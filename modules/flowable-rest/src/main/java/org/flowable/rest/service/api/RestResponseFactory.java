@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
 import org.flowable.common.rest.util.RestUrlBuilder;
@@ -73,6 +74,7 @@ import org.flowable.rest.service.api.history.HistoricDetailResponse;
 import org.flowable.rest.service.api.history.HistoricIdentityLinkResponse;
 import org.flowable.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.flowable.rest.service.api.history.HistoricTaskInstanceResponse;
+import org.flowable.rest.service.api.history.HistoricTaskLogEntryResponse;
 import org.flowable.rest.service.api.history.HistoricVariableInstanceResponse;
 import org.flowable.rest.service.api.identity.GroupResponse;
 import org.flowable.rest.service.api.identity.MembershipResponse;
@@ -92,6 +94,7 @@ import org.flowable.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.flowable.rest.service.api.runtime.task.TaskResponse;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskLogEntry;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -256,6 +259,14 @@ public class RestResponseFactory {
             response.setDiagramResource(urlBuilder.buildUrl(RestUrls.URL_DEPLOYMENT_RESOURCE, processDefinition.getDeploymentId(), processDefinition.getDiagramResourceName()));
         }
         return response;
+    }
+    
+    public String getFormModelString(FormModelResponse formModelResponse) {
+        try {
+            return objectMapper.writeValueAsString(formModelResponse);
+        } catch (Exception e) {
+            throw new FlowableException("Error writing form model response", e);
+        }
     }
 
     public List<RestVariable> createRestVariables(Map<String, Object> variables, String id, int variableType, RestVariableScope scope) {
@@ -830,6 +841,34 @@ public class RestResponseFactory {
         return result;
     }
 
+    public List<HistoricTaskLogEntryResponse> createHistoricTaskLogEntryResponseList(List<HistoricTaskLogEntry> logEntries) {
+        RestUrlBuilder urlBuilder = createUrlBuilder();
+        List<HistoricTaskLogEntryResponse> responseList = new ArrayList<>();
+        for (HistoricTaskLogEntry instance : logEntries) {
+            responseList.add(createHistoricTaskLogEntryResponse(instance, urlBuilder));
+        }
+        return responseList;
+    }
+
+    public HistoricTaskLogEntryResponse createHistoricTaskLogEntryResponse(HistoricTaskLogEntry logEntry, RestUrlBuilder urlBuilder) {
+        HistoricTaskLogEntryResponse response = new HistoricTaskLogEntryResponse();
+        response.setLogNumber(logEntry.getLogNumber());
+        response.setType(logEntry.getType());
+        response.setTaskId(logEntry.getTaskId());
+        response.setTimeStamp(logEntry.getTimeStamp());
+        response.setUserId(logEntry.getUserId());
+        response.setData(logEntry.getData());
+        response.setExecutionId(logEntry.getExecutionId());
+        response.setProcessInstanceId(logEntry.getProcessInstanceId());
+        response.setProcessDefinitionId(logEntry.getProcessDefinitionId());
+        response.setScopeId(logEntry.getScopeId());
+        response.setScopeDefinitionId(logEntry.getScopeDefinitionId());
+        response.setSubScopeId(logEntry.getSubScopeId());
+        response.setScopeType(logEntry.getScopeType());
+        response.setTenantId(logEntry.getTenantId());
+        return response;
+    }
+
     public List<HistoricActivityInstanceResponse> createHistoricActivityInstanceResponseList(List<HistoricActivityInstance> activityInstances) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         List<HistoricActivityInstanceResponse> responseList = new ArrayList<>();
@@ -1069,17 +1108,17 @@ public class RestResponseFactory {
         return createUserResponseList(users, false);
     }
 
-    public List<UserResponse> createUserResponseList(List<User> users, boolean incudePassword) {
+    public List<UserResponse> createUserResponseList(List<User> users, boolean includePassword) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         List<UserResponse> responseList = new ArrayList<>();
         for (User instance : users) {
-            responseList.add(createUserResponse(instance, incudePassword, urlBuilder));
+            responseList.add(createUserResponse(instance, includePassword, urlBuilder));
         }
         return responseList;
     }
 
-    public UserResponse createUserResponse(User user, boolean incudePassword) {
-        return createUserResponse(user, incudePassword, createUrlBuilder());
+    public UserResponse createUserResponse(User user, boolean includePassword) {
+        return createUserResponse(user, includePassword, createUrlBuilder());
     }
 
     public UserResponse createUserResponse(User user, boolean incudePassword, RestUrlBuilder urlBuilder) {
@@ -1090,7 +1129,8 @@ public class RestResponseFactory {
         response.setId(user.getId());
         response.setEmail(user.getEmail());
         response.setUrl(urlBuilder.buildUrl(RestUrls.URL_USER, user.getId()));
-
+        response.setTenantId(user.getTenantId());
+        
         if (incudePassword) {
             response.setPassword(user.getPassword());
         }

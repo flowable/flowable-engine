@@ -362,6 +362,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
             int startCount = 0;
             int taskCount = 0;
             int endCount = 0;
+            int sequenceFlowCount = 0;
             for (HistoricActivityInstance historicActivityInstance : historicActivities) {
                 if ("task".equals(historicActivityInstance.getActivityId())) {
                     taskCount++;
@@ -372,6 +373,9 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
                 } else if ("theEnd".equals(historicActivityInstance.getActivityId())) {
                     endCount++;
 
+                } else if (historicActivityInstance.getActivityId().contains("_flow_")) {
+                    sequenceFlowCount++;
+
                 } else {
                     Assert.fail("Unexpected activity found " + historicActivityInstance.getActivityId());
                 }
@@ -379,6 +383,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
 
             assertEquals(1, startCount);
             assertEquals(3, taskCount);
+            assertEquals(2, sequenceFlowCount);
             assertEquals(1, endCount);
         }
     }
@@ -397,6 +402,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
             int startCount = 0;
             int taskCount = 0;
             int endCount = 0;
+            int sequenceFlowCount = 0;
             for (HistoricActivityInstance historicActivityInstance : historicActivities) {
                 if ("task".equals(historicActivityInstance.getActivityId())) {
                     taskCount++;
@@ -407,6 +413,9 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
                 } else if ("theEnd".equals(historicActivityInstance.getActivityId())) {
                     endCount++;
 
+                } else if (historicActivityInstance.getActivityId().contains("_flow_")) {
+                    sequenceFlowCount++;
+
                 } else {
                     Assert.fail("Unexpected activity found " + historicActivityInstance.getActivityId());
                 }
@@ -414,6 +423,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
 
             assertEquals(1, startCount);
             assertEquals(3, taskCount);
+            assertEquals(2, sequenceFlowCount);
             assertEquals(1, endCount);
         }
     }
@@ -449,6 +459,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
             int startCount = 0;
             int taskCount = 0;
             int endCount = 0;
+            int sequenceFlowCount = 0;
             for (HistoricActivityInstance historicActivityInstance : historicActivities) {
                 if ("task".equals(historicActivityInstance.getActivityId())) {
                     taskCount++;
@@ -459,6 +470,9 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
                 } else if ("theEnd".equals(historicActivityInstance.getActivityId())) {
                     endCount++;
 
+                } else if (historicActivityInstance.getActivityId().contains("_flow_")) {
+                    sequenceFlowCount++;
+
                 } else {
                     Assert.fail("Unexpected activity found " + historicActivityInstance.getActivityId());
                 }
@@ -466,6 +480,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
 
             assertEquals(1, startCount);
             assertEquals(3, taskCount);
+            assertEquals(2, sequenceFlowCount);
             assertEquals(1, endCount);
         }
     }
@@ -484,6 +499,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
             int startCount = 0;
             int taskCount = 0;
             int endCount = 0;
+            int sequenceFlowCount = 0;
             for (HistoricActivityInstance historicActivityInstance : historicActivities) {
                 if ("task".equals(historicActivityInstance.getActivityId())) {
                     taskCount++;
@@ -494,6 +510,9 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
                 } else if ("theEnd".equals(historicActivityInstance.getActivityId())) {
                     endCount++;
 
+                } else if (historicActivityInstance.getActivityId().contains("_flow_")) {
+                    sequenceFlowCount++;
+
                 } else {
                     Assert.fail("Unexpected activity found " + historicActivityInstance.getActivityId());
                 }
@@ -501,6 +520,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
 
             assertEquals(1, startCount);
             assertEquals(3, taskCount);
+            assertEquals(2, sequenceFlowCount);
             assertEquals(1, endCount);
         }
     }

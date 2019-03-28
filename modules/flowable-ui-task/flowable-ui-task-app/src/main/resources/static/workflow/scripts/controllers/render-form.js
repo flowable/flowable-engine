@@ -728,13 +728,19 @@ angular.module('flowableApp')
 
                                 var emptyValue = field.options[0];
                                 if (field.value != null && field.value != undefined && emptyValue.name !== field.value.name) {
-                                    postData.values[field.id] = field.value;
+                                    if (field.value.id != null) {
+                                        postData.values[field.id] = field.value.id;
+                                    } else if (field.value.name != null) {
+                                        postData.values[field.id] = field.value.name;
+                                    }
                                 }
                             }
 
                         } else if (field.type === 'date' && field.value) {
                             postData.values[field.id] = field.value.getFullYear() + '-' + (field.value.getMonth() + 1) + '-' + field.value.getDate();
 
+                        } else if ((field.type === 'people' || field.type === 'functional-group') && field.value) {
+                            postData.values[field.id] = field.value.id;
                         } else {
                             postData.values[field.id] = field.value;
                         }

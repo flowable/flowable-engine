@@ -57,6 +57,7 @@ public class FormEngineImpl implements FormEngine {
     @Override
     public void close() {
         FormEngines.unregister(this);
+        engineConfiguration.close();
     }
 
     // getters and setters

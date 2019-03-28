@@ -34,13 +34,15 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(description = "Only one of caseDefinitionId or caseDefinitionKey can be used in the request body")
 public class CaseInstanceCreateRequest {
 
-    private String caseDefinitionId;
-    private String caseDefinitionKey;
-    private String businessKey;
-    private List<RestVariable> variables;
-    private List<RestVariable> transientVariables;
-    private String tenantId;
-    private boolean returnVariables;
+    protected String caseDefinitionId;
+    protected String caseDefinitionKey;
+    protected String businessKey;
+    protected List<RestVariable> variables;
+    protected List<RestVariable> transientVariables;
+    protected List<RestVariable> startFormVariables;
+    protected String outcome;
+    protected String tenantId;
+    protected boolean returnVariables;
 
     @ApiModelProperty(example = "oneTaskCase:1:158")
     public String getCaseDefinitionId() {
@@ -90,6 +92,23 @@ public class CaseInstanceCreateRequest {
 
     public void setTransientVariables(List<RestVariable> transientVariables) {
         this.transientVariables = transientVariables;
+    }
+
+    @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
+    public List<RestVariable> getStartFormVariables() {
+        return startFormVariables;
+    }
+
+    public void setStartFormVariables(List<RestVariable> startFormVariables) {
+        this.startFormVariables = startFormVariables;
+    }
+
+    public String getOutcome() {
+        return outcome;
+    }
+
+    public void setOutcome(String outcome) {
+        this.outcome = outcome;
     }
 
     @JsonIgnore

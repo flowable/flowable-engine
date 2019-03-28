@@ -27,6 +27,7 @@ public interface UserEventListenerInstanceQuery extends Query<UserEventListenerI
     UserEventListenerInstanceQuery name(String name);
     UserEventListenerInstanceQuery stageInstanceId(String stageInstanceId);
     UserEventListenerInstanceQuery stateAvailable();
+    UserEventListenerInstanceQuery stateUnavailable();
     UserEventListenerInstanceQuery stateSuspended();
 
     UserEventListenerInstanceQuery orderByName();

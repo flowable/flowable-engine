@@ -23,7 +23,7 @@
             </sentry>
             
             <task id="taskA" name="A" flowable:type="java" flowable:class="org.flowable.TestJavaDelegate" flowable:resultVariableName="result" />
-            <task id="taskB" name="B" flowable:type="java" flowable:delegateExpression="${testJavaDelegate}">
+            <task id="taskB" name="B" flowable:type="java" flowable:delegateExpression="${testJavaDelegate}" flowable:async="true" flowable:exclusive="true">
                 <extensionElements>
                     <flowable:field name="fieldA" stringValue="test" />
                     <flowable:field name="fieldB" expression="test" />

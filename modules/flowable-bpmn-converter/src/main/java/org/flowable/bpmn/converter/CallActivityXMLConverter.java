@@ -65,7 +65,12 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
         callActivity.setSameDeployment(Boolean.valueOf(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_SAME_DEPLOYMENT, xtr)));
         callActivity.setUseLocalScopeForOutParameters(Boolean.valueOf(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_USE_LOCALSCOPE_FOR_OUTPARAMETERS, xtr)));
         callActivity.setCompleteAsync(Boolean.valueOf(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_COMPLETE_ASYNC, xtr)));
-        callActivity.setFallbackToDefaultTenant(Boolean.valueOf(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT, xtr)));
+        
+        String fallbackToDefaultTenant = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT, xtr);
+        if (StringUtils.isNotEmpty(fallbackToDefaultTenant)) {
+            callActivity.setFallbackToDefaultTenant(Boolean.valueOf(fallbackToDefaultTenant));
+        }
+        
         parseChildElements(getXMLElementName(), callActivity, childParserMap, model, xtr);
         return callActivity;
     }
@@ -100,8 +105,8 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
         if (callActivity.isCompleteAsync()) {
             writeQualifiedAttribute(ATTRIBUTE_CALL_ACTIVITY_COMPLETE_ASYNC, "true", xtw);
         }
-        if (callActivity.isFallbackToDefaultTenant()) {
-            writeQualifiedAttribute(ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT, "true", xtw);
+        if (callActivity.getFallbackToDefaultTenant() != null) {
+            writeQualifiedAttribute(ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT, callActivity.getFallbackToDefaultTenant().toString(), xtw);
         }
     }
 

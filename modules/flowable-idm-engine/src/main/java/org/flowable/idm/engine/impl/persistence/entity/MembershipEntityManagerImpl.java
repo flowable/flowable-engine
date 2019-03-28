@@ -44,7 +44,7 @@ public class MembershipEntityManagerImpl extends AbstractEntityManager<Membershi
         membershipEntity.setGroupId(groupId);
         insert(membershipEntity, false);
 
-        if (getEventDispatcher().isEnabled()) {
+        if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
             getEventDispatcher().dispatchEvent(FlowableIdmEventBuilder.createMembershipEvent(FlowableIdmEventType.MEMBERSHIP_CREATED, groupId, userId));
         }
     }
@@ -52,7 +52,7 @@ public class MembershipEntityManagerImpl extends AbstractEntityManager<Membershi
     @Override
     public void deleteMembership(String userId, String groupId) {
         membershipDataManager.deleteMembership(userId, groupId);
-        if (getEventDispatcher().isEnabled()) {
+        if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
             getEventDispatcher().dispatchEvent(FlowableIdmEventBuilder.createMembershipEvent(FlowableIdmEventType.MEMBERSHIP_DELETED, groupId, userId));
         }
     }

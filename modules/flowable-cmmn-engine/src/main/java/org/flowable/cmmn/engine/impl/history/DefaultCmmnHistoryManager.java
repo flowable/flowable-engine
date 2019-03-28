@@ -34,6 +34,7 @@ import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLin
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
@@ -69,12 +70,12 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     }
 
     @Override
-    public void recordCaseInstanceEnd(CaseInstanceEntity caseInstanceEntity, String state) {
+    public void recordCaseInstanceEnd(CaseInstanceEntity caseInstanceEntity, String state, Date endTime) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
             HistoricCaseInstanceEntity historicCaseInstanceEntity = historicCaseInstanceEntityManager.findById(caseInstanceEntity.getId());
             if (historicCaseInstanceEntity != null) {
-                historicCaseInstanceEntity.setEndTime(cmmnEngineConfiguration.getClock().getCurrentTime());
+                historicCaseInstanceEntity.setEndTime(endTime);
                 historicCaseInstanceEntity.setState(state);
             }
         }
@@ -167,16 +168,16 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     }
 
     @Override
-    public void recordVariableCreate(VariableInstanceEntity variable) {
+    public void recordVariableCreate(VariableInstanceEntity variable, Date createTime) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            CommandContextUtil.getHistoricVariableService().createAndInsert(variable);
+            CommandContextUtil.getHistoricVariableService().createAndInsert(variable, createTime);
         }
     }
 
     @Override
-    public void recordVariableUpdate(VariableInstanceEntity variableInstanceEntity) {
+    public void recordVariableUpdate(VariableInstanceEntity variableInstanceEntity, Date updateTime) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            CommandContextUtil.getHistoricVariableService().recordVariableUpdate(variableInstanceEntity);
+            CommandContextUtil.getHistoricVariableService().recordVariableUpdate(variableInstanceEntity, updateTime);
         }
     }
 
@@ -195,16 +196,16 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     }
 
     @Override
-    public void recordTaskEnd(TaskEntity task, String deleteReason) {
+    public void recordTaskEnd(TaskEntity task, String deleteReason, Date endTime) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            CommandContextUtil.getHistoricTaskService().recordTaskEnd(task, deleteReason);
+            CommandContextUtil.getHistoricTaskService().recordTaskEnd(task, deleteReason, endTime);
         }
     }
 
     @Override
-    public void recordTaskInfoChange(TaskEntity taskEntity) {
+    public void recordTaskInfoChange(TaskEntity taskEntity, Date changeTime) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            CommandContextUtil.getHistoricTaskService().recordTaskInfoChange(taskEntity);
+            CommandContextUtil.getHistoricTaskService().recordTaskInfoChange(taskEntity, changeTime);
         }
     }
 
@@ -302,6 +303,16 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
                 h.setEndedTime(exitTime);
                 h.setExitTime(exitTime);
         });
+    }
+
+    @Override
+    public void recordHistoricUserTaskLogEntry(HistoricTaskLogEntryBuilder taskLogEntryBuilder) {
+        CommandContextUtil.getHistoricTaskService().createHistoricTaskLogEntry(taskLogEntryBuilder);
+    }
+
+    @Override
+    public void deleteHistoricUserTaskLogEntry(long logNumber) {
+        CommandContextUtil.getHistoricTaskService().deleteHistoricTaskLogEntry(logNumber);
     }
 
     protected void recordHistoricPlanItemInstanceEntity(PlanItemInstanceEntity planItemInstanceEntity, Date lastUpdatedTime, Consumer<HistoricPlanItemInstanceEntity> changes) {

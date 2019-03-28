@@ -15,6 +15,7 @@ package org.flowable.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.List;
 
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -40,6 +41,10 @@ public class GetIdentityLinksForTaskCmd implements Command<List<IdentityLink>>, 
     @Override
     public List<IdentityLink> execute(CommandContext commandContext) {
         TaskEntity task = CommandContextUtil.getTaskService().getTask(taskId);
+        
+        if (task == null) {
+            throw new FlowableObjectNotFoundException("task not found");
+        }
 
         List<IdentityLink> identityLinks = (List) task.getIdentityLinks();
 

@@ -99,31 +99,16 @@ public class GetTaskFormModelCmd implements Command<FormInfo>, Serializable {
         FormInfo formInfo = null;
         if (ignoreVariables) {
             FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService();
-            formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId);
-            
-            // fallback to search for a form model without parent deployment id
-            if (formInfo == null && parentDeploymentId != null) {
-                formInfo = formRepositoryService.getFormModelByKey(task.getFormKey());
-            }
+            formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId, 
+                            task.getTenantId(), cmmnEngineConfiguration.isFallbackToDefaultTenant());
             
         } else if (endTime != null) {
             formInfo = formService.getFormInstanceModelByKeyAndParentDeploymentIdAndScopeId(task.getFormKey(), parentDeploymentId, task.getScopeId(), 
-                            task.getScopeType(), variables, task.getTenantId());
-            
-            // fallback to search for a form model without parent deployment id
-            if (formInfo == null && parentDeploymentId != null) {
-                formInfo = formService.getFormInstanceModelByKeyAndScopeId(task.getFormKey(), task.getScopeId(), 
-                                task.getScopeType(), variables, task.getTenantId());
-            }
+                            task.getScopeType(), variables, task.getTenantId(), cmmnEngineConfiguration.isFallbackToDefaultTenant());
 
         } else {
             formInfo = formService.getFormModelWithVariablesByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId,
-                            taskId, variables, task.getTenantId());
-            
-            // fallback to search for a form model without parent deployment id
-            if (formInfo == null && parentDeploymentId != null) {
-                formInfo = formService.getFormModelWithVariablesByKey(task.getFormKey(), taskId, variables, task.getTenantId());
-            }
+                            taskId, variables, task.getTenantId(), cmmnEngineConfiguration.isFallbackToDefaultTenant());
         }
 
         // If form does not exists, we don't want to leak out this info to just anyone

@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.flowable.common.engine.impl.AbstractQuery;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.job.api.Job;
@@ -294,13 +294,11 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getTimerJobEntityManager(commandContext).findJobCountByQueryCriteria(this);
     }
 
     @Override
     public List<Job> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getTimerJobEntityManager(commandContext).findJobsByQueryCriteria(this);
     }
 

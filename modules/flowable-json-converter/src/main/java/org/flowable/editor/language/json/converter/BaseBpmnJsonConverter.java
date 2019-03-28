@@ -343,7 +343,11 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                 }
 
             } else if (baseElement instanceof Gateway) {
+                Gateway gateway= (Gateway) baseElement;
+                gateway.setAsynchronous(getPropertyValueAsBoolean(PROPERTY_ASYNCHRONOUS, elementNode));
+                gateway.setNotExclusive(!getPropertyValueAsBoolean(PROPERTY_EXCLUSIVE, elementNode));
                 JsonNode flowOrderNode = getProperty(PROPERTY_SEQUENCEFLOW_ORDER, elementNode);
+
                 if (flowOrderNode != null) {
                     flowOrderNode = BpmnJsonConverterUtil.validateIfNodeIsTextual(flowOrderNode);
                     JsonNode orderArray = flowOrderNode.get("sequenceFlowOrder");

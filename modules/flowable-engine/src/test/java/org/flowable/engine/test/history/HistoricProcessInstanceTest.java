@@ -90,7 +90,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertEquals(processInstance.getProcessDefinitionId(), historicProcessInstance.getProcessDefinitionId());
         assertEquals(noon, historicProcessInstance.getStartTime());
         assertEquals(twentyFiveSecsAfterNoon, historicProcessInstance.getEndTime());
-        assertEquals(new Long(25 * 1000), historicProcessInstance.getDurationInMillis());
+        assertEquals(Long.valueOf(25 * 1000), historicProcessInstance.getDurationInMillis());
 
         assertEquals(0, historyService.createHistoricProcessInstanceQuery().unfinished().count());
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
@@ -567,6 +567,26 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
 
         // cleanup
         deleteDeployment(deploymentId);
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryByInvalidCallbackId() {
+        String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", "now").getId();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertNull(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).processInstanceCallbackId("foo").singleResult());
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryByInvalidCallbackType() {
+        String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", "now").getId();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertNull(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).processInstanceCallbackType("foo").singleResult());
+        }
     }
 
 }

@@ -14,10 +14,16 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.List;
 
+import org.flowable.cmmn.model.PlanItem;
+
 /**
+ * An interface for entities that have child {@link org.flowable.cmmn.api.runtime.PlanItemInstance}s.
+ *
  * @author Joram Barrez
  */
 public interface PlanItemInstanceContainer {
+
+    List<PlanItem> getPlanItems();
 
     List<PlanItemInstanceEntity> getChildPlanItemInstances();
     void setChildPlanItemInstances(List<PlanItemInstanceEntity> childPlanItemInstances);

@@ -154,7 +154,17 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
             criterion.setExitCriterion(true);
         }
 
-        criterion.setAttachedToRefId(lookForAttachedRef(elementNode.get(EDITOR_SHAPE_ID).asText(), modelNode.get(EDITOR_CHILD_SHAPES)));
+        String attachedRefId = lookForAttachedRef(elementNode.get(EDITOR_SHAPE_ID).asText(), elementNode, modelNode.get(EDITOR_CHILD_SHAPES));
+        if (attachedRefId == null && criterion.isExitCriterion() && parentElement instanceof Stage) {
+            // exit sentry is on parent container, plan item model sentries are handled separately
+            Stage parentStage = (Stage) parentElement;
+            if (!parentStage.isPlanModel()) {
+                criterion.setAttachedToRefId(parentStage.getId());
+            }
+
+        } else {
+            criterion.setAttachedToRefId(attachedRefId);
+        }
 
         if (criterion.getAttachedToRefId() != null) {
             String criterionId = CmmnJsonConverterUtil.getElementId(elementNode);
@@ -187,7 +197,7 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
         criterion.setSentry(sentry);
     }
 
-    private String lookForAttachedRef(String criterionId, JsonNode childShapesNode) {
+    protected String lookForAttachedRef(String criterionId, JsonNode elementNode, JsonNode childShapesNode) {
         String attachedRefId = null;
 
         if (childShapesNode != null) {
@@ -208,7 +218,7 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
                     }
                 }
 
-                attachedRefId = lookForAttachedRef(criterionId, childNode.get(EDITOR_CHILD_SHAPES));
+                attachedRefId = lookForAttachedRef(criterionId, null, childNode.get(EDITOR_CHILD_SHAPES));
 
                 if (attachedRefId != null) {
                     break;

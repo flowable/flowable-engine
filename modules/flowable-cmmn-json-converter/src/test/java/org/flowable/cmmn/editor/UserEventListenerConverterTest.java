@@ -12,24 +12,28 @@
  */
 package org.flowable.cmmn.editor;
 
-import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.cmmn.model.Criterion;
-import org.flowable.cmmn.model.PlanItem;
-import org.flowable.cmmn.model.PlanItemTransition;
-import org.flowable.cmmn.model.Sentry;
-import org.flowable.cmmn.model.SentryOnPart;
-import org.flowable.cmmn.model.Stage;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.Criterion;
+import org.flowable.cmmn.model.EventListener;
+import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.cmmn.model.PlanItemTransition;
+import org.flowable.cmmn.model.Sentry;
+import org.flowable.cmmn.model.SentryOnPart;
+import org.flowable.cmmn.model.Stage;
 
 /**
  * @author Dennis Federico
+ * @author Joram Barrez
  */
 public class UserEventListenerConverterTest extends AbstractConverterTest {
 
@@ -78,6 +82,10 @@ public class UserEventListenerConverterTest extends AbstractConverterTest {
         assertNotNull(criterions);
         assertEquals(1, criterions.size());
         assertEquals(criterions.get(0).getSentryRef(), sentry.getId());
+
+        PlanItemDefinition planItemDefinition = model.findPlanItemDefinitionInStageOrDownwards("stopTaskBUserEvent");
+        assertTrue(planItemDefinition instanceof EventListener);
+        assertEquals("${someCondition}", ((EventListener) planItemDefinition).getAvailableConditionExpression());
 
     }
 

@@ -271,12 +271,10 @@ public abstract class BaseSpringRestTestCase extends TestCase {
     }
 
     protected void storeFormInstance(String url, String body) throws IOException {
-
         HttpPost post = new HttpPost(SERVER_URL_PREFIX + url);
         post.setEntity(new StringEntity(body));
         CloseableHttpResponse response = executeRequest(post, HttpStatus.SC_OK);
         closeResponse(response);
-
     }
 
     /**
@@ -291,7 +289,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
         // Check status and size
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-       // assertEquals(numberOfResultsExpected, dataNode.size());
+        // assertEquals(numberOfResultsExpected, dataNode.size());
 
         // Check presence of ID's
         List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));

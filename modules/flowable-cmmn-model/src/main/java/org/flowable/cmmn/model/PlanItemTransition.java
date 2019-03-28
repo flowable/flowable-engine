@@ -39,5 +39,9 @@ public interface PlanItemTransition {
     
     /* Non-spec transition from async-active to active */
     String ASYNC_ACTIVATE = "async-activate";
+
+    /* Flowable-specific: for event listeners only when going from unavailable -> available (and vice versa) */
+    String INITIATE = "initiate";
+    String DISMISS = "dismiss";
     
 }

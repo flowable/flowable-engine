@@ -12,6 +12,12 @@
  */
 package org.flowable.cmmn.engine.impl.history.async.json.transformer;
 
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDateFromJson;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
+
+import java.util.Collections;
+import java.util.List;
+
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityManager;
@@ -20,12 +26,6 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDateFromJson;
-import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author Joram Barrez
@@ -61,6 +61,8 @@ public class CaseInstanceStartHistoryJsonTransformer extends AbstractHistoryJson
                historicCaseInstanceEntity.setState(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_STATE));
                historicCaseInstanceEntity.setStartUserId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_START_USER_ID));
                historicCaseInstanceEntity.setStartTime(getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_START_TIME));
+               historicCaseInstanceEntity.setCallbackId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_CALLBACK_ID));
+               historicCaseInstanceEntity.setCallbackType(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_CALLBACK_TYPE));
                historicCaseInstanceEntity.setTenantId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_TENANT_ID));
                historicCaseInstanceEntityManager.insert(historicCaseInstanceEntity);
            }

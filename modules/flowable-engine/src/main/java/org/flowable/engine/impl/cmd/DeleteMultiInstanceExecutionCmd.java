@@ -69,7 +69,7 @@ public class DeleteMultiInstanceExecutionCmd implements Command<Void>, Serializa
         
         ExecutionEntity miExecution = getMultiInstanceRootExecution(execution);
         executionEntityManager.deleteChildExecutions(execution, "Delete MI execution", false);
-        executionEntityManager.deleteExecutionAndRelatedData(execution, "Delete MI execution");
+        executionEntityManager.deleteExecutionAndRelatedData(execution, "Delete MI execution", false);
         
         int loopCounter = 0;
         if (multiInstanceLoopCharacteristics.isSequential()) {

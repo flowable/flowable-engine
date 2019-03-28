@@ -147,7 +147,7 @@ public class JPAEntityMappings {
         } else if (type == Double.class || type == double.class) {
             return Double.parseDouble(string);
         } else if (type == Character.class || type == char.class) {
-            return new Character(string.charAt(0));
+            return Character.valueOf(string.charAt(0));
         } else if (type == java.util.Date.class) {
             return new java.util.Date(Long.parseLong(string));
         } else if (type == java.sql.Date.class) {
@@ -167,13 +167,10 @@ public class JPAEntityMappings {
         if (value == null) {
             throw new FlowableIllegalArgumentException("Value of primary key for JPA-Entity cannot be null");
         }
-        // Only java.sql.date and java.util.date require custom handling, the
-        // other types
-        // can just use toString()
+        // Only java.util.Date requires custom handling,
+        // the other types can just use toString()
         if (value instanceof java.util.Date) {
             return String.valueOf(((java.util.Date) value).getTime());
-        } else if (value instanceof java.sql.Date) {
-            return String.valueOf(((java.sql.Date) value).getTime());
         } else if (value instanceof Long || value instanceof String || value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Float || value instanceof Double
                 || value instanceof Character || value instanceof BigDecimal || value instanceof BigInteger || value instanceof UUID) {
             return value.toString();

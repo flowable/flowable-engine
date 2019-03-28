@@ -58,12 +58,12 @@ public class FormDeploymentEntityManagerImpl extends AbstractEntityManager<FormD
 
     @Override
     public void deleteDeployment(String deploymentId) {
-        deleteDecisionTablesForDeployment(deploymentId);
+        deleteFormDefinitionsForDeployment(deploymentId);
         getResourceEntityManager().deleteResourcesByDeploymentId(deploymentId);
         delete(findById(deploymentId));
     }
 
-    protected void deleteDecisionTablesForDeployment(String deploymentId) {
+    protected void deleteFormDefinitionsForDeployment(String deploymentId) {
         getFormDefinitionEntityManager().deleteFormDefinitionsByDeploymentId(deploymentId);
     }
 

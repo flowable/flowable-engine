@@ -26,4 +26,10 @@ public interface FormInstanceEntityManager extends EntityManager<FormInstanceEnt
     List<FormInstance> findFormInstancesByQueryCriteria(FormInstanceQueryImpl formInstanceQuery);
 
     long findFormInstanceCountByQueryCriteria(FormInstanceQueryImpl formInstanceQuery);
+    
+    void deleteFormInstancesByFormDefinitionId(String formDefinitionId);
+    
+    void deleteFormInstancesByProcessDefinitionId(String processDefinitionId);
+    
+    void deleteFormInstancesByScopeDefinitionId(String scopeDefinitionId);
 }

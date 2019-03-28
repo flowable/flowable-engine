@@ -64,10 +64,11 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
         deployOneTaskTestProcess();
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-        int expectedCreatedEvents = 13;
-        if (!processEngineConfiguration.getHistoryManager().isHistoryEnabled()) {
-            expectedCreatedEvents = 10;
+        int expectedCreatedEvents = 11;
+        if (processEngineConfiguration.getHistoryManager().isHistoryEnabled()) {
+            expectedCreatedEvents += 4;
         }
+        
         if (processEngineConfiguration.isAsyncHistoryEnabled()) {
             waitForHistoryJobExecutorToProcessAllJobs(7000L, 200L);
         }
@@ -138,7 +139,7 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
         public void onEvent(FlowableEvent event) {
             String eventType = event.getType().name();
             if (!eventsReceived.containsKey(eventType)) {
-                eventsReceived.put(eventType, new ArrayList<FlowableEvent>());
+                eventsReceived.put(eventType, new ArrayList<>());
             }
             eventsReceived.get(eventType).add(event);
         }

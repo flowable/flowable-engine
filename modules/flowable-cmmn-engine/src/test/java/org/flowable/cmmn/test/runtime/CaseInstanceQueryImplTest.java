@@ -16,8 +16,9 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 
+import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -44,14 +45,10 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
             addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCase.cmmn").
             deploy()
             .getId();
-        cmmnEngineConfiguration.getClock().setCurrentTime(new Date(0));
-        try {
-            cmmnRuntimeService.createCaseInstanceBuilder().
+        
+        cmmnRuntimeService.createCaseInstanceBuilder().
                 caseDefinitionKey("myCase").
                 start();
-        } finally {
-            cmmnEngineConfiguration.getClock().reset();
-        }
     }
 
     @After
@@ -273,31 +270,29 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
 
     @Test
     public void getCaseInstanceByStartedBefore() {
-        cmmnEngineConfiguration.getClock().setCurrentTime(new Date(0));
-        try {
-            cmmnRuntimeService.createCaseInstanceBuilder().
-                caseDefinitionKey("oneTaskCase").
-                start();
+        cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            start();
+        
+        Calendar todayCal = new GregorianCalendar();
+        Calendar dateCal = new GregorianCalendar(todayCal.get(Calendar.YEAR) + 1, todayCal.get(Calendar.MONTH), todayCal.get(Calendar.DAY_OF_YEAR));
 
-            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceStartedBefore(new Date(100)).count(), is(2L));
-            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceStartedBefore(new Date(100)).list().size(),
-                is(2));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceStartedBefore(dateCal.getTime()).count(), is(2L));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceStartedBefore(dateCal.getTime()).list().size(),
+            is(2));
 
-            assertThat(cmmnRuntimeService.createCaseInstanceQuery().
-                or().
-                caseInstanceStartedBefore(new Date(100)).
-                caseDefinitionName("undefinedId").
-                endOr().
-                count(), is(2L));
-            assertThat(cmmnRuntimeService.createCaseInstanceQuery().
-                or().
-                caseInstanceStartedBefore(new Date(100)).
-                caseDefinitionName("undefinedId").
-                endOr().
-                list().size(), is(2));
-        } finally {
-            cmmnEngineConfiguration.getClock().reset();
-        }
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+            or().
+            caseInstanceStartedBefore(dateCal.getTime()).
+            caseDefinitionName("undefinedId").
+            endOr().
+            count(), is(2L));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+            or().
+            caseInstanceStartedBefore(dateCal.getTime()).
+            caseDefinitionName("undefinedId").
+            endOr().
+            list().size(), is(2));
     }
 
     @Test
@@ -305,20 +300,23 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
             caseDefinitionKey("oneTaskCase").
             start();
+        
+        Calendar todayCal = new GregorianCalendar();
+        Calendar dateCal = new GregorianCalendar(todayCal.get(Calendar.YEAR) - 1, todayCal.get(Calendar.MONTH), todayCal.get(Calendar.DAY_OF_YEAR));
 
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceStartedAfter(new Date(0)).count(), is(2L));
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceStartedAfter(new Date(0)).list().size(),
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceStartedAfter(dateCal.getTime()).count(), is(2L));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceStartedAfter(dateCal.getTime()).list().size(),
             is(2));
 
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().
             or().
-                caseInstanceStartedAfter(new Date(0)).
+                caseInstanceStartedAfter(dateCal.getTime()).
                 caseDefinitionName("undefinedId").
             endOr().
             count(), is(2L));
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().
             or().
-                caseInstanceStartedAfter(new Date(0)).
+                caseInstanceStartedAfter(dateCal.getTime()).
                 caseDefinitionName("undefinedId").
             endOr().
             list().size(), is(2));

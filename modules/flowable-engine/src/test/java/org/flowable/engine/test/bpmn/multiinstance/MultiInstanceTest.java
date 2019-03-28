@@ -1465,7 +1465,7 @@ assertProcessEnded(procId);
         assertEquals(processes.size() * assignees.size(), tasks.size());
 
         for (org.flowable.task.api.Task t : tasks) {
-            taskService.complete(t.getId());
+            taskService.complete(t.getId(), Collections.singletonMap("assignee", "1"));
         }
 
         List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().processDefinitionKey("miNestedMultiInstanceTasks").list();

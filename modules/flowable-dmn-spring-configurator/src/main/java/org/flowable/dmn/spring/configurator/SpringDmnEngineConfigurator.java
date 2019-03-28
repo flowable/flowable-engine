@@ -32,7 +32,7 @@ public class SpringDmnEngineConfigurator extends DmnEngineConfigurator {
         if (dmnEngineConfiguration == null) {
             dmnEngineConfiguration = new SpringDmnEngineConfiguration();
         } else if (!(dmnEngineConfiguration instanceof SpringDmnEngineConfiguration)) {
-            throw new IllegalArgumentException("Expected dmnEngine configuration to be of type"
+            throw new IllegalArgumentException("Expected dmnEngine configuration to be of type "
                 + SpringDmnEngineConfiguration.class + " but was " + dmnEngineConfiguration.getClass());
         }
         initialiseCommonProperties(engineConfiguration, dmnEngineConfiguration);

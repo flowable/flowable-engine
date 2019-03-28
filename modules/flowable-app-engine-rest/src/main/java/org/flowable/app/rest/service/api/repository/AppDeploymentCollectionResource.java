@@ -84,7 +84,7 @@ public class AppDeploymentCollectionResource {
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return app deployments with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return app deployments with a name like the given name.", paramType = "query"),
             @ApiImplicitParam(name = "category", dataType = "string", value = "Only return app deployments with the given category.", paramType = "query"),
-            @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return app deployments which don’t have the given category.", paramType = "query"),
+            @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return app deployments which do not have the given category.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return app deployments with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return app deployments with a tenantId like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns app deployments without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
@@ -200,6 +200,10 @@ public class AppDeploymentCollectionResource {
 
             if (tenantId != null) {
                 deploymentBuilder.tenantId(tenantId);
+            }
+
+            if (restApiInterceptor != null) {
+                restApiInterceptor.enhanceDeployment(deploymentBuilder);
             }
 
             AppDeployment deployment = deploymentBuilder.deploy();

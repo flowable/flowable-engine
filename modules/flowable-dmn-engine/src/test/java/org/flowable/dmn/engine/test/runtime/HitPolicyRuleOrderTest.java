@@ -14,7 +14,6 @@ package org.flowable.dmn.engine.test.runtime;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,9 +38,6 @@ public class HitPolicyRuleOrderTest {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
-
-        Map<String, Object> inputVariables = new HashMap<>();
-        inputVariables.put("inputVariable1", 13);
 
         List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")

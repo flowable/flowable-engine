@@ -112,6 +112,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected Date completedBeforeDate;
     protected String category;
     protected boolean withFormKey;
+    protected String formKey;
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
@@ -141,7 +142,6 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     @Override
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
-        checkQueryOk();
         
         TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration(commandContext);
         if (taskServiceConfiguration.getHistoricTaskQueryInterceptor() != null) {
@@ -154,7 +154,6 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     @Override
     public List<HistoricTaskInstance> executeList(CommandContext commandContext) {
         ensureVariablesInitialized();
-        checkQueryOk();
         List<HistoricTaskInstance> tasks = null;
         
         TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration(commandContext);
@@ -1253,6 +1252,20 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     }
 
     @Override
+    public HistoricTaskInstanceQuery taskFormKey(String formKey) {
+        if (formKey == null) {
+            throw new FlowableIllegalArgumentException("Task formKey is null");
+        }
+
+        if (inOrStatement) {
+            currentOrQueryObject.formKey = formKey;
+        } else {
+            this.formKey = formKey;
+        }
+        return this;
+    }
+
+    @Override
     public HistoricTaskInstanceQuery taskCandidateUser(String candidateUser) {
         if (candidateUser == null) {
             throw new FlowableIllegalArgumentException("Candidate user is null");
@@ -1782,6 +1795,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public boolean isWithFormKey() {
         return withFormKey;
+    }
+
+    public String getFormKey() {
+        return formKey;
     }
 
     public String getTenantId() {

@@ -32,15 +32,26 @@ public interface CmmnAsyncHistoryConstants {
     String TYPE_ENTITY_LINK_CREATED = "cmmn-entity-link-created";
     String TYPE_ENTITY_LINK_DELETED = "cmmn-entity-link-deleted";
     String TYPE_MILESTONE_REACHED = "cmmn-milestone-reached";
+    String TYPE_PLAN_ITEM_INSTANCE_FULL = "cmmn-plan-item-instance-full";
+    @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_AVAILABLE = "cmmn-plan-item-instance-available";
+    @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_COMPLETED = "cmmn-plan-item-instance-completed";
+    @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_CREATED = "cmmn-plan-item-instance-created";
+    @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_DISABLED = "cmmn-plan-item-instance-disabled";
+    @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_ENABLED = "cmmn-plan-item-instance-enabled";
+    @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_EXIT = "cmmn-plan-item-instance-exit";
+    @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_OCCURRED = "cmmn-plan-item-instance-occurred";
+    @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_SUSPENDED = "cmmn-plan-item-instance-suspended";
+    @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_STARTED = "cmmn-plan-item-instance-started";
+    @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_TERMINATED = "cmmn-plan-item-instance-terminated";
     String TYPE_TASK_CREATED = "cmmn-task-created";
     String TYPE_TASK_REMOVED = "cmmn-task-removed";
@@ -48,7 +59,9 @@ public interface CmmnAsyncHistoryConstants {
     String TYPE_VARIABLE_CREATED = "cmmn-variable-created";
     String TYPE_VARIABLE_REMOVED = "cmmn-variable-removed";
     String TYPE_VARIABLE_UPDATED = "cmmn-variable-updated";
-    
+    String TYPE_HISTORIC_USER_TASK_LOG_RECORD = "cmmn-historic-user-task-log-record";
+    String TYPE_HISTORIC_USER_TASK_LOG_DELETE = "cmmn-historic-user-task-log-delete";
+
     List<String> ORDERED_TYPES = Arrays.asList(
             TYPE_CASE_INSTANCE_START,
             TYPE_UPDATE_CASE_INSTANCE_NAME,
@@ -57,16 +70,7 @@ public interface CmmnAsyncHistoryConstants {
             TYPE_IDENTITY_LINK_CREATED,
             TYPE_IDENTITY_LINK_DELETED,
             TYPE_MILESTONE_REACHED,
-            TYPE_PLAN_ITEM_INSTANCE_CREATED,
-            TYPE_PLAN_ITEM_INSTANCE_AVAILABLE,
-            TYPE_PLAN_ITEM_INSTANCE_COMPLETED,
-            TYPE_PLAN_ITEM_INSTANCE_DISABLED,
-            TYPE_PLAN_ITEM_INSTANCE_ENABLED,
-            TYPE_PLAN_ITEM_INSTANCE_EXIT,
-            TYPE_PLAN_ITEM_INSTANCE_OCCURRED,
-            TYPE_PLAN_ITEM_INSTANCE_SUSPENDED,
-            TYPE_PLAN_ITEM_INSTANCE_STARTED,
-            TYPE_PLAN_ITEM_INSTANCE_TERMINATED,
+            TYPE_PLAN_ITEM_INSTANCE_FULL,
             TYPE_TASK_CREATED,
             TYPE_TASK_REMOVED,
             TYPE_TASK_UPDATED,
@@ -115,8 +119,8 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_OWNER = "owner";
     String FIELD_PARENT_ID = "parentId";
     String FIELD_PARENT_TASK_ID = "parentTaskId";
-    String FIELD_PLAN_DEFINITION_ID = "planDefinitionId";
-    String FIELD_PLAN_DEFINITION_TYPE = "planDefinitionType";
+    String FIELD_PLAN_ITEM_DEFINITION_ID = "planItemDefinitionId";
+    String FIELD_PLAN_ITEM_DEFINITION_TYPE = "planItemDefinitionType";
     String FIELD_PLAN_ITEM_INSTANCE_ID = "planItemInstanceId";
     String FIELD_PRIORITY = "priority";
     String FIELD_REFERENCE_ID = "referenceId";
@@ -140,6 +144,8 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_TASK_DEFINITION_ID = "taskDefinitionId";
     String FIELD_TASK_DEFINITION_KEY = "taskDefinitionKey";
     String FIELD_TERMINATED_TIME = "terminatedTime";
+    String FIELD_CALLBACK_ID = "callbackId";
+    String FIELD_CALLBACK_TYPE = "callbackType";
     String FIELD_TENANT_ID = "tenantId";
     String FIELD_USER_ID = "userId";
     String FIELD_VARIABLE_BYTES_VALUE = "variableBytesValue";
@@ -148,5 +154,12 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_VARIABLE_TEXT_VALUE = "variableTextValue";
     String FIELD_VARIABLE_TEXT_VALUE2 = "variableTextValue2";
     String FIELD_VARIABLE_TYPE = "variableType";
- 
+    String FIELD_LOG_ENTRY_TYPE = "logEntryType";
+    String FIELD_LOG_ENTRY_DATA = "logEntryData";
+    String FIELD_LOG_ENTRY_LOGNUMBER = "logNumber";
+    
+    String FIELD_EXECUTION_ID = "executionId";
+    String FIELD_PROCESS_INSTANCE_ID = "processInstanceId";
+    String FIELD_PROCESS_DEFINITION_ID = "processDefinitionId";
+
 }

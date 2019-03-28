@@ -82,7 +82,7 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
         getJobServiceConfiguration().getInternalJobManager().handleJobDelete(jobEntity);
 
         // Send event
-        if (getEventDispatcher().isEnabled()) {
+        if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
             getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
         }
     }

@@ -81,11 +81,12 @@ public class HistoricActivityInstanceCollectionResourceTest extends BaseSpringRe
 
         assertResultsPresentInDataResponse(url + "?activityType=receiveTask", 0);
 
-        assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance.getId(), 3, "theStart", "processTask", "processTask2");
+        assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance.getId(), 5, "theStart", "flow1", "processTask", "flow2", "processTask2");
 
-        assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance2.getId(), 2, "theStart", "processTask");
+        assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance2.getId(), 3, "theStart", "flow1", "processTask");
 
-        assertResultsPresentInDataResponse(url + "?processDefinitionId=" + processInstance.getProcessDefinitionId(), 5, "theStart", "processTask", "processTask2");
+        assertResultsPresentInDataResponse(url + "?processDefinitionId=" + processInstance.getProcessDefinitionId(), 8,
+            "theStart", "flow1",  "processTask", "flow2", "processTask2");
 
         assertResultsPresentInDataResponse(url + "?taskAssignee=kermit", 2, "processTask");
 
@@ -94,14 +95,14 @@ public class HistoricActivityInstanceCollectionResourceTest extends BaseSpringRe
         assertResultsPresentInDataResponse(url + "?taskAssignee=fozzie2", 0);
 
         // Without tenant ID, only activities for processinstance1
-        assertResultsPresentInDataResponse(url + "?withoutTenantId=true", 3);
+        assertResultsPresentInDataResponse(url + "?withoutTenantId=true", 5);
 
         // Tenant id
-        assertResultsPresentInDataResponse(url + "?tenantId=myTenant", 2, "theStart", "processTask");
+        assertResultsPresentInDataResponse(url + "?tenantId=myTenant", 3, "theStart", "flow1", "processTask");
         assertResultsPresentInDataResponse(url + "?tenantId=anotherTenant");
 
         // Tenant id like
-        assertResultsPresentInDataResponse(url + "?tenantIdLike=" + encode("%enant"), 2, "theStart", "processTask");
+        assertResultsPresentInDataResponse(url + "?tenantIdLike=" + encode("%enant"), 3, "theStart", "flow1", "processTask");
         assertResultsPresentInDataResponse(url + "?tenantIdLike=anotherTenant");
     }
 

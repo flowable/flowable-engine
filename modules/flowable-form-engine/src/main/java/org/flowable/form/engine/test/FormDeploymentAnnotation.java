@@ -51,5 +51,7 @@ public @interface FormDeploymentAnnotation {
 
     /** Specify resources that make up the process definition. */
     public String[] resources() default {};
+    
+    public String tenantId() default "";
 
 }

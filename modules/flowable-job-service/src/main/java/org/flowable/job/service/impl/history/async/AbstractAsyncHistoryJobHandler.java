@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public abstract class AbstractAsyncHistoryJobHandler implements HistoryJobHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAsyncHistoryJobHandler.class);
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
     
     protected boolean isAsyncHistoryJsonGroupingEnabled;
     protected String jobType;
@@ -63,7 +63,7 @@ public abstract class AbstractAsyncHistoryJobHandler implements HistoryJobHandle
             } catch (Exception e) {
                 
                 if (!(e instanceof FlowableException) || (e instanceof FlowableException && ((FlowableException) e).isLogged())) {
-                    LOGGER.warn("Could not execute history job", e);
+                    logger.warn("Could not execute history job", e);
                 }
                 
                 // The transaction will be rolled back and the job retries decremented,

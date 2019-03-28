@@ -233,9 +233,9 @@ public class DmnEngineAutoConfigurationTest {
         assertThat(appDefinition.getVersion()).isOne();
         
         List<AppDeployment> appDeployments = appRepositoryService.createDeploymentQuery().list();
-        assertThat(appDeployments).hasSize(2)
+        assertThat(appDeployments).hasSize(3)
             .extracting(AppDeployment::getName)
-            .containsExactlyInAnyOrder("simple.bar", "vacationRequest.zip");
+            .containsExactlyInAnyOrder("simple.bar", "vacationRequest.zip", "processTask.bar");
     }
 
     private static DmnEngineConfigurationApi dmnEngine(ProcessEngine processEngine) {

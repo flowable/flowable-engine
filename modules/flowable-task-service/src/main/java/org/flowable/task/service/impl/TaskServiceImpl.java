@@ -113,7 +113,7 @@ public class TaskServiceImpl extends CommonServiceImpl<TaskServiceConfiguration>
     }
 
     @Override
-    public Task createTask(TaskBuilder taskBuilder) {
+    public TaskEntity createTask(TaskBuilder taskBuilder) {
         return getTaskEntityManager().createTask(taskBuilder);
     }
 }

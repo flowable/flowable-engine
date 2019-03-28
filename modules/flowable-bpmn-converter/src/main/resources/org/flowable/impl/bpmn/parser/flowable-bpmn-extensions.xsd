@@ -64,6 +64,16 @@
     </annotation>
   </attribute>
 
+  <attribute name="formFieldValidation" type="string">
+    <annotation>
+      <documentation>
+        Attribute used on a startEvent or a userTask. The value can be any expression, which results into boolean value. Another allowed values are 'true' and 'false' case insensitive strings,
+        which represents boolean values. The default value is empty string which results in false.
+        The boolean flag value enables/disables form field validation after the form submission on the backend side.
+      </documentation>
+    </annotation>
+  </attribute>
+
   <attribute name="formHandlerClass">
     <annotation>
       <documentation>

@@ -39,6 +39,7 @@
             "duedatedefinition" : "2012-11-01",
             "exclusivedefinition" : "No",
             "formkeydefinition" : "testKey",
+            "formfieldvalidation":"formFieldValidationValue",
             "categorydefinition" : "defaultCategory",
             "skipexpression" : "${skipExpression}",
             "formproperties" : { "formProperties" : [ { "expression" : "${expression}",

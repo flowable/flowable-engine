@@ -12,7 +12,7 @@
         </planItemOnPart>
       </sentry>
       <humanTask id="onehumantask1" name="Human task" flowable:assignee="admin" flowable:owner="admin" flowable:formKey="aHumanTaskForm" 
-            flowable:priority="50" flowable:dueDate="2019-01-01" flowable:category="testCategory">
+            flowable:priority="50" flowable:dueDate="2019-01-01" flowable:category="testCategory" flowable:formFieldValidation="validateFormFieldsValue">
         <extensionElements>
           <modeler:initiator-can-complete xmlns:modeler="http://flowable.org/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
         </extensionElements>

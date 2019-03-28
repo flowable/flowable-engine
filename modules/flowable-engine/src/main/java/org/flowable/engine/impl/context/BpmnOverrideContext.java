@@ -69,7 +69,7 @@ public class BpmnOverrideContext {
         bpmnOverrideContextThreadLocal.remove();
     }
 
-    protected static ObjectNode getProcessDefinitionInfoNode(String processDefinitionId) {
+    public static ObjectNode getProcessDefinitionInfoNode(String processDefinitionId) {
         Map<String, ObjectNode> bpmnOverrideMap = getBpmnOverrideContext();
         if (!bpmnOverrideMap.containsKey(processDefinitionId)) {
             ProcessDefinitionInfoCacheObject cacheObject = CommandContextUtil.getProcessEngineConfiguration().getDeploymentManager()

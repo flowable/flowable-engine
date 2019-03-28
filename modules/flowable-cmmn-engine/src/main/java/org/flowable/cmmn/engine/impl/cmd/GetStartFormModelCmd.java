@@ -17,6 +17,7 @@ import java.io.Serializable;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
@@ -48,7 +49,8 @@ public class GetStartFormModelCmd implements Command<FormInfo>, Serializable {
 
     @Override
     public FormInfo execute(CommandContext commandContext) {
-        FormService formService = CommandContextUtil.getFormService();
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        FormService formService = CommandContextUtil.getFormService(commandContext);
         if (formService == null) {
             throw new FlowableIllegalArgumentException("Form engine is not initialized");
         }
@@ -62,7 +64,7 @@ public class GetStartFormModelCmd implements Command<FormInfo>, Serializable {
         if (StringUtils.isNotEmpty(planModel.getFormKey())) {
             CmmnDeployment deployment = CommandContextUtil.getCmmnDeploymentEntityManager(commandContext).findById(caseDefinition.getDeploymentId());
             formInfo = formService.getFormInstanceModelByKeyAndParentDeploymentIdAndScopeId(planModel.getFormKey(), deployment.getParentDeploymentId(), 
-                            caseInstanceId, ScopeTypes.CMMN, null, caseDefinition.getTenantId());
+                            caseInstanceId, ScopeTypes.CMMN, null, caseDefinition.getTenantId(), cmmnEngineConfiguration.isFallbackToDefaultTenant());
         }
 
         // If form does not exists, we don't want to leak out this info to just anyone
@@ -70,7 +72,7 @@ public class GetStartFormModelCmd implements Command<FormInfo>, Serializable {
             throw new FlowableObjectNotFoundException("Form model for case definition " + caseDefinitionId + " cannot be found");
         }
 
-        FormFieldHandler formFieldHandler = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getFormFieldHandler();
+        FormFieldHandler formFieldHandler = cmmnEngineConfiguration.getFormFieldHandler();
         formFieldHandler.enrichFormFields(formInfo);
 
         return formInfo;

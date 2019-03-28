@@ -53,7 +53,7 @@ public class TaskCommentResource extends TaskBaseResource {
 
         Comment comment = taskService.getComment(commentId);
         if (comment == null || !task.getId().equals(comment.getTaskId())) {
-            throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' doesn't have a comment with id '" + commentId + "'.", Comment.class);
+            throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' does not have a comment with id '" + commentId + "'.", Comment.class);
         }
 
         return restResponseFactory.createRestComment(comment);
@@ -72,7 +72,7 @@ public class TaskCommentResource extends TaskBaseResource {
 
         Comment comment = taskService.getComment(commentId);
         if (comment == null || comment.getTaskId() == null || !comment.getTaskId().equals(task.getId())) {
-            throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' doesn't have a comment with id '" + commentId + "'.", Comment.class);
+            throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' does not have a comment with id '" + commentId + "'.", Comment.class);
         }
 
         taskService.deleteComment(commentId);

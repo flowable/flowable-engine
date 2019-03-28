@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
+import static org.flowable.cmmn.engine.impl.task.TaskHelper.logUserTaskCompleted;
+
 import java.util.Map;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -68,6 +70,8 @@ public class CompleteTaskCmd implements Command<Void> {
         if (transientVariables != null) {
             taskEntity.setTransientVariables(transientVariables);
         }
+
+        logUserTaskCompleted(taskEntity);
 
         CommandContextUtil.getInternalTaskAssignmentManager(commandContext).addUserIdentityLinkToParent(taskEntity, Authentication.getAuthenticatedUserId());
         CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_COMPLETE);

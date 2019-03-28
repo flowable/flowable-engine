@@ -11,9 +11,9 @@
     
     <userTask id="theTask1" name="The famous task1" activiti:assignee="kermit" />
     
-    <sequenceFlow id="flow2" sourceRef="theTask1" targetRef="subProcess" />
+    <sequenceFlow id="flow2" sourceRef="theTask1" targetRef="runSubProcess" />
     
-    <subProcess id="subProcess">
+    <subProcess id="runSubProcess">
     
     	<startEvent id="subStart" />
     	<sequenceFlow id="subflow1" sourceRef="subStart" targetRef="subTask" />
@@ -23,7 +23,7 @@
     
     </subProcess>
     
-    <sequenceFlow id="flow3" sourceRef="subProcess" targetRef="theTask2" />
+    <sequenceFlow id="flow3" sourceRef="runSubProcess" targetRef="theTask2" />
     
     <userTask id="theTask2" name="The famous task2" activiti:assignee="kermit" />
     

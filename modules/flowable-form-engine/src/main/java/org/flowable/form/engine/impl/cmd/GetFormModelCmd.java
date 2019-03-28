@@ -15,6 +15,7 @@ package org.flowable.form.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -25,6 +26,7 @@ import org.flowable.form.engine.impl.FormDeploymentQueryImpl;
 import org.flowable.form.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.form.engine.impl.persistence.deploy.FormDefinitionCacheEntry;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
+import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntityManager;
 import org.flowable.form.engine.impl.util.CommandContextUtil;
 import org.flowable.form.model.SimpleFormModel;
 
@@ -39,25 +41,29 @@ public class GetFormModelCmd implements Command<FormInfo>, Serializable {
     protected String formDefinitionId;
     protected String tenantId;
     protected String parentDeploymentId;
+    protected boolean fallbackToDefaultTenant;
 
     public GetFormModelCmd(String formDefinitionKey, String formDefinitionId) {
         this.formDefinitionKey = formDefinitionKey;
         this.formDefinitionId = formDefinitionId;
     }
 
-    public GetFormModelCmd(String formDefinitionKey, String formDefinitionId, String tenantId) {
+    public GetFormModelCmd(String formDefinitionKey, String formDefinitionId, String tenantId, boolean fallbackToDefaultTenant) {
         this(formDefinitionKey, formDefinitionId);
         this.tenantId = tenantId;
+        this.fallbackToDefaultTenant = fallbackToDefaultTenant;
     }
 
-    public GetFormModelCmd(String formDefinitionKey, String formDefinitionId, String tenantId, String parentDeploymentId) {
-        this(formDefinitionKey, formDefinitionId, tenantId);
+    public GetFormModelCmd(String formDefinitionKey, String formDefinitionId, String tenantId, String parentDeploymentId, boolean fallbackToDefaultTenant) {
+        this(formDefinitionKey, formDefinitionId, tenantId, fallbackToDefaultTenant);
         this.parentDeploymentId = parentDeploymentId;
     }
 
     @Override
     public FormInfo execute(CommandContext commandContext) {
-        DeploymentManager deploymentManager = CommandContextUtil.getFormEngineConfiguration().getDeploymentManager();
+        FormEngineConfiguration formEngineConfiguration = CommandContextUtil.getFormEngineConfiguration();
+        DeploymentManager deploymentManager = formEngineConfiguration.getDeploymentManager();
+        FormDefinitionEntityManager formDefinitionEntityManager = formEngineConfiguration.getFormDefinitionEntityManager();
 
         // Find the form definition
         FormDefinitionEntity formDefinitionEntity = null;
@@ -68,16 +74,27 @@ public class GetFormModelCmd implements Command<FormInfo>, Serializable {
                 throw new FlowableObjectNotFoundException("No form definition found for id = '" + formDefinitionId + "'", FormDefinitionEntity.class);
             }
 
-        } else if (formDefinitionKey != null && (tenantId == null || FormEngineConfiguration.NO_TENANT_ID.equals(tenantId)) && parentDeploymentId == null) {
+        } else if (formDefinitionKey != null && (tenantId == null || FormEngineConfiguration.NO_TENANT_ID.equals(tenantId)) && 
+                        (parentDeploymentId == null || formEngineConfiguration.isAlwaysLookupLatestDefinitionVersion())) {
 
             formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKey(formDefinitionKey);
             if (formDefinitionEntity == null) {
                 throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey + "'", FormDefinitionEntity.class);
             }
 
-        } else if (formDefinitionKey != null && tenantId != null && !FormEngineConfiguration.NO_TENANT_ID.equals(tenantId) && parentDeploymentId == null) {
+        } else if (formDefinitionKey != null && tenantId != null && !FormEngineConfiguration.NO_TENANT_ID.equals(tenantId) && 
+                        (parentDeploymentId == null || formEngineConfiguration.isAlwaysLookupLatestDefinitionVersion())) {
 
-            formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, tenantId);
+            formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, tenantId);
+            
+            if (formDefinitionEntity == null && (fallbackToDefaultTenant || formEngineConfiguration.isFallbackToDefaultTenant())) {
+                if (StringUtils.isNotEmpty(formEngineConfiguration.getDefaultTenantValue())) {
+                    formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, formEngineConfiguration.getDefaultTenantValue());
+                } else {
+                    formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKey(formDefinitionKey);
+                }
+            }
+            
             if (formDefinitionEntity == null) {
                 throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey + "' for tenant identifier " + tenantId, FormDefinitionEntity.class);
             }
@@ -88,7 +105,11 @@ public class GetFormModelCmd implements Command<FormInfo>, Serializable {
                             new FormDeploymentQueryImpl().parentDeploymentId(parentDeploymentId));
             
             if (formDeployments != null && formDeployments.size() > 0) {
-                formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKeyAndDeploymentId(formDefinitionKey, formDeployments.get(0).getId());
+                formDefinitionEntity = formDefinitionEntityManager.findFormDefinitionByDeploymentAndKey(formDeployments.get(0).getId(), formDefinitionKey);
+            }
+            
+            if (formDefinitionEntity == null) {
+                formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKey(formDefinitionKey);
             }
             
             if (formDefinitionEntity == null) {
@@ -102,8 +123,20 @@ public class GetFormModelCmd implements Command<FormInfo>, Serializable {
                             new FormDeploymentQueryImpl().parentDeploymentId(parentDeploymentId).deploymentTenantId(tenantId));
             
             if (formDeployments != null && formDeployments.size() > 0) {
-                formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKeyDeploymentIdAndTenantId(
-                                formDefinitionKey, formDeployments.get(0).getId(), tenantId);
+                formDefinitionEntity = formDefinitionEntityManager.findFormDefinitionByDeploymentAndKeyAndTenantId(
+                                formDeployments.get(0).getId(), formDefinitionKey, tenantId);
+            }
+            
+            if (formDefinitionEntity == null) {
+                formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, tenantId);
+            }
+            
+            if (formDefinitionEntity == null && (fallbackToDefaultTenant || formEngineConfiguration.isFallbackToDefaultTenant())) {
+                if (StringUtils.isNotEmpty(formEngineConfiguration.getDefaultTenantValue())) {
+                    formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, formEngineConfiguration.getDefaultTenantValue());
+                } else {
+                    formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKey(formDefinitionKey);
+                }
             }
             
             if (formDefinitionEntity == null) {

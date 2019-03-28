@@ -46,7 +46,8 @@ public class TaskEndedHistoryJsonTransformer extends AbstractTaskHistoryJsonTran
         HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskEntity(historicalData, commandContext);
         
         if (historicTaskInstance != null) {
-            Date lastUpdateTime = getDateFromJson(historicalData, AsyncHistorySession.TIMESTAMP);
+            // The end time is the last update time
+            Date lastUpdateTime = getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_END_TIME);
             if (historicTaskInstance.getLastUpdateTime() == null || !historicTaskInstance.getLastUpdateTime().after(lastUpdateTime)) {
                 historicTaskInstance.setLastUpdateTime(lastUpdateTime);
                 copyCommonHistoricTaskInstanceFields(historicalData, historicTaskInstance);

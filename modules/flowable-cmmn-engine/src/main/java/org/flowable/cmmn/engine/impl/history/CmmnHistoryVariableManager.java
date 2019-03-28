@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.history;
 
+import java.util.Date;
+
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
@@ -27,17 +29,18 @@ public class CmmnHistoryVariableManager implements InternalHistoryVariableManage
     }
 
     @Override
-    public void recordVariableCreate(VariableInstanceEntity variable) {
-        cmmnHistoryManager.recordVariableCreate(variable);
+    public void recordVariableCreate(VariableInstanceEntity variable, Date createTime) {
+        cmmnHistoryManager.recordVariableCreate(variable, createTime);
     }
 
     @Override
-    public void recordVariableUpdate(VariableInstanceEntity variable) {
-        cmmnHistoryManager.recordVariableUpdate(variable);
+    public void recordVariableUpdate(VariableInstanceEntity variable, Date updateTime) {
+        cmmnHistoryManager.recordVariableUpdate(variable, updateTime);
     }
 
     @Override
-    public void recordVariableRemoved(VariableInstanceEntity variable) {
+    public void recordVariableRemoved(VariableInstanceEntity variable, Date removeTime) {
+        // The remove time is not needed for the CmmnHistoryManager
         cmmnHistoryManager.recordVariableRemoved(variable);
     }
 

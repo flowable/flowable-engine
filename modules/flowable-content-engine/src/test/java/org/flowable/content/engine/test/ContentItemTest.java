@@ -285,7 +285,7 @@ public class ContentItemTest extends AbstractFlowableContentTest {
         ContentItem storedContentItem = contentService.createContentItemQuery().id(initialContentItem.getId()).singleResult();
         assertNotNull(storedContentItem);
         assertEquals(initialContentItem.getId(), storedContentItem.getId());
-        assertTrue(initialContentItem.getLastModified().getTime() == storedContentItem.getLastModified().getTime());
+        assertEquals(initialContentItem.getLastModified().getTime(), storedContentItem.getLastModified().getTime());
 
         long storeTS = System.currentTimeMillis();
         contentService.saveContentItem(storedContentItem, this.getClass().getClassLoader().getResourceAsStream("test.txt"));

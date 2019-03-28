@@ -19,13 +19,13 @@ import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * @author Dave Syer
  * @author Tom Baeyens
+ * @author Joram Barrez
  */
 public class SpringTransactionInterceptor extends AbstractCommandInterceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringTransactionInterceptor.class);
@@ -40,17 +40,23 @@ public class SpringTransactionInterceptor extends AbstractCommandInterceptor {
     public <T> T execute(final CommandConfig config, final Command<T> command) {
         LOGGER.debug("Running command with propagation {}", config.getTransactionPropagation());
 
-        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-        transactionTemplate.setPropagationBehavior(getPropagation(config));
 
-        T result = transactionTemplate.execute(new TransactionCallback<T>() {
-            @Override
-            public T doInTransaction(TransactionStatus status) {
-                return next.execute(config, command);
-            }
-        });
+        // If the transaction is required (the other two options always need to go through the transactionTemplate),
+        // the transactionTemplate is not used when the transaction is already active.
+        // The reason for this is that the transactionTemplate try-catches exceptions and marks it as rollback.
+        // Which will break nested service calls that go through the same stack of interceptors.
 
-        return result;
+        int transactionPropagation = getPropagation(config);
+        if (transactionPropagation == TransactionTemplate.PROPAGATION_REQUIRED && TransactionSynchronizationManager.isActualTransactionActive()) {
+            return next.execute(config, command);
+
+        } else {
+            TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+            transactionTemplate.setPropagationBehavior(transactionPropagation);
+            return transactionTemplate.execute(status -> next.execute(config, command));
+
+        }
+
     }
 
     private int getPropagation(CommandConfig config) {

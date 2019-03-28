@@ -18,10 +18,13 @@ import org.flowable.bpmn.model.ExclusiveGateway;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.condition.ConditionUtil;
 import org.slf4j.Logger;
@@ -55,8 +58,14 @@ public class ExclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
 
         ExclusiveGateway exclusiveGateway = (ExclusiveGateway) execution.getCurrentFlowElement();
 
-        if (CommandContextUtil.getProcessEngineConfiguration() != null && CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        FlowableEventDispatcher eventDispatcher = null;
+        if (processEngineConfiguration != null) {
+            eventDispatcher = processEngineConfiguration.getEventDispatcher();
+        }
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            processEngineConfiguration.getEventDispatcher().dispatchEvent(
                     FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, exclusiveGateway.getId(), exclusiveGateway.getName(), execution.getId(),
                             execution.getProcessInstanceId(), execution.getProcessDefinitionId(), exclusiveGateway));
         }
@@ -71,7 +80,7 @@ public class ExclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
             SequenceFlow sequenceFlow = sequenceFlowIterator.next();
 
             String skipExpressionString = sequenceFlow.getSkipExpression();
-            if (!SkipExpressionUtil.isSkipExpressionEnabled(execution, skipExpressionString)) {
+            if (!SkipExpressionUtil.isSkipExpressionEnabled(skipExpressionString, sequenceFlow.getId(), execution, commandContext)) {
                 boolean conditionEvaluatesToTrue = ConditionUtil.hasTrueCondition(sequenceFlow, execution);
                 if (conditionEvaluatesToTrue && (defaultSequenceFlowId == null || !defaultSequenceFlowId.equals(sequenceFlow.getId()))) {
                     if (LOGGER.isDebugEnabled()) {
@@ -79,7 +88,8 @@ public class ExclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
                     }
                     outgoingSequenceFlow = sequenceFlow;
                 }
-            } else if (SkipExpressionUtil.shouldSkipFlowElement(Context.getCommandContext(), execution, skipExpressionString)) {
+                
+            } else if (SkipExpressionUtil.shouldSkipFlowElement(skipExpressionString, sequenceFlow.getId(), execution, Context.getCommandContext())) {
                 outgoingSequenceFlow = sequenceFlow;
             }
 

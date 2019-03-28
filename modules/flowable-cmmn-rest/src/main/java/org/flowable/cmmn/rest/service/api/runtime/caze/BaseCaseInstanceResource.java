@@ -114,7 +114,7 @@ public class BaseCaseInstanceResource {
 
         DataResponse<CaseInstanceResponse> responseList = paginateList(requestParams, queryRequest, query, "id", allowedSortProperties, restResponseFactory::createCaseInstanceResponseList);
         
-        Set<String> caseDefinitionIds = new HashSet<String>();
+        Set<String> caseDefinitionIds = new HashSet<>();
         List<CaseInstanceResponse> caseInstanceList = responseList.getData();
         for (CaseInstanceResponse caseInstanceResponse : caseInstanceList) {
             if (!caseDefinitionIds.contains(caseInstanceResponse.getCaseDefinitionId())) {
@@ -124,7 +124,7 @@ public class BaseCaseInstanceResource {
         
         if (caseDefinitionIds.size() > 0) {
             List<CaseDefinition> caseDefinitionList = repositoryService.createCaseDefinitionQuery().caseDefinitionIds(caseDefinitionIds).list();
-            Map<String, CaseDefinition> caseDefinitionMap = new HashMap<String, CaseDefinition>();
+            Map<String, CaseDefinition> caseDefinitionMap = new HashMap<>();
             for (CaseDefinition caseDefinition : caseDefinitionList) {
                 caseDefinitionMap.put(caseDefinition.getId(), caseDefinition);
             }

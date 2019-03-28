@@ -16,6 +16,7 @@ import org.flowable.common.engine.impl.persistence.entity.AbstractEntityNoRevisi
 
 public abstract class AbstractCmmnEngineNoRevisionEntity extends AbstractEntityNoRevision {
 
+    @Override
     public String getIdPrefix() {
         return CmmnEngineEntityConstants.CMMN_ENGINE_ID_PREFIX;
     }

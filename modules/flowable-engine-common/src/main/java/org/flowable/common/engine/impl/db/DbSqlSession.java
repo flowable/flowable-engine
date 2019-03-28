@@ -70,7 +70,6 @@ public class DbSqlSession implements Session {
         this.sqlSession = dbSqlSessionFactory.getSqlSessionFactory().openSession(connection); // Note the use of connection param here, different from other constructor
         this.connectionMetadataDefaultCatalog = catalog;
         this.connectionMetadataDefaultSchema = schema;
-        this.entityCache = entityCache;
     }
 
     // insert ///////////////////////////////////////////////////////////////////
@@ -185,7 +184,8 @@ public class DbSqlSession implements Session {
         if (parameterToUse == null) {
             parameterToUse = new ListQueryParameterObject();
         }
-        return selectListWithRawParameter(statement, parameter, false);
+        parameterToUse.setDatabaseType(dbSqlSessionFactory.getDatabaseType());
+        return selectListWithRawParameter(statement, parameterToUse, false);
     }
 
     @SuppressWarnings("rawtypes")

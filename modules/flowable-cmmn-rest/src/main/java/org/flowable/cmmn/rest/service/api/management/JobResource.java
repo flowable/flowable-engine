@@ -138,7 +138,7 @@ public class JobResource extends JobBaseResource {
             @ApiResponse(code = 404, message = "Indicates the requested job was not found.")
     })
     @DeleteMapping("/cmmn-management/suspended-jobs/{jobId}")
-    public void deleteSuspendeJob(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
+    public void deleteSuspendedJob(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
         Job job = getSuspendedJobById(jobId);
         try {
             managementService.deleteSuspendedJob(job.getId());

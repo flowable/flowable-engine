@@ -83,7 +83,7 @@ create table ACT_RE_PROCDEF (
     TENANT_ID_ varchar(255) default '',
     DERIVED_FROM_ varchar(64),
     DERIVED_FROM_ROOT_ varchar(64),
-    DERIVED_VERSION_ integer NOT NULL default 0,
+    DERIVED_VERSION_ integer default 0 NOT NULL,
     ENGINE_VERSION_ varchar(255),
     primary key (ID_)
 );
@@ -324,7 +324,7 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.4.1.2', 1);
+values ('schema.version', '6.5.0.0', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.4.1.2)', 1);
+values ('schema.history', 'create(6.5.0.0)', 1);

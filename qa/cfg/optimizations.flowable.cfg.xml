@@ -41,6 +41,7 @@
     
     <property name="enableProcessDefinitionHistoryLevel" value="true" />
     <property name="enableProcessDefinitionInfoCache" value="true" />
+    <property name="enableHistoricTaskLogging" value="true"/>
     
     <!-- OPTIMIZATION FLAGS -->
     <property name="enableEagerExecutionTreeFetching" value="true" />

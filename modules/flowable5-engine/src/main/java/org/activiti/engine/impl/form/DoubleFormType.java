@@ -36,7 +36,7 @@ public class DoubleFormType extends AbstractFormType {
         if (propertyValue == null || "".equals(propertyValue)) {
             return null;
         }
-        return new Double(propertyValue);
+        return Double.valueOf(propertyValue);
     }
 
     @Override

@@ -20,7 +20,7 @@ import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.app.api.repository.AppDefinitionQuery;
 import org.flowable.app.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.AbstractQuery;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 
@@ -295,19 +295,12 @@ public class AppDefinitionQueryImpl extends AbstractQuery<AppDefinitionQuery, Ap
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getAppDefinitionEntityManager(commandContext).findAppDefinitionCountByQueryCriteria(this);
     }
 
     @Override
     public List<AppDefinition> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getAppDefinitionEntityManager(commandContext).findAppDefinitionsByQueryCriteria(this);
-    }
-
-    @Override
-    public void checkQueryOk() {
-        super.checkQueryOk();
     }
 
     // getters ////////////////////////////////////////////

@@ -154,12 +154,15 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_CANDIDATE_GROUPS = "candidateGroups";
     String ATTRIBUTE_PRIORITY = "priority";
     String ATTRIBUTE_FORM_KEY = "formKey";
+    String ATTRIBUTE_FORM_FIELD_VALIDATION = "formFieldValidation";
     String ATTRIBUTE_DUE_DATE = "dueDate";
     String ATTRIBUTE_CATEGORY = "category";
 
     String ATTRIBUTE_REPETITION_COUNTER_VARIABLE_NAME = "counterVariable";
 
     String ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE = "autoStoreVariables";
+
+    String ATTRIBUTE_EVENT_LISTENER_AVAILABLE_CONDITION = "availableCondition";
 
     String ELEMENT_DI_CMMN = "CMMNDI";
     String ELEMENT_DI_DIAGRAM = "CMMNDiagram";

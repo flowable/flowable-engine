@@ -94,7 +94,7 @@ public class TimerJobServiceImpl extends ServiceImpl implements TimerJobService 
         Collection<TimerJobEntity> timerJobsForExecution = timerJobEntityManager.findJobsByExecutionId(executionId);
         for (TimerJobEntity job : timerJobsForExecution) {
             timerJobEntityManager.delete(job);
-            if (getEventDispatcher().isEnabled()) {
+            if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
                 getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
             }
         }

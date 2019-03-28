@@ -25,6 +25,7 @@ import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.ExecutionListener;
@@ -246,7 +247,11 @@ public class ContinueProcessOperation extends AbstractOperation {
         LOGGER.debug("Executing activityBehavior {} on activity '{}' with execution {}", activityBehavior.getClass(), flowNode.getId(), execution.getId());
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
-        if (processEngineConfiguration != null && processEngineConfiguration.getEventDispatcher().isEnabled()) {
+        FlowableEventDispatcher eventDispatcher = null;
+        if (processEngineConfiguration != null) {
+            eventDispatcher = processEngineConfiguration.getEventDispatcher();
+        }
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
 
             if (flowNode instanceof Activity && ((Activity) flowNode).hasMultiInstanceLoopCharacteristics()) {
                 processEngineConfiguration.getEventDispatcher().dispatchEvent(
@@ -271,7 +276,6 @@ public class ContinueProcessOperation extends AbstractOperation {
     }
 
     protected void continueThroughSequenceFlow(SequenceFlow sequenceFlow) {
-
         // Execution listener. Sequenceflow only 'take' makes sense ... but we've supported all three since the beginning
         if (CollectionUtil.isNotEmpty(sequenceFlow.getExecutionListeners())) {
             executeExecutionListeners(sequenceFlow, ExecutionListener.EVENTNAME_START);
@@ -281,7 +285,11 @@ public class ContinueProcessOperation extends AbstractOperation {
 
         // Firing event that transition is being taken
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
-        if (processEngineConfiguration != null && processEngineConfiguration.getEventDispatcher().isEnabled()) {
+        FlowableEventDispatcher eventDispatcher = null;
+        if (processEngineConfiguration != null) {
+            eventDispatcher = processEngineConfiguration.getEventDispatcher();
+        }
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             FlowElement sourceFlowElement = sequenceFlow.getSourceFlowElement();
             FlowElement targetFlowElement = sequenceFlow.getTargetFlowElement();
             processEngineConfiguration.getEventDispatcher().dispatchEvent(
@@ -298,6 +306,8 @@ public class ContinueProcessOperation extends AbstractOperation {
                             targetFlowElement != null ? targetFlowElement.getClass().getName() : null,
                             targetFlowElement != null ? ((FlowNode) targetFlowElement).getBehavior() : null));
         }
+
+        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordSequenceFlowTaken(execution);
 
         FlowElement targetFlowElement = sequenceFlow.getTargetFlowElement();
         execution.setCurrentFlowElement(targetFlowElement);

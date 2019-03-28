@@ -13,6 +13,9 @@
 
 package org.flowable.rest.service.api.history;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
@@ -25,8 +28,6 @@ import org.flowable.task.api.Task;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
-import static org.junit.Assert.*;
 
 /**
  * Test for REST-operation related to get and delete a historic process instance.

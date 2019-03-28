@@ -13,6 +13,7 @@
 package org.flowable.test.cmmn.converter;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -84,6 +85,8 @@ public class JavaTaskCmmnXmlConverterTest extends AbstractConverterTest {
         assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, taskA.getImplementationType());
         assertEquals("org.flowable.TestJavaDelegate", taskA.getImplementation());
         assertEquals("result", taskA.getResultVariableName());
+        assertFalse(taskA.isAsync());
+        assertFalse(taskA.isExclusive());
         
         PlanItem planItemTaskB = cmmnModel.findPlanItem("planItemTaskB");
         planItemDefinition = planItemTaskB.getPlanItemDefinition();
@@ -94,6 +97,8 @@ public class JavaTaskCmmnXmlConverterTest extends AbstractConverterTest {
         assertEquals(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION, taskB.getImplementationType());
         assertEquals("${testJavaDelegate}", taskB.getImplementation());
         assertNull(taskB.getResultVariableName());
+        assertTrue(taskB.isAsync());
+        assertTrue(taskB.isExclusive());
         
         assertEquals(4, taskB.getFieldExtensions().size());
         FieldExtension fieldExtension = taskB.getFieldExtensions().get(0);

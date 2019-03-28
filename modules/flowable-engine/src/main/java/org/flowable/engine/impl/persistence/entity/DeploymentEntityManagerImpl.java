@@ -82,6 +82,7 @@ public class DeploymentEntityManagerImpl extends AbstractEntityManager<Deploymen
 
         if (cascade) {
             deleteProcessInstancesForProcessDefinitions(processDefinitions);
+            deleteHistoricTaskEventLogEntriesForProcessDefinitions(processDefinitions);
         }
 
         for (ProcessDefinition processDefinition : processDefinitions) {
@@ -137,12 +138,18 @@ public class DeploymentEntityManagerImpl extends AbstractEntityManager<Deploymen
         }
     }
 
+    protected void deleteHistoricTaskEventLogEntriesForProcessDefinitions(List<ProcessDefinition> processDefinitions) {
+        for (ProcessDefinition processDefinition : processDefinitions) {
+            CommandContextUtil.getHistoricTaskService().deleteHistoricTaskLogEntriesForProcessDefinition(processDefinition.getId());
+        }
+    }
+
     protected void removeTimerStartJobs(ProcessDefinition processDefinition) {
         TimerJobService timerJobService = CommandContextUtil.getTimerJobService();
         List<TimerJobEntity> timerStartJobs = timerJobService.findJobsByTypeAndProcessDefinitionId(TimerStartEventJobHandler.TYPE, processDefinition.getId());
         if (timerStartJobs != null && timerStartJobs.size() > 0) {
             for (TimerJobEntity timerStartJob : timerStartJobs) {
-                if (getEventDispatcher().isEnabled()) {
+                if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
                     getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timerStartJob, null, null, processDefinition.getId()));
                 }
 

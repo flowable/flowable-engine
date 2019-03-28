@@ -303,7 +303,7 @@ In the default configuration, event listeners are invoked synchronously and in t
 
 [source,java,linenums]
 ----
-public void onShipmentSuceeded(@Observes(during=TransactionPhase.AFTER_SUCCESS) @BusinessProcess("shippingProcess") @EndActivity("shipGoods") BusinessProcessEvent evt) {
+public void onShipmentSucceeded(@Observes(during=TransactionPhase.AFTER_SUCCESS) @BusinessProcess("shippingProcess") @EndActivity("shipGoods") BusinessProcessEvent evt) {
 	// send email to customer.
 }	
 ----

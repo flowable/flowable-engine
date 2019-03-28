@@ -10,7 +10,7 @@
     <groupId>org.flowable</groupId>
     <artifactId>flowable-spring-boot</artifactId>
     <relativePath>../flowable-spring-boot/pom.xml</relativePath>
-    <version>6.4.1-SNAPSHOT</version>
+    <version>6.5.0-SNAPSHOT</version>
   </parent>
   
   <properties>
@@ -44,20 +44,6 @@
 	 </dependencies>
 	</dependencyManagement>
 
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-			<argLine>-Xmx256m</argLine>
-			<forkCount>1</forkCount>
-			<reuseForks>true</reuseForks>
-			<!-- Force alphabetical order to have a reproducible build -->
-			<runOrder>alphabetical</runOrder>
-		</configuration>
-      </plugin>
-    </plugins>
-  </build>
     <profiles>
         <profile>
             <id>docker</id>

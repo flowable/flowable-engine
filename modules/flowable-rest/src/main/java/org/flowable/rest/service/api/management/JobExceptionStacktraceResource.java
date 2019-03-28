@@ -48,7 +48,7 @@ public class JobExceptionStacktraceResource extends JobBaseResource {
         String stackTrace = managementService.getJobExceptionStacktrace(job.getId());
 
         if (stackTrace == null) {
-            throw new FlowableObjectNotFoundException("Job with id '" + job.getId() + "' doesn't have an exception stacktrace.", String.class);
+            throw new FlowableObjectNotFoundException("Job with id '" + job.getId() + "' does not have an exception stacktrace.", String.class);
         }
 
         response.setContentType("text/plain");
@@ -67,7 +67,7 @@ public class JobExceptionStacktraceResource extends JobBaseResource {
         String stackTrace = managementService.getTimerJobExceptionStacktrace(job.getId());
 
         if (stackTrace == null) {
-            throw new FlowableObjectNotFoundException("Timer job with id '" + job.getId() + "' doesn't have an exception stacktrace.", String.class);
+            throw new FlowableObjectNotFoundException("Timer job with id '" + job.getId() + "' does not have an exception stacktrace.", String.class);
         }
 
         response.setContentType("text/plain");
@@ -86,7 +86,7 @@ public class JobExceptionStacktraceResource extends JobBaseResource {
         String stackTrace = managementService.getSuspendedJobExceptionStacktrace(job.getId());
 
         if (stackTrace == null) {
-            throw new FlowableObjectNotFoundException("Suspended job with id '" + job.getId() + "' doesn't have an exception stacktrace.", String.class);
+            throw new FlowableObjectNotFoundException("Suspended job with id '" + job.getId() + "' does not have an exception stacktrace.", String.class);
         }
 
         response.setContentType("text/plain");
@@ -105,7 +105,7 @@ public class JobExceptionStacktraceResource extends JobBaseResource {
         String stackTrace = managementService.getDeadLetterJobExceptionStacktrace(job.getId());
 
         if (stackTrace == null) {
-            throw new FlowableObjectNotFoundException("Suspended job with id '" + job.getId() + "' doesn't have an exception stacktrace.", String.class);
+            throw new FlowableObjectNotFoundException("Suspended job with id '" + job.getId() + "' does not have an exception stacktrace.", String.class);
         }
 
         response.setContentType("text/plain");

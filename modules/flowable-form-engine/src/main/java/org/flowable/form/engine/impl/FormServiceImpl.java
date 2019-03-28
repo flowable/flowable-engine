@@ -22,8 +22,13 @@ import org.flowable.form.api.FormInstanceQuery;
 import org.flowable.form.api.FormService;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.cmd.CreateFormInstanceCmd;
+import org.flowable.form.engine.impl.cmd.DeleteFormInstanceCmd;
+import org.flowable.form.engine.impl.cmd.DeleteFormInstancesByFormDefinitionCmd;
+import org.flowable.form.engine.impl.cmd.DeleteFormInstancesByProcessDefinitionCmd;
+import org.flowable.form.engine.impl.cmd.DeleteFormInstancesByScopeDefinitionCmd;
 import org.flowable.form.engine.impl.cmd.GetFormInstanceByScopeModelCmd;
 import org.flowable.form.engine.impl.cmd.GetFormInstanceModelCmd;
+import org.flowable.form.engine.impl.cmd.GetFormInstanceValuesCmd;
 import org.flowable.form.engine.impl.cmd.GetFormModelWithVariablesCmd;
 import org.flowable.form.engine.impl.cmd.GetVariablesFromFormSubmissionCmd;
 import org.flowable.form.engine.impl.cmd.SaveFormInstanceCmd;
@@ -47,33 +52,45 @@ public class FormServiceImpl extends CommonEngineServiceImpl<FormEngineConfigura
     }
 
     @Override
-    public FormInstance createFormInstance(Map<String, Object> variables, FormInfo formInfo, String taskId, String processInstanceId, String processDefinitionId) {
-        return commandExecutor.execute(new CreateFormInstanceCmd(formInfo, variables, taskId, processInstanceId, processDefinitionId));
+    public FormInstance createFormInstance(Map<String, Object> variables, FormInfo formInfo, String taskId, String processInstanceId,
+                    String processDefinitionId, String tenantId, String outcome) {
+        
+        return commandExecutor.execute(new CreateFormInstanceCmd(formInfo, variables, taskId, processInstanceId, processDefinitionId, tenantId, outcome));
     }
 
     @Override
-    public FormInstance saveFormInstance(Map<String, Object> variables, FormInfo formInfo, String taskId, String processInstanceId, String processDefinitionId) {
-        return commandExecutor.execute(new SaveFormInstanceCmd(formInfo, variables, taskId, processInstanceId, processDefinitionId));
+    public FormInstance saveFormInstance(Map<String, Object> variables, FormInfo formInfo, String taskId, String processInstanceId,
+                    String processDefinitionId, String tenantId, String outcome) {
+        
+        return commandExecutor.execute(new SaveFormInstanceCmd(formInfo, variables, taskId, processInstanceId, processDefinitionId, tenantId, outcome));
     }
 
     @Override
-    public FormInstance saveFormInstanceByFormDefinitionId(Map<String, Object> variables, String formDefinitionId, String taskId, String processInstanceId, String processDefinitionId) {
-        return commandExecutor.execute(new SaveFormInstanceCmd(formDefinitionId, variables, taskId, processInstanceId, processDefinitionId));
+    public FormInstance saveFormInstanceByFormDefinitionId(Map<String, Object> variables, String formDefinitionId,
+        String taskId, String processInstanceId, String processDefinitionId, String tenantId, String outcome) {
+        
+        return commandExecutor.execute(new SaveFormInstanceCmd(formDefinitionId, variables, taskId, processInstanceId, processDefinitionId, tenantId, outcome));
     }
     
     @Override
-    public FormInstance createFormInstanceWithScopeId(Map<String, Object> variables, FormInfo formInfo, String taskId, String scopeId, String scopeType, String scopeDefinitionId) {
-        return commandExecutor.execute(new CreateFormInstanceCmd(formInfo, variables, taskId, scopeId, scopeType, scopeDefinitionId));
+    public FormInstance createFormInstanceWithScopeId(Map<String, Object> variables, FormInfo formInfo, String taskId,
+                    String scopeId, String scopeType, String scopeDefinitionId, String tenantId, String outcome) {
+        
+        return commandExecutor.execute(new CreateFormInstanceCmd(formInfo, variables, taskId, scopeId, scopeType, scopeDefinitionId, tenantId, outcome));
     }
 
     @Override
-    public FormInstance saveFormInstanceWithScopeId(Map<String, Object> variables, FormInfo formInfo, String taskId, String scopeId, String scopeType, String scopeDefinitionId) {
-        return commandExecutor.execute(new SaveFormInstanceCmd(formInfo, variables, taskId, scopeId, scopeType, scopeDefinitionId));
+    public FormInstance saveFormInstanceWithScopeId(Map<String, Object> variables, FormInfo formInfo, String taskId,
+                    String scopeId, String scopeType, String scopeDefinitionId, String tenantId, String outcome) {
+        
+        return commandExecutor.execute(new SaveFormInstanceCmd(formInfo, variables, taskId, scopeId, scopeType, scopeDefinitionId, tenantId, outcome));
     }
 
     @Override
-    public FormInstance saveFormInstanceWithScopeId(Map<String, Object> variables, String formModelId, String taskId, String scopeId, String scopeType, String scopeDefinitionId) {
-        return commandExecutor.execute(new SaveFormInstanceCmd(formModelId, variables, taskId, scopeId, scopeType, scopeDefinitionId));
+    public FormInstance saveFormInstanceWithScopeId(Map<String, Object> variables, String formModelId, String taskId,
+        String scopeId, String scopeType, String scopeDefinitionId, String tenantId, String outcome) {
+        
+        return commandExecutor.execute(new SaveFormInstanceCmd(formModelId, variables, taskId, scopeId, scopeType, scopeDefinitionId, tenantId, outcome));
     }
 
     @Override
@@ -82,8 +99,11 @@ public class FormServiceImpl extends CommonEngineServiceImpl<FormEngineConfigura
     }
 
     @Override
-    public FormInfo getFormModelWithVariablesById(String formDefinitionId, String taskId,Map<String, Object> variables, String tenantId) {
-        return commandExecutor.execute(new GetFormModelWithVariablesCmd(null, null, formDefinitionId, taskId, tenantId, variables));
+    public FormInfo getFormModelWithVariablesById(String formDefinitionId, String taskId,Map<String, Object> variables, 
+                    String tenantId, boolean fallbackToDefaultTenant) {
+        
+        return commandExecutor.execute(new GetFormModelWithVariablesCmd(null, null, formDefinitionId, taskId, 
+                        tenantId, variables, fallbackToDefaultTenant));
     }
 
     @Override
@@ -92,8 +112,11 @@ public class FormServiceImpl extends CommonEngineServiceImpl<FormEngineConfigura
     }
 
     @Override
-    public FormInfo getFormModelWithVariablesByKey(String formDefinitionKey, String taskId, Map<String, Object> variables, String tenantId) {
-        return commandExecutor.execute(new GetFormModelWithVariablesCmd(formDefinitionKey, null, null, taskId, tenantId, variables));
+    public FormInfo getFormModelWithVariablesByKey(String formDefinitionKey, String taskId, Map<String, Object> variables, 
+                    String tenantId, boolean fallbackToDefaultTenant) {
+        
+        return commandExecutor.execute(new GetFormModelWithVariablesCmd(formDefinitionKey, null, null, taskId, 
+                        tenantId, variables, fallbackToDefaultTenant));
     }
 
     @Override
@@ -104,10 +127,11 @@ public class FormServiceImpl extends CommonEngineServiceImpl<FormEngineConfigura
     }
 
     @Override
-    public FormInfo getFormModelWithVariablesByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String taskId,
-                                                                         Map<String, Object> variables, String tenantId) {
+    public FormInfo getFormModelWithVariablesByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String taskId, 
+                    Map<String, Object> variables, String tenantId, boolean fallbackToDefaultTenant) {
 
-        return commandExecutor.execute(new GetFormModelWithVariablesCmd(formDefinitionKey, parentDeploymentId, null, taskId, tenantId, variables));
+        return commandExecutor.execute(new GetFormModelWithVariablesCmd(formDefinitionKey, parentDeploymentId, null, taskId, 
+                        tenantId, variables, fallbackToDefaultTenant));
     }
 
     @Override
@@ -123,8 +147,10 @@ public class FormServiceImpl extends CommonEngineServiceImpl<FormEngineConfigura
 
     @Override
     public FormInstanceInfo getFormInstanceModelById(String formDefinitionId, String taskId, String processInstanceId,
-            Map<String, Object> variables, String tenantId) {
-        return commandExecutor.execute(new GetFormInstanceModelCmd(null, formDefinitionId, taskId, processInstanceId, tenantId, variables));
+            Map<String, Object> variables, String tenantId, boolean fallbackToDefaultTenant) {
+        
+        return commandExecutor.execute(new GetFormInstanceModelCmd(null, null, formDefinitionId, taskId, processInstanceId, 
+                        tenantId, variables, fallbackToDefaultTenant));
     }
 
     @Override
@@ -134,9 +160,9 @@ public class FormServiceImpl extends CommonEngineServiceImpl<FormEngineConfigura
 
     @Override
     public FormInstanceInfo getFormInstanceModelByKey(String formDefinitionKey, String taskId, String processInstanceId,
-            Map<String, Object> variables, String tenantId) {
+            Map<String, Object> variables, String tenantId, boolean fallbackToDefaultTenant) {
 
-        return commandExecutor.execute(new GetFormInstanceModelCmd(formDefinitionKey, null, null, taskId, processInstanceId, tenantId, variables));
+        return commandExecutor.execute(new GetFormInstanceModelCmd(formDefinitionKey, null, null, taskId, processInstanceId, tenantId, variables, fallbackToDefaultTenant));
     }
 
     @Override
@@ -148,10 +174,10 @@ public class FormServiceImpl extends CommonEngineServiceImpl<FormEngineConfigura
 
     @Override
     public FormInstanceInfo getFormInstanceModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId,
-            String taskId, String processInstanceId, Map<String, Object> variables, String tenantId) {
+            String taskId, String processInstanceId, Map<String, Object> variables, String tenantId, boolean fallbackToDefaultTenant) {
 
         return commandExecutor.execute(new GetFormInstanceModelCmd(formDefinitionKey, parentDeploymentId, null,
-                taskId, processInstanceId, tenantId, variables));
+                taskId, processInstanceId, tenantId, variables, fallbackToDefaultTenant));
     }
     
     @Override
@@ -160,8 +186,11 @@ public class FormServiceImpl extends CommonEngineServiceImpl<FormEngineConfigura
     }
 
     @Override
-    public FormInstanceInfo getFormInstanceModelByKeyAndScopeId(String formDefinitionKey, String scopeId, String scopeType, Map<String, Object> variables, String tenantId) {
-        return commandExecutor.execute(new GetFormInstanceByScopeModelCmd(formDefinitionKey, scopeId, scopeType, tenantId, variables));
+    public FormInstanceInfo getFormInstanceModelByKeyAndScopeId(String formDefinitionKey, String scopeId, String scopeType, 
+                    Map<String, Object> variables, String tenantId, boolean fallbackToDefaultTenant) {
+        
+        return commandExecutor.execute(new GetFormInstanceByScopeModelCmd(formDefinitionKey, null, scopeId, scopeType, 
+                        tenantId, variables, fallbackToDefaultTenant));
     }
 
     @Override
@@ -169,19 +198,44 @@ public class FormServiceImpl extends CommonEngineServiceImpl<FormEngineConfigura
         String scopeId, String scopeType, Map<String, Object> variables) {
 
         return commandExecutor.execute(new GetFormInstanceByScopeModelCmd(formDefinitionKey, parentDeploymentId, 
-                        scopeId, scopeType, null, variables));
+                        scopeId, scopeType, null, variables, false));
     }
 
     @Override
     public FormInstanceInfo getFormInstanceModelByKeyAndParentDeploymentIdAndScopeId(String formDefinitionKey, String parentDeploymentId,
-        String scopeId, String scopeType, Map<String, Object> variables, String tenantId) {
+        String scopeId, String scopeType, Map<String, Object> variables, String tenantId, boolean fallbackToDefaultTenant) {
 
         return commandExecutor.execute(new GetFormInstanceByScopeModelCmd(formDefinitionKey, parentDeploymentId, 
-                        scopeId, scopeType, tenantId, variables));
+                        scopeId, scopeType, tenantId, variables, fallbackToDefaultTenant));
+    }
+    
+    @Override
+    public byte[] getFormInstanceValues(String formInstanceId) {
+        return commandExecutor.execute(new GetFormInstanceValuesCmd(formInstanceId));
     }
 
     @Override
     public FormInstanceQuery createFormInstanceQuery() {
         return new FormInstanceQueryImpl(commandExecutor);
+    }
+
+    @Override
+    public void deleteFormInstance(String formInstanceId) {
+        commandExecutor.execute(new DeleteFormInstanceCmd(formInstanceId));
+    }
+
+    @Override
+    public void deleteFormInstancesByFormDefinition(String formDefinitionId) {
+        commandExecutor.execute(new DeleteFormInstancesByFormDefinitionCmd(formDefinitionId));
+    }
+
+    @Override
+    public void deleteFormInstancesByProcessDefinition(String processDefinitionId) {
+        commandExecutor.execute(new DeleteFormInstancesByProcessDefinitionCmd(processDefinitionId));
+    }
+
+    @Override
+    public void deleteFormInstancesByScopeDefinition(String scopeDefinitionId) {
+        commandExecutor.execute(new DeleteFormInstancesByScopeDefinitionCmd(scopeDefinitionId));
     }
 }

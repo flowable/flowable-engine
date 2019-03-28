@@ -50,13 +50,20 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
         this.commandContext = commandContext;
     }
 
+    public AbstractQuery<T, U> setCommandExecutor(CommandExecutor commandExecutor) {
+        this.commandExecutor = commandExecutor;
+        return this;
+    }
+
     @Override
+    @SuppressWarnings("unchecked")
     public T orderBy(QueryProperty property) {
         this.orderProperty = property;
         return (T) this;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public T orderBy(QueryProperty property, NullHandlingOnOrder nullHandlingOnOrder) {
         orderBy(property);
         this.nullHandlingOnOrder = nullHandlingOnOrder;
@@ -90,28 +97,32 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings("unchecked")
     public U singleResult() {
         this.resultType = ResultType.SINGLE_RESULT;
         if (commandExecutor != null) {
             return (U) commandExecutor.execute(this);
         }
+        // The execute has a checkQueryOk() call as well, so no need to do the call earlier
+        checkQueryOk();
         return executeSingleResult(Context.getCommandContext());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings("unchecked")
     public List<U> list() {
         this.resultType = ResultType.LIST;
         if (commandExecutor != null) {
             return (List<U>) commandExecutor.execute(this);
         }
+        // The execute has a checkQueryOk() call as well, so no need to do the call earlier
+        checkQueryOk();
         return executeList(Context.getCommandContext());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings("unchecked")
     public List<U> listPage(int firstResult, int maxResults) {
         this.firstResult = firstResult;
         this.maxResults = maxResults;
@@ -119,6 +130,8 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
         if (commandExecutor != null) {
             return (List<U>) commandExecutor.execute(this);
         }
+        // The execute has a checkQueryOk() call as well, so no need to do the call earlier
+        checkQueryOk();
         return executeList(Context.getCommandContext());
     }
 
@@ -128,11 +141,14 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
         if (commandExecutor != null) {
             return (Long) commandExecutor.execute(this);
         }
+        // The execute has a checkQueryOk() call as well, so no need to do the call earlier
+        checkQueryOk();
         return executeCount(Context.getCommandContext());
     }
 
     @Override
     public Object execute(CommandContext commandContext) {
+        checkQueryOk();
         if (resultType == ResultType.LIST) {
             return executeList(commandContext);
         } else if (resultType == ResultType.SINGLE_RESULT) {
