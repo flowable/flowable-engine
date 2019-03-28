@@ -87,7 +87,7 @@ public class ErrorConverterTest extends AbstractConverterTest {
         assertEquals("myerror2", errorEndCode);
 
         // error boundary event
-        FlowElement boundaryErrorFlowElement = model.getMainProcess().getFlowElement("boundaryErrorEvent");
+        FlowElement boundaryErrorFlowElement = model.getMainProcess().getFlowElement("errorBoundaryEvent");
         assertNotNull(boundaryErrorFlowElement);
         assertTrue(boundaryErrorFlowElement instanceof BoundaryEvent);
 
