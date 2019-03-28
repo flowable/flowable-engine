@@ -126,6 +126,7 @@
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
+            <type>pom</type>
             <scope>provided</scope>
         </dependency>
         <dependency>

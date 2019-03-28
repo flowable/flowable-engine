@@ -673,6 +673,7 @@
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-all</artifactId>
+      <type>pom</type>
     </dependency>
     <dependency>
         <groupId>javax.xml.bind</groupId> <!-- Needed for swagger doc generation -->

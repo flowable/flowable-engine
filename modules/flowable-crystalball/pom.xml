@@ -134,6 +134,7 @@
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-all</artifactId>
       <scope>test</scope>
+      <type>pom</type>
     </dependency>
   </dependencies>
   
