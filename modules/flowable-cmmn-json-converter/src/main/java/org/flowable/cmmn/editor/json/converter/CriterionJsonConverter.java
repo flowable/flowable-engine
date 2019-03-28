@@ -16,6 +16,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -75,14 +77,27 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
         if (criterion.getAttachedToRefId() != null) {
             if (criterion.getAttachedToRefId().equals(planModel.getId())) {
                 parentGraphicInfo = cmmnModel.getGraphicInfo(planModel.getId());
-                
             } else {
                 PlanItem parentPlanItem = cmmnModel.findPlanItem(criterion.getAttachedToRefId());
                 parentGraphicInfo = cmmnModel.getGraphicInfo(parentPlanItem.getId());
             }
-        
-            dockNode.put(EDITOR_BOUNDS_X, graphicInfo.getX() - parentGraphicInfo.getX());
-            dockNode.put(EDITOR_BOUNDS_Y, graphicInfo.getY() - parentGraphicInfo.getY());
+
+            BigDecimal parentX = new BigDecimal(parentGraphicInfo.getX());
+            BigDecimal parentY = new BigDecimal(parentGraphicInfo.getY());
+
+            BigDecimal criterionX = new BigDecimal(graphicInfo.getX());
+            BigDecimal criterionWidth = new BigDecimal(graphicInfo.getWidth());
+            BigDecimal criterionXMid = criterionWidth.divide(new BigDecimal(2));
+
+            BigDecimal criterionY = new BigDecimal(graphicInfo.getY());
+            BigDecimal criterionHeight = new BigDecimal(graphicInfo.getHeight());
+            BigDecimal criterionYMid = criterionHeight.divide(new BigDecimal(2));
+
+            BigDecimal xBound = criterionX.add(criterionXMid).subtract(parentX).setScale(0, RoundingMode.HALF_UP);
+            BigDecimal yBound = criterionY.add(criterionYMid).subtract(parentY).setScale(0,RoundingMode.HALF_UP);
+
+            dockNode.put(EDITOR_BOUNDS_X, xBound);
+            dockNode.put(EDITOR_BOUNDS_Y, yBound);
             dockersArrayNode.add(dockNode);
             elementNode.set("dockers", dockersArrayNode);
             elementNode.set("outgoing", getOutgoingArrayNodes(criterion.getId(), cmmnModel));

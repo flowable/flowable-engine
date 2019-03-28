@@ -41,7 +41,6 @@ public class BoundaryEventGraphicInfoTest extends AbstractConverterTest {
         validate(model);
         model = convertToJsonAndBack(model);
         validate(model);
-
     }
 
     @Test
@@ -53,7 +52,7 @@ public class BoundaryEventGraphicInfoTest extends AbstractConverterTest {
         validate(model);
     }
 
-    private void validate(JsonNode model){
+    protected void validate(JsonNode model){
         ArrayNode node = (ArrayNode) model.path("childShapes");
         JsonNode boundaryEventNode = null;
 
@@ -73,7 +72,7 @@ public class BoundaryEventGraphicInfoTest extends AbstractConverterTest {
         assertThat(y,is(80.0));
     }
 
-    private void validate(BpmnModel model) {
+    protected void validate(BpmnModel model) {
         BoundaryEvent event = (BoundaryEvent) model.getFlowElement(TIMER_BOUNDERY_ID);
         assertThat(event.getAttachedToRefId(), is(USER_TASK_ID));
 
@@ -90,8 +89,6 @@ public class BoundaryEventGraphicInfoTest extends AbstractConverterTest {
         assertThat(giTaskOne.getY(),is(135.0));
         assertThat(giTaskOne.getWidth(),is(100.0));
         assertThat(giTaskOne.getHeight(),is(80.0));
-
-
     }
 
     @Override
