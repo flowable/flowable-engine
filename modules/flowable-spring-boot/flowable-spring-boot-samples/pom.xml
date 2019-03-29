@@ -35,7 +35,8 @@
     <dependencies>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-jsr223</artifactId>
+            <artifactId>groovy-all</artifactId>
+            <type>pom</type>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
