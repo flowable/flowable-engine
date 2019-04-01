@@ -488,7 +488,14 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         assertEquals("def", tasks.get(1).getName());
         assertEquals("ghi", tasks.get(2).getName());
     }
-    
+
+    @Test
+    @Deployment
+    public void testDeleteResponseEmptyBody() {
+        String processInstanceId = runtimeService.startProcessInstanceByKey("testDeleteResponse").getId();
+        assertTrue(runtimeService.hasVariable(processInstanceId, "myResponse"));
+        assertNull(runtimeService.getVariable(processInstanceId, "myResponse"));
+    }
 
     private void assertEquals(final String processInstanceId, final Map<String, Object> vars) {
         for (String key : vars.keySet()) {
