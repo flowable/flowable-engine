@@ -620,12 +620,12 @@
            }
         },
         "OUTCOMES": {
-            "DESCRIPTION": "您可以为这个任务定义多个结果。在完成一个任务时，用户选择一个可用的结果，可以在eg中使用。在这个过程中进一步的条件。",
+            "DESCRIPTION": "您可以为这个任务定义多个结果。在完成一个任务时，用户选择一个可用的结果，可在后续的流程中使用结果变量",
             "NO-OUTCOMES-OPTION": "不要使用自定义结果，只显示'完成'按钮。",
             "OUTCOMES-OPTION": "使用此表单的定制结果。",
-            "POSSIBLE-OUTCOMES": "可能的出线",
-            "NEW-OUTCOME-PLACEHOLDER": "输入新的出线",
-            "ADD": "添加出线",
+            "POSSIBLE-OUTCOMES": "可能的结果",
+            "NEW-OUTCOME-PLACEHOLDER": "输入新的结果",
+            "ADD": "添加结果",
             "REMOVE": "移除"
         }
     },
