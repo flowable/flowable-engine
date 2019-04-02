@@ -12,7 +12,8 @@
  */
 package org.flowable.common.engine.impl.interceptor;
 
-import org.flowable.common.engine.api.FlowableException;
+import java.sql.SQLException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +22,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Joram Barrez
  */
-public class CockroachDbRetryInterceptor extends AbstractCommandInterceptor {
+public class CrDbRetryInterceptor extends AbstractCommandInterceptor {
 
     private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
@@ -47,13 +48,23 @@ public class CockroachDbRetryInterceptor extends AbstractCommandInterceptor {
                 return next.execute(config, command);
 
             } catch (Exception e) {
-                LOGGER.debug("Exception caught. Retrying.", e);
+                if (isTransactionRetryException(e)) {
+                    LOGGER.debug("Exception caught. Retrying.", e);
+
+                    if (failedAttempts >= nrRetries) {
+                        throw e;
+                    }
+                    failedAttempts++;
+
+                } else {
+                    throw e;
+                }
+
             }
 
-            failedAttempts++;
         } while (failedAttempts <= nrRetries);
 
-        throw new FlowableException(nrRetries + " retries failed. Stopping");
+        return null;
     }
 
     protected void waitBeforeRetry(long waitTime) {
@@ -62,6 +73,22 @@ public class CockroachDbRetryInterceptor extends AbstractCommandInterceptor {
         } catch (InterruptedException e) {
             LOGGER.debug("Interrupted while waiting for a retry.");
         }
+    }
+
+    protected boolean isTransactionRetryException(Throwable exception) {
+        if (exception instanceof SQLException) {
+            SQLException sqlException = (SQLException) exception;
+            if (sqlException.getErrorCode() == 40001 || (sqlException.getMessage() != null && sqlException.getMessage().contains("retry txn"))) {
+                return true;
+            }
+        }
+
+        if (exception.getCause() != null) {
+            if (isTransactionRetryException(exception.getCause())) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
