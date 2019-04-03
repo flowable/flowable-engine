@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -70,11 +70,16 @@ public class UserServiceImpl extends AbstractIdmService implements UserService {
     }
 
     public void updateUserDetails(String userId, String firstName, String lastName, String email) {
+        updateUserDetails(userId, firstName, lastName, email, null);
+    }
+
+    public void updateUserDetails(String userId, String firstName, String lastName, String email, String tenantId) {
         User user = identityService.createUserQuery().userId(userId).singleResult();
         if (user != null) {
             user.setFirstName(firstName);
             user.setLastName(lastName);
             user.setEmail(email);
+            user.setTenantId(tenantId);
             identityService.saveUser(user);
         }
     }
@@ -105,9 +110,14 @@ public class UserServiceImpl extends AbstractIdmService implements UserService {
     }
 
     public User createNewUser(String id, String firstName, String lastName, String email, String password) {
+        return createNewUser(id, firstName, lastName, email, password, null);
+    }
+
+    @Override
+    public User createNewUser(String id, String firstName, String lastName, String email, String password, String tenantId) {
         if (StringUtils.isBlank(id) ||
-                StringUtils.isBlank(password) ||
-                StringUtils.isBlank(firstName)) {
+            StringUtils.isBlank(password) ||
+            StringUtils.isBlank(firstName)) {
             throw new BadRequestException("Id, password and first name are required");
         }
 
@@ -119,6 +129,7 @@ public class UserServiceImpl extends AbstractIdmService implements UserService {
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setEmail(email);
+        user.setTenantId(tenantId);
         identityService.saveUser(user);
 
         User savedUser = identityService.createUserQuery().userEmail(email).singleResult();

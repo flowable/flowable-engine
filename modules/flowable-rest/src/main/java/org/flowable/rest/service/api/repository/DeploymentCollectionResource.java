@@ -139,6 +139,9 @@ public class DeploymentCollectionResource {
             restApiInterceptor.accessDeploymentsWithQuery(deploymentQuery);
         }
 
+        if (request.getHeader("x-tenant") != null )
+            deploymentQuery.deploymentTenantId(request.getHeader("x-tenant"));
+
         return paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties, restResponseFactory::createDeploymentResponseList);
     }
 

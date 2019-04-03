@@ -159,6 +159,9 @@ public class ProcessDefinitionCollectionResource {
             restApiInterceptor.accessProcessDefinitionsWithQuery(processDefinitionQuery);
         }
 
+        if( request.getHeader("x-tenant") != null )
+            processDefinitionQuery.processDefinitionTenantId(request.getHeader("x-tenant"));
+
         return paginateList(allRequestParams, processDefinitionQuery, "name", properties, restResponseFactory::createProcessDefinitionResponseList);
     }
 }

@@ -270,7 +270,8 @@ angular.module('flowableApp')
                 if (newTask && newTask.name) {
                     var taskData = {
                         name: newTask.name,
-                        description: newTask.description
+                        description: newTask.description,
+                        tenantId: $scope.account.tenantId
                     };
 
                     if (newTask.assignee && newTask.assignee.id) {

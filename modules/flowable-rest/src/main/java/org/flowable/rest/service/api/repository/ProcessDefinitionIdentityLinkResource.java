@@ -55,7 +55,7 @@ public class ProcessDefinitionIdentityLinkResource extends BaseProcessDefinition
             @ApiParam(name = "family") @PathVariable("family") String family, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
             HttpServletRequest request) {
 
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId, request.getHeader("x-tenant"));
 
         validateIdentityLinkArguments(family, identityId);
 
@@ -73,9 +73,9 @@ public class ProcessDefinitionIdentityLinkResource extends BaseProcessDefinition
     @DeleteMapping(value = "/repository/process-definitions/{processDefinitionId}/identitylinks/{family}/{identityId}")
     public void deleteIdentityLink(@ApiParam(name = "processDefinitionId") @PathVariable("processDefinitionId") String processDefinitionId,
             @ApiParam(name = "family") @PathVariable("family") String family, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
-            HttpServletResponse response) {
+            HttpServletRequest request, HttpServletResponse response) {
 
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId, request.getHeader("x-tenant"));
 
         validateIdentityLinkArguments(family, identityId);
 

@@ -47,6 +47,7 @@ public class TasksResource {
         task.setName(taskRepresentation.getName());
         task.setDescription(taskRepresentation.getDescription());
         task.setParentTaskId(taskRepresentation.getParentTaskId());
+        task.setTenantId(taskRepresentation.getTenantId());
         if (StringUtils.isNotEmpty(taskRepresentation.getCategory())) {
             task.setCategory(taskRepresentation.getCategory());
         }

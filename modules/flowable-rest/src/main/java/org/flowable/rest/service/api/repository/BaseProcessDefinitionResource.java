@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,9 +16,11 @@ package org.flowable.rest.service.api.repository;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.repository.ProcessDefinitionQuery;
 import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AuthorizationServiceException;
 
 /**
  * @author Tijs Rademakers
@@ -30,24 +32,33 @@ public class BaseProcessDefinitionResource {
 
     @Autowired
     protected RepositoryService repositoryService;
-    
-    @Autowired(required=false)
+
+    @Autowired(required = false)
     protected BpmnRestApiInterceptor restApiInterceptor;
 
     /**
      * Returns the {@link ProcessDefinition} that is requested. Throws the right exceptions when bad request was made or definition was not found.
      */
     protected ProcessDefinition getProcessDefinitionFromRequest(String processDefinitionId) {
-        ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processDefinitionId);
+        return getProcessDefinitionFromRequest(processDefinitionId, null);
+    }
+
+    protected ProcessDefinition getProcessDefinitionFromRequest(String processDefinitionId, String tenantId) {
+        ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId);
+
+        if( tenantId != null )
+            processDefinitionQuery.processDefinitionTenantId(tenantId);
+
+        ProcessDefinition processDefinition = processDefinitionQuery.singleResult();
 
         if (processDefinition == null) {
             throw new FlowableObjectNotFoundException("Could not find a process definition with id '" + processDefinitionId + "'.", ProcessDefinition.class);
         }
-        
+
         if (restApiInterceptor != null) {
             restApiInterceptor.accessProcessDefinitionById(processDefinition);
         }
-        
+
         return processDefinition;
     }
 }

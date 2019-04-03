@@ -145,6 +145,9 @@ public class ModelCollectionResource extends BaseModelResource {
         if (restApiInterceptor != null) {
             restApiInterceptor.accessModelInfoWithQuery(modelQuery);
         }
+
+        if( request.getHeader("x-tenant") != null )
+            modelQuery.modelTenantId(request.getHeader("x-tenant"));
         
         return paginateList(allRequestParams, modelQuery, "id", allowedSortProperties, restResponseFactory::createModelResponseList);
     }

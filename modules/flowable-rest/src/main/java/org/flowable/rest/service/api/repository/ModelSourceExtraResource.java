@@ -51,8 +51,8 @@ public class ModelSourceExtraResource extends BaseModelSourceResource {
             @ApiResponse(code = 404, message = "Indicates the requested model was not found.")
     })
     @GetMapping("/repository/models/{modelId}/source-extra")
-    public byte[] getModelBytes(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletResponse response) {
-        Model model = getModelFromRequest(modelId);
+    public byte[] getModelBytes(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletRequest request, HttpServletResponse response) {
+        Model model = getModelFromRequest(modelId, request.getHeader("x-tenant"));
         byte[] editorSource = repositoryService.getModelEditorSourceExtra(model.getId());
         if (editorSource == null) {
             throw new FlowableObjectNotFoundException("Model with id '" + modelId + "' does not have extra source available.", String.class);
@@ -72,7 +72,7 @@ public class ModelSourceExtraResource extends BaseModelSourceResource {
     })
     @PutMapping(value = "/repository/models/{modelId}/source-extra", consumes = "multipart/form-data")
     public void setModelSource(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletRequest request, HttpServletResponse response) {
-        Model model = getModelFromRequest(modelId);
+        Model model = getModelFromRequest(modelId, request.getHeader("x-tenant"));
         try {
 
             if (!(request instanceof MultipartHttpServletRequest)) {

@@ -13,6 +13,7 @@
 
 package org.flowable.rest.service.api.repository;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,8 +44,9 @@ public class DeploymentResourceDataResource extends BaseDeploymentResourceDataRe
     @GetMapping("/repository/deployments/{deploymentId}/resourcedata/{resourceName}")
      public byte[] getDeploymentResource(@ApiParam(name = "deploymentId") @PathVariable("deploymentId") String deploymentId,
             @ApiParam(name = "resourceName", value = "The name of the resource to get. Make sure you URL-encode the resourceName in case it contains forward slashes. Eg: use diagrams%2Fmy-process.bpmn20.xml instead of diagrams/my-process.bpmn20.xml.") @PathVariable("resourceName") String resourceName,
+            HttpServletRequest request,
             HttpServletResponse response) {
 
-        return getDeploymentResourceData(deploymentId, resourceName, response);
+        return getDeploymentResourceData(deploymentId, resourceName, response, request.getHeader("x-tenant"));
     }
 }

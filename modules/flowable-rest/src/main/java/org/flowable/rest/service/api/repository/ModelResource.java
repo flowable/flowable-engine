@@ -21,6 +21,7 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import org.flowable.engine.repository.Model;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,7 +46,7 @@ public class ModelResource extends BaseModelResource {
     })
     @GetMapping(value = "/repository/models/{modelId}", produces = "application/json")
     public ModelResponse getModel(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletRequest request) {
-        Model model = getModelFromRequest(modelId);
+        Model model = getModelFromRequest(modelId, request.getHeader("x-tenant"));
 
         return restResponseFactory.createModelResponse(model);
     }
@@ -59,7 +60,7 @@ public class ModelResource extends BaseModelResource {
     })
     @PutMapping(value = "/repository/models/{modelId}", produces = "application/json")
     public ModelResponse updateModel(@ApiParam(name = "modelId") @PathVariable String modelId, @RequestBody ModelRequest modelRequest, HttpServletRequest request) {
-        Model model = getModelFromRequest(modelId);
+        Model model = getModelFromRequest(modelId, request.getHeader("x-tenant"));
 
         if (modelRequest.isCategoryChanged()) {
             model.setCategory(modelRequest.getCategory());
@@ -93,8 +94,8 @@ public class ModelResource extends BaseModelResource {
             @ApiResponse(code = 404, message = "Indicates the requested model was not found.")
     })
     @DeleteMapping("/repository/models/{modelId}")
-    public void deleteModel(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletResponse response) {
-        Model model = getModelFromRequest(modelId);
+    public void deleteModel(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletRequest request, HttpServletResponse response) {
+        Model model = getModelFromRequest(modelId, request.getHeader("x-tenant"));
         repositoryService.deleteModel(model.getId());
         response.setStatus(HttpStatus.NO_CONTENT.value());
     }

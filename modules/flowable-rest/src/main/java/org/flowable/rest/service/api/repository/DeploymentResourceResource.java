@@ -21,6 +21,7 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.DeploymentQuery;
 import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +75,12 @@ public class DeploymentResourceResource {
         // See also https://stackoverflow.com/questions/31421061/how-to-handle-requests-that-includes-forward-slashes/42403361#42403361
 
         // Check if deployment exists
-        Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
+        DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery().deploymentId(deploymentId);
+
+        if (request.getHeader("x-tenant") != null )
+            deploymentQuery.deploymentTenantId(request.getHeader("x-tenant"));
+
+        Deployment deployment = deploymentQuery.singleResult();
         if (deployment == null) {
             throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.");
         }

@@ -46,7 +46,7 @@ public class ProcessDefinitionFormDefinitionCollectionResource extends BaseProce
             @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
             HttpServletRequest request) {
         
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId, request.getHeader("x-tenant"));
 
         List<FormDefinition> formDefinitions = repositoryService.getFormDefinitionsForProcessDefinition(processDefinition.getId());
 
