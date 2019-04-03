@@ -99,6 +99,8 @@ public class BlueprintBasicTest {
                 mavenBundle().groupId("org.flowable").artifactId("flowable-identitylink-service").versionAsInProject(),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-entitylink-service-api").versionAsInProject(),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-entitylink-service").versionAsInProject(),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-eventsubscription-service-api").versionAsInProject(),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-eventsubscription-service").versionAsInProject(),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-task-service-api").versionAsInProject(),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-task-service").versionAsInProject(),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-job-service-api").versionAsInProject(),
