@@ -21,7 +21,7 @@ import org.flowable.cmmn.model.UserEventListener;
 /**
  * @author Dennis Federico
  */
-public class UserEventListenerXmlConverter extends PlanItemDefinitiomXmlConverter {
+public class UserEventListenerXmlConverter extends PlanItemDefinitionXmlConverter {
 
     @Override
     public boolean hasChildElements() {

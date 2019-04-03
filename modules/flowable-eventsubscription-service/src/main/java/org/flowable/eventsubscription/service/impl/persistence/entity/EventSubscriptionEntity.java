@@ -40,6 +40,14 @@ public interface EventSubscriptionEntity extends EventSubscription, Entity, HasR
     void setCreated(Date created);
 
     void setProcessDefinitionId(String processDefinitionId);
+    
+    void setSubScopeId(String subScopeId);
+    
+    void setScopeId(String scopeId);
+    
+    void setScopeDefinitionId(String scopeDefinitionId);
+    
+    void setScopeType(String scopeType);
 
     void setTenantId(String tenantId);
 }

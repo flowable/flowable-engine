@@ -14,9 +14,9 @@ package org.flowable.eventsubscription.service.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.bpmn.model.Signal;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.eventsubscription.api.EventSubscriptionBuilder;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 
 /**
@@ -34,14 +34,7 @@ public interface EventSubscriptionEntityManager extends EntityManager<EventSubsc
 
     /* Create and insert */
 
-    SignalEventSubscriptionEntity insertSignalEvent(String signalName, Signal signal, String executionId, 
-                    String processInstanceId, String currentActivityId, String processDefinitionId, String tenantI);
-
-    MessageEventSubscriptionEntity insertMessageEvent(String messageName, String executionId, 
-                    String processInstanceId, String currentActivityId, String processDefinitionId, String tenantI);
-
-    CompensateEventSubscriptionEntity insertCompensationEvent(String executionId, 
-                    String processInstanceId, String activityId, String tenantId);
+    EventSubscription createEventSubscription(EventSubscriptionBuilder eventSubscriptionBuilder);
 
     /* Update */
 
@@ -62,6 +55,8 @@ public interface EventSubscriptionEntityManager extends EntityManager<EventSubsc
     List<EventSubscriptionEntity> findEventSubscriptionsByExecution(String executionId);
 
     List<EventSubscriptionEntity> findEventSubscriptionsByExecutionAndType(String executionId, String type);
+    
+    List<EventSubscriptionEntity> findEventSubscriptionsBySubScopeId(final String subScopeId);
 
     List<EventSubscriptionEntity> findEventSubscriptionsByProcessInstanceAndActivityId(String processInstanceId, String activityId, String type);
 

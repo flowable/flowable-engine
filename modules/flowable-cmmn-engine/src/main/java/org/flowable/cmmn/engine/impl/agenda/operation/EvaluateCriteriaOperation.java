@@ -47,6 +47,7 @@ import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryIfPart;
 import org.flowable.cmmn.model.SentryOnPart;
+import org.flowable.cmmn.model.SignalEventListener;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
@@ -150,7 +151,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                         }
                     }
 
-                    if (planItem.getPlanItemDefinition() instanceof EventListener) {
+                    if (planItem.getPlanItemDefinition() instanceof EventListener && !(planItem.getPlanItemDefinition() instanceof SignalEventListener)) {
                         activatePlanItemInstance = false; // event listeners occur, they don't become active
                     }
 

@@ -38,6 +38,10 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
     protected String processInstanceId;
     protected String processDefinitionId;
     protected String activityId;
+    protected String subScopeId;
+    protected String scopeId;
+    protected String scopeDefinitionId;
+    protected String scopeType;
     protected Date createdBefore;
     protected Date createdAfter;
     protected String tenantId;
@@ -110,6 +114,42 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
             throw new FlowableIllegalArgumentException("Provided activity id is null");
         }
         this.activityId = activityId;
+        return this;
+    }
+    
+    @Override
+    public EventSubscriptionQueryImpl subScopeId(String subScopeId) {
+        if (scopeId == null) {
+            throw new FlowableIllegalArgumentException("Provided sub scope id is null");
+        }
+        this.subScopeId = subScopeId;
+        return this;
+    }
+    
+    @Override
+    public EventSubscriptionQueryImpl scopeId(String scopeId) {
+        if (scopeId == null) {
+            throw new FlowableIllegalArgumentException("Provided scope id is null");
+        }
+        this.scopeId = scopeId;
+        return this;
+    }
+    
+    @Override
+    public EventSubscriptionQueryImpl scopeDefinitionId(String scopeDefinitionId) {
+        if (scopeDefinitionId == null) {
+            throw new FlowableIllegalArgumentException("Provided scope definition id is null");
+        }
+        this.scopeDefinitionId = scopeDefinitionId;
+        return this;
+    }
+    
+    @Override
+    public EventSubscriptionQueryImpl scopeType(String scopeType) {
+        if (scopeType == null) {
+            throw new FlowableIllegalArgumentException("Provided scope type is null");
+        }
+        this.scopeType = scopeType;
         return this;
     }
 
@@ -212,6 +252,22 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
 
     public String getProcessDefinitionId() {
         return processDefinitionId;
+    }
+
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
+    }
+
+    public String getScopeType() {
+        return scopeType;
     }
 
     public Date getCreatedBefore() {

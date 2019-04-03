@@ -43,6 +43,18 @@ public interface EventSubscriptionQuery extends Query<EventSubscriptionQuery, Ev
 
     /** Only select event subscriptions which have an activity with the given id. **/
     EventSubscriptionQuery activityId(String activityId);
+    
+    /** Only select event subscriptions which have a sub scope id with the given value. **/
+    EventSubscriptionQuery subScopeId(String subScopeId);
+    
+    /** Only select event subscriptions which have a scope id with the given value. **/
+    EventSubscriptionQuery scopeId(String scopeId);
+    
+    /** Only select event subscriptions which have a scope definition id with the given value. **/
+    EventSubscriptionQuery scopeDefinitionId(String scopeDefinitionId);
+    
+    /** Only select event subscriptions which have a scope type with the given value. **/
+    EventSubscriptionQuery scopeType(String scopeType);
 
     /** Only select event subscriptions that were created before the given start time. **/
     EventSubscriptionQuery createdBefore(Date beforeTime);

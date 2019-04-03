@@ -55,8 +55,16 @@ public class IntermediateCatchMessageEventActivityBehavior extends IntermediateC
             messageName = messageExpression.getValue(execution).toString();
         }
 
-        EventSubscriptionEntity eventSubscription = CommandContextUtil.getEventSubscriptionService(commandContext).insertMessageEvent(messageName, executionEntity.getId(), executionEntity.getProcessInstanceId(),
-                        executionEntity.getCurrentActivityId(), executionEntity.getProcessDefinitionId(), executionEntity.getTenantId());
+        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
+                        .eventType(MessageEventSubscriptionEntity.EVENT_TYPE)
+                        .eventName(messageName)
+                        .executionId(executionEntity.getId())
+                        .processInstanceId(executionEntity.getProcessInstanceId())
+                        .activityId(executionEntity.getCurrentActivityId())
+                        .processDefinitionId(executionEntity.getProcessDefinitionId())
+                        .tenantId(executionEntity.getTenantId())
+                        .create();
+        
         CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
         executionEntity.getEventSubscriptions().add(eventSubscription);
 

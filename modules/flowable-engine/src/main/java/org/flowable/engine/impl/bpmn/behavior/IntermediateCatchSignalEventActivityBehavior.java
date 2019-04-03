@@ -58,8 +58,17 @@ public class IntermediateCatchSignalEventActivityBehavior extends IntermediateCa
             signalName = signalExpression.getValue(execution).toString();
         }
 
-        EventSubscriptionEntity eventSubscription = CommandContextUtil.getEventSubscriptionService(commandContext).insertSignalEvent(signalName, signal, executionEntity.getId(), executionEntity.getProcessInstanceId(),
-                        executionEntity.getCurrentActivityId(), executionEntity.getProcessDefinitionId(), executionEntity.getTenantId());
+        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
+                        .eventType(SignalEventSubscriptionEntity.EVENT_TYPE)
+                        .eventName(signalName)
+                        .signal(signal)
+                        .executionId(executionEntity.getId())
+                        .processInstanceId(executionEntity.getProcessInstanceId())
+                        .activityId(executionEntity.getCurrentActivityId())
+                        .processDefinitionId(executionEntity.getProcessDefinitionId())
+                        .tenantId(executionEntity.getTenantId())
+                        .create();
+        
         CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
         executionEntity.getEventSubscriptions().add(eventSubscription);
 

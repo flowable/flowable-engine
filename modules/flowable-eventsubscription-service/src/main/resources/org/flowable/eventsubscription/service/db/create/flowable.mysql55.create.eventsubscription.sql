@@ -9,6 +9,10 @@ create table ACT_RU_EVENT_SUBSCR (
     CONFIGURATION_ varchar(255),
     CREATED_ timestamp not null DEFAULT CURRENT_TIMESTAMP,
     PROC_DEF_ID_ varchar(64),
+    SUB_SCOPE_ID_ varchar(64),
+    SCOPE_ID_ varchar(64),
+    SCOPE_DEFINITION_ID_ varchar(64),
+    SCOPE_TYPE_ varchar(64),
     TENANT_ID_ varchar(255) default '',
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;

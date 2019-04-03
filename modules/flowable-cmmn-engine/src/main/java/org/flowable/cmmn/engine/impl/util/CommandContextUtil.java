@@ -49,6 +49,8 @@ import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.entitylink.api.EntityLinkService;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
+import org.flowable.eventsubscription.service.EventSubscriptionService;
+import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
@@ -384,6 +386,25 @@ public class CommandContextUtil {
 
     public static HistoricEntityLinkService getHistoricEntityLinkService(CommandContext commandContext) {
         return getEntityLinkServiceConfiguration(commandContext).getHistoricEntityLinkService();
+    }
+    
+    // EVENT SUBSCRIPTION SERVICE
+
+    public static EventSubscriptionServiceConfiguration getEventSubscriptionServiceConfiguration() {
+        return getEventSubscriptionServiceConfiguration(getCommandContext());
+    }
+
+    public static EventSubscriptionServiceConfiguration getEventSubscriptionServiceConfiguration(CommandContext commandContext) {
+        return (EventSubscriptionServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
+                        .get(EngineConfigurationConstants.KEY_EVENT_SUBSCRIPTION_SERVICE_CONFIG);
+    }
+
+    public static EventSubscriptionService getEventSubscriptionService() {
+        return getEventSubscriptionService(getCommandContext());
+    }
+
+    public static EventSubscriptionService getEventSubscriptionService(CommandContext commandContext) {
+        return getEventSubscriptionServiceConfiguration(commandContext).getEventSubscriptionService();
     }
     
     // VARIABLE SERVICE

@@ -120,6 +120,7 @@ import org.flowable.cmmn.engine.impl.parser.handler.PlanFragmentParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.ProcessTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.ScriptTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.ServiceTaskParseHandler;
+import org.flowable.cmmn.engine.impl.parser.handler.SignalEventListenerParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.StageParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.TaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.TimerEventListenerParseHandler;
@@ -222,6 +223,8 @@ import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
 import org.flowable.entitylink.service.impl.db.EntityLinkDbSchemaManager;
+import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
+import org.flowable.eventsubscription.service.impl.db.EventSubscriptionDbSchemaManager;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.identitylink.service.IdentityLinkEventHandler;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
@@ -379,6 +382,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     protected SchemaManager identityLinkSchemaManager;
     protected SchemaManager entityLinkSchemaManager;
+    protected SchemaManager eventSubscriptionSchemaManager;
     protected SchemaManager variableSchemaManager;
     protected SchemaManager taskSchemaManager;
     protected SchemaManager jobSchemaManager;
@@ -400,6 +404,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     // Entitylink support
     protected EntityLinkServiceConfiguration entityLinkServiceConfiguration;
     protected boolean enableEntityLinks;
+    
+    // EventSubscription support
+    protected EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration;
 
     // Task support
     protected TaskServiceConfiguration taskServiceConfiguration;
@@ -783,6 +790,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initClock();
         initIdentityLinkServiceConfiguration();
         initEntityLinkServiceConfiguration();
+        initEventSubscriptionServiceConfiguration();
         initVariableServiceConfiguration();
         configuratorsAfterInit();
         initTaskServiceConfiguration();
@@ -810,6 +818,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         if (executeServiceSchemaManagers) {
             initIdentityLinkSchemaManager();
             initEntityLinkSchemaManager();
+            initEventSubscriptionSchemaManager();
             initVariableSchemaManager();
             initTaskSchemaManager();
             initJobSchemaManager();
@@ -851,6 +860,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected void initEntityLinkSchemaManager() {
         if (this.entityLinkSchemaManager == null) {
             this.entityLinkSchemaManager = new EntityLinkDbSchemaManager();
+        }
+    }
+    
+    protected void initEventSubscriptionSchemaManager() {
+        if (this.eventSubscriptionSchemaManager == null) {
+            this.eventSubscriptionSchemaManager = new EventSubscriptionDbSchemaManager();
         }
     }
 
@@ -1167,6 +1182,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         cmmnParseHandlers.add(new HttpTaskParseHandler());
         cmmnParseHandlers.add(new TaskParseHandler());
         cmmnParseHandlers.add(new GenericEventListenerParseHandler());
+        cmmnParseHandlers.add(new SignalEventListenerParseHandler());
         cmmnParseHandlers.add(new TimerEventListenerParseHandler());
         cmmnParseHandlers.add(new UserEventListenerParseHandler());
 
@@ -1431,6 +1447,21 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     protected EntityLinkServiceConfiguration instantiateEntityLinkServiceConfiguration() {
         return new EntityLinkServiceConfiguration();
+    }
+    
+    public void initEventSubscriptionServiceConfiguration() {
+        this.eventSubscriptionServiceConfiguration = instantiateEventSubscriptionServiceConfiguration();
+        this.eventSubscriptionServiceConfiguration.setClock(this.clock);
+        this.eventSubscriptionServiceConfiguration.setObjectMapper(this.objectMapper);
+        this.eventSubscriptionServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        
+        this.eventSubscriptionServiceConfiguration.init();
+
+        addServiceConfiguration(EngineConfigurationConstants.KEY_EVENT_SUBSCRIPTION_SERVICE_CONFIG, this.eventSubscriptionServiceConfiguration);
+    }
+    
+    protected EventSubscriptionServiceConfiguration instantiateEventSubscriptionServiceConfiguration() {
+        return new EventSubscriptionServiceConfiguration();
     }
 
     public void initBusinessCalendarManager() {
@@ -2361,6 +2392,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setEntityLinkSchemaManager(SchemaManager entityLinkSchemaManager) {
         this.entityLinkSchemaManager = entityLinkSchemaManager;
+        return this;
+    }
+
+    public SchemaManager getEventSubscriptionSchemaManager() {
+        return eventSubscriptionSchemaManager;
+    }
+
+    public CmmnEngineConfiguration setEventSubscriptionSchemaManager(SchemaManager eventSubscriptionSchemaManager) {
+        this.eventSubscriptionSchemaManager = eventSubscriptionSchemaManager;
         return this;
     }
 

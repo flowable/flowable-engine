@@ -36,6 +36,10 @@ public abstract class EventSubscriptionEntityImpl extends AbstractEventSubscript
     protected String configuration;
     protected Date created;
     protected String processDefinitionId;
+    protected String subScopeId;
+    protected String scopeId;
+    protected String scopeDefinitionId;
+    protected String scopeType;
     protected String tenantId;
 
     public EventSubscriptionEntityImpl() {
@@ -51,6 +55,10 @@ public abstract class EventSubscriptionEntityImpl extends AbstractEventSubscript
         persistentState.put("activityId", this.activityId);
         persistentState.put("created", this.created);
         persistentState.put("configuration", this.configuration);
+        persistentState.put("subScopeId", this.subScopeId);
+        persistentState.put("scopeId", this.scopeId);
+        persistentState.put("scopeDefinitionId", this.scopeDefinitionId);
+        persistentState.put("scopeType", this.scopeType);
         persistentState.put("tenantId", this.tenantId);
         return persistentState;
     }
@@ -135,6 +143,46 @@ public abstract class EventSubscriptionEntityImpl extends AbstractEventSubscript
     @Override
     public void setProcessDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
+    }
+    
+    @Override
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+
+    @Override
+    public void setSubScopeId(String subScopeId) {
+        this.subScopeId = subScopeId;
+    }
+
+    @Override
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    @Override
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    @Override
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
+    }
+
+    @Override
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
+    }
+
+    @Override
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    @Override
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
     }
 
     @Override

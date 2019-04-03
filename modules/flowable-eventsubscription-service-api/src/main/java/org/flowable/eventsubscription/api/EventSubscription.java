@@ -55,6 +55,26 @@ public interface EventSubscription {
      * Id of the process definition for this event subscription.
      */
     String getProcessDefinitionId();
+    
+    /**
+     * Id of the sub scope for this event subscription.
+     */
+    String getSubScopeId();
+    
+    /**
+     * Id of the scope for this event subscription.
+     */
+    String getScopeId();
+    
+    /**
+     * Id of the scope definition for this event subscription.
+     */
+    String getScopeDefinitionId();
+    
+    /**
+     * Scope type for this event subscription.
+     */
+    String getScopeType();
 
     /**
      * Returns the configuration with additional info about this event subscription.

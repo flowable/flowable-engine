@@ -17,6 +17,10 @@
     <result property="configuration" column="CONFIGURATION_" jdbcType="VARCHAR" />
     <result property="created" column="CREATED_" jdbcType="TIMESTAMP" />   
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR" />
+    <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR" />
+    <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR" />
+    <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />     
     <discriminator javaType="string" column="EVENT_TYPE_">
       <case value="message" resultMap="messageResultMap"/> 
@@ -71,6 +75,18 @@
       </if>
       <if test="activityId != null">
         and RES.ACTIVITY_ID_ = #{activityId}
+      </if>
+      <if test="subScopeId != null">
+        and RES.SUB_SCOPE_ID_ = #{subScopeId}
+      </if>
+      <if test="scopeId != null">
+        and RES.SCOPE_ID_ = #{scopeId}
+      </if>
+      <if test="scopeDefinitionId != null">
+        and RES.SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
+      </if>
+      <if test="scopeType != null">
+        and RES.SCOPE_TYPE_ = #{scopeType}
       </if>
       <if test="createdBefore != null">
 		and RES.CREATED_ &lt; #{createdBefore}
@@ -159,6 +175,12 @@
     	and (ACTIVITY_ID_ = #{parameter.activityId})
   </select>
   
+  <select id="selectEventSubscriptionsBySubScopeId" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
+    select * 
+    from ${prefix}ACT_RU_EVENT_SUBSCR
+    where (SUB_SCOPE_ID_ = #{parameter})
+  </select>
+  
   <select id="selectEventSubscriptionsByTypeAndProcessDefinitionId" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
@@ -212,8 +234,7 @@
         and (TENANT_ID_ = '' or TENANT_ID_ is null)
     </if>   	
   </select>
-  
-  
+    
   <!-- MESSAGE INSERT -->
   
   <insert id="insertMessageEventSubscription" parameterType="org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntityImpl">
@@ -228,6 +249,10 @@
            	CONFIGURATION_,
            	CREATED_,
            	PROC_DEF_ID_,
+            SUB_SCOPE_ID_,
+            SCOPE_ID_,
+            SCOPE_DEFINITION_ID_,
+            SCOPE_TYPE_,
            	TENANT_ID_
     )
     values (#{id, jdbcType=VARCHAR},
@@ -240,6 +265,10 @@
             #{configuration, jdbcType=VARCHAR},
             #{created, jdbcType=TIMESTAMP},
             #{processDefinitionId, jdbcType=VARCHAR},
+            #{subScopeId, jdbcType=VARCHAR},
+            #{scopeId, jdbcType=VARCHAR},
+            #{scopeDefinitionId, jdbcType=VARCHAR},
+            #{scopeType, jdbcType=VARCHAR},
             #{tenantId, jdbcType=VARCHAR}
     )
   </insert>
@@ -256,6 +285,10 @@
             CONFIGURATION_,
             CREATED_,
             PROC_DEF_ID_,
+            SUB_SCOPE_ID_,
+            SCOPE_ID_,
+            SCOPE_DEFINITION_ID_,
+            SCOPE_TYPE_,
             TENANT_ID_
     )
     values 
@@ -270,6 +303,10 @@
            #{messageEventSubscription.configuration, jdbcType=VARCHAR},
            #{messageEventSubscription.created, jdbcType=TIMESTAMP},
            #{messageEventSubscription.processDefinitionId, jdbcType=VARCHAR},
+           #{messageEventSubscription.subScopeId, jdbcType=VARCHAR},
+           #{messageEventSubscription.scopeId, jdbcType=VARCHAR},
+           #{messageEventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
+           #{messageEventSubscription.scopeType, jdbcType=VARCHAR},
            #{messageEventSubscription.tenantId, jdbcType=VARCHAR})
       </foreach>
   </insert>
@@ -288,6 +325,10 @@
             CONFIGURATION_,
             CREATED_,
             PROC_DEF_ID_,
+            SUB_SCOPE_ID_,
+            SCOPE_ID_,
+            SCOPE_DEFINITION_ID_,
+            SCOPE_TYPE_,
             TENANT_ID_
           ) VALUES 
           (#{messageEventSubscription.id, jdbcType=VARCHAR},
@@ -300,6 +341,10 @@
            #{messageEventSubscription.configuration, jdbcType=VARCHAR},
            #{messageEventSubscription.created, jdbcType=TIMESTAMP},
            #{messageEventSubscription.processDefinitionId, jdbcType=VARCHAR},
+           #{messageEventSubscription.subScopeId, jdbcType=VARCHAR},
+           #{messageEventSubscription.scopeId, jdbcType=VARCHAR},
+           #{messageEventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
+           #{messageEventSubscription.scopeType, jdbcType=VARCHAR},
            #{messageEventSubscription.tenantId, jdbcType=VARCHAR})
       </foreach>
     SELECT * FROM dual
@@ -332,8 +377,20 @@
       <if test="originalPersistentState.processDefinitionId != processDefinitionId">
            PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
       </if>
+      <if test="originalPersistentState.subScopeId != subScopeId">
+           SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.scopeId != scopeId">
+           SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.scopeDefinitionId != scopeDefinitionId">
+           SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.scopeType != scopeType">
+           SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
+      </if>
       <if test="originalPersistentState.tenantId != tenantId">
-          TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+           TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
       </if>
     </set>
     where ID_= #{id, jdbcType=VARCHAR}
@@ -344,7 +401,7 @@
   
   <insert id="insertSignalEventSubscription" parameterType="org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntityImpl">
    insert into ${prefix}ACT_RU_EVENT_SUBSCR (
-             ID_, 
+            ID_, 
             REV_,
             EVENT_TYPE_,
            	EVENT_NAME_,
@@ -354,6 +411,10 @@
            	CONFIGURATION_,
            	CREATED_,
            	PROC_DEF_ID_,
+            SUB_SCOPE_ID_,
+            SCOPE_ID_,
+            SCOPE_DEFINITION_ID_,
+            SCOPE_TYPE_,
            	TENANT_ID_
     )
     values (#{id, jdbcType=VARCHAR},
@@ -366,6 +427,10 @@
             #{configuration, jdbcType=VARCHAR},
             #{created, jdbcType=TIMESTAMP},
             #{processDefinitionId, jdbcType=VARCHAR},
+            #{subScopeId, jdbcType=VARCHAR},
+            #{scopeId, jdbcType=VARCHAR},
+            #{scopeDefinitionId, jdbcType=VARCHAR},
+            #{scopeType, jdbcType=VARCHAR},
             #{tenantId, jdbcType=VARCHAR}         
     )
   </insert>
@@ -382,6 +447,10 @@
             CONFIGURATION_,
             CREATED_,
             PROC_DEF_ID_,
+            SUB_SCOPE_ID_,
+            SCOPE_ID_,
+            SCOPE_DEFINITION_ID_,
+            SCOPE_TYPE_,
             TENANT_ID_
     )
     values 
@@ -396,6 +465,10 @@
          #{signalEventSubscription.configuration, jdbcType=VARCHAR},
          #{signalEventSubscription.created, jdbcType=TIMESTAMP},
          #{signalEventSubscription.processDefinitionId, jdbcType=VARCHAR},
+         #{signalEventSubscription.subScopeId, jdbcType=VARCHAR},
+         #{signalEventSubscription.scopeId, jdbcType=VARCHAR},
+         #{signalEventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
+         #{signalEventSubscription.scopeType, jdbcType=VARCHAR},
          #{signalEventSubscription.tenantId, jdbcType=VARCHAR})
      </foreach>
   </insert>
@@ -414,6 +487,10 @@
           CONFIGURATION_,
           CREATED_,
           PROC_DEF_ID_,
+          SUB_SCOPE_ID_,
+          SCOPE_ID_,
+          SCOPE_DEFINITION_ID_,
+          SCOPE_TYPE_,
           TENANT_ID_
           )
           VALUES 
@@ -427,6 +504,10 @@
            #{signalEventSubscription.configuration, jdbcType=VARCHAR},
            #{signalEventSubscription.created, jdbcType=TIMESTAMP},
            #{signalEventSubscription.processDefinitionId, jdbcType=VARCHAR},
+           #{signalEventSubscription.subScopeId, jdbcType=VARCHAR},
+           #{signalEventSubscription.scopeId, jdbcType=VARCHAR},
+           #{signalEventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
+           #{signalEventSubscription.scopeType, jdbcType=VARCHAR},
            #{signalEventSubscription.tenantId, jdbcType=VARCHAR})
      </foreach>
     SELECT * FROM dual
@@ -453,6 +534,18 @@
       <if test="originalPersistentState.configuration != configuration">
            CONFIGURATION_ = #{configuration, jdbcType=VARCHAR},  
       </if>
+      <if test="originalPersistentState.subScopeId != subScopeId">
+           SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.scopeId != scopeId">
+           SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.scopeDefinitionId != scopeDefinitionId">
+           SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.scopeType != scopeType">
+           SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
+      </if>
       <if test="originalPersistentState.created != created">
            CREATED_ = #{created, jdbcType=TIMESTAMP},
       </if>
@@ -478,6 +571,10 @@
            	CONFIGURATION_,
            	CREATED_,
            	PROC_DEF_ID_,
+            SUB_SCOPE_ID_,
+            SCOPE_ID_,
+            SCOPE_DEFINITION_ID_,
+            SCOPE_TYPE_,
            	TENANT_ID_
     )
     values (#{id, jdbcType=VARCHAR},
@@ -490,6 +587,10 @@
             #{configuration, jdbcType=VARCHAR},
             #{created, jdbcType=TIMESTAMP},
             #{processDefinitionId, jdbcType=VARCHAR},
+            #{subScopeId, jdbcType=VARCHAR},
+            #{scopeId, jdbcType=VARCHAR},
+            #{scopeDefinitionId, jdbcType=VARCHAR},
+            #{scopeType, jdbcType=VARCHAR},
             #{tenantId, jdbcType=VARCHAR}
     )
   </insert>
@@ -506,6 +607,10 @@
             CONFIGURATION_,
             CREATED_,
             PROC_DEF_ID_,
+            SUB_SCOPE_ID_,
+            SCOPE_ID_,
+            SCOPE_DEFINITION_ID_,
+            SCOPE_TYPE_,
             TENANT_ID_
     )
     values 
@@ -520,6 +625,10 @@
          #{compensateEventSubscription.configuration, jdbcType=VARCHAR},
          #{compensateEventSubscription.created, jdbcType=TIMESTAMP},
          #{compensateEventSubscription.processDefinitionId, jdbcType=VARCHAR},
+         #{compensateEventSubscription.subScopeId, jdbcType=VARCHAR},
+         #{compensateEventSubscription.scopeId, jdbcType=VARCHAR},
+         #{compensateEventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
+         #{compensateEventSubscription.scopeType, jdbcType=VARCHAR},
          #{compensateEventSubscription.tenantId, jdbcType=VARCHAR})
       </foreach>
   </insert>
@@ -538,6 +647,10 @@
           CONFIGURATION_,
           CREATED_,
           PROC_DEF_ID_,
+          SUB_SCOPE_ID_,
+          SCOPE_ID_,
+          SCOPE_DEFINITION_ID_,
+          SCOPE_TYPE_,
           TENANT_ID_
         )
         VALUES
@@ -551,6 +664,10 @@
          #{compensateEventSubscription.configuration, jdbcType=VARCHAR},
          #{compensateEventSubscription.created, jdbcType=TIMESTAMP},
          #{compensateEventSubscription.processDefinitionId, jdbcType=VARCHAR},
+         #{compensateEventSubscription.subScopeId, jdbcType=VARCHAR},
+         #{compensateEventSubscription.scopeId, jdbcType=VARCHAR},
+         #{compensateEventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
+         #{compensateEventSubscription.scopeType, jdbcType=VARCHAR},
          #{compensateEventSubscription.tenantId, jdbcType=VARCHAR})
       </foreach>
     SELECT * FROM dual
@@ -576,6 +693,18 @@
       </if>
       <if test="originalPersistentState.configuration != configuration">
            CONFIGURATION_ = #{configuration, jdbcType=VARCHAR},  
+      </if>
+      <if test="originalPersistentState.subScopeId != subScopeId">
+           SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.scopeId != scopeId">
+           SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.scopeDefinitionId != scopeDefinitionId">
+           SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.scopeType != scopeType">
+           SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.created != created">
            CREATED_ = #{created, jdbcType=TIMESTAMP},

@@ -21,7 +21,7 @@ import org.flowable.cmmn.model.Stage;
 /**
  * @author Joram Barrez
  */
-public abstract class PlanItemDefinitiomXmlConverter extends CaseElementXmlConverter {
+public abstract class PlanItemDefinitionXmlConverter extends CaseElementXmlConverter {
     
     @Override
     public abstract String getXMLElementName();

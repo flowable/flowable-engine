@@ -44,6 +44,7 @@ public class CmmnDbSchemaManager extends LiquibaseBasedSchemaManager {
             getCommonSchemaManager().schemaCreate();
             getIdentityLinkSchemaManager().schemaCreate();
             getEntityLinkSchemaManager().schemaCreate();
+            getEventSubscriptionSchemaManager().schemaCreate();
             getTaskSchemaManager().schemaCreate();
             getVariableSchemaManager().schemaCreate();
             getJobSchemaManager().schemaCreate();
@@ -81,15 +82,21 @@ public class CmmnDbSchemaManager extends LiquibaseBasedSchemaManager {
         }
         
         try {
-            getIdentityLinkSchemaManager().schemaDrop();
+            getEventSubscriptionSchemaManager().schemaDrop();
         } catch (Exception e) {
-            logger.info("Error dropping identity link tables", e);
+            logger.info("Error dropping event subscription tables", e);
         }
         
         try {
             getEntityLinkSchemaManager().schemaDrop();
         } catch (Exception e) {
             logger.info("Error dropping entity link tables", e);
+        }
+        
+        try {
+            getIdentityLinkSchemaManager().schemaDrop();
+        } catch (Exception e) {
+            logger.info("Error dropping identity link tables", e);
         }
         
         try {
@@ -108,6 +115,7 @@ public class CmmnDbSchemaManager extends LiquibaseBasedSchemaManager {
             if (CommandContextUtil.getCmmnEngineConfiguration().isExecuteServiceSchemaManagers()) {
                 getIdentityLinkSchemaManager().schemaUpdate();
                 getEntityLinkSchemaManager().schemaUpdate();
+                getEventSubscriptionSchemaManager().schemaUpdate();
                 getTaskSchemaManager().schemaUpdate();
                 getVariableSchemaManager().schemaUpdate();
                 getJobSchemaManager().schemaUpdate();
@@ -131,6 +139,10 @@ public class CmmnDbSchemaManager extends LiquibaseBasedSchemaManager {
     
     protected SchemaManager getEntityLinkSchemaManager() {
         return CommandContextUtil.getCmmnEngineConfiguration().getEntityLinkSchemaManager();
+    }
+    
+    protected SchemaManager getEventSubscriptionSchemaManager() {
+        return CommandContextUtil.getCmmnEngineConfiguration().getEventSubscriptionSchemaManager();
     }
     
     protected SchemaManager getVariableSchemaManager() {

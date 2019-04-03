@@ -995,8 +995,16 @@ public abstract class AbstractDynamicStateManager {
                         messageExecution.setCurrentFlowElement(startEvent);
                         messageExecution.setEventScope(true);
                         messageExecution.setActive(false);
-                        MessageEventSubscriptionEntity messageSubscription = eventSubscriptionService.insertMessageEvent(messageEventDefinition.getMessageRef(), messageExecution.getId(),
-                                        messageExecution.getProcessInstanceId(), messageExecution.getCurrentActivityId(), messageExecution.getProcessDefinitionId(), messageExecution.getTenantId());
+                        EventSubscriptionEntity messageSubscription = (EventSubscriptionEntity) eventSubscriptionService.createEventSubscriptionBuilder()
+                                        .eventType(MessageEventSubscriptionEntity.EVENT_TYPE)
+                                        .eventName(messageEventDefinition.getMessageRef())
+                                        .executionId(messageExecution.getId())
+                                        .processInstanceId(messageExecution.getProcessInstanceId())
+                                        .activityId(messageExecution.getCurrentActivityId())
+                                        .processDefinitionId(messageExecution.getProcessDefinitionId())
+                                        .tenantId(messageExecution.getTenantId())
+                                        .create();
+                        
                         CountingEntityUtil.handleInsertEventSubscriptionEntityCount(messageSubscription);
                         messageExecution.getEventSubscriptions().add(messageSubscription);
                         
@@ -1019,8 +1027,17 @@ public abstract class AbstractDynamicStateManager {
                         signalExecution.setCurrentFlowElement(startEvent);
                         signalExecution.setEventScope(true);
                         signalExecution.setActive(false);
-                        SignalEventSubscriptionEntity signalSubscription = eventSubscriptionService.insertSignalEvent(signalEventDefinition.getSignalRef(), signal, signalExecution.getId(),
-                                        signalExecution.getProcessInstanceId(), signalExecution.getCurrentActivityId(), signalExecution.getProcessDefinitionId(), signalExecution.getTenantId());
+                        EventSubscriptionEntity signalSubscription = (EventSubscriptionEntity) eventSubscriptionService.createEventSubscriptionBuilder()
+                                        .eventType(SignalEventSubscriptionEntity.EVENT_TYPE)
+                                        .eventName(signalEventDefinition.getSignalRef())
+                                        .signal(signal)
+                                        .executionId(signalExecution.getId())
+                                        .processInstanceId(signalExecution.getProcessInstanceId())
+                                        .activityId(signalExecution.getCurrentActivityId())
+                                        .processDefinitionId(signalExecution.getProcessDefinitionId())
+                                        .tenantId(signalExecution.getTenantId())
+                                        .create();
+                                        
                         CountingEntityUtil.handleInsertEventSubscriptionEntityCount(signalSubscription);
                         signalExecution.getEventSubscriptions().add(signalSubscription);
                         

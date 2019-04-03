@@ -32,7 +32,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
 
         String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
 
-        assertEquals(Long.valueOf(10), tableCount.get(tablePrefix + "ACT_GE_PROPERTY"));
+        assertEquals(Long.valueOf(12), tableCount.get(tablePrefix + "ACT_GE_PROPERTY"));
         assertEquals(Long.valueOf(0), tableCount.get(tablePrefix + "ACT_GE_BYTEARRAY"));
         assertEquals(Long.valueOf(0), tableCount.get(tablePrefix + "ACT_RE_DEPLOYMENT"));
         assertEquals(Long.valueOf(0), tableCount.get(tablePrefix + "ACT_RU_EXECUTION"));

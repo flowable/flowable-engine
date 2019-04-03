@@ -14,8 +14,8 @@ package org.flowable.eventsubscription.service;
 
 import java.util.List;
 
-import org.flowable.bpmn.model.Signal;
 import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.eventsubscription.api.EventSubscriptionBuilder;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.eventsubscription.service.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
@@ -36,6 +36,8 @@ public interface EventSubscriptionService {
     List<EventSubscriptionEntity> findEventSubscriptionsByExecution(String executionId);
     
     List<EventSubscriptionEntity> findEventSubscriptionsByNameAndExecution(String type, String eventName, String executionId);
+    
+    List<EventSubscriptionEntity> findEventSubscriptionsBySubScopeId(String subScopeId);
     
     List<EventSubscriptionEntity> findEventSubscriptionsByProcessInstanceAndActivityId(String processInstanceId, String activityId, String type);
     
@@ -63,15 +65,9 @@ public interface EventSubscriptionService {
     
     MessageEventSubscriptionEntity createMessageEventSubscription();
     
+    EventSubscriptionBuilder createEventSubscriptionBuilder();
+    
     void insertEventSubscription(EventSubscriptionEntity eventSubscription);
-    
-    SignalEventSubscriptionEntity insertSignalEvent(String signalName, Signal signal, String executionId, String processInstanceId, 
-                    String currentActivityId, String processDefinitionId, String tenantId);
-    
-    MessageEventSubscriptionEntity insertMessageEvent(String messageName, String executionId, String processInstanceId, 
-                    String currentActivityId, String processDefinitionId, String tenantId);
-    
-    CompensateEventSubscriptionEntity insertCompensationEvent(String executionId, String processInstanceId, String activityId, String tenantId);
     
     void updateEventSubscriptionTenantId(String oldTenantId, String newTenantId);
     

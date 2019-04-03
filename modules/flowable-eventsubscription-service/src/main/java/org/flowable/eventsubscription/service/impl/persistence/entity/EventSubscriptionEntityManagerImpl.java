@@ -17,8 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.bpmn.model.Signal;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.eventsubscription.api.EventSubscriptionBuilder;
 import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.EventSubscriptionDataManager;
@@ -58,65 +60,19 @@ public class EventSubscriptionEntityManagerImpl extends AbstractEntityManager<Ev
         return eventSubscriptionDataManager.createSignalEventSubscription();
     }
 
-    @Override
-    public SignalEventSubscriptionEntity insertSignalEvent(String signalName, Signal signal, String executionId, 
-                    String processInstanceId, String currentActivityId, String processDefinitionId, String tenantId) {
+    public EventSubscription createEventSubscription(EventSubscriptionBuilder eventSubscriptionBuilder) {
+        if (SignalEventSubscriptionEntity.EVENT_TYPE.equals(eventSubscriptionBuilder.getEventType())) {
+            return insertSignalEvent(eventSubscriptionBuilder);
+            
+        } else if (MessageEventSubscriptionEntity.EVENT_TYPE.equals(eventSubscriptionBuilder.getEventType())) {
+            return insertMessageEvent(eventSubscriptionBuilder);
+            
+        } else if (CompensateEventSubscriptionEntity.EVENT_TYPE.equals(eventSubscriptionBuilder.getEventType())) {
+            return insertCompensationEvent(eventSubscriptionBuilder);
         
-        SignalEventSubscriptionEntity subscriptionEntity = createSignalEventSubscription();
-        subscriptionEntity.setExecutionId(executionId);
-        subscriptionEntity.setProcessInstanceId(processInstanceId);
-        if (signal != null) {
-            subscriptionEntity.setEventName(signal.getName());
-            if (signal.getScope() != null) {
-                subscriptionEntity.setConfiguration(signal.getScope());
-            }
         } else {
-            subscriptionEntity.setEventName(signalName);
+            throw new FlowableException("unknown event type " + eventSubscriptionBuilder.getEventType());
         }
-
-        subscriptionEntity.setActivityId(currentActivityId);
-        subscriptionEntity.setProcessDefinitionId(processDefinitionId);
-        if (tenantId != null) {
-            subscriptionEntity.setTenantId(tenantId);
-        }
-        
-        insert(subscriptionEntity);
-        
-        return subscriptionEntity;
-    }
-
-    @Override
-    public MessageEventSubscriptionEntity insertMessageEvent(String messageName, String executionId, 
-                    String processInstanceId, String currentActivityId, String processDefinitionId, String tenantId) {
-        
-        MessageEventSubscriptionEntity subscriptionEntity = createMessageEventSubscription();
-        subscriptionEntity.setExecutionId(executionId);
-        subscriptionEntity.setProcessInstanceId(processInstanceId);
-        subscriptionEntity.setEventName(messageName);
-
-        subscriptionEntity.setActivityId(currentActivityId);
-        subscriptionEntity.setProcessDefinitionId(processDefinitionId);
-        if (tenantId != null) {
-            subscriptionEntity.setTenantId(tenantId);
-        }
-        insert(subscriptionEntity);
-        
-        return subscriptionEntity;
-    }
-
-    @Override
-    public CompensateEventSubscriptionEntity insertCompensationEvent(String executionId, 
-                    String processInstanceId, String activityId, String tenantId) {
-        
-        CompensateEventSubscriptionEntity eventSubscription = createCompensateEventSubscription();
-        eventSubscription.setExecutionId(executionId);
-        eventSubscription.setProcessInstanceId(processInstanceId);
-        eventSubscription.setActivityId(activityId);
-        if (tenantId != null) {
-            eventSubscription.setTenantId(tenantId);
-        }
-        insert(eventSubscription);
-        return eventSubscription;
     }
 
     @Override
@@ -192,6 +148,11 @@ public class EventSubscriptionEntityManagerImpl extends AbstractEntityManager<Ev
     public List<EventSubscriptionEntity> findEventSubscriptionsByExecution(final String executionId) {
         return eventSubscriptionDataManager.findEventSubscriptionsByExecution(executionId);
     }
+    
+    @Override
+    public List<EventSubscriptionEntity> findEventSubscriptionsBySubScopeId(final String subScopeId) {
+        return eventSubscriptionDataManager.findEventSubscriptionsBySubScopeId(subScopeId);
+    }
 
     @Override
     public List<EventSubscriptionEntity> findEventSubscriptionsByTypeAndProcessDefinitionId(String type, String processDefinitionId, String tenantId) {
@@ -226,6 +187,66 @@ public class EventSubscriptionEntityManagerImpl extends AbstractEntityManager<Ev
     @Override
     public void deleteEventSubscriptionsByExecutionId(String executionId) {
         eventSubscriptionDataManager.deleteEventSubscriptionsByExecutionId(executionId);
+    }
+    
+    protected SignalEventSubscriptionEntity insertSignalEvent(EventSubscriptionBuilder eventSubscriptionBuilder) {
+        SignalEventSubscriptionEntity subscriptionEntity = createSignalEventSubscription();
+        subscriptionEntity.setExecutionId(eventSubscriptionBuilder.getExecutionId());
+        subscriptionEntity.setProcessInstanceId(eventSubscriptionBuilder.getProcessInstanceId());
+        Signal signal = eventSubscriptionBuilder.getSignal();
+        if (signal != null) {
+            subscriptionEntity.setEventName(signal.getName());
+            if (signal.getScope() != null) {
+                subscriptionEntity.setConfiguration(signal.getScope());
+            }
+        } else {
+            subscriptionEntity.setEventName(eventSubscriptionBuilder.getEventName());
+        }
+
+        subscriptionEntity.setActivityId(eventSubscriptionBuilder.getActivityId());
+        subscriptionEntity.setProcessDefinitionId(eventSubscriptionBuilder.getProcessDefinitionId());
+        subscriptionEntity.setSubScopeId(eventSubscriptionBuilder.getSubScopeId());
+        subscriptionEntity.setScopeId(eventSubscriptionBuilder.getScopeId());
+        subscriptionEntity.setScopeDefinitionId(eventSubscriptionBuilder.getScopeDefinitionId());
+        subscriptionEntity.setScopeType(eventSubscriptionBuilder.getScopeType());
+        
+        if (eventSubscriptionBuilder.getTenantId() != null) {
+            subscriptionEntity.setTenantId(eventSubscriptionBuilder.getTenantId());
+        }
+        
+        insert(subscriptionEntity);
+        
+        return subscriptionEntity;
+    }
+    
+    protected MessageEventSubscriptionEntity insertMessageEvent(EventSubscriptionBuilder eventSubscriptionBuilder) {
+        
+        MessageEventSubscriptionEntity subscriptionEntity = createMessageEventSubscription();
+        subscriptionEntity.setExecutionId(eventSubscriptionBuilder.getExecutionId());
+        subscriptionEntity.setProcessInstanceId(eventSubscriptionBuilder.getProcessInstanceId());
+        subscriptionEntity.setEventName(eventSubscriptionBuilder.getEventName());
+
+        subscriptionEntity.setActivityId(eventSubscriptionBuilder.getActivityId());
+        subscriptionEntity.setProcessDefinitionId(eventSubscriptionBuilder.getProcessDefinitionId());
+        if (eventSubscriptionBuilder.getTenantId() != null) {
+            subscriptionEntity.setTenantId(eventSubscriptionBuilder.getTenantId());
+        }
+        insert(subscriptionEntity);
+        
+        return subscriptionEntity;
+    }
+    
+    protected CompensateEventSubscriptionEntity insertCompensationEvent(EventSubscriptionBuilder eventSubscriptionBuilder) {
+        
+        CompensateEventSubscriptionEntity eventSubscription = createCompensateEventSubscription();
+        eventSubscription.setExecutionId(eventSubscriptionBuilder.getExecutionId());
+        eventSubscription.setProcessInstanceId(eventSubscriptionBuilder.getProcessInstanceId());
+        eventSubscription.setActivityId(eventSubscriptionBuilder.getActivityId());
+        if (eventSubscriptionBuilder.getTenantId() != null) {
+            eventSubscription.setTenantId(eventSubscriptionBuilder.getTenantId());
+        }
+        insert(eventSubscription);
+        return eventSubscription;
     }
 
     protected List<SignalEventSubscriptionEntity> toSignalEventSubscriptionEntityList(List<EventSubscriptionEntity> result) {

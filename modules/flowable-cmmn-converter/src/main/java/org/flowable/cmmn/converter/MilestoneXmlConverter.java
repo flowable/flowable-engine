@@ -20,7 +20,7 @@ import org.flowable.cmmn.model.Milestone;
 /**
  * @author Joram Barrez
  */
-public class MilestoneXmlConverter extends PlanItemDefinitiomXmlConverter {
+public class MilestoneXmlConverter extends PlanItemDefinitionXmlConverter {
     
     @Override
     public String getXMLElementName() {

@@ -109,18 +109,28 @@ public class ScopeUtil {
                 eventSubscriptionService.deleteEventSubscription(eventSubscriptionEntity);
                 CountingEntityUtil.handleDeleteEventSubscriptionEntityCount(eventSubscriptionEntity);
 
-                CompensateEventSubscriptionEntity newSubscription = eventSubscriptionService.insertCompensationEvent(
-                        eventScopeExecution.getId(), eventScopeExecution.getProcessInstanceId(), 
-                        eventSubscriptionEntity.getActivityId(), eventSubscriptionEntity.getTenantId());
+                EventSubscriptionEntity newSubscription = (EventSubscriptionEntity) eventSubscriptionService.createEventSubscriptionBuilder()
+                                .eventType(CompensateEventSubscriptionEntity.EVENT_TYPE)
+                                .executionId(eventScopeExecution.getId())
+                                .processInstanceId(eventScopeExecution.getProcessInstanceId())
+                                .activityId(eventSubscriptionEntity.getActivityId())
+                                .tenantId(eventScopeExecution.getTenantId())
+                                .create();
+                
                 CountingEntityUtil.handleInsertEventSubscriptionEntityCount(newSubscription);
                 
                 newSubscription.setConfiguration(eventSubscriptionEntity.getConfiguration());
                 newSubscription.setCreated(eventSubscriptionEntity.getCreated());
             }
 
-            CompensateEventSubscriptionEntity eventSubscription = eventSubscriptionService.insertCompensationEvent(
-                    processInstanceExecutionEntity.getId(), processInstanceExecutionEntity.getProcessInstanceId(), 
-                    eventScopeExecution.getCurrentFlowElement().getId(), processInstanceExecutionEntity.getTenantId());
+            EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) eventSubscriptionService.createEventSubscriptionBuilder()
+                            .eventType(CompensateEventSubscriptionEntity.EVENT_TYPE)
+                            .executionId(processInstanceExecutionEntity.getId())
+                            .processInstanceId(processInstanceExecutionEntity.getProcessInstanceId())
+                            .activityId(eventScopeExecution.getCurrentFlowElement().getId())
+                            .tenantId(processInstanceExecutionEntity.getTenantId())
+                            .create();
+            
             CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
             
             eventSubscription.setConfiguration(eventScopeExecution.getId());

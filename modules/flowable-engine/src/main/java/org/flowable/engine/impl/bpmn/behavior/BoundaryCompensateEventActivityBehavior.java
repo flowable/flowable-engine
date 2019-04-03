@@ -96,8 +96,14 @@ public class BoundaryCompensateEventActivityBehavior extends BoundaryEventActivi
             throw new FlowableException("Could not find a scope execution for compensation boundary event " + boundaryEvent.getId());
         }
 
-        EventSubscriptionEntity eventSubscription = CommandContextUtil.getEventSubscriptionService().insertCompensationEvent(scopeExecution.getId(), scopeExecution.getProcessInstanceId(),
-                        sourceActivity.getId(), scopeExecution.getTenantId());
+        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) CommandContextUtil.getEventSubscriptionService().createEventSubscriptionBuilder()
+                        .eventType(CompensateEventSubscriptionEntity.EVENT_TYPE)
+                        .executionId(scopeExecution.getId())
+                        .processInstanceId(scopeExecution.getProcessInstanceId())
+                        .activityId(sourceActivity.getId())
+                        .tenantId(scopeExecution.getTenantId())
+                        .create();
+        
         CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
     }
 

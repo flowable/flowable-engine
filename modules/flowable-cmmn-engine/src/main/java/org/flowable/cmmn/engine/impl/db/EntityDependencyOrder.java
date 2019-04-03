@@ -29,6 +29,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityImpl;
 import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntityImpl;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
@@ -52,6 +53,7 @@ public class EntityDependencyOrder {
         DELETE_ORDER.add(VariableInstanceEntityImpl.class);
         DELETE_ORDER.add(VariableByteArrayEntityImpl.class);
         DELETE_ORDER.add(HistoricVariableInstanceEntityImpl.class);
+        DELETE_ORDER.add(EventSubscriptionEntityImpl.class);
         DELETE_ORDER.add(EntityLinkEntityImpl.class);
         DELETE_ORDER.add(IdentityLinkEntityImpl.class);
         DELETE_ORDER.add(MilestoneInstanceEntityImpl.class);

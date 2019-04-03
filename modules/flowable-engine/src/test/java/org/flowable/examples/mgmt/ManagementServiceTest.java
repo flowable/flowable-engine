@@ -56,7 +56,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
             
         });
 
-        assertEquals(Long.valueOf(11), tableCount.get(tablePrefix + "ACT_GE_PROPERTY"));
+        assertEquals(Long.valueOf(12), tableCount.get(tablePrefix + "ACT_GE_PROPERTY"));
         assertEquals(Long.valueOf(0), tableCount.get(tablePrefix + "ACT_GE_BYTEARRAY"));
         assertEquals(Long.valueOf(0), tableCount.get(tablePrefix + "ACT_RE_DEPLOYMENT"));
         assertEquals(Long.valueOf(0), tableCount.get(tablePrefix + "ACT_RU_EXECUTION"));

@@ -26,7 +26,7 @@ import org.flowable.cmmn.model.ScriptServiceTask;
 /**
  * @author Joram Barrez
  */
-public class TaskXmlConverter extends PlanItemDefinitiomXmlConverter {
+public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
 
     @Override
     public String getXMLElementName() {

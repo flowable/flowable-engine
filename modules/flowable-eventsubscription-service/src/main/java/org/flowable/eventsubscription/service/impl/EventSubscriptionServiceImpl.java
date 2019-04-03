@@ -14,9 +14,9 @@ package org.flowable.eventsubscription.service.impl;
 
 import java.util.List;
 
-import org.flowable.bpmn.model.Signal;
 import org.flowable.common.engine.impl.service.CommonServiceImpl;
 import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.eventsubscription.api.EventSubscriptionBuilder;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
 import org.flowable.eventsubscription.service.impl.persistence.entity.CompensateEventSubscriptionEntity;
@@ -52,6 +52,11 @@ public class EventSubscriptionServiceImpl extends CommonServiceImpl<EventSubscri
     @Override
     public List<EventSubscriptionEntity> findEventSubscriptionsByNameAndExecution(String type, String eventName, String executionId) {
         return getEventSubscriptionEntityManager().findEventSubscriptionsByNameAndExecution(type, eventName, executionId);
+    }
+    
+    @Override
+    public List<EventSubscriptionEntity> findEventSubscriptionsBySubScopeId(String subScopeId) {
+        return getEventSubscriptionEntityManager().findEventSubscriptionsBySubScopeId(subScopeId);
     }
 
     @Override
@@ -120,23 +125,13 @@ public class EventSubscriptionServiceImpl extends CommonServiceImpl<EventSubscri
     }
 
     @Override
+    public EventSubscriptionBuilder createEventSubscriptionBuilder() {
+        return new EventSubscriptionBuilderImpl(this);
+    }
+
+    @Override
     public void insertEventSubscription(EventSubscriptionEntity eventSubscription) {
         getEventSubscriptionEntityManager().insert(eventSubscription);
-    }
-
-    @Override
-    public SignalEventSubscriptionEntity insertSignalEvent(String signalName, Signal signal, String executionId, String processInstanceId, String currentActivityId, String processDefinitionId, String tenantId) {
-        return getEventSubscriptionEntityManager().insertSignalEvent(signalName, signal, executionId, processInstanceId, currentActivityId, processDefinitionId, tenantId);
-    }
-
-    @Override
-    public MessageEventSubscriptionEntity insertMessageEvent(String messageName, String executionId, String processInstanceId, String currentActivityId, String processDefinitionId, String tenantId) {
-        return getEventSubscriptionEntityManager().insertMessageEvent(messageName, executionId, processInstanceId, currentActivityId, processDefinitionId, tenantId);
-    }
-
-    @Override
-    public CompensateEventSubscriptionEntity insertCompensationEvent(String executionId, String processInstanceId, String activityId, String tenantId) {
-        return getEventSubscriptionEntityManager().insertCompensationEvent(executionId, processInstanceId, activityId, tenantId);
     }
 
     @Override
@@ -162,6 +157,10 @@ public class EventSubscriptionServiceImpl extends CommonServiceImpl<EventSubscri
     @Override
     public void deleteEventSubscriptionsForProcessDefinition(String processDefinitionId) {
         getEventSubscriptionEntityManager().deleteEventSubscriptionsForProcessDefinition(processDefinitionId);
+    }
+    
+    public EventSubscription createEventSubscription(EventSubscriptionBuilder builder) {
+        return getEventSubscriptionEntityManager().createEventSubscription(builder);
     }
 
     public EventSubscriptionEntityManager getEventSubscriptionEntityManager() {

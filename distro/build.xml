@@ -109,6 +109,12 @@
 			<fileset dir="../modules/flowable-entitylink-service/target">
                 <include name="flowable-entitylink-service-*.jar" />
             </fileset>
+			<fileset dir="../modules/flowable-eventsubscription-service-api/target">
+                <include name="flowable-eventsubscription-service-api-*.jar" />
+            </fileset>
+            <fileset dir="../modules/flowable-eventsubscription-service/target">
+                <include name="flowable-eventsubscription-service-*.jar" />
+            </fileset>
 			<fileset dir="../modules/flowable-job-service-api/target">
                 <include name="flowable-job-service-api-*.jar" />
             </fileset>

@@ -18,7 +18,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
+import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -65,7 +65,7 @@ public class CountingEntityUtil {
         }
     }
     
-    public static void handleInsertEventSubscriptionEntityCount(EventSubscriptionEntity eventSubscription) {
+    public static void handleInsertEventSubscriptionEntityCount(EventSubscription eventSubscription) {
         if (eventSubscription.getExecutionId() != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
             CountingExecutionEntity executionEntity = (CountingExecutionEntity) CommandContextUtil.getExecutionEntityManager().findById(
                             eventSubscription.getExecutionId());
@@ -76,7 +76,7 @@ public class CountingEntityUtil {
         }
     }
     
-    public static void handleDeleteEventSubscriptionEntityCount(EventSubscriptionEntity eventSubscription) {
+    public static void handleDeleteEventSubscriptionEntityCount(EventSubscription eventSubscription) {
         if (eventSubscription.getExecutionId() != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
             CountingExecutionEntity executionEntity = (CountingExecutionEntity) CommandContextUtil.getExecutionEntityManager().findById(
                             eventSubscription.getExecutionId());

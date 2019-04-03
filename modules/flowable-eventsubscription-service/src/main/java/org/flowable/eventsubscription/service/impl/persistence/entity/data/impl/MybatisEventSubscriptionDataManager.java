@@ -36,6 +36,7 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByExecutionIdMatcher;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByNameMatcher;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByProcInstTypeAndActivityMatcher;
+import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsBySubScopeIdMatcher;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.MessageEventSubscriptionsByProcInstAndEventNameMatcher;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.SignalEventSubscriptionByEventNameMatcher;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.SignalEventSubscriptionByNameAndExecutionMatcher;
@@ -57,6 +58,8 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
     protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByNameMatcher = new EventSubscriptionsByNameMatcher();
 
     protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByExecutionIdMatcher = new EventSubscriptionsByExecutionIdMatcher();
+    
+    protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsBySubScopeIdMatcher = new EventSubscriptionsBySubScopeIdMatcher();
 
     protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByProcInstTypeAndActivityMatcher = new EventSubscriptionsByProcInstTypeAndActivityMatcher();
 
@@ -185,6 +188,18 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
         }
         
         return getList(dbSqlSession, "selectEventSubscriptionsByExecution", executionId, eventSubscriptionsByExecutionIdMatcher, true);
+    }
+    
+    @Override
+    public List<EventSubscriptionEntity> findEventSubscriptionsBySubScopeId(final String subScopeId) {
+        DbSqlSession dbSqlSession = getDbSqlSession();
+        
+        // If the sub scope has been inserted in the same command execution as this query, there can't be any in the database 
+        if (isEntityInserted(dbSqlSession, "subScopeId", subScopeId)) {
+            return getListFromCache(eventSubscriptionsBySubScopeIdMatcher, subScopeId);
+        }
+        
+        return getList(dbSqlSession, "selectEventSubscriptionsBySubScopeId", subScopeId, eventSubscriptionsBySubScopeIdMatcher, true);
     }
 
     @Override
