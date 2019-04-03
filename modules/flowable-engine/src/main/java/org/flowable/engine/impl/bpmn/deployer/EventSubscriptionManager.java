@@ -28,12 +28,13 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.event.MessageEventHandler;
 import org.flowable.engine.impl.event.SignalEventHandler;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
-import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.CountingEntityUtil;
+import org.flowable.eventsubscription.service.EventSubscriptionService;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
+import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntity;
+import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
 
 /**
  * Manages event subscriptions for newly-deployed process definitions and their previous versions.
@@ -42,11 +43,13 @@ public class EventSubscriptionManager {
 
     protected void removeObsoleteEventSubscriptionsImpl(ProcessDefinitionEntity processDefinition, String eventHandlerType) {
         // remove all subscriptions for the previous version
-        EventSubscriptionEntityManager eventSubscriptionEntityManager = CommandContextUtil.getEventSubscriptionEntityManager();
-        List<EventSubscriptionEntity> subscriptionsToDelete = eventSubscriptionEntityManager.findEventSubscriptionsByTypeAndProcessDefinitionId(eventHandlerType, processDefinition.getId(), processDefinition.getTenantId());
+        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService();
+        List<EventSubscriptionEntity> subscriptionsToDelete = eventSubscriptionService
+                        .findEventSubscriptionsByTypeAndProcessDefinitionId(eventHandlerType, processDefinition.getId(), processDefinition.getTenantId());
 
         for (EventSubscriptionEntity eventSubscriptionEntity : subscriptionsToDelete) {
-            eventSubscriptionEntityManager.delete(eventSubscriptionEntity);
+            eventSubscriptionService.deleteEventSubscription(eventSubscriptionEntity);
+            CountingEntityUtil.handleDeleteEventSubscriptionEntityCount(eventSubscriptionEntity);
         }
     }
 
@@ -84,8 +87,9 @@ public class EventSubscriptionManager {
     protected void insertMessageEvent(MessageEventDefinition messageEventDefinition, StartEvent startEvent, ProcessDefinitionEntity processDefinition, BpmnModel bpmnModel) {
         CommandContext commandContext = Context.getCommandContext();
 
+        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
         // look for subscriptions for the same name in db:
-        List<EventSubscriptionEntity> subscriptionsForSameMessageName = CommandContextUtil.getEventSubscriptionEntityManager(commandContext)
+        List<EventSubscriptionEntity> subscriptionsForSameMessageName = eventSubscriptionService
                 .findEventSubscriptionsByName(MessageEventHandler.EVENT_HANDLER_TYPE, messageEventDefinition.getMessageRef(), processDefinition.getTenantId());
 
         for (EventSubscriptionEntity eventSubscriptionEntity : subscriptionsForSameMessageName) {
@@ -98,7 +102,7 @@ public class EventSubscriptionManager {
             }
         }
 
-        MessageEventSubscriptionEntity newSubscription = CommandContextUtil.getEventSubscriptionEntityManager(commandContext).createMessageEventSubscription();
+        MessageEventSubscriptionEntity newSubscription = eventSubscriptionService.createMessageEventSubscription();
         newSubscription.setEventName(messageEventDefinition.getMessageRef());
         newSubscription.setActivityId(startEvent.getId());
         newSubscription.setConfiguration(processDefinition.getId());
@@ -108,7 +112,8 @@ public class EventSubscriptionManager {
             newSubscription.setTenantId(processDefinition.getTenantId());
         }
 
-        CommandContextUtil.getEventSubscriptionEntityManager(commandContext).insert(newSubscription);
+        eventSubscriptionService.insertEventSubscription(newSubscription);
+        CountingEntityUtil.handleInsertEventSubscriptionEntityCount(newSubscription);
     }
 
     protected void addSignalEventSubscriptions(CommandContext commandContext, ProcessDefinitionEntity processDefinition, org.flowable.bpmn.model.Process process, BpmnModel bpmnModel) {
@@ -120,7 +125,7 @@ public class EventSubscriptionManager {
                         EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
                         if (eventDefinition instanceof SignalEventDefinition) {
                             SignalEventDefinition signalEventDefinition = (SignalEventDefinition) eventDefinition;
-                            SignalEventSubscriptionEntity subscriptionEntity = CommandContextUtil.getEventSubscriptionEntityManager(commandContext).createSignalEventSubscription();
+                            SignalEventSubscriptionEntity subscriptionEntity = CommandContextUtil.getEventSubscriptionService(commandContext).createSignalEventSubscription();
                             Signal signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
                             if (signal != null) {
                                 subscriptionEntity.setEventName(signal.getName());
@@ -133,7 +138,8 @@ public class EventSubscriptionManager {
                                 subscriptionEntity.setTenantId(processDefinition.getTenantId());
                             }
 
-                            CommandContextUtil.getEventSubscriptionEntityManager(commandContext).insert(subscriptionEntity);
+                            CommandContextUtil.getEventSubscriptionService(commandContext).insertEventSubscription(subscriptionEntity);
+                            CountingEntityUtil.handleInsertEventSubscriptionEntityCount(subscriptionEntity);
                         }
                     }
                 }

@@ -36,7 +36,6 @@ import org.flowable.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.flowable.engine.impl.persistence.entity.CommentEntityManager;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityManager;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntityManager;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
@@ -51,6 +50,8 @@ import org.flowable.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.entitylink.api.EntityLinkService;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
+import org.flowable.eventsubscription.service.EventSubscriptionService;
+import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
@@ -188,6 +189,30 @@ public class CommandContextUtil {
         }
         
         return historicEntityLinkService;
+    }
+    
+    // EVENT SUBSCRIPTION SERVICE
+    public static EventSubscriptionServiceConfiguration getEventSubscriptionServiceConfiguration() {
+        return getEventSubscriptionServiceConfiguration(getCommandContext());
+    }
+    
+    public static EventSubscriptionServiceConfiguration getEventSubscriptionServiceConfiguration(CommandContext commandContext) {
+        return (EventSubscriptionServiceConfiguration) getProcessEngineConfiguration(commandContext).getServiceConfigurations()
+                        .get(EngineConfigurationConstants.KEY_EVENT_SUBSCRIPTION_SERVICE_CONFIG);
+    }
+    
+    public static EventSubscriptionService getEventSubscriptionService() {
+        return getEventSubscriptionService(getCommandContext());
+    }
+    
+    public static EventSubscriptionService getEventSubscriptionService(CommandContext commandContext) {
+        EventSubscriptionService eventSubscriptionService = null;
+        EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration = getEventSubscriptionServiceConfiguration(commandContext);
+        if (eventSubscriptionServiceConfiguration != null) {
+            eventSubscriptionService = eventSubscriptionServiceConfiguration.getEventSubscriptionService();
+        }
+        
+        return eventSubscriptionService;
     }
     
     // TASK SERVICE
@@ -529,14 +554,6 @@ public class CommandContextUtil {
     
     public static ExecutionEntityManager getExecutionEntityManager(CommandContext commandContext) {
         return getProcessEngineConfiguration(commandContext).getExecutionEntityManager();
-    }
-    
-    public static EventSubscriptionEntityManager getEventSubscriptionEntityManager() {
-        return getEventSubscriptionEntityManager(getCommandContext());
-    }
-    
-    public static EventSubscriptionEntityManager getEventSubscriptionEntityManager(CommandContext commandContext) {
-        return getProcessEngineConfiguration(commandContext).getEventSubscriptionEntityManager();
     }
     
     public static CommentEntityManager getCommentEntityManager() {

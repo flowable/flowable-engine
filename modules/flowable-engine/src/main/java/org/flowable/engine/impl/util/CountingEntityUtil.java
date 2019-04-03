@@ -18,6 +18,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -60,6 +61,28 @@ public class CountingEntityUtil {
             CountingExecutionEntity executionEntity = (CountingExecutionEntity) CommandContextUtil.getExecutionEntityManager(commandContext).findById(variableInstance.getExecutionId());
             if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
                 executionEntity.setVariableCount(executionEntity.getVariableCount() + 1);
+            }
+        }
+    }
+    
+    public static void handleInsertEventSubscriptionEntityCount(EventSubscriptionEntity eventSubscription) {
+        if (eventSubscription.getExecutionId() != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
+            CountingExecutionEntity executionEntity = (CountingExecutionEntity) CommandContextUtil.getExecutionEntityManager().findById(
+                            eventSubscription.getExecutionId());
+
+            if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(executionEntity)) {
+                executionEntity.setEventSubscriptionCount(executionEntity.getEventSubscriptionCount() + 1);
+            }
+        }
+    }
+    
+    public static void handleDeleteEventSubscriptionEntityCount(EventSubscriptionEntity eventSubscription) {
+        if (eventSubscription.getExecutionId() != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
+            CountingExecutionEntity executionEntity = (CountingExecutionEntity) CommandContextUtil.getExecutionEntityManager().findById(
+                            eventSubscription.getExecutionId());
+            
+            if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(executionEntity)) {
+                executionEntity.setEventSubscriptionCount(executionEntity.getEventSubscriptionCount() - 1);
             }
         }
     }

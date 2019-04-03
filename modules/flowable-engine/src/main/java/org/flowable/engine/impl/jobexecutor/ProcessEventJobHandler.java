@@ -14,9 +14,10 @@
 package org.flowable.engine.impl.jobexecutor;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.EventSubscriptionUtil;
+import org.flowable.eventsubscription.service.EventSubscriptionService;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
@@ -37,14 +38,14 @@ public class ProcessEventJobHandler implements JobHandler {
     @Override
     public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
 
-        EventSubscriptionEntityManager eventSubscriptionEntityManager = CommandContextUtil.getEventSubscriptionEntityManager(commandContext);
+        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
 
         // lookup subscription:
-        EventSubscriptionEntity eventSubscriptionEntity = eventSubscriptionEntityManager.findById(configuration);
+        EventSubscriptionEntity eventSubscriptionEntity = eventSubscriptionService.findById(configuration);
 
         // if event subscription is null, ignore
         if (eventSubscriptionEntity != null) {
-            eventSubscriptionEntityManager.eventReceived(eventSubscriptionEntity, null, false);
+            EventSubscriptionUtil.eventReceived(eventSubscriptionEntity, null, false);
         }
 
     }

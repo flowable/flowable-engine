@@ -43,11 +43,11 @@ import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
-import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.engine.impl.runtime.callback.ProcessInstanceState;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntity;
+import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 
 /**
@@ -271,7 +271,11 @@ public class ProcessInstanceHelper {
                 messageExecution.setEventScope(true);
                 messageExecution.setActive(false);
 
-                messageEventSubscriptions.add(CommandContextUtil.getEventSubscriptionEntityManager(commandContext).insertMessageEvent(messageEventDefinition.getMessageRef(), messageExecution));
+                MessageEventSubscriptionEntity eventSubscription = CommandContextUtil.getEventSubscriptionService(commandContext).insertMessageEvent(messageEventDefinition.getMessageRef(), messageExecution.getId(),
+                                messageExecution.getProcessInstanceId(), messageExecution.getCurrentActivityId(), messageExecution.getProcessDefinitionId(), messageExecution.getTenantId());
+                CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
+                messageEventSubscriptions.add(eventSubscription);
+                messageExecution.getEventSubscriptions().add(eventSubscription);
 
             } else if (eventDefinition instanceof SignalEventDefinition) {
                 SignalEventDefinition signalEventDefinition = (SignalEventDefinition) eventDefinition;
@@ -287,7 +291,11 @@ public class ProcessInstanceHelper {
                 signalExecution.setEventScope(true);
                 signalExecution.setActive(false);
 
-                signalEventSubscriptions.add(CommandContextUtil.getEventSubscriptionEntityManager(commandContext).insertSignalEvent(signalEventDefinition.getSignalRef(), signal, signalExecution));
+                SignalEventSubscriptionEntity eventSubscription = CommandContextUtil.getEventSubscriptionService(commandContext).insertSignalEvent(signalEventDefinition.getSignalRef(), signal, signalExecution.getId(),
+                                signalExecution.getProcessInstanceId(), signalExecution.getCurrentActivityId(), signalExecution.getProcessDefinitionId(), signalExecution.getTenantId());
+                CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
+                signalEventSubscriptions.add(eventSubscription);
+                signalExecution.getEventSubscriptions().add(eventSubscription);
 
             } else if (eventDefinition instanceof TimerEventDefinition) {
                 TimerEventDefinition timerEventDefinition = (TimerEventDefinition) eventDefinition;
@@ -311,14 +319,14 @@ public class ProcessInstanceHelper {
             for (MessageEventSubscriptionEntity messageEventSubscription : messageEventSubscriptions) {
                 CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
                     .dispatchEvent(FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING, messageEventSubscription.getActivityId(),
-                        messageEventSubscription.getEventName(), null, messageEventSubscription.getExecution().getId(),
+                        messageEventSubscription.getEventName(), null, messageEventSubscription.getExecutionId(),
                         messageEventSubscription.getProcessInstanceId(), messageEventSubscription.getProcessDefinitionId()));
             }
 
             for (SignalEventSubscriptionEntity signalEventSubscription : signalEventSubscriptions) {
                 CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
                     .dispatchEvent(FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING, signalEventSubscription.getActivityId(),
-                        signalEventSubscription.getEventName(), null, signalEventSubscription.getExecution().getId(),
+                        signalEventSubscription.getEventName(), null, signalEventSubscription.getExecutionId(),
                         signalEventSubscription.getProcessInstanceId(), signalEventSubscription.getProcessDefinitionId()));
             }
         }

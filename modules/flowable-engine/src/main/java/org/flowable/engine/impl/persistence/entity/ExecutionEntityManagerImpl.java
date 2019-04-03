@@ -57,6 +57,9 @@ import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkService;
 import org.flowable.entitylink.api.EntityLinkType;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
+import org.flowable.eventsubscription.service.EventSubscriptionService;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
+import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
@@ -902,11 +905,11 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         if (!enableExecutionRelationshipCounts
                 || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getEventSubscriptionCount() > 0)) {
             
-            EventSubscriptionEntityManager eventSubscriptionEntityManager = getEventSubscriptionEntityManager();
+            EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService();
             
             boolean deleteEventSubscriptions = true;
             if (eventDispatcherEnabled) {
-                List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionEntityManager.findEventSubscriptionsByExecution(executionEntity.getId());
+                List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionService.findEventSubscriptionsByExecution(executionEntity.getId());
                 for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
                     
                     fireEntityDeletedEvent(eventSubscription);
@@ -921,7 +924,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
             }
             
             if (deleteEventSubscriptions) {
-                eventSubscriptionEntityManager.deleteEventSubscriptionsByExecutionId(executionEntity.getId());
+                eventSubscriptionService.deleteEventSubscriptionsByExecutionId(executionEntity.getId());
             }
         }
     }

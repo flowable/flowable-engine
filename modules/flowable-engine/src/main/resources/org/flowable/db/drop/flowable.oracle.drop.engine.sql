@@ -134,8 +134,6 @@ alter table ACT_PROCDEF_INFO
 alter table ACT_PROCDEF_INFO
     drop CONSTRAINT ACT_FK_INFO_PROCDEF;
 
-drop index ACT_IDX_EVENT_SUBSCR_CONFIG_;
-drop index ACT_IDX_EVENT_SUBSCR;
 drop index ACT_IDX_ATHRZ_PROCEDEF;
 drop index ACT_IDX_PROCDEF_INFO_PROC;
 
@@ -144,7 +142,6 @@ drop table ACT_RE_DEPLOYMENT;
 drop table ACT_RE_MODEL;
 drop table ACT_RE_PROCDEF;
 drop table ACT_RU_EXECUTION;
-drop table ACT_RU_EVENT_SUBSCR;
 
 drop sequence act_evt_log_seq;
 drop table ACT_EVT_LOG;

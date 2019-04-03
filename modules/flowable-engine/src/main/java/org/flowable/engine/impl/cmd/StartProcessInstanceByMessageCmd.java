@@ -21,12 +21,12 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
-import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntity;
 
 /**
  * @author Joram Barrez
@@ -66,7 +66,7 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
             throw new FlowableIllegalArgumentException("Cannot start process instance by message: message name is null");
         }
 
-        MessageEventSubscriptionEntity messageEventSubscription = CommandContextUtil.getEventSubscriptionEntityManager(commandContext).findMessageStartEventSubscriptionByName(messageName, tenantId);
+        MessageEventSubscriptionEntity messageEventSubscription = CommandContextUtil.getEventSubscriptionService(commandContext).findMessageStartEventSubscriptionByName(messageName, tenantId);
 
         if (messageEventSubscription == null) {
             throw new FlowableObjectNotFoundException("Cannot start process instance by message: no subscription to message with name '" + messageName + "' found.", MessageEventSubscriptionEntity.class);

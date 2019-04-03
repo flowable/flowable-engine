@@ -23,11 +23,13 @@ import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.ThrowEvent;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.EventSubscriptionUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.eventsubscription.service.EventSubscriptionService;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 
 /**
  * @author Daniel Meyer
@@ -66,14 +68,9 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
                 signalEventSubscriptionEntity.eventReceived(null, signalDefinition.isAsync());
                 
             } else {
-                org.flowable.engine.ProcessEngineConfiguration flowable6ProcessEngineConfiguration = commandContext.getProcessEngineConfiguration()
-                        .getFlowable5CompatibilityHandler()
-                        .getFlowable6ProcessEngineConfiguration();
-                
-                org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl flowable6ProcessEngineConfigurationImpl = (org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl) flowable6ProcessEngineConfiguration;
-                EventSubscriptionEntityManager eventSubScriptionEntityManager = flowable6ProcessEngineConfigurationImpl.getEventSubscriptionEntityManager();
-                EventSubscriptionEntity flowable6EventSubscription = eventSubScriptionEntityManager.findById(signalEventSubscriptionEntity.getId());
-                eventSubScriptionEntityManager.eventReceived(flowable6EventSubscription, null, signalDefinition.isAsync());
+                EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService();
+                EventSubscriptionEntity flowable6EventSubscription = eventSubscriptionService.findById(signalEventSubscriptionEntity.getId());
+                EventSubscriptionUtil.eventReceived(flowable6EventSubscription, null, signalDefinition.isAsync());
             }
         }
 

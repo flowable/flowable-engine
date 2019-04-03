@@ -53,7 +53,7 @@
         <mapper resource="org/flowable/task/service/db/mapping/entity/Task.xml" />
         <mapper resource="org/flowable/job/service/db/mapping/entity/TimerJob.xml" />
         <mapper resource="org/flowable/variable/service/db/mapping/entity/VariableInstance.xml" />
-        <mapper resource="org/flowable/db/mapping/entity/EventSubscription.xml" />
+        <mapper resource="org/flowable/eventsubscription/service/db/mapping/entity/EventSubscription.xml" />
         <mapper resource="org/flowable/db/mapping/entity/EventLogEntry.xml" />
     </mappers>
 

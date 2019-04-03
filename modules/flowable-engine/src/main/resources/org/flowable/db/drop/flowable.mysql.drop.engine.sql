@@ -96,7 +96,6 @@ alter table ACT_PROCDEF_INFO
     drop FOREIGN KEY ACT_FK_INFO_PROCDEF;
 
 drop index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK;
-drop index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR;
 
 drop index ACT_IDX_RU_ACTI_START on ACT_RU_ACTINST;
 drop index ACT_IDX_RU_ACTI_END on ACT_RU_ACTINST;
@@ -110,6 +109,5 @@ drop table if exists ACT_RE_DEPLOYMENT;
 drop table if exists ACT_RE_MODEL;
 drop table if exists ACT_RE_PROCDEF;
 drop table if exists ACT_RU_EXECUTION;
-drop table if exists ACT_RU_EVENT_SUBSCR;
 drop table if exists ACT_EVT_LOG;
 drop table if exists ACT_PROCDEF_INFO;

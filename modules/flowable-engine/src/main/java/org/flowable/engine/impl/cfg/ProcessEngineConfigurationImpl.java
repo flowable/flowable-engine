@@ -269,8 +269,6 @@ import org.flowable.engine.impl.persistence.entity.DeploymentEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntityImpl;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntityManager;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntityManagerImpl;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
@@ -297,7 +295,6 @@ import org.flowable.engine.impl.persistence.entity.data.ByteArrayDataManager;
 import org.flowable.engine.impl.persistence.entity.data.CommentDataManager;
 import org.flowable.engine.impl.persistence.entity.data.DeploymentDataManager;
 import org.flowable.engine.impl.persistence.entity.data.EventLogEntryDataManager;
-import org.flowable.engine.impl.persistence.entity.data.EventSubscriptionDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ExecutionDataManager;
 import org.flowable.engine.impl.persistence.entity.data.HistoricActivityInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.HistoricDetailDataManager;
@@ -313,7 +310,6 @@ import org.flowable.engine.impl.persistence.entity.data.impl.MybatisByteArrayDat
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisCommentDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisDeploymentDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisEventLogEntryDataManager;
-import org.flowable.engine.impl.persistence.entity.data.impl.MybatisEventSubscriptionDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisExecutionDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisHistoricActivityInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisHistoricDetailDataManager;
@@ -329,6 +325,8 @@ import org.flowable.engine.migration.ProcessInstanceMigrationManager;
 import org.flowable.engine.parse.BpmnParseHandler;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
 import org.flowable.entitylink.service.impl.db.EntityLinkDbSchemaManager;
+import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
+import org.flowable.eventsubscription.service.impl.db.EventSubscriptionDbSchemaManager;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.identitylink.service.IdentityLinkEventHandler;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
@@ -435,7 +433,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected CommentDataManager commentDataManager;
     protected DeploymentDataManager deploymentDataManager;
     protected EventLogEntryDataManager eventLogEntryDataManager;
-    protected EventSubscriptionDataManager eventSubscriptionDataManager;
     protected ExecutionDataManager executionDataManager;
     protected ActivityInstanceDataManager activityInstanceDataManager;
     protected HistoricActivityInstanceDataManager historicActivityInstanceDataManager;
@@ -454,7 +451,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected CommentEntityManager commentEntityManager;
     protected DeploymentEntityManager deploymentEntityManager;
     protected EventLogEntryEntityManager eventLogEntryEntityManager;
-    protected EventSubscriptionEntityManager eventSubscriptionEntityManager;
     protected ExecutionEntityManager executionEntityManager;
     protected ActivityInstanceEntityManager activityInstanceEntityManager;
     protected HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager;
@@ -494,6 +490,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected VariableServiceConfiguration variableServiceConfiguration;
     protected IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
     protected EntityLinkServiceConfiguration entityLinkServiceConfiguration;
+    protected EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration;
     protected TaskServiceConfiguration taskServiceConfiguration;
     protected JobServiceConfiguration jobServiceConfiguration;
     
@@ -874,6 +871,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected SchemaManager identityLinkSchemaManager;
     protected SchemaManager entityLinkSchemaManager;
+    protected SchemaManager eventSubscriptionSchemaManager;
     protected SchemaManager variableSchemaManager;
     protected SchemaManager taskSchemaManager;
     protected SchemaManager jobSchemaManager;
@@ -996,6 +994,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initVariableServiceConfiguration();
         initIdentityLinkServiceConfiguration();
         initEntityLinkServiceConfiguration();
+        initEventSubscriptionServiceConfiguration();
         initTaskServiceConfiguration();
         initJobServiceConfiguration();
         initAsyncExecutor();
@@ -1066,6 +1065,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initProcessSchemaManager();
         initIdentityLinkSchemaManager();
         initEntityLinkSchemaManager();
+        initEventSubscriptionSchemaManager();
         initVariableSchemaManager();
         initTaskSchemaManager();
         initJobSchemaManager();
@@ -1102,6 +1102,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected void initEntityLinkSchemaManager() {
         if (this.entityLinkSchemaManager == null) {
             this.entityLinkSchemaManager = new EntityLinkDbSchemaManager();
+        }
+    }
+    
+    protected void initEventSubscriptionSchemaManager() {
+        if (this.eventSubscriptionSchemaManager == null) {
+            this.eventSubscriptionSchemaManager = new EventSubscriptionDbSchemaManager();
         }
     }
 
@@ -1160,9 +1166,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (eventLogEntryDataManager == null) {
             eventLogEntryDataManager = new MybatisEventLogEntryDataManager(this);
         }
-        if (eventSubscriptionDataManager == null) {
-            eventSubscriptionDataManager = new MybatisEventSubscriptionDataManager(this);
-        }
         if (executionDataManager == null) {
             executionDataManager = new MybatisExecutionDataManager(this);
         }
@@ -1215,9 +1218,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
         if (eventLogEntryEntityManager == null) {
             eventLogEntryEntityManager = new EventLogEntryEntityManagerImpl(this, eventLogEntryDataManager);
-        }
-        if (eventSubscriptionEntityManager == null) {
-            eventSubscriptionEntityManager = new EventSubscriptionEntityManagerImpl(this, eventSubscriptionDataManager);
         }
         if (executionEntityManager == null) {
             executionEntityManager = new ExecutionEntityManagerImpl(this, executionDataManager);
@@ -1420,6 +1420,21 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected EntityLinkServiceConfiguration instantiateEntityLinkServiceConfiguration() {
         return new EntityLinkServiceConfiguration();
+    }
+    
+    public void initEventSubscriptionServiceConfiguration() {
+        this.eventSubscriptionServiceConfiguration = instantiateEventSubscriptionServiceConfiguration();
+        this.eventSubscriptionServiceConfiguration.setClock(this.clock);
+        this.eventSubscriptionServiceConfiguration.setObjectMapper(this.objectMapper);
+        this.eventSubscriptionServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        
+        this.eventSubscriptionServiceConfiguration.init();
+        
+        addServiceConfiguration(EngineConfigurationConstants.KEY_EVENT_SUBSCRIPTION_SERVICE_CONFIG, this.eventSubscriptionServiceConfiguration);
+    }
+    
+    protected EventSubscriptionServiceConfiguration instantiateEventSubscriptionServiceConfiguration() {
+        return new EventSubscriptionServiceConfiguration();
     }
 
     public void initTaskServiceConfiguration() {
@@ -3607,15 +3622,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public EventSubscriptionDataManager getEventSubscriptionDataManager() {
-        return eventSubscriptionDataManager;
-    }
-
-    public ProcessEngineConfigurationImpl setEventSubscriptionDataManager(EventSubscriptionDataManager eventSubscriptionDataManager) {
-        this.eventSubscriptionDataManager = eventSubscriptionDataManager;
-        return this;
-    }
-
     public ExecutionDataManager getExecutionDataManager() {
         return executionDataManager;
     }
@@ -3748,15 +3754,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setEventLogEntryEntityManager(EventLogEntryEntityManager eventLogEntryEntityManager) {
         this.eventLogEntryEntityManager = eventLogEntryEntityManager;
-        return this;
-    }
-
-    public EventSubscriptionEntityManager getEventSubscriptionEntityManager() {
-        return eventSubscriptionEntityManager;
-    }
-
-    public ProcessEngineConfigurationImpl setEventSubscriptionEntityManager(EventSubscriptionEntityManager eventSubscriptionEntityManager) {
-        this.eventSubscriptionEntityManager = eventSubscriptionEntityManager;
         return this;
     }
 
@@ -4077,6 +4074,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setEntityLinkSchemaManager(SchemaManager entityLinkSchemaManager) {
         this.entityLinkSchemaManager = entityLinkSchemaManager;
+        return this;
+    }
+
+    public SchemaManager getEventSubscriptionSchemaManager() {
+        return eventSubscriptionSchemaManager;
+    }
+
+    public ProcessEngineConfigurationImpl setEventSubscriptionSchemaManager(SchemaManager eventSubscriptionSchemaManager) {
+        this.eventSubscriptionSchemaManager = eventSubscriptionSchemaManager;
         return this;
     }
 

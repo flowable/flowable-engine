@@ -26,11 +26,12 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.EventSubscriptionUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
+import org.flowable.eventsubscription.service.EventSubscriptionService;
+import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
 
 /**
  * @author Tijs Rademakers
@@ -72,13 +73,13 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
             eventSubscriptionName = expressionObject.getValue(execution).toString();
         }
 
-        EventSubscriptionEntityManager eventSubscriptionEntityManager = CommandContextUtil.getEventSubscriptionEntityManager(commandContext);
+        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
         List<SignalEventSubscriptionEntity> subscriptionEntities = null;
         if (processInstanceScope) {
-            subscriptionEntities = eventSubscriptionEntityManager
+            subscriptionEntities = eventSubscriptionService
                     .findSignalEventSubscriptionsByProcessInstanceAndEventName(execution.getProcessInstanceId(), eventSubscriptionName);
         } else {
-            subscriptionEntities = eventSubscriptionEntityManager
+            subscriptionEntities = eventSubscriptionService
                     .findSignalEventSubscriptionsByEventName(eventSubscriptionName, execution.getTenantId());
         }
 
@@ -93,7 +94,7 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
                 compatibilityHandler.signalEventReceived(signalEventSubscriptionEntity, null, signalEventDefinition.isAsync());
                 
             } else {
-                eventSubscriptionEntityManager.eventReceived(signalEventSubscriptionEntity, null, signalEventDefinition.isAsync());
+                EventSubscriptionUtil.eventReceived(signalEventSubscriptionEntity, null, signalEventDefinition.isAsync());
             }
         }
 

@@ -28,11 +28,11 @@ import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.bpmn.helper.ScopeUtil;
-import org.flowable.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.eventsubscription.service.impl.persistence.entity.CompensateEventSubscriptionEntity;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 
 /**
  * @author Tijs Rademakers
@@ -66,7 +66,7 @@ public class CompensationEventHandler implements EventHandler {
 
             // descend into scope:
             compensatingExecution.setScope(true);
-            List<CompensateEventSubscriptionEntity> eventsForThisScope = CommandContextUtil.getEventSubscriptionEntityManager(commandContext).findCompensateEventSubscriptionsByExecutionId(compensatingExecution.getId());
+            List<CompensateEventSubscriptionEntity> eventsForThisScope = CommandContextUtil.getEventSubscriptionService(commandContext).findCompensateEventSubscriptionsByExecutionId(compensatingExecution.getId());
             ScopeUtil.throwCompensationEvent(eventsForThisScope, compensatingExecution, false);
 
         } else {
