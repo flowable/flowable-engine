@@ -150,15 +150,6 @@ public class ScriptTaskTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
-    @Test
-    @Deployment
-    public void testGroovyAllFunctionality() {
-        String processInstanceId = runtimeService.startProcessInstanceByKey("groovyAllScript").getId();
-
-        assertEquals("Homer", runtimeService.getVariable(processInstanceId, "userFirstName"));
-        assertEquals("Simpson", runtimeService.getVariable(processInstanceId, "userLastName"));
-    }
-
     protected void verifyExceptionInStacktrace(Exception rootException, Class<?> expectedExceptionClass) {
         Throwable expectedException = rootException;
         boolean found = false;

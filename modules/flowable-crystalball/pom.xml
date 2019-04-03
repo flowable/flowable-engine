@@ -132,9 +132,8 @@
     </dependency>
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
+      <artifactId>groovy-jsr223</artifactId>
       <scope>test</scope>
-      <type>pom</type>
     </dependency>
   </dependencies>
   
