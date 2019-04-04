@@ -42,6 +42,8 @@ public interface EventSubscriptionDataManager extends DataManager<EventSubscript
     List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByEventName(final String eventName, final String tenantId);
 
     List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByProcessInstanceAndEventName(final String processInstanceId, final String eventName);
+    
+    List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByScopeAndEventName(final String scopeId, final String scopeType, final String eventName);
 
     List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByNameAndExecution(final String name, final String executionId);
 
@@ -66,5 +68,7 @@ public interface EventSubscriptionDataManager extends DataManager<EventSubscript
     void deleteEventSubscriptionsForProcessDefinition(String processDefinitionId);
     
     void deleteEventSubscriptionsByExecutionId(String executionId);
+    
+    void deleteEventSubscriptionsForScopeIdAndType(String scopeId, String scopeType);
 
 }

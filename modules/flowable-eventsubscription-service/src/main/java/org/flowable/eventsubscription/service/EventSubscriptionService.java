@@ -47,6 +47,8 @@ public interface EventSubscriptionService {
     
     List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByProcessInstanceAndEventName(String processInstanceId, String eventName);
     
+    List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByScopeAndEventName(String scopeId, String scopeType, String eventName);
+    
     List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByEventName(String eventName, String tenantId);
     
     List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByNameAndExecution(String eventName, String executionId);
@@ -76,6 +78,8 @@ public interface EventSubscriptionService {
     void deleteEventSubscription(EventSubscriptionEntity eventSubscription);
     
     void deleteEventSubscriptionsByExecutionId(String executionId);
+    
+    void deleteEventSubscriptionsForScopeIdAndType(String scopeId, String scopeType);
     
     void deleteEventSubscriptionsForProcessDefinition(String processDefinitionId);
     

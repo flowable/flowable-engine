@@ -25,8 +25,10 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
 import org.flowable.job.service.impl.JobQueryImpl;
@@ -102,6 +104,10 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
         for (TaskEntity taskEntity : taskEntities) {
             TaskHelper.deleteTask(taskEntity, deleteReason, cascade, true);
         }
+        
+        // Event subscriptions
+        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService();
+        eventSubscriptionService.deleteEventSubscriptionsForScopeIdAndType(caseInstanceId, ScopeTypes.CMMN);
 
         // Sentry part instances
         getSentryPartInstanceEntityManager().deleteByCaseInstanceId(caseInstanceId);

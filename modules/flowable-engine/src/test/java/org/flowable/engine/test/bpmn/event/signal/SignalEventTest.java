@@ -29,6 +29,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.job.api.Job;
+import org.flowable.task.api.Task;
 import org.flowable.validation.validator.Problems;
 import org.junit.jupiter.api.Test;
 
@@ -326,13 +327,35 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         // Then start the process that will throw the signal
         runtimeService.startProcessInstanceByKey("processWithSignalThrow");
 
-        // Since the signal is process instance scoped, the second process
-        // shouldn't have proceeded in any way
+        // Since the signal is process instance scoped, the second process shouldn't have proceeded in any way
         assertEquals("userTaskWithSignalCatch", taskService.createTaskQuery().processInstanceId(processInstanceCatch.getId()).singleResult().getName());
 
         // Let's try to trigger the catch using the API, that should also fail
         runtimeService.signalEventReceived("The Signal");
         assertEquals("userTaskWithSignalCatch", taskService.createTaskQuery().processInstanceId(processInstanceCatch.getId()).singleResult().getName());
+    }
+    
+    @Test
+    @Deployment
+    public void testCallActivityWithInstanceScopeSignal() {
+        // start process with call activity and catching signal   
+        ProcessInstance processInstanceCatch = runtimeService.startProcessInstanceByKey("processWithSignalCatch");
+        assertEquals("userTaskWithSignalCatch", taskService.createTaskQuery().processInstanceId(processInstanceCatch.getId()).singleResult().getName());
+        
+        ProcessInstance throwingProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstanceCatch.getId()).singleResult();
+        assertNotNull(throwingProcessInstance);
+        
+        Task beforeThrowTask = taskService.createTaskQuery().processInstanceId(throwingProcessInstance.getId()).singleResult();
+        assertEquals("beforeThrowTask", beforeThrowTask.getTaskDefinitionKey());
+        taskService.complete(beforeThrowTask.getId());
+        
+        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(throwingProcessInstance.getId()).count());
+        
+        Task afterSignalReceiveTask = taskService.createTaskQuery().processInstanceId(processInstanceCatch.getId()).singleResult();
+        assertEquals("userTaskAfterSignalCatch", afterSignalReceiveTask.getTaskDefinitionKey());
+        taskService.complete(afterSignalReceiveTask.getId());
+        
+        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceCatch.getId()).count());
     }
 
     @Test

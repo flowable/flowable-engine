@@ -21,6 +21,7 @@ import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.ThrowEvent;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
@@ -30,6 +31,8 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.EventSubscriptionUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
+import org.flowable.entitylink.api.EntityLink;
+import org.flowable.entitylink.api.EntityLinkType;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
 
@@ -76,8 +79,24 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
         EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
         List<SignalEventSubscriptionEntity> subscriptionEntities = null;
         if (processInstanceScope) {
-            subscriptionEntities = eventSubscriptionService
-                    .findSignalEventSubscriptionsByProcessInstanceAndEventName(execution.getProcessInstanceId(), eventSubscriptionName);
+            subscriptionEntities = eventSubscriptionService.findSignalEventSubscriptionsByProcessInstanceAndEventName(
+                            execution.getProcessInstanceId(), eventSubscriptionName);
+            
+            List<EntityLink> entityLinks = CommandContextUtil.getEntityLinkService(commandContext).findEntityLinksByReferenceScopeIdAndType(
+                            execution.getProcessInstanceId(), ScopeTypes.BPMN, EntityLinkType.CHILD);
+            if (entityLinks != null) {
+                for (EntityLink entityLink : entityLinks) {
+                    if (ScopeTypes.BPMN.equals(entityLink.getScopeType())) {
+                        subscriptionEntities.addAll(eventSubscriptionService.findSignalEventSubscriptionsByProcessInstanceAndEventName(
+                                        entityLink.getScopeId(), eventSubscriptionName));
+                        
+                    } else if (ScopeTypes.CMMN.equals(entityLink.getScopeType())) {
+                        subscriptionEntities.addAll(eventSubscriptionService.findSignalEventSubscriptionsByScopeAndEventName(
+                                        entityLink.getScopeId(), ScopeTypes.CMMN, eventSubscriptionName));
+                    }
+                }
+            }
+            
         } else {
             subscriptionEntities = eventSubscriptionService
                     .findSignalEventSubscriptionsByEventName(eventSubscriptionName, execution.getTenantId());
