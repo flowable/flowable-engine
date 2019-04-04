@@ -1341,7 +1341,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         if (this.internalHistoryVariableManager != null) {
             this.variableServiceConfiguration.setInternalHistoryVariableManager(this.internalHistoryVariableManager);
         } else {
-            this.variableServiceConfiguration.setInternalHistoryVariableManager(new CmmnHistoryVariableManager(cmmnHistoryManager));
+            this.variableServiceConfiguration.setInternalHistoryVariableManager(new CmmnHistoryVariableManager(this));
         }
 
         this.variableServiceConfiguration.setMaxLengthString(this.getMaxLengthString());
@@ -1373,7 +1373,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         if (this.internalHistoryTaskManager != null) {
             this.taskServiceConfiguration.setInternalHistoryTaskManager(this.internalHistoryTaskManager);
         } else {
-            this.taskServiceConfiguration.setInternalHistoryTaskManager(new CmmnHistoryTaskManager(cmmnHistoryManager));
+            this.taskServiceConfiguration.setInternalHistoryTaskManager(new CmmnHistoryTaskManager(this));
         }
 
         if (this.internalTaskVariableScopeResolver != null) {
