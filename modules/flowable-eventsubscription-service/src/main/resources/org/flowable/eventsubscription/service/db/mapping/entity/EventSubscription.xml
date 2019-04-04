@@ -136,6 +136,15 @@
     where (EVENT_TYPE_ = 'signal')
         and EVENT_NAME_ = #{parameter.eventName}  
         and PROC_INST_ID_ = #{parameter.processInstanceId}
+  </select>
+  
+  <select id="selectSignalEventSubscriptionsByScopeAndEventName" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
+    select * 
+    from ${prefix}ACT_RU_EVENT_SUBSCR EVT
+    where (EVENT_TYPE_ = 'signal')
+        and EVENT_NAME_ = #{parameter.eventName}  
+        and SCOPE_ID_ = #{parameter.scopeId}
+        and SCOPE_TYPE_ = #{parameter.scopeType}
   </select> 
   
   <select id="selectSignalEventSubscriptionsByNameAndExecution" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
@@ -749,6 +758,10 @@
   
   <delete id="deleteEventSubscriptionsByExecutionId" parameterType="string">
      delete from ${prefix}ACT_RU_EVENT_SUBSCR where EXECUTION_ID_ = #{id}
+  </delete>
+  
+  <delete id="deleteEventSubscriptionsForScopeIdAndType" parameterType="map">
+     delete from ${prefix}ACT_RU_EVENT_SUBSCR where SCOPE_ID_ = #{scopeId} and SCOPE_TYPE_ = #{scopeType}
   </delete>
 
 </mapper>

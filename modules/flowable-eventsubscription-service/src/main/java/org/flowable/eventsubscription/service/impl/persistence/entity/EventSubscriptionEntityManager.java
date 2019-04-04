@@ -45,6 +45,8 @@ public interface EventSubscriptionEntityManager extends EntityManager<EventSubsc
     void deleteEventSubscriptionsForProcessDefinition(String processDefinitionId);
     
     void deleteEventSubscriptionsByExecutionId(String executionId);
+    
+    void deleteEventSubscriptionsForScopeIdAndType(String scopeId, String scopeType);
 
     /* Find (generic) */
 
@@ -71,6 +73,8 @@ public interface EventSubscriptionEntityManager extends EntityManager<EventSubsc
     List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByEventName(String eventName, String tenantId);
 
     List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByProcessInstanceAndEventName(String processInstanceId, String eventName);
+    
+    List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByScopeAndEventName(String scopeId, String scopeType, String eventName);
 
     List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByNameAndExecution(String name, String executionId);
 

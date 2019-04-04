@@ -128,6 +128,11 @@ public class EventSubscriptionEntityManagerImpl extends AbstractEntityManager<Ev
     public List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByProcessInstanceAndEventName(String processInstanceId, String eventName) {
         return eventSubscriptionDataManager.findSignalEventSubscriptionsByProcessInstanceAndEventName(processInstanceId, eventName);
     }
+    
+    @Override
+    public List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByScopeAndEventName(String scopeId, String scopeType, String eventName) {
+        return eventSubscriptionDataManager.findSignalEventSubscriptionsByScopeAndEventName(scopeId, scopeType, eventName);
+    }
 
     @Override
     public List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByNameAndExecution(String name, String executionId) {
@@ -187,6 +192,11 @@ public class EventSubscriptionEntityManagerImpl extends AbstractEntityManager<Ev
     @Override
     public void deleteEventSubscriptionsByExecutionId(String executionId) {
         eventSubscriptionDataManager.deleteEventSubscriptionsByExecutionId(executionId);
+    }
+    
+    @Override
+    public void deleteEventSubscriptionsForScopeIdAndType(String scopeId, String scopeType) {
+        eventSubscriptionDataManager.deleteEventSubscriptionsForScopeIdAndType(scopeId, scopeType);
     }
     
     protected SignalEventSubscriptionEntity insertSignalEvent(EventSubscriptionBuilder eventSubscriptionBuilder) {

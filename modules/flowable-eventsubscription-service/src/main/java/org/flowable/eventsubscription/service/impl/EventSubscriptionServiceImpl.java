@@ -78,6 +78,11 @@ public class EventSubscriptionServiceImpl extends CommonServiceImpl<EventSubscri
     public List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByProcessInstanceAndEventName(String processInstanceId, String eventName) {
         return getEventSubscriptionEntityManager().findSignalEventSubscriptionsByProcessInstanceAndEventName(processInstanceId, eventName);
     }
+    
+    @Override
+    public List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByScopeAndEventName(String scopeId, String scopeType, String eventName) {
+        return getEventSubscriptionEntityManager().findSignalEventSubscriptionsByScopeAndEventName(scopeId, scopeType, eventName);
+    }
 
     @Override
     public List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByEventName(String eventName, String tenantId) {
@@ -152,6 +157,11 @@ public class EventSubscriptionServiceImpl extends CommonServiceImpl<EventSubscri
     @Override
     public void deleteEventSubscriptionsByExecutionId(String executionId) {
         getEventSubscriptionEntityManager().deleteEventSubscriptionsByExecutionId(executionId);
+    }
+    
+    @Override
+    public void deleteEventSubscriptionsForScopeIdAndType(String scopeId, String scopeType) {
+        getEventSubscriptionEntityManager().deleteEventSubscriptionsForScopeIdAndType(scopeId, scopeType);
     }
 
     @Override
