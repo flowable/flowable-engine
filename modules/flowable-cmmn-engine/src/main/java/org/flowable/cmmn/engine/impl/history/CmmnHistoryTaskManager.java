@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.history;
 
 import java.util.Date;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
@@ -24,29 +25,29 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
  */
 public class CmmnHistoryTaskManager implements InternalHistoryTaskManager {
 
-    protected CmmnHistoryManager cmmnHistoryManager;
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
-    public CmmnHistoryTaskManager(CmmnHistoryManager cmmnHistoryManager) {
-        this.cmmnHistoryManager = cmmnHistoryManager;
+    public CmmnHistoryTaskManager(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
     public void recordTaskInfoChange(TaskEntity taskEntity, Date changeTime) {
-        CommandContextUtil.getCmmnHistoryManager().recordTaskInfoChange(taskEntity, changeTime);
+        cmmnEngineConfiguration.getCmmnHistoryManager().recordTaskInfoChange(taskEntity, changeTime);
     }
 
     @Override
     public void recordTaskCreated(TaskEntity taskEntity) {
-        cmmnHistoryManager.recordTaskCreated(taskEntity);
+        cmmnEngineConfiguration.getCmmnHistoryManager().recordTaskCreated(taskEntity);
     }
 
     @Override
     public void recordHistoryUserTaskLog(HistoricTaskLogEntryBuilder taskLogEntryBuilder) {
-        CommandContextUtil.getCmmnHistoryManager().recordHistoricUserTaskLogEntry(taskLogEntryBuilder);
+        cmmnEngineConfiguration.getCmmnHistoryManager().recordHistoricUserTaskLogEntry(taskLogEntryBuilder);
     }
 
     @Override
     public void deleteHistoryUserTaskLog(long logNumber) {
-        CommandContextUtil.getCmmnHistoryManager().deleteHistoricUserTaskLogEntry(logNumber);
+        cmmnEngineConfiguration.getCmmnHistoryManager().deleteHistoricUserTaskLogEntry(logNumber);
     }
 }
