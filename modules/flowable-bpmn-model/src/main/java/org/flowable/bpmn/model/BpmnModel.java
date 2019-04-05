@@ -423,8 +423,12 @@ public class BpmnModel {
     }
 
     public void addError(String errorRef, String errorCode) {
-        if (StringUtils.isNotEmpty(errorRef)) {
-            errorMap.put(errorRef, errorCode);
+        if (StringUtils.isNotEmpty(errorRef) && !errorMap.containsKey(errorRef)) {
+            if (StringUtils.isNotEmpty(errorCode)) {
+                errorMap.put(errorRef, errorCode);
+            } else {
+                errorMap.put(errorRef, errorRef);
+            }
         }
     }
 

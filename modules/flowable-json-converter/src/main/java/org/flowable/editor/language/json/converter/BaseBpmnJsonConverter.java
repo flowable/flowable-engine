@@ -633,6 +633,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         ErrorEventDefinition eventDefinition = new ErrorEventDefinition();
         eventDefinition.setErrorCode(errorRef);
         event.getEventDefinitions().add(eventDefinition);
+        this.model.addError(errorRef, null);
     }
 
     protected String getValueAsString(String name, JsonNode objectNode) {

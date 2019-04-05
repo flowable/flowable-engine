@@ -1,4 +1,6 @@
 <div ng-controller="FlowableErrorRefCtrl">
-    <select ng-model="property.value" ng-change="errorChanged()" ng-options="errorDefinition.id as (errorDefinition.name + ' (' + errorDefinition.id + ')') for errorDefinition in errorDefinitions">
-    </select>
+    <input type="text" list="errorDefinitions" ng-blur="errorChanged()" custom-keys enter-pressed="errorChanged()" ng-model="property.value"/>
+    <datalist id="errorDefinitions">
+        <option ng-repeat="errorDefinition in errorDefinitions" value = "{{errorDefinition.id}}">{{errorDefinition.name}} ({{errorDefinition.id}})</option>
+    </datalist>
 </div>
