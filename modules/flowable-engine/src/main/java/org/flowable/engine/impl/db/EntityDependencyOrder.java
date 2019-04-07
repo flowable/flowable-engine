@@ -139,6 +139,9 @@ public class EntityDependencyOrder {
         /*
          * FK to Execution
          */
+        DELETE_ORDER.add(SignalEventSubscriptionEntityImpl.class);
+        DELETE_ORDER.add(MessageEventSubscriptionEntityImpl.class);
+        DELETE_ORDER.add(CompensateEventSubscriptionEntityImpl.class);
         DELETE_ORDER.add(EventSubscriptionEntityImpl.class);
 
         /*
