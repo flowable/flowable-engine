@@ -143,7 +143,7 @@ public class ProcessWithFormTest {
 
         FormRepositoryService formRepositoryService = FormEngines.getDefaultFormEngine().getFormRepositoryService();
         FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
-        assertThrows( RuntimeException.class,
+        assertThrows( FlowableException.class,
             () ->taskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", Collections.emptyMap())
         );
 

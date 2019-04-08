@@ -10,21 +10,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.form.engine.test;
+package org.flowable.form.engine.impl.cmd;
 
 import java.util.Map;
 
-import org.flowable.common.engine.api.variable.VariableContainer;
-import org.flowable.engine.impl.formhandler.DefaultFormFieldHandler;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.form.api.FormInfo;
 
 /**
  * @author martin.grofcik
  */
-public class ThrowExceptionFormFieldValidator extends DefaultFormFieldHandler{
+public class ValidateFormFieldsCmd implements Command<Void> {
+
+    protected FormInfo formInfo;
+    protected Map<String, Object> values;
+
+    public ValidateFormFieldsCmd(FormInfo formInfo, Map<String, Object> values) {
+        this.formInfo = formInfo;
+        this.values = values;
+    }
 
     @Override
-    public void validateFormFieldsOnSubmit(FormInfo formInfo, VariableContainer variableContainer, Map<String, Object> variables) {
-        throw new RuntimeException("validation failed");
+    public Void execute(CommandContext commandContext) {
+        // empty validation implementation
+        return null;
     }
+
 }

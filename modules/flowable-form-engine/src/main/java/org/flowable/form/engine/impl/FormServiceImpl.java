@@ -32,6 +32,7 @@ import org.flowable.form.engine.impl.cmd.GetFormInstanceValuesCmd;
 import org.flowable.form.engine.impl.cmd.GetFormModelWithVariablesCmd;
 import org.flowable.form.engine.impl.cmd.GetVariablesFromFormSubmissionCmd;
 import org.flowable.form.engine.impl.cmd.SaveFormInstanceCmd;
+import org.flowable.form.engine.impl.cmd.ValidateFormFieldsCmd;
 
 /**
  * @author Tijs Rademakers
@@ -40,6 +41,11 @@ public class FormServiceImpl extends CommonEngineServiceImpl<FormEngineConfigura
 
     public FormServiceImpl(FormEngineConfiguration engineConfiguration) {
         super(engineConfiguration);
+    }
+
+    @Override
+    public void validateFormFields(FormInfo formInfo, Map<String, Object> values) {
+        commandExecutor.execute(new ValidateFormFieldsCmd(formInfo, values));
     }
 
     public Map<String, Object> getVariablesFromFormSubmission(FormInfo formInfo, Map<String, Object> values) {

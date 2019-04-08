@@ -81,7 +81,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
             CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
             FormFieldHandler formFieldHandler = cmmnEngineConfiguration.getFormFieldHandler();
             if (isFormFieldValidationEnabled(cmmnEngineConfiguration, task)) {
-                formFieldHandler.validateFormFieldsOnSubmit(formInfo, task, variables);
+                formService.validateFormFields(formInfo, variables);
             }
             // Extract raw variables and complete the task
             Map<String, Object> taskVariables = formService.getVariablesFromFormSubmission(formInfo, variables, outcome);

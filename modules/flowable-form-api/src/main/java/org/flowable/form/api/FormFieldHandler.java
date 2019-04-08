@@ -28,13 +28,4 @@ public interface FormFieldHandler {
     
     void enrichFormFields(FormInfo formInfo);
 
-    /**
-     * Apply validation restrictions on the submitted variables
-     *
-     * @param formInfo form description
-     * @param variableContainer variableContainer to be able to get initial variable values
-     * @param variables submitted variables
-     */
-    void validateFormFieldsOnSubmit(FormInfo formInfo, VariableContainer variableContainer, Map<String, Object> variables);
-
 }
