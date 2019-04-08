@@ -73,7 +73,8 @@ public class IdmUsersResource {
     public void updateUserDetails(@PathVariable String userId, @RequestBody UpdateUsersRepresentation updateUsersRepresentation) {
         userService.updateUserDetails(userId, updateUsersRepresentation.getFirstName(),
                 updateUsersRepresentation.getLastName(),
-                updateUsersRepresentation.getEmail());
+                updateUsersRepresentation.getEmail(),
+                updateUsersRepresentation.getTenantId());
     }
 
     @ResponseStatus(value = HttpStatus.OK)
@@ -90,11 +91,13 @@ public class IdmUsersResource {
 
     @RequestMapping(value = "/rest/admin/users", method = RequestMethod.POST)
     public UserRepresentation createNewUser(@RequestBody CreateUserRepresentation userRepresentation) {
-        return new UserRepresentation(userService.createNewUser(userRepresentation.getId(),
+        return new UserRepresentation(userService.createNewUser(
+                userRepresentation.getId(),
                 userRepresentation.getFirstName(),
                 userRepresentation.getLastName(),
                 userRepresentation.getEmail(),
-                userRepresentation.getPassword()));
+                userRepresentation.getPassword(),
+                userRepresentation.getTenantId()));
     }
 
 }
