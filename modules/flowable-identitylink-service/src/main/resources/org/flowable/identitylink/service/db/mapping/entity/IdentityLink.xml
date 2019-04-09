@@ -59,6 +59,42 @@
     SELECT * FROM dual
   </insert>
   
+  <!-- IDENTITY LINK UPDATE -->
+
+  <update id="updateIdentityLink" parameterType="org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl">
+    update ${prefix}ACT_RU_IDENTITYLINK
+    <set>
+        <if test="originalPersistentState.type != type">
+            TYPE_ = #{type, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.userId != userId">
+            USER_ID_ = #{userId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.groupId != groupId">
+            GROUP_ID_ = #{groupId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.taskId != taskId">
+            TASK_ID_ = #{taskId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.processInstanceId != processInstanceId">
+            PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.processDefinitionId != processDefinitionId">
+            PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.scopeId != scopeId">
+            SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.scopeType != scopeType">
+            SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.scopeDefinitionId != scopeDefinitionId">
+            SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR},
+        </if>
+    </set>
+    where ID_= #{id, jdbcType=VARCHAR}
+  </update>
+  
   <!-- IDENTITY LINK DELETE -->
   
   <delete id="deleteIdentityLink" parameterType="string">

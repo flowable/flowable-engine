@@ -46,6 +46,8 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManage
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.EntityLinkUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.engine.interceptor.StartSubProcessInstanceAfterContext;
+import org.flowable.engine.interceptor.StartSubProcessInstanceBeforeContext;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,9 +127,20 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
             ExecutionEntity processInstance = executionEntityManager.findById(execution.getProcessInstanceId());
             businessKey = processInstance.getBusinessKey();
         }
+        
+        Map<String, Object> variables = new HashMap<>();
+        
+        StartSubProcessInstanceBeforeContext instanceBeforeContext = new StartSubProcessInstanceBeforeContext(businessKey, callActivity.getProcessInstanceName(), 
+                        variables, executionEntity, callActivity.getInParameters(), callActivity.isInheritVariables(), 
+                        initialFlowElement.getId(), initialFlowElement, subProcess, processDefinition);
+        
+        if (processEngineConfiguration.getStartProcessInstanceInterceptor() != null) {
+            processEngineConfiguration.getStartProcessInstanceInterceptor().beforeStartSubProcessInstance(instanceBeforeContext);
+        }
 
         ExecutionEntity subProcessInstance = CommandContextUtil.getExecutionEntityManager(commandContext).createSubprocessInstance(
-                processDefinition, executionEntity, businessKey, initialFlowElement.getId());
+                        instanceBeforeContext.getProcessDefinition(), instanceBeforeContext.getCallActivityExecution(), 
+                        instanceBeforeContext.getBusinessKey(), instanceBeforeContext.getInitialActivityId());
         CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordSubProcessInstanceStart(executionEntity, subProcessInstance);
 
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
@@ -139,17 +152,15 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         // process template-defined data objects
         subProcessInstance.setVariables(processDataObjects(subProcess.getDataObjects()));
 
-        Map<String, Object> variables = new HashMap<>();
-
-        if (callActivity.isInheritVariables()) {
+        if (instanceBeforeContext.isInheritVariables()) {
             Map<String, Object> executionVariables = execution.getVariables();
             for (Map.Entry<String, Object> entry : executionVariables.entrySet()) {
-                variables.put(entry.getKey(), entry.getValue());
+                instanceBeforeContext.getVariables().put(entry.getKey(), entry.getValue());
             }
         }
         
         // copy process variables
-        for (IOParameter inParameter : callActivity.getInParameters()) {
+        for (IOParameter inParameter : instanceBeforeContext.getInParameters()) {
 
             Object value = null;
             if (StringUtils.isNotEmpty(inParameter.getSourceExpression())) {
@@ -176,17 +187,17 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
 
             }
 
-            variables.put(variableName, value);
+            instanceBeforeContext.getVariables().put(variableName, value);
         }
 
-        if (!variables.isEmpty()) {
-            initializeVariables(subProcessInstance, variables);
+        if (!instanceBeforeContext.getVariables().isEmpty()) {
+            initializeVariables(subProcessInstance, instanceBeforeContext.getVariables());
         }
         
         // Process instance name is resolved after setting the variables on the process instance, so they can be used in the expression
         String processInstanceName = null;
-        if (StringUtils.isNotEmpty(callActivity.getProcessInstanceName())) {
-            Expression processInstanceNameExpression = expressionManager.createExpression(callActivity.getProcessInstanceName());
+        if (StringUtils.isNotEmpty(instanceBeforeContext.getProcessInstanceName())) {
+            Expression processInstanceNameExpression = expressionManager.createExpression(instanceBeforeContext.getProcessInstanceName());
             processInstanceName = processInstanceNameExpression.getValue(subProcessInstance).toString();
             subProcessInstance.setName(processInstanceName);
         }
@@ -202,12 +213,20 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
 
         // Create the first execution that will visit all the process definition elements
         ExecutionEntity subProcessInitialExecution = executionEntityManager.createChildExecution(subProcessInstance);
-        subProcessInitialExecution.setCurrentFlowElement(initialFlowElement);
+        subProcessInitialExecution.setCurrentFlowElement(instanceBeforeContext.getInitialFlowElement());
 
         CommandContextUtil.getAgenda().planContinueProcessOperation(subProcessInitialExecution);
 
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(subProcessInitialExecution, variables, false));
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(subProcessInitialExecution, instanceBeforeContext.getVariables(), false));
+        }
+        
+        if (processEngineConfiguration.getStartProcessInstanceInterceptor() != null) {
+            StartSubProcessInstanceAfterContext instanceAfterContext = new StartSubProcessInstanceAfterContext(subProcessInstance, subProcessInitialExecution, 
+                            instanceBeforeContext.getVariables(), instanceBeforeContext.getCallActivityExecution(), instanceBeforeContext.getInParameters(), 
+                            instanceBeforeContext.getInitialFlowElement(), instanceBeforeContext.getProcess(), instanceBeforeContext.getProcessDefinition());
+            
+            processEngineConfiguration.getStartProcessInstanceInterceptor().afterStartSubProcessInstance(instanceAfterContext);
         }
     }
 

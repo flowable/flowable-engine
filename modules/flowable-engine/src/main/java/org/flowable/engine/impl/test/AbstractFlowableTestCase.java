@@ -267,8 +267,23 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
      */
     public BpmnModel createOneTaskTestProcess() {
         BpmnModel model = new BpmnModel();
-        org.flowable.bpmn.model.Process process = new org.flowable.bpmn.model.Process();
+        org.flowable.bpmn.model.Process process = createOneTaskProcess();
         model.addProcess(process);
+
+        return model;
+    }
+    
+    public BpmnModel createOneTaskTestProcessWithCandidateStarterGroup() {
+        BpmnModel model = new BpmnModel();
+        org.flowable.bpmn.model.Process process = createOneTaskProcess();
+        process.getCandidateStarterGroups().add("testGroup");
+        model.addProcess(process);
+
+        return model;
+    }
+    
+    protected org.flowable.bpmn.model.Process createOneTaskProcess() {
+        org.flowable.bpmn.model.Process process = new org.flowable.bpmn.model.Process();
         process.setId("oneTaskProcess");
         process.setName("The one task process");
 
@@ -290,8 +305,8 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
 
         process.addFlowElement(new SequenceFlow("start", "theTask"));
         process.addFlowElement(new SequenceFlow("theTask", "theEnd"));
-
-        return model;
+        
+        return process;
     }
 
     public BpmnModel createTwoTasksTestProcess() {
@@ -336,6 +351,16 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
      */
     public String deployOneTaskTestProcess() {
         BpmnModel bpmnModel = createOneTaskTestProcess();
+        Deployment deployment = repositoryService.createDeployment().addBpmnModel("oneTasktest.bpmn20.xml", bpmnModel).deploy();
+
+        deploymentIdsForAutoCleanup.add(deployment.getId()); // For auto-cleanup
+
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult();
+        return processDefinition.getId();
+    }
+    
+    public String deployOneTaskTestProcessWithCandidateStarterGroup() {
+        BpmnModel bpmnModel = createOneTaskTestProcessWithCandidateStarterGroup();
         Deployment deployment = repositoryService.createDeployment().addBpmnModel("oneTasktest.bpmn20.xml", bpmnModel).deploy();
 
         deploymentIdsForAutoCleanup.add(deployment.getId()); // For auto-cleanup

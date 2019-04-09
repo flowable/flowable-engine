@@ -10,16 +10,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine;
+package org.flowable.engine.interceptor;
 
-import java.util.List;
+public interface StartProcessInstanceInterceptor {
 
-import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.history.HistoricProcessInstanceQuery;
-
-public interface HistoricProcessInstanceQueryInterceptor {
-
-    void beforeHistoricProcessInstanceQueryExecute(HistoricProcessInstanceQuery processInstanceQuery);
+    void beforeStartProcessInstance(StartProcessInstanceBeforeContext instanceContext);
     
-    void afterHistoricProcessInstanceQueryExecute(HistoricProcessInstanceQuery processInstanceQuery, List<HistoricProcessInstance> processInstances);
+    void afterStartProcessInstance(StartProcessInstanceAfterContext instanceContext);
+    
+    void beforeStartSubProcessInstance(StartSubProcessInstanceBeforeContext instanceContext);
+    
+    void afterStartSubProcessInstance(StartSubProcessInstanceAfterContext instanceContext);
 }
