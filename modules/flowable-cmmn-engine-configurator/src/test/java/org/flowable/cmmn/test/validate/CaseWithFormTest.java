@@ -281,7 +281,7 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
     public void completeTaskWithoutValidationOnModelLevelExpression() {
         cmmnEngineConfiguration.getCmmnRepositoryService().createDeployment().
             addString("org/flowable/cmmn/test/oneTasksCaseWithForm.cmmn", ONE_TASK_CASE.
-                replace("CASE_VALIDATE_VALUE", "true").
+                replace("CASE_VALIDATE_VALUE", "${true}").
                 replace("TASK_VALIDATE_VALUE", "${allowValidation}")
             ).
             deploy();

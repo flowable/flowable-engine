@@ -48,6 +48,7 @@ import org.flowable.form.api.FormService;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -232,7 +233,7 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
                         FormFieldHandler formFieldHandler = CommandContextUtil.getCmmnEngineConfiguration().getFormFieldHandler();
                         // validate input before anything else
                         if (isFormFieldValidationEnabled(cmmnEngineConfiguration, planModel)) {
-                            formFieldHandler.validateFormFieldsOnSubmit(formInfo, null, startFormVariables);
+                            formFieldHandler.validateFormFieldsOnSubmit(formInfo, NoExecutionVariableScope.getSharedInstance(), startFormVariables);
                         }
                         // Extract the caseVariables from the form submission variables and pass them to the case
                         Map<String, Object> caseVariables = formService.getVariablesFromFormSubmission(formInfo,
@@ -262,7 +263,7 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
 
     protected boolean isFormFieldValidationEnabled(CmmnEngineConfiguration cmmnEngineConfiguration, Stage stage) {
         if (cmmnEngineConfiguration.isFormFieldValidationEnabled()) {
-            return TaskHelper.isFormFieldValidationEnabled(null, // case instance does not exist yet
+            return TaskHelper.isFormFieldValidationEnabled(NoExecutionVariableScope.getSharedInstance(), // case instance does not exist yet
                 cmmnEngineConfiguration, stage.getValidateFormFields()
             );
         }

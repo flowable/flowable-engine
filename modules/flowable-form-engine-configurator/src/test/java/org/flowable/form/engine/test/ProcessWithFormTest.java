@@ -172,7 +172,7 @@ public class ProcessWithFormTest {
     }
 
     @Test
-    public void completeTaskWithoutValidationOnModelLevel(ProcessEngineConfiguration processEngineConfiguration, RuntimeService runtimeService,
+    public void completeTaskWithoutValidationOnModelLevel(RuntimeService runtimeService,
         TaskService taskService, RepositoryService repositoryService) {
 
         Deployment deployment = repositoryService.createDeployment().
@@ -212,9 +212,9 @@ public class ProcessWithFormTest {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult();
 
         assertEquals(
-            "Unable to resolve formFieldValidationExpression without variable container",
+            "validation failed",
             assertThrows(
-                FlowableException.class,
+                RuntimeException.class,
                 () -> runtimeService.startProcessInstanceWithForm(processDefinition.getId(), "__COMPLETE",
                     Collections.singletonMap("allowValidation", Boolean.TRUE),
                     "oneTaskWithFormSideEffectProcess")
