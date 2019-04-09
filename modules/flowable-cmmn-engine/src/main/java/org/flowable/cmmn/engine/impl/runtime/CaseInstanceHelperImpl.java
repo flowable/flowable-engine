@@ -48,6 +48,7 @@ import org.flowable.form.api.FormService;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -262,7 +263,7 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
 
     protected boolean isFormFieldValidationEnabled(CmmnEngineConfiguration cmmnEngineConfiguration, Stage stage) {
         if (cmmnEngineConfiguration.isFormFieldValidationEnabled()) {
-            return TaskHelper.isFormFieldValidationEnabled(null, // case instance does not exist yet
+            return TaskHelper.isFormFieldValidationEnabled(NoExecutionVariableScope.getSharedInstance(), // case instance does not exist yet
                 cmmnEngineConfiguration, stage.getValidateFormFields()
             );
         }
