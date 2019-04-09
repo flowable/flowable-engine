@@ -241,5 +241,35 @@ public class SignalEventTest extends AbstractProcessEngineIntegrationTest {
             processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
         }
     }
+    
+    @Test
+    @CmmnDeployment(resources = {"org/flowable/cmmn/test/processTaskWithSignalListener.cmmn"})
+    public void testTerminateCaseInstanceWithSignal() {
+        Deployment deployment = this.processEngineRepositoryService.createDeployment().
+            addClasspathResource("org/flowable/cmmn/test/signalProcess.bpmn20.xml").
+            deploy();
+        
+        try {
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("signalCase").start();
+            
+            Task task = processEngineTaskService.createTaskQuery().caseInstanceIdWithChildren(caseInstance.getId()).singleResult();
+            assertNotNull(task);
+            
+            assertEquals(0, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+            
+            EventSubscription eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).singleResult();
+            assertEquals("testSignal", eventSubscription.getEventName());
+            
+            cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+            
+            assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).count());
+            
+            assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+            
+        
+        } finally {
+            processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
+        }
+    }
 
 }

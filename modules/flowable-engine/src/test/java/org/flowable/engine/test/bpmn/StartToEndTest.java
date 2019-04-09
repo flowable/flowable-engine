@@ -65,7 +65,7 @@ public class StartToEndTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/StartToEndTest.testStartWithSerializableVariables.bpmn20.xml" })
-    public void testStartProcessInstanceWithSerializbleVariables() {
+    public void testStartProcessInstanceWithSerializableVariables() {
         Map<String, Object> varMap = new HashMap<>();
         varMap.put("test", "hello");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd", varMap);

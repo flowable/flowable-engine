@@ -25,7 +25,13 @@ import org.flowable.common.engine.impl.util.io.InputStreamSource;
 import org.flowable.common.engine.impl.util.io.StreamSource;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
+import org.flowable.engine.interceptor.StartProcessInstanceAfterContext;
+import org.flowable.engine.interceptor.StartProcessInstanceBeforeContext;
+import org.flowable.engine.interceptor.StartProcessInstanceInterceptor;
+import org.flowable.engine.interceptor.StartSubProcessInstanceAfterContext;
+import org.flowable.engine.interceptor.StartSubProcessInstanceBeforeContext;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -386,6 +392,61 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         assertEquals("The child process must have the name of the newest child process deployment as it there " +
                 "is no deployed child process in the same deployment", "User Task V2", task.getName());
     }
+    
+    @Test
+    public void testStartSubProcessInstanceInterceptor() throws Exception {
+        BpmnModel mainBpmnModel = loadBPMNModel(NOT_INHERIT_VARIABLES_MAIN_PROCESS_RESOURCE);
+        BpmnModel childBpmnModel = loadBPMNModel(INHERIT_VARIABLES_CHILD_PROCESS_RESOURCE);
+        
+        TestStartProcessInstanceInterceptor testStartProcessInstanceInterceptor = new TestStartProcessInstanceInterceptor();
+        processEngineConfiguration.setStartProcessInstanceInterceptor(testStartProcessInstanceInterceptor);
+        
+        try {
+            processEngine.getRepositoryService()
+                    .createDeployment()
+                    .name("mainProcessDeployment")
+                    .addBpmnModel("mainProcess.bpmn20.xml", mainBpmnModel).deploy();
+    
+            processEngine.getRepositoryService()
+                    .createDeployment()
+                    .name("childProcessDeployment")
+                    .addBpmnModel("childProcess.bpmn20.xml", childBpmnModel).deploy();
+    
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("var1", "test value");
+    
+            ProcessInstance mainProcessInstance = runtimeService.startProcessInstanceByKey("mainProcess", variables);
+            assertEquals("testKey", mainProcessInstance.getBusinessKey());
+            
+            HistoricProcessInstance subProcessInstance = historyService.createHistoricProcessInstanceQuery().superProcessInstanceId(mainProcessInstance.getId()).singleResult();
+            assertEquals("testSubKey", subProcessInstance.getBusinessKey());
+            
+            HistoricVariableInstanceQuery variableInstanceQuery = historyService.createHistoricVariableInstanceQuery();
+            List<HistoricVariableInstance> variableInstances = variableInstanceQuery.processInstanceId(mainProcessInstance.getId()).list();
+    
+            assertEquals(2, variableInstances.size());
+            Map<String, Object> variableMap = new HashMap<>();
+            for (HistoricVariableInstance variable : variableInstances) {
+                variableMap.put(variable.getVariableName(), variable.getValue());
+            }
+            assertEquals("test value", variableMap.get("var1"));
+            assertEquals("test", variableMap.get("beforeContextVar"));
+            
+            variableInstances = variableInstanceQuery.processInstanceId(subProcessInstance.getId()).list();
+            
+            assertEquals(3, variableInstances.size());
+            variableMap = new HashMap<>();
+            for (HistoricVariableInstance variable : variableInstances) {
+                variableMap.put(variable.getVariableName(), variable.getValue());
+            }
+            assertEquals("test value", variableMap.get("var1"));
+            assertEquals("test", variableMap.get("beforeContextVar"));
+            assertEquals("subtest", variableMap.get("beforeSubContextVar"));
+            
+        } finally {
+            processEngineConfiguration.setStartProcessInstanceInterceptor(null);
+        }
+    }
 
     private void suspendProcessDefinitions(Deployment childDeployment) {
         List<ProcessDefinition> childProcessDefinitionList = repositoryService.createProcessDefinitionQuery().deploymentId(childDeployment.getId()).list();
@@ -407,6 +468,55 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         StreamSource xmlSource = new InputStreamSource(xmlStream);
         BpmnModel bpmnModel = new BpmnXMLConverter().convertToBpmnModel(xmlSource, false, false, processEngineConfiguration.getXmlEncoding());
         return bpmnModel;
+    }
+    
+    protected class TestStartProcessInstanceInterceptor implements StartProcessInstanceInterceptor {
+        
+        protected int beforeStartProcessInstanceCounter = 0;
+        protected int afterStartProcessInstanceCounter = 0;
+        protected int beforeStartSubProcessInstanceCounter = 0;
+        protected int afterStartSubProcessInstanceCounter = 0;
+
+        @Override
+        public void beforeStartProcessInstance(StartProcessInstanceBeforeContext instanceContext) {
+            beforeStartProcessInstanceCounter++;
+            instanceContext.getVariables().put("beforeContextVar", "test");
+            instanceContext.setBusinessKey("testKey");
+        }
+
+        @Override
+        public void afterStartProcessInstance(StartProcessInstanceAfterContext instanceContext) {
+            afterStartProcessInstanceCounter++;
+        }
+
+        @Override
+        public void beforeStartSubProcessInstance(StartSubProcessInstanceBeforeContext instanceContext) {
+            beforeStartSubProcessInstanceCounter++;
+            instanceContext.getVariables().put("beforeSubContextVar", "subtest");
+            instanceContext.setBusinessKey("testSubKey");
+            instanceContext.setInheritVariables(true);
+        }
+
+        @Override
+        public void afterStartSubProcessInstance(StartSubProcessInstanceAfterContext instanceContext) {
+            afterStartSubProcessInstanceCounter++;
+        }
+
+        public int getBeforeStartProcessInstanceCounter() {
+            return beforeStartProcessInstanceCounter;
+        }
+
+        public int getAfterStartProcessInstanceCounter() {
+            return afterStartProcessInstanceCounter;
+        }
+
+        public int getBeforeStartSubProcessInstanceCounter() {
+            return beforeStartSubProcessInstanceCounter;
+        }
+
+        public int getAfterStartSubProcessInstanceCounter() {
+            return afterStartSubProcessInstanceCounter;
+        }
     }
 
 }

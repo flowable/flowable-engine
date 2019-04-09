@@ -77,12 +77,14 @@
                             <th width="20%">{{'IDM.USER-MGMT.ID' | translate}}</th>
                             <th width="30%">{{'IDM.USER-MGMT.EMAIL' | translate}}</th>
                             <th width="30%">{{'IDM.USER-MGMT.NAME' | translate}}</th>
+                            <th width="20%">{{'IDM.USER-MGMT.TENANT' | translate}}</th>
                         </tr>
                         <tr ng-repeat="user in model.users.data" ng-click="toggleUserSelection(user)" ng-class="{'selected': model.selectedUsers[user.id]}">
                             <td class="control"><input type="checkbox" ng-checked="model.selectedUsers[user.id]"></td>
                             <td>{{user.id}}</td>
                             <td>{{user.email}}</td>
                             <td>{{user.fullName}}</td>
+                            <td>{{user.tenantId}}</td>
                         </tr>
                     </table>
                 </div>

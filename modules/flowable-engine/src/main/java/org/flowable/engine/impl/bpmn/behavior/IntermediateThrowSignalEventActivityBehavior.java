@@ -82,17 +82,19 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
             subscriptionEntities = eventSubscriptionService.findSignalEventSubscriptionsByProcessInstanceAndEventName(
                             execution.getProcessInstanceId(), eventSubscriptionName);
             
-            List<EntityLink> entityLinks = CommandContextUtil.getEntityLinkService(commandContext).findEntityLinksByReferenceScopeIdAndType(
-                            execution.getProcessInstanceId(), ScopeTypes.BPMN, EntityLinkType.CHILD);
-            if (entityLinks != null) {
-                for (EntityLink entityLink : entityLinks) {
-                    if (ScopeTypes.BPMN.equals(entityLink.getScopeType())) {
-                        subscriptionEntities.addAll(eventSubscriptionService.findSignalEventSubscriptionsByProcessInstanceAndEventName(
-                                        entityLink.getScopeId(), eventSubscriptionName));
-                        
-                    } else if (ScopeTypes.CMMN.equals(entityLink.getScopeType())) {
-                        subscriptionEntities.addAll(eventSubscriptionService.findSignalEventSubscriptionsByScopeAndEventName(
-                                        entityLink.getScopeId(), ScopeTypes.CMMN, eventSubscriptionName));
+            if (CommandContextUtil.getProcessEngineConfiguration(commandContext).isEnableEntityLinks()) {
+                List<EntityLink> entityLinks = CommandContextUtil.getEntityLinkService(commandContext).findEntityLinksByReferenceScopeIdAndType(
+                                execution.getProcessInstanceId(), ScopeTypes.BPMN, EntityLinkType.CHILD);
+                if (entityLinks != null) {
+                    for (EntityLink entityLink : entityLinks) {
+                        if (ScopeTypes.BPMN.equals(entityLink.getScopeType())) {
+                            subscriptionEntities.addAll(eventSubscriptionService.findSignalEventSubscriptionsByProcessInstanceAndEventName(
+                                            entityLink.getScopeId(), eventSubscriptionName));
+                            
+                        } else if (ScopeTypes.CMMN.equals(entityLink.getScopeType())) {
+                            subscriptionEntities.addAll(eventSubscriptionService.findSignalEventSubscriptionsByScopeAndEventName(
+                                            entityLink.getScopeId(), ScopeTypes.CMMN, eventSubscriptionName));
+                        }
                     }
                 }
             }
