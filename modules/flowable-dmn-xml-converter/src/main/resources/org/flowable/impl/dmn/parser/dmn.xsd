@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.omg.org/spec/DMN/20151101" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.omg.org/spec/DMN/20151101" elementFormDefault="qualified">
+<xsd:schema xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.omg.org/spec/DMN/20151101/dmn.xsd" elementFormDefault="qualified">
 	<xsd:element name="DMNElement" type="tDMNElement" abstract="true"/>
 	<xsd:complexType name="tDMNElement">
 		<xsd:sequence>
