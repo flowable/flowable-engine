@@ -17,8 +17,13 @@ import java.io.InputStream;
 
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.test.AbstractFlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,50 +36,60 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Joram Barrez
  */
-public abstract class CustomCmmnConfigurationFlowableTestCase extends FlowableCmmnTestCase {
+@RunWith(CmmnTestRunner.class)
+public abstract class CustomCmmnConfigurationFlowableTestCase extends AbstractFlowableCmmnTestCase {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(CustomCmmnConfigurationFlowableTestCase.class);
     
-    protected CmmnEngine originalCmmnEngine;
-    protected CmmnEngineConfiguration originalCmmnEngineConfiguration;
-    
-    @Override
-    public void setupServices() {
-        this.originalCmmnEngine = cmmnEngine;
-        this.originalCmmnEngineConfiguration = CmmnTestRunner.getCmmnEngineConfiguration();
-        
-        try (InputStream inputStream = FlowableCmmnTestCase.class.getClassLoader().getResourceAsStream(FLOWABLE_CMMN_CFG_XML)) {
-            if (inputStream != null) {
-                CmmnEngineConfiguration cmmnEngineConfiguration = CmmnEngineConfiguration.createCmmnEngineConfigurationFromInputStream(inputStream);
-                cmmnEngineConfiguration.setCmmnEngineName(getEngineName());
-                cmmnEngineConfiguration.setDatabaseSchemaUpdate(CmmnEngineConfiguration.DB_SCHEMA_UPDATE_TRUE); // override the default db setting of drop-create when running in QA 
-                configureConfiguration(cmmnEngineConfiguration);
-                
-                cmmnEngine = cmmnEngineConfiguration.buildCmmnEngine();
-                cmmnEngineConfiguration.getClock().reset();
-                CmmnTestRunner.setCmmnEngineConfiguration(cmmnEngineConfiguration);
-                
-                // Calling this will change the cmmnEngine and cmmnEngineConfiguration
-                super.setupServices();
-                
-            } else {
-               throw new RuntimeException("No " + FLOWABLE_CMMN_CFG_XML + " file found on the classpath");
-            }
-        } catch (IOException e) {
-            LOGGER.error("Could not create CMMN engine", e);
-        }
+    public static CmmnEngineConfiguration originalCmmnEngineConfiguration;
+    public static CmmnEngine cmmnEngine;
+
+    @BeforeClass
+    public static void copyOriginalConfig() {
+        originalCmmnEngineConfiguration = CmmnTestRunner.getCmmnEngineConfiguration();
     }
-    
-    @Override
-    public void cleanup() {
-        super.cleanup();
+
+    @AfterClass
+    public static void resetConfig() {
         cmmnEngine.close();
-        
+        cmmnEngine = null;
+
         // Restore any previous engine and config
-        cmmnEngine = originalCmmnEngine;
         CmmnTestRunner.setCmmnEngineConfiguration(originalCmmnEngineConfiguration);
     }
-    
+
+    @Before
+    public void setupServices() {
+        if (CustomCmmnConfigurationFlowableTestCase.cmmnEngine == null) {
+
+            try (InputStream inputStream = FlowableCmmnTestCase.class.getClassLoader().getResourceAsStream(FlowableCmmnTestCase.FLOWABLE_CMMN_CFG_XML)) {
+                if (inputStream != null) {
+                    CmmnEngineConfiguration cmmnEngineConfiguration = CmmnEngineConfiguration.createCmmnEngineConfigurationFromInputStream(inputStream);
+                    cmmnEngineConfiguration.setCmmnEngineName(getEngineName());
+                    configureConfiguration(cmmnEngineConfiguration);
+
+                    CmmnTestRunner.setCmmnEngineConfiguration(cmmnEngineConfiguration);
+                    CustomCmmnConfigurationFlowableTestCase.cmmnEngine = cmmnEngineConfiguration.buildCmmnEngine();
+
+                } else {
+                    throw new RuntimeException("No " + FlowableCmmnTestCase.FLOWABLE_CMMN_CFG_XML + " file found on the classpath");
+                }
+            } catch (IOException e) {
+                LOGGER.error("Could not create CMMN engine", e);
+            }
+
+        }
+
+        CmmnTestRunner.getCmmnEngineConfiguration().getClock().reset();
+
+        this.cmmnEngineConfiguration = CmmnTestRunner.getCmmnEngineConfiguration();
+        this.cmmnRepositoryService = CmmnTestRunner.getCmmnEngineConfiguration().getCmmnRepositoryService();
+        this.cmmnManagementService = CmmnTestRunner.getCmmnEngineConfiguration().getCmmnManagementService();
+        this.cmmnRuntimeService = CmmnTestRunner.getCmmnEngineConfiguration().getCmmnRuntimeService();
+        this.cmmnTaskService = CmmnTestRunner.getCmmnEngineConfiguration().getCmmnTaskService();
+        this.cmmnHistoryService = CmmnTestRunner.getCmmnEngineConfiguration().getCmmnHistoryService();
+    }
+
     protected abstract String getEngineName();
     
     protected abstract void configureConfiguration(CmmnEngineConfiguration cmmnEngineConfiguration);
