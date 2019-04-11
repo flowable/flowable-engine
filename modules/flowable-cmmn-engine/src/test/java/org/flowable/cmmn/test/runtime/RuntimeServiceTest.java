@@ -12,8 +12,8 @@
  */
 package org.flowable.cmmn.test.runtime;
 
-import static org.assertj.core.api.Assertions.tuple;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
@@ -40,6 +40,9 @@ import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.MilestoneInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.interceptor.StartCaseInstanceAfterContext;
+import org.flowable.cmmn.engine.interceptor.StartCaseInstanceBeforeContext;
+import org.flowable.cmmn.engine.interceptor.StartCaseInstanceInterceptor;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableException;
@@ -141,6 +144,28 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
             assertNotNull(historicCaseInstance.getStartTime());
             assertNotNull(historicCaseInstance.getEndTime());
             assertEquals(CaseInstanceState.COMPLETED, historicCaseInstance.getState());
+        }
+    }
+    
+    @Test
+    @CmmnDeployment(resources = {"org/flowable/cmmn/test/runtime/RuntimeServiceTest.testStartSimplePassthroughCaseWithBlockingTask.cmmn"})
+    public void testBlockingTaskWithStartInterceptor() {
+        TestStartCaseInstanceInterceptor testStartCaseInstanceInterceptor = new TestStartCaseInstanceInterceptor();
+        cmmnEngineConfiguration.setStartCaseInstanceInterceptor(testStartCaseInstanceInterceptor);
+        
+        try {
+            CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionId(caseDefinition.getId()).start();
+            assertEquals(CaseInstanceState.ACTIVE, caseInstance.getState());
+            
+            assertEquals(1, testStartCaseInstanceInterceptor.getBeforeStartCaseInstanceCounter());
+            assertEquals(1, testStartCaseInstanceInterceptor.getAfterStartCaseInstanceCounter());
+            
+            assertEquals("testKey", caseInstance.getBusinessKey());
+            assertEquals("test", cmmnRuntimeService.getVariable(caseInstance.getId(), "beforeContextVar"));
+            
+        } finally {
+            cmmnEngineConfiguration.setStartCaseInstanceInterceptor(null);
         }
     }
 
@@ -958,6 +983,34 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().orderByStartTime().asc().listPage(10, 20))
             .extracting(HistoricCaseInstance::getId, HistoricCaseInstance::getBusinessKey)
             .isEmpty();
+    }
+    
+    protected class TestStartCaseInstanceInterceptor implements StartCaseInstanceInterceptor {
+        
+        protected int beforeStartCaseInstanceCounter = 0;
+        protected int afterStartCaseInstanceCounter = 0;
+
+        @Override
+        public void beforeStartCaseInstance(StartCaseInstanceBeforeContext instanceContext) {
+            beforeStartCaseInstanceCounter++;
+            Map<String, Object> varMap = new HashMap<>();
+            varMap.put("beforeContextVar", "test");
+            instanceContext.setVariables(varMap);
+            instanceContext.setBusinessKey("testKey");
+        }
+
+        @Override
+        public void afterStartCaseInstance(StartCaseInstanceAfterContext instanceContext) {
+            afterStartCaseInstanceCounter++;
+        }
+
+        public int getBeforeStartCaseInstanceCounter() {
+            return beforeStartCaseInstanceCounter;
+        }
+
+        public int getAfterStartCaseInstanceCounter() {
+            return afterStartCaseInstanceCounter;
+        }
     }
 
 }

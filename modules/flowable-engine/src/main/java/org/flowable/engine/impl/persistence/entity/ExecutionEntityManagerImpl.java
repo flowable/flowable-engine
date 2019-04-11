@@ -47,7 +47,6 @@ import org.flowable.engine.impl.runtime.callback.ProcessInstanceState;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.EventUtil;
-import org.flowable.engine.impl.util.IdentityLinkUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -60,7 +59,6 @@ import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntity;
-import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.IdentityLinksByProcessInstanceMatcher;
@@ -286,8 +284,10 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         // Need to be after insert, cause we need the id
         processInstanceExecution.setProcessInstanceId(processInstanceExecution.getId());
         processInstanceExecution.setRootProcessInstanceId(processInstanceExecution.getId());
-        if (authenticatedUserId != null) {
-            IdentityLinkUtil.createProcessInstanceIdentityLink(processInstanceExecution, authenticatedUserId, null, IdentityLinkType.STARTER);
+        
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        if (processEngineConfiguration.getIdentityLinkInterceptor() != null) {
+            processEngineConfiguration.getIdentityLinkInterceptor().handleCreateProcessInstance(processInstanceExecution);
         }
 
         // Fire events
@@ -358,9 +358,9 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
 
         subProcessInstance.setProcessInstanceId(subProcessInstance.getId());
         superExecutionEntity.setSubProcessInstance(subProcessInstance);
-
-        if (authenticatedUserId != null) {
-            IdentityLinkUtil.createProcessInstanceIdentityLink(subProcessInstance, authenticatedUserId, null, IdentityLinkType.STARTER);
+        
+        if (processEngineConfiguration.getIdentityLinkInterceptor() != null) {
+            processEngineConfiguration.getIdentityLinkInterceptor().handleCreateSubProcessInstance(subProcessInstance, superExecutionEntity);
         }
 
         FlowableEventDispatcher flowableEventDispatcher = processEngineConfiguration.getEventDispatcher();

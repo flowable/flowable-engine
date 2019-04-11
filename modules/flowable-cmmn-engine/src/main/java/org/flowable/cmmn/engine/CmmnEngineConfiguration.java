@@ -97,6 +97,7 @@ import org.flowable.cmmn.engine.impl.history.async.json.transformer.VariableRemo
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.VariableUpdatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.idm.DefaultCandidateManager;
 import org.flowable.cmmn.engine.impl.interceptor.CmmnCommandInvoker;
+import org.flowable.cmmn.engine.impl.interceptor.DefaultCmmnIdentityLinkInterceptor;
 import org.flowable.cmmn.engine.impl.job.AsyncActivatePlanItemInstanceJobHandler;
 import org.flowable.cmmn.engine.impl.job.AsyncInitializePlanModelJobHandler;
 import org.flowable.cmmn.engine.impl.job.TriggerTimerEventJobHandler;
@@ -176,6 +177,8 @@ import org.flowable.cmmn.engine.impl.runtime.CmmnRuntimeServiceImpl;
 import org.flowable.cmmn.engine.impl.runtime.DefaultCmmnDynamicStateManager;
 import org.flowable.cmmn.engine.impl.scripting.CmmnVariableScopeResolverFactory;
 import org.flowable.cmmn.engine.impl.task.DefaultCmmnTaskVariableScopeResolver;
+import org.flowable.cmmn.engine.interceptor.CmmnIdentityLinkInterceptor;
+import org.flowable.cmmn.engine.interceptor.StartCaseInstanceInterceptor;
 import org.flowable.cmmn.image.CaseDiagramGenerator;
 import org.flowable.cmmn.image.impl.DefaultCaseDiagramGenerator;
 import org.flowable.common.engine.api.FlowableException;
@@ -335,6 +338,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CmmnDynamicStateManager dynamicStateManager;
     protected Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks;
     protected Map<String, List<PlanItemInstanceLifecycleListener>> planItemInstanceLifecycleListeners;
+    protected StartCaseInstanceInterceptor startCaseInstanceInterceptor;
+    protected CmmnIdentityLinkInterceptor identityLinkInterceptor;
 
     protected boolean executeServiceSchemaManagers = true;
 
@@ -787,6 +792,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initDynamicStateManager();
         initCaseInstanceCallbacks();
         initFormFieldHandler();
+        initIdentityLinkInterceptor();
         initClock();
         initIdentityLinkServiceConfiguration();
         initEntityLinkServiceConfiguration();
@@ -1263,6 +1269,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void initFormFieldHandler() {
         if (this.formFieldHandler == null) {
             this.formFieldHandler = new DefaultFormFieldHandler();
+        }
+    }
+    
+    public void initIdentityLinkInterceptor() {
+        if (identityLinkInterceptor == null) {
+            identityLinkInterceptor = new DefaultCmmnIdentityLinkInterceptor();
         }
     }
 
@@ -2234,8 +2246,18 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return planItemInstanceLifecycleListeners;
     }
 
-    public void setPlanItemInstanceLifecycleListeners(Map<String, List<PlanItemInstanceLifecycleListener>> planItemInstanceLifecycleListeners) {
+    public CmmnEngineConfiguration setPlanItemInstanceLifecycleListeners(Map<String, List<PlanItemInstanceLifecycleListener>> planItemInstanceLifecycleListeners) {
         this.planItemInstanceLifecycleListeners = planItemInstanceLifecycleListeners;
+        return this;
+    }
+    
+    public StartCaseInstanceInterceptor getStartCaseInstanceInterceptor() {
+        return startCaseInstanceInterceptor;
+    }
+
+    public CmmnEngineConfiguration setStartCaseInstanceInterceptor(StartCaseInstanceInterceptor startCaseInstanceInterceptor) {
+        this.startCaseInstanceInterceptor = startCaseInstanceInterceptor;
+        return this;
     }
 
     /**
@@ -3295,6 +3317,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setFormFieldHandler(FormFieldHandler formFieldHandler) {
         this.formFieldHandler = formFieldHandler;
+        return this;
+    }
+
+    public CmmnIdentityLinkInterceptor getIdentityLinkInterceptor() {
+        return identityLinkInterceptor;
+    }
+
+    public CmmnEngineConfiguration setIdentityLinkInterceptor(CmmnIdentityLinkInterceptor identityLinkInterceptor) {
+        this.identityLinkInterceptor = identityLinkInterceptor;
         return this;
     }
 

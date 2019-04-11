@@ -51,6 +51,7 @@ public class TaskHelper {
         if (taskEntity.getOwner() != null) {
             addOwnerIdentityLink(taskEntity);
         }
+        
         if (taskEntity.getAssignee() != null) {
             addAssigneeIdentityLinks(taskEntity);
             CommandContextUtil.getCmmnEngineConfiguration().getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_ASSIGNMENT);
@@ -153,11 +154,17 @@ public class TaskHelper {
     }
     
     protected static void addAssigneeIdentityLinks(TaskEntity taskEntity) {
-        CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLinkToParent(taskEntity, taskEntity.getAssignee());
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();
+        if (cmmnEngineConfiguration.getIdentityLinkInterceptor() != null) {
+            cmmnEngineConfiguration.getIdentityLinkInterceptor().handleAddAssigneeIdentityLinkToTask(taskEntity, taskEntity.getAssignee());
+        }
     }
 
     protected static void addOwnerIdentityLink(TaskEntity taskEntity) {
-        CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLinkToParent(taskEntity, taskEntity.getOwner());
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();
+        if (cmmnEngineConfiguration.getIdentityLinkInterceptor() != null) {
+            cmmnEngineConfiguration.getIdentityLinkInterceptor().handleAddOwnerIdentityLinkToTask(taskEntity, taskEntity.getOwner());
+        }
     }
 
     public static void deleteHistoricTask(String taskId) {

@@ -238,6 +238,7 @@ import org.flowable.engine.impl.history.async.json.transformer.VariableRemovedHi
 import org.flowable.engine.impl.history.async.json.transformer.VariableUpdatedHistoryJsonTransformer;
 import org.flowable.engine.impl.interceptor.BpmnOverrideContextInterceptor;
 import org.flowable.engine.impl.interceptor.CommandInvoker;
+import org.flowable.engine.impl.interceptor.DefaultIdentityLinkInterceptor;
 import org.flowable.engine.impl.interceptor.DelegateInterceptor;
 import org.flowable.engine.impl.interceptor.LoggingExecutionTreeCommandInvoker;
 import org.flowable.engine.impl.jobexecutor.AsyncCompleteCallActivityJobHandler;
@@ -320,6 +321,7 @@ import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.interceptor.ExecutionQueryInterceptor;
 import org.flowable.engine.interceptor.HistoricProcessInstanceQueryInterceptor;
+import org.flowable.engine.interceptor.IdentityLinkInterceptor;
 import org.flowable.engine.interceptor.ProcessInstanceQueryInterceptor;
 import org.flowable.engine.interceptor.StartProcessInstanceInterceptor;
 import org.flowable.engine.migration.ProcessInstanceMigrationManager;
@@ -800,6 +802,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected BusinessCalendarManager businessCalendarManager;
 
     protected StartProcessInstanceInterceptor startProcessInstanceInterceptor;
+    protected IdentityLinkInterceptor identityLinkInterceptor;
     protected ProcessInstanceQueryInterceptor processInstanceQueryInterceptor;
     protected ExecutionQueryInterceptor executionQueryInterceptor;
     protected HistoricProcessInstanceQueryInterceptor historicProcessInstanceQueryInterceptor;
@@ -984,6 +987,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initHistoryManager();
         initDynamicStateManager();
         initProcessInstanceMigrationValidationManager();
+        initIdentityLinkInterceptor();
         initJpa();
         initDeployers();
         initEventHandlers();
@@ -1287,6 +1291,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initProcessInstanceMigrationValidationManager() {
         if (processInstanceMigrationManager == null) {
             processInstanceMigrationManager = new ProcessInstanceMigrationManagerImpl();
+        }
+    }
+    
+    // identity link interceptor ///////////////////////////////////////////////
+    public void initIdentityLinkInterceptor() {
+        if (identityLinkInterceptor == null) {
+            identityLinkInterceptor = new DefaultIdentityLinkInterceptor();
         }
     }
 
@@ -3972,6 +3983,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setProcessInstanceMigrationManager(ProcessInstanceMigrationManager processInstanceMigrationValidationMananger) {
         this.processInstanceMigrationManager = processInstanceMigrationValidationMananger;
+        return this;
+    }
+    
+    public IdentityLinkInterceptor getIdentityLinkInterceptor() {
+        return identityLinkInterceptor;
+    }
+
+    public ProcessEngineConfigurationImpl setIdentityLinkInterceptor(IdentityLinkInterceptor identityLinkInterceptor) {
+        this.identityLinkInterceptor = identityLinkInterceptor;
         return this;
     }
 

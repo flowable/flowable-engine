@@ -33,7 +33,6 @@ import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.event.impl.FlowableIdentityLinkEventBuilder;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.api.DelegationState;
@@ -91,12 +90,11 @@ public class TaskHelper {
             }
         }
 
-        CommandContextUtil.getProcessEngineConfiguration(commandContext).getListenerNotificationHelper()
-            .executeTaskListeners(taskEntity, TaskListener.EVENTNAME_COMPLETE);
-        if (Authentication.getAuthenticatedUserId() != null && taskEntity.getProcessInstanceId() != null) {
-            ExecutionEntity processInstanceEntity = CommandContextUtil.getExecutionEntityManager(commandContext).findById(taskEntity.getProcessInstanceId());
-            IdentityLinkUtil.createProcessInstanceIdentityLink(processInstanceEntity,
-                    Authentication.getAuthenticatedUserId(), null, IdentityLinkType.PARTICIPANT);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_COMPLETE);
+        
+        if (processEngineConfiguration.getIdentityLinkInterceptor() != null) {
+            processEngineConfiguration.getIdentityLinkInterceptor().handleCompleteTask(taskEntity);
         }
 
         logUserTaskCompleted(taskEntity);
@@ -201,15 +199,21 @@ public class TaskHelper {
     }
 
     public static void addAssigneeIdentityLinks(TaskEntity taskEntity) {
-        CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLinkToParent(taskEntity, taskEntity.getAssignee());
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        if (processEngineConfiguration.getIdentityLinkInterceptor() != null) {
+            processEngineConfiguration.getIdentityLinkInterceptor().handleAddAssigneeIdentityLinkToTask(taskEntity, taskEntity.getAssignee());
+        }
     }
 
     public static void addOwnerIdentityLink(TaskEntity taskEntity, String owner) {
         if (owner == null && taskEntity.getOwner() == null) {
             return;
         }
-
-        CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLinkToParent(taskEntity, owner);
+        
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        if (processEngineConfiguration.getIdentityLinkInterceptor() != null) {
+            processEngineConfiguration.getIdentityLinkInterceptor().handleAddOwnerIdentityLinkToTask(taskEntity, owner);
+        }
     }
     
     /**
