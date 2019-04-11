@@ -51,4 +51,4 @@ After you've done that you can post questions and comments on https://forum.flow
 
 ### QA server
 
-There's a Jenkins server running the Flowable unit tests on http://qa.flowable.org.
+There's a Jenkins server running the Flowable unit tests on http://qa.flowable.org:8080.
