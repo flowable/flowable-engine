@@ -33,8 +33,7 @@ public class DataObjectValidator extends ProcessLevelValidator {
     protected void executeValidation(BpmnModel bpmnModel, Process process, List<ValidationError> errors) {
 
         // Gather data objects
-        List<ValuedDataObject> allDataObjects = new ArrayList<>();
-        allDataObjects.addAll(process.getDataObjects());
+        List<ValuedDataObject> allDataObjects = new ArrayList<>(process.getDataObjects());
         List<SubProcess> subProcesses = process.findFlowElementsOfType(SubProcess.class, true);
         for (SubProcess subProcess : subProcesses) {
             allDataObjects.addAll(subProcess.getDataObjects());

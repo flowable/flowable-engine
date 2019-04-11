@@ -36,7 +36,7 @@ public class SpringCmmnConfigurationHelper {
         try (GenericXmlApplicationContext applicationContext = new GenericXmlApplicationContext(new UrlResource(resource))) {
             Map<String, CmmnEngine> beansOfType = applicationContext.getBeansOfType(CmmnEngine.class);
             if ((beansOfType == null) || beansOfType.isEmpty()) {
-                throw new FlowableException("no " + CmmnEngine.class.getName() + " defined in the application context " + resource.toString());
+                throw new FlowableException("no " + CmmnEngine.class.getName() + " defined in the application context " + resource);
             }
 
             CmmnEngine cmmnEngine = beansOfType.values().iterator().next();

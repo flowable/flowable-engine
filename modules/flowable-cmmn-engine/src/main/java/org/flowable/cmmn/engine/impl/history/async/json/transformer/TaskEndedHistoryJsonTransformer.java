@@ -19,7 +19,6 @@ import java.util.List;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.job.service.impl.history.async.AsyncHistorySession;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
