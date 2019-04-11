@@ -24,7 +24,7 @@
                 <bean class="org.flowable.cmmn.engine.configurator.CmmnEngineConfigurator">
                     <property name="cmmnEngineConfiguration" ref="cmmnEngineConfiguration" />
                 </bean>
-                <bean class="org.flowable.form.engine.configurator.FormEngineConfigurator"/>
+                <bean class="org.flowable.cmmn.test.validate.TestValidationFormEngineConfigurator"/>
             </list>
         </property>
     </bean>
@@ -45,10 +45,6 @@
 
         <property name="formFieldValidationEnabled" value="true"/>
         <property name="enableHistoricTaskLogging" value="true"/>
-        <property name="formFieldHandler">
-            <bean class="org.flowable.cmmn.test.validate.ThrowExceptionFormFieldValidator"/>
-        </property>
-
     </bean>
     
     <bean id="processAsyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">

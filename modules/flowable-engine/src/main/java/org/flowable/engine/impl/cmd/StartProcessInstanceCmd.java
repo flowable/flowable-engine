@@ -138,9 +138,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
 
                     if (formInfo != null) {
                         if (isFormFieldValidationEnabled(processEngineConfiguration, startEvent)) {
-                            processEngineConfiguration.getFormFieldHandler().validateFormFieldsOnSubmit(
-                                formInfo, NoExecutionVariableScope.getSharedInstance(), startFormVariables
-                            );
+                            formService.validateFormFields(formInfo, startFormVariables);
                         }
                         // The processVariables are the variables that should be used when starting the process
                         // the actual variables should instead be used when saving the form instances

@@ -17,7 +17,7 @@ package org.flowable.dmn.xml.constants;
  */
 public interface DmnXMLConstants {
 
-    public static final String DMN_NAMESPACE = "http://www.omg.org/spec/DMN/20151101";
+    public static final String DMN_NAMESPACE = "http://www.omg.org/spec/DMN/20180521/MODEL/";
     public static final String XSI_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance";
     public static final String XSI_PREFIX = "xsi";
     public static final String SCHEMA_NAMESPACE = "http://www.w3.org/2001/XMLSchema";

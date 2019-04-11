@@ -145,7 +145,7 @@
                                 <div>
                                     <div class="property-row" ng-repeat="property in selectedItem.properties"
                                          ng-click="propertyClicked($index)" ng-class="{'clear' : $index%2 == 0}">
-                                        <span class="title" ng-if="!property.hidden">{{ property.title }}&nbsp;:</span>
+					<span class="title" ng-if="!property.hidden" title="{{ property.description }}">{{ property.title }}&nbsp;:</span>
                                         <span class="title-removed" ng-if="property.hidden"><i>{{ property.title }}&nbsp;({{'PROPERTY.REMOVED' | translate}})&nbsp;:</i></span>
                                         <span class="value">
 	                                    <ng-include

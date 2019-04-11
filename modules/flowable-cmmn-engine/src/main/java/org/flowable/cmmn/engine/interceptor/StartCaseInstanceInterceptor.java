@@ -10,22 +10,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.form.api;
+package org.flowable.cmmn.engine.interceptor;
 
-import java.util.Map;
+public interface StartCaseInstanceInterceptor {
 
-import org.flowable.common.engine.api.variable.VariableContainer;
-
-/**
- * Defines a form field handler.
- * 
- * @author Tijs Rademakers
- */
-public interface FormFieldHandler {
-
-    void handleFormFieldsOnSubmit(FormInfo formInfo, String taskId, String processInstanceId, String scopeId, 
-                    String scopeType, Map<String, Object> variables, String tenantId);
+    void beforeStartCaseInstance(StartCaseInstanceBeforeContext instanceContext);
     
-    void enrichFormFields(FormInfo formInfo);
-
+    void afterStartCaseInstance(StartCaseInstanceAfterContext instanceContext);
 }
