@@ -83,12 +83,12 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
             ).
             deploy();
         SideEffectTaskListener.reset();
-        ThrowExceptionFormFieldValidator.activate();
+        TestValidationFormEngineConfigurator.ThrowExceptionOnValidationFormService.activate();
     }
 
     @After
     public void cleanDeployments() {
-        ThrowExceptionFormFieldValidator.deactivate();
+        TestValidationFormEngineConfigurator.ThrowExceptionOnValidationFormService.deactivate();
         formRepositoryService.createDeploymentQuery().list().forEach(
             formDeployment -> formRepositoryService.deleteDeployment(formDeployment.getId())
         );
