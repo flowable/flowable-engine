@@ -14,7 +14,7 @@ package org.flowable.ui.modeler.rest.app;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 @RestController
 @RequestMapping("/app")
@@ -33,24 +37,37 @@ public class StencilSetResource {
     protected ObjectMapper objectMapper;
 
     @RequestMapping(value = "/rest/stencil-sets/editor", method = RequestMethod.GET, produces = "application/json")
-    public JsonNode getStencilSetForEditor() {
+    public JsonNode getStencilSetForEditor(String i18n) {
         try {
-            JsonNode stencilNode = objectMapper.readTree(this.getClass().getClassLoader().getResourceAsStream("stencilset_bpmn.json"));
-            return stencilNode;
+            String path = "i18n" + File.separator + "stencilset" + File.separator + "bpmn" + File.separator;
+            return getJsonNode(i18n, path);
         } catch (Exception e) {
             LOGGER.error("Error reading bpmn stencil set json", e);
             throw new InternalServerErrorException("Error reading bpmn stencil set json");
         }
     }
-    
+
     @RequestMapping(value = "/rest/stencil-sets/cmmneditor", method = RequestMethod.GET, produces = "application/json")
-    public JsonNode getCmmnStencilSetForEditor() {
+    public JsonNode getCmmnStencilSetForEditor(String i18n) {
         try {
-            JsonNode stencilNode = objectMapper.readTree(this.getClass().getClassLoader().getResourceAsStream("stencilset_cmmn.json"));
-            return stencilNode;
+            String path = "i18n" + File.separator + "stencilset" + File.separator + "cmmn" + File.separator;
+            return getJsonNode(i18n, path);
         } catch (Exception e) {
             LOGGER.error("Error reading bpmn stencil set json", e);
             throw new InternalServerErrorException("Error reading bpmn stencil set json");
         }
+    }
+
+    private JsonNode getJsonNode(String i18n, String path) throws IOException {
+        JsonNode stencilNode;
+        InputStream in = this.getClass().getClassLoader().getResourceAsStream(
+                path + StringUtils.trimToEmpty(i18n) + ".json");
+        if (in != null) {
+            stencilNode = objectMapper.readTree(in);
+        } else {
+            stencilNode = objectMapper.readTree(this.getClass().getClassLoader().getResourceAsStream(
+                    path + "en.json"));
+        }
+        return stencilNode;
     }
 }

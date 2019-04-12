@@ -19,11 +19,13 @@ FLOWABLE.URL = {
     },
 
     getStencilSet: function() {
-        return FLOWABLE.CONFIG.contextRoot + '/app/rest/stencil-sets/editor?version=' + Date.now();
+        return FLOWABLE.CONFIG.contextRoot + '/app/rest/stencil-sets/editor?version=' + Date.now()
+            + '&i18n=' + navigator.language;
     },
     
     getCmmnStencilSet: function() {
-        return FLOWABLE.CONFIG.contextRoot + '/app/rest/stencil-sets/cmmneditor?version=' + Date.now();
+        return FLOWABLE.CONFIG.contextRoot + '/app/rest/stencil-sets/cmmneditor?version=' + Date.now()
+            + '&i18n=' + navigator.language;
     },
 
     putModel: function(modelId) {
