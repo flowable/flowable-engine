@@ -130,6 +130,7 @@
          "ID": "ID",
          "EMAIL": "邮箱",
          "NAME": "名称",
+         "TENANT": "租户",
          "CREATED": "创建",
          "TYPE": "类型",
          "EXTERNAL-ID": "外部标识",
