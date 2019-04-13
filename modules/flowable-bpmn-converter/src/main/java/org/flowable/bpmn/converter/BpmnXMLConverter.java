@@ -513,7 +513,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
                     continue;
                 }
 
-                ProcessExport.writeProcess(process, xtw);
+                ProcessExport.writeProcess(process, model, xtw);
 
                 for (FlowElement flowElement : process.getFlowElements()) {
                     createXML(flowElement, model, xtw);
