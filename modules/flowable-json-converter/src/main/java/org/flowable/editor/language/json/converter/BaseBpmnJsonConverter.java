@@ -522,6 +522,9 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                 TerminateEventDefinition terminateEventDefinition = (TerminateEventDefinition) eventDefinition;
                 propertiesNode.put(PROPERTY_TERMINATE_ALL, terminateEventDefinition.isTerminateAll());
                 propertiesNode.put(PROPERTY_TERMINATE_MULTI_INSTANCE, terminateEventDefinition.isTerminateMultiInstance());
+            } else if (eventDefinition instanceof ErrorEventDefinition) {
+                ErrorEventDefinition errorEventDefinition = (ErrorEventDefinition) eventDefinition;
+                propertiesNode.put(PROPERTY_ERRORREF, errorEventDefinition.getErrorCode());
             }
         }
     }
@@ -630,6 +633,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         ErrorEventDefinition eventDefinition = new ErrorEventDefinition();
         eventDefinition.setErrorCode(errorRef);
         event.getEventDefinitions().add(eventDefinition);
+        this.model.addError(errorRef, null);
     }
 
     protected String getValueAsString(String name, JsonNode objectNode) {

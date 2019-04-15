@@ -1,0 +1,359 @@
+{
+  "modelId": "e9e9c946-5096-11e9-b6d2-b2447dd813ca",
+  "bounds": {
+    "lowerRight": {
+      "x": 1200,
+      "y": 1050
+    },
+    "upperLeft": {
+      "x": 0,
+      "y": 0
+    }
+  },
+  "properties": {
+    "process_id": "shareniu-errorcode",
+    "name": "shareniu-errorcode",
+    "documentation": "",
+    "process_author": "",
+    "process_version": "",
+    "process_namespace": "http://www.flowable.org/processdef",
+    "process_historylevel": "",
+    "isexecutable": true,
+    "dataproperties": "",
+    "executionlisteners": "",
+    "eventlisteners": "",
+    "signaldefinitions": "",
+    "messagedefinitions": "",
+    "errordefinitions": [
+      {
+        "id": "myerror1",
+        "errorcode": "shareniu-a",
+        "$$hashKey": "uiGrid-0009"
+      },
+      {
+        "id": "myerror2",
+        "errorcode": "shareniu-b",
+        "$$hashKey": "uiGrid-000F"
+      }
+    ],
+    "process_potentialstarteruser": "",
+    "process_potentialstartergroup": "",
+    "iseagerexecutionfetch": "false"
+  },
+  "childShapes": [
+    {
+      "resourceId": "startErrorEvent",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": "",
+        "executionlisteners": "",
+        "errorref": "myerror1",
+        "interrupting": true
+      },
+      "stencil": {
+        "id": "StartErrorEvent"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "sid-7F0D5E2F-9363-444D-B491-59E2595D4924"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 187,
+          "y": 153
+        },
+        "upperLeft": {
+          "x": 157,
+          "y": 123
+        }
+      },
+      "dockers": [
+        {
+          "x": 172,
+          "y": 138
+        }
+      ]
+    },
+    {
+      "resourceId": "sid-C6EE1A89-F3F4-44D9-B29E-E29AA15D1E39",
+      "properties": {
+        "overrideid": "userTask",
+        "name": "",
+        "documentation": "",
+        "asynchronousdefinition": "false",
+        "exclusivedefinition": "false",
+        "executionlisteners": "",
+        "multiinstance_type": "None",
+        "multiinstance_cardinality": "",
+        "multiinstance_collection": "",
+        "multiinstance_variable": "",
+        "multiinstance_condition": "",
+        "isforcompensation": "false",
+        "usertaskassignment": "",
+        "formkeydefinition": "",
+        "formreference": "",
+        "duedatedefinition": "",
+        "prioritydefinition": "",
+        "formproperties": "",
+        "tasklisteners": "",
+        "skipexpression": "",
+        "categorydefinition": ""
+      },
+      "stencil": {
+        "id": "UserTask"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "sid-BAEBDC33-3017-45B8-98D6-394AD2BFFC33"
+        },
+        {
+          "resourceId": "sid-556D14E1-18BA-46CE-9C6D-EE3865F127CD"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 355,
+          "y": 178
+        },
+        "upperLeft": {
+          "x": 255,
+          "y": 98
+        }
+      },
+      "dockers": []
+    },
+    {
+      "resourceId": "sid-7F0D5E2F-9363-444D-B491-59E2595D4924",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": "",
+        "conditionsequenceflow": "",
+        "executionlisteners": "",
+        "defaultflow": "false",
+        "skipexpression": ""
+      },
+      "stencil": {
+        "id": "SequenceFlow"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "sid-C6EE1A89-F3F4-44D9-B29E-E29AA15D1E39"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 254.125,
+          "y": 138
+        },
+        "upperLeft": {
+          "x": 187.546875,
+          "y": 138
+        }
+      },
+      "dockers": [
+        {
+          "x": 15,
+          "y": 15
+        },
+        {
+          "x": 50,
+          "y": 40
+        }
+      ],
+      "target": {
+        "resourceId": "sid-C6EE1A89-F3F4-44D9-B29E-E29AA15D1E39"
+      }
+    },
+    {
+      "resourceId": "sid-740FABA5-9DB1-422B-AE34-A128C9B96371",
+      "properties": {
+        "overrideid": "endErrorEvent",
+        "name": "",
+        "documentation": "",
+        "executionlisteners": "",
+        "errorref": "myerror2"
+      },
+      "stencil": {
+        "id": "EndErrorEvent"
+      },
+      "childShapes": [],
+      "outgoing": [],
+      "bounds": {
+        "lowerRight": {
+          "x": 448,
+          "y": 152
+        },
+        "upperLeft": {
+          "x": 420,
+          "y": 124
+        }
+      },
+      "dockers": [
+        {
+          "x": 434,
+          "y": 138
+        }
+      ]
+    },
+    {
+      "resourceId": "sid-BAEBDC33-3017-45B8-98D6-394AD2BFFC33",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": "",
+        "conditionsequenceflow": "",
+        "executionlisteners": "",
+        "defaultflow": "false",
+        "skipexpression": ""
+      },
+      "stencil": {
+        "id": "SequenceFlow"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "sid-740FABA5-9DB1-422B-AE34-A128C9B96371"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 419.8984375,
+          "y": 138
+        },
+        "upperLeft": {
+          "x": 355.3828125,
+          "y": 138
+        }
+      },
+      "dockers": [
+        {
+          "x": 50,
+          "y": 40
+        },
+        {
+          "x": 14,
+          "y": 14
+        }
+      ],
+      "target": {
+        "resourceId": "sid-740FABA5-9DB1-422B-AE34-A128C9B96371"
+      }
+    },
+    {
+      "resourceId": "sid-556D14E1-18BA-46CE-9C6D-EE3865F127CD",
+      "properties": {
+        "overrideid": "errorBoundaryEvent",
+        "name": "",
+        "documentation": "",
+        "errorref": "myerror2"
+      },
+      "stencil": {
+        "id": "BoundaryErrorEvent"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "sid-B8F1A1C4-F77F-490F-AE8B-28D5DC475DD6"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 320,
+          "y": 193.18798828125
+        },
+        "upperLeft": {
+          "x": 290,
+          "y": 163.18798828125
+        }
+      },
+      "dockers": [
+        {
+          "x": 50,
+          "y": 74
+        }
+      ]
+    },
+    {
+      "resourceId": "sid-398308FE-BE2A-4485-A5EF-FBB1D5DE1AEF",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": "",
+        "executionlisteners": ""
+      },
+      "stencil": {
+        "id": "EndNoneEvent"
+      },
+      "childShapes": [],
+      "outgoing": [],
+      "bounds": {
+        "lowerRight": {
+          "x": 319,
+          "y": 253
+        },
+        "upperLeft": {
+          "x": 291,
+          "y": 225
+        }
+      },
+      "dockers": []
+    },
+    {
+      "resourceId": "sid-B8F1A1C4-F77F-490F-AE8B-28D5DC475DD6",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": "",
+        "conditionsequenceflow": "",
+        "executionlisteners": "",
+        "defaultflow": "false",
+        "skipexpression": ""
+      },
+      "stencil": {
+        "id": "SequenceFlow"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "sid-398308FE-BE2A-4485-A5EF-FBB1D5DE1AEF"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 305,
+          "y": 224.69737243652344
+        },
+        "upperLeft": {
+          "x": 305,
+          "y": 193.44080352783203
+        }
+      },
+      "dockers": [
+        {
+          "x": 15,
+          "y": 15
+        },
+        {
+          "x": 14,
+          "y": 14
+        }
+      ],
+      "target": {
+        "resourceId": "sid-398308FE-BE2A-4485-A5EF-FBB1D5DE1AEF"
+      }
+    }
+  ],
+  "stencil": {
+    "id": "BPMNDiagram"
+  },
+  "stencilset": {
+    "namespace": "http://b3mn.org/stencilset/bpmn2.0#",
+    "url": "../editor/stencilsets/bpmn2.0/bpmn2.0.json"
+  }
+}
