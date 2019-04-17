@@ -1,0 +1,247 @@
+{
+  "modelId": "8c6c38ee-069f-11e9-9a60-66983343cfc3",
+  "bounds": {
+    "lowerRight": {
+      "x": 1200,
+      "y": 1050
+    },
+    "upperLeft": {
+      "x": 0,
+      "y": 0
+    }
+  },
+  "properties": {
+    "process_id": "shareniu-errorcode",
+    "name": "shareniu-errorcode",
+    "documentation": "",
+    "process_author": "",
+    "process_version": "",
+    "process_namespace": "http://www.flowable.org/processdef",
+    "process_historylevel": "",
+    "isexecutable": true,
+    "dataproperties": "",
+    "executionlisteners": "",
+    "eventlisteners": "",
+    "signaldefinitions": "",
+    "messagedefinitions": "",
+    "errordefinitions": [
+      {
+        "id": "myerror1",
+        "errorcode": "shareniu-a",
+        "$$hashKey": "uiGrid-0009"
+      },
+      {
+        "id": "myerror2",
+        "errorcode": "shareniu-b",
+        "$$hashKey": "uiGrid-000F"
+      }
+    ],
+    "process_potentialstarteruser": "",
+    "process_potentialstartergroup": "",
+    "iseagerexecutionfetch": "false"
+  },
+  "childShapes": [
+    {
+      "resourceId": "sid-CF7571C4-F093-45C5-ADD6-8F357ACF584C",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": "",
+        "executionlisteners": "",
+        "errorref": "myerror1",
+        "interrupting": true
+      },
+      "stencil": {
+        "id": "StartErrorEvent"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "sid-7F0D5E2F-9363-444D-B491-59E2595D4924"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 187,
+          "y": 153
+        },
+        "upperLeft": {
+          "x": 157,
+          "y": 123
+        }
+      },
+      "dockers": [
+        {
+          "x": 172,
+          "y": 138
+        }
+      ]
+    },
+    {
+      "resourceId": "sid-C6EE1A89-F3F4-44D9-B29E-E29AA15D1E39",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": "",
+        "asynchronousdefinition": "false",
+        "exclusivedefinition": "false",
+        "executionlisteners": "",
+        "multiinstance_type": "None",
+        "multiinstance_cardinality": "",
+        "multiinstance_collection": "",
+        "multiinstance_variable": "",
+        "multiinstance_condition": "",
+        "isforcompensation": "false",
+        "usertaskassignment": "",
+        "formkeydefinition": "",
+        "formreference": "",
+        "duedatedefinition": "",
+        "prioritydefinition": "",
+        "formproperties": "",
+        "tasklisteners": "",
+        "skipexpression": "",
+        "categorydefinition": ""
+      },
+      "stencil": {
+        "id": "UserTask"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "sid-20929D5B-E7B1-45A9-B468-F44712DE9B8A"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 332,
+          "y": 178
+        },
+        "upperLeft": {
+          "x": 232,
+          "y": 98
+        }
+      },
+      "dockers": []
+    },
+    {
+      "resourceId": "sid-7F0D5E2F-9363-444D-B491-59E2595D4924",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": "",
+        "conditionsequenceflow": "",
+        "executionlisteners": "",
+        "defaultflow": "false",
+        "skipexpression": ""
+      },
+      "stencil": {
+        "id": "SequenceFlow"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "sid-C6EE1A89-F3F4-44D9-B29E-E29AA15D1E39"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 231.15625,
+          "y": 138
+        },
+        "upperLeft": {
+          "x": 187.609375,
+          "y": 138
+        }
+      },
+      "dockers": [
+        {
+          "x": 15,
+          "y": 15
+        },
+        {
+          "x": 50,
+          "y": 40
+        }
+      ],
+      "target": {
+        "resourceId": "sid-C6EE1A89-F3F4-44D9-B29E-E29AA15D1E39"
+      }
+    },
+    {
+      "resourceId": "sid-94208560-D0F0-4B2F-8691-56B7D55427CC",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": "",
+        "executionlisteners": ""
+      },
+      "stencil": {
+        "id": "EndNoneEvent"
+      },
+      "childShapes": [],
+      "outgoing": [],
+      "bounds": {
+        "lowerRight": {
+          "x": 405,
+          "y": 152
+        },
+        "upperLeft": {
+          "x": 377,
+          "y": 124
+        }
+      },
+      "dockers": []
+    },
+    {
+      "resourceId": "sid-20929D5B-E7B1-45A9-B468-F44712DE9B8A",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": "",
+        "conditionsequenceflow": "",
+        "executionlisteners": "",
+        "defaultflow": "false",
+        "skipexpression": ""
+      },
+      "stencil": {
+        "id": "SequenceFlow"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "sid-94208560-D0F0-4B2F-8691-56B7D55427CC"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 376.375,
+          "y": 138
+        },
+        "upperLeft": {
+          "x": 332.390625,
+          "y": 138
+        }
+      },
+      "dockers": [
+        {
+          "x": 50,
+          "y": 40
+        },
+        {
+          "x": 14,
+          "y": 14
+        }
+      ],
+      "target": {
+        "resourceId": "sid-94208560-D0F0-4B2F-8691-56B7D55427CC"
+      }
+    }
+  ],
+  "stencil": {
+    "id": "BPMNDiagram"
+  },
+  "stencilset": {
+    "namespace": "http://b3mn.org/stencilset/bpmn2.0#",
+    "url": "../editor/stencilsets/bpmn2.0/bpmn2.0.json"
+  }
+}

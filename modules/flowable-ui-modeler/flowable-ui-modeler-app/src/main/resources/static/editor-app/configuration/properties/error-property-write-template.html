@@ -1,0 +1,4 @@
+<div ng-controller="FlowableErrorRefCtrl">
+    <select ng-model="property.value" ng-change="errorChanged()" ng-options="errorDefinition.id as (errorDefinition.name + ' (' + errorDefinition.id + ')') for errorDefinition in errorDefinitions">
+    </select>
+</div>
