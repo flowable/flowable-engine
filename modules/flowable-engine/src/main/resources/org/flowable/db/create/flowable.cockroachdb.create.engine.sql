@@ -88,21 +88,6 @@ CREATE TABLE ACT_RE_PROCDEF (
     primary key (ID_)
 );
 
-CREATE TABLE ACT_RU_EVENT_SUBSCR (
-    ID_ varchar(64) not null,
-    REV_ integer,
-    EVENT_TYPE_ varchar(255) not null,
-    EVENT_NAME_ varchar(255),
-    EXECUTION_ID_ varchar(64),
-    PROC_INST_ID_ varchar(64),
-    ACTIVITY_ID_ varchar(64),
-    CONFIGURATION_ varchar(255),
-    CREATED_ timestamp not null,
-    PROC_DEF_ID_ varchar(64),
-    TENANT_ID_ varchar(255) default '',
-    primary key (ID_)
-);
-
 -- Cockroachdb specific
 create sequence act_evt_log_nr__seq MINVALUE 1 MAXVALUE 9223372036854775807 INCREMENT 1 START 1;
 
@@ -151,7 +136,6 @@ CREATE TABLE ACT_RU_ACTINST (
 
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDX_EXE_ROOT on ACT_RU_EXECUTION(ROOT_PROC_INST_ID_);
-create index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR(CONFIGURATION_);
 create index ACT_IDX_VARIABLE_TASK_ID on ACT_RU_VARIABLE(TASK_ID_);
 
 create index ACT_IDX_BYTEAR_DEPL on ACT_GE_BYTEARRAY(DEPLOYMENT_ID_);
@@ -187,7 +171,6 @@ create index ACT_IDX_SUSPENDED_JOB_PROC_DEF_ID on ACT_RU_SUSPENDED_JOB(PROC_DEF_
 create index ACT_IDX_DEADLETTER_JOB_EXECUTION_ID on ACT_RU_DEADLETTER_JOB(EXECUTION_ID_);
 create index ACT_IDX_DEADLETTER_JOB_PROCESS_INSTANCE_ID on ACT_RU_DEADLETTER_JOB(PROCESS_INSTANCE_ID_);
 create index ACT_IDX_DEADLETTER_JOB_PROC_DEF_ID on ACT_RU_DEADLETTER_JOB(PROC_DEF_ID_);
-create index ACT_IDX_EVENT_SUBSCR on ACT_RU_EVENT_SUBSCR(EXECUTION_ID_);
 create index ACT_IDX_MODEL_SOURCE on ACT_RE_MODEL(EDITOR_SOURCE_VALUE_ID_);
 create index ACT_IDX_MODEL_SOURCE_EXTRA on ACT_RE_MODEL(EDITOR_SOURCE_EXTRA_VALUE_ID_);
 create index ACT_IDX_MODEL_DEPLOYMENT on ACT_RE_MODEL(DEPLOYMENT_ID_);
@@ -325,11 +308,6 @@ alter table ACT_RU_DEADLETTER_JOB
     add constraint ACT_FK_DEADLETTER_JOB_PROC_DEF
     foreign key (PROC_DEF_ID_) 
     references ACT_RE_PROCDEF (ID_);
-    
-alter table ACT_RU_EVENT_SUBSCR
-    add constraint ACT_FK_EVENT_EXEC
-    foreign key (EXECUTION_ID_)
-    references ACT_RU_EXECUTION(ID_);
 
 alter table ACT_RE_MODEL
     add constraint ACT_FK_MODEL_SOURCE 

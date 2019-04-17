@@ -17,6 +17,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,6 +34,7 @@ import java.util.Set;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
@@ -280,6 +283,9 @@ public abstract class AbstractEngineConfiguration {
     protected List<EngineConfigurator> allConfigurators; // Including auto-discovered configurators
     protected EngineConfigurator idmEngineConfigurator;
 
+    public static final String PRODUCT_NAME_POSTGRES = "PostgreSQL";
+    public static final String PRODUCT_NAME_CRDB = "CockroachDB";
+
     public static final String DATABASE_TYPE_H2 = "h2";
     public static final String DATABASE_TYPE_HSQL = "hsql";
     public static final String DATABASE_TYPE_MYSQL = "mysql";
@@ -287,6 +293,7 @@ public abstract class AbstractEngineConfiguration {
     public static final String DATABASE_TYPE_POSTGRES = "postgres";
     public static final String DATABASE_TYPE_MSSQL = "mssql";
     public static final String DATABASE_TYPE_DB2 = "db2";
+    public static final String DATABASE_TYPE_COCKROACHDB = "cockroachdb";
 
     public static Properties getDefaultDatabaseTypeMappings() {
         Properties databaseTypeMappings = new Properties();
@@ -294,7 +301,7 @@ public abstract class AbstractEngineConfiguration {
         databaseTypeMappings.setProperty("HSQL Database Engine", DATABASE_TYPE_HSQL);
         databaseTypeMappings.setProperty("MySQL", DATABASE_TYPE_MYSQL);
         databaseTypeMappings.setProperty("Oracle", DATABASE_TYPE_ORACLE);
-        databaseTypeMappings.setProperty("PostgreSQL", DATABASE_TYPE_POSTGRES);
+        databaseTypeMappings.setProperty(PRODUCT_NAME_POSTGRES, DATABASE_TYPE_POSTGRES);
         databaseTypeMappings.setProperty("Microsoft SQL Server", DATABASE_TYPE_MSSQL);
         databaseTypeMappings.setProperty(DATABASE_TYPE_DB2, DATABASE_TYPE_DB2);
         databaseTypeMappings.setProperty("DB2", DATABASE_TYPE_DB2);
@@ -317,6 +324,7 @@ public abstract class AbstractEngineConfiguration {
         databaseTypeMappings.setProperty("DB2/PTX", DATABASE_TYPE_DB2);
         databaseTypeMappings.setProperty("DB2/2", DATABASE_TYPE_DB2);
         databaseTypeMappings.setProperty("DB2 UDB AS400", DATABASE_TYPE_DB2);
+        databaseTypeMappings.setProperty(PRODUCT_NAME_CRDB, DATABASE_TYPE_COCKROACHDB);
         return databaseTypeMappings;
     }
 
@@ -407,6 +415,23 @@ public abstract class AbstractEngineConfiguration {
             DatabaseMetaData databaseMetaData = connection.getMetaData();
             String databaseProductName = databaseMetaData.getDatabaseProductName();
             logger.debug("database product name: '{}'", databaseProductName);
+
+            // CRDB does not expose the version through the jdbc driver, so we need to fetch it through version().
+            if (PRODUCT_NAME_POSTGRES.equalsIgnoreCase(databaseProductName)) {
+                PreparedStatement preparedStatement = connection.prepareStatement("select version() as version;");
+                ResultSet resultSet = preparedStatement.executeQuery();
+                String version = null;
+                if (resultSet.next()) {
+                    version = resultSet.getString("version");
+                }
+                resultSet.close();
+
+                if (StringUtils.isNotEmpty(version) && version.toLowerCase().startsWith(PRODUCT_NAME_CRDB.toLowerCase())) {
+                    databaseProductName = PRODUCT_NAME_CRDB;
+                    logger.info("CockroachDB version '{}' detected", version);
+                }
+            }
+
             databaseType = databaseTypeMappings.getProperty(databaseProductName);
             if (databaseType == null) {
                 throw new FlowableException("couldn't deduct database type from database product name '" + databaseProductName + "'");

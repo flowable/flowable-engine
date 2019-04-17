@@ -1,11 +1,11 @@
-CREATE TABLE ACT_GE_PROPERTY (
+CREATE TABLE if not exists ACT_GE_PROPERTY  (
     NAME_ varchar(64),
     VALUE_ varchar(300),
     REV_ integer,
     primary key (NAME_)
 );
 
-CREATE TABLE ACT_GE_BYTEARRAY (
+CREATE TABLE if not exists ACT_GE_BYTEARRAY  (
     ID_ varchar(64),
     REV_ integer,
     NAME_ varchar(255),
