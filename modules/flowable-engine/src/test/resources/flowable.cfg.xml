@@ -6,14 +6,9 @@
 
   <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
 
-    <!-- cockroachdb specific -->
-    <property name="bulkInsertEnabled" value="true" />
-    <property name="databaseType" value="cockroachdb" />
-    <property name="databaseSchema" value="public" /> <!-- CRDB supports 'public' only currently -->
-
-    <property name="jdbcUrl" value="jdbc:postgresql://127.0.0.1:26257/flowable?sslmode=disable" />
-    <property name="jdbcDriver" value="org.postgresql.Driver" />
-    <property name="jdbcUsername" value="flowable" />
+    <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE" />
+    <property name="jdbcDriver" value="org.h2.Driver" />
+    <property name="jdbcUsername" value="sa" />
     <property name="jdbcPassword" value="" />
 
     <!-- Database configurations -->
