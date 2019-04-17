@@ -29,7 +29,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 
-@DisabledIfSystemProperty(named = "db", matches = "crdb") // Disabled due to having a retry interceptor for CRDB and barriers in this test
+@DisabledIfSystemProperty(named = "database", matches = "cockroachdb") // Disabled due to having a retry interceptor for CRDB and barriers in this test
 public class DuplicateVariableInsertTest extends PluggableFlowableTestCase {
 
     /**
