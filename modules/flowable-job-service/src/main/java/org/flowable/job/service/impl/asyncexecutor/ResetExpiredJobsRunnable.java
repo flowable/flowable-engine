@@ -54,7 +54,7 @@ public class ResetExpiredJobsRunnable implements Runnable {
 
     @Override
     public synchronized void run() {
-        LOGGER.info("starting to reset expired jobs");
+        LOGGER.info("starting to reset expired jobs for engine " + asyncExecutor.getJobServiceConfiguration().getEngineName());
         Thread.currentThread().setName(name);
 
         while (!isInterrupted) {
@@ -81,7 +81,7 @@ public class ResetExpiredJobsRunnable implements Runnable {
 
         }
 
-        LOGGER.info("stopped resetting expired jobs");
+        LOGGER.info("stopped resetting expired jobs for engine " + asyncExecutor.getJobServiceConfiguration().getEngineName());
     }
 
     /**
@@ -113,17 +113,16 @@ public class ResetExpiredJobsRunnable implements Runnable {
                 // If another exception happens, we return the method which will trigger a sleep.
 
                 if (e instanceof FlowableOptimisticLockingException) {
-                    LOGGER.debug("Optimistic lock exception while resetting locked jobs", e);
+                    LOGGER.debug("Optimistic lock exception while resetting locked jobs for engine " + 
+                                    asyncExecutor.getJobServiceConfiguration().getEngineName(), e);
 
                 } else {
-                    LOGGER.error("exception during resetting expired jobs: {}", e.getMessage(), e);
+                    LOGGER.error("exception during resetting expired jobs: {} for engine {}", e.getMessage(), 
+                                    asyncExecutor.getJobServiceConfiguration().getEngineName(), e);
                     hasExpiredJobs = false; // will stop the loop
-
                 }
             }
-
         }
-
     }
 
     public void stop() {

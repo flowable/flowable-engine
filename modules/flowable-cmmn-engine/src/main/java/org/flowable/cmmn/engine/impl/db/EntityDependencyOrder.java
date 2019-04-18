@@ -55,7 +55,6 @@ public class EntityDependencyOrder {
         DELETE_ORDER.add(TimerJobEntityImpl.class);
         DELETE_ORDER.add(SuspendedJobEntityImpl.class);
         DELETE_ORDER.add(DeadLetterJobEntityImpl.class);
-        DELETE_ORDER.add(VariableByteArrayEntityImpl.class);
         DELETE_ORDER.add(JobByteArrayEntityImpl.class);
         DELETE_ORDER.add(HistoryJobEntityImpl.class);
         DELETE_ORDER.add(HistoricEntityLinkEntityImpl.class);
