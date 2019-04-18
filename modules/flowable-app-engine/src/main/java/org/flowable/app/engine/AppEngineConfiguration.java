@@ -53,6 +53,7 @@ import org.flowable.app.engine.impl.persistence.entity.data.impl.MybatisAppDeplo
 import org.flowable.app.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
 import org.flowable.app.engine.impl.persistence.entity.data.impl.TableDataManagerImpl;
 import org.flowable.app.engine.impl.persistence.entity.deploy.AppDefinitionCacheEntry;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
@@ -414,7 +415,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     }
 
     public void initVariableServiceConfiguration() {
-        this.variableServiceConfiguration = new VariableServiceConfiguration();
+        this.variableServiceConfiguration = new VariableServiceConfiguration(ScopeTypes.APP);
 
         this.variableServiceConfiguration.setClock(this.clock);
         this.variableServiceConfiguration.setObjectMapper(this.objectMapper);
@@ -431,7 +432,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     }
 
     public void initIdentityLinkServiceConfiguration() {
-        this.identityLinkServiceConfiguration = new IdentityLinkServiceConfiguration();
+        this.identityLinkServiceConfiguration = new IdentityLinkServiceConfiguration(ScopeTypes.APP);
         this.identityLinkServiceConfiguration.setClock(this.clock);
         this.identityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
         this.identityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);

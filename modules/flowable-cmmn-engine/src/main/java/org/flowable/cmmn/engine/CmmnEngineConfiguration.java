@@ -179,6 +179,7 @@ import org.flowable.cmmn.image.impl.DefaultCaseDiagramGenerator;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.FlowableExpressionEnhancer;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
@@ -1352,7 +1353,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
 
     protected VariableServiceConfiguration instantiateVariableServiceConfiguration() {
-        return new VariableServiceConfiguration();
+        return new VariableServiceConfiguration(ScopeTypes.CMMN);
     }
 
     public void initTaskServiceConfiguration() {
@@ -1401,7 +1402,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
 
     protected TaskServiceConfiguration instantiateTaskServiceConfiguration() {
-        return new TaskServiceConfiguration();
+        return new TaskServiceConfiguration(ScopeTypes.CMMN);
     }
 
     public void initIdentityLinkServiceConfiguration() {
@@ -1418,7 +1419,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
 
     protected IdentityLinkServiceConfiguration instantiateIdentityLinkServiceConfiguration() {
-        return new IdentityLinkServiceConfiguration();
+        return new IdentityLinkServiceConfiguration(ScopeTypes.CMMN);
     }
     
     public void initEntityLinkServiceConfiguration() {
@@ -1436,7 +1437,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
 
     protected EntityLinkServiceConfiguration instantiateEntityLinkServiceConfiguration() {
-        return new EntityLinkServiceConfiguration();
+        return new EntityLinkServiceConfiguration(ScopeTypes.CMMN);
     }
 
     public void initBusinessCalendarManager() {
@@ -1614,7 +1615,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
 
     protected JobServiceConfiguration instantiateJobServiceConfiguration() {
-        return new JobServiceConfiguration();
+        return new JobServiceConfiguration(ScopeTypes.CMMN);
     }
     
     public void addJobHandler(JobHandler jobHandler) {

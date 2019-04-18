@@ -31,6 +31,12 @@ import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityI
 import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.JobByteArrayEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.JobEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
@@ -45,6 +51,13 @@ public class EntityDependencyOrder {
 
     static {
 
+        DELETE_ORDER.add(JobEntityImpl.class);
+        DELETE_ORDER.add(TimerJobEntityImpl.class);
+        DELETE_ORDER.add(SuspendedJobEntityImpl.class);
+        DELETE_ORDER.add(DeadLetterJobEntityImpl.class);
+        DELETE_ORDER.add(VariableByteArrayEntityImpl.class);
+        DELETE_ORDER.add(JobByteArrayEntityImpl.class);
+        DELETE_ORDER.add(HistoryJobEntityImpl.class);
         DELETE_ORDER.add(HistoricEntityLinkEntityImpl.class);
         DELETE_ORDER.add(HistoricIdentityLinkEntityImpl.class);
         DELETE_ORDER.add(HistoricMilestoneInstanceEntityImpl.class);
