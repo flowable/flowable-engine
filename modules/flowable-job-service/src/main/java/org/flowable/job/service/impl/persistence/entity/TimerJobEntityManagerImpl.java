@@ -127,9 +127,11 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
     }
 
     protected boolean doInsert(TimerJobEntity jobEntity, boolean fireCreateEvent) {
-        boolean handledJob = getJobServiceConfiguration().getInternalJobManager().handleJobInsert(jobEntity);
-        if (!handledJob) {
-            return false;
+        if (getJobServiceConfiguration().getInternalJobManager() != null) {
+            boolean handledJob = getJobServiceConfiguration().getInternalJobManager().handleJobInsert(jobEntity);
+            if (!handledJob) {
+                return false;
+            }
         }
 
         jobEntity.setCreateTime(getJobServiceConfiguration().getClock().getCurrentTime());
@@ -144,7 +146,9 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
         deleteByteArrayRef(jobEntity.getExceptionByteArrayRef());
         deleteByteArrayRef(jobEntity.getCustomValuesByteArrayRef());
 
-        getJobServiceConfiguration().getInternalJobManager().handleJobDelete(jobEntity);
+        if (getJobServiceConfiguration().getInternalJobManager() != null) {
+            getJobServiceConfiguration().getInternalJobManager().handleJobDelete(jobEntity);
+        }
 
         // Send event
         FlowableEventDispatcher eventDispatcher = getEventDispatcher();

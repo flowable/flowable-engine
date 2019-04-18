@@ -54,9 +54,11 @@ public class JobEntityManagerImpl extends JobInfoEntityManagerImpl<JobEntity> im
     }
 
     protected boolean doInsert(JobEntity jobEntity, boolean fireCreateEvent) {
-        boolean handledJob = getJobServiceConfiguration().getInternalJobManager().handleJobInsert(jobEntity);
-        if (!handledJob) {
-            return false;
+        if (getJobServiceConfiguration().getInternalJobManager() != null) {
+            boolean handledJob = getJobServiceConfiguration().getInternalJobManager().handleJobInsert(jobEntity);
+            if (!handledJob) {
+                return false;
+            }
         }
 
         jobEntity.setCreateTime(getJobServiceConfiguration().getClock().getCurrentTime());
@@ -90,7 +92,10 @@ public class JobEntityManagerImpl extends JobInfoEntityManagerImpl<JobEntity> im
 
     @Override
     public void delete(JobEntity entity, boolean fireDeleteEvent) {
-        getJobServiceConfiguration().getInternalJobManager().handleJobDelete(entity);
+        if (getJobServiceConfiguration().getInternalJobManager() != null) {
+            getJobServiceConfiguration().getInternalJobManager().handleJobDelete(entity);
+        }
+        
         super.delete(entity, fireDeleteEvent);
     }
 
