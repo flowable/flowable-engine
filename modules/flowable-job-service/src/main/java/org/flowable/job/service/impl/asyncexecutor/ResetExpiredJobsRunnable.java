@@ -12,9 +12,9 @@
  */
 package org.flowable.job.service.impl.asyncexecutor;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.job.api.Job;
@@ -26,7 +26,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Runnable that checks the {@link Job} entities periodically for 'expired' jobs.
  * 
- * When a job is executed, it is first locked (lock owner and lock time is set). A job is expired when this lock time is exceeded. This can happen when an executor goes down before completing a task.
+ * When a job is executed, it is first locked (lock owner and lock time is set).
+ * A job is expired when this lock time is exceeded (this can for example happen when an executor goes down before completing a task)
  * 
  * This runnable will find such jobs and reset them, so they can be picked up again.
  * 
@@ -83,28 +84,46 @@ public class ResetExpiredJobsRunnable implements Runnable {
         LOGGER.info("stopped resetting expired jobs");
     }
 
+    /**
+     * Resets jobs that were expired. Will continue to reset jobs until no more jobs are returned.
+     */
     public void resetJobs() {
-        try {
-            List<? extends JobInfoEntity> expiredJobs = asyncExecutor.getJobServiceConfiguration().getCommandExecutor()
+
+        boolean hasExpiredJobs = true;
+        while (hasExpiredJobs) {
+
+            try {
+
+                List<? extends JobInfoEntity> expiredJobs = asyncExecutor.getJobServiceConfiguration().getCommandExecutor()
                     .execute(new FindExpiredJobsCmd(asyncExecutor.getResetExpiredJobsPageSize(), jobEntityManager));
 
-            List<String> expiredJobIds = new ArrayList<>(expiredJobs.size());
-            for (JobInfoEntity expiredJob : expiredJobs) {
-                expiredJobIds.add(expiredJob.getId());
-            }
-
-            if (expiredJobIds.size() > 0) {
-                asyncExecutor.getJobServiceConfiguration().getCommandExecutor().execute(
+                List<String> expiredJobIds = expiredJobs.stream().map(JobInfoEntity::getId).collect(Collectors.toList());
+                if (!expiredJobIds.isEmpty()) {
+                    asyncExecutor.getJobServiceConfiguration().getCommandExecutor().execute(
                         new ResetExpiredJobsCmd(expiredJobIds, jobEntityManager));
+
+                } else {
+                    hasExpiredJobs = false;
+
+                }
+
+            } catch (Throwable e) {
+
+                // If an optimistic locking exception happens, we continue resetting.
+                // If another exception happens, we return the method which will trigger a sleep.
+
+                if (e instanceof FlowableOptimisticLockingException) {
+                    LOGGER.debug("Optimistic lock exception while resetting locked jobs", e);
+
+                } else {
+                    LOGGER.error("exception during resetting expired jobs: {}", e.getMessage(), e);
+                    hasExpiredJobs = false; // will stop the loop
+
+                }
             }
 
-        } catch (Throwable e) {
-            if (e instanceof FlowableOptimisticLockingException) {
-                LOGGER.debug("Optimistic lock exception while resetting locked jobs", e);
-            } else {
-                LOGGER.error("exception during resetting expired jobs: {}", e.getMessage(), e);
-            }
         }
+
     }
 
     public void stop() {
