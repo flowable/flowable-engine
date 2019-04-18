@@ -118,7 +118,8 @@ public class TaskHelper {
                 deleteHistoricTask(task.getId());
                 deleteHistoricTaskLogEntries(task.getId());
             } else {
-                CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskEnd(task, deleteReason);
+                CommandContextUtil.getCmmnHistoryManager(commandContext)
+                    .recordTaskEnd(task, deleteReason, commandContext.getCurrentEngineConfiguration().getClock().getCurrentTime());
             }
 
             CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_DELETE);

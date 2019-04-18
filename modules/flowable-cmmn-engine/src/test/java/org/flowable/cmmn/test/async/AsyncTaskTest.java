@@ -159,5 +159,44 @@ public class AsyncTaskTest extends FlowableCmmnTestCase {
         assertCaseInstanceEnded(caseInstance);
         assertEquals(0L, cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).count());
     }
+
+    @Test
+    @CmmnDeployment
+    public void testAsyncExclusiveServiceTaskAfterStageExit() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testAsyncExclusive").start();
+
+        // Trigger the user event listener first. This will execute the first exclusive async service task
+        cmmnRuntimeService.completeUserEventListenerInstance(cmmnRuntimeService.createUserEventListenerInstanceQuery()
+            .caseInstanceId(caseInstance.getId()).singleResult().getId());
+
+        // There should be one job and it needs to be exclusive
+        Job job = cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(job.isExclusive()).isTrue();
+
+        waitForJobExecutorToProcessAllJobs();
+
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "serviceTaskVar1")).isEqualTo("firstST");
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "serviceTaskVar2")).isNull();
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).contains("Task in stage", "Task outside stage");
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .planItemInstanceName("Second service task outside stage")
+            .singleResult();
+        assertThat(planItemInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+
+        // Completing 'Task in stage' exits the stage, which will start the service task.
+        // The service task is async and exclusive. It will set the 'serviceTaskVar2' variable.
+        cmmnTaskService.complete(tasks.get(0).getId());
+
+        // There should be one job and it needs to be exclusive
+        job = cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(job.isExclusive()).isTrue();
+
+        waitForJobExecutorToProcessAllJobs();
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "serviceTaskVar1")).isEqualTo("firstST");
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "serviceTaskVar2")).isEqualTo("secondST");
+    }
     
 }

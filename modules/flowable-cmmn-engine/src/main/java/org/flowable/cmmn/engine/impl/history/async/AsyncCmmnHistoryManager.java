@@ -12,9 +12,13 @@
  */
 package org.flowable.cmmn.engine.impl.history.async;
 
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.putIfNotNull;
 
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -58,12 +62,11 @@ public class AsyncCmmnHistoryManager extends AbstractAsyncCmmnHistoryManager {
     }
 
     @Override
-    public void recordCaseInstanceEnd(CaseInstanceEntity caseInstanceEntity, String state) {
+    public void recordCaseInstanceEnd(CaseInstanceEntity caseInstanceEntity, String state, Date endTime) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonCaseInstanceFields(caseInstanceEntity, data);
             
-            Date endTime = cmmnEngineConfiguration.getClock().getCurrentTime();
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_END_TIME, endTime);
             
             if (caseInstanceEntity.getStartTime() != null) {
@@ -172,20 +175,20 @@ public class AsyncCmmnHistoryManager extends AbstractAsyncCmmnHistoryManager {
     }
     
     @Override
-    public void recordVariableCreate(VariableInstanceEntity variable) {
+    public void recordVariableCreate(VariableInstanceEntity variable, Date createTime) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
-            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CREATE_TIME, cmmnEngineConfiguration.getClock().getCurrentTime());
-            addCommonVariableFields(variable, data);
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CREATE_TIME, createTime);
+            addCommonVariableFields(variable, data, createTime);
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_VARIABLE_CREATED, data);
         }
     }
 
     @Override
-    public void recordVariableUpdate(VariableInstanceEntity variable) {
+    public void recordVariableUpdate(VariableInstanceEntity variable, Date updateTime) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) { 
             ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
-            addCommonVariableFields(variable, data);
+            addCommonVariableFields(variable, data, updateTime);
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_VARIABLE_UPDATED, data);
         }
     }
@@ -194,7 +197,8 @@ public class AsyncCmmnHistoryManager extends AbstractAsyncCmmnHistoryManager {
     public void recordVariableRemoved(VariableInstanceEntity variable) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
-            addCommonVariableFields(variable, data);
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, variable.getId());
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REVISION, variable.getRevision());
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_VARIABLE_REMOVED, data);
         }
     }
@@ -209,22 +213,24 @@ public class AsyncCmmnHistoryManager extends AbstractAsyncCmmnHistoryManager {
     }
 
     @Override
-    public void recordTaskInfoChange(TaskEntity task) {
+    public void recordTaskInfoChange(TaskEntity task, Date changeTime) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonTaskFields(task, data);
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_UPDATE_TIME, changeTime);
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_TASK_UPDATED, data, task.getTenantId());
         }
     }
     
     @Override
-    public void recordTaskEnd(TaskEntity task, String deleteReason) {
+    public void recordTaskEnd(TaskEntity task, String deleteReason, Date endTime) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonTaskFields(task, data);
             
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_DELETE_REASON, deleteReason);
-            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_END_TIME, cmmnEngineConfiguration.getClock().getCurrentTime());
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_END_TIME, endTime);
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_UPDATE_TIME, endTime);
             
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_TASK_REMOVED, data, task.getTenantId());
         }
@@ -232,65 +238,52 @@ public class AsyncCmmnHistoryManager extends AbstractAsyncCmmnHistoryManager {
     
     @Override
     public void recordPlanItemInstanceCreated(PlanItemInstanceEntity planItemInstanceEntity) {
-        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-            ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
-            addCommonPlanItemInstanceFields(planItemInstanceEntity, data);
-            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_CREATED, data, planItemInstanceEntity.getTenantId());
-        }
+        recordPlanItemInstanceFull(planItemInstanceEntity, null);
     }
 
     @Override
     public void recordPlanItemInstanceAvailable(PlanItemInstanceEntity planItemInstanceEntity) {
-        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, planItemInstanceEntity.getLastAvailableTime(),
-            CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_AVAILABLE, CmmnAsyncHistoryConstants.FIELD_LAST_AVAILABLE_TIME);
+        recordPlanItemInstanceFull(planItemInstanceEntity, planItemInstanceEntity.getLastAvailableTime());
     }
 
     @Override
     public void recordPlanItemInstanceEnabled(PlanItemInstanceEntity planItemInstanceEntity) {
-        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, planItemInstanceEntity.getLastEnabledTime(),
-            CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_ENABLED, CmmnAsyncHistoryConstants.FIELD_LAST_ENABLED_TIME);
+        recordPlanItemInstanceFull(planItemInstanceEntity, planItemInstanceEntity.getLastEnabledTime());
     }
 
     @Override
     public void recordPlanItemInstanceDisabled(PlanItemInstanceEntity planItemInstanceEntity) {
-        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, planItemInstanceEntity.getLastDisabledTime(),
-            CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_DISABLED, CmmnAsyncHistoryConstants.FIELD_LAST_DISABLED_TIME);
+        recordPlanItemInstanceFull(planItemInstanceEntity, planItemInstanceEntity.getLastDisabledTime());
     }
 
     @Override
     public void recordPlanItemInstanceStarted(PlanItemInstanceEntity planItemInstanceEntity) {
-        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, planItemInstanceEntity.getLastStartedTime(),
-            CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_STARTED, CmmnAsyncHistoryConstants.FIELD_LAST_STARTED_TIME);
+        recordPlanItemInstanceFull(planItemInstanceEntity, planItemInstanceEntity.getLastStartedTime());
     }
 
     @Override
     public void recordPlanItemInstanceSuspended(PlanItemInstanceEntity planItemInstanceEntity) {
-        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, planItemInstanceEntity.getLastSuspendedTime(),
-            CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_SUSPENDED, CmmnAsyncHistoryConstants.FIELD_LAST_SUSPENDED_TIME);
+        recordPlanItemInstanceFull(planItemInstanceEntity, planItemInstanceEntity.getLastSuspendedTime());
     }
 
     @Override
     public void recordPlanItemInstanceCompleted(PlanItemInstanceEntity planItemInstanceEntity) {
-        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, planItemInstanceEntity.getCompletedTime(),
-            CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_COMPLETED, CmmnAsyncHistoryConstants.FIELD_END_TIME, CmmnAsyncHistoryConstants.FIELD_COMPLETED_TIME);
+        recordPlanItemInstanceFull(planItemInstanceEntity, planItemInstanceEntity.getCompletedTime());
     }
 
     @Override
     public void recordPlanItemInstanceOccurred(PlanItemInstanceEntity planItemInstanceEntity) {
-        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, planItemInstanceEntity.getOccurredTime(),
-            CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_OCCURRED, CmmnAsyncHistoryConstants.FIELD_END_TIME, CmmnAsyncHistoryConstants.FIELD_OCCURRED_TIME);
+        recordPlanItemInstanceFull(planItemInstanceEntity, planItemInstanceEntity.getOccurredTime());
     }
 
     @Override
     public void recordPlanItemInstanceTerminated(PlanItemInstanceEntity planItemInstanceEntity) {
-        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, planItemInstanceEntity.getTerminatedTime(),
-            CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_TERMINATED, CmmnAsyncHistoryConstants.FIELD_END_TIME, CmmnAsyncHistoryConstants.FIELD_TERMINATED_TIME);
+        recordPlanItemInstanceFull(planItemInstanceEntity, planItemInstanceEntity.getTerminatedTime());
     }
 
     @Override
     public void recordPlanItemInstanceExit(PlanItemInstanceEntity planItemInstanceEntity) {
-        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, planItemInstanceEntity.getExitTime(),
-            CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_EXIT, CmmnAsyncHistoryConstants.FIELD_END_TIME, CmmnAsyncHistoryConstants.FIELD_EXIT_TIME);
+        recordPlanItemInstanceFull(planItemInstanceEntity, planItemInstanceEntity.getExitTime());
     }
 
     @Override
@@ -313,15 +306,38 @@ public class AsyncCmmnHistoryManager extends AbstractAsyncCmmnHistoryManager {
         }
     }
 
-    protected void updatePlanItemInstanceTimeStamp(PlanItemInstanceEntity planItemInstanceEntity, Date time, String type, String...fields) {
+    protected void recordPlanItemInstanceFull(PlanItemInstanceEntity planItemInstance, Date lastUpdateTime) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            // When there are multiple changes on a PlanItemInstance within the same transaction
+            // we need to use only the last one (that one will contain the latest data)
+            removePlanItemInstanceFull(planItemInstance.getId());
+
             ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
-            addCommonPlanItemInstanceFields(planItemInstanceEntity, data);
-            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_UPDATE_TIME, time);
-            for (String field : fields) {
-                putIfNotNull(data, field, time);
+            addCommonPlanItemInstanceFields(planItemInstance, data);
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_UPDATE_TIME, lastUpdateTime);
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_FULL, data);
+        }
+    }
+
+    /* Helper methods */
+
+    protected void removePlanItemInstanceFull(String planItemInstanceId) {
+        Map<JobServiceConfiguration, AsyncHistorySession.AsyncHistorySessionData> sessionData = getAsyncHistorySession().getSessionData();
+        if (sessionData != null) {
+            AsyncHistorySession.AsyncHistorySessionData asyncHistorySessionData = sessionData.get(getJobServiceConfiguration());
+            if (asyncHistorySessionData != null) {
+                Map<String, List<ObjectNode>> jobData = asyncHistorySessionData.getJobData();
+                if (jobData != null && jobData.containsKey(CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_FULL)) {
+                    List<ObjectNode> planItemInstanceDataList = jobData.get(CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_FULL);
+                    Iterator<ObjectNode> planItemInstanceDataIterator = planItemInstanceDataList.listIterator();
+                    while (planItemInstanceDataIterator.hasNext()) {
+                        ObjectNode planItemInstanceData = planItemInstanceDataIterator.next();
+                        if (planItemInstanceId.equals(getStringFromJson(planItemInstanceData, CmmnAsyncHistoryConstants.FIELD_ID))) {
+                            planItemInstanceDataIterator.remove();
+                        }
+                    }
+                }
             }
-            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), type, data, planItemInstanceEntity.getTenantId());
         }
     }
     

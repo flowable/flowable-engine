@@ -12,6 +12,7 @@
  */
 package org.flowable.task.service;
 
+import java.util.Date;
 import java.util.List;
 
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -52,9 +53,9 @@ public interface HistoricTaskService {
     
     HistoricTaskInstanceEntity recordTaskCreated(TaskEntity task);
     
-    HistoricTaskInstanceEntity recordTaskEnd(TaskEntity task, String deleteReason);
+    HistoricTaskInstanceEntity recordTaskEnd(TaskEntity task, String deleteReason, Date endTime);
     
-    HistoricTaskInstanceEntity recordTaskInfoChange(TaskEntity taskEntity);
+    HistoricTaskInstanceEntity recordTaskInfoChange(TaskEntity taskEntity, Date changeTime);
 
     void deleteHistoricTaskLogEntry(long taskLogNumber);
 

@@ -835,7 +835,8 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         if (isPropagateToHistoricVariable()) {
             VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getVariableServiceConfiguration();
             if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {
-                variableServiceConfiguration.getInternalHistoryVariableManager().recordVariableRemoved(variableInstance);
+                variableServiceConfiguration.getInternalHistoryVariableManager()
+                    .recordVariableRemoved(variableInstance, variableServiceConfiguration.getClock().getCurrentTime());
             }
         }
     }
@@ -864,7 +865,8 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getVariableServiceConfiguration();
         if (isPropagateToHistoricVariable()) {
             if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {
-                variableServiceConfiguration.getInternalHistoryVariableManager().recordVariableUpdate(variableInstance);
+                variableServiceConfiguration.getInternalHistoryVariableManager()
+                    .recordVariableUpdate(variableInstance, variableServiceConfiguration.getClock().getCurrentTime());
             }
         }
 
@@ -895,7 +897,8 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getVariableServiceConfiguration();
         if (isPropagateToHistoricVariable()) {
             if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {
-                variableServiceConfiguration.getInternalHistoryVariableManager().recordVariableCreate(variableInstance);
+                variableServiceConfiguration.getInternalHistoryVariableManager()
+                    .recordVariableCreate(variableInstance, variableServiceConfiguration.getClock().getCurrentTime());
             }
         }
 

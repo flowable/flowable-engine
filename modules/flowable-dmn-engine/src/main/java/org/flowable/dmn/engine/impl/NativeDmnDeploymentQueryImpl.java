@@ -15,7 +15,7 @@ package org.flowable.dmn.engine.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.AbstractNativeQuery;
+import org.flowable.common.engine.impl.query.AbstractNativeQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.dmn.api.DmnDeployment;

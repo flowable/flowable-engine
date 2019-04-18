@@ -13,8 +13,9 @@
 
 package org.flowable.cmmn.rest.service.api.history;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+
 import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -26,6 +27,8 @@ import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for REST-operation related to the historic task instance identity links resource.
@@ -59,27 +62,55 @@ public class HistoricTaskInstanceIdentityLinkCollectionResourceTest extends Base
         // Check status and size
         JsonNode linksArray = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertEquals(2, linksArray.size());
-        Map<String, JsonNode> linksMap = new HashMap<>();
-        for (JsonNode linkNode : linksArray) {
-            linksMap.put(linkNode.get("type").asText(), linkNode);
-        }
-        JsonNode assigneeNode = linksMap.get("assignee");
-        assertNotNull(assigneeNode);
-        assertEquals("fozzie", assigneeNode.get("userId").asText());
-        assertTrue(assigneeNode.get("groupId").isNull());
-        assertEquals(task.getId(), assigneeNode.get("taskId").asText());
-        assertNotNull(assigneeNode.get("taskUrl").asText());
-        assertTrue(assigneeNode.get("caseInstanceId").isNull());
-        assertTrue(assigneeNode.get("caseInstanceUrl").isNull());
-
-        JsonNode ownerNode = linksMap.get("owner");
-        assertNotNull(ownerNode);
-        assertEquals("test", ownerNode.get("userId").asText());
-        assertTrue(ownerNode.get("groupId").isNull());
-        assertEquals(task.getId(), ownerNode.get("taskId").asText());
-        assertNotNull(ownerNode.get("taskUrl").asText());
-        assertTrue(ownerNode.get("caseInstanceId").isNull());
-        assertTrue(ownerNode.get("caseInstanceUrl").isNull());
+        String taskId = task.getId();
+        assertThatJson(linksArray)
+            .when(Option.IGNORING_ARRAY_ORDER)
+            .isEqualTo("["
+                + "  {"
+                + "    'type': 'assignee',"
+                + "    'userId': 'fozzie',"
+                + "    'groupId': null,"
+                + "    'taskId': '" + taskId + "',"
+                + "    'taskUrl': '${json-unit.any-string}',"
+                + "    'caseInstanceId': null,"
+                + "    'caseInstanceUrl': null"
+                + "  },"
+                + "  {"
+                + "    'type': 'owner',"
+                + "    'userId': 'test',"
+                + "    'groupId': null,"
+                + "    'taskId': '" + taskId + "',"
+                + "    'taskUrl': '${json-unit.any-string}',"
+                + "    'caseInstanceId': null,"
+                + "    'caseInstanceUrl': null"
+                + "  },"
+                + "  {"
+                + "    'type': 'candidate',"
+                + "    'userId': 'test',"
+                + "    'groupId': null,"
+                + "    'taskId': '" + taskId + "',"
+                + "    'taskUrl': '${json-unit.any-string}',"
+                + "    'caseInstanceId': null,"
+                + "    'caseInstanceUrl': null"
+                + "  },"
+                + "  {"
+                + "    'type': 'candidate',"
+                + "    'userId': 'test2',"
+                + "    'groupId': null,"
+                + "    'taskId': '" + taskId + "',"
+                + "    'taskUrl': '${json-unit.any-string}',"
+                + "    'caseInstanceId': null,"
+                + "    'caseInstanceUrl': null"
+                + "  },"
+                + "  {"
+                + "    'type': 'candidate',"
+                + "    'userId': null,"
+                + "    'groupId': 'test',"
+                + "    'taskId': '" + taskId + "',"
+                + "    'taskUrl': '${json-unit.any-string}',"
+                + "    'caseInstanceId': null,"
+                + "    'caseInstanceUrl': null"
+                + "  }"
+                + "]");
     }
 }

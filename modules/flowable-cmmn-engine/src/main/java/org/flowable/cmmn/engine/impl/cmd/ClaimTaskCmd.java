@@ -16,6 +16,7 @@ import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
@@ -35,7 +36,8 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
     @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
         if (userId != null) {
-            task.setClaimTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
+            Clock clock = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock();
+            task.setClaimTime(clock.getCurrentTime());
 
             if (task.getAssignee() != null) {
                 if (!task.getAssignee().equals(userId)) {
@@ -43,7 +45,7 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
                     // exception. Otherwise, ignore this, post-conditions of method already met.
                     throw new FlowableTaskAlreadyClaimedException(task.getId(), task.getAssignee());
                 }
-                CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskInfoChange(task);
+                CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskInfoChange(task, clock.getCurrentTime());
                 
             } else {
                 TaskHelper.changeTaskAssignee(task, userId);

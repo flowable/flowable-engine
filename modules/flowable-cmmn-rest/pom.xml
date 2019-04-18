@@ -10,7 +10,7 @@
     <groupId>org.flowable</groupId>
     <artifactId>flowable-root</artifactId>
     <relativePath>../..</relativePath>
-    <version>6.4.1-15</version>
+    <version>6.4.1-18</version>
   </parent>
 
   <properties>
@@ -221,6 +221,11 @@
     <dependency>
       <groupId>org.flowable</groupId>
       <artifactId>flowable-spring-security</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.javacrumbs.json-unit</groupId>
+      <artifactId>json-unit-assertj</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

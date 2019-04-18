@@ -345,7 +345,8 @@ public class TaskHelper {
             if (task.getExecutionId() != null) {
                 execution = CommandContextUtil.getExecutionEntityManager(commandContext).findById(task.getExecutionId());
             }
-            CommandContextUtil.getHistoryManager(commandContext).recordTaskEnd(task, execution, deleteReason);
+            CommandContextUtil.getHistoryManager(commandContext)
+                .recordTaskEnd(task, execution, deleteReason, commandContext.getCurrentEngineConfiguration().getClock().getCurrentTime());
         }
     }
 

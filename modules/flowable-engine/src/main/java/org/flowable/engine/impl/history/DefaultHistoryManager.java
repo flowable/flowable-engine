@@ -13,6 +13,7 @@
 
 package org.flowable.engine.impl.history;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -68,13 +69,13 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     // Process related history
 
     @Override
-    public void recordProcessInstanceEnd(ExecutionEntity processInstance, String deleteReason, String activityId) {
+    public void recordProcessInstanceEnd(ExecutionEntity processInstance, String deleteReason, String activityId, Date endTime) {
 
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processInstance.getProcessDefinitionId())) {
             HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceEntityManager().findById(processInstance.getId());
 
             if (historicProcessInstance != null) {
-                historicProcessInstance.markEnded(deleteReason);
+                historicProcessInstance.markEnded(deleteReason, endTime);
                 historicProcessInstance.setEndActivityId(activityId);
 
                 // Fire event
@@ -195,11 +196,11 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     }
 
     @Override
-    public void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason) {
+    public void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason, Date endTime) {
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, executionEntity.getProcessDefinitionId())) {
             HistoricActivityInstanceEntity historicActivityInstance = findHistoricActivityInstance(executionEntity, true);
             if (historicActivityInstance != null) {
-                historicActivityInstance.markEnded(deleteReason);
+                historicActivityInstance.markEnded(deleteReason, endTime);
 
                 // Fire event
                 FlowableEventDispatcher eventDispatcher = getEventDispatcher();
@@ -251,7 +252,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     }
 
     @Override
-    public void recordTaskEnd(TaskEntity task, ExecutionEntity execution, String deleteReason) {
+    public void recordTaskEnd(TaskEntity task, ExecutionEntity execution, String deleteReason, Date endTime) {
         String processDefinitionId = null;
         if (execution != null) {
             processDefinitionId = execution.getProcessDefinitionId();
@@ -259,15 +260,15 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             processDefinitionId = task.getProcessDefinitionId();
         }
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processDefinitionId)) {
-            HistoricTaskInstanceEntity historicTaskInstance = CommandContextUtil.getHistoricTaskService().recordTaskEnd(task, deleteReason);
+            HistoricTaskInstanceEntity historicTaskInstance = CommandContextUtil.getHistoricTaskService().recordTaskEnd(task, deleteReason, endTime);
             if (historicTaskInstance != null) {
-                historicTaskInstance.setLastUpdateTime(processEngineConfiguration.getClock().getCurrentTime());
+                historicTaskInstance.setLastUpdateTime(endTime);
             }
         }
     }
 
     @Override
-    public void recordTaskInfoChange(TaskEntity taskEntity, String activityInstanceId) {
+    public void recordTaskInfoChange(TaskEntity taskEntity, String activityInstanceId, Date changeTime) {
         boolean assigneeChanged = false;
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, taskEntity.getProcessDefinitionId())) {
             HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
@@ -277,7 +278,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
                 originalAssignee = originalHistoricTaskInstanceEntity.getAssignee();
             }
 
-            HistoricTaskInstanceEntity historicTaskInstance = historicTaskService.recordTaskInfoChange(taskEntity);
+            HistoricTaskInstanceEntity historicTaskInstance = historicTaskService.recordTaskInfoChange(taskEntity, changeTime);
             if (historicTaskInstance != null) {
                 if (!Objects.equals(originalAssignee, taskEntity.getAssignee())) {
                     assigneeChanged = true;
@@ -305,7 +306,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     // Variables related history
 
     @Override
-    public void recordVariableCreate(VariableInstanceEntity variable) {
+    public void recordVariableCreate(VariableInstanceEntity variable, Date createTime) {
         String processDefinitionId = null;
         if (enableProcessDefinitionHistoryLevel && variable.getProcessInstanceId() != null) {
             ExecutionEntity processInstanceExecution = CommandContextUtil.getExecutionEntityManager().findById(variable.getProcessInstanceId());
@@ -313,18 +314,18 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
         
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processDefinitionId)) {
-            CommandContextUtil.getHistoricVariableService().createAndInsert(variable);
+            CommandContextUtil.getHistoricVariableService().createAndInsert(variable, createTime);
         }
     }
 
     @Override
     public void recordHistoricDetailVariableCreate(VariableInstanceEntity variable, ExecutionEntity sourceActivityExecution, boolean useActivityId,
-        String activityInstanceId) {
+        String activityInstanceId, Date createTime) {
         String processDefinitionId = getProcessDefinitionId(variable, sourceActivityExecution);
 
         if (isHistoryLevelAtLeast(HistoryLevel.FULL, processDefinitionId)) {
 
-            HistoricDetailVariableInstanceUpdateEntity historicVariableUpdate = getHistoricDetailEntityManager().copyAndInsertHistoricDetailVariableInstanceUpdateEntity(variable);
+            HistoricDetailVariableInstanceUpdateEntity historicVariableUpdate = getHistoricDetailEntityManager().copyAndInsertHistoricDetailVariableInstanceUpdateEntity(variable, createTime);
 
             if (StringUtils.isNotEmpty(activityInstanceId)) {
                 historicVariableUpdate.setActivityInstanceId(activityInstanceId);
@@ -340,7 +341,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     }
 
     @Override
-    public void recordVariableUpdate(VariableInstanceEntity variableInstanceEntity) {
+    public void recordVariableUpdate(VariableInstanceEntity variableInstanceEntity, Date updateTime) {
         String processDefinitionId = null;
         if (enableProcessDefinitionHistoryLevel && variableInstanceEntity.getProcessInstanceId() != null) {
             ExecutionEntity processInstanceExecution = CommandContextUtil.getExecutionEntityManager().findById(variableInstanceEntity.getProcessInstanceId());
@@ -348,7 +349,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
         
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processDefinitionId)) {
-            CommandContextUtil.getHistoricVariableService().recordVariableUpdate(variableInstanceEntity);
+            CommandContextUtil.getHistoricVariableService().recordVariableUpdate(variableInstanceEntity, updateTime);
         }
     }
 
@@ -366,11 +367,11 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     }
 
     @Override
-    public void recordFormPropertiesSubmitted(ExecutionEntity processInstance, Map<String, String> properties, String taskId) {
+    public void recordFormPropertiesSubmitted(ExecutionEntity processInstance, Map<String, String> properties, String taskId, Date createTime) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processInstance.getProcessDefinitionId())) {
             for (String propertyId : properties.keySet()) {
                 String propertyValue = properties.get(propertyId);
-                getHistoricDetailEntityManager().insertHistoricFormPropertyEntity(processInstance, propertyId, propertyValue, taskId);
+                getHistoricDetailEntityManager().insertHistoricFormPropertyEntity(processInstance, propertyId, propertyValue, taskId, createTime);
             }
         }
     }

@@ -67,7 +67,7 @@ public interface HistoricTaskInstanceEntity extends Entity, HistoricTaskInstance
 
     void setQueryVariables(List<HistoricVariableInstanceEntity> queryVariables);
     
-    void markEnded(String deleteReason);
+    void markEnded(String deleteReason, Date endTime);
 
     void setProcessInstanceId(String processInstanceId);
 

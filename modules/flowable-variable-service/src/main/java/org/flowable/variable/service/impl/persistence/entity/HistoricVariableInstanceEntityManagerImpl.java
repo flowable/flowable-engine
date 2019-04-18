@@ -43,7 +43,7 @@ public class HistoricVariableInstanceEntityManagerImpl extends AbstractEntityMan
     }
 
     @Override
-    public HistoricVariableInstanceEntity createAndInsert(VariableInstanceEntity variableInstance) {
+    public HistoricVariableInstanceEntity createAndInsert(VariableInstanceEntity variableInstance, Date createTime) {
         HistoricVariableInstanceEntity historicVariableInstance = historicVariableInstanceDataManager.create();
         historicVariableInstance.setId(variableInstance.getId());
         historicVariableInstance.setProcessInstanceId(variableInstance.getProcessInstanceId());
@@ -56,11 +56,10 @@ public class HistoricVariableInstanceEntityManagerImpl extends AbstractEntityMan
         historicVariableInstance.setSubScopeId(variableInstance.getSubScopeId());
         historicVariableInstance.setScopeType(variableInstance.getScopeType());
 
-        copyVariableValue(historicVariableInstance, variableInstance);
+        copyVariableValue(historicVariableInstance, variableInstance, createTime);
 
-        Date time = getClock().getCurrentTime();
-        historicVariableInstance.setCreateTime(time);
-        historicVariableInstance.setLastUpdatedTime(time);
+        historicVariableInstance.setCreateTime(createTime);
+        historicVariableInstance.setLastUpdatedTime(createTime);
 
         insert(historicVariableInstance);
 
@@ -68,7 +67,7 @@ public class HistoricVariableInstanceEntityManagerImpl extends AbstractEntityMan
     }
 
     @Override
-    public void copyVariableValue(HistoricVariableInstanceEntity historicVariableInstance, VariableInstanceEntity variableInstance) {
+    public void copyVariableValue(HistoricVariableInstanceEntity historicVariableInstance, VariableInstanceEntity variableInstance, Date updateTime) {
         historicVariableInstance.setTextValue(variableInstance.getTextValue());
         historicVariableInstance.setTextValue2(variableInstance.getTextValue2());
         historicVariableInstance.setDoubleValue(variableInstance.getDoubleValue());
@@ -79,7 +78,7 @@ public class HistoricVariableInstanceEntityManagerImpl extends AbstractEntityMan
             historicVariableInstance.setBytes(variableInstance.getBytes());
         }
 
-        historicVariableInstance.setLastUpdatedTime(getClock().getCurrentTime());
+        historicVariableInstance.setLastUpdatedTime(updateTime);
     }
 
     @Override

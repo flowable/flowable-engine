@@ -102,7 +102,7 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
     public void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason) {
         ActivityInstance activityInstance = recordActivityInstanceEnd(executionEntity, deleteReason);
         if (activityInstance == null) {
-            getHistoryManager().recordActivityEnd(executionEntity, deleteReason);
+            getHistoryManager().recordActivityEnd(executionEntity, deleteReason, getClock().getCurrentTime());
         } else {
             getHistoryManager().recordActivityEnd(activityInstance);
         }
@@ -144,15 +144,15 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
     }
 
     @Override
-    public void recordTaskInfoChange(TaskEntity taskEntity) {
+    public void recordTaskInfoChange(TaskEntity taskEntity, Date changeTime) {
         ActivityInstanceEntity activityInstanceEntity = recordActivityTaskInfoChange(taskEntity);
-        getHistoryManager().recordTaskInfoChange(taskEntity, activityInstanceEntity != null ? activityInstanceEntity.getId() : null);
+        getHistoryManager().recordTaskInfoChange(taskEntity, activityInstanceEntity != null ? activityInstanceEntity.getId() : null, changeTime);
     }
 
     @Override
     public void syncUserTaskExecution(ExecutionEntity executionEntity, FlowElement newFlowElement, String oldActivityId, TaskEntity task) {
         syncUserTaskExecutionActivityInstance(executionEntity, oldActivityId, newFlowElement);
-        getHistoryManager().updateActivity(executionEntity, oldActivityId, newFlowElement, task);
+        getHistoryManager().updateActivity(executionEntity, oldActivityId, newFlowElement, task, getClock().getCurrentTime());
     }
 
     @Override
