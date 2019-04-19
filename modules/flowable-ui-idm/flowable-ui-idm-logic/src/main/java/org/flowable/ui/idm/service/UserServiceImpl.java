@@ -121,7 +121,11 @@ public class UserServiceImpl extends AbstractIdmService implements UserService {
             throw new BadRequestException("Id, password and first name are required");
         }
 
-        if (email != null && identityService.createUserQuery().userEmail(email).count() > 0) {
+        if (StringUtils.isNotBlank(email) && identityService.createUserQuery().userEmail(email).count() > 0) {
+            throw new ConflictingRequestException("User already registered", "ACCOUNT.SIGNUP.ERROR.ALREADY-REGISTERED");
+        }
+        
+        if (identityService.createUserQuery().userId(id).count() > 0) {
             throw new ConflictingRequestException("User already registered", "ACCOUNT.SIGNUP.ERROR.ALREADY-REGISTERED");
         }
 
