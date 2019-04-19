@@ -358,7 +358,7 @@ public class TaskVariableResourceTest extends BaseSpringRestTestCase {
             assertTrue(responseNode.get("value").isNull());
             assertEquals("local", responseNode.get("scope").asText());
             assertEquals("binary", responseNode.get("type").asText());
-            assertNotNull(responseNode.get("valueUrl").isNull());
+            assertNotNull(responseNode.get("valueUrl"));
             assertTrue(responseNode.get("valueUrl").asText().endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLE_DATA, task.getId(), "binaryVariable")));
 
             // Check actual value of variable in engine

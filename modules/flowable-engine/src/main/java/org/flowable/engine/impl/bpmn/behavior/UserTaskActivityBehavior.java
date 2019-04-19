@@ -197,7 +197,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                 category = activeTaskCategory;
                 LOGGER.warn("property not found in task category expression {}", e.getMessage());
             }
-            task.setCategory(category.toString());
+            task.setCategory(category);
         }
 
         if (StringUtils.isNotEmpty(activeTaskFormKey)) {
@@ -211,7 +211,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                 formKey = activeTaskFormKey;
                 LOGGER.warn("property not found in task formKey expression {}", e.getMessage());
             }
-            task.setFormKey(formKey.toString());
+            task.setFormKey(formKey);
         }
         
         boolean skipUserTask = SkipExpressionUtil.isSkipExpressionEnabled(activeTaskSkipExpression, userTask.getId(), execution, commandContext)
