@@ -54,10 +54,10 @@ public class DefaultAutoDeploymentStrategy extends AbstractAutoDeploymentStrateg
 
                 String resourceName = determineResourceName(resource);
                 if (resourceName.contains("/")) {
-                    resourceName = resourceName.substring(resourceName.lastIndexOf("/") + 1);
+                    resourceName = resourceName.substring(resourceName.lastIndexOf('/') + 1);
 
                 } else if (resourceName.contains("\\")) {
-                    resourceName = resourceName.substring(resourceName.lastIndexOf("\\") + 1);
+                    resourceName = resourceName.substring(resourceName.lastIndexOf('\\') + 1);
                 }
 
                 final AppDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(resourceName);

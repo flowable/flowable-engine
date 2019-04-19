@@ -210,7 +210,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
         assertEquals("binaryVariable", responseNode.get("name").asText());
         assertTrue(responseNode.get("value").isNull());
         assertEquals("binary", responseNode.get("type").asText());
-        assertNotNull(responseNode.get("valueUrl").isNull());
+        assertNotNull(responseNode.get("valueUrl"));
         assertTrue(responseNode.get("valueUrl").asText().endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_DATA, caseInstance.getId(), "binaryVariable")));
 
         // Check actual value of variable in engine

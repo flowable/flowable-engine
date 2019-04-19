@@ -84,7 +84,7 @@
             "PROFILE": "个人",
             "USER-MGMT": "用户",
             "GROUP-MGMT": "组",
-            "PRIVILEGE-MGMT": "权限控制"
+            "PRIVILEGE-MGMT": "权限"
         },
         "ACTION": {
           "CANCEL": "取消",
@@ -130,8 +130,8 @@
          "ID": "ID",
          "EMAIL": "邮箱",
          "NAME": "名称",
-         "CREATED": "创建",
          "TENANT": "租户",
+         "CREATED": "创建",
          "TYPE": "类型",
          "EXTERNAL-ID": "外部标识",
          "LAST-SYNC-TIME": "最新更新",

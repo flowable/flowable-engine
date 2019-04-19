@@ -37,7 +37,1565 @@
           "GROUP-SOURCE-TYPE": "Group source",
           "GROUP-SOURCE-SEARCH-OPTION": "Group search",
           "GROUP-SOURCE-FIELD-OPTION": "Form field"
+        },
+        "OTHERS" : {
+          "PROCESS" : "Process",
+          "PROCESS_NAVIGATOR" : "Process Navigator",
+          "NO_STRUCTURAL_ELEMENTS_USED" : "No structural elements used."
         }
+    },
+
+    "BPMN" : {
+      "TITLE": "Process editor",
+      "DESCRIPTION" : "BPMN process editor",
+      "PROPERTYPACKAGES" : {
+        "PROCESS_IDPACKAGE" : {
+          "PROCESS_ID" : {
+            "TITLE" : "Process identifier",
+            "DESCRIPTION" : "Unique identifier of the process definition."
+          }
+        },
+        "OVERRIDEIDPACKAGE" : {
+          "OVERRIDEID" : {
+            "TITLE" : "Id",
+            "DESCRIPTION" : "Unique identifier of the element."
+          }
+        },
+        "NAMEPACKAGE" : {
+          "NAME" : {
+            "TITLE" : "Name",
+            "DESCRIPTION" : "The descriptive name of the BPMN element."
+          }
+        },
+        "DOCUMENTATIONPACKAGE" : {
+          "DOCUMENTATION" : {
+            "TITLE" : "Documentation",
+            "DESCRIPTION" : "The descriptive name of the BPMN element."
+          }
+        },
+        "CATEGORYPACKAGE" : {
+          "CATEGORYDEFINITION" : {
+            "TITLE" : "Category",
+            "DESCRIPTION" : "Category of the BPMN element."
+          }
+        },
+        "PROCESS_AUTHORPACKAGE" : {
+          "PROCESS_AUTHOR" : {
+            "TITLE" : "Process author",
+            "DESCRIPTION" : "Author of the process definition."
+          }
+        },
+        "PROCESS_VERSIONPACKAGE" : {
+          "PROCESS_VERSION" : {
+            "TITLE" : "Process version string (documentation only)",
+            "DESCRIPTION" : "Version identifier for documentation purpose."
+          }
+        },
+        "PROCESS_HISTORYLEVELPACKAGE" : {
+          "PROCESS_HISTORYLEVEL" : {
+            "TITLE" : "Set a specific history level for this process definition",
+            "DESCRIPTION" : "Set a specific history level for this process definition"
+          }
+        },
+        "ISEXECUTABLEPACKAGE" : {
+          "ISEXECUTABLE" : {
+            "TITLE" : "Is executable",
+            "DESCRIPTION" : "Is the process executable?"
+          }
+        },
+        "PROCESS_POTENTIALSTARTERUSERPACKAGE" : {
+          "PROCESS_POTENTIALSTARTERUSER" : {
+            "TITLE" : "Potential starter user",
+            "DESCRIPTION" : "Which user, can start the process?"
+          }
+        },
+        "PROCESS_POTENTIALSTARTERGROUPPACKAGE" : {
+          "PROCESS_POTENTIALSTARTERGROUP" : {
+            "TITLE" : "Potential starter group",
+            "DESCRIPTION" : "Which group, can start the process?"
+          }
+        },
+        "PROCESS_NAMESPACEPACKAGE" : {
+          "PROCESS_NAMESPACE" : {
+            "TITLE" : "Target namespace",
+            "DESCRIPTION" : "Target namespace for the process definition."
+          }
+        },
+        "PROCESS_ISEAGEREXECUTIONFETCHPACKAGE" : {
+          "ISEAGEREXECUTIONFETCH" : {
+            "TITLE" : "Eager execution fetching",
+            "DESCRIPTION" : "Enable eager execution fetching for this process definition?"
+          }
+        },
+        "ASYNCHRONOUSDEFINITIONPACKAGE" : {
+          "ASYNCHRONOUSDEFINITION" : {
+            "TITLE" : "Asynchronous",
+            "DESCRIPTION" : "Define the activity as asynchronous."
+          }
+        },
+        "DATAPROPERTIESPACKAGE" : {
+          "DATAPROPERTIES" : {
+            "TITLE" : "Data Objects",
+            "DESCRIPTION" : "Definition of the data object properties"
+          }
+        },
+        "EXCLUSIVEDEFINITIONPACKAGE" : {
+          "EXCLUSIVEDEFINITION" : {
+            "TITLE" : "Exclusive",
+            "DESCRIPTION" : "Define the activity as exclusive."
+          }
+        },
+        "EXECUTIONLISTENERSPACKAGE" : {
+          "EXECUTIONLISTENERS" : {
+            "TITLE" : "Execution listeners",
+            "DESCRIPTION" : "Listeners for an activity, process, sequence flow, start and end event."
+          }
+        },
+        "TASKLISTENERSPACKAGE" : {
+          "TASKLISTENERS" : {
+            "TITLE" : "Task listeners",
+            "DESCRIPTION" : "Listeners for a user task"
+          }
+        },
+        "EVENTLISTENERSPACKAGE" : {
+          "EVENTLISTENERS" : {
+            "TITLE" : "Event listeners",
+            "DESCRIPTION" : "Listeners for any event happening in the Flowable Engine. It's also possible to rethrow the event as a signal, message or error event"
+          }
+        },
+        "USERTASKASSIGNMENTPACKAGE" : {
+          "USERTASKASSIGNMENT" : {
+            "TITLE" : "Assignments",
+            "DESCRIPTION" : "Assignment definition for the user task"
+          }
+        },
+        "FORMPROPERTIESPACKAGE" : {
+          "FORMPROPERTIES" : {
+            "TITLE" : "Form properties",
+            "DESCRIPTION" : "Definition of the form with a list of form properties"
+          }
+        },
+        "FORMKEYDEFINITIONPACKAGE" : {
+          "FORMKEYDEFINITION" : {
+            "TITLE" : "Form key",
+            "DESCRIPTION" : "Form key that provides a reference to a form."
+          }
+        },
+        "FORMFIELDVALIDATIONPACKAGE" : {
+          "FORMFIELDVALIDATION" : {
+            "TITLE" : "Validate form fields",
+            "DESCRIPTION" : "Validate form fields on the form submission. (allowed values are 'true', 'false' or expression)"
+          }
+        },
+        "DUEDATEDEFINITIONPACKAGE" : {
+          "DUEDATEDEFINITION" : {
+            "TITLE" : "Due date",
+            "DESCRIPTION" : "Due date of the user task."
+          }
+        },
+        "PRIORITYDEFINITIONPACKAGE" : {
+          "PRIORITYDEFINITION" : {
+            "TITLE" : "Priority",
+            "DESCRIPTION" : "Priority of the user task."
+          }
+        },
+        "SERVICETASKCLASSPACKAGE" : {
+          "SERVICETASKCLASS" : {
+            "TITLE" : "Class",
+            "DESCRIPTION" : "Class that implements the service task logic."
+          }
+        },
+        "SERVICETASKEXPRESSIONPACKAGE" : {
+          "SERVICETASKEXPRESSION" : {
+            "TITLE" : "Expression",
+            "DESCRIPTION" : "Service task logic defined with an expression."
+          }
+        },
+        "SERVICETASKDELEGATEEXPRESSIONPACKAGE" : {
+          "SERVICETASKDELEGATEEXPRESSION" : {
+            "TITLE" : "Delegate expression",
+            "DESCRIPTION" : "Service task logic defined with a delegate expression."
+          }
+        },
+        "SERVICETASKFIELDSPACKAGE" : {
+          "SERVICETASKFIELDS" : {
+            "TITLE" : "Class fields",
+            "DESCRIPTION" : "Field extensions"
+          }
+        },
+        "SERVICETASKRESULTVARIABLEPACKAGE" : {
+          "SERVICETASKRESULTVARIABLE" : {
+            "TITLE" : "Result variable name",
+            "DESCRIPTION" : "Process variable name to store the service task result."
+          }
+        },
+        "SERVICETASKRESULTVARIABLEPACKAGE" : {
+          "SERVICETASKUSELOCALSCOPEFORRESULTVARIABLE" : {
+            "TITLE" : "Use local scope for result variable",
+            "DESCRIPTION" : "Flag that marks that the used resultVariable needs to be saved as a local variable"
+          }
+        },
+        "SERVICETASKTRIGGERABLEPACKAGE" : {
+          "SERVICETASKTRIGGERABLE" : {
+            "TITLE" : "Set service task to be triggerable",
+            "DESCRIPTION" : "Sets the service task to be triggerable"
+          }
+        },
+        "SCRIPTFORMATPACKAGE" : {
+          "SCRIPTFORMAT" : {
+            "TITLE" : "Script format",
+            "DESCRIPTION" : "Script format of the script task."
+          }
+        },
+        "SCRIPTTEXTPACKAGE" : {
+          "SCRIPTTEXT" : {
+            "TITLE" : "Script",
+            "DESCRIPTION" : "Script text of the script task."
+          }
+        },
+        "SCRIPTAUTOSTOREVARIABLESPACKAGE" : {
+          "SCRIPTAUTOSTOREVARIABLES" : {
+            "TITLE" : "Auto Store Variables",
+            "DESCRIPTION" : "Automatically store all script variables to the process."
+          }
+        },
+        "SHELLCOMMANDPACKAGE" : {
+          "SHELLCOMMAND" : {
+            "TITLE" : "Command",
+            "DESCRIPTION" : "Shell task command"
+          }
+        },
+        "SHELLARG1PACKAGE" : {
+          "SHELLARG1" : {
+            "TITLE" : "Argument 1",
+            "DESCRIPTION" : "Shell commnad arg 1"
+          }
+        },
+        "SHELLARG2PACKAGE" : {
+          "SHELLARG2" : {
+            "TITLE" : "Argument 2",
+            "DESCRIPTION" : "Shell commnad arg 2"
+          }
+        },
+        "SHELLARG3PACKAGE" : {
+          "SHELLARG3" : {
+            "TITLE" : "Argument 3",
+            "DESCRIPTION" : "Shell commnad arg 3"
+          }
+        },
+        "SHELLARG4PACKAGE" : {
+          "SHELLARG4" : {
+            "TITLE" : "Argument 4",
+            "DESCRIPTION" : "Shell commnad arg 4"
+          }
+        },
+        "SHELLARG5PACKAGE" : {
+          "SHELLARG5" : {
+            "TITLE" : "Argument 5",
+            "DESCRIPTION" : "Shell commnad arg 5"
+          }
+        },
+        "SHELLWAITPACKAGE" : {
+          "SHELLWAIT" : {
+            "TITLE" : "Wait",
+            "DESCRIPTION" : "Flag to wait for shell command execution end"
+          }
+        },
+        "SHELLOUTPUTVARIABLEPACKAGE" : {
+          "SHELLOUTPUTVARIABLE" : {
+            "TITLE" : "Output variable",
+            "DESCRIPTION" : "Variable to store shell commnad output"
+          }
+        },
+        "SHELLERRORCODEVARIABLEPACKAGE" : {
+          "SHELLERRORCODEVARIABLE" : {
+            "TITLE" : "Error code variable",
+            "DESCRIPTION" : "Variable to store shell commnad error code"
+          }
+        },
+        "SHELLREDIRECTERRORPACKAGE" : {
+          "SHELLREDIRECTERROR" : {
+            "TITLE" : "Redirect error",
+            "DESCRIPTION" : "If true merge error output with standard output"
+          }
+        },
+        "SHELLCLEANENVPACKAGE" : {
+          "SHELLCLEANENV" : {
+            "TITLE" : "Clean env",
+            "DESCRIPTION" : "Clean shell execution environment"
+          }
+        },
+        "SHELLDIRECTORYPACKAGE" : {
+          "SHELLDIRECTORY" : {
+            "TITLE" : "Directory",
+            "DESCRIPTION" : "Shell process working directory"
+          }
+        },
+        "RULETASK_RULESPACKAGE" : {
+          "RULETASK_RULES" : {
+            "TITLE" : "Rules",
+            "DESCRIPTION" : "Rules of the rule task."
+          }
+        },
+        "RULETASK_VARIABLES_INPUTPACKAGE" : {
+          "RULETASK_VARIABLES_INPUT" : {
+            "TITLE" : "Input variables",
+            "DESCRIPTION" : "Input variables of the rule task."
+          }
+        },
+        "RULETASK_EXCLUDEPACKAGE" : {
+          "RULETASK_EXCLUDE" : {
+            "TITLE" : "Exclude",
+            "DESCRIPTION" : "Use the rules property as exclusion."
+          }
+        },
+        "RULETASK_RESULTPACKAGE" : {
+          "RULETASK_RESULT" : {
+            "TITLE" : "Result variable",
+            "DESCRIPTION" : "Result variable of the rule task."
+          }
+        },
+        "MAILTASKHEADERSPACKAGE" : {
+          "MAILTASKHEADERS" : {
+            "TITLE" : "Headers",
+            "DESCRIPTION" : "Line separated Mail headers (For example - X-Attribute: value)."
+          }
+        },
+        "MAILTASKTOPACKAGE" : {
+          "MAILTASKTO" : {
+            "TITLE" : "To",
+            "DESCRIPTION" : "The recipients if the e-mail. Multiple recipients are defined in a comma-separated list."
+          }
+        },
+        "MAILTASKFROMPACKAGE" : {
+          "MAILTASKFROM" : {
+            "TITLE" : "From",
+            "DESCRIPTION" : "The sender e-mail address. If not provided, the default configured from address is used."
+          }
+        },
+        "MAILTASKSUBJECTPACKAGE" : {
+          "MAILTASKSUBJECT" : {
+            "TITLE" : "Subject",
+            "DESCRIPTION" : "The subject of the e-mail."
+          }
+        },
+        "MAILTASKCCPACKAGE" : {
+          "MAILTASKCC" : {
+            "TITLE" : "Cc",
+            "DESCRIPTION" : "The cc's of the e-mail. Multiple recipients are defined in a comma-separated list"
+          }
+        },
+        "MAILTASKBCCPACKAGE" : {
+          "MAILTASKBCC" : {
+            "TITLE" : "Bcc",
+            "DESCRIPTION" : "The bcc's of the e-mail. Multiple recipients are defined in a comma-separated list"
+          }
+        },
+        "MAILTASKTEXTPACKAGE" : {
+          "MAILTASKTEXT" : {
+            "TITLE" : "Text",
+            "DESCRIPTION" : "The content of the e-mail, in case one needs to send plain none-rich e-mails. Can be used in combination with html, for e-mail clients that don't support rich content. The client will then fall back to this text-only alternative."
+          }
+        },
+        "MAILTASKHTMLPACKAGE" : {
+          "MAILTASKHTML" : {
+            "TITLE" : "Html",
+            "DESCRIPTION" : "A piece of HTML that is the content of the e-mail."
+          }
+        },
+        "MAILTASKCHARSETPACKAGE" : {
+          "MAILTASKCHARSET" : {
+            "TITLE" : "Charset",
+            "DESCRIPTION" : "Allows to change the charset of the email, which is necessary for many non-English languages. "
+          }
+        },
+        "HTTPTASKREQUESTMETHODPACKAGE" : {
+          "HTTPTASKREQUESTMETHOD" : {
+            "TITLE" : "Request method",
+            "DESCRIPTION" : "Request method (For example - GET,POST,PUT etc)."
+          }
+        },
+        "HTTPTASKREQUESTURLPACKAGE" : {
+          "HTTPTASKREQUESTURL" : {
+            "TITLE" : "Request URL",
+            "DESCRIPTION" : "Request URL (For example - http://flowable.org)."
+          }
+        },
+        "HTTPTASKREQUESTHEADERSPACKAGE" : {
+          "HTTPTASKREQUESTHEADERS" : {
+            "TITLE" : "Request headers",
+            "DESCRIPTION" : "Line separated HTTP request headers (For example - Content-Type: application/json)."
+          }
+        },
+        "HTTPTASKREQUESTBODYPACKAGE" : {
+          "HTTPTASKREQUESTBODYPACKAGE" : {
+            "TITLE" : "Request body",
+            "DESCRIPTION" : "Request body (For example- ${sampleBody})."
+          }
+        },
+        "HTTPTASKREQUESTBODYENCODINGPACKAGE" : {
+          "HTTPTASKREQUESTBODYENCODING" : {
+            "TITLE" : "Request body encoding",
+            "DESCRIPTION" : "Request body encoding (For example- UTF-8)."
+          }
+        },
+        "HTTPTASKREQUESTTIMEOUTPACKAGE" : {
+          "HTTPTASKREQUESTTIMEOUT" : {
+            "TITLE" : "Request timeout",
+            "DESCRIPTION" : "Timeout in milliseconds for the request (For example - 5000)."
+          }
+        },
+        "HTTPTASKDISALLOWREDIRECTSPACKAGE" : {
+          "HTTPTASKDISALLOWREDIRECTS" : {
+            "TITLE" : "Disallow redirects",
+            "DESCRIPTION" : "Flag to disallow HTTP redirects."
+          }
+        },
+        "HTTPTASKFAILSTATUSCODESPACKAGE" : {
+          "HTTPTASKFAILSTATUSCODES" : {
+            "TITLE" : "Fail status codes",
+            "DESCRIPTION" : "Comma separated list of HTTP response status codes to retry, for example 400,5XX."
+          }
+        },
+        "HTTPTASKHANDLESTATUSCODESPACKAGE" : {
+          "HTTPTASKHANDLESTATUSCODES" : {
+            "TITLE" : "Handle status codes",
+            "DESCRIPTION" : "Comma separated list of HTTP response status codes to ignore, for example 404,3XX."
+          }
+        },
+        "HTTPTASKIGNOREEXCEPTIONPACKAGE" : {
+          "HTTPTASKIGNOREEXCEPTION" : {
+            "TITLE" : "Ignore exception",
+            "DESCRIPTION" : "Flag to ignore exceptions."
+          }
+        },
+        "HTTPTASKSAVERESPONSEPARAMETERSTRANSIENTPACKAGE" : {
+          "HTTPTASKSAVERESPONSEPARAMETERSTRANSIENT" : {
+            "TITLE" : "Save response as a transient variable",
+            "DESCRIPTION" : "Flag indicating to store the response variable(s) transient"
+          }
+        },
+        "HTTPTASKSAVERESPONSEASJSONPACKAGE" : {
+          "HTTPTASKSAVERESPONSEASJSON" : {
+            "TITLE" : "Save response as JSON",
+            "DESCRIPTION" : "Flag indicating to store the response variable as a JSON variable instead of a String"
+          }
+        },
+        "SKIPEXPRESSIONPACKAGE" : {
+          "SKIPEXPRESSION" : {
+            "TITLE" : "Skip expression",
+            "DESCRIPTION" : "Skip an expression execution associated with task or association or not."
+          }
+        },
+        "HTTPTASKRESPONSEVARIABLENAMEPACKAGE" : {
+          "HTTPTASKRESPONSEVARIABLENAME" : {
+            "TITLE" : "Response variable name",
+            "DESCRIPTION" : "Define the variable name to store the http response."
+          }
+        },
+        "HTTPTASKSAVEREQUESTVARIABLESPACKAGE" : {
+          "HTTPTASKSAVEREQUESTVARIABLES" : {
+            "TITLE" : "Save request variables",
+            "DESCRIPTION" : "Flag to save request variables."
+          }
+        },
+        "HTTPTASKSAVERESPONSEPARAMETERSPACKAGE" : {
+          "HTTPTASKSAVERESPONSEPARAMETERS" : {
+            "TITLE" : "Save response status, headers",
+            "DESCRIPTION" : "Flag to save response status, headers etc."
+          }
+        },
+        "HTTPTASKRESULTVARIABLEPREFIXPACKAGE" : {
+          "HTTPTASKRESULTVARIABLEPREFIX" : {
+            "TITLE" : "Result variable prefix",
+            "DESCRIPTION" : "Prefix for the execution variable names."
+          }
+        },
+        "CALLACTIVITYCALLEDELEMENTPACKAGE" : {
+          "CALLACTIVITYCALLEDELEMENT" : {
+            "TITLE" : "Called element",
+            "DESCRIPTION" : "Process reference."
+          }
+        },
+        "CALLACTIVITYCALLEDELEMENTTYPEPACKAGE" : {
+          "CALLACTIVITYCALLEDELEMENTTYPE" : {
+            "TITLE" : "Called element type",
+            "DESCRIPTION" : "Type of the used process reference."
+          }
+        },
+        "CALLACTIVITYINPARAMETERSPACKAGE" : {
+          "CALLACTIVITYINPARAMETERS" : {
+            "TITLE" : "In parameters",
+            "DESCRIPTION" : "Definition of the input parameters"
+          }
+        },
+        "CALLACTIVITYOUTPARAMETERSPACKAGE" : {
+          "CALLACTIVITYOUTPARAMETERS" : {
+            "TITLE" : "Out parameters",
+            "DESCRIPTION" : "Definition of the output parameters"
+          }
+        },
+        "CALLACTIVITYINHERITVARIABLESPACKAGE" : {
+          "CALLACTIVITYINHERITVARIABLES" : {
+            "TITLE" : "Inherit variables in sub process",
+            "DESCRIPTION" : "Inherit parent process variables in the sub process."
+          }
+        },
+        "CALLACTIVITYSAMEDEPLOYMENTPACKAGE" : {
+          "CALLACTIVITYSAMEDEPLOYMENT" : {
+            "TITLE" : "Start the referenced process from the same deployment.",
+            "DESCRIPTION" : "Use the referenced process from the same deployment."
+          }
+        },
+        "CALLACTIVITYFALLBACKTODEFAULTTENANTPACKAGE" : {
+          "CALLACTIVITYFALLBACKTODEFAULTTENANT" : {
+            "TITLE" : "Fallback to default tenant",
+            "DESCRIPTION" : "Look for the definition by key in the default tenant when current tenant search fails."
+          }
+        },
+        "CALLACTIVITYPROCESSINSTANCENAMEPACKAGE" : {
+          "CALLACTIVITYPROCESSINSTANCENAME" : {
+            "TITLE" : "Process instance name",
+            "DESCRIPTION" : "An expression that resolves to the name of the child process instance"
+          }
+        },
+        "CALLACTIVITYINHERITBUSINESSKEYPACKAGE" : {
+          "CALLACTIVITYINHERITBUSINESSKEY" : {
+            "TITLE" : "Inherit business key",
+            "DESCRIPTION" : "Inherit the business key from the parent process."
+          }
+        },
+        "CALLACTIVITYUSELOCALSCOPEFOROUTPARAMETERSPACKAGE" : {
+          "CALLACTIVITYUSELOCALSCOPEFOROUTPARAMETERS" : {
+            "TITLE" : "Use local scope for out parameters",
+            "DESCRIPTION" : "Use local variable scope for out parameters."
+          }
+        },
+        "CALLACTIVITYBUSINESSKEYPACKAGE" : {
+          "CALLACTIVITYBUSINESSKEY" : {
+            "TITLE" : "Business key expression",
+            "DESCRIPTION" : "An expression that resolves to a business key for the child process instance"
+          }
+        },
+        "CALLACTIVITYCOMPLETEASYNCPACKAGE" : {
+          "CALLACTIVITYCOMPLETEASYNC" : {
+            "TITLE" : "Complete asynchronously",
+            "DESCRIPTION" : "If set, the child process ending and completing the call activity is done asynchronously. Useful when using parallel multi instance with a called process definition that has async tasks."
+          }
+        },
+        "CAMELTASKCAMELCONTEXTPACKAGE" : {
+          "CAMELTASKCAMELCONTEXT" : {
+            "TITLE" : "Camel context",
+            "DESCRIPTION" : "An optional camel context definition, if left empty the default is used."
+          }
+        },
+        "MULETASKENDPOINTURLPACKAGE" : {
+          "MULETASKENDPOINTURL" : {
+            "TITLE" : "Endpoint url",
+            "DESCRIPTION" : "A required endpoint url to sent the message to Mule."
+          }
+        },
+        "MULETASKLANGUAGEPACKAGE" : {
+          "MULETASKLANGUAGE" : {
+            "TITLE" : "Language",
+            "DESCRIPTION" : "A required definition for the language to resolve the payload expression, like juel."
+          }
+        },
+        "MULETASKPAYLOADEXPRESSIONPACKAGE" : {
+          "MULETASKPAYLOADEXPRESSION" : {
+            "TITLE" : "Payload expression",
+            "DESCRIPTION" : "A required definition for the payload of the message sent to Mule."
+          }
+        },
+        "MULETASKRESULTVARIABLEPACKAGE" : {
+          "MULETASKRESULTVARIABLE" : {
+            "TITLE" : "Result variable",
+            "DESCRIPTION" : "An optional result variable for the payload returned."
+          }
+        },
+        "CONDITIONSEQUENCEFLOWPACKAGE" : {
+          "CONDITIONSEQUENCEFLOWPACKAGE" : {
+            "TITLE" : "Flow condition",
+            "DESCRIPTION" : "The condition of the sequence flow"
+          }
+        },
+        "DEFAULTFLOWPACKAGE" : {
+          "DEFAULTFLOW" : {
+            "TITLE" : "Default flow",
+            "DESCRIPTION" : "Define the sequence flow as default"
+          }
+        },
+        "CONDITIONALFLOWPACKAGE" : {
+          "CONDITIONALFLOW" : {
+            "TITLE" : "Conditional flow",
+            "DESCRIPTION" : "Define the sequence flow with a condition"
+          }
+        },
+        "TIMERCYCLEDEFINITIONPACKAGE" : {
+          "TIMERCYCLEDEFINITION" : {
+            "TITLE" : "Time cycle (e.g. R3/PT10H)",
+            "DESCRIPTION" : "Define the timer with a ISO-8601 cycle."
+          }
+        },
+        "TIMERDATEDEFINITIONPACKAGE" : {
+          "TIMERDATEDEFINITION" : {
+            "TITLE" : "Time date in ISO-8601",
+            "DESCRIPTION" : "Define the timer with a ISO-8601 date definition."
+          }
+        },
+        "TIMERDURATIONDEFINITIONPACKAGE" : {
+          "TIMERDURATIONDEFINITION" : {
+            "TITLE" : "Time duration (e.g. PT5M)",
+            "DESCRIPTION" : "Define the timer with a ISO-8601 duration."
+          }
+        },
+        "TIMERENDDATEDEFINITIONPACKAGE" : {
+          "TIMERENDDATEDEFINITION" : {
+            "TITLE" : "Time End Date in ISO-8601",
+            "DESCRIPTION" : "Define the timer with a ISO-8601 duration."
+          }
+        },
+        "MESSAGEREFPACKAGE" : {
+          "MESSAGEREF" : {
+            "TITLE" : "Message reference",
+            "DESCRIPTION" : "Define the message name."
+          }
+        },
+        "SIGNALREFPACKAGE" : {
+          "SIGNALREF" : {
+            "TITLE" : "Signal reference",
+            "DESCRIPTION" : "Define the signal name."
+          }
+        },
+        "ERRORREFPACKAGE" : {
+          "ERRORREF" : {
+            "TITLE" : "Error reference",
+            "DESCRIPTION" : "Define the error name."
+          }
+        },
+        "CANCELACTIVITYPACKAGE" : {
+          "CANCELACTIVITY" : {
+            "TITLE" : "Cancel activity",
+            "DESCRIPTION" : "Should the activity be cancelled"
+          }
+        },
+        "INITIATORPACKAGE" : {
+          "INITIATOR" : {
+            "TITLE" : "Initiator",
+            "DESCRIPTION" : "Initiator of the process."
+          }
+        },
+        "TEXTPACKAGE" : {
+          "TEXT" : {
+            "TITLE" : "Text",
+            "DESCRIPTION" : "The text of the text annotation."
+          }
+        },
+        "MULTIINSTANCE_TYPEPACKAGE" : {
+          "MULTIINSTANCE_TYPE" : {
+            "TITLE" : "Multi-instance type",
+            "DESCRIPTION" : "Repeated activity execution (parallel or sequential) can be displayed through different loop types"
+          }
+        },
+        "MULTIINSTANCE_CARDINALITYPACKAGE" : {
+          "MULTIINSTANCE_CARDINALITY" : {
+            "TITLE" : "Cardinality (Multi-instance)",
+            "DESCRIPTION" : "Define the cardinality of multi instance."
+          }
+        },
+        "MULTIINSTANCE_COLLECTIONPACKAGE" : {
+          "MULTIINSTANCE_COLLECTION" : {
+            "TITLE" : "Collection (Multi-instance)",
+            "DESCRIPTION" : "Define the collection for the multi instance."
+          }
+        },
+        "MULTIINSTANCE_VARIABLEPACKAGE" : {
+          "MULTIINSTANCE_VARIABLE" : {
+            "TITLE" : "Element variable (Multi-instance)",
+            "DESCRIPTION" : "Define the element variable for the multi instance."
+          }
+        },
+        "MULTIINSTANCE_CONDITIONPACKAGE" : {
+          "MULTIINSTANCE_CONDITION" : {
+            "TITLE" : "Completion condition (Multi-instance)",
+            "DESCRIPTION" : "Define the completion condition for the multi instance."
+          }
+        },
+        "ISFORCOMPENSATIONPACKAGE" : {
+          "ISFORCOMPENSATION" : {
+            "TITLE" : "Is for compensation",
+            "DESCRIPTION" : "A flag that identifies whether this activity is intended for the purposes of compensation."
+          }
+        },
+        "SEQUENCEFLOWORDERPACKAGE" : {
+          "SEQUENCEFLOWORDER" : {
+            "TITLE" : "Flow order",
+            "DESCRIPTION" : "Order outgoing sequence flows."
+          }
+        },
+        "SIGNALDEFINITIONSPACKAGE" : {
+          "SIGNALDEFINITIONS" : {
+            "TITLE" : "Signal definitions",
+            "DESCRIPTION" : "Signal definitions"
+          }
+        },
+        "MESSAGEDEFINITIONSPACKAGE" : {
+          "MESSAGEDEFINITIONS" : {
+            "TITLE" : "Message definitions",
+            "DESCRIPTION" : "Message definitions"
+          }
+        },
+        "ISTRANSACTIONPACKAGE" : {
+          "ISTRANSACTION" : {
+            "TITLE" : "Is a transaction sub process",
+            "DESCRIPTION" : "A flag that identifies whether this sub process is of type transaction."
+          }
+        },
+        "FORMREFERENCEPACKAGE" : {
+          "FORMREFERENCE" : {
+            "TITLE" : "Form reference",
+            "DESCRIPTION" : "Reference to a form"
+          }
+        },
+        "TERMINATEALLPACKAGE" : {
+          "TERMINATEALL" : {
+            "TITLE" : "Terminate all",
+            "DESCRIPTION" : "Enable to terminate the process instance"
+          }
+        },
+        "DECISIONTASKDECISIONTABLEREFERENCEPACKAGE" : {
+          "DECISIONTASKDECISIONTABLEREFERENCE" : {
+            "TITLE" : "Decision table reference",
+            "DESCRIPTION" : "Set the decision table reference"
+          }
+        },
+        "DECISIONTASKTHROWERRORONNOHITSPACKAGE" : {
+          "DECISIONTASKTHROWERRORONNOHITS" : {
+            "TITLE" : "Throw error if no rules were hit",
+            "DESCRIPTION" : "Should an error be thrown if no rules of the decision table were hit and consequently no result was found."
+          }
+        },
+        "DECISIONTASKFALLBACKTODEFAULTTENANTPACKAGE" : {
+          "DECISIONTASKFALLBACKTODEFAULTTENANT" : {
+            "TITLE" : "Fallback to default tenant",
+            "DESCRIPTION" : "Find decision definition without tenant when previous attemps to find it with tenant failed."
+          }
+        },
+        "INTERRUPTINGPACKAGE" : {
+          "INTERRUPTING" : {
+            "TITLE" : "Interrupting",
+            "DESCRIPTION" : "Should all parent executions be terminated?"
+          }
+        },
+        "COMPLETIONCONDITIONPACKAGE" : {
+          "COMPLETIONCONDITION" : {
+            "TITLE" : "Completion condition",
+            "DESCRIPTION" : "The completion condition for the adhoc sub process"
+          }
+        },
+        "ORDERINGPACKAGE" : {
+          "ORDERING" : {
+            "TITLE" : "Ordering",
+            "DESCRIPTION" : "The ordering for the adhoc sub process"
+          }
+        },
+        "CANCELREMAININGINSTANCESPACKAGE" : {
+          "CANCELREMAININGINSTANCES" : {
+            "TITLE" : "Cancel remaining instances",
+            "DESCRIPTION" : "Cancel the remaining instances for the adhoc sub process?"
+          }
+        }
+
+      },
+      "STENCILS" : {
+        "GROUPS" : {
+          "STARTEVENTS" : "Start Events",
+          "ENDEVENTS" : "End Events",
+          "DIAGRAM" : "Diagram",
+          "ACTIVITIES" : "Activities",
+          "STRUCTURAL" : "Structural",
+          "GATEWAYS" : "Gateways",
+          "BOUNDARYEVENTS" : "Boundary Events",
+          "INTERMEDIATECATCHINGEVENTS" : "Intermediate Catching Events",
+          "INTERMEDIATETHROWINGEVENTS" : "Intermediate Throwing Events",
+          "SWIMLANES" : "Swimlanes",
+          "CONNECTINGOBJECTS" : "Connecting Objects",
+          "ARTIFACTS" : "Artifacts"
+        },
+        "BPMNDIAGRAM" : {
+          "TITLE" : "BPMN-Diagram",
+          "DESCRIPTION" : "A BPMN 2.0 diagram."
+        },
+        "STARTNONEEVENT" : {
+          "TITLE" : "Start event",
+          "DESCRIPTION" : "A start event without a specific trigger"
+        },
+        "STARTTIMEREVENT" : {
+          "TITLE" : "Start timer event",
+          "DESCRIPTION" : "A start event with a timer trigger"
+        },
+        "STARTSIGNALEVENT" : {
+          "TITLE" : "Start signal event",
+          "DESCRIPTION" : "A start event with a signal trigger"
+        },
+        "STARTMESSAGEEVENT" : {
+          "TITLE" : "Start message event",
+          "DESCRIPTION" : "A start event with a message trigger"
+        },
+        "STARTERROREVENT" : {
+          "TITLE" : "Start error event",
+          "DESCRIPTION" : "A start event that catches a thrown BPMN error"
+        },
+        "USERTASK" : {
+          "TITLE" : "User task",
+          "DESCRIPTION" : "A manual task assigned to a specific person"
+        },
+        "SERVICETASK" : {
+          "TITLE" : "Service task",
+          "DESCRIPTION" : "An automatic task with service logic"
+        },
+        "SCRIPTTASK" : {
+          "TITLE" : "Script task",
+          "DESCRIPTION" : "An automatic task with script logic"
+        },
+        "BUSINESSRULE" : {
+          "TITLE" : "Business rule task",
+          "DESCRIPTION" : "An automatic task with rule logic"
+        },
+        "RECEIVETASK" : {
+          "TITLE" : "Receive task",
+          "DESCRIPTION" : "An task that waits for a signal"
+        },
+        "MANUALTASK" : {
+          "TITLE" : "Manual task",
+          "DESCRIPTION" : "An automatic task with no logic"
+        },
+        "MAILTASK" : {
+          "TITLE" : "Mail task",
+          "DESCRIPTION" : "An mail task"
+        },
+        "CAMELTASK" : {
+          "TITLE" : "Camel task",
+          "DESCRIPTION" : "An task that sends a message to Camel"
+        },
+        "HTTPTASK" : {
+          "TITLE" : "Http task",
+          "DESCRIPTION" : "A HTTP task"
+        },
+        "MULETASK" : {
+          "TITLE" : "Mule task",
+          "DESCRIPTION" : "An task that sends a message to Mule"
+        },
+        "SENDTASK" : {
+          "TITLE" : "Send task",
+          "DESCRIPTION" : "An task that sends a message"
+        },
+        "DECISIONTASK" : {
+          "TITLE" : "Decision task",
+          "DESCRIPTION" : "Task to use the Flowable DMN rule engine"
+        },
+        "SHELLTASK" : {
+          "TITLE" : "Shell task",
+          "DESCRIPTION" : "An automatic task with shell batch logic"
+        },
+        "SUBPROCESS" : {
+          "TITLE" : "Sub process",
+          "DESCRIPTION" : "A sub process scope"
+        },
+        "COLLAPSEDSUBPROCESS" : {
+          "TITLE" : "Collapsed Sub process",
+          "DESCRIPTION" : "A sub process scope"
+        },
+        "EVENTSUBPROCESS" : {
+          "TITLE" : "Event sub process",
+          "DESCRIPTION" : "A event sub process scope"
+        },
+        "CALLACTIVITY" : {
+          "TITLE" : "Call activity",
+          "DESCRIPTION" : "A call activity"
+        },
+        "EXCLUSIVEGATEWAY" : {
+          "TITLE" : "Exclusive gateway",
+          "DESCRIPTION" : "A choice gateway"
+        },
+        "PARALLELGATEWAY" : {
+          "TITLE" : "Parallel gateway",
+          "DESCRIPTION" : "A parallel gateway"
+        },
+        "INCLUSIVEGATEWAY" : {
+          "TITLE" : "Inclusive gateway",
+          "DESCRIPTION" : "An inclusive gateway"
+        },
+        "EVENTGATEWAY" : {
+          "TITLE" : "Event gateway",
+          "DESCRIPTION" : "An event gateway"
+        },
+        "BOUNDARYERROREVENT" : {
+          "TITLE" : "Boundary error event",
+          "DESCRIPTION" : "A boundary event that catches a BPMN error"
+        },
+        "BOUNDARYTIMEREVENT" : {
+          "TITLE" : "Boundary timer event",
+          "DESCRIPTION" : "A boundary event with a timer trigger"
+        },
+        "BOUNDARYSIGNALEVENT" : {
+          "TITLE" : "Boundary signal event",
+          "DESCRIPTION" : "A boundary event with a signal trigger"
+        },
+        "BOUNDARYMESSAGEEVENT" : {
+          "TITLE" : "Boundary message event",
+          "DESCRIPTION" : "A boundary event with a message trigger"
+        },
+        "BOUNDARYCANCELEVENT" : {
+          "TITLE" : "Boundary cancel event",
+          "DESCRIPTION" : "A boundary cancel event"
+        },
+        "BOUNDARYCOMPENSATIONEVENT" : {
+          "TITLE" : "Boundary compensation event",
+          "DESCRIPTION" : "A boundary compensation event"
+        },
+        "CATCHTIMEREVENT" : {
+          "TITLE" : "Intermediate timer catching event",
+          "DESCRIPTION" : "An intermediate catching event with a timer trigger"
+        },
+        "CATCHSIGNALEVENT" : {
+          "TITLE" : "Intermediate signal catching event",
+          "DESCRIPTION" : "An intermediate catching event with a signal trigger"
+        },
+        "CATCHMESSAGEEVENT" : {
+          "TITLE" : "Intermediate message catching event",
+          "DESCRIPTION" : "An intermediate catching event with a message trigger"
+        },
+        "THROWNONEEVENT" : {
+          "TITLE" : "Intermediate none throwing event",
+          "DESCRIPTION" : "An intermediate event without a specific trigger"
+        },
+        "THROWSIGNALEVENT" : {
+          "TITLE" : "Intermediate signal throwing event",
+          "DESCRIPTION" : "An intermediate event with a signal trigger"
+        },
+        "ENDNONEEVENT" : {
+          "TITLE" : "End event",
+          "DESCRIPTION" : "An end event without a specific trigger"
+        },
+        "ENDERROREVENT" : {
+          "TITLE" : "End error event",
+          "DESCRIPTION" : "An end event that throws an error event"
+        },
+        "ENDCANCELEVENT" : {
+          "TITLE" : "End cancel event",
+          "DESCRIPTION" : "A cancel end event"
+        },
+        "ENDTERMINATEEVENT" : {
+          "TITLE" : "End terminate event",
+          "DESCRIPTION" : "A terminate end event"
+        },
+        "POOL" : {
+          "TITLE" : "Pool",
+          "DESCRIPTION" : "A pool to stucture the process definition"
+        },
+        "LANE" : {
+          "TITLE" : "Lane",
+          "DESCRIPTION" : "A lane to stucture the process definition"
+        },
+        "SEQUENCEFLOW" : {
+          "TITLE" : "Sequence flow",
+          "DESCRIPTION" : "Sequence flow defines the execution order of activities."
+        },
+        "MESSAGEFLOW" : {
+          "TITLE" : "Message flow",
+          "DESCRIPTION" : "Message flow to connect elements in different pools."
+        },
+        "ASSOCIATION" : {
+          "TITLE" : "Association",
+          "DESCRIPTION" : "Associates a text annotation with an element."
+        },
+        "DATAASSOCIATION" : {
+          "TITLE" : "DataAssociation",
+          "DESCRIPTION" : "Associates a data element with an activity."
+        },
+        "TEXTANNOTATION" : {
+          "TITLE" : "Text annotation",
+          "DESCRIPTION" : "Annotates elements with description text."
+        },
+        "DATASTORE" : {
+          "TITLE" : "Data store",
+          "DESCRIPTION" : "Reference to a data store."
+        },
+        "ADHOCSUBPROCESS" : {
+          "TITLE" : "Adhoc sub process",
+          "DESCRIPTION" : "An adhoc sub process"
+        }
+      }
+    },
+
+    "CMMN" : {
+      "TITLE": "CMMN editor",
+      "DESCRIPTION": "CMMN case editor",
+      "PROPERTYPACKAGES": {
+        "CASE_IDPACKAGE": {
+          "CASE_ID": {
+            "TITLE": "Case identifier",
+            "DESCRIPTION": "Unique identifier of the case definition."
+          }
+        },
+        "OVERRIDEIDPACKAGE": {
+          "OVERRIDEID": {
+            "TITLE": "Id",
+            "DESCRIPTION": "Unique identifier of the element."
+          }
+        },
+        "NAMEPACKAGE": {
+          "NAME": {
+            "TITLE": "Name",
+            "DESCRIPTION": "The descriptive name of the CMMN element."
+          }
+        },
+        "DOCUMENTATIONPACKAGE": {
+          "DOCUMENTATION": {
+            "TITLE": "Documentation",
+            "DESCRIPTION": "The descriptive name of the CMMN element."
+          }
+        },
+        "BLOCKINGPACKAGE": {
+          "ISBLOCKING": {
+            "TITLE": "Blocking",
+            "DESCRIPTION": "Boolean property, default true. If false the task will automatically complete the task after executing any associated logic"
+          },
+          "ISBLOCKINGEXPRESSION": {
+            "TITLE": "Blocking expression",
+            "DESCRIPTION": "An expression to control at runtime whether this task is blocking or not. When set, the value of the blocking property is ignored."
+          }
+        },
+        "CASE_INITIATORVARIABLENAMEPACKAGE": {
+          "CASE_INITIATORVARIABLENAME": {
+            "TITLE": "Initiator variable name",
+            "DESCRIPTION": "Sets the variable name to be used for the case initiator value."
+          }
+        },
+        "CASE_AUTHORPACKAGE": {
+          "CASE_AUTHOR": {
+            "TITLE": "Case author",
+            "DESCRIPTION": "Author of the case definition."
+          }
+        },
+        "CASE_VERSIONPACKAGE": {
+          "CASE_VERSION": {
+            "TITLE": "Case version string (documentation only)",
+            "DESCRIPTION": "Version identifier for documentation purpose."
+          }
+        },
+        "CASE_NAMESPACEPACKAGE": {
+          "CASE_NAMESPACE": {
+            "TITLE": "Target namespace",
+            "DESCRIPTION": "Target namespace for the case definition."
+          }
+        },
+        "USERTASKASSIGNMENTPACKAGE": {
+          "USERTASKASSIGNMENT": {
+            "TITLE": "Assignments",
+            "DESCRIPTION": "Assignment definition for the user task"
+          }
+        },
+        "TASKLISTENERSPACKAGE": {
+          "TASKLISTENERS": {
+            "TITLE": "Task listeners",
+            "DESCRIPTION": "Listeners for a human task"
+          }
+        },
+        "FORMPROPERTIESPACKAGE": {
+          "FORMPROPERTIES": {
+            "TITLE": "Form properties",
+            "DESCRIPTION": "Definition of the form with a list of form properties"
+          }
+        },
+        "FORMKEYDEFINITIONPACKAGE": {
+          "FORMKEYDEFINITION": {
+            "TITLE": "Form key",
+            "DESCRIPTION": "Form key that provides a reference to a form."
+          }
+        },
+        "FORMFIELDVALIDATIONPACKAGE": {
+          "FORMFIELDVALIDATION": {
+            "TITLE": "Validate form fields",
+            "DESCRIPTION": "Validate form fields on the form submission. (allowed values are 'true', 'false' or expression)"
+          }
+        },
+        "DUEDATEDEFINITIONPACKAGE": {
+          "DUEDATEDEFINITION": {
+            "TITLE": "Due date",
+            "DESCRIPTION": "Due date of the user task."
+          }
+        },
+        "PRIORITYDEFINITIONPACKAGE": {
+          "PRIORITYDEFINITION": {
+            "TITLE": "Priority",
+            "DESCRIPTION": "Priority of the user task."
+          }
+        },
+        "SERVICETASKCLASSPACKAGE": {
+          "SERVICETASKCLASS": {
+            "TITLE": "Class",
+            "DESCRIPTION": "Class that implements the service task logic."
+          }
+        },
+        "SERVICETASKEXPRESSIONPACKAGE": {
+          "SERVICETASKEXPRESSION": {
+            "TITLE": "Expression",
+            "DESCRIPTION": "Service task logic defined with an expression."
+          }
+        },
+        "SERVICETASKDELEGATEEXPRESSIONPACKAGE": {
+          "SERVICETASKDELEGATEEXPRESSION": {
+            "TITLE": "Delegate expression",
+            "DESCRIPTION": "Service task logic defined with a delegate expression."
+          }
+        },
+        "SERVICETASKFIELDSPACKAGE": {
+          "SERVICETASKFIELDS": {
+            "TITLE": "Class fields",
+            "DESCRIPTION": "Field extensions"
+          }
+        },
+        "SERVICETASKRESULTVARIABLEPACKAGE": {
+          "SERVICETASKRESULTVARIABLE": {
+            "TITLE": "Result variable name",
+            "DESCRIPTION": "Process variable name to store the service task result."
+          }
+        },
+        "ASYNCPACKAGE": {
+          "ISASYNC": {
+            "TITLE": "Asynchronous",
+            "DESCRIPTION": "Indicates if the task needs to be executed asynchronously."
+          },
+          "ISEXCLUSIVE": {
+            "TITLE": "Exclusive",
+            "DESCRIPTION": "Indicates if an asynchronous task must be executed exclusively"
+          }
+        },
+        "MAILTASKHEADERSPACKAGE": {
+          "MAILTASKHEADERS": {
+            "TITLE": "Headers",
+            "DESCRIPTION": "Line separated Mail headers (For example - X-Attribute: value)."
+          }
+        },
+        "MAILTASKTOPACKAGE": {
+          "MAILTASKTO": {
+            "TITLE": "To",
+            "DESCRIPTION": "The recipients if the e-mail. Multiple recipients are defined in a comma-separated list."
+          }
+        },
+        "MAILTASKFROMPACKAGE": {
+          "MAILTASKFROM": {
+            "TITLE": "From",
+            "DESCRIPTION": "The sender e-mail address. If not provided, the default configured from address is used."
+          }
+        },
+        "MAILTASKSUBJECTPACKAGE": {
+          "MAILTASKSUBJECT": {
+            "TITLE": "Subject",
+            "DESCRIPTION": "The subject of the e-mail."
+          }
+        },
+        "MAILTASKCCPACKAGE": {
+          "MAILTASKCC": {
+            "TITLE": "Cc",
+            "DESCRIPTION": "The cc's of the e-mail. Multiple recipients are defined in a comma-separated list"
+          }
+        },
+        "MAILTASKBCCPACKAGE": {
+          "MAILTASKBCC": {
+            "TITLE": "Bcc",
+            "DESCRIPTION": "The bcc's of the e-mail. Multiple recipients are defined in a comma-separated list"
+          }
+        },
+        "MAILTASKTEXTPACKAGE": {
+          "MAILTASKTEXT": {
+            "TITLE": "Text",
+            "DESCRIPTION": "The content of the e-mail, in case one needs to send plain none-rich e-mails. Can be used in combination with html, for e-mail clients that don't support rich content. The client will then fall back to this text-only alternative."
+          }
+        },
+        "MAILTASKHTMLPACKAGE": {
+          "MAILTASKHTML": {
+            "TITLE": "Html",
+            "DESCRIPTION": "A piece of HTML that is the content of the e-mail."
+          }
+        },
+        "MAILTASKCHARSETPACKAGE": {
+          "MAILTASKCHARSET": {
+            "TITLE": "Charset",
+            "DESCRIPTION": "Allows to change the charset of the email, which is necessary for many non-English languages. "
+          }
+        },
+        "TEXTPACKAGE": {
+          "TEXT": {
+            "TITLE": "TEXT",
+            "DESCRIPTION": "The text of the text annotation."
+          }
+        },
+        "FORMREFERENCEPACKAGE": {
+          "FORMREFERENCE": {
+            "TITLE": "Form reference",
+            "DESCRIPTION": "Reference to a form"
+          }
+        },
+        "DECISIONTASKDECISIONTABLEREFERENCEPACKAGE": {
+          "DECISIONTASKDECISIONTABLEREFERENCE": {
+            "TITLE": "Decision table reference",
+            "DESCRIPTION": "Set the decision table reference"
+          }
+        },
+        "DECISIONTASKTHROWERRORONNOHITSPACKAGE": {
+          "DECISIONTASKTHROWERRORONNOHITS": {
+            "TITLE": "Throw error if no rules were hit",
+            "DESCRIPTION": "Should an error be thrown if no rules of the decision table were hit and consequently no result was found."
+          }
+        },
+        "DECISIONTASKFALLBACKTODEFAULTTENANTPACKAGE": {
+          "DECISIONTASKFALLBACKTODEFAULTTENANT": {
+            "TITLE": "Fallback to default tenant",
+            "DESCRIPTION": "Find decision definition without tenant when previous attemps to find it with tenant failed."
+          }
+        },
+        "HTTPTASKREQUESTMETHODPACKAGE": {
+          "HTTPTASKREQUESTMETHOD": {
+            "TITLE": "Request method",
+            "DESCRIPTION": "Request method (For example - GET,POST,PUT etc)."
+          }
+        },
+        "HTTPTASKREQUESTURLPACKAGE": {
+          "HTTPTASKREQUESTURL": {
+            "TITLE": "Request URL",
+            "DESCRIPTION": "Request URL (For example - http://flowable.org)"
+          }
+        },
+        "HTTPTASKREQUESTHEADERSPACKAGE": {
+          "HTTPTASKREQUESTHEADERS": {
+            "TITLE": "Request headers",
+            "DESCRIPTION": "Line separated HTTP request headers (For example - Content-Type: application/json)."
+          }
+        },
+        "HTTPTASKREQUESTBODYPACKAGE": {
+          "HTTPTASKREQUESTBODY": {
+            "TITLE": "Request body",
+            "DESCRIPTION": "Request body (For example- ${sampleBody})."
+          }
+        },
+        "HTTPTASKREQUESTBODYENCODINGPACKAGE": {
+          "HTTPTASKREQUESTBODYENCODING": {
+            "TITLE": "Request body encoding",
+            "DESCRIPTION": "Request body encoding (For example- UTF-8)."
+          }
+        },
+        "HTTPTASKREQUESTTIMEOUTPACKAGE": {
+          "HTTPTASKREQUESTTIMEOUT": {
+            "TITLE": "Request timeout",
+            "DESCRIPTION": "Timeout in milliseconds for the request (For example - 5000)."
+          }
+        },
+        "HTTPTASKDISALLOWREDIRECTSPACKAGE": {
+          "HTTPTASKDISALLOWREDIRECTS": {
+            "TITLE": "Disallow redirects",
+            "DESCRIPTION": "Flag to disallow HTTP redirects."
+          }
+        },
+        "HTTPTASKFAILSTATUSCODESPACKAGE": {
+          "HTTPTASKFAILSTATUSCODES": {
+            "TITLE": "Fail status codes",
+            "DESCRIPTION": "Comma separated list of HTTP response status codes to retry, for example 400,5XX."
+          }
+        },
+        "HTTPTASKHANDLESTATUSCODESPACKAGE": {
+          "HTTPTASKHANDLESTATUSCODES": {
+            "TITLE": "Handle status codes",
+            "DESCRIPTION": "Comma separated list of HTTP response status codes to ignore, for example 404,3XX."
+          }
+        },
+        "HTTPTASKIGNOREEXCEPTIONPACKAGE": {
+          "HTTPTASKIGNOREEXCEPTION": {
+            "TITLE": "Ignore exception",
+            "DESCRIPTION": "Flag to ignore exceptions."
+          }
+        },
+        "HTTPTASKRESPONSEVARIABLENAMEPACKAGE": {
+          "HTTPTASKRESPONSEVARIABLENAME": {
+            "TITLE": "Response variable name",
+            "DESCRIPTION": "Define the variable name to store the http response."
+          }
+        },
+        "HTTPTASKSAVEREQUESTVARIABLESPACKAGE": {
+          "HTTPTASKSAVEREQUESTVARIABLES": {
+            "TITLE": "Save request variables",
+            "DESCRIPTION": "Flag to save request variables."
+          }
+        },
+        "HTTPTASKSAVERESPONSEPARAMETERSPACKAGE": {
+          "HTTPTASKSAVERESPONSEPARAMETERS": {
+            "TITLE": "Save response status, headers",
+            "DESCRIPTION": "Flag to save response status, headers etc."
+          }
+        },
+        "HTTPTASKRESULTVARIABLEPREFIXPACKAGE": {
+          "HTTPTASKRESULTVARIABLEPREFIX": {
+            "TITLE": "Result variable prefix",
+            "DESCRIPTION": "Prefix for the execution variable names."
+          }
+        },
+        "HTTPTASKSAVERESPONSEPARAMETERSTRANSIENTPACKAGE": {
+          "HTTPTASKSAVERESPONSEPARAMETERSTRANSIENT": {
+            "TITLE": "Save response as a transient variable",
+            "DESCRIPTION": "Flag indicating to store the response variable(s) transient"
+          }
+        },
+        "HTTPTASKSAVERESPONSEASJSONPACKAGE": {
+          "HTTPTASKSAVERESPONSEASJSON": {
+            "TITLE": "Save response as JSON",
+            "DESCRIPTION": "Flag indicating to store the response variable as a JSON variable instead of a String"
+          }
+        },
+        "CASETASKCASEREFERENCEPACKAGE": {
+          "CASETASKCASEREFERENCE": {
+            "TITLE": "Case reference",
+            "DESCRIPTION": "Set the case reference"
+          }
+        },
+        "PROCESSTASKPROCESSREFERENCEPACKAGE": {
+          "PROCESSTASKPROCESSREFERENCE": {
+            "TITLE": "Process reference",
+            "DESCRIPTION": "Set the process reference"
+          }
+        },
+        "FALLBACKTODEFAULTTENANTPACKAGE": {
+          "FALLBACKTODEFAULTTENANT": {
+            "TITLE": "Fallback to default tenant",
+            "DESCRIPTION": "Use default tenant as a fallback when definition is not found by key in the specified tenant"
+          }
+        },
+        "PROCESSTASKINPARAMETERSPACKAGE": {
+          "PROCESSTASKINPARAMETERS": {
+            "TITLE": "In parameters",
+            "DESCRIPTION": "Definition of the input parameters"
+          }
+        },
+        "PROCESSTASKOUTPARAMETERSPACKAGE": {
+          "PROCESSTASKOUTPARAMETERS": {
+            "TITLE": "Out parameters",
+            "DESCRIPTION": "Definition of the output parameters"
+          }
+        },
+        "TIMEREXPRESSIONPACKAGE": {
+          "TIMEREXPRESSION": {
+            "TITLE": "Timer Expression",
+            "DESCRIPTION": "An ISO-8601 string or an expression that resolves to either an ISO-8601 string or a java.util.Date"
+          }
+        },
+        "TIMERSTARTTRIGGERPACKAGE": {
+          "TIMERSTARTTRIGGERSOURCEREF": {
+            "TITLE": "Start trigger plan item",
+            "DESCRIPTION": "A reference to the plan item for which the configured standard event needs to happen to start the timer (optional)"
+          },
+          "TRANSITIONEVENT": {
+            "TITLE": "Start trigger transition event",
+            "DESCRIPTION": "The type of the transition event. Only used when the start trigger plan item is set"
+          }
+        },
+        "DECISIONTASKDECISIONREFERENCEPACKAGE": {
+          "DECISIONTASKDECISIONREFERENCE": {
+            "TITLE": "Decision reference",
+            "DESCRIPTION": "Set the decision reference"
+          }
+        },
+        "IFPARTCONDITIONPACKAGE": {
+          "IFPARTCONDITION": {
+            "TITLE": "Condition",
+            "DESCRIPTION": ""
+          }
+        },
+        "TRIGGERMODEPACKAGE": {
+          "TRIGGERMODE": {
+            "TITLE": "Trigger mode",
+            "DESCRIPTION": "Determines if the sentry conditions are evaluated with memory (default) of without (on-event). The default means that the parts (on- and ifparts) of a sentry being satisfied will be stored. Subsequent evaluations will use the stored parts when the sentry is re-evaluated. Using 'on-event', all parts are evaluated and if all are true the sentry is satisfied. If not, all results are discarded and not stored."
+          }
+        },
+        "AUTOCOMPLETEPACKAGE": {
+          "AUTOCOMPLETEENABLED": {
+            "TITLE": "Auto complete",
+            "DESCRIPTION": "Flag indicating that the stage will automatically complete, once all required children are in an end state and no other children are active."
+          },
+          "AUTOCOMPLETECONDITION": {
+            "TITLE": "Auto complete condition",
+            "DESCRIPTION": "An expression that is resolved to if the stage can automatically complere."
+          }
+        },
+        "REQUIREDRULEPACKAGE": {
+          "REQUIREDENABLED": {
+            "TITLE": "Required",
+            "DESCRIPTION": "Flag indicating if the stage, task or milestone is required when determining the parent stage completion. By default false."
+          },
+          "REQUIREDRULECONDITION": {
+            "TITLE": "Required Rule",
+            "DESCRIPTION": "An expression that is resolved to determine if the stage, task or milestone is required when determining the parent stage completion."
+          }
+        },
+        "REPETITIONRULEPACKAGE": {
+          "REPETITIONENABLED": {
+            "TITLE": "Repetition",
+            "DESCRIPTION": "Flag indicating if repetition is enabled"
+          },
+          "REPETITIONRULECONDITION": {
+            "TITLE": "Repetition Rule",
+            "DESCRIPTION": "An expression that is resolved to determine if new instances of the planitem need to be created"
+          },
+          "REPETITIONCOUNTERVARIABLENAME": {
+            "TITLE": "Repetition counter variable",
+            "DESCRIPTION": "The name of the local variable which stores the instance counter of the repetition. Default value is 'repetitionCounter'."
+          }
+        },
+        "MANUALACTIVATIONRULEPACKAGE": {
+          "MANUALACTIVATIONENABLED": {
+            "TITLE": "Manual activation",
+            "DESCRIPTION": "Flag indicating if the task or stage needs to be manually activated. False by default."
+          },
+          "MANUALACTIVATIONRULECONDITION": {
+            "TITLE": "Manual activation Rule",
+            "DESCRIPTION": "An expression that is resolved to determine if the stage or task needs to be manually activated."
+          }
+        },
+        "COMPLETIONNEUTRALRULEPACKAGE": {
+          "COMPLETIONNEUTRALENABLED": {
+            "TITLE": "Completion neutral",
+            "DESCRIPTION": "Flag indicating if the plan item is completion neutral. False by default."
+          },
+          "COMPLETIONNEUTRALRULECONDITION": {
+            "TITLE": "Completion neutral Rule",
+            "DESCRIPTION": "An expression that is resolved to determine if the plan item is completion neutral."
+          }
+        },
+        "PLANITEMLIFECYCLELISTENERSPACKAGE": {
+          "PLANITEMLIFECYCLELISTENERS": {
+            "TITLE": "Lifecycle listeners",
+            "DESCRIPTION": "Listeners for lifecycle events of a plan item"
+          }
+        },
+        "DISPLAYORDERPACKAGE": {
+          "DISPLAYORDER": {
+            "TITLE": "Display order",
+            "DESCRIPTION": "A number value indicating the order compared to other stages when getting or showing a stage overview."
+          }
+        },
+        "INCLUDEINSTAGEOVERVIEWPACKAGE": {
+          "INCLUDEINSTAGEOVERVIEW": {
+            "TITLE": "Include in overview",
+            "DESCRIPTION": "Indicates if this stage should be considered for the stage overview"
+          }
+        },
+        "SCRIPTFORMATPACKAGE": {
+          "SCRIPTFORMAT": {
+            "TITLE": "Script format",
+            "DESCRIPTION": "Script format of the script task (JavaScript, groovy, etc)."
+          }
+        },
+        "SCRIPTTEXTPACKAGE": {
+          "SCRIPTTEXT": {
+            "TITLE": "Script",
+            "DESCRIPTION": "Script text of the script task."
+          }
+        },
+        "TRANSITIONEVENTPACKAGE": {
+          "TRANSITIONEVENT": {
+            "TITLE": "Transition event type",
+            "DESCRIPTION": "The type of the transition event"
+          }
+        },
+        "AVAILABLECONDITIONPACKAGE": {
+          "AVAILABLECONDITION": {
+            "TITLE": "Available condition",
+            "DESCRIPTION": "An optional condition expression on an event listener to indicate to determine when it becomes available."
+          }
+        }
+      },
+      "STENCILS" : {
+        "GROUPS" : {
+          "DIAGRAM" : "Diagram",
+          "CONTAINERS" : "Containers",
+          "ACTIVITIES" : "Activities",
+          "EVENTLISTENERS" : "Event Listeners",
+          "SENTRIES" : "Sentries",
+          "CONNECTORS" : "Connectors"
+        },
+        "CMMNDIAGRAM" : {
+          "TITLE" : "CMMN-Diagram",
+          "DESCRIPTION" : "A CMMN 2.0 diagram."
+        },
+        "CASEPLANMODEL" : {
+          "TITLE" : "Case plan model",
+          "DESCRIPTION" : "A case plan model"
+        },
+        "STAGE" : {
+          "TITLE" : "Stage",
+          "DESCRIPTION" : "A stage"
+        },
+        "TASK" : {
+          "TITLE" : "Task",
+          "DESCRIPTION" : "A manual task"
+        },
+        "HUMANTASK" : {
+          "TITLE" : "Human task",
+          "DESCRIPTION" : "A manual task assigned to a specific person"
+        },
+        "SERVICETASK" : {
+          "TITLE" : "Service task",
+          "DESCRIPTION" : "An automatic task with service logic"
+        },
+        "DECISIONTASK" : {
+          "TITLE" : "Decision task",
+          "DESCRIPTION" : "Task to invoke a DMN decision"
+        },
+        "HTTPTASK" : {
+          "TITLE" : "Http task",
+          "DESCRIPTION" : "A HTTP task"
+        },
+        "SCRIPTTASK" : {
+          "TITLE" : "Script task",
+          "DESCRIPTION" : "An automatic task with script logic"
+        },
+        "MILESTONE" : {
+          "TITLE" : "Milestone",
+          "DESCRIPTION" : "A milestone"
+        },
+        "CASETASK" : {
+          "TITLE" : "Case task",
+          "DESCRIPTION" : "A reference to a case definition to start a new instance"
+        },
+        "PROCESSTASK" : {
+          "TITLE" : "Process task",
+          "DESCRIPTION" : "A reference to a process definition to start a new instance"
+        },
+        "EVENTLISTENER" : {
+          "TITLE" : "Event listener",
+          "DESCRIPTION" : "A generic eventlistener"
+        },
+        "TIMEREVENTLISTENER" : {
+          "TITLE" : "Timer event listener",
+          "DESCRIPTION" : "An eventlistener with a timer trigger"
+        },
+        "USEREVENTLISTENER" : {
+          "TITLE" : "User event listener",
+          "DESCRIPTION" : "An listener for user events"
+        },
+        "ENTRYCRITERION" : {
+          "TITLE" : "Entry criterion",
+          "DESCRIPTION" : "A sentry that defines an entry criterion"
+        },
+        "EXITCRITERION" : {
+          "TITLE" : "Exit criterion",
+          "DESCRIPTION" : "A sentry that defines an exit criterion"
+        },
+        "ASSOCIATION" : {
+          "TITLE" : "Association",
+          "DESCRIPTION" : "Associates a sentry with a plan item."
+        }
+      }
     },
 
     "EDITOR": {
@@ -294,7 +1852,6 @@
             "DELETE-CONFIRM": "Delete case model",
             "USE-AS-NEW-VERSION": "Use as new version",
             "FAVORITE": "Favorite this model"
-
         },
         "DETAILS": {
           "HISTORY-TITLE": "History",

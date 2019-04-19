@@ -212,9 +212,9 @@ public abstract class ReflectUtil {
             field.setAccessible(true);
             field.set(object, value);
         } catch (IllegalArgumentException e) {
-            throw new FlowableException("Could not set field " + field.toString(), e);
+            throw new FlowableException("Could not set field " + field, e);
         } catch (IllegalAccessException e) {
-            throw new FlowableException("Could not set field " + field.toString(), e);
+            throw new FlowableException("Could not set field " + field, e);
         }
     }
 

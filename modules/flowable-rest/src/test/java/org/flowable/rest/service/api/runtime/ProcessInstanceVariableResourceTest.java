@@ -230,7 +230,7 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
         assertEquals("binaryVariable", responseNode.get("name").asText());
         assertTrue(responseNode.get("value").isNull());
         assertEquals("binary", responseNode.get("type").asText());
-        assertNotNull(responseNode.get("valueUrl").isNull());
+        assertNotNull(responseNode.get("valueUrl"));
         assertTrue(responseNode.get("valueUrl").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_DATA, processInstance.getId(), "binaryVariable")));
 
         // Check actual value of variable in engine
