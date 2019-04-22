@@ -280,8 +280,11 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
 
                     if ("-- force-commit".equals(line)) {
                         connection.commit();
+                        logger.debug("Forcing commit");
+
                     } else {
                         logger.debug(line.substring(3));
+
                     }
 
                 } else if (line.startsWith("execute java ")) {

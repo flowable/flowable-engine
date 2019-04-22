@@ -20,6 +20,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Inspired by {@link RetryInterceptor}, but adapted for CRDB.
  *
+ * This probably won't work in environments such as Spring if the transaction is externally managed
+ *
  * @author Joram Barrez
  */
 public class CrDbRetryInterceptor extends AbstractCommandInterceptor {

@@ -844,7 +844,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     protected void initCmmnSchemaManager() {
         if (this.schemaManager == null) {
-            if ("cockroachdb".equals(databaseType)) {
+            if (DATABASE_TYPE_COCKROACHDB.equals(databaseType)) {
                 this.schemaManager = new CmmnDbSchemaManager(CmmnDbSchemaManager.LIQUIBASE_CHANGELOG_CRDB);
             } else {
                 this.schemaManager = new CmmnDbSchemaManager(CmmnDbSchemaManager.LIQUIBASE_CHANGELOG);

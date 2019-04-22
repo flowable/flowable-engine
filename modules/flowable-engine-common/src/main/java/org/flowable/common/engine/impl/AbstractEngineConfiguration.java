@@ -527,8 +527,7 @@ public abstract class AbstractEngineConfiguration {
             List<CommandInterceptor> interceptors = new ArrayList<>();
             interceptors.add(new LogInterceptor());
 
-            // This probably won't work in environments such as Spring if the transaction is externally managed
-            if ("cockroachdb".equals(databaseType)) {
+            if (DATABASE_TYPE_COCKROACHDB.equals(databaseType)) {
                 interceptors.add(new CrDbRetryInterceptor());
             }
 
