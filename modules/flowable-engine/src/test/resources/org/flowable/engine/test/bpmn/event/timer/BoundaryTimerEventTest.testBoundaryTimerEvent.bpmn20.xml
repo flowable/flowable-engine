@@ -24,7 +24,7 @@
     <sequenceFlow id="sid-D4871E89-2EAF-4498-9927-4DE54A81530E" sourceRef="sid-3897D60D-5FDB-4477-94DA-EB005A6B66BE" targetRef="sid-1084D551-6963-4A5B-B32E-F1C9415B8164">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${consult=="no"}]]></conditionExpression>
     </sequenceFlow>
-    <boundaryEvent id="sid-02ED4884-A593-4767-A7A7-1DD2B047248C" attachedToRef="first_task" cancelActivity="true">
+    <boundaryEvent id="boundaryTimerEvent" name="Timer event" attachedToRef="first_task" cancelActivity="true">
       <timerEventDefinition>
         <timeDuration>PT10M</timeDuration>
       </timerEventDefinition>
@@ -33,7 +33,7 @@
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${consult=="yes"}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="sid-3FD93BBB-0508-4511-9473-B49D3BD818E5" sourceRef="first_task" targetRef="sid-3897D60D-5FDB-4477-94DA-EB005A6B66BE"></sequenceFlow>
-    <sequenceFlow id="sid-656542B0-C148-4E15-A06F-B2C8673127C0" sourceRef="sid-02ED4884-A593-4767-A7A7-1DD2B047248C" targetRef="sceond_task"></sequenceFlow>
+    <sequenceFlow id="sid-656542B0-C148-4E15-A06F-B2C8673127C0" sourceRef="boundaryTimerEvent" targetRef="sceond_task"></sequenceFlow>
     <sequenceFlow id="sid-FC24CACC-F64B-4B46-B579-1DA94F191F18" sourceRef="sceond_task" targetRef="sid-47C35172-EC6A-4148-90EC-35663BFE66C9"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_process1">
@@ -59,7 +59,7 @@
       <bpmndi:BPMNShape bpmnElement="sid-1084D551-6963-4A5B-B32E-F1C9415B8164" id="BPMNShape_sid-1084D551-6963-4A5B-B32E-F1C9415B8164">
         <omgdc:Bounds height="28.0" width="28.0" x="621.0" y="50.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-02ED4884-A593-4767-A7A7-1DD2B047248C" id="BPMNShape_sid-02ED4884-A593-4767-A7A7-1DD2B047248C">
+      <bpmndi:BPMNShape bpmnElement="boundaryTimerEvent" id="BPMNShape_boundaryTimerEvent">
         <omgdc:Bounds height="31.0" width="31.0" x="424.17712916530286" y="207.17327496081"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="sid-F07AA205-82D5-4405-852B-500DB6B9F713" id="BPMNEdge_sid-F07AA205-82D5-4405-852B-500DB6B9F713">

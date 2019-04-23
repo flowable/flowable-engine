@@ -168,6 +168,8 @@ public class EndExecutionOperation extends AbstractOperation {
         String processInstanceId = superExecutionEntity.getProcessInstanceId() != null ? superExecutionEntity.getProcessInstanceId() : superExecutionEntity.getId();
         job.setProcessInstanceId(processInstanceId);
         job.setProcessDefinitionId(childProcessInstanceExecutionEntity.getProcessDefinitionId());
+        job.setElementId(superExecutionEntity.getCurrentFlowElement().getId());
+        job.setElementName(superExecutionEntity.getCurrentFlowElement().getName());
         job.setTenantId(childProcessInstanceExecutionEntity.getTenantId());
         job.setJobHandlerType(AsyncCompleteCallActivityJobHandler.TYPE);
         

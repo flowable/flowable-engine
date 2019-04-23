@@ -138,17 +138,19 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
 
         // create a job to execute InitPlanModelOperation, which will take care of initializing all the child plan items of that stage
         JobService jobService = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService();
-        createAsyncInitJob(caseInstanceEntity, jobService);
+        createAsyncInitJob(caseInstanceEntity, caseDefinition, jobService);
 
         return caseInstanceEntity;
     }
 
-    protected void createAsyncInitJob(CaseInstance caseInstance, JobService jobService) {
+    protected void createAsyncInitJob(CaseInstance caseInstance, CaseDefinition caseDefinition, JobService jobService) {
         JobEntity job = jobService.createJob();
         job.setJobHandlerType(AsyncInitializePlanModelJobHandler.TYPE);
         job.setScopeId(caseInstance.getId());
         job.setScopeDefinitionId(caseInstance.getCaseDefinitionId());
         job.setScopeType(ScopeTypes.CMMN);
+        job.setElementId(caseDefinition.getId());
+        job.setElementName(caseDefinition.getName());
         job.setJobHandlerConfiguration(caseInstance.getId());
         job.setTenantId(caseInstance.getTenantId());
         jobService.createAsyncJob(job, true);

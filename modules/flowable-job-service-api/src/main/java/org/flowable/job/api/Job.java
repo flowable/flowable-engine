@@ -49,6 +49,16 @@ public interface Job extends JobInfo {
     String getProcessDefinitionId();
     
     /**
+     * Reference to an element identifier or null if none is set.
+     */
+    String getElementId();
+    
+    /**
+     * Reference to an element name or null if none is set.
+     */
+    String getElementName();
+    
+    /**
      * Reference to a scope identifier or null if none is set.
      */
     String getScopeId();

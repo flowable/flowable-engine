@@ -48,6 +48,9 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
     protected String processInstanceId;
     protected String processDefinitionId;
     
+    protected String elementId;
+    protected String elementName;
+    
     protected String scopeId;
     protected String subScopeId;
     protected String scopeType;
@@ -210,6 +213,24 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         this.processDefinitionId = processDefinitionId;
     }
     
+    @Override
+    public String getElementId() {
+        return elementId;
+    }
+
+    public void setElementId(String elementId) {
+        this.elementId = elementId;
+    }
+
+    @Override
+    public String getElementName() {
+        return elementName;
+    }
+
+    public void setElementName(String elementName) {
+        this.elementName = elementName;
+    }
+
     @Override
     public String getScopeId() {
         return scopeId;

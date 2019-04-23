@@ -63,8 +63,9 @@ public class SuspendedJobCollectionResource {
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "Only return jobs part of a process with the given id", paramType = "query"),
             @ApiImplicitParam(name = "executionId", dataType = "string", value = "Only return jobs part of an execution with the given id", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "Only return jobs with the given process definition id", paramType = "query"),
-            // @ApiImplicitParam(name = "withRetriesLeft", dataType = "boolean", value = "If true, only return jobs with retries left. If false, this parameter is ignored.", paramType = "query"),
-            // @ApiImplicitParam(name = "executable", dataType = "boolean", value = "If true, only return jobs which are executable. If false, this parameter is ignored.", paramType = "query"),
+            @ApiImplicitParam(name = "elementId", dataType = "string", value = "Only return jobs with the given element id", paramType = "query"),
+            @ApiImplicitParam(name = "elementName", dataType = "string", value = "Only return jobs with the given element name", paramType = "query"),
+            @ApiImplicitParam(name = "executable", dataType = "boolean", value = "If true, only return jobs which are executable. If false, this parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "timersOnly", dataType = "boolean", value = "If true, only return jobs which are timers. If false, this parameter is ignored. Cannot be used together with 'messagesOnly'.", paramType = "query"),
             @ApiImplicitParam(name = "messagesOnly", dataType = "boolean", value = "If true, only return jobs which are messages. If false, this parameter is ignored. Cannot be used together with 'timersOnly'", paramType = "query"),
             @ApiImplicitParam(name = "withException", dataType = "boolean", value = "If true, only return jobs for which an exception occurred while executing it. If false, this parameter is ignored.", paramType = "query"),
@@ -97,6 +98,12 @@ public class SuspendedJobCollectionResource {
         }
         if (allRequestParams.containsKey("processDefinitionId")) {
             query.processDefinitionId(allRequestParams.get("processDefinitionId"));
+        }
+        if (allRequestParams.containsKey("elementId")) {
+            query.elementId(allRequestParams.get("elementId"));
+        }
+        if (allRequestParams.containsKey("elementName")) {
+            query.elementName(allRequestParams.get("elementName"));
         }
         if (allRequestParams.containsKey("executable")) {
             query.executable();

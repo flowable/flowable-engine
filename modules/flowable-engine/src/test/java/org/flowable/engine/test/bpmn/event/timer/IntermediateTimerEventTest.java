@@ -35,7 +35,6 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testCatchingTimerEvent() throws Exception {
-
         // Set the clock fixed
         Date startTime = new Date();
 
@@ -43,6 +42,10 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("intermediateTimerEventExample");
         TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
         assertEquals(1, jobQuery.count());
+        
+        Job job = managementService.createTimerJobQuery().elementId("timer").singleResult();
+        assertEquals("timer", job.getElementId());
+        assertEquals("Timer catch", job.getElementName());
 
         // After setting the clock to time '50minutes and 5 seconds', the second timer should fire
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((50 * 60 * 1000) + 5000)));

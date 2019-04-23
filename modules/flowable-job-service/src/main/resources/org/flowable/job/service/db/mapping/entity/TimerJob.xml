@@ -16,6 +16,8 @@
         <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
         <result property="processInstanceId" column="PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
         <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+        <result property="elementId" column="ELEMENT_ID_" jdbcType="VARCHAR" />
+        <result property="elementName" column="ELEMENT_NAME_" jdbcType="VARCHAR" />
         <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
         <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
         <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
@@ -68,6 +70,12 @@
             </if>
             <if test="processDefinitionId != null">
                 and RES.PROC_DEF_ID_ = #{processDefinitionId}
+            </if>
+            <if test="elementId != null">
+                and RES.ELEMENT_ID_ = #{elementId}
+            </if>
+            <if test="elementName != null">
+                and RES.ELEMENT_NAME_ = #{elementName}
             </if>
             <if test="scopeId != null">
                 and RES.SCOPE_ID_ = #{scopeId}
@@ -148,6 +156,8 @@
         EXECUTION_ID_,
         PROCESS_INSTANCE_ID_,
         PROC_DEF_ID_,
+        ELEMENT_ID_,
+        ELEMENT_NAME_,
         SCOPE_ID_, 
         SUB_SCOPE_ID_, 
         SCOPE_TYPE_, 
@@ -169,6 +179,8 @@
         #{executionId, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{processDefinitionId, jdbcType=VARCHAR},
+        #{elementId, jdbcType=VARCHAR},
+        #{elementName, jdbcType=VARCHAR},
         #{scopeId, jdbcType=VARCHAR},
         #{subScopeId, jdbcType=VARCHAR},
         #{scopeType, jdbcType=VARCHAR},
@@ -195,6 +207,8 @@
         EXECUTION_ID_,
         PROCESS_INSTANCE_ID_,
         PROC_DEF_ID_,
+        ELEMENT_ID_,
+        ELEMENT_NAME_,
         SCOPE_ID_, 
         SUB_SCOPE_ID_, 
         SCOPE_TYPE_, 
@@ -217,6 +231,8 @@
             #{job.executionId, jdbcType=VARCHAR},
             #{job.processInstanceId, jdbcType=VARCHAR},
             #{job.processDefinitionId, jdbcType=VARCHAR},
+            #{job.elementId, jdbcType=VARCHAR},
+            #{job.elementName, jdbcType=VARCHAR},
             #{job.scopeId, jdbcType=VARCHAR},
             #{job.subScopeId, jdbcType=VARCHAR},
             #{job.scopeType, jdbcType=VARCHAR},
@@ -245,6 +261,8 @@
             EXECUTION_ID_,
             PROCESS_INSTANCE_ID_,
             PROC_DEF_ID_,
+            ELEMENT_ID_,
+            ELEMENT_NAME_,
             SCOPE_ID_, 
             SUB_SCOPE_ID_, 
             SCOPE_TYPE_, 
@@ -266,6 +284,8 @@
             #{job.executionId, jdbcType=VARCHAR},
             #{job.processInstanceId, jdbcType=VARCHAR},
             #{job.processDefinitionId, jdbcType=VARCHAR},
+            #{job.elementId, jdbcType=VARCHAR},
+            #{job.elementName, jdbcType=VARCHAR},
             #{job.scopeId, jdbcType=VARCHAR},
             #{job.subScopeId, jdbcType=VARCHAR},
             #{job.scopeType, jdbcType=VARCHAR},
@@ -299,6 +319,12 @@
             </if>
             <if test="originalPersistentState.processDefinitionId != processDefinitionId">
                 PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.elementId != elementId">
+                ELEMENT_ID_ = #{elementId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.elementName != elementName">
+                ELEMENT_NAME_ = #{elementName, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.duedate != duedate">
                 DUEDATE_ = #{duedate, jdbcType=TIMESTAMP},
