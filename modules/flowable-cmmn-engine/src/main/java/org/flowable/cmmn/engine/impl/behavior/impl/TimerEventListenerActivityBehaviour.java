@@ -123,6 +123,7 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
 
     protected void scheduleTimerJob(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity,
             Object timerValue, Date timerDueDate, boolean isRepeating) {
+        
         if (timerDueDate != null) {
             JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getJobServiceConfiguration();
             TimerJobEntity timer = jobServiceConfiguration.getTimerJobService().createTimerJob();
@@ -135,6 +136,8 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
             timer.setScopeId(planItemInstanceEntity.getCaseInstanceId());
             timer.setSubScopeId(planItemInstanceEntity.getId());
             timer.setScopeType(ScopeTypes.CMMN);
+            timer.setElementId(timerEventListener.getId());
+            timer.setElementName(timerEventListener.getName());
             timer.setTenantId(planItemInstanceEntity.getTenantId());
             
             if (isRepeating && timerValue instanceof String) {

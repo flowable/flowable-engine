@@ -38,7 +38,7 @@ public class UserEventListenerXmlConverter extends PlanItemDefinitionXmlConverte
         return convertCommonAttributes(xtr, new UserEventListener());
     }
 
-    private UserEventListener convertCommonAttributes(XMLStreamReader xtr, UserEventListener listener) {
+    protected UserEventListener convertCommonAttributes(XMLStreamReader xtr, UserEventListener listener) {
         listener.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
         listener.setAvailableConditionExpression(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE,
             CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_AVAILABLE_CONDITION));

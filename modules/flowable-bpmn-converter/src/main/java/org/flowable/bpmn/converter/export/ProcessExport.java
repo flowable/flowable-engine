@@ -20,6 +20,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
+import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionAttribute;
 import org.flowable.bpmn.model.Process;
 
@@ -36,7 +37,7 @@ public class ProcessExport implements BpmnXMLConstants {
             new ExtensionAttribute(ATTRIBUTE_PROCESS_EAGER_EXECUTION_FETCHING));
 
     @SuppressWarnings("unchecked")
-    public static void writeProcess(Process process, XMLStreamWriter xtw) throws Exception {
+    public static void writeProcess(Process process, BpmnModel model, XMLStreamWriter xtw) throws Exception {
         // start process element
         xtw.writeStartElement(ELEMENT_PROCESS);
         xtw.writeAttribute(ATTRIBUTE_ID, process.getId());
@@ -70,13 +71,13 @@ public class ProcessExport implements BpmnXMLConstants {
         }
 
         boolean didWriteExtensionStartElement = FlowableListenerExport.writeListeners(process, false, xtw);
-        didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(process, didWriteExtensionStartElement, xtw);
+        didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(process, didWriteExtensionStartElement, model.getNamespaces(), xtw);
 
         if (didWriteExtensionStartElement) {
             // closing extensions element
             xtw.writeEndElement();
         }
 
-        LaneExport.writeLanes(process, xtw);
+        LaneExport.writeLanes(process, model, xtw);
     }
 }

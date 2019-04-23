@@ -40,6 +40,10 @@ public class EventSubscriptionServiceConfiguration extends AbstractServiceConfig
     protected EventSubscriptionEntityManager eventSubscriptionEntityManager;
     
     protected ObjectMapper objectMapper;
+    
+    public EventSubscriptionServiceConfiguration(String engineName) {
+        super(engineName);
+    }
 
     // init
     // /////////////////////////////////////////////////////////////////////

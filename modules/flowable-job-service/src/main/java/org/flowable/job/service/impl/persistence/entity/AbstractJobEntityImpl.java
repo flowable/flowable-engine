@@ -37,6 +37,9 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
     protected String processInstanceId;
     protected String processDefinitionId;
     
+    protected String elementId;
+    protected String elementName;
+    
     protected String scopeId;
     protected String subScopeId;
     protected String scopeType;
@@ -69,7 +72,9 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
         persistentState.put("exceptionMessage", exceptionMessage);
         persistentState.put("jobHandlerType", jobHandlerType);
         persistentState.put("processDefinitionId", processDefinitionId);
-
+        persistentState.put("elementId", elementId);
+        persistentState.put("elementName", elementName);
+        
         if (customValuesByteArrayRef != null) {
             persistentState.put("customValuesByteArrayRef", customValuesByteArrayRef);
         }
@@ -153,6 +158,26 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
         this.processDefinitionId = processDefinitionId;
     }
     
+    @Override
+    public String getElementId() {
+        return elementId;
+    }
+
+    @Override
+    public void setElementId(String elementId) {
+        this.elementId = elementId;
+    }
+
+    @Override
+    public String getElementName() {
+        return elementName;
+    }
+
+    @Override
+    public void setElementName(String elementName) {
+        this.elementName = elementName;
+    }
+
     @Override
     public String getScopeId() {
         return scopeId;

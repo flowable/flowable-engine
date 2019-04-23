@@ -42,6 +42,7 @@ import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
@@ -319,6 +320,7 @@ import org.flowable.engine.impl.persistence.entity.data.impl.MybatisPropertyData
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
+import org.flowable.engine.interceptor.CreateUserTaskInterceptor;
 import org.flowable.engine.interceptor.ExecutionQueryInterceptor;
 import org.flowable.engine.interceptor.HistoricProcessInstanceQueryInterceptor;
 import org.flowable.engine.interceptor.IdentityLinkInterceptor;
@@ -802,6 +804,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected BusinessCalendarManager businessCalendarManager;
 
     protected StartProcessInstanceInterceptor startProcessInstanceInterceptor;
+    protected CreateUserTaskInterceptor createUserTaskInterceptor;
     protected IdentityLinkInterceptor identityLinkInterceptor;
     protected ProcessInstanceQueryInterceptor processInstanceQueryInterceptor;
     protected ExecutionQueryInterceptor executionQueryInterceptor;
@@ -1397,7 +1400,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     protected VariableServiceConfiguration instantiateVariableServiceConfiguration() {
-        return new VariableServiceConfiguration();
+        return new VariableServiceConfiguration(ScopeTypes.BPMN);
     }
 
     public void initIdentityLinkServiceConfiguration() {
@@ -1414,7 +1417,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     protected IdentityLinkServiceConfiguration instantiateIdentityLinkServiceConfiguration() {
-        return new IdentityLinkServiceConfiguration();
+        return new IdentityLinkServiceConfiguration(ScopeTypes.BPMN);
     }
     
     public void initEntityLinkServiceConfiguration() {
@@ -1432,7 +1435,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     protected EntityLinkServiceConfiguration instantiateEntityLinkServiceConfiguration() {
-        return new EntityLinkServiceConfiguration();
+        return new EntityLinkServiceConfiguration(ScopeTypes.BPMN);
     }
     
     public void initEventSubscriptionServiceConfiguration() {
@@ -1447,7 +1450,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
     
     protected EventSubscriptionServiceConfiguration instantiateEventSubscriptionServiceConfiguration() {
-        return new EventSubscriptionServiceConfiguration();
+        return new EventSubscriptionServiceConfiguration(ScopeTypes.BPMN);
     }
 
     public void initTaskServiceConfiguration() {
@@ -1505,7 +1508,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     protected TaskServiceConfiguration instantiateTaskServiceConfiguration() {
-        return new TaskServiceConfiguration();
+        return new TaskServiceConfiguration(ScopeTypes.BPMN);
     }
 
     public void initJobServiceConfiguration() {
@@ -1589,7 +1592,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     protected JobServiceConfiguration instantiateJobServiceConfiguration() {
-       return new JobServiceConfiguration();
+       return new JobServiceConfiguration(ScopeTypes.BPMN);
     }
     
     public void addJobHandler(JobHandler jobHandler) {
@@ -2989,6 +2992,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setStartProcessInstanceInterceptor(StartProcessInstanceInterceptor startProcessInstanceInterceptor) {
         this.startProcessInstanceInterceptor = startProcessInstanceInterceptor;
+        return this;
+    }
+    
+    public CreateUserTaskInterceptor getCreateUserTaskInterceptor() {
+        return createUserTaskInterceptor;
+    }
+
+    public ProcessEngineConfigurationImpl setCreateUserTaskInterceptor(CreateUserTaskInterceptor createUserTaskInterceptor) {
+        this.createUserTaskInterceptor = createUserTaskInterceptor;
         return this;
     }
 

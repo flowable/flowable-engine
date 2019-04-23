@@ -1040,6 +1040,8 @@ public class RestResponseFactory {
         response.setExecutionId(job.getExecutionId());
         response.setProcessDefinitionId(job.getProcessDefinitionId());
         response.setProcessInstanceId(job.getProcessInstanceId());
+        response.setElementId(job.getElementId());
+        response.setElementName(job.getElementName());
         response.setRetries(job.getRetries());
         response.setCreateTime(job.getCreateTime());
         response.setTenantId(job.getTenantId());

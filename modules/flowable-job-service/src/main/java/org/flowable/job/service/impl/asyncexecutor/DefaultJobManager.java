@@ -346,13 +346,18 @@ public class DefaultJobManager implements JobManager {
     protected void executeTimerJob(JobEntity timerEntity) {
         TimerJobEntityManager timerJobEntityManager = jobServiceConfiguration.getTimerJobEntityManager();
 
-        VariableScope variableScope = jobServiceConfiguration.getInternalJobManager().resolveVariableScope(timerEntity);
+        VariableScope variableScope = null;
+        if (jobServiceConfiguration.getInternalJobManager() != null) {
+            variableScope = jobServiceConfiguration.getInternalJobManager().resolveVariableScope(timerEntity);
+        }
 
         if (variableScope == null) {
             variableScope = NoExecutionVariableScope.getSharedInstance();
         }
 
-        jobServiceConfiguration.getInternalJobManager().preTimerJobDelete(timerEntity, variableScope);
+        if (jobServiceConfiguration.getInternalJobManager() != null) {
+            jobServiceConfiguration.getInternalJobManager().preTimerJobDelete(timerEntity, variableScope);
+        }
 
         if (timerEntity.getDuedate() != null && !isValidTime(timerEntity, timerEntity.getDuedate(), variableScope)) {
             if (LOGGER.isDebugEnabled()) {
@@ -372,39 +377,66 @@ public class DefaultJobManager implements JobManager {
         if (timerEntity.getRepeat() != null) {
             TimerJobEntity newTimerJobEntity = timerJobEntityManager.createAndCalculateNextTimer(timerEntity, variableScope);
             if (newTimerJobEntity != null) {
-                jobServiceConfiguration.getInternalJobManager().preRepeatedTimerSchedule(newTimerJobEntity, variableScope);
+                if (jobServiceConfiguration.getInternalJobManager() != null) {
+                    jobServiceConfiguration.getInternalJobManager().preRepeatedTimerSchedule(newTimerJobEntity, variableScope);
+                }
+                
                 scheduleTimerJob(newTimerJobEntity);
             }
         }
     }
     
     protected void executeJobHandler(JobEntity jobEntity) {
-        VariableScope variableScope = jobServiceConfiguration.getInternalJobManager().resolveVariableScope(jobEntity);
+        VariableScope variableScope = null;
+        if (jobServiceConfiguration.getInternalJobManager() != null) {
+            variableScope = jobServiceConfiguration.getInternalJobManager().resolveVariableScope(jobEntity);
+        }
+        
+        if (variableScope == null) {
+            variableScope = NoExecutionVariableScope.getSharedInstance();
+        }
 
         Map<String, JobHandler> jobHandlers = jobServiceConfiguration.getJobHandlers();
         if (jobEntity.getJobHandlerType() != null) {
-            JobHandler jobHandler = jobHandlers.get(jobEntity.getJobHandlerType());
-            if (jobHandler != null) {
-                jobHandler.execute(jobEntity, jobEntity.getJobHandlerConfiguration(), variableScope, getCommandContext());
+            
+            if (jobHandlers != null) {
+                JobHandler jobHandler = jobHandlers.get(jobEntity.getJobHandlerType());
+                if (jobHandler != null) {
+                    jobHandler.execute(jobEntity, jobEntity.getJobHandlerConfiguration(), variableScope, getCommandContext());
+                } else {
+                    throw new FlowableException("No job handler registered for type " + jobEntity.getJobHandlerType() + 
+                                    " in job config for engine: " + jobServiceConfiguration.getEngineName());
+                }
+                
             } else {
-                throw new FlowableException("No job handler registered for type " + jobEntity.getJobHandlerType());
+                throw new FlowableException("No job handler registered for type " + jobEntity.getJobHandlerType() +
+                                " in job config for engine: " + jobServiceConfiguration.getEngineName());
             }
+            
         } else {
-            throw new FlowableException("Job has no job handler type");
+            throw new FlowableException("Job has no job handler type in job config for engine: " + jobServiceConfiguration.getEngineName());
         }
     }
 
     protected void executeHistoryJobHandler(HistoryJobEntity historyJobEntity) {
         Map<String, HistoryJobHandler> jobHandlers = jobServiceConfiguration.getHistoryJobHandlers();
         if (historyJobEntity.getJobHandlerType() != null) {
-            HistoryJobHandler jobHandler = jobHandlers.get(historyJobEntity.getJobHandlerType());
-            if (jobHandler != null) {
-                jobHandler.execute(historyJobEntity, historyJobEntity.getJobHandlerConfiguration(), getCommandContext());
+            if (jobHandlers != null) {
+                HistoryJobHandler jobHandler = jobHandlers.get(historyJobEntity.getJobHandlerType());
+                if (jobHandler != null) {
+                    jobHandler.execute(historyJobEntity, historyJobEntity.getJobHandlerConfiguration(), getCommandContext());
+                } else {
+                    throw new FlowableException("No history job handler registered for type " + historyJobEntity.getJobHandlerType() +
+                                    " in job config for engine: " + jobServiceConfiguration.getEngineName());
+                }
+                
             } else {
-                throw new FlowableException("No history job handler registered for type " + historyJobEntity.getJobHandlerType());
+                throw new FlowableException("No history job handler registered for type " + historyJobEntity.getJobHandlerType() + 
+                                " in job config for engine: " + jobServiceConfiguration.getEngineName());
             }
+            
         } else {
-            throw new FlowableException("Async history job has no job handler type");
+            throw new FlowableException("Async history job has no job handler type in job config for engine: " + jobServiceConfiguration.getEngineName());
         }
     }
 
@@ -572,6 +604,8 @@ public class DefaultJobManager implements JobManager {
         copyToJob.setExceptionStacktrace(copyFromJob.getExceptionStacktrace());
         copyToJob.setMaxIterations(copyFromJob.getMaxIterations());
         copyToJob.setProcessDefinitionId(copyFromJob.getProcessDefinitionId());
+        copyToJob.setElementId(copyFromJob.getElementId());
+        copyToJob.setElementName(copyFromJob.getElementName());
         copyToJob.setProcessInstanceId(copyFromJob.getProcessInstanceId());
         copyToJob.setScopeId(copyFromJob.getScopeId());
         copyToJob.setSubScopeId(copyFromJob.getSubScopeId());

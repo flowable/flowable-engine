@@ -37,6 +37,12 @@ public interface TimerJobQuery extends Query<TimerJobQuery, Job> {
     /** Only select jobs which exist for the given process definition id */
     TimerJobQuery processDefinitionId(String processDefinitionid);
     
+    /** Only select jobs which exist for the given element id */
+    TimerJobQuery elementId(String elementId);
+    
+    /** Only select jobs which exist for the given element name */
+    TimerJobQuery elementName(String elementName);
+    
     /** Only select jobs for the given scope identifier. */
     TimerJobQuery scopeId(String scopeId);
 

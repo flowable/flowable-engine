@@ -37,7 +37,7 @@ public class SpringIdmConfigurationHelper {
         ApplicationContext applicationContext = new GenericXmlApplicationContext(new UrlResource(resource));
         Map<String, IdmEngine> beansOfType = applicationContext.getBeansOfType(IdmEngine.class);
         if ((beansOfType == null) || beansOfType.isEmpty()) {
-            throw new FlowableException("no " + IdmEngine.class.getName() + " defined in the application context " + resource.toString());
+            throw new FlowableException("no " + IdmEngine.class.getName() + " defined in the application context " + resource);
         }
 
         IdmEngine idmEngine = beansOfType.values().iterator().next();

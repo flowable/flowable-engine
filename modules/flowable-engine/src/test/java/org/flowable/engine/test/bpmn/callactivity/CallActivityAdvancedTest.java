@@ -651,6 +651,53 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         taskService.complete(taskAfterSubProcess.getId());
         assertEquals(0, runtimeService.createExecutionQuery().count());
     }
+    
+    @Test
+    @Deployment(resources = {
+        "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml", 
+        "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" 
+    })
+    public void testSubProcessEndTime() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
+        Task taskBeforeSubProcess = taskService.createTaskQuery().singleResult();
+        assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
+        taskService.complete(taskBeforeSubProcess.getId());
+        Task taskInSubProcess = taskService.createTaskQuery().singleResult();
+        assertEquals("Task in subprocess", taskInSubProcess.getName());
+
+        runtimeService.deleteProcessInstance(processInstance.getId(), null);
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration, 20000)) {
+            List<HistoricProcessInstance> processes = historyService.createHistoricProcessInstanceQuery().list();
+            assertEquals(2, processes.size());
+    
+            for (HistoricProcessInstance process: processes) {
+                assertNotNull(process.getEndTime());
+            }
+        }
+    }
+    
+    @Test
+    @Deployment(resources = {
+        "org/flowable/engine/test/bpmn/callactivity/callActivityInEmbeddedSubProcess.bpmn20.xml", 
+        "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" 
+    })
+    public void testCallActivityInEmbeddedSubProcessEndTime() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("mainProcess");
+        Task taskInSubProcess = taskService.createTaskQuery().singleResult();
+        assertEquals("Task in subprocess", taskInSubProcess.getName());
+
+        runtimeService.deleteProcessInstance(processInstance.getId(), null);
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration, 20000)) {
+            List<HistoricProcessInstance> processes = historyService.createHistoricProcessInstanceQuery().list();
+            assertEquals(2, processes.size());
+    
+            for (HistoricProcessInstance process: processes) {
+                assertNotNull(process.getEndTime());
+            }
+        }
+    }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcessWithFallback.bpmn20.xml"},

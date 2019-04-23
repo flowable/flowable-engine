@@ -451,7 +451,8 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         }
         getActivityInstanceEntityManager().deleteActivityInstancesByProcessInstanceId(execution.getId());
 
-        for (ExecutionEntity subExecutionEntity : execution.getExecutions()) {
+        List<ExecutionEntity> childExecutions = collectChildren(execution.getProcessInstance());
+        for (ExecutionEntity subExecutionEntity : childExecutions) {
             if (subExecutionEntity.isMultiInstanceRoot()) {
                 for (ExecutionEntity miExecutionEntity : subExecutionEntity.getExecutions()) {
                     if (miExecutionEntity.getSubProcessInstance() != null) {
@@ -493,7 +494,6 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
             return;
         }
 
-        List<ExecutionEntity> childExecutions = collectChildren(execution.getProcessInstance());
         for (int i = childExecutions.size() - 1; i >= 0; i--) {
             ExecutionEntity childExecutionEntity = childExecutions.get(i);
             deleteExecutionAndRelatedData(childExecutionEntity, deleteReason, deleteHistory);

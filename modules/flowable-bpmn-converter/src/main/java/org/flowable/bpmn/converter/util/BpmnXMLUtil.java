@@ -272,6 +272,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
 
                                     xtw.writeNamespace(attribute.getNamespacePrefix(), attribute.getNamespace());
                                     namespaceMap.put(attribute.getNamespacePrefix(), attribute.getNamespace());
+                                    localNamespaceMap.put(attribute.getNamespacePrefix(), attribute.getNamespace());
                                 }
 
                                 xtw.writeAttribute(attribute.getNamespacePrefix(), attribute.getNamespace(), attribute.getName(), attribute.getValue());

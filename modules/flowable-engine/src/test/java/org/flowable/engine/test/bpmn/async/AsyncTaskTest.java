@@ -146,8 +146,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         // let 'max-retires' on the message be reached
         waitForJobExecutorToProcessAllJobs(7000L, 100L);
 
-        // the service failed: the execution is still sitting in the service
-        // task:
+        // the service failed: the execution is still sitting in the service task:
         Execution execution = runtimeService.createExecutionQuery().singleResult();
         assertNotNull(execution);
         assertEquals("service", runtimeService.getActiveActivityIds(execution.getId()).get(0));
@@ -210,6 +209,10 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("asyncTask");
         // now there should be one job in the database:
         assertEquals(1, managementService.createJobQuery().count());
+        
+        Job job = managementService.createJobQuery().singleResult();
+        assertEquals("task", job.getElementId());
+        assertEquals("Test task", job.getElementName());
 
         waitForJobExecutorToProcessAllJobs(7000L, 200L);
 
@@ -224,6 +227,10 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncEndEvent");
         // now there should be one job in the database:
         assertEquals(1, managementService.createJobQuery().count());
+        
+        Job job = managementService.createJobQuery().singleResult();
+        assertEquals("theEnd", job.getElementId());
+        assertEquals("End event", job.getElementName());
 
         Object value = runtimeService.getVariable(processInstance.getId(), "variableSetInExecutionListener");
         assertNull(value);
@@ -256,6 +263,11 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncScript");
         // now there should be one job in the database:
         assertEquals(1, managementService.createJobQuery().count());
+        
+        Job job = managementService.createJobQuery().singleResult();
+        assertEquals("script", job.getElementId());
+        assertEquals("Script", job.getElementName());
+        
         // the script was not invoked:
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
         String eid = null;

@@ -23,6 +23,9 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.interceptor.CreateUserTaskAfterContext;
+import org.flowable.engine.interceptor.CreateUserTaskBeforeContext;
+import org.flowable.engine.interceptor.CreateUserTaskInterceptor;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.entitylink.api.EntityLink;
@@ -254,5 +257,52 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         }
         assertEquals(2, candidateIdentityLinkCount);
     }
+    
+    @Test
+    @Deployment(resources="org/flowable/engine/test/bpmn/usertask/UserTaskTest.testTaskPropertiesNotNull.bpmn20.xml")
+    public void testCreateUserTaskInterceptor() throws Exception {
+        TestCreateUserTaskInterceptor testCreateUserTaskInterceptor = new TestCreateUserTaskInterceptor();
+        processEngineConfiguration.setCreateUserTaskInterceptor(testCreateUserTaskInterceptor);
+        
+        try {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertNotNull(task.getId());
+            assertEquals("my task", task.getName());
+            assertEquals("Very important", task.getDescription());
+            assertEquals("testCategory", task.getCategory());
+            
+            assertEquals(1, testCreateUserTaskInterceptor.getBeforeCreateUserTaskCounter());
+            assertEquals(1, testCreateUserTaskInterceptor.getAfterCreateUserTaskCounter());
+            
+        } finally {
+            processEngineConfiguration.setCreateUserTaskInterceptor(null);
+        }
+    }
+
+    protected class TestCreateUserTaskInterceptor implements CreateUserTaskInterceptor {
+        
+        protected int beforeCreateUserTaskCounter = 0;
+        protected int afterCreateUserTaskCounter = 0;
+        
+        @Override
+        public void beforeCreateUserTask(CreateUserTaskBeforeContext context) {
+            beforeCreateUserTaskCounter++;
+            context.setCategory("testCategory");
+        }
+
+        @Override
+        public void afterCreateUserTask(CreateUserTaskAfterContext context) {
+            afterCreateUserTaskCounter++;
+        }
+
+        public int getBeforeCreateUserTaskCounter() {
+            return beforeCreateUserTaskCounter;
+        }
+
+        public int getAfterCreateUserTaskCounter() {
+            return afterCreateUserTaskCounter;
+        }
+    }
 }

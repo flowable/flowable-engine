@@ -10,7 +10,7 @@
 
 		<userTask id="task" />
 
-		<boundaryEvent attachedToRef="task" id="timer">
+		<boundaryEvent attachedToRef="task" id="timer" name="Timer">
 			<timerEventDefinition>
 				<timeDuration>PT1H</timeDuration>
 			</timerEventDefinition>

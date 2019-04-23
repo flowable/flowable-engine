@@ -173,6 +173,8 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
                 .singleResult();
 
         assertEquals(2, asyncJob.getRetries());
+        assertEquals("theScriptTask", asyncJob.getElementId());
+        assertEquals("Execute script", asyncJob.getElementName());
 
         try {
             asyncJob = managementService.moveTimerToExecutableJob(asyncJob.getId());
@@ -185,6 +187,8 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         asyncJob = managementService.createTimerJobQuery()
                 .processInstanceId(processInstance.getId())
                 .singleResult();
+        assertEquals("theScriptTask", asyncJob.getElementId());
+        assertEquals("Execute script", asyncJob.getElementName());
 
         try {
             asyncJob = managementService.moveTimerToExecutableJob(asyncJob.getId());
@@ -197,12 +201,18 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         asyncJob = managementService.createDeadLetterJobQuery()
                 .processInstanceId(processInstance.getId())
                 .singleResult();
+        
+        assertEquals("theScriptTask", asyncJob.getElementId());
+        assertEquals("Execute script", asyncJob.getElementName());
 
         managementService.moveDeadLetterJobToExecutableJob(asyncJob.getId(), 5);
 
         asyncJob = managementService.createJobQuery()
                 .processInstanceId(processInstance.getId())
                 .singleResult();
+        
+        assertEquals("theScriptTask", asyncJob.getElementId());
+        assertEquals("Execute script", asyncJob.getElementName());
 
         assertEquals(5, asyncJob.getRetries());
     }
