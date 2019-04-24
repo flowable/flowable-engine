@@ -37,6 +37,10 @@ public interface HistoricTaskLogEntryQuery extends Query<HistoricTaskLogEntryQue
 
     HistoricTaskLogEntryQuery scopeDefinitionId(String scopeDefinitionId);
 
+    HistoricTaskLogEntryQuery caseInstanceId(String caseInstanceId);
+
+    HistoricTaskLogEntryQuery caseDefinitionId(String caseDefinitionId);
+
     HistoricTaskLogEntryQuery subScopeId(String subScopeId);
 
     HistoricTaskLogEntryQuery scopeType(String scopeType);
