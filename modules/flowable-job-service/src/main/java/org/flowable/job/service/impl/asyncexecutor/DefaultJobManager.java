@@ -604,6 +604,8 @@ public class DefaultJobManager implements JobManager {
         copyToJob.setExceptionStacktrace(copyFromJob.getExceptionStacktrace());
         copyToJob.setMaxIterations(copyFromJob.getMaxIterations());
         copyToJob.setProcessDefinitionId(copyFromJob.getProcessDefinitionId());
+        copyToJob.setElementId(copyFromJob.getElementId());
+        copyToJob.setElementName(copyFromJob.getElementName());
         copyToJob.setProcessInstanceId(copyFromJob.getProcessInstanceId());
         copyToJob.setScopeId(copyFromJob.getScopeId());
         copyToJob.setSubScopeId(copyFromJob.getSubScopeId());

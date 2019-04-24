@@ -766,6 +766,28 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
             deleteTaskWithLogEntries("3");
         }
     }
+
+    @Test
+    public void testTaskLogEntriesDeletedOnDeploymentDelete() {
+        CaseInstance caseInstance = null;
+        try {
+            cmmnRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/history/CmmnHistoryServiceTaskLogTest.testTaskLogEntriesDeletedOnDeploymentDelete.cmmn").deploy();
+            caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+            Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            cmmnTaskService.complete(task.getId());
+
+            assertEquals(6, cmmnHistoryService.createHistoricTaskLogEntryQuery().caseInstanceId(caseInstance.getId()).count());
+            assertEquals(6, cmmnHistoryService.createHistoricTaskLogEntryQuery().caseDefinitionId(caseInstance.getCaseDefinitionId()).count());
+
+        } finally {
+            cmmnRepositoryService.deleteDeployment(cmmnRepositoryService.createCaseDefinitionQuery()
+                .caseDefinitionId(caseInstance.getCaseDefinitionId()).singleResult().getDeploymentId(), true);
+
+            assertEquals(0, cmmnHistoryService.createHistoricTaskLogEntryQuery().caseInstanceId(caseInstance.getId()).count());
+            assertEquals(0, cmmnHistoryService.createHistoricTaskLogEntryQuery().caseDefinitionId(caseInstance.getCaseDefinitionId()).count());
+        }
+    }
     
     protected Date getInsertDate() {
         Calendar cal = new GregorianCalendar(2020, 3, 10);

@@ -61,6 +61,8 @@ public class ActivateAsyncPlanItemInstanceOperation extends AbstractChangePlanIt
         job.setSubScopeId(planItemInstanceEntity.getId());
         job.setScopeDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
         job.setScopeType(ScopeTypes.CMMN);
+        job.setElementId(task.getId());
+        job.setElementName(task.getName());
         job.setJobHandlerConfiguration(entryCriterionId);
         job.setTenantId(planItemInstanceEntity.getTenantId());
         jobService.createAsyncJob(job, task.isExclusive());

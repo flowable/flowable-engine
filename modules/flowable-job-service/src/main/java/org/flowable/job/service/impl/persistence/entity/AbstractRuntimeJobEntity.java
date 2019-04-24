@@ -27,6 +27,10 @@ public interface AbstractRuntimeJobEntity extends Job, AbstractJobEntity {
     void setProcessInstanceId(String processInstanceId);
 
     void setProcessDefinitionId(String processDefinitionId);
+    
+    void setElementId(String elementId);
+    
+    void setElementName(String elementName);
 
     void setScopeId(String scopeId);
 

@@ -15,6 +15,7 @@ package org.flowable.cmmn.test.async;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -41,6 +42,11 @@ public class AsyncTaskTest extends FlowableCmmnTestCase {
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertEquals("Task before service task", task.getName());
         cmmnTaskService.complete(task.getId());
+        
+        Job job = cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertNotNull(job);
+        assertEquals("asyncServiceTask", job.getElementId());
+        assertEquals("Async service task", job.getElementName());
 
         waitForJobExecutorToProcessAllJobs();
       
@@ -81,6 +87,14 @@ public class AsyncTaskTest extends FlowableCmmnTestCase {
         
         // Now 3 async jobs should be created for the 3 async human tasks
         assertEquals(3L, cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        List<Job> jobs = cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).list();
+        assertEquals(3, jobs.size());
+        for (Job job : jobs) {
+            assertTrue(job.getElementId().startsWith("sid-"));
+            assertThat(job.getElementName()).isIn("B", "C", "D");
+        }
+        
         waitForJobExecutorToProcessAllJobs();
         
         List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();

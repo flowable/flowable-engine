@@ -9,7 +9,7 @@
         <startEvent id="theStart"/>
         <sequenceFlow id="flow1" sourceRef="theStart" targetRef="timer"/>
 
-        <intermediateCatchEvent id="timer">
+        <intermediateCatchEvent id="timer" name="Timer catch">
             <timerEventDefinition>
                 <timeDuration>PT5M</timeDuration>
             </timerEventDefinition>
