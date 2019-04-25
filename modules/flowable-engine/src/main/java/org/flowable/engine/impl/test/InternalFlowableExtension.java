@@ -97,8 +97,11 @@ public abstract class InternalFlowableExtension implements AfterEachCallback, Be
         // Always reset authenticated user to avoid any mistakes
         processEngine.getIdentityService().setAuthenticatedUserId(null);
 
-        AbstractFlowableTestCase.validateHistoryData(processEngine);
-        doFinally(context, TestInstance.Lifecycle.PER_METHOD);
+        try {
+            AbstractFlowableTestCase.validateHistoryData(processEngine);
+        } finally {
+            doFinally(context, TestInstance.Lifecycle.PER_METHOD);
+        }
     }
 
     @Override

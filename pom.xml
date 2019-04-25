@@ -1020,6 +1020,7 @@
         <module>modules/flowable-cmmn-converter</module>
         <module>modules/flowable-cmmn-image-generator</module>
         <module>modules/flowable-cmmn-engine</module>
+		<module>modules/flowable-cmmn-engine-configurator</module>
         <module>modules/flowable-variable-service-api</module>
 		<module>modules/flowable-variable-service</module>
         <module>modules/flowable-identitylink-service-api</module>

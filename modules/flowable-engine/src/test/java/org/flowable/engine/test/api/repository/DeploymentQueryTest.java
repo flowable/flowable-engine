@@ -203,8 +203,8 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
 
     @Test
     public void testNativeQuery() {
-        assertEquals("ACT_RE_DEPLOYMENT", managementService.getTableName(Deployment.class));
-        assertEquals("ACT_RE_DEPLOYMENT", managementService.getTableName(DeploymentEntity.class));
+        assertEquals("ACT_RE_DEPLOYMENT", managementService.getTableName(Deployment.class, false));
+        assertEquals("ACT_RE_DEPLOYMENT", managementService.getTableName(DeploymentEntity.class, false));
         String tableName = managementService.getTableName(Deployment.class);
         String baseQuerySql = "SELECT * FROM " + tableName;
 

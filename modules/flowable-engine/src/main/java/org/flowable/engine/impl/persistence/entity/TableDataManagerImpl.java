@@ -180,7 +180,8 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
                 LOGGER.debug("retrieving flowable tables from jdbc metadata");
                 String databaseTablePrefix = getDbSqlSession().getDbSqlSessionFactory().getDatabaseTablePrefix();
                 String tableNameFilter = databaseTablePrefix + "ACT_%";
-                if ("postgres".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
+                if ("postgres".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())
+                        || "cockroachdb".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
                     tableNameFilter = databaseTablePrefix + "act_%";
                 }
                 if ("oracle".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
@@ -264,7 +265,8 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
             result.setTableName(tableName);
             DatabaseMetaData metaData = getDbSqlSession().getSqlSession().getConnection().getMetaData();
 
-            if ("postgres".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
+            if ("postgres".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())
+                    || "cockroachdb".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
                 tableName = tableName.toLowerCase();
             }
 

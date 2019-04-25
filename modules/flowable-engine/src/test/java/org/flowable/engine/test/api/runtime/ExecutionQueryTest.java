@@ -1449,7 +1449,7 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
     public void testNativeQuery() {
         // just test that the query will be constructed and executed, details
         // are tested in the TaskQueryTest
-        assertEquals("ACT_RU_EXECUTION", managementService.getTableName(Execution.class));
+        assertEquals("ACT_RU_EXECUTION", managementService.getTableName(Execution.class, false));
 
         long executionCount = runtimeService.createExecutionQuery().count();
 

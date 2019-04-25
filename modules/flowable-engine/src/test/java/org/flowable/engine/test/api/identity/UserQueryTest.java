@@ -365,7 +365,7 @@ public class UserQueryTest extends PluggableFlowableTestCase {
 
     @Test
     public void testNativeQuery() {
-        String baseQuerySql = "SELECT * FROM ACT_ID_USER";
+        String baseQuerySql = "SELECT * FROM " + IdentityTestUtil.getTableName("ACT_ID_USER", processEngineConfiguration);
 
         assertEquals(4, identityService.createNativeUserQuery().sql(baseQuerySql).list().size());
 

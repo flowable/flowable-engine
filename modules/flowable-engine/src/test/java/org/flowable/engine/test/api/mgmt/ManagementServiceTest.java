@@ -326,7 +326,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
     // ManagementService doesn't seem to give actual table Name for EventSubscriptionEntity.class
     @Test
     public void testGetTableName() {
-        String table = managementService.getTableName(EventSubscriptionEntity.class);
+        String table = managementService.getTableName(EventSubscriptionEntity.class, false);
         assertEquals("ACT_RU_EVENT_SUBSCR", table);
     }
 }

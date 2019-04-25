@@ -56,6 +56,11 @@ public interface ManagementService {
     String getTableName(Class<?> entityClass);
 
     /**
+     * Gets the table name for an entity like Task, Execution or the like.
+     */
+    String getTableName(Class<?> entityClass, boolean includePrefix);
+
+    /**
      * Gets the metadata (column names, column types, etc.) of a certain table. Returns null when no table exists with the given name.
      */
     TableMetaData getTableMetaData(String tableName);

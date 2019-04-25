@@ -315,8 +315,8 @@ public class ProcessDefinitionQueryTest extends PluggableFlowableTestCase {
 
     @Test
     public void testNativeQuery() {
-        assertEquals("ACT_RE_PROCDEF", managementService.getTableName(ProcessDefinition.class));
-        assertEquals("ACT_RE_PROCDEF", managementService.getTableName(ProcessDefinitionEntity.class));
+        assertEquals("ACT_RE_PROCDEF", managementService.getTableName(ProcessDefinition.class, false));
+        assertEquals("ACT_RE_PROCDEF", managementService.getTableName(ProcessDefinitionEntity.class, false));
         String tableName = managementService.getTableName(ProcessDefinition.class);
         String baseQuerySql = "SELECT * FROM " + tableName;
 
