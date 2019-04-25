@@ -21,6 +21,7 @@ import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceBuilderImpl;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
@@ -110,6 +111,16 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
         if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
             // The plan item will be deleted by the regular TerminatePlanItemOperation
             CommandContextUtil.getAgenda(commandContext).planManualTerminateCaseInstanceOperation(planItemInstance.getReferenceId());
+        }
+    }
+
+    @Override
+    public void deleteChildEntity(CommandContext commandContext, DelegatePlanItemInstance delegatePlanItemInstance, boolean cascade) {
+        if (CallbackTypes.PLAN_ITEM_CHILD_CASE.equals(delegatePlanItemInstance.getReferenceType())) {
+            CaseInstanceEntityManager caseInstanceEntityManager = CommandContextUtil.getCaseInstanceEntityManager(commandContext);
+            caseInstanceEntityManager.delete(delegatePlanItemInstance.getReferenceId(), cascade, null);
+        } else {
+            throw new FlowableException("Can only delete a child entity for a plan item with callback type " + CallbackTypes.PLAN_ITEM_CHILD_CASE);
         }
     }
 
