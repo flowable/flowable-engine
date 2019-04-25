@@ -319,10 +319,6 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
                         Statement jdbcStatement = connection.createStatement();
                         try {
 
-                            if (sqlStatement.contains("${databaseSchema}")) {
-                                sqlStatement = sqlStatement.replace("${databaseSchema}", dbSqlSession.getDbSqlSessionFactory().getDatabaseSchema() + ".");
-                            }
-
                             logger.debug("SQL: {}", sqlStatement);
                             jdbcStatement.execute(sqlStatement);
                             jdbcStatement.close();
