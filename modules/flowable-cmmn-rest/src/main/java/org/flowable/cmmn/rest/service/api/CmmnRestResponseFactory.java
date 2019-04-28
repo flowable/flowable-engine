@@ -558,6 +558,12 @@ public class CmmnRestResponseFactory {
         result.setStartTime(caseInstance.getStartTime());
         result.setStartUserId(caseInstance.getStartUserId());
         result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, caseInstance.getId()));
+        if (caseInstance.getCaseVariables() != null) {
+            Map<String, Object> variableMap = caseInstance.getCaseVariables();
+            for (String name : variableMap.keySet()) {
+                result.addVariable(createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, caseInstance.getId(), VARIABLE_HISTORY_CASE, false, urlBuilder));
+            }
+        }
         result.setTenantId(caseInstance.getTenantId());
         return result;
     }
