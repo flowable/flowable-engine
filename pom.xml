@@ -1012,6 +1012,7 @@
 		<module>modules/flowable-idm-engine-configurator</module>
 		<module>modules/flowable-form-model</module>
 		<module>modules/flowable-form-api</module>
+        <module>modules/flowable-form-json-converter</module>
         <module>modules/flowable-form-engine</module>
         <module>modules/flowable-form-engine-configurator</module>
 		<module>modules/flowable-dmn-model</module>
