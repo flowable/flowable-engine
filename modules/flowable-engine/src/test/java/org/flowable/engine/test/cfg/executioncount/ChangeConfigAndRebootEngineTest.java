@@ -27,12 +27,14 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Joram Barrez
  */
+@DisabledIfSystemProperty(named = "database", matches = "cockroachdb")
 public class ChangeConfigAndRebootEngineTest extends ResourceFlowableTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ChangeConfigAndRebootEngineTest.class);

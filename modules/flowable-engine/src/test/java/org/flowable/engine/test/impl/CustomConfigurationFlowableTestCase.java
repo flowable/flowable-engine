@@ -36,7 +36,7 @@ public abstract class CustomConfigurationFlowableTestCase extends ResourceFlowab
 
     @Override
     protected final void additionalConfiguration(ProcessEngineConfiguration processEngineConfiguration) {
-        processEngineConfiguration.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+        processEngineConfiguration.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE);
         configureConfiguration((ProcessEngineConfigurationImpl) processEngineConfiguration);
     }
 

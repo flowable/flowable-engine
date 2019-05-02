@@ -17,8 +17,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
@@ -32,6 +34,7 @@ import org.flowable.task.api.Task;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Test for REST-operation related to the historic case instance query resource.
@@ -48,7 +51,12 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         Calendar startTime = Calendar.getInstance();
         cmmnEngineConfiguration.getClock().setCurrentTime(startTime.getTime());
 
-        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        HashMap<String, Object> caseVariables = new HashMap<>();
+        caseVariables.put("stringVar", "Azerty");
+        caseVariables.put("intVar", 67890);
+        caseVariables.put("booleanVar", false);
+
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").variables(caseVariables).start();
         Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
@@ -67,6 +75,9 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         assertResultsPresentInDataResponse(url + "?caseDefinitionId=" + caseInstance.getCaseDefinitionId() + "&finished=true", caseInstance.getId());
 
         assertResultsPresentInDataResponse(url + "?caseDefinitionKey=oneHumanTaskCase", caseInstance.getId(), caseInstance2.getId());
+
+        assertVariablesPresentInPostDataResponse(url, "?includeCaseVariables=false&caseInstanceId=" + caseInstance.getId(), caseInstance.getId(), new HashMap<>());
+        assertVariablesPresentInPostDataResponse(url, "?includeCaseVariables=true&caseInstanceId=" + caseInstance.getId(), caseInstance.getId(), caseVariables);
 
         // Without tenant ID, before setting tenant
         assertResultsPresentInDataResponse(url + "?withoutTenantId=true", caseInstance.getId(), caseInstance2.getId());
@@ -124,5 +135,33 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
             toBeFound.remove(id);
         }
         assertTrue("Not all process instances have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
+    }
+
+    private void assertVariablesPresentInPostDataResponse(String url, String queryParameters, String caseInstanceId, Map<String, Object> expectedVariables) throws IOException {
+
+        HttpGet httpPost = new HttpGet(SERVER_URL_PREFIX + url + queryParameters);
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_OK);
+
+        // Check status and size
+        JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
+        closeResponse(response);
+        assertEquals(1, dataNode.size());
+        JsonNode valueNode = dataNode.get(0);
+        assertEquals(caseInstanceId, valueNode.get("id").asText());
+
+        // Check expectec variables
+        assertEquals(expectedVariables.size(), valueNode.get("variables").size());
+
+        for(JsonNode node: valueNode.get("variables")) {
+            ObjectNode variableNode = (ObjectNode) node;
+            String variableName = variableNode.get("name").textValue();
+            Object variableValue = objectMapper.convertValue(variableNode.get("value"), Object.class);
+
+            assertTrue(expectedVariables.containsKey(variableName));
+            assertEquals(expectedVariables.get(variableName), variableValue);
+            assertEquals(expectedVariables.get(variableName).getClass().getSimpleName().toLowerCase(), variableNode.get("type").textValue());
+            assertEquals("local", variableNode.get("scope").textValue());
+        }
+
     }
 }

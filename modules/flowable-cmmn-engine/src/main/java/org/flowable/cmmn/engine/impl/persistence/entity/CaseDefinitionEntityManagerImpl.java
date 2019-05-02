@@ -106,7 +106,8 @@ public class CaseDefinitionEntityManagerImpl extends AbstractCmmnEntityManager<C
             for (HistoricMilestoneInstance historicMilestoneInstance : historicMilestoneInstances) {
                 historicMilestoneInstanceEntityManager.delete(historicMilestoneInstance.getId());
             }
-            
+
+            // Historic tasks
             HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager = getHistoricTaskInstanceEntityManager();
             List<HistoricTaskInstance> historicTaskInstances = historicTaskInstanceEntityManager
                     .findHistoricTaskInstancesByQueryCriteria(new HistoricTaskInstanceQueryImpl().scopeDefinitionId(caseDefinitionId).scopeType(ScopeTypes.CMMN)); 
@@ -114,6 +115,7 @@ public class CaseDefinitionEntityManagerImpl extends AbstractCmmnEntityManager<C
                 TaskHelper.deleteHistoricTask(historicTaskInstance.getId());
             }
 
+            // Historic Plan Items
             HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = getHistoricPlanItemInstanceEntityManager();
             historicPlanItemInstanceEntityManager.findByCaseDefinitionId(caseDefinitionId)
                     .forEach(p -> historicPlanItemInstanceEntityManager.delete(p.getId()));

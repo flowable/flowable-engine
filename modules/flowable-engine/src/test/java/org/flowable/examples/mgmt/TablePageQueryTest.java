@@ -19,10 +19,12 @@ import java.util.Map;
 import org.flowable.common.engine.api.management.TablePage;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 
 /**
  * @author Joram Barrez
  */
+@DisabledIfSystemProperty(named = "database", matches = "cockroachdb")
 public class TablePageQueryTest extends PluggableFlowableTestCase {
 
     @Test

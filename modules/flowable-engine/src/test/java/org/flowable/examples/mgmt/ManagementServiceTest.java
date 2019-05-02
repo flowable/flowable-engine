@@ -24,6 +24,7 @@ import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
+@DisabledIfSystemProperty(named = "database", matches = "cockroachdb")
 public class ManagementServiceTest extends PluggableFlowableTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ManagementServiceTest.class);

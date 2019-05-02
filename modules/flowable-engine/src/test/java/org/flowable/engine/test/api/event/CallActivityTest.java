@@ -40,6 +40,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 
 public class CallActivityTest extends PluggableFlowableTestCase {
 
@@ -694,6 +695,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
             "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityAsyncComplete.bpmn20.xml",
             "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityAsyncComplete_subprocess.bpmn20.xml"
     })
+    @DisabledIfSystemProperty(named = "database", matches = "cockroachdb")
     public void testCallActivityAsyncCompleteRealExecutor() {
         runtimeService.startProcessInstanceByKey("testAsyncComplete");
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(20000L, 200L);

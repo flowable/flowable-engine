@@ -270,8 +270,8 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
 
     @Test
     public void testNativeQuery() {
-        assertEquals("ACT_RE_MODEL", managementService.getTableName(Model.class));
-        assertEquals("ACT_RE_MODEL", managementService.getTableName(ModelEntity.class));
+        assertEquals("ACT_RE_MODEL", managementService.getTableName(Model.class, false));
+        assertEquals("ACT_RE_MODEL", managementService.getTableName(ModelEntity.class, false));
         String tableName = managementService.getTableName(Model.class);
         String baseQuerySql = "SELECT * FROM " + tableName;
 

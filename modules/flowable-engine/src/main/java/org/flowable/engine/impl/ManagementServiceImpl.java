@@ -12,6 +12,10 @@
  */
 package org.flowable.engine.impl;
 
+import java.sql.Connection;
+import java.util.List;
+import java.util.Map;
+
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.management.TableMetaData;
@@ -62,10 +66,6 @@ import org.flowable.job.service.impl.cmd.MoveTimerToExecutableJobCmd;
 import org.flowable.job.service.impl.cmd.SetJobRetriesCmd;
 import org.flowable.job.service.impl.cmd.SetTimerJobRetriesCmd;
 
-import java.sql.Connection;
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -82,6 +82,11 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     @Override
     public String getTableName(Class<?> entityClass) {
         return commandExecutor.execute(new GetTableNameCmd(entityClass));
+    }
+
+    @Override
+    public String getTableName(Class<?> entityClass, boolean includePrefix) {
+        return commandExecutor.execute(new GetTableNameCmd(entityClass, includePrefix));
     }
 
     @Override

@@ -105,6 +105,11 @@ public class HistoricCaseInstanceBaseResource {
                 query.unfinished();
             }
         }
+        if (queryRequest.getIncludeCaseVariables() != null) {
+            if (queryRequest.getIncludeCaseVariables()) {
+                query.includeCaseVariables();
+            }
+        }
         if (queryRequest.getVariables() != null) {
             addVariables(query, queryRequest.getVariables());
         }

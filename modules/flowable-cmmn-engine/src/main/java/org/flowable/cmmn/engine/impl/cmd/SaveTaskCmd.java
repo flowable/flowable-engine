@@ -50,6 +50,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
 
         if (task.getRevision() == 0) {
             TaskHelper.insertTask(task, true);
+            CommandContextUtil.getCmmnHistoryManager().recordTaskCreated(task);
 
             if (CommandContextUtil.getEventDispatcher() != null && CommandContextUtil.getEventDispatcher().isEnabled()) {
                 CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));

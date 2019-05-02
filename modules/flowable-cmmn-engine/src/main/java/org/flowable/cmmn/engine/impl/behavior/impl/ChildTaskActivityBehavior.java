@@ -26,6 +26,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public abstract class ChildTaskActivityBehavior extends CoreCmmnTriggerableActivityBehavior {
 
@@ -60,5 +61,11 @@ public abstract class ChildTaskActivityBehavior extends CoreCmmnTriggerableActiv
         }
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation((PlanItemInstanceEntity) planItemInstance);
     }
+
+    /**
+     * Called when a manual delete is triggered (NOT when a terminate/complete is triggered),
+     * for example when a deployment is deleted and everything related needs to be deleted.
+     */
+    public abstract void deleteChildEntity(CommandContext commandContext, DelegatePlanItemInstance delegatePlanItemInstance, boolean cascade);
 
 }
