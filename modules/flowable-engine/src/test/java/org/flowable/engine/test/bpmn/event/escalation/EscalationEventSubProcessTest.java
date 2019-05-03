@@ -69,7 +69,7 @@ public class EscalationEventSubProcessTest extends PluggableFlowableTestCase {
     
     @Test
     @Deployment(resources = {"org/flowable/engine/test/bpmn/event/escalation/EscalationEventSubProcessTest.testCatchChildProcessThrowEventInEventSubProcess.bpmn20.xml", 
-                    "org/flowable/engine/test/bpmn/event/escalation/throwEscalationEventSubprocess.bpmn20.xml"})
+                    "org/flowable/engine/test/bpmn/event/escalation/throwEscalationEventSubProcess.bpmn20.xml"})
     public void testCatchChildProcessThrowEventInEventSubprocess() {
         String procId = runtimeService.startProcessInstanceByKey("catchEscalationInEventSubProcess").getId();
         
