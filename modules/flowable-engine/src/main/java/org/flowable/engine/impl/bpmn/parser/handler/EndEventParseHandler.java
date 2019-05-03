@@ -17,6 +17,8 @@ import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.CancelEventDefinition;
 import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.ErrorEventDefinition;
+import org.flowable.bpmn.model.Escalation;
+import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.TerminateEventDefinition;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
@@ -52,6 +54,19 @@ public class EndEventParseHandler extends AbstractActivityBpmnParseHandler<EndEv
                     }
                 }
                 endEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createErrorEndEventActivityBehavior(endEvent, errorDefinition));
+                
+            } else if (eventDefinition instanceof EscalationEventDefinition) {
+                EscalationEventDefinition escalationDefinition = (EscalationEventDefinition) eventDefinition;
+                Escalation escalation = null;
+                if (bpmnParse.getBpmnModel().containsEscalationRef(escalationDefinition.getEscalationCode())) {
+                    escalation = bpmnParse.getBpmnModel().getEscalation(escalationDefinition.getEscalationCode());
+                    String escalationCode = escalation.getEscalationCode();
+                    if (StringUtils.isEmpty(escalationCode)) {
+                        LOGGER.warn("escalationCode is required for an escalation event {}", endEvent.getId());
+                    }
+                }
+                endEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createEscalationEndEventActivityBehavior(endEvent, escalationDefinition, escalation));
+                
             } else if (eventDefinition instanceof TerminateEventDefinition) {
                 endEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createTerminateEndEventActivityBehavior(endEvent));
             } else if (eventDefinition instanceof CancelEventDefinition) {

@@ -673,6 +673,12 @@
             "DESCRIPTION" : "Define the error name."
           }
         },
+        "ESCALATIONREFPACKAGE" : {
+          "ESCALATIONREF" : {
+            "TITLE" : "Escalation reference",
+            "DESCRIPTION" : "Define the escalation name."
+          }
+        },
         "CANCELACTIVITYPACKAGE" : {
           "CANCELACTIVITY" : {
             "TITLE" : "Cancel activity",
@@ -743,6 +749,12 @@
           "MESSAGEDEFINITIONS" : {
             "TITLE" : "Message definitions",
             "DESCRIPTION" : "Message definitions"
+          }
+        },
+        "ESCALATIONDEFINITIONSPACKAGE" : {
+          "ESCALATIONDEFINITIONS" : {
+            "TITLE" : "Escalation definitions",
+            "DESCRIPTION" : "Escalation definitions"
           }
         },
         "ISTRANSACTIONPACKAGE" : {
@@ -846,6 +858,10 @@
           "TITLE" : "Start error event",
           "DESCRIPTION" : "A start event that catches a thrown BPMN error"
         },
+        "STARTESCALATIONEVENT" : {
+          "TITLE" : "Start escalation event",
+          "DESCRIPTION" : "A start event that catches a thrown BPMN escalation"
+        },
         "USERTASK" : {
           "TITLE" : "User task",
           "DESCRIPTION" : "A manual task assigned to a specific person"
@@ -934,6 +950,10 @@
           "TITLE" : "Boundary error event",
           "DESCRIPTION" : "A boundary event that catches a BPMN error"
         },
+        "BOUNDARYESCALATIONEVENT" : {
+          "TITLE" : "Boundary escalation event",
+          "DESCRIPTION" : "A boundary event that catches a BPMN escalation"
+        },
         "BOUNDARYTIMEREVENT" : {
           "TITLE" : "Boundary timer event",
           "DESCRIPTION" : "A boundary event with a timer trigger"
@@ -974,6 +994,10 @@
           "TITLE" : "Intermediate signal throwing event",
           "DESCRIPTION" : "An intermediate event with a signal trigger"
         },
+        "THROWESCALATIONEVENT" : {
+          "TITLE" : "Intermediate escalation throwing event",
+          "DESCRIPTION" : "An intermediate event with an escalation trigger"
+        },
         "ENDNONEEVENT" : {
           "TITLE" : "End event",
           "DESCRIPTION" : "An end event without a specific trigger"
@@ -981,6 +1005,10 @@
         "ENDERROREVENT" : {
           "TITLE" : "End error event",
           "DESCRIPTION" : "An end event that throws an error event"
+        },
+        "ENDESCALATIONEVENT" : {
+          "TITLE" : "End escalation event",
+          "DESCRIPTION" : "An end event that throws an escalation event"
         },
         "ENDCANCELEVENT" : {
           "TITLE" : "End cancel event",
@@ -2499,6 +2527,11 @@
     "PROPERTY.MESSAGEDEFINITIONS.EMPTY" : "No message definitions configured",
     "PROPERTY.MESSAGEDEFINITIONS.ID" : "Id",
     "PROPERTY.MESSAGEDEFINITIONS.NAME" : "Name",
+    
+    "PROPERTY.ESCALATIONDEFINITIONS.DISPLAY" : "{{length}} escalation definitions",
+    "PROPERTY.ESCALATIONDEFINITIONS.EMPTY" : "No escalation definitions configured",
+    "PROPERTY.ESCALATIONDEFINITIONS.ID" : "Id",
+    "PROPERTY.ESCALATIONDEFINITIONS.NAME" : "Name",
 
     "PROPERTY.SEQUENCEFLOW.ORDER.EMPTY" : "No sequence flow order determined",
     "PROPERTY.SEQUENCEFLOW.ORDER.NOT.EMPTY" : "Sequence flow order set",

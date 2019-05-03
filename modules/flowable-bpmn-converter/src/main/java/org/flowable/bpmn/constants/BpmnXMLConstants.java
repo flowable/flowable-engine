@@ -49,6 +49,7 @@ public interface BpmnXMLConstants {
     public static final String ELEMENT_SIGNAL = "signal";
     public static final String ELEMENT_MESSAGE = "message";
     public static final String ELEMENT_ERROR = "error";
+    public static final String ELEMENT_ESCALATION = "escalation";
     public static final String ELEMENT_COLLABORATION = "collaboration";
     public static final String ELEMENT_PARTICIPANT = "participant";
     public static final String ELEMENT_MESSAGE_FLOW = "messageFlow";
@@ -273,6 +274,9 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_TIMER_CYCLE = "timeCycle";
     public static final String ATTRIBUTE_END_DATE = "endDate";
     public static final String ATTRIBUTE_TIMER_DURATION = "timeDuration";
+    public static final String ELEMENT_EVENT_ESCALATIONDEFINITION = "escalationEventDefinition";
+    public static final String ATTRIBUTE_ESCALATION_REF = "escalationRef";
+    public static final String ATTRIBUTE_ESCALATION_CODE = "escalationCode";
     public static final String ELEMENT_EVENT_TERMINATEDEFINITION = "terminateEventDefinition";
     public static final String ATTRIBUTE_TERMINATE_ALL = "terminateAll";
     public static final String ATTRIBUTE_TERMINATE_MULTI_INSTANCE = "terminateMultiInstance";
