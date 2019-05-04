@@ -12,17 +12,24 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavior;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.IOParameter;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Tijs Rademakers
@@ -30,12 +37,22 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  */
 public abstract class ChildTaskActivityBehavior extends CoreCmmnTriggerableActivityBehavior {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChildTaskActivityBehavior.class);
+
     protected boolean isBlocking;
     protected String isBlockingExpression;
+    protected List<IOParameter> inParameters;
+    protected List<IOParameter> outParameters;
 
     public ChildTaskActivityBehavior(boolean isBlocking, String isBlockingExpression) {
         this.isBlocking = isBlocking;
         this.isBlockingExpression = isBlockingExpression;
+    }
+
+    public ChildTaskActivityBehavior(boolean isBlocking, String isBlockingExpression, List<IOParameter> inParameters, List<IOParameter> outParameters) {
+        this(isBlocking, isBlockingExpression);
+        this.inParameters = inParameters;
+        this.outParameters = outParameters;
     }
 
     @Override
@@ -60,6 +77,86 @@ public abstract class ChildTaskActivityBehavior extends CoreCmmnTriggerableActiv
             throw new FlowableException("Can only trigger a plan item that is in the ACTIVE state");
         }
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation((PlanItemInstanceEntity) planItemInstance);
+    }
+
+    protected void handleInParameters(PlanItemInstanceEntity planItemInstanceEntity,
+                                      CmmnEngineConfiguration cmmnEngineConfiguration, Map<String, Object> inParametersMap) {
+
+        if (inParameters == null) {
+            return;
+        }
+
+        for (IOParameter inParameter : inParameters) {
+
+            String variableName = null;
+            if (StringUtils.isNotEmpty(inParameter.getTargetExpression())) {
+                Expression expression = cmmnEngineConfiguration.getExpressionManager().createExpression(inParameter.getTargetExpression());
+                Object variableNameValue = expression.getValue(planItemInstanceEntity);
+                if (variableNameValue != null) {
+                    variableName = variableNameValue.toString();
+                } else {
+                    LOGGER.warn("In parameter target expression {} did not resolve to a variable name, this is most likely a programmatic error",
+                            inParameter.getTargetExpression());
+                }
+
+            } else if (StringUtils.isNotEmpty(inParameter.getTarget())){
+                variableName = inParameter.getTarget();
+
+            }
+
+            Object variableValue = null;
+            if (StringUtils.isNotEmpty(inParameter.getSourceExpression())) {
+                Expression expression = cmmnEngineConfiguration.getExpressionManager().createExpression(inParameter.getSourceExpression());
+                variableValue = expression.getValue(planItemInstanceEntity);
+
+            } else if (StringUtils.isNotEmpty(inParameter.getSource())) {
+                variableValue = planItemInstanceEntity.getVariable(inParameter.getSource());
+
+            }
+
+            if (variableName != null) {
+                inParametersMap.put(variableName, variableValue);
+            }
+
+        }
+    }
+
+    protected void handleOutParameters(DelegatePlanItemInstance planItemInstance,
+                                       CaseInstanceEntity caseInstance,
+                                       BiFunction<String, String, Object> resolveExpression,
+                                       BiFunction<String, String, Object> getVariable) {
+
+        if (outParameters == null) {
+            return;
+        }
+
+        for (IOParameter outParameter : outParameters) {
+
+            String variableName = null;
+            if (StringUtils.isNotEmpty(outParameter.getTarget()))  {
+                variableName = outParameter.getTarget();
+
+            } else if (StringUtils.isNotEmpty(outParameter.getTargetExpression())) {
+                Object variableNameValue = resolveExpression.apply(planItemInstance.getReferenceId(), outParameter.getTargetExpression());
+                if (variableNameValue != null) {
+                    variableName = variableNameValue.toString();
+                } else {
+                    LOGGER.warn("Out parameter target expression {} did not resolve to a variable name, this is most likely a programmatic error",
+                            outParameter.getTargetExpression());
+                }
+
+            }
+
+            Object variableValue = null;
+            if (StringUtils.isNotEmpty(outParameter.getSourceExpression())) {
+                variableValue = resolveExpression.apply(planItemInstance.getReferenceId(), outParameter.getSourceExpression());
+
+            } else if (StringUtils.isNotEmpty(outParameter.getSource())) {
+                variableValue = getVariable.apply(planItemInstance.getReferenceId(), outParameter.getSource());
+
+            }
+            caseInstance.setVariable(variableName, variableValue);
+        }
     }
 
     /**

@@ -13,7 +13,6 @@
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -27,7 +26,6 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.EntityLinkUtil;
-import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.Process;
 import org.flowable.cmmn.model.ProcessTask;
@@ -48,17 +46,13 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
     protected Process process;
     protected Expression processRefExpression;
     protected String processRef;
-    protected List<IOParameter> inParameters;
-    protected List<IOParameter> outParameters;
     protected Boolean fallbackToDefaultTenant;
 
     public ProcessTaskActivityBehavior(Process process, Expression processRefExpression, ProcessTask processTask) {
-        super(processTask.isBlocking(), processTask.getBlockingExpression());
+        super(processTask.isBlocking(), processTask.getBlockingExpression(), processTask.getInParameters(), processTask.getOutParameters());
         this.process = process;
         this.processRefExpression = processRefExpression;
         this.processRef = processTask.getProcessRef();
-        this.inParameters = processTask.getInParameters();
-        this.outParameters = processTask.getOutParameters();
         this.fallbackToDefaultTenant = processTask.getFallbackToDefaultTenant();
     }
 
@@ -112,48 +106,6 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
         }
     }
 
-    protected void handleInParameters(PlanItemInstanceEntity planItemInstanceEntity,
-            CmmnEngineConfiguration cmmnEngineConfiguration, Map<String, Object> inParametersMap) {
-
-        if (inParameters == null) {
-            return;
-        }
-
-        for (IOParameter inParameter : inParameters) {
-
-            String variableName = null;
-            if (StringUtils.isNotEmpty(inParameter.getTargetExpression())) {
-                Expression expression = cmmnEngineConfiguration.getExpressionManager().createExpression(inParameter.getTargetExpression());
-                Object variableNameValue = expression.getValue(planItemInstanceEntity);
-                if (variableNameValue != null) {
-                    variableName = variableNameValue.toString();
-                } else {
-                    LOGGER.warn("In parameter target expression {} did not resolve to a variable name, this is most likely a programmatic error",
-                        inParameter.getTargetExpression());
-                }
-
-            } else if (StringUtils.isNotEmpty(inParameter.getTarget())){
-                variableName = inParameter.getTarget();
-
-            }
-
-            Object variableValue = null;
-            if (StringUtils.isNotEmpty(inParameter.getSourceExpression())) {
-                Expression expression = cmmnEngineConfiguration.getExpressionManager().createExpression(inParameter.getSourceExpression());
-                variableValue = expression.getValue(planItemInstanceEntity);
-
-            } else if (StringUtils.isNotEmpty(inParameter.getSource())) {
-                variableValue = planItemInstanceEntity.getVariable(inParameter.getSource());
-
-            }
-
-            if (variableName != null) {
-                inParametersMap.put(variableName, variableValue);
-            }
-
-        }
-    }
-
     @Override
     public void trigger(CommandContext commandContext, PlanItemInstanceEntity planItemInstance) {
         if (!PlanItemInstanceState.ACTIVE.equals(planItemInstance.getState())) {
@@ -186,45 +138,9 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
                 ProcessInstanceService processInstanceService = cmmnEngineConfiguration.getProcessInstanceService();
 
                 CaseInstanceEntity caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(planItemInstance.getCaseInstanceId());
-                handleOutParameters(planItemInstance, cmmnEngineConfiguration, processInstanceService, caseInstance);
+                handleOutParameters(planItemInstance, caseInstance, processInstanceService::resolveExpression, processInstanceService::getVariable);
 
             }
-        }
-    }
-
-    protected void handleOutParameters(DelegatePlanItemInstance planItemInstance, CmmnEngineConfiguration cmmnEngineConfiguration,
-        ProcessInstanceService processInstanceService, CaseInstanceEntity caseInstance) {
-
-        if (outParameters == null) {
-            return;
-        }
-
-        for (IOParameter outParameter : outParameters) {
-
-            String variableName = null;
-            if (StringUtils.isNotEmpty(outParameter.getTarget()))  {
-                variableName = outParameter.getTarget();
-
-            } else if (StringUtils.isNotEmpty(outParameter.getTargetExpression())) {
-                Object variableNameValue = processInstanceService.resolveExpression(planItemInstance.getReferenceId(), outParameter.getTargetExpression());
-                if (variableNameValue != null) {
-                    variableName = variableNameValue.toString();
-                } else {
-                    LOGGER.warn("Out parameter target expression {} did not resolve to a variable name, this is most likely a programmatic error",
-                        outParameter.getTargetExpression());
-                }
-
-            }
-
-            Object variableValue = null;
-            if (StringUtils.isNotEmpty(outParameter.getSourceExpression())) {
-                variableValue = processInstanceService.resolveExpression(planItemInstance.getReferenceId(), outParameter.getSourceExpression());
-
-            } else if (StringUtils.isNotEmpty(outParameter.getSource())) {
-                variableValue = processInstanceService.getVariable(planItemInstance.getReferenceId(), outParameter.getSource());
-
-            }
-            caseInstance.setVariable(variableName, variableValue);
         }
     }
 

@@ -12,13 +12,16 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CallbackTypes;
+import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
@@ -43,14 +46,14 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
     protected Boolean fallbackToDefaultTenant;
 
     public CaseTaskActivityBehavior(Expression caseRefExpression, CaseTask caseTask) {
-        super(caseTask.isBlocking(), caseTask.getBlockingExpression());
+        super(caseTask.isBlocking(), caseTask.getBlockingExpression(), caseTask.getInParameters(), caseTask.getOutParameters());
         this.caseRefExpression = caseRefExpression;
         this.fallbackToDefaultTenant = caseTask.getFallbackToDefaultTenant();
     }
 
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, Map<String, Object> variables) {
-
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         CaseInstanceHelper caseInstanceHelper = CommandContextUtil.getCaseInstanceHelper(commandContext);
         CaseInstanceBuilder caseInstanceBuilder = new CaseInstanceBuilderImpl().
                 caseDefinitionKey(caseRefExpression.getValue(planItemInstanceEntity).toString());
@@ -64,10 +67,15 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
         if (fallbackToDefaultTenant != null && fallbackToDefaultTenant) {
             caseInstanceBuilder.fallbackToDefaultTenant();
         }
-        
+
+        Map<String, Object> inParametersMap = new HashMap<>();
+        handleInParameters(planItemInstanceEntity, cmmnEngineConfiguration, inParametersMap);
+
         if (variables != null && !variables.isEmpty()) {
-            caseInstanceBuilder.variables(variables);
+            inParametersMap.putAll(variables);
         }
+
+        caseInstanceBuilder.variables(inParametersMap);
 
         CaseInstanceEntity caseInstanceEntity = caseInstanceHelper.startCaseInstance(caseInstanceBuilder);
 
@@ -111,7 +119,27 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
         if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
             // The plan item will be deleted by the regular TerminatePlanItemOperation
             CommandContextUtil.getAgenda(commandContext).planManualTerminateCaseInstanceOperation(planItemInstance.getReferenceId());
+        } else if (PlanItemTransition.COMPLETE.equals(transition)) {
+            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+            CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
+            CaseInstanceEntity caseInstance = caseInstanceEntityManager.findById(planItemInstance.getCaseInstanceId());
+            CmmnRuntimeService cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
+            handleOutParameters(
+                    planItemInstance,
+                    caseInstance,
+                    (executionId, expressionString) -> resolveExpression(cmmnEngineConfiguration, executionId, expressionString),
+                    cmmnRuntimeService::getVariable
+            );
         }
+    }
+
+    private Object resolveExpression(CmmnEngineConfiguration cmmnEngineConfiguration, String executionId, String expressionString) {
+        CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
+        Expression expression = cmmnEngineConfiguration.getExpressionManager().createExpression(expressionString);
+        return cmmnEngineConfiguration.getCommandExecutor().execute(innerCommandContext -> {
+            CaseInstanceEntity caseInstanceEntity = caseInstanceEntityManager.findById(executionId);
+            return expression.getValue(caseInstanceEntity);
+        });
     }
 
     @Override
