@@ -1,0 +1,17 @@
+[[restApiChapter]]
+
+== REST API
+
+include::../bpmn/ch02-GettingStarted.adoc[tags=getting.started.rest]
+
+=== BPMN
+
+include::../bpmn/ch14-REST.adoc[leveloffset=+1]
+
+=== DMN
+
+include::../dmn/ch07-REST.adoc[leveloffset=+1]
+
+=== FORM
+
+include::../form/ch07-REST.adoc[leveloffset=+1]

@@ -1,0 +1,366 @@
+
+== Configuration
+
+[[configuration]]
+
+=== Creating a CmmnEngine
+
+
+The Flowable CMMN engine is configured through an XML file called +flowable.cmmn.cfg.xml+. Note that this is *not* applicable if you're using <<springintegration,the Spring style of building a process engine>>.
+
+The easiest way to obtain a +CmmnEngine+ is to use the +org.flowable.cmmn.engine.CmmnEngineConfiguration+ class:
+
+[source,java,linenums]
+----
+CmmnEngine cmmnEngine = CmmnEngineConfiguration.createStandaloneCmmnEngineConfiguration();
+----
+
+This will look for a +flowable.cmmn.cfg.xml+ file on the classpath and construct an engine based on the configuration in that file. The following snippet shows an example configuration.  The following sections will give a detailed overview of the configuration properties.
+
+[source,xml,linenums]
+----
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="cmmnEngineConfiguration" class="org.flowable.cmmn.engine.CmmnEngineConfiguration">
+
+    <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000" />
+    <property name="jdbcDriver" value="org.h2.Driver" />
+    <property name="jdbcUsername" value="sa" />
+    <property name="jdbcPassword" value="" />
+
+    <property name="databaseSchemaUpdate" value="true" />
+  </bean>
+
+</beans>
+----
+
+Note that the configuration XML is in fact a Spring configuration. *This does not mean that Flowable can only be used in a Spring environment!* We are simply leveraging the parsing and dependency injection capabilities of Spring internally for building up the engine.
+
+The CmmnEngineConfiguration object can also be created programmatically using the configuration file. It is also possible to use a different bean id (for example, see line 3).
+
+[source,java,linenums]
+----
+CmmnEngineConfiguration.
+  createCmmnEngineConfigurationFromResourceDefault();
+  createCmmnEngineConfigurationFromResource(String resource);
+  createCmmnEngineConfigurationFromResource(String resource, String beanName);
+  createCmmnEngineConfigurationFromInputStream(InputStream inputStream);
+  createCmmnEngineConfigurationFromInputStream(InputStream inputStream, String beanName);
+----
+
+
+It is also possible not to use a configuration file, and create a configuration based on
+defaults (see <<configurationClasses,the different supported classes>> for more information).
+
+[source,java,linenums]
+----
+CmmnEngineConfiguration.createStandaloneCmmnEngineConfiguration();
+CmmnEngineConfiguration.createStandaloneInMemCmmnEngineConfiguration();
+----
+
+All these +CmmnEngineConfiguration.createXXX()+ methods return a +CmmnEngineConfiguration+ that can be tweaked further if needed. After calling the +buildCmmnEngine()+ operation, a +CmmnEngine+ is created:
+
+[source,java,linenums]
+----
+CmmnEngine cmmnEngine = CmmnEngineConfiguration.createStandaloneInMemCmmnEngineConfiguration()
+  .setDatabaseSchemaUpdate(CmmnEngineConfiguration.DB_SCHEMA_UPDATE_TRUE)
+  .setJdbcUrl("jdbc:h2:mem:my-own-db;DB_CLOSE_DELAY=1000")
+  .buildCmmnEngine();
+----
+
+
+
+[[configurationRoot]]
+
+
+=== CmmnEngineConfiguration bean
+
+
+The +flowable.cmmn.cfg.xml+ must contain a bean that has the id +$$'cmmnEngineConfiguration'$$+.
+
+[source,xml,linenums]
+----
+ <bean id="cmmnEngineConfiguration" class="org.flowable.cmmn.engine.CmmnEngineConfiguration">
+----
+
+
+This bean is then used to construct the +CmmnEngine+. There are multiple classes available that can be used to define the +cmmnEngineConfiguration+. These classes represent different environments, and set defaults accordingly. It's best practice to select the class that best matches your environment, to minimize the number of properties needed to configure the engine. The following classes are currently available: [[configurationClasses]]
+
+* *org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration*: this is a convenience class for unit testing purposes. Flowable will take care of all transactions. An H2 in-memory database is used by default. The database will be created and dropped when the engine boots and shuts down. When using this, no additional configuration is probably needed.
+* *org.flowable.cmmn.spring.SpringCmmnEngineConfiguration*: To be used when the CMMN engine is used in a Spring environment.  See <<springintegration,the Spring integration section>> for more information.
+
+
+[[databaseConfiguration]]
+
+=== Database configuration
+
+
+There are two ways to configure the database that the Flowable CMMN engine will use. The first option is to define the JDBC properties of the database:
+
+* *jdbcUrl*: JDBC URL of the database.
+* *jdbcDriver*: implementation of the driver for the specific database type.
+* *jdbcUsername*: username to connect to the database.
+* *jdbcPassword*: password to connect to the database.
+
+The data source that is constructed based on the provided JDBC properties will have the default link:$$http://www.mybatis.org/$$[MyBatis] connection pool settings. The following attributes can optionally be set to tweak that connection pool (taken from the MyBatis documentation):
+
+* *jdbcMaxActiveConnections*: The number of active connections that the connection pool at maximum at any time can contain. Default is 10.
+* *jdbcMaxIdleConnections*: The number of idle connections that the connection pool at maximum at any time can contain.
+* *jdbcMaxCheckoutTime*: The amount of time in milliseconds a connection can be 'checked out' from the connection pool before it is forcefully returned. Default is 20000 (20 seconds).
+* *jdbcMaxWaitTime*: This is a low level setting that gives the pool a chance to print a log status and re-attempt the acquisition of a connection in the case that it is taking unusually long (to avoid failing silently forever if the pool is misconfigured) Default is 20000 (20 seconds).
+
+Example database configuration:
+
+[source,xml,linenums]
+----
+<property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000" />
+<property name="jdbcDriver" value="org.h2.Driver" />
+<property name="jdbcUsername" value="sa" />
+<property name="jdbcPassword" value="" />
+----
+
+Our benchmarks have shown that the MyBatis connection pool is not the most efficient or resilient when dealing with a lot of concurrent requests. As such, it is advised to us a +javax.sql.DataSource+ implementation and inject it into the process engine configuration (For example HikariCP, Tomcat JDBC Connection Pool, etc.):
+
+[source,xml,linenums]
+----
+<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" >
+  <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+  <property name="url" value="jdbc:mysql://localhost:3306/flowable" />
+  <property name="username" value="flowable" />
+  <property name="password" value="flowable" />
+  <property name="defaultAutoCommit" value="false" />
+</bean>
+
+<bean id="cmmnEngineConfiguration" class="org.flowable.cmmn.engine.CmmnEngineConfiguration">
+
+  <property name="dataSource" ref="dataSource" />
+  ...
+
+----
+
+
+Note that Flowable does not ship with a library that allows you to define such a data source. So you need to make sure that the libraries are on your classpath.
+
+The following properties can be set, regardless of whether you are using the JDBC or data source approach:
+
+* *databaseType*: it's normally not necessary to specify this property, as it is automatically detected from the database connection metadata. Should only be specified when automatic detection fails. Possible values: {h2, mysql, oracle, postgres, mssql, db2}. This setting will determine which create/drop scripts and queries will be used. See <<supporteddatabases,the 'supported databases' section>> for an overview of which types are supported.
+* *databaseSchemaUpdate*: sets the strategy to handle the database schema on process engine boot and shutdown.
+** +false+ (default): Checks the version of the DB schema against the library when the process engine is being created and throws an exception if the versions don't match.
+** ++true++: Upon building the process engine, a check is performed and an update of the schema is performed if it is necessary. If the schema doesn't exist, it is created.
+** ++create-drop++: Creates the schema when the process engine is being created and drops the schema when the process engine is being closed.
+
+
+[[jndiDatasourceConfig]]
+
+=== JNDI Datasource Configuration
+
+
+By default, the database configuration for Flowable is contained within the db.properties files in the WEB-INF/classes of each web application. This isn't always ideal because it
+requires users to either modify the db.properties in the Flowable source and recompile the WAR file, or explode the WAR and modify the db.properties on every deployment.
+
+By using JNDI (Java Naming and Directory Interface) to obtain the database connection, the connection is fully managed by the Servlet Container and the configuration can be managed outside the WAR deployment. This also allows more control over the connection parameters than what is provided by the db.properties file.
+
+[[jndi_configuration]]
+
+==== Configuration
+
+Configuration of the JNDI data source will differ depending on what servlet container application you are using. The instructions below will work for Tomcat, but for other container applications, please refer to the documentation for your container app.
+
+If using Tomcat, the JNDI resource is configured within $CATALINA_BASE/conf/[enginename]/[hostname]/[warname].xml (for the Flowable UI this will usually be $CATALINA_BASE/conf/Catalina/localhost/flowable-app.xml). The default context is copied from the Flowable WAR file when the application is first deployed, so if it already exists, you will need to replace it. To change the JNDI resource so that the application connects to MySQL instead of H2, for example, change the file to the following:
+
+[source,xml,linenums]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+    <Context antiJARLocking="true" path="/flowable-app">
+        <Resource auth="Container"
+            name="jdbc/flowableDB"
+            type="javax.sql.DataSource"
+            description="JDBC DataSource"
+            url="jdbc:mysql://localhost:3306/flowable"
+            driverClassName="com.mysql.jdbc.Driver"
+            username="sa"
+            password=""
+            defaultAutoCommit="false"
+            initialSize="5"
+            maxWait="5000"
+            maxActive="120"
+            maxIdle="5"/>
+        </Context>
+----
+
+==== JNDI properties
+
+To configure a JNDI data source, use following properties in the properties file for the Flowable UI:
+
+* spring.datasource.jndi-name=: the JNDI name of the data source.
+* datasource.jndi.resourceRef: Set whether the lookup occurs in a J2EE container, for example, the prefix "java:comp/env/" needs to be added if the JNDI name doesn't already contain it. Default is "true".
+
+
+[[supporteddatabases]]
+
+
+=== Supported databases
+
+Listed below are the types (case sensitive!) that Flowable uses to refer to databases.
+
+[[databaseTypes]]
+[options="header"]
+|===============
+|Flowable database type|Example JDBC URL|Notes
+|h2|jdbc:h2:tcp://localhost/flowable|Default configured database
+|mysql|jdbc:mysql://localhost:3306/flowable?autoReconnect=true|Tested using mysql-connector-java database driver
+|oracle|jdbc:oracle:thin:@localhost:1521:xe|
+|postgres|jdbc:postgresql://localhost:5432/flowable|
+|db2|jdbc:db2://localhost:50000/flowable|
+|mssql|jdbc:sqlserver://localhost:1433;databaseName=flowable (jdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver) _OR_ jdbc:jtds:sqlserver://localhost:1433/flowable (jdbc.driver=net.sourceforge.jtds.jdbc.Driver)|Tested using Microsoft JDBC Driver 4.0 (sqljdbc4.jar) and JTDS Driver
+|===============
+
+
+[[creatingDatabaseTable]]
+
+=== Creating the database tables
+
+The easiest way to create the database tables for your database is to:
+
+* Add the flowable-cmmn-engine JARs to your classpath
+* Add a suitable database driver
+* Add a Flowable configuration file (__flowable.cmmn.cfg.xml__) to your classpath, pointing to your database (see <<databaseConfiguration,database configuration section>>)
+* Execute the main method of the _DbSchemaCreate_ class
+
+However, often only database administrators can execute DDL statements on a database. On a production system, this is also the wisest of choices. The SQL DDL statements can be found on the Flowable downloads page or inside the Flowable distribution folder, in the +database+ subdirectory. The scripts are also in the engine JAR (__flowable-cmmn-engine-x.jar__), in the package __org/flowable/cmmn/db/create__ . The SQL files are of the form
+
+----
+flowable.{db}.cmmn.create.sql
+----
+
+Where __db__ is any of the <<supporteddatabases,supported databases>>.
+
+[[database.tables.explained]]
+
+
+=== Database table names explained
+
+The database names of the Flowable CMMN Engine all start with *ACT_CMMN_*. The second part is a two-character identification of the use case of the table. This use case will also roughly match the service API.
+
+* *ACT_CMMN_**: Tables without an additional prefix contain 'static' information such as case definitions and case resources (images, rules, etc.).
+* *ACT_CMMN_RU_**: 'RU' stands for +runtime+. These are the runtime tables that contain the runtime data of case instances, plan items, and so on. Flowable only stores the runtime data during case instance execution and removes the records when a case instance ends. This keeps the runtime tables small and fast.
+* *ACT_CMMN_HI_**: 'HI' stands for +history+. These are the tables that contain historic data, such as past case instances, plan items, and so on.
+
+
+[[databaseUpgrade]]
+
+
+=== Database upgrade
+
+Make sure you make a backup of your database (using your database backup capabilities) before you run an upgrade.
+
+
+By default, a version check will be performed each time a process engine is created. This typically happens once at boot time of your application or of the Flowable webapps. If the Flowable library notices a difference between the library version and the version of the Flowable database tables, then an exception is thrown.
+
+
+To upgrade, you have to start by putting the following configuration property in your flowable.cmmn.cfg.xml configuration file:
+
+[source,xml,linenums]
+----
+<beans >
+
+  <bean id="cmmnEngineConfiguration" 
+      class="org.flowable.cmmn.engine.CmmnEngineConfiguration">
+    <!-- ... -->
+    <property name="databaseSchemaUpdate" value="true" />
+    <!-- ... -->
+  </bean>
+
+</beans>
+----
+
+*Also, include a suitable database driver for your database to the classpath.* Upgrade the Flowable libraries in your application. Or start up a new version of Flowable and point it to a database that contains data from an older version.  With +databaseSchemaUpdate+ set to +true+, Flowable will automatically upgrade the DB schema to the newest version the first time when it notices that libraries and DB schema are out of sync.
+
+*As an alternative, you can also run the upgrade DDL statements.* It's also possible to run the upgrade database scripts available on the Flowable downloads page.
+
+
+[[historyConfiguration]]
+
+
+=== History configuration
+
+Customizing the configuration of history storage is optional. This allows you to tweak settings that influence the <<history,history capabilities>> of the engine. See <<historyConfig,history configuration>> for more details.
+
+[source,xml,linenums]
+----
+<property name="history" value="audit" />
+----
+
+
+
+[[exposingConfigurationBeans]]
+
+
+=== Exposing configuration beans in expressions and scripts
+
+By default, all beans that you specify in the +flowable.cmmn.cfg.xml+ configuration or in your own Spring configuration file are available to expressions and scripts. If you want to limit the visibility of beans in your configuration file, you can configure a property called +beans+ in your process engine configuration. The beans property in +CmmnEngineConfiguration+ is a map. When you specify that property, only beans specified in that map will be visible to expressions and scripts.  The exposed beans will be exposed with the names as you specify in the map.
+
+
+[[caseDefinitionCacheConfiguration]]
+
+
+=== Deployment cache configuration
+
+All case definitions are cached (after they're parsed) to avoid hitting the database every time a case definition is needed and because case definition data doesn't change. By default, there is no limit on this cache. To limit the case definition cache, add following property:
+
+[source,xml,linenums]
+----
+<property name="caseDefinitionCacheLimit" value="10" />
+----
+
+
+Setting this property will swap the default hashmap cache with a LRU cache that has the provided hard limit. Of course, the 'best' value for this property depends on the total amount of case definitions stored and the number of case definitions actually used at runtime by all the runtime case instances.
+
+You can also inject your own cache implementation. This must be a bean that implements the org.flowable.engine.common.impl.persistence.deploy.DeploymentCache interface:
+
+[source,xml,linenums]
+----
+<property name="caseDefinitionCache">
+  <bean class="org.flowable.MyCache" />
+</property>
+----
+
+
+
+[[loggingConfiguration]]
+
+
+=== Logging
+
+All logging (flowable, spring, mybatis, ...) is routed through SLF4J and allows for selecting the logging-implementation of your choice.
+
+*By default no SFL4J-binding JAR is present in the flowable-cmmn-engine dependencies, this should be added in your project in order to use the logging framework of your choice.* If no implementation JAR is added, SLF4J will use a NOP-logger, not logging anything at all, other than a warning that nothing will be logged. For more info on these bindings link:$$http://www.slf4j.org/codes.html#StaticLoggerBinder$$[http://www.slf4j.org/codes.html#StaticLoggerBinder].
+
+With Maven, add for example a dependency like this (here using log4j), note that you still need to add a version:
+
+[source,xml,linenums]
+----
+<dependency>
+  <groupId>org.slf4j</groupId>
+  <artifactId>slf4j-log4j12</artifactId>
+</dependency>
+----
+
+
+The flowable-ui and flowable-rest webapps are configured to use Log4j-binding. Log4j is also used when running the tests for all the flowable-* modules.
+
+
+*Important note when using a container with commons-logging in the classpath:* In order to route the spring-logging through SLF4J, a bridge is used (see link:$$http://www.slf4j.org/legacy.html#jclOverSLF4J$$[http://www.slf4j.org/legacy.html#jclOverSLF4J]). If your container provides a commons-logging implementation, please follow directions on this page: link:$$http://www.slf4j.org/codes.html#release$$[http://www.slf4j.org/codes.html#release] to ensure stability.
+
+Example when using Maven (version omitted):
+
+[source,xml,linenums]
+----
+<dependency>
+  <groupId>org.slf4j</groupId>
+  <artifactId>jcl-over-slf4j</artifactId>
+</dependency>
+----
+

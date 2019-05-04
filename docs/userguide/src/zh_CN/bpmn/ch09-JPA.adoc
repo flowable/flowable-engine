@@ -1,0 +1,239 @@
+
+== JPA
+（Java Persistence API Java持久化API）
+
+可以使用JPA实体作为流程变量，这样可以：
+
+* 使用流程变量更新已有的JPA实体。流程变量可以在用户任务的表单中填写，或者通过服务任务生成。
+* 重用已有的领域模型，而不需要写专门的服务用于读取与更新实体。
+* 基于已有实体做决策（网关）。
+* ...
+
+[[_requirements]]
+=== 需求
+
+只支持完全满足下列条件的实体：
+
+* 实体需要使用JPA注解配置，字段与参数访问器都可以。也可以使用映射的父类。
+* 实体需要有使用++@Id++注解的主键，不支持复合主键（++@EmbeddedId++与++@IdClass++）。Id字段/参数可以是任何JPA规范支持的类型：原生类型与其包装器（除了boolean）、++String++、++BigInteger++、++BigDecimal++、++java.util.Date++与++java.sql.Date++。
+
+[[jpaconfiguration]]
+
+
+=== 配置
+
+引擎必须引用++EntityManagerFactory++才能使用JPA实体，可以配置引用，或者配置持久化单元名（Persistence Unit Name）。引擎会自动检测用作变量的JPA实体，并按需处理。
+
+下面的示例配置使用jpaPersistenceUnitName：
+
+[source,xml,linenums]
+----
+<bean id="processEngineConfiguration"
+  class="org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+
+<!-- 数据库配置 -->
+<property name="databaseSchemaUpdate" value="true" />
+<property name="jdbcUrl" value="jdbc:h2:mem:JpaVariableTest;DB_CLOSE_DELAY=1000" />
+
+<property name="jpaPersistenceUnitName" value="flowable-jpa-pu" />
+<property name="jpaHandleTransaction" value="true" />
+<property name="jpaCloseEntityManager" value="true" />
+
+<!-- 作业执行器配置 -->
+<property name="asyncExecutorActivate" value="false" />
+
+<!-- 邮件服务器配置 -->
+<property name="mailServerPort" value="5025" />
+</bean>
+----
+
+下面的示例配置使用自定义的++EntityManagerFactory++（open-jpa实体管理器）。请注意这段代码只包含了与本例相关的bean，而省略了其他的bean。使用open-jpa实体管理器的完整可用示例，可以在flowable-spring-examples (++/flowable-spring/src/test/java/org/flowable/spring/test/jpa/JPASpringTest.java++)中找到。
+
+[source,xml,linenums]
+----
+<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+  <property name="persistenceUnitManager" ref="pum"/>
+  <property name="jpaVendorAdapter">
+    <bean class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter">
+      <property name="databasePlatform" value="org.apache.openjpa.jdbc.sql.H2Dictionary" />
+    </bean>
+  </property>
+</bean>
+
+<bean id="processEngineConfiguration" class="org.flowable.spring.SpringProcessEngineConfiguration">
+  <property name="dataSource" ref="dataSource" />
+  <property name="transactionManager" ref="transactionManager" />
+  <property name="databaseSchemaUpdate" value="true" />
+  <property name="jpaEntityManagerFactory" ref="entityManagerFactory" />
+  <property name="jpaHandleTransaction" value="true" />
+  <property name="jpaCloseEntityManager" value="true" />
+  <property name="asyncExecutorActivate" value="false" />
+</bean>
+----
+
+也可以使用相同的配置，以编程方式构建引擎。例如：
+
+[source,java,linenums]
+----
+ProcessEngine processEngine = ProcessEngineConfiguration
+    .createProcessEngineConfigurationFromResourceDefault()
+    .setJpaPersistenceUnitName("flowable-pu")
+    .buildProcessEngine();
+----
+
+配置参数：
+
+* ++jpaPersistenceUnitName++：要使用的持久化单元的名字。（需要确保该持久化单元在classpath中可用。根据规范，默认位置为++/META-INF/persistence.xml++）。++jpaEntityManagerFactory++与++jpaPersistenceUnitName++二选一。
+
+* ++jpaEntityManagerFactory++：用于载入实体及刷入更新的，实现++javax.persistence.EntityManagerFactory++的bean。__jpaEntityManagerFactory__与__jpaPersistenceUnitName__二选一。
+
+* ++jpaHandleTransaction++：标示是否需要由引擎负责开启及提交/回滚__EntityManager__上的事务。当使用__Java Transaction API (JTA)__时，需设置为false。
+
+* ++jpaCloseEntityManager++：标示是否需要由引擎负责关闭从++EntityManagerFactory++获取的++EntityManager++实例。当__EntityManager__由容器管理时（例如，使用扩展持久化上下文 Extended Persistence Context，而不将实体范围限制为单一事务时）需设置为false。
+
+[[_usage]]
+=== 使用
+
+[[_simple_example]]
+==== 简单示例
+
+可以在Flowable源代码的JPAVariableTest中找到使用JPA变量的例子。下面逐步解释++JPAVariableTest.testUpdateJPAEntityValues++。
+
+首先，基于++META-INF/persistence.xml++为持久化单元创建__EntityManagerFactory__。包括需要包含在持久化单元内的类及一些（数据库）厂商特定配置。
+
+在这个测试里使用的是简单实体，包括id以及一个++String++值参数。在运行测试前，先创建一个实体并保存。
+
+[source,java,linenums]
+----
+@Entity(name = "JPA_ENTITY_FIELD")
+public class FieldAccessJPAEntity {
+
+  @Id
+  @Column(name = "ID_")
+  private Long id;
+
+  private String value;
+
+  public FieldAccessJPAEntity() {
+    // JPA需要的空构造方法
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public String getValue() {
+    return value;
+  }
+
+  public void setValue(String value) {
+    this.value = value;
+  }
+}
+----
+
+启动一个新的流程实例，将这个实体加入变量。与其他变量一样，它们都会在引擎中持久化存储。当下一次请求这个变量时，将会根据类及Id，从++EntityManager++载入。
+
+[source,java,linenums]
+----
+Map<String, Object> variables = new HashMap<String, Object>();
+variables.put("entityToUpdate", entityToUpdate);
+
+ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
+    "UpdateJPAValuesProcess", variables);
+----
+
+流程定义的第一个节点是++服务任务++，将调用++entityToUpdate++上的++setValue++方法。++entityToUpdate++将解析为之前启动流程实例时设置的JPA变量，并使用当前引擎的上下文中关联的++EntityManager++载入。
+
+[source,xml,linenums]
+----
+<serviceTask id='theTask' name='updateJPAEntityTask'
+  flowable:expression="${entityToUpdate.setValue('updatedValue')}" />
+----
+
+当服务任务完成时，流程实例在流程定义中的用户任务处等待，以便我们可以查看流程实例。在这时，++EntityManager++已经刷入，对实体的修改也已经存入数据库。当获取++entityToUpdate++变量的值时，将重新载入实体。所以可以得到++value++参数设置为++updatedValue++的实体。
+
+
+[source,java,linenums]
+----
+// 流程'UpdateJPAValuesProcess'中的服务任务已经设置了entityToUpdate的值。
+Object updatedEntity = runtimeService.getVariable(processInstance.getId(), "entityToUpdate");
+assertTrue(updatedEntity instanceof FieldAccessJPAEntity);
+assertEquals("updatedValue", ((FieldAccessJPAEntity)updatedEntity).getValue());
+----
+
+[[_query_jpa_process_variables]]
+==== 查询JPA流程变量
+
+可以查询以特定JPA实体作为变量值的++流程实例++与++执行++。**请注意++ProcessInstanceQuery++与++ExecutionQuery++中，只有++variableValueEquals(name, entity)++方法支持JPA实体查询**。而++variableValueNotEquals++、++variableValueGreaterThan++、++variableValueGreaterThanOrEqual++、++variableValueLessThan++与++variableValueLessThanOrEqual++等方法都不支持JPA，并会在值传递为JPA实体时，抛出++FlowableException++。
+
+[source,java,linenums]
+----
+ ProcessInstance result = runtimeService.createProcessInstanceQuery()
+    .variableValueEquals("entityToQuery", entityToQuery).singleResult();
+----
+
+[[_advanced_example_using_spring_beans_and_jpa]]
+==== 使用Spring bean与JPA的高级示例
+
+可以在++flowable-spring-examples++中找到高级用法的示例——++JPASpringTest++。它描述了一个简单的用例：
+
+* 使用一个已有的Spring bean及已定义的JPA实体，用于存储贷款申请。
+* Flowable通过该bean获取该实体，并将其用作流程中的变量。流程定义如下步骤：
+** 使用++LoanRequestBean++，并使用启动流程时（从启动表单）接收的变量创建LoanRequest（贷款申请）实体的服务任务。使用++flowable:resultVariable++将表达式结果，即所创建的实体存储为流程变量。
+** 经理用于审核并批准/驳回申请的用户任务，并将审核结论存储为boolean变量++approvedByManager++。
+** 更新贷款申请实体的服务任务，使实体与流程同步。
+** 使用一个排他网关，依据++approved++实体参数的值选择下一步采用哪条路径：若申请被批准，结束流程；否则，生成一个额外任务（Send rejection letter 发送拒信），以便客户可以收到拒信得到通知。
+
+请注意这个流程只用于单元测试，而不包含任何表单。
+
+image::images/jpa.spring.example.process.png[align="center"]
+
+[source,xml,linenums]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="taskAssigneeExample"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="org.flowable.examples">
+
+  <process id="LoanRequestProcess" name="Process creating and handling loan request">
+    <startEvent id='theStart' />
+    <sequenceFlow id='flow1' sourceRef='theStart' targetRef='createLoanRequest' />
+
+    <serviceTask id='createLoanRequest' name='Create loan request'
+      flowable:expression="${loanRequestBean.newLoanRequest(customerName, amount)}"
+      flowable:resultVariable="loanRequest"/>
+    <sequenceFlow id='flow2' sourceRef='createLoanRequest' targetRef='approveTask' />
+
+    <userTask id="approveTask" name="Approve request" />
+    <sequenceFlow id='flow3' sourceRef='approveTask' targetRef='approveOrDissaprove' />
+
+    <serviceTask id='approveOrDissaprove' name='Store decision'
+      flowable:expression="${loanRequest.setApproved(approvedByManager)}" />
+    <sequenceFlow id='flow4' sourceRef='approveOrDissaprove' targetRef='exclusiveGw' />
+
+    <exclusiveGateway id="exclusiveGw" name="Exclusive Gateway approval" />
+    <sequenceFlow id="endFlow1" sourceRef="exclusiveGw" targetRef="theEnd">
+      <conditionExpression xsi:type="tFormalExpression">${loanRequest.approved}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="endFlow2" sourceRef="exclusiveGw" targetRef="sendRejectionLetter">
+      <conditionExpression xsi:type="tFormalExpression">${!loanRequest.approved}</conditionExpression>
+    </sequenceFlow>
+
+    <userTask id="sendRejectionLetter" name="Send rejection letter" />
+    <sequenceFlow id='flow5' sourceRef='sendRejectionLetter' targetRef='theOtherEnd' />
+
+    <endEvent id='theEnd' />
+    <endEvent id='theOtherEnd' />
+  </process>
+
+</definitions>
+----
+
+尽管上面的例子很简单，但也展示了JPA与Spring结合，以及带参数方法表达式的威力。这个流程本身完全不需要写Java代码（当然还是需要写Spring bean），大幅加速了开发。
