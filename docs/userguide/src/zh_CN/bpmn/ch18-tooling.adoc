@@ -1,0 +1,174 @@
+[[Tooling]]
+== 工具
+
+[[JMX]]
+
+
+=== JMX
+
+[[jmxIntroduction]]
+
+==== 介绍
+
+可以使用标准Java管理扩展（Java Management Extensions, JMX）技术连接Flowable引擎，查询信息或修改配置。任何符合标准的JMX客户端都可以使用。通过JMX可以完成启用与禁用作业执行器、部署新的流程定义文件或删除流程等操作，而不需要写一行代码。
+
+[[jmxQuickStart]]
+
+
+==== 快速开始
+
+默认情况下没有启用JMX。用Maven或其他方法将flowable-jmx jar文件加入classpath即可使用默认配置启动JMX。如果使用Maven，可以在pom.xml中添加下列依赖：
+
+[source,xml,linenums]
+----
+<dependency>
+  <groupId>org.flowable</groupId>
+  <artifactId>flowable-jmx</artifactId>
+  <version>latest.version</version>
+</dependency>
+----
+
+在添加依赖并启动流程引擎后，就可以使用JMX进行连接了。可以使用在标准JDK发行版中提供的jconsole。在本地线程列表中，可以找到运行Flowable的JVM。如果在“本地进程”中没有列出Flowable的JVM，可以尝试使用这个URL从“远程进程”中连接：
+
+----
+service:jmx:rmi:///jndi/rmi://localhost:1099/jmxrmi/flowable
+----
+
+可以在日志文件中找到正确的本地URL。连接成功后，可以看到标准的JVM信息以及MBean。选择MBeans页签，并在右侧面板选择"org.flowable.jmx.Mbeans"，查看Flowable的MBean。选择任何MBean，都可以查询相应的信息或修改配置。如下图所示：
+
+image::images/jmx.jconsole.png[align="center"]
+
+不只是jconsole，任何JMX客户端都可以访问MBeans。大多数数据中心的监控工具都会提供连接至JMX MBeans的连接器。
+
+[[_attributes_and_operations]]
+==== 属性与操作
+
+下表是目前可用的属性与操作的列表。这个列表可能根据需要在未来版本中扩展。
+
+[options="header"]
+|===============
+|MBean|类型|名字|描述
+|ProcessDefinitionsMBean|属性|processDefinitions|已部署流程定义的++Id++、++Name++、++Version++、++IsSuspended++等参数，是一个字符串的list
+||属性|deployments|当前部署的++Id++、++Name++、++TenantId++参数
+||方法|getProcessDefinitionById(String id)|给定id流程定义的++Id++、++Name++、++Version++与++IsSuspended++参数
+||方法|deleteDeployment(String id)|删除给定++Id++的部署
+||方法|suspendProcessDefinitionById(String id)|暂停给定++Id++的流程定义
+||方法|activatedProcessDefinitionById(String id)|激活给定++Id++的流程定义
+||方法|suspendProcessDefinitionByKey(String id)|暂停给定++key++的流程定义
+||方法|activatedProcessDefinitionByKey(String id)|激活给定++key++的流程定义
+||方法|deployProcessDefinition(String resourceName, String processDefinitionFile)|部署流程定义文件
+|JobExecutorMBean|属性|isJobExecutorActivated|返回作业执行器是否在运行
+||方法|setJobExecutorActivate(Boolean active)|启用或停用作业执行器
+
+|===============
+
+[[_configuration_3]]
+==== 配置
+
+JMX默认配置为最常使用的配置，以简化部署。但也可以很容易地以代码或配置文件的方式修改默认配置。下列代码展示了如何修改配置文件：
+
+[source,xml,linenums]
+----
+<bean id="processEngineConfiguration" class="...SomeProcessEngineConfigurationClass">
+  ...
+  <property name="configurators">
+    <list>
+	  <bean class="org.flowable.management.jmx.JMXConfigurator">
+
+	    <property name="connectorPort" value="1912" />
+        <property name="serviceUrlPath" value="/jmxrmi/flowable" />
+
+		...
+      </bean>
+    </list>
+  </property>
+</bean>
+----
+
+下表展示了可配置的参数与其默认值：
+
+[options="header"]
+|===============
+|名字|默认值|描述
+|disabled|false|若值为true，即使已添加依赖也不会启动JMX
+|domain|org.flowable.jmx.Mbeans|MBean的域
+|createConnector|true|若值为true，则会创建一个连接器至MbeanServer
+|MBeanDomain|DefaultDomain|MBean服务器的域
+|registryPort|1099|注册端口，组成服务URL
+|serviceUrlPath|/jmxrmi/flowable|组成服务URL
+|connectorPort|-1|如果大于0，则作为连接端口组成服务URL
+
+|===============
+
+[[_jmx_service_url]]
+==== JMX服务URL
+
+JMX服务URL格式如下：
+
+----
+service:jmx:rmi://<hostName>:<connectorPort>/jndi/rmi://<hostName>:<registryPort>/<serviceUrlPath>
+----
+
+++hostName++自动设置为机器的网络名。可以配置++connectorPort++、++registryPort++与++serviceUrlPath++。
+
+如果++connectionPort++小于0，则服务URL不包括这部分，简化为：
+
+----
+service:jmx:rmi:///jndi/rmi://:<hostname>:<registryPort>/<serviceUrlPath>
+----
+
+
+[[mavenArchetypes]]
+=== Maven脚手架
+
+[[_create_test_case]]
+==== 创建测试用例
+
+在开发过程中，有时会需要在实际实现前，先构建一个小型的测试用例来测试想法或功能。这样可以用测试来明确目标。JUnit测试用例也是沟通功能需求及报告Bug的推荐工具。在一份bug报告或功能需求jira单中附加一个测试用例，可以显著减少修复所用的时间。
+
+用maven脚手架可以快速创建标准测试用例，简化测试用例的创建过程。标准库中应该已经有脚手架了。如果没有，也可以在**tooling/archtypes**目录下键入**mvn install**，轻松安装到本地maven仓库目录中。
+
+使用下列命令创建单元测试项目：
+
+[source]
+mvn archetype:generate \
+-DarchetypeGroupId=org.flowable \
+-DarchetypeArtifactId=flowable-archetype-unittest \
+-DarchetypeVersion=<current version> \
+-DgroupId=org.myGroup \
+-DartifactId=myArtifact
+
+下表介绍每个参数的作用：
+
+.单元测试脚手架生成参数
+|===
+|行|参数|说明
+|1|archetypeGroupId|脚手架的Group id。需要为**org.flowable**
+|2|archetypeArtifactId|脚手架Artifact id。需要为**flowable-archetype-unittest**
+|3|archetypeVersion|生成的测试项目中使用的Flowable版本
+|4|groupId|生成的测试项目的Group id
+|5|artifactId|生成的测试项目的Artifact id
+|===
+
+生成的项目的目录结构像是这样：
+
+----
+.
+├── pom.xml
+└── src
+    └── test
+        ├── java
+        │   └── org
+        │       └── myGroup
+        │           └── MyUnitTest.java
+        └── resources
+            ├── flowable.cfg.xml
+            ├── log4j.properties
+            └── org
+                └── myGroup
+                    └── my-process.bpmn20.xml
+----
+
+可以修改java单元测试用例及相应的流程模型，或者添加新的单元测试用例与流程模型。
+如果用该项目来描述bug或功能，测试用例应该在初始时失败，并在修复了bug或实现了预期的功能以后成功。
+请确保在发送之前键入**mvn clean**清理项目。

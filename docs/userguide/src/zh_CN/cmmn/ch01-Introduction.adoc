@@ -1,0 +1,50 @@
+
+== Introduction
+
+[[license]]
+
+=== License
+
+Flowable is distributed under link:$$http://www.apache.org/licenses/LICENSE-2.0.html$$[the Apache V2 license].
+
+[[download]]
+
+=== Download
+
+link:$$http://www.flowable.org/downloads.html$$[http://www.flowable.org/downloads.html]
+
+[[sources]]
+
+=== Sources
+
+The distribution contains most of the sources as JAR files. The source code of Flowable can be found on link:$$https://github.com/flowable/flowable-engine$$[https://github.com/flowable/flowable-engine]
+
+[[experimental]]
+
+=== Experimental Release
+
+This is the first release of Flowable containing the CMMN engine, which is currently marked as experimental.
+Similar to experimental features in the other engines, this means that no stability guarantees are given with regards to backwards compatibility (packages, classes, data),
+as we want to use this release to gather feedback from the community before making the API's fully final. However, future release notes will describe the changes if any such changes are made.
+
+In the next releases, we will enhance and expand on the CMMN 1.1 support and continue to add more features.
+
+[[required.software]]
+
+=== Required software
+
+Flowable runs on a JDK higher than or equal to version 8. Go to link:$$http://www.oracle.com/technetwork/java/javase/downloads/index.html$$[Oracle Java SE downloads] and click on button "Download JDK".  There are installation instructions on that page as well. To verify that your installation was successful, run +java -version+ on the command line.  That should print the installed version of your JDK.
+
+
+[[reporting.problems]]
+
+=== Reporting problems
+
+
+Questions and comments can be discussed on the on link:$$https://forum.flowable.org$$[the Flowable forum]. Issues can be created in link:$$https://github.com/flowable/flowable-engine/issues$$[our Github issue tracker].
+
+[[internal]]
+
+=== Internal implementation classes
+
+In the JAR file, all classes in packages that have +.impl.+ in them are implementation classes and should be considered internal. No stability guarantees are given on classes or interfaces that are in implementation classes.

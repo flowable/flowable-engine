@@ -1,0 +1,801 @@
+[[_configuration]]
+== 配置
+
+[[configuration]]
+
+=== 创建ProcessEngine
+
+Flowable流程引擎通过名为++flowable.cfg.xml++的XML文件进行配置。请注意这种方式与<<springintegration, 使用Spring创建流程引擎>>**不**一样。
+
+获取++ProcessEngine++，最简单的方式是使用++org.flowable.engine.ProcessEngines++类：
+
+[source,java,linenums]
+----
+ProcessEngine processEngine = ProcessEngines.getDefaultProcessEngine()
+----
+
+这样会从classpath寻找++flowable.cfg.xml++，并用这个文件中的配置构造引擎。下面的代码展示了一个配置的例子。后续章节会对配置参数进行详细介绍。
+
+[source,xml,linenums]
+----
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+
+    <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000" />
+    <property name="jdbcDriver" value="org.h2.Driver" />
+    <property name="jdbcUsername" value="sa" />
+    <property name="jdbcPassword" value="" />
+
+    <property name="databaseSchemaUpdate" value="true" />
+
+    <property name="asyncExecutorActivate" value="false" />
+
+    <property name="mailServerHost" value="mail.my-corp.com" />
+    <property name="mailServerPort" value="5025" />
+  </bean>
+
+</beans>
+----
+
+请注意这个配置XML文件实际上是一个Spring配置文件。**但这并不意味着Flowable只能用于Spring环境！**我们只是利用Spring内部的解析与依赖注入功能来简化引擎的构建过程。
+
+也可以通过编程方式使用配置文件，来构造ProcessEngineConfiguration对象。也可以使用不同的bean id(例如第3行)。
+
+[source,java,linenums]
+----
+ProcessEngineConfiguration.
+  createProcessEngineConfigurationFromResourceDefault();
+  createProcessEngineConfigurationFromResource(String resource);
+  createProcessEngineConfigurationFromResource(String resource, String beanName);
+  createProcessEngineConfigurationFromInputStream(InputStream inputStream);
+  createProcessEngineConfigurationFromInputStream(InputStream inputStream, String beanName);
+----
+
+也可以不使用配置文件，使用默认配置（参考<<configurationClasses, 不同的支持类>>获得更多信息）。
+
+
+[source,java,linenums]
+----
+ProcessEngineConfiguration.createStandaloneProcessEngineConfiguration();
+ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration();
+----
+
+所有的++ProcessEngineConfiguration.createXXX()++方法都返回++ProcessEngineConfiguration++，并可以继续按需调整。调用++buildProcessEngine()++后，生成一个++ProcessEngine++：
+
+[source,java,linenums]
+----
+ProcessEngine processEngine = ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration()
+  .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE)
+  .setJdbcUrl("jdbc:h2:mem:my-own-db;DB_CLOSE_DELAY=1000")
+  .setAsyncExecutorActivate(false)
+  .buildProcessEngine();
+----
+
+
+
+[[configurationRoot]]
+
+
+=== ProcessEngineConfiguration bean
+
+
+++flowable.cfg.xml++文件中必须包含一个id为$$'processEngineConfiguration'$$的bean。
+
+[source,xml,linenums]
+----
+ <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+----
+
+
+这个bean用于构建++ProcessEngine++。有多个类可以用于定义++processEngineConfiguration++。这些类用于不同的环境，并各自设置一些默认值。最佳实践是选择最匹配你环境的类，以便减少配置引擎需要的参数。目前可以使用的类为：[[configurationClasses]]
+
+* *org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration*：流程引擎独立运行。Flowable自行处理事务。在默认情况下，数据库检查只在引擎启动时进行（如果Flowable表结构不存在或表结构版本不对，会抛出异常）。
+* *org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration*：这是一个便于使用单元测试的类。Flowable自行处理事务。默认使用H2内存数据库。数据库会在引擎启动时创建，并在引擎关闭时删除。使用这个类时，很可能不需要更多的配置（除了使用任务执行器或邮件等功能时）。
+* *org.flowable.spring.SpringProcessEngineConfiguration*：在流程引擎处于Spring环境时使用。查看<<springintegration, Spring集成>>章节了解更多信息。
+* *org.flowable.engine.impl.cfg.JtaProcessEngineConfiguration*：用于引擎独立运行，并使用JTA事务的情况。
+
+
+[[databaseConfiguration]]
+
+=== 配置数据库
+
+
+有两种方式配置Flowable引擎使用的数据库。第一种方式是定义数据库的JDBC参数：
+
+* *jdbcUrl*: 数据库的JDBC URL。
+* *jdbcDriver*: 对应数据库类型的驱动。
+* *jdbcUsername*: 用于连接数据库的用户名。
+* *jdbcPassword*: 用于连接数据库的密码。
+
+通过提供的JDBC参数构造的数据源，使用默认的link:$$http://www.mybatis.org/$$[MyBatis]连接池设置。可用下列属性调整这个连接池（来自MyBatis文档）：
+
+* *jdbcMaxActiveConnections*: 连接池能够容纳的最大活动连接数量。默认值为10.
+* *jdbcMaxIdleConnections*: 连接池能够容纳的最大空闲连接数量。
+* *jdbcMaxCheckoutTime*: 连接从连接池“取出”后，被强制返回前的最大时间间隔，单位为毫秒。默认值为20000（20秒）。
+* *jdbcMaxWaitTime*: 这是一个底层设置，在连接池获取连接的时间异常长时，打印日志并尝试重新获取连接（避免连接池配置错误，导致没有异常提示）。默认值为20000（20秒）。
+
+数据库配置示例：
+
+[source,xml,linenums]
+----
+<property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000" />
+<property name="jdbcDriver" value="org.h2.Driver" />
+<property name="jdbcUsername" value="sa" />
+<property name="jdbcPassword" value="" />
+----
+
+我们的跑分显示MyBatis连接池在处理大量并发请求时，并不是最经济或最具弹性的。因此，建议使用++javax.sql.DataSource++的实现，并将其注入到流程引擎配置中（如Hikari、Tomcat JDBC连接池，等等）：
+
+
+[source,xml,linenums]
+----
+<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" >
+  <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+  <property name="url" value="jdbc:mysql://localhost:3306/flowable" />
+  <property name="username" value="flowable" />
+  <property name="password" value="flowable" />
+  <property name="defaultAutoCommit" value="false" />
+</bean>
+
+<bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+
+  <property name="dataSource" ref="dataSource" />
+  ...
+
+----
+
+
+请注意Flowable发布时不包括用于定义数据源的库。需要自行把库放在classpath中。
+
+无论使用JDBC还是数据源方式配置，都可以使用下列参数：
+
+* *databaseType*: 通常不需要专门设置这个参数，因为它可以从数据库连接信息中自动检测得出。只有在自动检测失败时才需要设置。可用值：{h2, mysql, oracle, postgres, mssql, db2}。这个选项会决定创建、删除与查询时使用的脚本。查看<<supporteddatabases, “支持的数据库”>>章节了解我们支持哪些类型的数据库。
+* *databaseSchemaUpdate*: 用于设置流程引擎启动关闭时使用的数据库表结构控制策略。
+** +false+ (默认): 当引擎启动时，检查数据库表结构的版本是否匹配库文件版本。版本不匹配时抛出异常。
+** ++true++: 构建引擎时，检查并在需要时更新表结构。表结构不存在则会创建。
+** ++create-drop++: 引擎创建时创建表结构，并在引擎关闭时删除表结构。
+
+[[jndiDatasourceConfig]]
+
+=== 配置JNDI数据源
+
+默认情况下，Flowable的数据库配置保存在每个web应用WEB-INF/classes文件夹下的db.properties文件中。有时这样并不合适，因为这需要用户修改Flowable源码中的db.properties文件并重新编译war包，或者在部署后解开war包并修改db.properties文件。
+
+
+通过使用JNDI（Java Naming and Directory Interface，Java命名和目录接口）获取数据库连接，连接就完全交由Servlet容器管理，并可以在WAR部署之外管理配置。同时也提供了比db.properties中更多的控制连接的参数。
+
+[[jndi_configuration]]
+
+==== 配置
+
+根据你使用的servlet容器应用不同，配置JNDI数据源的方式也不同。下面的介绍用于Tomcat，对于其他容器应用，请参考对应的文档。
+
+Tomcat的JNDI资源配置在$CATALINA_BASE/conf/[enginename]/[hostname]/[warname].xml (对于Flowable UI通常会是$CATALINA_BASE/conf/Catalina/localhost/flowable-app.xml)。当应用第一次部署时，默认会从Flowable war包中复制context.xml。所以如果存在这个文件则需要替换。例如，如果需要将JNDI资源修改为应用连接MySQL而不是H2，需要如下修改：
+
+
+[source,xml,linenums]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+    <Context antiJARLocking="true" path="/flowable-app">
+        <Resource auth="Container"
+            name="jdbc/flowableDB"
+            type="javax.sql.DataSource"
+            description="JDBC DataSource"
+            url="jdbc:mysql://localhost:3306/flowable"
+            driverClassName="com.mysql.jdbc.Driver"
+            username="sa"
+            password=""
+            defaultAutoCommit="false"
+            initialSize="5"
+            maxWait="5000"
+            maxActive="120"
+            maxIdle="5"/>
+        </Context>
+----
+
+[[_jndi_properties]]
+==== JNDI参数
+
+在Flowable UI的配置文件中使用下列参数配置JNDI数据源：
+
+* spring.datasource.jndi-name=: 数据源的JNDI名
+* datasource.jndi.resourceRef: 设置是否在J2EE容器中查找。也就是说，如果JNDI名中没有包含"java:comp/env/"前缀，是否需要添加它。默认为"true"。
+
+
+[[supporteddatabases]]
+
+
+=== 支持的数据库
+
+下面列出Flowable用于引用数据库的类型（区分大小写！）。
+
+[[databaseTypes]]
+[options="header"]
+|===============
+|Flowable数据库类型|示例JDBC URL|备注
+|h2|jdbc:h2:tcp://localhost/flowable|默认配置的数据库
+|mysql|jdbc:mysql://localhost:3306/flowable?autoReconnect=true|已使用mysql-connector-java数据库驱动测试
+|oracle|jdbc:oracle:thin:@localhost:1521:xe|
+|postgres|jdbc:postgresql://localhost:5432/flowable|
+|db2|jdbc:db2://localhost:50000/flowable|
+|mssql|jdbc:sqlserver://localhost:1433;databaseName=flowable (jdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver) _OR_ jdbc:jtds:sqlserver://localhost:1433/flowable (jdbc.driver=net.sourceforge.jtds.jdbc.Driver)|已使用Microsoft JDBC Driver 4.0 (sqljdbc4.jar)与JTDS Driver测试
+|===============
+
+
+[[creatingDatabaseTable]]
+
+=== 创建数据库表
+
+在你的数据库中创建数据库表，最简单的方法是：
+
+* 在classpath中添加flowable-engine JAR
+* 添加合适的数据库驱动
+* 在classpath中添加Flowable配置文件(__flowable.cfg.xml__)，指向你的数据库(参考<<databaseConfiguration,数据库配置>>)
+* 执行__DbSchemaCreate__类的main方法
+
+然而，通常只有数据库管理员可以在数据库中执行DDL语句，在生产环境中这也是最明智的选择。DDL的SQL脚本可以在Flowable下载页面或Flowable发布文件夹中找到，位于++database++子文件夹。引擎JAR (__flowable-engine-x.jar__)的__org/flowable/db/create__包中也有一份(__drop__文件夹存放删除脚本)。SQL文件的格式为：
+
+----
+flowable.{db}.{create|drop}.{type}.sql
+----
+
+其中__db__为<<supporteddatabases, 支持的数据库>>，而__type__为：
+
+* *engine:* 引擎执行所需的表，必需。
+* *history:* 存储历史与审计信息的表。当历史级别设置为__none__时不需要。请注意不使用这些表会导致部分使用历史数据的功能失效（如任务备注）。
+
+**MySQL用户请注意：**低于5.6.4的MySQL版本不支持timestamps或包含毫秒精度的日期。更糟的是部分版本会在创建类似的列时抛出异常，而另一些版本则不会。当使用自动创建/升级时，引擎在执行时会自动修改DDL语句。当使用DDL文件方式建表时，可以使用通用版本，或使用文件名包含__mysql55__的特殊版本（用于5.6.4以下的任何版本）。特殊版本的文件中不会使用毫秒精度的列类型。
+
+具体地说，对于MySQL的版本：
+
+* *<5.6:* 不支持毫秒精度。可以使用DDL文件（使用包含__mysql55__的文件）。可以使用自动创建/升级。
+* *5.6.0 - 5.6.3:* 不支持毫秒精度。**不**可以使用自动创建/升级。建议升级为较新版本的数据库。如果确实需要，可以使用包含__mysql55__的DDL文件。
+* *5.6.4+:* 支持毫秒精度。可以使用DDL文件（默认的包含__mysql__的文件）。可以使用自动创建/升级。
+
+
+请注意如果在Flowable表已经创建/升级后，再升级MySQL数据库，则需要手工修改列类型！
+
+
+[[database.tables.explained]]
+
+
+=== 数据库表名说明
+
+Flowable的所有数据库表都以**ACT_**开头。第二部分是说明表用途的两字符标示符。服务API的命名也大略符合这个规则。
+
+* *ACT_RE_**: 'RE'代表++repository++。带有这个前缀的表包含“静态”信息，例如流程定义与流程资源（图片、规则等）。
+* *ACT_RU_**: 'RU'代表++runtime++。这些表存储运行时信息，例如流程实例（process instance）、用户任务（user task）、变量（variable）、作业（job）等。Flowable只在流程实例运行中保存运行时数据，并在流程实例结束时删除记录。这样保证运行时表小和快。
+* *ACT_HI_**: 'HI'代表++history++。这些表存储历史数据，例如已完成的流程实例、变量、任务等。
+* *ACT_GE_**: 通用数据。在多处使用。
+
+
+[[databaseUpgrade]]
+
+
+=== 数据库升级
+
+在升级前，请确保你已经（使用数据库的备份功能）备份了数据库。
+
+默认情况下，每次流程引擎创建时会进行版本检查，通常是在你的应用或者Flowable web应用启动的时候。如果Flowable发现库版本与Flowable数据库表版本不同，会抛出异常。
+
+要进行升级，首先需要将下列配置参数放入你的flowable.cfg.xml配置文件：
+
+[source,xml,linenums]
+----
+<beans >
+
+  <bean id="processEngineConfiguration" 
+      class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+    <!-- ... -->
+    <property name="databaseSchemaUpdate" value="true" />
+    <!-- ... -->
+  </bean>
+
+</beans>
+----
+
+**同时，在classpath中加上合适的数据库驱动。**升级应用中的Flowable库，或者启动一个新版本的Flowable，并将它指向包含旧版本数据的数据库。将++databaseSchemaUpdate++设置为++true++。当Flowable发现库与数据库表结构不一致时，会自动将数据库表结构升级至新版本。
+
+**也可以直接运行升级DDL语句。**也可以从Flowable下载页面获取升级数据库脚本并运行。
+
+[[jobExecutorConfiguration]]
+
+=== 作业执行器（从6.0.1版本起）
+
+在Flowable V6中唯一可用的作业执行器，是Flowable V5中的异步执行器(async executor)。因为它为Flowable引擎提供了性能更好，对数据库也更友好的执行异步作业的方式。
+Flowable V5中的作业执行器(job executor)在V6中不再可用。可以在用户手册的高级章节找到更多信息。
+
+此外，如果在Java EE 7下运行，容器还可以使用符合JSR-236标准的++ManagedAsyncJobExecutor++来管理线程。要启用这个功能，需要在配置中如下加入线程工厂：
+
+[source,xml,linenums]
+----
+<bean id="threadFactory" class="org.springframework.jndi.JndiObjectFactoryBean">
+   <property name="jndiName" value="java:jboss/ee/concurrency/factory/default" />
+</bean>
+
+<bean id="customJobExecutor" class="org.flowable.engine.impl.jobexecutor.ManagedAsyncJobExecutor">
+   <!-- ... -->
+   <property name="threadFactory" ref="threadFactory" />
+   <!-- ... -->
+</bean>
+----
+
+如果没有设置线程工厂，ManagedAsyncJobExecutor实现会退化为默认实现（AsyncJobExecutor）。
+
+[[_job_executor_activation]]
+=== 启用作业执行器
+
+++AsyncExecutor++是管理线程池的组件，用于触发定时器与其他异步任务。也可以使用其他实现（如使用消息队列，参见用户手册的高级章节）。
+
+默认情况下，++AsyncExecutor++并未启用，也不会启动。如下配置使异步执行器与Flowable引擎一同启动：
+
+[source,xml,linenums]
+----
+<property name="asyncExecutorActivate" value="true" />
+----
+
+asyncExecutorActivate这个参数使Flowable引擎在启动同时启动异步执行器。
+
+[[mailServerConfiguration]]
+
+
+=== 配置邮件服务器
+
+配置邮件服务器是可选的。Flowable支持在业务流程中发送电子邮件。发送电子邮件需要配置有效的SMTP邮件服务器。查看<<bpmnEmailTaskServerConfiguration, 电子邮件任务>>了解配置选项。
+
+
+[[historyConfiguration]]
+
+
+=== 配置历史
+
+历史存储的配置是可选的。你可以通过调整配置控制<<history, 历史功能>>。查看<<historyConfig, 配置历史>>章节了解更多细节。
+
+[source,xml,linenums]
+----
+<property name="history" value="audit" />
+----
+
+
+[[asyncHistoryConfiguration]]
+
+
+=== 配置异步历史
+
+[实验性] 从Flowable 6.1.0起，添加了异步历史功能。当启用异步历史时，历史数据将由历史任务执行器负责持久化，而不是与运行时执行持久化同步保存。
+查看<<asyncHistoryConfig, 配置异步历史>>章节了解更多细节。
+
+[source,xml,linenums]
+----
+<property name="asyncHistoryEnabled" value="true" />
+----
+
+
+[[exposingConfigurationBeans]]
+
+
+=== 配置在表达式与脚本中可用的bean
+
+默认情况下，所有通过++flowable.cfg.xml++或你自己的Spring配置文件声明的bean，都可以在表达式与脚本中使用。如果你希望限制配置文件中bean的可见性，可以使用流程引擎配置的++beans++参数。++ProcessEngineConfiguration++中的++beans++参数是一个map。当你配置这个参数时，只有在这个map中声明的bean可以在表达式与脚本中使用。bean会使用你在map中指定的名字暴露。
+
+
+[[processDefinitionCacheConfiguration]]
+
+
+=== 配置部署缓存
+
+鉴于流程定义信息不会改变，为了避免每次使用流程定义时都读取数据库，所有的流程定义都会（在解析后）被缓存。默认情况下，这个缓存没有限制。要限制流程定义缓存，加上如下的参数
+
+[source,xml,linenums]
+----
+<property name="processDefinitionCacheLimit" value="10" />
+----
+
+
+设置这个参数，会将默认的hashmap缓存替换为LRU缓存，以进行限制。当然，参数的“最佳”取值，取决于总的流程定义数量，以及实际使用的流程定义数量。
+
+
+也可以注入自己的缓存实现。必须是一个实现了++org.flowable.engine.impl.persistence.deploy.DeploymentCache++接口的bean：
+
+[source,xml,linenums]
+----
+<property name="processDefinitionCache">
+  <bean class="org.flowable.MyCache" />
+</property>
+----
+
+
+类似的，可以使用名为++knowledgeBaseCacheLimit++与++knowledgeBaseCache++的参数配置规则缓存(rules cache)。只有在流程中使用规则任务(rules task)时才需要设置。
+
+
+[[loggingConfiguration]]
+
+
+=== 日志
+
+所有的日志（Flowable、Spring、MyBatis等）都通过SLF4J路由，并允许你自行选择日志实现。
+
+**默认情况下，Flowable引擎依赖中不提供SFL4J绑定JAR。你需要自行将其加入你的项目，以便使用所选的日志框架。**如果没有加入实现JAR，SLF4J会使用NOP-logger。这时除了一条警告外，不会记录任何日志。可以从link:$$http://www.slf4j.org/codes.html#StaticLoggerBinder$$[http://www.slf4j.org/codes.html#StaticLoggerBinder]了解关于绑定的更多信息。
+
+可以像这样（这里使用Log4j）使用Maven添加依赖，请注意你还需要加上版本：
+
+[source,xml,linenums]
+----
+<dependency>
+  <groupId>org.slf4j</groupId>
+  <artifactId>slf4j-log4j12</artifactId>
+</dependency>
+----
+
+
+Flowable-UI与Flowable-rest web应用配置为使用Log4j绑定。运行所有flowable-*模块的测试时也会使用Log4j。
+
+**重要提示：当使用classpath中带有commons-logging的容器时：**为了将spring的日志路由至SLF4j，需要使用桥接（参考link:$$http://www.slf4j.org/legacy.html#jclOverSLF4J$$[http://www.slf4j.org/legacy.html#jclOverSLF4J]）。如果你的容器提供了commons-logging实现，请按照link:$$http://www.slf4j.org/codes.html#release$$[http://www.slf4j.org/codes.html#release]页面的指示调整。
+
+
+使用Maven的示例（省略了版本）：
+
+[source,xml,linenums]
+----
+<dependency>
+  <groupId>org.slf4j</groupId>
+  <artifactId>jcl-over-slf4j</artifactId>
+</dependency>
+----
+
+
+[[MDC]]
+
+
+=== 映射诊断上下文
+
+
+Flowable支持SLF4J的映射诊断上下文特性。下列基本信息会与需要日志记录的信息一起，传递给底层日志实现：
+
+* processDefinition Id 作为 mdcProcessDefinitionID
+* processInstance Id 作为 mdcProcessInstanceID
+* execution Id 作为 mdcExecutionId
+
+默认情况下这些信息都不会被日志记录，但可以通过配置logger，按照你想要的格式，与其他日志信息一起显示。例如在Log4j中进行如下简单的格式定义，就可以让logger显示上述信息：
+
+[source,properties,linenums]
+----
+log4j.appender.consoleAppender.layout.ConversionPattern=ProcessDefinitionId=%X{mdcProcessDefinitionID}
+executionId=%X{mdcExecutionId} mdcProcessInstanceID=%X{mdcProcessInstanceID} mdcBusinessKey=%X{mdcBusinessKey} %m%n
+----
+
+如果需要使用日志中包含的信息进行实时监测（如使用日志分析器），就会很有帮助。
+
+
+[[eventDispatcher]]
+
+
+=== 事件处理器
+
+Flowable引擎中的事件机制可以让你在引擎中发生多种事件的时候得到通知。查看<<eventDispatcherEventTypes, 所有支持的事件类型>>了解可用的事件。
+
+可以只为特定种类的事件注册监听器，而不是在任何类型的事件发送时都被通知。可以<<eventDispatcherConfiguration, 通过配置>>添加引擎全局的事件监听器，<<eventDispatcherConfigurationRuntime,在运行时通过API>>添加引擎全局的事件监听器，也可以<<eventDispatcherConfigurationProcessDefinition,在BPMN XML文件为个别流程定义>>添加事件监听器。
+
+所有被分发的事件都是++org.flowable.engine.common.api.delegate.event.FlowableEvent++的子类。事件（在可用时）提供++type++, +executionId+, ++processInstanceId++与++processDefinitionId++。部分事件含有关于发生事件的上下文信息。关于事件包含的附加信息，请参阅<<eventDispatcherEventTypes, 所有支持的事件类型>>。
+
+[[eventDispatcherListener]]
+
+
+==== 实现事件监听器
+
+对事件监听器的唯一要求，是要实现++org.flowable.engine.delegate.event.FlowableEventListener++接口。下面是一个监听器实现的例子，它将接收的所有事件打印至标准输出，并对作业执行相关的事件特别处理：
+
+[source,java,linenums]
+----
+public class MyEventListener implements FlowableEventListener {
+
+  @Override
+  public void onEvent(FlowableEvent event) {
+    switch (event.getType()) {
+
+      case JOB_EXECUTION_SUCCESS:
+        System.out.println("A job well done!");
+        break;
+
+      case JOB_EXECUTION_FAILURE:
+        System.out.println("A job has failed...");
+        break;
+
+      default:
+        System.out.println("Event received: " + event.getType());
+    }
+  }
+
+  @Override
+  public boolean isFailOnException() {
+    // onEvent方法中的逻辑并不重要，可以忽略日志失败异常……
+    
+    return false;
+  }
+}
+----
+
+
+++isFailOnException()++方法决定了当事件分发后，++onEvent(..)++方法抛出异常时的行为。若返回++false++，忽略异常；若返回++true++，异常不会被忽略而会被上抛，使当前执行的命令失败。如果事件是API调用（或其他事务操作，例如作业执行）的一部分，事务将被回滚。如果事件监听器中并不是重要的业务操作，建议返回++false++。
+
+Flowable提供了少量基础实现，以简化常用的事件监听器使用场景。它们可以被用作监听器的示例或基类：
+
+* *org.flowable.engine.delegate.event.BaseEntityEventListener*: 事件监听器基类，可用来监听实体（entity）相关事件，特定或所有实体的事件都可以。它隐藏了类型检测，提供了4个需要覆盖的方法：++onCreate(..)++, ++onUpdate(..)++与++onDelete(..)++在实体创建、更新及删除时调用；对所有其他实体相关事件，++onEntityEvent(..)++会被调用。
+
+
+
+[[eventDispatcherConfiguration]]
+
+
+==== 配置与使用
+
+在流程引擎中配置的事件监听器会在流程引擎启动时生效，引擎重启后也会保持有效。
+
+++eventListeners++参数为++org.flowable.engine.delegate.event.FlowableEventListener++类实例的列表(list)。与其他地方一样，你可以声明内联bean定义，也可以用++ref++指向已有的bean。下面的代码片段在配置中添加了一个事件监听器，无论任何类型的事件分发时，都会得到通知：
+
+[source,xml,linenums]
+----
+<bean id="processEngineConfiguration" 
+    class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+    ...
+    <property name="eventListeners">
+      <list>
+         <bean class="org.flowable.engine.example.MyEventListener" />
+      </list>
+    </property>
+</bean>
+----
+
+要在特定类型的事件分发时得到通知，使用++typedEventListeners++参数，值为map。map的key为逗号分隔的事件名字列表（或者一个事件的名字），取值为++org.flowable.engine.delegate.event.FlowableEventListener++实例的列表。下面的代码片段在配置中添加了一个事件监听器，它会在作业执行成功或失败时得到通知：
+
+[source,xml,linenums]
+----
+<bean id="processEngineConfiguration" 
+    class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+    ...
+    <property name="typedEventListeners">
+      <map>
+        <entry key="JOB_EXECUTION_SUCCESS,JOB_EXECUTION_FAILURE" >
+          <list>
+            <bean class="org.flowable.engine.example.MyJobEventListener" />
+          </list>
+        </entry>
+      </map>
+    </property>
+</bean>
+----
+
+
+事件分发的顺序由加入监听器的顺序决定。首先，所有普通(++eventListeners++参数定义的)事件监听器按照在++list++里的顺序被调用；之后，如果分发的是某类型的事件，则(++typedEventListeners++ 参数定义的)该类型监听器被调用。
+
+
+[[eventDispatcherConfigurationRuntime]]
+
+==== 在运行时添加监听器
+
+可以使用API(++RuntimeService++)为引擎添加或删除事件监听器：
+
+[source,java,linenums]
+----
+
+/**
+ * 新增一个监听器，会在所有事件发生时被通知。
+ * @param listenerToAdd 要新增的监听器
+ */
+void addEventListener(FlowableEventListener listenerToAdd);
+
+/**
+ * 新增一个监听器，在给定类型的事件发生时被通知。
+ * @param listenerToAdd 要新增的监听器
+ * @param types 监听器需要监听的事件类型
+ */
+void addEventListener(FlowableEventListener listenerToAdd, FlowableEventType... types);
+
+/**
+ * 从分发器中移除指定监听器。该监听器将不再被通知，无论该监听器注册为监听何种类型。
+ * @param listenerToRemove 要移除的监听器
+ */
+ void removeEventListener(FlowableEventListener listenerToRemove);
+----
+
+请注意，运行时新增的监听器**在引擎重启后不会保持。**
+
+
+[[eventDispatcherConfigurationProcessDefinition]]
+
+
+==== 为流程定义增加监听器
+
+可以为某一流程定义增加监听器。只有与该流程定义相关，或使用该流程定义启动的流程实例相关的事件，才会调用这个监听器。监听器实现可以用完全限定类名（fully qualified classname）定义；也可以定义为表达式，该表达式需要能被解析为实现监听器接口的bean；也可以配置为抛出消息（message）/信号（signal）/错误（error）的BPMN事件。
+
+
+[[_listeners_executing_user_defined_logic]]
+===== 执行用户定义逻辑的监听器
+
+下面的代码片段为流程定义增加了2个监听器。第一个监听器接收任何类型的事件，使用完全限定类名定义。第二个监听器只在作业成功执行或失败时被通知，使用流程引擎配置中++beans++参数定义的bean作为监听器。
+
+[source,xml,linenums]
+----
+<process id="testEventListeners">
+  <extensionElements>
+    <flowable:eventListener class="org.flowable.engine.test.MyEventListener" />
+    <flowable:eventListener delegateExpression="${testEventListener}" events="JOB_EXECUTION_SUCCESS,JOB_EXECUTION_FAILURE" />
+  </extensionElements>
+
+  ...
+
+</process>
+----
+
+实体相关的事件也可以在流程定义中增加监听器，只有在特定实体类型的事件发生时得到通知。下面的代码片段展示了如何设置。可以响应实体的所有事件（第一个例子），或只响应实体的特定类型事件（第二个例子）。
+
+
+[source,xml,linenums]
+----
+<process id="testEventListeners">
+  <extensionElements>
+    <flowable:eventListener class="org.flowable.engine.test.MyEventListener" entityType="task" />
+    <flowable:eventListener delegateExpression="${testEventListener}" events="ENTITY_CREATED" entityType="task" />
+  </extensionElements>
+
+  ...
+
+</process>
+----
+
+++entityType++可用的值有：++attachment++（附件）, ++comment++（备注）, ++execution++（执行）, ++identity-link++（身份关联）, ++job++（作业）, ++process-instance++（流程实例）, ++process-definition++（流程定义）, ++task++（任务）。
+
+[[_listeners_throwing_bpmn_events]]
+
+===== 抛出BPMN事件的监听器
+
+处理分发的事件的另一个方法，是抛出BPMN事件。请牢记在心，只有特定种类的Flowable事件类型，抛出BPMN事件才合理。例如，在流程实例被删除时抛出BPMN事件，会导致错误。下面的代码片段展示了如何在流程实例中抛出信号，向外部流程（全局）抛出信号，在流程实例中抛出消息事件，以及在流程实例中抛出错误事件。这里不使用++class++或++delegateExpression++，而要使用++throwEvent++属性，以及一个附加属性，用于指定需要抛出的事件类型。
+
+[source,xml,linenums]
+----
+<process id="testEventListeners">
+  <extensionElements>
+    <flowable:eventListener throwEvent="signal" signalName="My signal" events="TASK_ASSIGNED" />
+  </extensionElements>
+</process>
+----
+
+[source,xml,linenums]
+----
+<process id="testEventListeners">
+  <extensionElements>
+    <flowable:eventListener throwEvent="globalSignal" signalName="My signal" events="TASK_ASSIGNED" />
+  </extensionElements>
+</process>
+----
+
+
+[source,xml,linenums]
+----
+<process id="testEventListeners">
+  <extensionElements>
+    <flowable:eventListener throwEvent="message" messageName="My message" events="TASK_ASSIGNED" />
+  </extensionElements>
+</process>
+----
+
+[source,xml,linenums]
+----
+<process id="testEventListeners">
+  <extensionElements>
+    <flowable:eventListener throwEvent="error" errorCode="123" events="TASK_ASSIGNED" />
+  </extensionElements>
+</process>
+----
+
+如果需要使用额外的逻辑判断是否需要抛出BPMN事件，可以扩展Flowable提供的监听器类。通过在你的子类中覆盖++isValidEvent(FlowableEvent event)++，可以阻止抛出BPMN事件。相关的类为++org.flowable.engine.test.api.event.SignalThrowingEventListenerTest++, ++org.flowable.engine.impl.bpmn.helper.MessageThrowingEventListener++与++org.flowable.engine.impl.bpmn.helper.ErrorThrowingEventListener++.
+
+[[_notes_on_listeners_on_a_process_definition]]
+===== 关于流程定义监听器的说明
+
+* 事件监听器只能作为++extensionElements++的子元素，声明在++process++元素上。不能在个别节点（activity）上定义（事件）监听器。
+* ++delegateExpression++中的表达式，与其他表达式（例如在网关中的）不一样，不可以访问执行上下文。只能够引用在流程引擎配置中++beans++参数定义的bean；或是在使用spring（且没有定义beans参数）时，引用任何实现了监听器接口的spring bean。
+* 使用监听器的++class++属性时，只会创建唯一一个该类的实例。请确保监听器实现不依赖于成员变量，或确保多线程/上下文的使用安全。
+* 如果++events++属性使用了不合法的事件类型，或者使用了不合法的++throwEvent++值，会在流程定义部署时抛出异常（导致部署失败）。如果++class++或++delegateExecution++指定了不合法的值（不存在的类，不存在的bean引用，或者代理类没有实现监听器接口），在流程启动（或该流程定义的第一个有效事件分发给这个监听器）时，会抛出异常。请确保引用的类在classpath中，并且保证表达式能够解析为有效的实例。
+
+
+[[eventDispatcherCustomEvents]]
+
+==== 通过API分发事件
+
+
+可以通过API提供事件分发机制，向任何在引擎中注册的监听器分发自定义事件。建议（但不强制）只分发++CUSTOM++类型的++FlowableEvents++。使用++RuntimeService++分发事件：
+
+[source,java,linenums]
+----
+
+/**
+ * 将给定事件分发给所有注册监听器。
+ * @param event 要分发的事件。
+ *
+ * @throws FlowableException 当分发事件发生异常，或者{@link FlowableEventDispatcher}被禁用。
+ * @throws FlowableIllegalArgumentException 当给定事件不可分发
+ */
+ void dispatchEvent(FlowableEvent event);
+----
+
+[[eventDispatcherEventTypes]]
+
+
+==== 支持的事件类型
+
+下表列出引擎中的所有事件类型。每种类型对应++org.flowable.engine.common.api.delegate.event.FlowableEventType++中的一个枚举值。
+
+
+[[eventTypes]]
+.Supported events
+[options="header"]
+|===============
+|事件名称|说明|事件类
+|ENGINE_CREATED|本监听器所属的流程引擎已经创建，并可以响应API调用。|+org.flowable...FlowableEvent+
+|ENGINE_CLOSED|本监听器所属的流程引擎已经关闭，不能再对该引擎进行API调用。|+org.flowable...FlowableEvent+
+|ENTITY_CREATED|新的实体已经创建。该实体包含在本事件里。|+org.flowable...FlowableEntityEvent+
+|ENTITY_INITIALIZED|新的实体已经创建并完全初始化。如果任何子实体作为该实体的一部分被创建，本事件会在子实体创建/初始化后触发，与 +$$ENTITY_CREATE$$+ 事件相反。|+org.flowable...FlowableEntityEvent+
+|ENTITY_UPDATED|实体已经更新。该实体包含在本事件里。|+org.flowable...FlowableEntityEvent+
+|ENTITY_DELETED|实体已经删除。该实体包含在本事件里。|+org.flowable...FlowableEntityEvent+
+|ENTITY_SUSPENDED|实体已经暂停。该实体包含在本事件里。ProcessDefinitions（流程定义）, ProcessInstances（流程实例）与Tasks（任务）会分发本事件。|+org.flowable...FlowableEntityEvent+
+|ENTITY_ACTIVATED|实体已经激活。该实体包含在本事件里。ProcessDefinitions, ProcessInstances与Tasks会分发本事件。|+org.flowable...FlowableEntityEvent+
+|JOB_EXECUTION_SUCCESS|作业已经成功执行。该作业包含在本事件里。|+org.flowable...FlowableEntityEvent+
+|JOB_EXECUTION_FAILURE|作业执行失败。该作业与异常包含在本事件里。|+org.flowable...FlowableEntityEvent+ 及 +org.flowable...FlowableExceptionEvent+
+|JOB_RETRIES_DECREMENTED|作业重试次数已经由于执行失败而减少。该作业包含在本事件里。|+org.flowable...FlowableEntityEvent+
+|TIMER_SCHEDULED|已创建一个定时作业，并预计在未来时间点执行。|+org.flowable...FlowableEntityEvent+
+|TIMER_FIRED|定时器已经触发。|+org.flowable...FlowableEntityEvent+
+|JOB_CANCELED|作业已经取消。该作业包含在本事件里。作业会由于API调用取消，任务完成导致关联的边界定时器取消，也会由于新流程定义的部署而取消。|+org.flowable...FlowableEntityEvent+
+|ACTIVITY_STARTED|节点开始执行|+org.flowable...FlowableActivityEvent+
+|ACTIVITY_COMPLETED|节点成功完成|+org.flowable...FlowableActivityEvent+
+|ACTIVITY_CANCELLED|节点将要取消。节点的取消有三个原因（MessageEventSubscriptionEntity, SignalEventSubscriptionEntity, TimerEntity）。|+org.flowable...FlowableActivityCancelledEvent+
+|ACTIVITY_SIGNALED|节点收到了一个信号|+org.flowable...FlowableSignalEvent+
+|ACTIVITY_MESSAGE_RECEIVED|节点收到了一个消息。事件在节点接收消息前分发。节点接收消息后，会为该节点分发 +$$ACTIVITY_SIGNAL$$+ 或 +$$ACTIVITY_STARTED$$+ 事件，取决于其类型（边界事件，或子流程启动事件）。|+org.flowable...FlowableMessageEvent+
+|ACTIVITY_MESSAGE_WAITING|一个节点已经创建了一个消息事件订阅，并正在等待接收消息。|+org.flowable...FlowableMessageEvent+
+|ACTIVITY_MESSAGE_CANCELLED|一个节点已经取消了一个消息事件订阅，因此接收这个消息不会再触发该节点。|+org.flowable...FlowableMessageEvent+
+|ACTIVITY_ERROR_RECEIVED|节点收到了错误事件。在节点实际处理错误前分发。该事件的++activityId++为处理错误的节点。如果错误成功传递，后续会为节点发送 +$$ACTIVITY_SIGNALLED$$+ 或 +$$ACTIVITY_COMPLETE$$+ 消息。|+org.flowable...FlowableErrorEvent+
+|UNCAUGHT_BPMN_ERROR|抛出了未捕获的BPMN错误。流程没有该错误的处理器。该事件的++activityId++为空。|+org.flowable...FlowableErrorEvent+
+|ACTIVITY_COMPENSATE|节点将要被补偿(compensate)。该事件包含将要执行补偿的节点id。|+org.flowable...FlowableActivityEvent+
+|MULTI_INSTANCE_ACTIVITY_STARTED|多实例节点开始执行|+org.flowable...FlowableMultiInstanceActivityEvent+
+|MULTI_INSTANCE_ACTIVITY_COMPLETED|多实例节点成功完成|+org.flowable...FlowableMultiInstanceActivityEvent+
+|MULTI_INSTANCE_ACTIVITY_CANCELLED|多实例节点将要取消。多实例节点的取消有三个原因（MessageEventSubscriptionEntity, SignalEventSubscriptionEntity, TimerEntity）。|+org.flowable...FlowableMultiInstanceActivityCancelledEvent+
+|VARIABLE_CREATED|流程变量已经创建。本事件包含变量名、取值，及关联的执行和任务（若有）。|+org.flowable...FlowableVariableEvent+
+|VARIABLE_UPDATED|变量已经更新。本事件包含变量名、取值，及关联的执行和任务（若有）。|+org.flowable...FlowableVariableEvent+
+|VARIABLE_DELETED|变量已经删除。本事件包含变量名、最后取值，及关联的执行和任务（若有）。|+org.flowable...FlowableVariableEvent+
+|TASK_ASSIGNED|任务已经分派给了用户。该任务包含在本事件里。|+org.flowable...FlowableEntityEvent+
+|TASK_CREATED|任务已经创建。本事件在 +$$ENTITY_CREATE$$+ 事件之后分发。若该任务是流程的一部分，本事件会在任务监听器执行前触发。|+org.flowable...FlowableEntityEvent+
+|TASK_COMPLETED|任务已经完成。本事件在 +$$ENTITY_DELETE$$+ 事件前分发。若该任务是流程的一部分，本事件会在流程前进之前触发，并且会跟随一个 +$$ACTIVITY_COMPLETE$$+ 事件，指向代表该任务的节点。|+org.flowable...FlowableEntityEvent+
+|PROCESS_CREATED|流程实例已经创建。已经设置所有的基础参数，但还未设置变量。|+org.flowable...FlowableEntityEvent+
+|PROCESS_STARTED|流程实例已经启动。在启动之前创建的流程时分发。PROCESS_STARTED事件在相关的ENTITY_INITIALIZED事件，以及设置变量之后分发。|+org.flowable...FlowableEntityEvent+
+|PROCESS_COMPLETED|流程实例已经完成。在最后一个节点的 +$$ACTIVITY_COMPLETED $$+ 事件后分发。当流程实例没有任何路径可以继续时，流程结束。|+org.flowable...FlowableEntityEvent+
+|PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT| 流程已经到达终止结束事件(terminate end event)并结束。|+org.flowable...FlowableProcessTerminatedEvent+
+|PROCESS_CANCELLED|流程已经被取消。在流程实例从运行时中删除前分发。流程实例由API调用++RuntimeService.deleteProcessInstance++取消。|+org.flowable...FlowableCancelledEvent+
+|MEMBERSHIP_CREATED|用户已经加入组。本事件包含了相关的用户和组的id。|+org.flowable...FlowableMembershipEvent+
+|MEMBERSHIP_DELETED|用户已经从组中移出。本事件包含了相关的用户和组的id。|+org.flowable...FlowableMembershipEvent+
+|MEMBERSHIPS_DELETED|组的所有用户将被移出。本事件在用户移出前抛出，因此关联关系仍然可以访问。因为性能原因，不会再为每个被移出的用户抛出 +$$MEMBERSHIP_DELETED$$+ 事件。|+org.flowable...FlowableMembershipEvent+
+
+|===============
+
+
+引擎中所有的 +$$ENTITY_\*$$+ 事件都与实体关联。下表列出每个实体分发的实体事件：
+
+* *+$$ENTITY_CREATED, ENTITY_INITIALIZED, ENTITY_DELETED$$+*: 附件(Attachment)，备注(Comment)，部署(Deployment)，执行(Execution)，组(Group)，身份关联(IdentityLink)，作业(Job)，模型(Model)，流程定义(ProcessDefinition)，流程实例(ProcessInstance)，任务(Task)，用户(User)。
+* *+$$ENTITY_UPDATED$$+*: 附件，部署，执行，组，身份关联，作业，模型，流程定义，流程实例，任务，用户。
+* *+$$ENTITY_SUSPENDED, ENTITY_ACTIVATED$$+*: 流程定义，流程实例/执行，任务。
+
+
+[[eventDispatcherRemarks]]
+
+
+==== 附加信息
+
+
+**监听器只会响应其所在引擎分发的事件。**因此如果在同一个数据库上运行不同的引擎，则只有该监听器注册的引擎生成的事件，才会分发给该监听器。其他引擎生成的事件不会分发给这个监听器，而不论这些引擎是否运行在同一个JVM下。
+
+某些事件类型（与实体相关）暴露了目标实体。按照事件类型的不同，有些实体不能被更新（如实体删除事件中的实体）。如果可能的话，请使用事件暴露的++EngineServices++来安全地操作引擎。即使这样，更新、操作事件中暴露的实体仍然需要小心。
+
+历史不会分发实体事件，因为它们都有对应的运行时实体分发事件。
+
