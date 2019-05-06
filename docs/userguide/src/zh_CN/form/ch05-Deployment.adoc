@@ -1,23 +1,22 @@
 [[chDeployment]]
 
-== Deployment
+== 部署
 
-=== Form Definitions
+=== 表单定义
 
-Form Definitions with +.form+ extension can be deployed to the Form engine.
+**表单定义**带有++.form++后缀名，可以被部署到**表单引擎**。
 
-When the Form engine is plugged into the Process engine, the Form definitions can be packed into a business archive (BAR) together with other process related resources. The Process engine deployment service will take care of deploying the Form resources to the Form engine when the flowable-form-engine-configurator or flowable-form-spring-configurator modules are used.
-
-
-==== Form Definitions
-
-A Form definition consists of one or more form field definitions. 
-When deploying a Form definition, it is inserted into the ACT_FO_FORM_DEFINITION table. 
+当**表单引擎**接入**流程引擎**后，**表单定义**和与此流程相关其他资源，将被打包进一个业务存档(BAR, Business archive)中。若使用了 flowable-form-engine-configurator 或 flowable-form-spring-configurator 模块，**流程引擎**部署服务将负责把表单资源部署到**流程引擎**中。
 
 
-==== Deploying programmatically
+==== 表单定义
 
-Deploying a Form definition can be done like this:
+每个**表单定义**由一个或多个表单字段定义组成。当部署一个**表单定义**时，其信息将会被插入到 ACT_FO_FORM_DEFINITION 表中。
+
+
+==== 编程方式部署
+
+可使用如下方式部署一个**表单定义**：
 
 [source,java,linenums]
 ----
@@ -34,18 +33,18 @@ formRepositoryService.createDeployment()
 [[versioningOfFormDefinitions]]
 
 
-=== Versioning of Form definitions
+=== 表单定义的版本管理
 
-Versions of Form definitions are created during deployment, where Flowable will assign a version to the +form definition+ before it is stored in the Flowable Form DB.
+**表单定义**的版本会在部署期间创建，Flowable在将**表单定义**存储到表单数据库前，为其分配一个版本。
 
-For each Form definition, the following steps are performed to initialize the properties +key+, +version+, +name+ and ++id++:
+对于每个**表单定义**，执行以下步骤来初始化这些属性++key++、++version++、 ++name++和++id++：
 
-* The form definition +key+ attribute in the definition JSON file is used as the form definition +key+ property.
-* The form definition +name+ attribute in the JSON file is used as the form definition +name+ property.
-* The first time a form definition with a particular key is deployed, version 1 is assigned. For all subsequent deployments of form definition with the same key, the version will be set 1 higher than the maximum currently deployed version. The key property is used to distinguish form definition.
-* The id property is a unique number to guarantee uniqueness of the form definition id for the form definition caches in a clustered environment.
+* 表单定义JSON文件中的++key++属性，被用作数据库中表单定义信息表的++key++属性。
+* 表单定义JSON文件中的++name++属性，被用作数据库中表单定义信息表的++name++属性。
+* 当首次以一个特定的++key++属性部署表单定义时，将分配版本为1。对于具有相同++key++属性表单定义的所有后续部署，版本将设置为当前已部署的最大版本号加1。++key++属性用来区分不同的表单定义。
+* ++id++属性是一个唯一的编号，用以保证在集群环境下，流程定义缓存中，流程++id++的唯一性。
 
-Take, for example, the following form definition:
+表单定义示例如下：
 
 [source,json,linenums]
 ----
@@ -64,7 +63,7 @@ Take, for example, the following form definition:
 }
 ----
 
-When deploying this form definition, the form definition table in the database will look like this:
+当部署此表单定义后，数据库中表单定义信息表将如下所示：
 
 [options="header"]
 |===============
@@ -74,7 +73,7 @@ When deploying this form definition, the form definition table in the database w
 |===============
 
 
-Suppose we now deploy an updated version of the same form definition (for example, changing the text field), but the ++key++ of the form definition remains the same. The form definition table will now contain the following entries:
+假设我们现在部署相同表单定义的一个更新版本（例如，更改文本变量），但表单定义的++key++属性保持不变。数据库中表单定义信息表将包含以下条目：
 
 [options="header"]
 |===============
@@ -84,7 +83,7 @@ Suppose we now deploy an updated version of the same form definition (for exampl
 
 |===============
 
-Should we create a second form definition, as defined below, and deploy this to Flowable Form Engine, a third row will be added to the table.
+如果我们创建第二个表单定义，如下所示，并将其部署到Flowable**表单引擎**，第三行将会添加到表中。
 
 [source,xml,linenums]
 ----
@@ -103,7 +102,7 @@ Should we create a second form definition, as defined below, and deploy this to 
 }
 ----
 
-The table will look like this:
+数据库中表单定义信息表将如下所示：
 
 [options="header"]
 |===============
@@ -114,16 +113,16 @@ The table will look like this:
 
 |===============
 
-Note how the key for the new form definition is different from our first form definition. The Flowable Form engine only considers the +key+ attribute when distinguishing form definitions. The new form definition is therefore deployed with version 1.
+请注意新表单定义的++key++属性与第一个表单定义不同。 Flowable**表单引擎**仅使用++key++属性区分表单定义。因此，新的表单定义部署版本为1。
 
 
 [[deploymentCategory]]
 
 
-=== Category
+=== 类别
 
-Both Form deployments and form definitions can have user-defined categories.
-The deployment category can be specified in the API like this:
+**表单部署**和**表单定义**都可以具有用户定义的类别。
+部署类别可以在如下API中指定：
 
 [source,java,linenums]
 ----
@@ -134,7 +133,7 @@ formRepository
     .deploy();
 ----
 
-The form definition category can be specified in the API like this:
+表单定义类别可以在如下API中指定:
 
 [source,java,linenums]
 ----
