@@ -38,6 +38,7 @@ public class EventSubscriptionUtil {
         JobEntity message = jobService.createJob();
         message.setJobType(JobEntity.JOB_TYPE_MESSAGE);
         message.setJobHandlerType(ProcessEventJobHandler.TYPE);
+        message.setElementId(eventSubscriptionEntity.getActivityId());
         message.setJobHandlerConfiguration(eventSubscriptionEntity.getId());
         message.setTenantId(eventSubscriptionEntity.getTenantId());
 

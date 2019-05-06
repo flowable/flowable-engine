@@ -29,7 +29,7 @@
 
 		<junit.version>4.12</junit.version>
 		<junit.jupiter.version>5.3.2</junit.jupiter.version>
-		<mockito.version>2.25.1</mockito.version>
+		<mockito.version>2.27.0</mockito.version>
 
         <checkstyle.config.location>checkstyle/flowable-checkstyle.xml</checkstyle.config.location>
         <checkstyle.suppressions.location>/checkstyle/flowable-suppressions.xml</checkstyle.suppressions.location>
@@ -106,7 +106,7 @@
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
-				<version>3.8.1</version>
+				<version>3.9</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
@@ -1012,6 +1012,9 @@
 		<module>modules/flowable-idm-engine-configurator</module>
 		<module>modules/flowable-form-model</module>
 		<module>modules/flowable-form-api</module>
+        <module>modules/flowable-form-json-converter</module>
+        <module>modules/flowable-form-engine</module>
+        <module>modules/flowable-form-engine-configurator</module>
 		<module>modules/flowable-dmn-model</module>
 		<module>modules/flowable-dmn-api</module>
 		<module>modules/flowable-content-api</module>
@@ -1020,6 +1023,7 @@
         <module>modules/flowable-cmmn-converter</module>
         <module>modules/flowable-cmmn-image-generator</module>
         <module>modules/flowable-cmmn-engine</module>
+		<module>modules/flowable-cmmn-engine-configurator</module>
         <module>modules/flowable-variable-service-api</module>
 		<module>modules/flowable-variable-service</module>
         <module>modules/flowable-identitylink-service-api</module>
@@ -1450,6 +1454,23 @@
                 <module>modules/flowable-spring-configurator</module>
 				<module>modules/flowable-secure-javascript</module>
 				<module>modules/flowable-groovy-script-static-engine</module>
+                <module>modules/flowable-form-model</module>
+                <module>modules/flowable-form-json-converter</module>
+                <module>modules/flowable-form-engine</module>
+                <module>modules/flowable-form-engine-configurator</module>
+                <module>modules/flowable-form-spring</module>
+                <module>modules/flowable-form-spring-configurator</module>
+                <module>modules/flowable-form-rest</module>
+                <module>modules/flowable-idm-engine-configurator</module>
+                <module>modules/flowable-idm-spring</module>
+                <module>modules/flowable-idm-spring-configurator</module>
+                <module>modules/flowable-idm-rest</module>
+                <module>modules/flowable-content-engine</module>
+                <module>modules/flowable-content-engine-configurator</module>
+                <module>modules/flowable-content-spring</module>
+                <module>modules/flowable-content-spring-configurator</module>
+                <module>modules/flowable-content-rest</module>
+                <module>modules/flowable-spring</module>
                 <module>modules/flowable-app-engine-spring</module>
                 <module>modules/flowable-app-engine-rest</module>
 				<module>modules/flowable-dmn-model</module>
@@ -1469,23 +1490,6 @@
                 <module>modules/flowable-cmmn-spring</module>
                 <module>modules/flowable-cmmn-spring-configurator</module>
                 <module>modules/flowable-cmmn-rest</module>
-				<module>modules/flowable-form-model</module>
-				<module>modules/flowable-form-json-converter</module>
-				<module>modules/flowable-form-engine</module>
-				<module>modules/flowable-form-engine-configurator</module>
-				<module>modules/flowable-form-spring</module>
-				<module>modules/flowable-form-spring-configurator</module>
-				<module>modules/flowable-form-rest</module>
-				<module>modules/flowable-idm-engine-configurator</module>
-				<module>modules/flowable-idm-spring</module>
-				<module>modules/flowable-idm-spring-configurator</module>
-                <module>modules/flowable-idm-rest</module>
-				<module>modules/flowable-content-engine</module>
-				<module>modules/flowable-content-engine-configurator</module>
-				<module>modules/flowable-content-spring</module>
-				<module>modules/flowable-content-spring-configurator</module>
-				<module>modules/flowable-content-rest</module>
-				<module>modules/flowable-spring</module>
 				<module>modules/flowable5-engine</module>
 				<module>modules/flowable5-compatibility</module>
 				<module>modules/flowable5-spring</module>

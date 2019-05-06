@@ -15,6 +15,7 @@ package org.flowable.task.service.impl;
 import java.util.Date;
 import java.util.List;
 
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -85,6 +86,20 @@ public class HistoricTaskLogEntryQueryImpl extends AbstractQuery<HistoricTaskLog
     @Override
     public HistoricTaskLogEntryQuery scopeDefinitionId(String scopeDefinitionId) {
         this.scopeDefinitionId = scopeDefinitionId;
+        return this;
+    }
+
+    @Override
+    public HistoricTaskLogEntryQuery caseInstanceId(String caseInstanceId) {
+        this.scopeId = caseInstanceId;
+        this.scopeType = ScopeTypes.CMMN;
+        return this;
+    }
+
+    @Override
+    public HistoricTaskLogEntryQuery caseDefinitionId(String caseDefinitionId) {
+        this.scopeDefinitionId = caseDefinitionId;
+        this.scopeType = ScopeTypes.CMMN;
         return this;
     }
 

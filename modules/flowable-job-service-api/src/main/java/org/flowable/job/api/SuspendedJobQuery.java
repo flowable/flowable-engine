@@ -40,6 +40,12 @@ public interface SuspendedJobQuery extends Query<SuspendedJobQuery, Job> {
     /** Only select jobs which exist for the given process definition id */
     SuspendedJobQuery processDefinitionId(String processDefinitionid);
     
+    /** Only select jobs which exist for the given element id */
+    SuspendedJobQuery elementId(String elementId);
+    
+    /** Only select jobs which exist for the given element name */
+    SuspendedJobQuery elementName(String elementName);
+    
     /** Only select jobs for the given scope identifier. */
     SuspendedJobQuery scopeId(String scopeId);
 

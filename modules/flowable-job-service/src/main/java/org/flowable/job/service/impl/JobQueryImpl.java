@@ -19,9 +19,9 @@ import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
 import org.flowable.job.service.impl.util.CommandContextUtil;
@@ -39,6 +39,8 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     protected String executionId;
     protected String handlerType;
     protected String processDefinitionId;
+    protected String elementId;
+    protected String elementName;
     protected String scopeId;
     protected String subScopeId;
     protected String scopeType;
@@ -94,6 +96,24 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
             throw new FlowableIllegalArgumentException("Provided process definition id is null");
         }
         this.processDefinitionId = processDefinitionId;
+        return this;
+    }
+    
+    @Override
+    public JobQueryImpl elementId(String elementId) {
+        if (elementId == null) {
+            throw new FlowableIllegalArgumentException("Provided element id is null");
+        }
+        this.elementId = elementId;
+        return this;
+    }
+    
+    @Override
+    public JobQueryImpl elementName(String elementName) {
+        if (elementName == null) {
+            throw new FlowableIllegalArgumentException("Provided element name is null");
+        }
+        this.elementName = elementName;
         return this;
     }
     

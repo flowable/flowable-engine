@@ -36,6 +36,7 @@ import org.flowable.bpmn.converter.child.DataOutputAssociationParser;
 import org.flowable.bpmn.converter.child.DataStateParser;
 import org.flowable.bpmn.converter.child.DocumentationParser;
 import org.flowable.bpmn.converter.child.ErrorEventDefinitionParser;
+import org.flowable.bpmn.converter.child.EscalationEventDefinitionParser;
 import org.flowable.bpmn.converter.child.ExecutionListenerParser;
 import org.flowable.bpmn.converter.child.FieldExtensionParser;
 import org.flowable.bpmn.converter.child.FlowNodeRefParser;
@@ -75,6 +76,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
         addGenericParser(new DataStateParser());
         addGenericParser(new DocumentationParser());
         addGenericParser(new ErrorEventDefinitionParser());
+        addGenericParser(new EscalationEventDefinitionParser());
         addGenericParser(new ExecutionListenerParser());
         addGenericParser(new FieldExtensionParser());
         addGenericParser(new FlowableEventListenerParser());
@@ -272,6 +274,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
 
                                     xtw.writeNamespace(attribute.getNamespacePrefix(), attribute.getNamespace());
                                     namespaceMap.put(attribute.getNamespacePrefix(), attribute.getNamespace());
+                                    localNamespaceMap.put(attribute.getNamespacePrefix(), attribute.getNamespace());
                                 }
 
                                 xtw.writeAttribute(attribute.getNamespacePrefix(), attribute.getNamespace(), attribute.getName(), attribute.getValue());

@@ -26,6 +26,7 @@ import org.flowable.bpmn.model.Artifact;
 import org.flowable.bpmn.model.Association;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ErrorEventDefinition;
+import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.Event;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.FlowElement;
@@ -530,6 +531,13 @@ public class RuntimeDisplayJsonClientResource {
                     eventNode.put("type", "error");
                     if (StringUtils.isNotEmpty(errorDef.getErrorCode())) {
                         eventNode.put("errorCode", errorDef.getErrorCode());
+                    }
+                    
+                } else if (eventDef instanceof EscalationEventDefinition) {
+                    EscalationEventDefinition escalationDef = (EscalationEventDefinition) eventDef;
+                    eventNode.put("type", "escalation");
+                    if (StringUtils.isNotEmpty(escalationDef.getEscalationCode())) {
+                        eventNode.put("escalationCode", escalationDef.getEscalationCode());
                     }
 
                 } else if (eventDef instanceof SignalEventDefinition) {

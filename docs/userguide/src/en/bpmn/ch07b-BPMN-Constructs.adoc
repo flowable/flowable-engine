@@ -3664,14 +3664,14 @@ For example, 404 status code is set with error code 'HTTP404'. +
 Status codes in 'handleStatusCodes' override those in 'failStatusCodes' when they are set in both. +
 Example: 400, 404, 500, 503 +
 Example: 3XX, 4XX, 5XX +
-|ignoreException|no|Flag for ignoring the exceptions. The exception is caught and stored as a variable with the name '<taskId>.errorMessage'.
+|ignoreException|no|Flag for ignoring the exceptions. The exception is caught and stored as a variable with the name '<taskId>ErrorMessage'.
 |saveRequestVariables|no|Flag to save request variables. +
 By default, only response related variables are stored as variables.
 |saveResponseParameters|no|Flag to save all response variables including HTTP status, headers etc. +
 By default, only the response body is stored as a variable.
 |resultVariablePrefix|no|Prefix for the execution variable names. +
-If prefix is not set, variables will be saved with name as '<taskId>'.'fieldName'. +
-For example, requestUrl is saved as 'task7.requestUrl' for task with id 'task7'.
+If prefix is not set, variables will be saved with name as '<taskId>FieldName'. +
+For example, requestUrl is saved as 'task7RequestUrl' for task with id 'task7'.
 |saveResponseParametersTransient|no|If resolves to true, the response body variable (and response header, status, etc. if set to be stored) will be stored as a transient variable.
 |saveResponseVariableAsJson|no|If resolves to true, the response body value will be stored as a JSON variable instead of a String. This is useful if the HTTP service returns JSON and you want to reference the fields using the dot notation (e.g. _myResponse.user.name_) later on.
 |httpActivityBehaviorClass|no|Full class name of custom extension of org.flowable.http.HttpActivityBehavior.
@@ -3696,7 +3696,7 @@ Content-Length: 777
 ===== Result variables
 
 Remember all the above execution variable names are prefixed by evaluated value of 'resultVariablePrefix'.
-For example the response status code can be accessed in another activity as 'task7.responseStatusCode'.
+For example the response status code can be accessed in another activity as 'task7ResponseStatusCode'.
 Here 'task7' is the 'id' of the service task. To override this behavior, set 'resultVariablePrefix' as required.
 
 [[bpmnHttpTaskExampleUsage]]

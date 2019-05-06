@@ -259,7 +259,7 @@ public class GroupQueryTest extends PluggableFlowableTestCase {
 
     @Test
     public void testNativeQuery() {
-        String baseQuerySql = "SELECT * FROM ACT_ID_GROUP";
+        String baseQuerySql = "SELECT * FROM " + IdentityTestUtil.getTableName("ACT_ID_GROUP", processEngineConfiguration);
 
         assertEquals(4, identityService.createNativeGroupQuery().sql(baseQuerySql).list().size());
 
@@ -270,8 +270,9 @@ public class GroupQueryTest extends PluggableFlowableTestCase {
                 identityService
                         .createNativeGroupQuery()
                         .sql(
-                                "SELECT aig.* from ACT_ID_GROUP aig" + " inner join ACT_ID_MEMBERSHIP aim on aig.ID_ = aim.GROUP_ID_ "
-                                        + " inner join ACT_ID_USER aiu on aiu.ID_ = aim.USER_ID_ where aiu.ID_ = #{id}")
+                                "SELECT aig.* from " + IdentityTestUtil.getTableName("ACT_ID_GROUP", processEngineConfiguration) + " aig" + " inner join "
+                                        + IdentityTestUtil.getTableName("ACT_ID_MEMBERSHIP", processEngineConfiguration) + " aim on aig.ID_ = aim.GROUP_ID_ "
+                                        + " inner join " + IdentityTestUtil.getTableName("ACT_ID_USER", processEngineConfiguration) + " aiu on aiu.ID_ = aim.USER_ID_ where aiu.ID_ = #{id}")
                         .parameter("id", "kermit").list().size());
 
         // paging

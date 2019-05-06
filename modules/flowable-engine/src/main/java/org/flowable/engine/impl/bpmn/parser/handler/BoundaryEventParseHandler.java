@@ -17,6 +17,7 @@ import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.CancelEventDefinition;
 import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.ErrorEventDefinition;
+import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.SignalEventDefinition;
@@ -52,7 +53,8 @@ public class BoundaryEventParseHandler extends AbstractFlowNodeBpmnParseHandler<
         }
 
         if (eventDefinition instanceof TimerEventDefinition || eventDefinition instanceof ErrorEventDefinition || eventDefinition instanceof SignalEventDefinition
-                || eventDefinition instanceof CancelEventDefinition || eventDefinition instanceof MessageEventDefinition || eventDefinition instanceof CompensateEventDefinition) {
+                || eventDefinition instanceof CancelEventDefinition || eventDefinition instanceof MessageEventDefinition 
+                || eventDefinition instanceof EscalationEventDefinition || eventDefinition instanceof CompensateEventDefinition) {
 
             bpmnParse.getBpmnParserHandlers().parseElement(bpmnParse, eventDefinition);
 

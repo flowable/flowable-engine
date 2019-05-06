@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CompensateEventDefinition;
+import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SignalEventDefinition;
@@ -38,7 +39,9 @@ public class IntermediateThrowEventValidator extends ProcessLevelValidator {
                 eventDefinition = throwEvent.getEventDefinitions().get(0);
             }
 
-            if (eventDefinition != null && !(eventDefinition instanceof SignalEventDefinition) && !(eventDefinition instanceof CompensateEventDefinition)) {
+            if (eventDefinition != null && !(eventDefinition instanceof SignalEventDefinition) && 
+                            !(eventDefinition instanceof EscalationEventDefinition) && !(eventDefinition instanceof CompensateEventDefinition)) {
+                
                 addError(errors, Problems.THROW_EVENT_INVALID_EVENTDEFINITION, process, throwEvent, "Unsupported intermediate throw event type");
             }
         }

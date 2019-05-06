@@ -58,7 +58,6 @@ public class TaskHelper {
         }
 
         CommandContextUtil.getTaskService().insertTask(taskEntity, fireCreateEvent);
-        CommandContextUtil.getCmmnHistoryManager().recordTaskCreated(taskEntity);
     }
 
     public static void deleteTask(String taskId, String deleteReason, boolean cascade) {

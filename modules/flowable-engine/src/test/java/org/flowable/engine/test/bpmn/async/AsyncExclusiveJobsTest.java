@@ -18,6 +18,7 @@ import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 
 public class AsyncExclusiveJobsTest extends PluggableFlowableTestCase {
 
@@ -26,6 +27,7 @@ public class AsyncExclusiveJobsTest extends PluggableFlowableTestCase {
      */
     @Test
     @Deployment
+    @DisabledIfSystemProperty(named = "database", matches = "cockroachdb")
     public void testExclusiveJobs() {
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {

@@ -130,6 +130,10 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     protected boolean asyncHistoryJsonGroupingEnabled;
     protected boolean asyncHistoryExecutorMessageQueueMode;
     protected int asyncHistoryJsonGroupingThreshold = 10;
+    
+    public JobServiceConfiguration(String engineName) {
+        super(engineName);
+    }
 
     // init
     // /////////////////////////////////////////////////////////////////////

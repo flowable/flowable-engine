@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
+    typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" 
+    targetNamespace="http://www.flowable.org/processdef">
+  <escalation id="escalation1" name="Escalation 1" escalationCode="firstEscalation" />
+  <escalation id="escalation2" name="Escalation 2" escalationCode="secondEscalation" />
+  <process id="escalationtest" name="escalationtest" isExecutable="true">
+    <startEvent id="start" />
+    <userTask id="task" name="Task" />
+    <sequenceFlow id="sid-AA22B839-7645-48E8-967B-9757A87F31F9" sourceRef="start" targetRef="task"/>
+    <intermediateCatchEvent id="escalationCatch">
+      <escalationEventDefinition escalationRef="escalation1"/>
+    </intermediateCatchEvent>
+    <sequenceFlow id="sid-D8D34DF9-5679-4AF8-B1AD-8ACCA3A2D801" sourceRef="task" targetRef="escalationCatch"/>
+    <intermediateThrowEvent id="escalationThrow">
+      <escalationEventDefinition escalationRef="escalation2"/>
+    </intermediateThrowEvent>
+    <sequenceFlow id="sid-A5CF9DA5-C1E2-42BE-A1AD-4D888D86FFCF" sourceRef="escalationCatch" targetRef="escalationThrow"/>
+    <endEvent id="endEvent"/>
+    <sequenceFlow id="sid-AD478EB5-1650-4D3E-BFE0-FBFFA70786AA" sourceRef="escalationThrow" targetRef="endEvent"/>
+  </process>
+</definitions>

@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.test.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -21,12 +23,16 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.common.engine.api.FlowableException;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
+import org.junit.runners.model.MultipleFailureException;
+import org.junit.runners.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +44,7 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(CmmnTestRunner.class);
     
     protected static CmmnEngineConfiguration cmmnEngineConfiguration;
+    protected static String deploymentId;
 
     public CmmnTestRunner(Class<?> klass) throws InitializationError {
         super(klass);
@@ -53,18 +60,73 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
     
     @Override
     protected void runChild(FrameworkMethod method, RunNotifier notifier) {
-        String deploymentId = null;
-        if (method.getAnnotation(Ignore.class) == null && method.getAnnotation(CmmnDeployment.class) != null) {
-            deploymentId = deployCmmnDefinition(method);
-        }
-        
         super.runChild(method, notifier);
         
-        if (deploymentId != null) {
-            deleteDeployment(deploymentId);
-        }
-        assertDatabaseEmpty(method);
     }
+
+    @Override
+    protected Statement withBefores(FrameworkMethod method, Object target, Statement statement) {
+        if (method.getAnnotation(Ignore.class) == null && method.getAnnotation(CmmnDeployment.class) != null) {
+
+            List<FrameworkMethod> befores = getTestClass().getAnnotatedMethods(Before.class);
+
+            return new Statement() {
+
+                @Override
+                public void evaluate() throws Throwable {
+                    for (FrameworkMethod before : befores) {
+                        before.invokeExplosively(target);
+                    }
+                    deploymentId = deployCmmnDefinition(method);
+                    statement.evaluate();
+                }
+
+            };
+        } else {
+            return super.withBefores(method, target, statement);
+        }
+
+    }
+
+    @Override
+    protected Statement withAfters(FrameworkMethod method, Object target, Statement statement) {
+        List<FrameworkMethod> afters = getTestClass().getAnnotatedMethods(After.class);
+
+        return new Statement() {
+
+            @Override
+            public void evaluate() throws Throwable {
+                List<Throwable> errors = new ArrayList<Throwable>();
+                try {
+                    statement.evaluate();
+                } catch (Throwable e) {
+                    errors.add(e);
+                } finally {
+
+                    if (deploymentId != null) {
+                        deleteDeployment(deploymentId);
+                        deploymentId = null;
+                    }
+
+                    for (FrameworkMethod each : afters) {
+                        try {
+                            each.invokeExplosively(target);
+                        } catch (Throwable e) {
+                            errors.add(e);
+                        }
+                    }
+
+                    if (errors == null || errors.isEmpty()) {
+                        assertDatabaseEmpty(method);
+                    }
+
+                }
+                MultipleFailureException.assertEmpty(errors);
+            }
+
+        };
+    }
+
 
     protected String deployCmmnDefinition(FrameworkMethod method) {
         try {

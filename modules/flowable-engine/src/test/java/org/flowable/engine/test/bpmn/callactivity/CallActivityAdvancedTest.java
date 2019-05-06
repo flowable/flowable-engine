@@ -48,6 +48,7 @@ import org.flowable.entitylink.api.HierarchyType;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -651,6 +652,53 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         taskService.complete(taskAfterSubProcess.getId());
         assertEquals(0, runtimeService.createExecutionQuery().count());
     }
+    
+    @Test
+    @Deployment(resources = {
+        "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml", 
+        "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" 
+    })
+    public void testSubProcessEndTime() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
+        Task taskBeforeSubProcess = taskService.createTaskQuery().singleResult();
+        assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
+        taskService.complete(taskBeforeSubProcess.getId());
+        Task taskInSubProcess = taskService.createTaskQuery().singleResult();
+        assertEquals("Task in subprocess", taskInSubProcess.getName());
+
+        runtimeService.deleteProcessInstance(processInstance.getId(), null);
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration, 20000)) {
+            List<HistoricProcessInstance> processes = historyService.createHistoricProcessInstanceQuery().list();
+            assertEquals(2, processes.size());
+    
+            for (HistoricProcessInstance process: processes) {
+                assertNotNull(process.getEndTime());
+            }
+        }
+    }
+    
+    @Test
+    @Deployment(resources = {
+        "org/flowable/engine/test/bpmn/callactivity/callActivityInEmbeddedSubProcess.bpmn20.xml", 
+        "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" 
+    })
+    public void testCallActivityInEmbeddedSubProcessEndTime() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("mainProcess");
+        Task taskInSubProcess = taskService.createTaskQuery().singleResult();
+        assertEquals("Task in subprocess", taskInSubProcess.getName());
+
+        runtimeService.deleteProcessInstance(processInstance.getId(), null);
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration, 20000)) {
+            List<HistoricProcessInstance> processes = historyService.createHistoricProcessInstanceQuery().list();
+            assertEquals(2, processes.size());
+    
+            for (HistoricProcessInstance process: processes) {
+                assertNotNull(process.getEndTime());
+            }
+        }
+    }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcessWithFallback.bpmn20.xml"},
@@ -818,6 +866,42 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         } finally {
             processEngineConfiguration.setFallbackToDefaultTenant(false);
         }
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/bpmn/callactivity/CallActivity.testAsyncSequentialMiCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
+    })
+    public void testAsyncSequentialMiCallActivity() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testAsyncMiCallActivity")
+                .variable("myList", Arrays.asList("one", "two", "three"))
+                .start();
+
+        Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(job);
+        managementService.executeJob(job.getId());
+
+        assertEquals(1, taskService.createTaskQuery().count());
+        Task task = taskService.createTaskQuery().singleResult();
+        taskService.complete(task.getId());
+
+        Job secondJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotSame(job.getId(), secondJob.getId());
+        managementService.executeJob(secondJob.getId());
+
+        task = taskService.createTaskQuery().singleResult();
+        taskService.complete(task.getId());
+
+        Job thirdJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotSame(secondJob.getId(), thirdJob.getId());
+        managementService.executeJob(thirdJob.getId());
+
+        task = taskService.createTaskQuery().singleResult();
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
     }
 
     protected void assertCallActivityToFallback() {

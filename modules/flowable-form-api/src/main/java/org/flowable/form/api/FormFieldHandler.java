@@ -14,8 +14,6 @@ package org.flowable.form.api;
 
 import java.util.Map;
 
-import org.flowable.common.engine.api.variable.VariableContainer;
-
 /**
  * Defines a form field handler.
  * 

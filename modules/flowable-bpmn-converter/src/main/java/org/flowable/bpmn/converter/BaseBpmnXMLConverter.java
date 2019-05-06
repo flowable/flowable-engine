@@ -35,6 +35,7 @@ import org.flowable.bpmn.model.CancelEventDefinition;
 import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.DataObject;
 import org.flowable.bpmn.model.ErrorEventDefinition;
+import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.Event;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.ExtensionAttribute;
@@ -396,29 +397,31 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
     protected void writeEventDefinitions(Event parentEvent, List<EventDefinition> eventDefinitions, BpmnModel model, XMLStreamWriter xtw) throws Exception {
         for (EventDefinition eventDefinition : eventDefinitions) {
             if (eventDefinition instanceof TimerEventDefinition) {
-                writeTimerDefinition(parentEvent, (TimerEventDefinition) eventDefinition, xtw);
+                writeTimerDefinition(parentEvent, (TimerEventDefinition) eventDefinition, model, xtw);
             } else if (eventDefinition instanceof SignalEventDefinition) {
-                writeSignalDefinition(parentEvent, (SignalEventDefinition) eventDefinition, xtw);
+                writeSignalDefinition(parentEvent, (SignalEventDefinition) eventDefinition, model, xtw);
             } else if (eventDefinition instanceof MessageEventDefinition) {
                 writeMessageDefinition(parentEvent, (MessageEventDefinition) eventDefinition, model, xtw);
             } else if (eventDefinition instanceof ErrorEventDefinition) {
-                writeErrorDefinition(parentEvent, (ErrorEventDefinition) eventDefinition, xtw);
+                writeErrorDefinition(parentEvent, (ErrorEventDefinition) eventDefinition, model, xtw);
+            } else if (eventDefinition instanceof EscalationEventDefinition) {
+                writeEscalationDefinition(parentEvent, (EscalationEventDefinition) eventDefinition, model, xtw);
             } else if (eventDefinition instanceof TerminateEventDefinition) {
-                writeTerminateDefinition(parentEvent, (TerminateEventDefinition) eventDefinition, xtw);
+                writeTerminateDefinition(parentEvent, (TerminateEventDefinition) eventDefinition, model, xtw);
             } else if (eventDefinition instanceof CancelEventDefinition) {
-                writeCancelDefinition(parentEvent, (CancelEventDefinition) eventDefinition, xtw);
+                writeCancelDefinition(parentEvent, (CancelEventDefinition) eventDefinition, model, xtw);
             } else if (eventDefinition instanceof CompensateEventDefinition) {
-                writeCompensateDefinition(parentEvent, (CompensateEventDefinition) eventDefinition, xtw);
+                writeCompensateDefinition(parentEvent, (CompensateEventDefinition) eventDefinition, model, xtw);
             }
         }
     }
 
-    protected void writeTimerDefinition(Event parentEvent, TimerEventDefinition timerDefinition, XMLStreamWriter xtw) throws Exception {
+    protected void writeTimerDefinition(Event parentEvent, TimerEventDefinition timerDefinition, BpmnModel model, XMLStreamWriter xtw) throws Exception {
         xtw.writeStartElement(ELEMENT_EVENT_TIMERDEFINITION);
         if (StringUtils.isNotEmpty(timerDefinition.getCalendarName())) {
             writeQualifiedAttribute(ATTRIBUTE_CALENDAR_NAME, timerDefinition.getCalendarName(), xtw);
         }
-        boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(timerDefinition, false, xtw);
+        boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(timerDefinition, false, model.getNamespaces(), xtw);
         if (didWriteExtensionStartElement) {
             xtw.writeEndElement();
         }
@@ -446,32 +449,35 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
         xtw.writeEndElement();
     }
 
-    protected void writeSignalDefinition(Event parentEvent, SignalEventDefinition signalDefinition, XMLStreamWriter xtw) throws Exception {
+    protected void writeSignalDefinition(Event parentEvent, SignalEventDefinition signalDefinition, BpmnModel model,
+        XMLStreamWriter xtw) throws Exception {
         xtw.writeStartElement(ELEMENT_EVENT_SIGNALDEFINITION);
         writeDefaultAttribute(ATTRIBUTE_SIGNAL_REF, signalDefinition.getSignalRef(), xtw);
         if (parentEvent instanceof ThrowEvent && signalDefinition.isAsync()) {
             BpmnXMLUtil.writeQualifiedAttribute(ATTRIBUTE_ACTIVITY_ASYNCHRONOUS, "true", xtw);
         }
-        boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(signalDefinition, false, xtw);
+        boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(signalDefinition, false, model.getNamespaces(), xtw);
         if (didWriteExtensionStartElement) {
             xtw.writeEndElement();
         }
         xtw.writeEndElement();
     }
 
-    protected void writeCancelDefinition(Event parentEvent, CancelEventDefinition cancelEventDefinition, XMLStreamWriter xtw) throws Exception {
+    protected void writeCancelDefinition(Event parentEvent, CancelEventDefinition cancelEventDefinition, BpmnModel model,
+        XMLStreamWriter xtw) throws Exception {
         xtw.writeStartElement(ELEMENT_EVENT_CANCELDEFINITION);
-        boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(cancelEventDefinition, false, xtw);
+        boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(cancelEventDefinition, false, model.getNamespaces(), xtw);
         if (didWriteExtensionStartElement) {
             xtw.writeEndElement();
         }
         xtw.writeEndElement();
     }
 
-    protected void writeCompensateDefinition(Event parentEvent, CompensateEventDefinition compensateEventDefinition, XMLStreamWriter xtw) throws Exception {
+    protected void writeCompensateDefinition(Event parentEvent, CompensateEventDefinition compensateEventDefinition, BpmnModel model,
+        XMLStreamWriter xtw) throws Exception {
         xtw.writeStartElement(ELEMENT_EVENT_COMPENSATEDEFINITION);
         writeDefaultAttribute(ATTRIBUTE_COMPENSATE_ACTIVITYREF, compensateEventDefinition.getActivityRef(), xtw);
-        boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(compensateEventDefinition, false, xtw);
+        boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(compensateEventDefinition, false, model.getNamespaces(), xtw);
         if (didWriteExtensionStartElement) {
             xtw.writeEndElement();
         }
@@ -498,24 +504,38 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
             }
         }
         writeDefaultAttribute(ATTRIBUTE_MESSAGE_REF, messageRef, xtw);
-        boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(messageDefinition, false, xtw);
+        boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(messageDefinition, false, model.getNamespaces(), xtw);
         if (didWriteExtensionStartElement) {
             xtw.writeEndElement();
         }
         xtw.writeEndElement();
     }
 
-    protected void writeErrorDefinition(Event parentEvent, ErrorEventDefinition errorDefinition, XMLStreamWriter xtw) throws Exception {
+    protected void writeErrorDefinition(Event parentEvent, ErrorEventDefinition errorDefinition, BpmnModel model, XMLStreamWriter xtw) throws Exception {
         xtw.writeStartElement(ELEMENT_EVENT_ERRORDEFINITION);
         writeDefaultAttribute(ATTRIBUTE_ERROR_REF, errorDefinition.getErrorCode(), xtw);
-        boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(errorDefinition, false, xtw);
+        boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(errorDefinition, false, model.getNamespaces(), xtw);
+        if (didWriteExtensionStartElement) {
+            xtw.writeEndElement();
+        }
+        xtw.writeEndElement();
+    }
+    
+    protected void writeEscalationDefinition(Event parentEvent, EscalationEventDefinition escalationDefinition, BpmnModel model,
+                    XMLStreamWriter xtw) throws Exception {
+        
+        xtw.writeStartElement(ELEMENT_EVENT_ESCALATIONDEFINITION);
+        writeDefaultAttribute(ATTRIBUTE_ESCALATION_REF, escalationDefinition.getEscalationCode(), xtw);
+        
+        boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(escalationDefinition, false, model.getNamespaces(), xtw);
         if (didWriteExtensionStartElement) {
             xtw.writeEndElement();
         }
         xtw.writeEndElement();
     }
 
-    protected void writeTerminateDefinition(Event parentEvent, TerminateEventDefinition terminateDefinition, XMLStreamWriter xtw) throws Exception {
+    protected void writeTerminateDefinition(Event parentEvent, TerminateEventDefinition terminateDefinition, BpmnModel model,
+        XMLStreamWriter xtw) throws Exception {
         xtw.writeStartElement(ELEMENT_EVENT_TERMINATEDEFINITION);
 
         if (terminateDefinition.isTerminateAll()) {
@@ -526,7 +546,7 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
             writeQualifiedAttribute(ATTRIBUTE_TERMINATE_MULTI_INSTANCE, "true", xtw);
         }
 
-        boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(terminateDefinition, false, xtw);
+        boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(terminateDefinition, false, model.getNamespaces(), xtw);
         if (didWriteExtensionStartElement) {
             xtw.writeEndElement();
         }

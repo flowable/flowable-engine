@@ -173,6 +173,8 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
                 .singleResult();
 
         assertEquals(2, asyncJob.getRetries());
+        assertEquals("theScriptTask", asyncJob.getElementId());
+        assertEquals("Execute script", asyncJob.getElementName());
 
         try {
             asyncJob = managementService.moveTimerToExecutableJob(asyncJob.getId());
@@ -185,6 +187,8 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         asyncJob = managementService.createTimerJobQuery()
                 .processInstanceId(processInstance.getId())
                 .singleResult();
+        assertEquals("theScriptTask", asyncJob.getElementId());
+        assertEquals("Execute script", asyncJob.getElementName());
 
         try {
             asyncJob = managementService.moveTimerToExecutableJob(asyncJob.getId());
@@ -197,12 +201,18 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         asyncJob = managementService.createDeadLetterJobQuery()
                 .processInstanceId(processInstance.getId())
                 .singleResult();
+        
+        assertEquals("theScriptTask", asyncJob.getElementId());
+        assertEquals("Execute script", asyncJob.getElementName());
 
         managementService.moveDeadLetterJobToExecutableJob(asyncJob.getId(), 5);
 
         asyncJob = managementService.createJobQuery()
                 .processInstanceId(processInstance.getId())
                 .singleResult();
+        
+        assertEquals("theScriptTask", asyncJob.getElementId());
+        assertEquals("Execute script", asyncJob.getElementName());
 
         assertEquals(5, asyncJob.getRetries());
     }
@@ -316,7 +326,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
     // ManagementService doesn't seem to give actual table Name for EventSubscriptionEntity.class
     @Test
     public void testGetTableName() {
-        String table = managementService.getTableName(EventSubscriptionEntity.class);
+        String table = managementService.getTableName(EventSubscriptionEntity.class, false);
         assertEquals("ACT_RU_EVENT_SUBSCR", table);
     }
 }

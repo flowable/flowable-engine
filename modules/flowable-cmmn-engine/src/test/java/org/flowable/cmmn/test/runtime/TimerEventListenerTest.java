@@ -57,6 +57,9 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
         
         Job timerJob = cmmnManagementService.createTimerJobQuery().scopeDefinitionId(caseInstance.getCaseDefinitionId()).singleResult();
         assertNotNull(timerJob);
+        assertEquals("timerListener", timerJob.getElementId());
+        assertEquals("Timer listener", timerJob.getElementName());
+        
         cmmnManagementService.moveTimerToExecutableJob(timerJob.getId());
         cmmnManagementService.executeJob(timerJob.getId());
         

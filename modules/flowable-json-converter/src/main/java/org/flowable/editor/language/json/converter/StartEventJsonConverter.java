@@ -17,6 +17,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.ErrorEventDefinition;
+import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.Event;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.EventSubProcess;
@@ -40,7 +41,6 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
     protected Map<String, ModelInfo> formKeyMap;
 
     public static void fillTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap, Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
-
         fillJsonTypes(convertersToBpmnMap);
         fillBpmnTypes(convertersToJsonMap);
     }
@@ -49,6 +49,7 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
         convertersToBpmnMap.put(STENCIL_EVENT_START_NONE, StartEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_START_TIMER, StartEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_START_ERROR, StartEventJsonConverter.class);
+        convertersToBpmnMap.put(STENCIL_EVENT_START_ESCALATION, StartEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_START_MESSAGE, StartEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_START_SIGNAL, StartEventJsonConverter.class);
     }
@@ -66,6 +67,8 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
                 return STENCIL_EVENT_START_TIMER;
             } else if (eventDefinition instanceof ErrorEventDefinition) {
                 return STENCIL_EVENT_START_ERROR;
+            } else if (eventDefinition instanceof EscalationEventDefinition) {
+                return STENCIL_EVENT_START_ESCALATION;
             } else if (eventDefinition instanceof MessageEventDefinition) {
                 return STENCIL_EVENT_START_MESSAGE;
             } else if (eventDefinition instanceof SignalEventDefinition) {
@@ -136,6 +139,8 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
             convertJsonToTimerDefinition(elementNode, startEvent);
         } else if (STENCIL_EVENT_START_ERROR.equals(stencilId)) {
             convertJsonToErrorDefinition(elementNode, startEvent);
+        } else if (STENCIL_EVENT_START_ESCALATION.equals(stencilId)) {
+            convertJsonToEscalationDefinition(elementNode, startEvent);
         } else if (STENCIL_EVENT_START_MESSAGE.equals(stencilId)) {
             convertJsonToMessageDefinition(elementNode, startEvent);
         } else if (STENCIL_EVENT_START_SIGNAL.equals(stencilId)) {
