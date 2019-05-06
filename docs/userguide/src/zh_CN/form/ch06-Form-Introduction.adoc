@@ -1,24 +1,20 @@
-[[form introduction]]
+[[formIntroduction]]
 
-== Form Introduction
-
+== 表单介绍
 [[whatIsFormDefinition]]
 
+=== 表单定义是什么？
 
-=== What is a form definition?
 
-For the BPMN engine, we adhere to the BPMN specification and for the DMN engine we use the DMN specification. For start and task forms there's no Oasis specification that can be used. Therefore, we have defined a JSON-based form definition structure that we use as an output format for the Flowable Form Editor and is used to render start and task forms in the Flowable Task application.
-
+对于BPMN引擎而言，我们沿用了BPMN规范，同理对与DMN引擎，我们使用了DMN规范。但是对于开始或任务表单，并不存在类似的共性问题让我们使用。因此，我们自己定义了一个基于JSON格式的的表单结构定义，我们使用这种结构作为Flowable表单编辑器的输出格式，而且我们会在Flowable任务应用中提取该结构让开始或任务表单使用。
 
 [[formDefining]]
 
-
 === Defining a form
 
-Create a new JSON file using your favourite text or JSON editor and give it a name. Make sure that the file *ends with .form*, as otherwise the Form engine won't pick up the file for deployment.
+用你最爱的文本或JSON编辑器新建一个JSON文件，然后给这个文件起个个性的名字。确保这个文件的后缀为.form，比如shareniu.fom,否则表单引擎将无法部署此文件。
 
-The form definition JSON starts with a _key_, _name_ and _description_. The _key_ property is used by the Form engine to identify the form definition across the whole Form engine. The versioning system is also based on the _key_ property being identical for form definitions that have the same origin. The second part is the array of fields that defines the form fields of the form definition. Optionally, there's a third part that defines the form outcomes.
-
+表单的JSON定义以key、name和description开头。表单引擎通过属性key来辨别表单在整个表单引擎中的唯一身份。对于来源相同的同一个表单定义的版本系统也是基于属性key运作的。第二部分是一个数组类型fields，表单定义的字段在这里阐明。第三部分是可选的，用来定义表单的结果outcomes。示例如下：
 [source,json,linenums]
 ----
 {
@@ -46,18 +42,27 @@ The form definition JSON starts with a _key_, _name_ and _description_. The _key
 }
 ----
 
-Each form field has an _id_, _name_ and _type_ property. The _id_ should be unique within the same form definition and is used as the variable name when a form is completed by a user. In this small example, an _input1_ process variable is created with the value of the text field the user has filled in.  The outcomes are also mapped to a variable based on the form's identifier, in the format of "+form_<form-identifier>_outcome"+.  For the example above, the selected outcome will be set for a variable named "+form_form1_outcome+".  In an expression, you can test if the outcome was 'Accept' using +${form_form1_outcome == "Accept"}+.
+每个表单字段都有一个id、name和type属性。在同一个表单定义中id应该是独一无二的。当一个用户完成表单后id还能当作变量名使用。在这个小例子中，一个名叫input1的流程变量被创建了，用户填入这个文本字段里的东西就是这个变量的值。结果outcomes也可以被映射成一个变量，此变量基于表单标识符，格式为："form_<form-identifier>_outcome"。举例说明，选中的结果会被设置为一个名叫"form_form1_outcome"的变量。你可以通过表达式${form_form1_outcome == "Accept"}来检验结果outcome是否为'Accept'
 
-The following form field types are supported:
+表单支持以下类型字段
 
-* text: rendered as a text field
-* multi-line-text: rendered as a text area field
-* integer: rendered as a text field, but only allows numeric values
-* boolean: rendered as a checkbox field
-* date: rendered as a date field
-* dropdown: rendered as a select field with the option values configured in the field definition
-* radio-buttons: rendered as a radio field with the option values configured in the field definition
-* people: rendered as a select field where a person from the Identity user table can be selected
-* functional-group: rendered as a select field where a group from the Identity group table can be selected
-* upload: rendered as an upload field
-* expression: rendered as a label and allows you to use JUEL expressions to use variables and/or other dynamic values in the label text
+* text: 文本字段
+* multi-line-text: 多行文本字段
+
+* integer: 文本字段，但是只允许数字类型的值
+
+* boolean: 复选框字段
+
+* date: 日期字段
+
+* dropdown: 选择框字段，定义字段时可以设置选项的值
+
+* radio-buttons: 单选字段，定义字段时可以设置选项的值
+
+* people: 选择框字段，可以选中用户表里的一个用户
+
+* functional-group: 选择框字段，可以选中分组表里的一个组
+
+* upload: 上传文件字段
+
+* expression:  一个标签，在标签文本中你可以运用JUEL表达式操作变量或其他动态的值
