@@ -118,7 +118,11 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
     public void deleteChildEntity(CommandContext commandContext, DelegatePlanItemInstance delegatePlanItemInstance, boolean cascade) {
         if (CallbackTypes.PLAN_ITEM_CHILD_CASE.equals(delegatePlanItemInstance.getReferenceType())) {
             CaseInstanceEntityManager caseInstanceEntityManager = CommandContextUtil.getCaseInstanceEntityManager(commandContext);
-            caseInstanceEntityManager.delete(delegatePlanItemInstance.getReferenceId(), cascade, null);
+            CaseInstanceEntity caseInstance = caseInstanceEntityManager.findById(delegatePlanItemInstance.getReferenceId());
+            if (caseInstance != null && !caseInstance.isDeleted()) {
+                caseInstanceEntityManager.delete(caseInstance.getId(), cascade, null);
+            }
+            
         } else {
             throw new FlowableException("Can only delete a child entity for a plan item with callback type " + CallbackTypes.PLAN_ITEM_CHILD_CASE);
         }
